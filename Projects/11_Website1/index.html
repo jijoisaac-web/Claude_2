@@ -502,6 +502,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <button class="tab-btn"        data-tab="nrenro"   onclick="showTab('nrenro',this)">&#127963; NRE vs NRO</button>
     <button class="tab-btn"        data-tab="homeloan" onclick="showTab('homeloan',this)">&#127968; Home Loan</button>
     <button class="tab-btn"        data-tab="return"   onclick="showTab('return',this)">&#9992;&#65039; Return Planner</button>
+    <button class="tab-btn"        data-tab="dtaa"     onclick="showTab('dtaa',this)">&#128200; Tax &amp; DTAA</button>
+    <button class="tab-btn"        data-tab="realty"   onclick="showTab('realty',this)">&#127968; Real Estate ROI</button>
   </div>
 
   <!-- TAB 1: LIVE RATES -->
@@ -819,6 +821,91 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="info">&#128203; <strong>India Inflation Reality:</strong> CPI has averaged 5&ndash;7% p.a. over the last decade. Healthcare and education inflate faster (~8&ndash;10%). Kids education fees in metro schools: &#8377;10K&ndash;40K/month. Family health floater: &#8377;15K&ndash;40K/year. Build in a 20% buffer for unexpected expenses.</div>
+  </div>
+  <!-- ══ DTAA TAX CALCULATOR ══════════════════════════════════════════════ -->
+  <div class="tool-section" id="tab-dtaa">
+    <div class="sec-head">
+      <h2>DTAA Tax Calculator</h2>
+      <p>India has Double Tax Avoidance Agreements (DTAA) with 90+ countries. NRIs can claim reduced TDS rates — often saving 15–20% on their India income.</p>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Your Details</div>
+      <div class="fg">
+        <div class="f">
+          <label>Country of Residence</label>
+          <select id="dtaa-country" onchange="calcDTAA()">
+            <option value="AED">🇦🇪 UAE (AED)</option>
+            <option value="SAR">🇸🇦 Saudi Arabia (SAR)</option>
+            <option value="QAR">🇶🇦 Qatar (QAR)</option>
+            <option value="KWD">🇰🇼 Kuwait (KWD)</option>
+            <option value="BHD">🇧🇭 Bahrain (BHD)</option>
+            <option value="OMR">🇴🇲 Oman (OMR)</option>
+            <option value="MYR">🇲🇾 Malaysia (MYR)</option>
+            <option value="SGD">🇸🇬 Singapore (SGD)</option>
+            <option value="AUD">🇦🇺 Australia (AUD)</option>
+            <option value="NZD">🇳🇿 New Zealand (NZD)</option>
+            <option value="USD">🇺🇸 USA (USD)</option>
+            <option value="CAD">🇨🇦 Canada (CAD)</option>
+            <option value="EUR">🇩🇪 Germany / Europe (EUR)</option>
+            <option value="GBP">🇬🇧 United Kingdom (GBP)</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Income Type</label>
+          <select id="dtaa-type" onchange="calcDTAA()">
+            <option value="interest">NRO FD / Savings Interest</option>
+            <option value="dividend">Dividend Income</option>
+            <option value="stcg">Short-Term Capital Gains (Equity)</option>
+            <option value="ltcg">Long-Term Capital Gains (Equity &gt;₹1L)</option>
+            <option value="rental">Rental Income (property in India)</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Annual Income Amount (₹)</label>
+          <input type="number" id="dtaa-income" value="200000" step="10000" oninput="calcDTAA()"/>
+        </div>
+      </div>
+      <button class="btn btn-amber" onclick="calcDTAA()">Calculate Tax Savings →</button>
+      <div id="dtaa-result" style="display:none;margin-top:28px">
+        <div class="rg" id="dtaa-grid"></div>
+        <div id="dtaa-info" class="info" style="margin-top:16px"></div>
+        <div id="dtaa-rates-table" style="margin-top:24px"></div>
+      </div>
+    </div>
+  </div>
+  <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
+  <div class="tool-section" id="tab-realty">
+    <div class="sec-head">
+      <h2>Real Estate ROI Calculator</h2>
+      <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Property Details</div>
+      <div class="fg">
+        <div class="f"><label>Property Value (₹ Lakhs)</label><input type="number" id="re-value" value="80" oninput="calcRealty()"/></div>
+        <div class="f"><label>Down Payment (%)</label><input type="number" id="re-dp" value="20" min="10" max="100" oninput="calcRealty()"/></div>
+        <div class="f"><label>Home Loan Interest Rate (% p.a.)</label><input type="number" id="re-rate" value="8.5" step="0.1" oninput="calcRealty()"/></div>
+        <div class="f"><label>Loan Tenure (Years)</label><input type="number" id="re-tenure" value="20" oninput="calcRealty()"/></div>
+      </div>
+      <div class="card-hd" style="margin-top:8px"><div class="card-hd-bar"></div>Rental &amp; Growth</div>
+      <div class="fg">
+        <div class="f"><label>Expected Monthly Rent (₹)</label><input type="number" id="re-rent" value="25000" oninput="calcRealty()"/></div>
+        <div class="f"><label>Annual Maintenance &amp; Repairs (₹)</label><input type="number" id="re-maint" value="30000" oninput="calcRealty()"/></div>
+        <div class="f"><label>Property Tax per Year (₹)</label><input type="number" id="re-ptax" value="15000" oninput="calcRealty()"/></div>
+        <div class="f"><label>Expected Annual Appreciation (%)</label><input type="number" id="re-apprec" value="6" step="0.5" oninput="calcRealty()"/></div>
+        <div class="f"><label>NRE FD Benchmark Rate (% p.a.)</label><input type="number" id="re-fd" value="7" step="0.25" oninput="calcRealty()"/></div>
+      </div>
+      <button class="btn btn-amber" onclick="calcRealty()">Calculate ROI →</button>
+      <div id="realty-result" style="display:none;margin-top:28px">
+        <div class="rg" id="realty-grid"></div>
+        <div id="realty-verdict" style="margin-top:16px"></div>
+        <div class="year-table-wrap" style="margin-top:20px">
+          <table class="year-table"><thead><tr><th>Year</th><th>Property Value</th><th>Annual Rent</th><th>EMI Paid</th><th>Net Cash Flow</th><th>Total Return</th></tr></thead>
+          <tbody id="realty-year-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="info">&#128203; <strong>NRI Repatriation Rule:</strong> You can repatriate up to USD 1 million per year from property sale proceeds (if purchased via NRE/foreign remittance). Rental income from NRO account: repatriate up to USD 1M/year with CA certificate. Always consult a FEMA-qualified CA before large transactions.</div>
   </div>
 </div>
 
@@ -1507,6 +1594,144 @@ window.addEventListener('DOMContentLoaded',()=>{
     .catch(()=>{})
     .finally(()=>updateAll());
 });
+// ══ DTAA TAX CALCULATOR ═════════════════════════════════════════════════════
+const DTAA_RATES={
+  AED:{country:'UAE',         interest:12.5, dividend:10, stcg:15, ltcg:10, rental:30, note:'UAE has no personal income tax. DTAA signed 1992. Submit TRC + Form 10F to bank.'},
+  SAR:{country:'Saudi Arabia',interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-KSA DTAA 2006. Reduced 10% on interest/dividends. Submit TRC to claim.'},
+  QAR:{country:'Qatar',       interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Qatar DTAA 1999. Claim by submitting Tax Residency Certificate to your bank.'},
+  KWD:{country:'Kuwait',      interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Kuwait DTAA 2006. Submit TRC + Form 10F before year end for TDS relief.'},
+  BHD:{country:'Bahrain',     interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Bahrain DTAA. Bahrain has no income tax, so interest TDS reduced to 10%.'},
+  OMR:{country:'Oman',        interest:12.5, dividend:12.5,stcg:15,ltcg:10, rental:30, note:'India-Oman DTAA 1997. Interest rate capped at 12.5%.'},
+  MYR:{country:'Malaysia',    interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Malaysia DTAA 1976 (revised). 10% on interest income.'},
+  SGD:{country:'Singapore',   interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-Singapore DTAA 1994. Interest/dividends capped at 15%.'},
+  AUD:{country:'Australia',   interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-Australia DTAA 1991. 15% withholding on interest/dividends.'},
+  NZD:{country:'New Zealand', interest:10,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-NZ DTAA 1986. Interest reduced to 10%, dividends 15%.'},
+  USD:{country:'USA',         interest:15,   dividend:25, stcg:15, ltcg:10, rental:30, note:'India-USA DTAA 1990. Note: Dividends TDS 25% (US treaty). FATCA compliance required for MF investments.'},
+  CAD:{country:'Canada',      interest:15,   dividend:25, stcg:15, ltcg:10, rental:30, note:'India-Canada DTAA 1996. Dividends 25%, interest 15%. File ITR in India for refund.'},
+  EUR:{country:'Germany/EU',  interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Germany DTAA (representative). Most EU countries: 10–15% on interest. Check specific country treaty.'},
+  GBP:{country:'UK',          interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-UK DTAA 1993. 15% on interest and dividends. Must file ITR in India to claim DTAA.'},
+};
+const STD_TDS={interest:31.2,dividend:20.8,stcg:15.6,ltcg:10.4,rental:31.2};
+const TYPE_LABEL={interest:'NRO FD/Savings Interest',dividend:'Dividend Income',stcg:'Short-Term Capital Gains',ltcg:'Long-Term Capital Gains',rental:'Rental Income'};
+
+function calcDTAA(){
+  const cur=document.getElementById('dtaa-country').value;
+  const type=document.getElementById('dtaa-type').value;
+  const income=parseFloat(document.getElementById('dtaa-income').value)||0;
+  const d=DTAA_RATES[cur];
+  const stdRate=STD_TDS[type];
+  const dtaaRate=d[type];
+  const stdTax=income*stdRate/100;
+  const dtaaTax=income*dtaaRate/100;
+  const saving=stdTax-dtaaTax;
+  const savingPct=((saving/stdTax)*100).toFixed(1);
+
+  const fmt=v=>'₹'+Math.round(v).toLocaleString('en-IN');
+  document.getElementById('dtaa-result').style.display='block';
+  document.getElementById('dtaa-grid').innerHTML=`
+    <div class="rg-card"><div class="rg-lbl">Standard TDS Rate</div><div class="rg-val" style="color:var(--red)">${stdRate}%</div><div class="rg-sub">Without DTAA benefit</div></div>
+    <div class="rg-card"><div class="rg-lbl">DTAA Rate (${d.country})</div><div class="rg-val" style="color:var(--green)">${dtaaRate}%</div><div class="rg-sub">With treaty benefit</div></div>
+    <div class="rg-card"><div class="rg-lbl">Standard TDS Amount</div><div class="rg-val" style="color:var(--red)">${fmt(stdTax)}</div><div class="rg-sub">Per year on ${fmt(income)}</div></div>
+    <div class="rg-card"><div class="rg-lbl">DTAA TDS Amount</div><div class="rg-val" style="color:var(--teal)">${fmt(dtaaTax)}</div><div class="rg-sub">Reduced under treaty</div></div>
+    <div class="rg-card" style="border:1px solid var(--amber-glow);background:var(--amber-dim)"><div class="rg-lbl">💰 Annual Tax Saving</div><div class="rg-val" style="color:var(--amber)">${fmt(saving)}</div><div class="rg-sub">That's ${savingPct}% less tax</div></div>
+    <div class="rg-card"><div class="rg-lbl">Effective Rate After DTAA</div><div class="rg-val">${dtaaRate}%</div><div class="rg-sub">vs ${stdRate}% standard</div></div>`;
+
+  document.getElementById('dtaa-info').innerHTML=`<strong>📋 How to Claim:</strong> ${d.note}<br><br>
+    <strong>Steps:</strong> (1) Obtain Tax Residency Certificate (TRC) from your country's tax authority &nbsp;·&nbsp;
+    (2) Fill <strong>Form 10F</strong> on the Indian Income Tax portal &nbsp;·&nbsp;
+    (3) Submit TRC + Form 10F + self-declaration to your Indian bank/broker before receiving income &nbsp;·&nbsp;
+    (4) File ITR in India to claim refund if excess TDS was deducted.`;
+
+  // DTAA rates comparison table
+  const rows=Object.entries(DTAA_RATES).map(([k,v])=>{
+    const rate=v[type];
+    const saving=((STD_TDS[type]-rate)/STD_TDS[type]*100).toFixed(0);
+    const isCur=k===cur;
+    return`<tr style="${isCur?'background:var(--amber-dim);':''}">
+      <td>${v.country}</td>
+      <td style="color:var(--red)">${STD_TDS[type]}%</td>
+      <td style="color:var(--green);font-weight:${isCur?700:400}">${rate}%</td>
+      <td style="color:var(--amber)">${saving}% saved</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('dtaa-rates-table').innerHTML=`
+    <div class="card-hd" style="margin-bottom:12px"><div class="card-hd-bar"></div>DTAA Rates Comparison — ${TYPE_LABEL[type]}</div>
+    <div class="year-table-wrap"><table class="year-table">
+      <thead><tr><th>Country</th><th>Standard TDS</th><th>DTAA Rate</th><th>Saving</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ══ REAL ESTATE ROI CALCULATOR ═══════════════════════════════════════════════
+function calcRealty(){
+  const val=parseFloat(document.getElementById('re-value').value)||0;   // lakhs
+  const dp=parseFloat(document.getElementById('re-dp').value)||20;
+  const rate=parseFloat(document.getElementById('re-rate').value)||8.5;
+  const tenure=parseFloat(document.getElementById('re-tenure').value)||20;
+  const rent=parseFloat(document.getElementById('re-rent').value)||0;   // monthly
+  const maint=parseFloat(document.getElementById('re-maint').value)||0; // annual
+  const ptax=parseFloat(document.getElementById('re-ptax').value)||0;   // annual
+  const apprec=parseFloat(document.getElementById('re-apprec').value)||6;
+  const fdRate=parseFloat(document.getElementById('re-fd').value)||7;
+
+  const propVal=val*100000; // in ₹
+  const loanAmt=propVal*(1-dp/100);
+  const downPay=propVal*(dp/100);
+  const mr=rate/12/100;
+  const n=tenure*12;
+  const emi=loanAmt>0?Math.round(loanAmt*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1)):0;
+
+  const annualRent=rent*12;
+  const netAnnualRent=annualRent-maint-ptax;
+  const grossYield=(annualRent/propVal*100).toFixed(2);
+  const netYield=(netAnnualRent/propVal*100).toFixed(2);
+  const annualEMI=emi*12;
+  const annualCashFlow=netAnnualRent-annualEMI;
+  const totalROI=(parseFloat(netYield)+apprec).toFixed(2);
+  const fdReturn=(downPay*fdRate/100);
+  const appreciationGain=propVal*apprec/100;
+  const totalAnnualGain=netAnnualRent+appreciationGain;
+  const effROI=(totalAnnualGain/propVal*100).toFixed(2);
+
+  const fmt=v=>'₹'+Math.round(v).toLocaleString('en-IN');
+  const fmtL=v=>'₹'+(v/100000).toFixed(1)+'L';
+  document.getElementById('realty-result').style.display='block';
+  document.getElementById('realty-grid').innerHTML=`
+    <div class="rg-card"><div class="rg-lbl">Monthly EMI</div><div class="rg-val" style="color:var(--red)">${fmt(emi)}</div><div class="rg-sub">On ${fmtL(loanAmt)} loan @ ${rate}%</div></div>
+    <div class="rg-card"><div class="rg-lbl">Gross Rental Yield</div><div class="rg-val">${grossYield}%</div><div class="rg-sub">Annual rent ÷ property value</div></div>
+    <div class="rg-card"><div class="rg-lbl">Net Rental Yield</div><div class="rg-val" style="color:var(--teal)">${netYield}%</div><div class="rg-sub">After maintenance &amp; tax</div></div>
+    <div class="rg-card"><div class="rg-lbl">Annual Cash Flow</div><div class="rg-val" style="color:${annualCashFlow>=0?'var(--green)':'var(--red)'}">${fmt(Math.abs(annualCashFlow))}</div><div class="rg-sub">${annualCashFlow>=0?'Surplus (rent > EMI)':'Shortfall (EMI > rent)'}</div></div>
+    <div class="rg-card"><div class="rg-lbl">Total ROI (yield + appreciation)</div><div class="rg-val" style="color:var(--amber)">${effROI}%</div><div class="rg-sub">vs NRE FD ${fdRate}%</div></div>
+    <div class="rg-card" style="${parseFloat(effROI)>fdRate?'border:1px solid var(--green);background:var(--green-dim)':'border:1px solid var(--red);background:var(--red-dim)'}">
+      <div class="rg-lbl">${parseFloat(effROI)>fdRate?'✅ Beats NRE FD':'⚠️ Below NRE FD'}</div>
+      <div class="rg-val">${(parseFloat(effROI)-fdRate).toFixed(1)}% ${parseFloat(effROI)>fdRate?'extra':'less'}</div>
+      <div class="rg-sub">Property ROI vs FD benchmark</div></div>`;
+
+  // Year-by-year projection (10 years)
+  let pv=propVal, tbody='', cumRent=0, cumEMI=0;
+  for(let y=1;y<=10;y++){
+    pv*=(1+apprec/100);
+    const yr=annualRent*Math.pow(1+0.04,y-1); // rent grows 4% p.a.
+    cumRent+=yr; cumEMI+=annualEMI;
+    const netRent=yr-maint-ptax;
+    const cf=netRent-annualEMI;
+    const totalReturn=cumRent+(pv-propVal)-cumEMI;
+    tbody+=`<tr>
+      <td>${y}</td>
+      <td>${fmtL(pv)}</td>
+      <td>${fmt(yr)}</td>
+      <td style="color:var(--red)">${fmt(annualEMI)}</td>
+      <td style="color:${cf>=0?'var(--green)':'var(--red)'}">${fmt(Math.abs(cf))} ${cf>=0?'▲':'▼'}</td>
+      <td style="color:var(--amber)">${fmtL(totalReturn)}</td>
+    </tr>`;
+  }
+  document.getElementById('realty-year-body').innerHTML=tbody;
+
+  const verdict=parseFloat(effROI)>fdRate
+    ?`<div class="info" style="border-color:var(--green)">✅ <strong>Good investment:</strong> Your total ROI of ${effROI}% beats the NRE FD benchmark of ${fdRate}%. The property generates both rental income and capital appreciation. Ensure you factor in stamp duty (5–7%), registration fees, and FEMA repatriation rules.</div>`
+    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real estate has illiquidity risk.</div>`;
+  document.getElementById('realty-verdict').innerHTML=verdict;
+}
 </script>
 </body>
 </html>
