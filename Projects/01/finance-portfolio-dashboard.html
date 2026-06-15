@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Finance Portfolio Dashboard",
+  "schemaVersion": 1,
+  "description": "Live personal finance portfolio dashboard. Pulls the Google Sheet \"Finance\" on each open, parses the summary + daily time series, and shows net worth, allocation, trend, composition-over-time and a holdings table across Mutual Funds, Indian Equity, DELL Shares, Cash, Fixed Deposit, PRS Malaysia and EPF Malaysia. INR/MYR toggle with editable FX rate. Sheet values are in INR.",
+  "mcpTools": [
+    "mcp__13cc7b57-0f3b-4edd-8dec-1cabf9b8d326__read_file_content"
+  ],
+  "mcpServerNames": [
+    "Google Drive"
+  ]
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Portfolio Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{ color-scheme: light;
+  --bg:#f6f8fc; --panel:#ffffff; --line:#e3e8f2; --txt:#1c2538;
+  --mut:#6b7794; --acc:#3b6fff; --grn:#12a86b; --red:#e23b5a; --amb:#d98a00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,Roboto,sans-serif;padding:22px;max-width:1320px;margin:0 auto}
+h1{font-size:22px;font-weight:680}
+.sub{color:var(--mut);font-size:13px;margin-top:4px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toggle{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.toggle button{background:transparent;color:var(--mut);border:0;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.toggle button.on{background:var(--acc);color:#fff}
+.rate{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--mut)}
+.rate input{width:74px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--txt);background:#fbfcff}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(20,30,60,.04)}
+.kpi .lab{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.kpi .val{font-size:24px;font-weight:730;margin-top:7px}
+.kpi .alt{color:var(--mut);font-size:13px;margin-top:3px}
+.pos{color:var(--grn)} .neg{color:var(--red)} .amber{color:var(--amb)}
+.row{display:grid;grid-template-columns:1.05fr 1fr;gap:14px;margin-top:14px}
+.row3{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+.ctitle{font-size:14px;font-weight:670;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.hint{font-size:11px;color:var(--mut);font-weight:500}
+.cwrap{position:relative;height:300px}
+.cwrap.tall{height:330px}
+.cwrap.mini{height:170px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+tbody.clk tr{cursor:pointer}
+tbody.clk tr:hover{background:#f0f4ff}
+tbody.clk tr.sel{background:#e8efff}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.foot{color:var(--mut);font-size:12px;margin-top:20px;text-align:center;line-height:1.6}
+.state{padding:40px;text-align:center;color:var(--mut);font-size:14px}
+.chips{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.chip .l{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
+.chip .v{font-size:18px;font-weight:700;margin-top:2px}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:650}
+.b-grn{background:#e3f7ee;color:#0c8a57} .b-red{background:#fde7eb;color:#c52541} .b-amb{background:#fdf0d9;color:#b3760a} .b-gry{background:#eef1f7;color:#6b7794}
+.detailgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.tabs button{border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+small.note{color:var(--mut);font-size:11px}
+.insight{border-left:3px solid var(--line);padding:9px 12px;margin-bottom:9px;background:#fbfcff;border-radius:0 8px 8px 0;font-size:13px;line-height:1.45}
+.insight.red{border-color:var(--red)} .insight.amb{border-color:var(--amb)} .insight.grn{border-color:var(--grn)} .insight.info{border-color:var(--acc)}
+.insight b{font-weight:680}
+.smix{margin-bottom:8px}
+.smix .lab{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.smix .bar{height:9px;border-radius:6px;background:#eef1f7;overflow:hidden}
+.smix .bar i{display:block;height:100%;border-radius:6px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.row,.detailgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <h1>Finance Portfolio Dashboard</h1>
+    <div class="sub" id="subline">Loading from Google Sheet…</div>
+  </div>
+  <div class="controls">
+    <div class="rate">1 ₹ = <input id="rate" type="number" step="0.0001" value="0.0412"/> RM</div>
+    <div class="toggle">
+      <button id="bINR" class="on" onclick="setCur('INR')">₹ INR</button>
+      <button id="bMYR" onclick="setCur('MYR')">RM MYR</button>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="grid kpis" id="kpis"></div>
+  <div class="row">
+    <div class="card"><div class="ctitle">Allocation by asset class</div><div class="cwrap"><canvas id="alloc"></canvas></div></div>
+    <div class="card"><div class="ctitle">Net worth — recent history</div><div class="cwrap"><canvas id="trend"></canvas></div></div>
+  </div>
+  <div class="row3">
+    <div class="card">
+      <div class="ctitle">Holdings by asset class <span class="hint">click a row to drill down ↓</span></div>
+      <table id="tbl"><thead><tr>
+        <th>Asset class</th><th>Invested</th><th>Current</th><th>Profit / Loss</th><th>Return</th><th>Weight</th>
+      </tr></thead><tbody class="clk"></tbody></table>
+    </div>
+  </div>
+
+  <div class="row3"><div class="card" id="drill">
+     <div class="tabs" id="tabs"></div>
+     <div class="ctitle" id="drillTitle"></div>
+     <div class="detailgrid">
+       <div><div class="cwrap mini"><canvas id="catTrend"></canvas></div><div id="drillChips" class="chips" style="margin-top:14px"></div></div>
+       <div id="drillBody"></div>
+     </div>
+  </div></div>
+
+  <div class="row3"><div class="card">
+     <div class="ctitle">Analysis &amp; rebalancing notes <span class="hint">auto-generated from your data — not financial advice</span></div>
+     <div class="detailgrid">
+       <div><div style="font-size:12px;font-weight:670;color:var(--mut);margin-bottom:10px">MUTUAL FUND STYLE MIX</div><div id="styleMix"></div></div>
+       <div id="analysisBody"></div>
+     </div>
+  </div></div>
+
+  <div class="row3"><div class="card">
+     <div class="ctitle">Mutual fund rebalance overview <span class="hint">current vs an illustrative target mix — not advice</span></div>
+     <div class="detailgrid">
+       <div id="mfRebalanceTbl"></div>
+       <div id="mfRebalanceNotes"></div>
+     </div>
+  </div></div>
+
+  <div class="row3">
+    <div class="card">
+      <div class="ctitle">Equity &amp; cash deployment strategy <span class="hint">based on MF composition + liquid cash — not advice</span></div>
+      <div class="detailgrid">
+        <div id="eqRecLeft"></div>
+        <div id="eqRecRight"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row3"><div class="card">
+    <div class="ctitle">Monthly / Annual income forecaster <span class="hint">FD interest · insurance maturity · ₹2L/month investment · 3-month intervals</span></div>
+    <div id="incomeForecaster"></div>
+  </div></div>
+
+  <div class="row3">
+    <div class="card"><div class="ctitle">Insurance &amp; pension commitments</div><div id="insBody"></div></div>
+  </div>
+
+  <div class="row3"><div class="card"><div class="ctitle">Composition over time</div><div class="cwrap tall"><canvas id="stack"></canvas></div></div></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<div class="state" id="state">Fetching latest data from your "Finance" sheet…</div>
+
+<script>
+const FILE_ID='1rb88bBTcS3Zq_VYTCc9hvdJhVgXdd_KdmI-auAc2_Mc';
+const TOOL='mcp__13cc7b57-0f3b-4edd-8dec-1cabf9b8d326__read_file_content';
+const CATS=[
+  {key:'mf',   name:'Mutual Funds',     cols:['Mutual Fund'], color:'#3b6fff', native:'INR'},
+  {key:'dell', name:'DELL Shares (US)', cols:['DELL Shares'], color:'#8b5cf6', native:'INR'},
+  {key:'cash', name:'Cash',             cols:['Cash NRE','Cash NRO'], color:'#12a86b', native:'INR'},
+  {key:'fd',   name:'Fixed Deposit',    cols:['Fixed Deposit'], color:'#06b6d4', native:'INR'},
+  {key:'eq',   name:'Indian Equity',    cols:['Equity','NRO-Derivatives','Zerodha Orbis'], color:'#e0a90f', native:'INR'},
+  {key:'prs',  name:'PRS Malaysia',     cols:['PRS Malaysia'], color:'#e23b5a', native:'MYR'},
+  {key:'epf',  name:'EPF Malaysia',     cols:['EPF Malaysia'], color:'#f97316', native:'MYR'},
+];
+// ── Income & forecast assumptions ──
+const INCOME_CFG = {
+  fd: { count:4, eachPrincipal:500000, ratePA:0.0645, payoutMonthly:true },  // 4 × ₹5L @ 6.45% monthly
+  insurance: [
+    { name:'Insurance / LIC policies', maturityYear:2028, annualIncomeAfter:120000, maturityLumpsum:null }
+    // maturityLumpsum will be read from sheet if available
+  ],
+  monthlyInvestment: 200000,   // ₹2L/month new investable capacity
+  existingSIP: 25000,          // Kotak ₹25K/month (already within the ₹2L)
+  assumedCAGR: 0.12,           // 12% blended on equity/MF corpus
+  fdReinvest: false,           // FD interest taken as income, not reinvested
+  projectionYears: 6,
+};
+
+// Transaction-level MF data — June 2026 report
+// LTCG: equity MF units held > 12 months; taxed at 12.5% above ₹1.25L/yr exemption
+const MF_TX = {
+  'axis midcap':{action:'hold',badge:'b-grn',label:'Hold — Do Not Touch',
+    note:'Crown jewel at 17.53% CAGR. Let it compound — target ₹34L in 5 years.',
+    ltcgGain:571000, estLtcgTax:57000,
+    tranches:[
+      {period:'Jun 2023',inv:950000,pl:571000,months:36,ltcg:true,gain:true,note:'Single switch-in, excellent timing'}
+    ]},
+  'nippon india growth':{action:'hold',badge:'b-grn',label:'Hold — Continue SIP',
+    note:'8% return is a timing illusion — ₹16L of ₹23L deployed <12 months ago.',
+    ltcgGain:0, estLtcgTax:0,
+    tranches:[
+      {period:'Dec 2023',inv:200000,pl:null,months:30,ltcg:true,gain:true,note:'Mature — compounding'},
+      {period:'Jul 2024',inv:200000,pl:null,months:23,ltcg:true,gain:true,note:'Building'},
+      {period:'May 2025',inv:100000,pl:null,months:13,ltcg:true,gain:true,note:'Just crossed LTCG'},
+      {period:'Jun–Sep 2025',inv:600000,pl:null,months:12,ltcg:false,gain:true,note:'Borderline — watch'},
+      {period:'Nov 2025–Apr 2026',inv:800000,pl:null,months:5,ltcg:false,gain:true,note:'Too early (STCG)'},
+    ]},
+  'kotak':{action:'hold',badge:'b-grn',label:'Hold — Continue ₹25K SIP',
+    note:'All 36 tranches in profit. Rupee cost averaging working perfectly.',
+    ltcgGain:120000, estLtcgTax:0,
+    tranches:[
+      {period:'Aug–Nov 2023',inv:150000,pl:null,months:34,ltcg:true,gain:true,note:'+53–58% — excellent'},
+      {period:'Jan–Apr 2024',inv:100000,pl:null,months:29,ltcg:true,gain:true,note:'+38.7%'},
+      {period:'May–Aug 2024',inv:75000,pl:null,months:25,ltcg:true,gain:true,note:'+11.1%'},
+      {period:'Oct–Dec 2024',inv:75000,pl:null,months:20,ltcg:true,gain:true,note:'+4.9%'},
+      {period:'Jan–May 2025',inv:125000,pl:null,months:17,ltcg:true,gain:true,note:'+17.5%'},
+      {period:'Jun–Jul 2025 (₹4L lumpsums)',inv:400000,pl:null,months:12,ltcg:true,gain:true,note:'+11.3%, well-timed'},
+      {period:'Jul–Dec 2025',inv:150000,pl:null,months:9,ltcg:false,gain:true,note:'+1.5% (STCG)'},
+      {period:'Jan–Apr 2026',inv:100000,pl:null,months:4,ltcg:false,gain:true,note:'+5.6% (STCG)'},
+    ]},
+  'nippon india large':{action:'exit',badge:'b-red',label:'EXIT — Redeploy ₹20L',
+    note:'Every tranche in red. NAV fell ₹105 → ₹97.48 in 6 months. ₹28K loss offsets LTCG gains.',
+    ltcgGain:-28000, estLtcgTax:0,
+    tranches:[
+      {period:'2 Jan 2024',inv:200000,pl:-3640,months:29,ltcg:true,gain:false,note:'2.4 yrs — still negative'},
+      {period:'24 Jan 2025',inv:200000,pl:-27000,months:17,ltcg:true,gain:false,note:''},
+      {period:'4 Mar 2025',inv:200000,pl:-18000,months:15,ltcg:true,gain:false,note:''},
+      {period:'12 May 2025',inv:200000,pl:-870,months:13,ltcg:true,gain:false,note:''},
+      {period:'22 May 2025',inv:200000,pl:-870,months:13,ltcg:true,gain:false,note:''},
+      {period:'29 May 2025',inv:200000,pl:-4400,months:12,ltcg:true,gain:false,note:'12m — verify exit load'},
+      {period:'10 Jun 2025',inv:200000,pl:-7800,months:12,ltcg:true,gain:false,note:'12m — verify exit load'},
+      {period:'9 Jul 2025',inv:200000,pl:-9200,months:11,ltcg:false,gain:false,note:'STCG'},
+      {period:'1 Oct 2025',inv:200000,pl:-9200,months:8,ltcg:false,gain:false,note:'STCG'},
+      {period:'31 Dec 2025',inv:200000,pl:-15000,months:5,ltcg:false,gain:false,note:'STCG'},
+    ]},
+  'parag parikh':{action:'hold',badge:'b-amb',label:'Hold — Give Time',
+    note:'All 5 tranches now ≥12 months — crossed LTCG threshold. Quality fund, flat due to USD headwinds.',
+    ltcgGain:-4000, estLtcgTax:0,
+    tranches:[
+      {period:'12 May 2025',inv:200000,pl:0,months:13,ltcg:true,gain:false,note:'Flat'},
+      {period:'21 May 2025',inv:200000,pl:0,months:13,ltcg:true,gain:false,note:'Flat'},
+      {period:'22 May 2025',inv:200000,pl:0,months:13,ltcg:true,gain:false,note:'Flat'},
+      {period:'29 May 2025',inv:200000,pl:0,months:13,ltcg:true,gain:false,note:'Flat'},
+      {period:'10 Jun 2025',inv:200000,pl:-5100,months:12,ltcg:true,gain:false,note:'Just crossed LTCG'},
+    ]},
+  'canara robeco':{action:'topup',badge:'b-grn',label:'Hold + Top Up ₹8L',
+    note:'Jan 2024 tranche +18.5% — proves large cap worked; Nippon same vintage is negative.',
+    ltcgGain:34600, estLtcgTax:0,
+    tranches:[
+      {period:'2 Jan 2024',inv:200000,pl:37000,months:29,ltcg:true,gain:true,note:'+18.5% — best large cap'},
+      {period:'31 Dec 2024',inv:200000,pl:-2400,months:18,ltcg:true,gain:false,note:'Building'},
+    ]},
+  'quant multi':{action:'hold',badge:'b-grn',label:'Hold',
+    note:'Multi-asset stabiliser. Apr 2024 tranche +33.5%. Recent units too fresh to judge.',
+    ltcgGain:79000, estLtcgTax:0,
+    tranches:[
+      {period:'12 Apr 2024',inv:200000,pl:67000,months:26,ltcg:true,gain:true,note:'+33.5% — strong'},
+      {period:'31 Dec 2024',inv:200000,pl:12000,months:18,ltcg:true,gain:true,note:'+6%'},
+      {period:'1 Apr 2026',inv:400000,pl:36000,months:2,ltcg:false,gain:true,note:'+9% (STCG — too early)'},
+      {period:'6 May 2026',inv:200000,pl:3000,months:1,ltcg:false,gain:true,note:'+1.5% (STCG — very fresh)'},
+    ]},
+};
+function findTx(name){
+  const n=(name||'').toLowerCase();
+  return Object.entries(MF_TX).find(([k])=>{ const kw=k.split(' '); return kw.every(w=>n.includes(w))||n.startsWith(k.slice(0,6)); });
+}
+
+let CUR='INR', RATE=parseFloat(localStorage.getItem('inrmyr')||'0.0412');
+let D=null, charts={}, SEL=null;
+document.getElementById('rate').value=RATE;
+
+const num=s=>{ if(s==null)return null; s=(''+s).replace(/,/g,'').replace(/\\/g,'').replace(/[₹$]/g,'').trim(); const v=parseFloat(s); return isNaN(v)?null:v; };
+const cells=l=>l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim());
+const isSep=l=>/^\|?[\s:|-]+\|?$/.test(l)&&l.includes('-');
+
+// Parse HTML tables (returned by Google Drive MCP for Sheets)
+function parseHtmlTables(t){
+  const out=[];
+  const tRe=/<table[^>]*>([\s\S]*?)<\/table>/gi;
+  let tm;
+  while((tm=tRe.exec(t))!==null){
+    const rows=[];
+    const rRe=/<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let rm;
+    while((rm=rRe.exec(tm[1]))!==null){
+      const cs=[];
+      const cRe=/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+      let cm;
+      while((cm=cRe.exec(rm[1]))!==null){
+        cs.push(cm[1].replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ').replace(/&#[0-9]+;/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim());
+      }
+      if(cs.length)rows.push(cs);
+    }
+    if(rows.length>1)out.push({header:rows[0],rows:rows.slice(1)});
+  }
+  return out;
+}
+
+// Auto-detect HTML vs markdown and dispatch accordingly
+function parseTables(t){
+  if(/<table/i.test(t)) return parseHtmlTables(t);
+  const lines=t.split('\n');const bl=[];let c=[];
+  for(const l of lines){if(l.trim().startsWith('|'))c.push(l);else{if(c.length)bl.push(c);c=[]}}
+  if(c.length)bl.push(c);
+  return bl.map(b=>{const rows=b.filter(l=>!isSep(l)).map(cells);return{header:rows[0]||[],rows:rows.slice(1)};});
+}
+
+function extractText(res){
+  // Score a string by how many lines look like markdown table rows
+  const mdScore=s=>s.split('\n').filter(l=>l.trim().startsWith('|')).length;
+  let bestTable='', bestScore=0, plain='';
+  const seen=new Set();
+  function walk(x){
+    if(x==null) return;
+    if(typeof x==='string'){
+      if(x.length>plain.length) plain=x;
+      if(x.indexOf('|')>=0 && x.indexOf('\n')>=0){
+        const sc=mdScore(x);
+        // Prefer by markdown table row count; break ties by length
+        if(sc>bestScore||(sc===bestScore&&x.length>bestTable.length)){bestTable=x;bestScore=sc;}
+      } else if(/<table/i.test(x)&&x.length>bestTable.length){bestTable=x;}
+      const ch=x.charAt(0);
+      if(ch==='{'||ch==='['){ try{ walk(JSON.parse(x)); }catch(e){} }
+      return;
+    }
+    if(typeof x==='object'){ if(seen.has(x)) return; seen.add(x); for(const k in x){ try{ walk(x[k]); }catch(e){} } }
+  }
+  walk(res);
+  return bestTable||plain||'';
+}
+function cleanStatus(s){ return (s||'').replace(/[^\x20-\x7E]/g,'').trim(); }
+
+function buildModel(text){
+  const T=parseTables(text);
+  let ts=T.find(t=>t.header[0]&&/^date/i.test(t.header[0]));
+  if(!ts) ts=T.find(t=>t.header.some(h=>/grand total/i.test(h||'')));
+  if(!ts){ window.__rawSample=text; throw new Error('Data table not found ('+T.length+' tables, '+text.length+' chars). SAMPLE >>> '+text.slice(0,700).replace(/[<>]/g,' ')); }
+  const hdr=ts.header;
+  const series=ts.rows.filter(r=>/^\d{4}-\d{2}-\d{2}/.test(r[0]||'')).map(r=>{const rec={date:r[0]};hdr.forEach((h,j)=>{if(j>1)rec[h]=num(r[j]);});return rec;}).sort((a,b)=>a.date<b.date?-1:1);
+  const sm=T.find(t=>/^name/i.test(t.header[0]||'')&&t.header.some(h=>/invested/i.test(h))&&t.header.length<=6);
+  const summary={}; if(sm) sm.rows.forEach(r=>{ if(r[0]) summary[r[0]]={invested:num(r[1]),current:num(r[2])}; });
+
+  const detail={};
+  const eq=T.find(t=>/zerodha/i.test(t.header[0]||''));
+  detail.eq= eq? eq.rows.map(r=>({name:(r[1]||'').replace('NSE:',''),qty:num(r[2]),avg:num(r[3]),inv:num(r[4]),ltp:num(r[5]),cur:num(r[6]),pl:num(r[8]),roe:cleanStatus(r[12]),sector:r[15]})).filter(x=>x.name&&x.qty>0):[];
+  const mf=T.find(t=>/^start date/i.test(t.header[0]||'')&&t.header.some(h=>/liquidate/i.test(h)));
+  detail.mf= mf? mf.rows.map(r=>({house:r[2],name:r[4],start:r[0],inv:num(r[9]),units:num(r[10]),cur:num(r[11]),pl:num(r[12]),ret:cleanStatus(r[13]),cagr:cleanStatus(r[17]),taxLTCG:num(r[20])})).filter(x=>x.inv>0):[];
+  const ev=T.filter(t=>/^start date/i.test(t.header[0]||'')&&t.header.some(h=>/evaluation/i.test(h)));
+  detail.prs=[];detail.epf=[];
+  ev.forEach(t=>t.rows.forEach(r=>{const h=r[2]||'';if(!h)return;
+    if(/public mutual/i.test(h)) detail.prs.push({acct:h,name:r[4],inv:num(r[9]),cur:num(r[11]),pl:num(r[12]),ret:cleanStatus(r[13])});
+    else if(/kwsp/i.test(h)){ const cur=Math.max(num(r[10])||0,num(r[11])||0,num(r[12])||0); detail.epf.push({acct:h,cur:cur}); }
+  }));
+  const cash=T.find(t=>/^account/i.test(t.header[0]||'')&&t.header.some(h=>/closing balance/i.test(h)));
+  detail.cash= cash? cash.rows.map(r=>({acct:r[0],updated:r[1],bal:num(r[2]),type:r[3]})).filter(x=>x.acct):[];
+  const ins=T.find(t=>/^name/i.test(t.header[0]||'')&&t.header.some(h=>/premium due/i.test(h)));
+  detail.ins=[];
+  if(ins) ins.rows.filter(r=>r[0]&&!/^PRS Malaysia/i.test(r[0])).forEach(r=>{
+    const isLIC=/^LIC/i.test(r[0]);
+    if(isLIC) detail.ins.push({name:r[0].replace(/\\/,'').trim()+' ('+r[1]+')',due:r[6],term:r[7],maturity:r[8],premium:r[9],sum:num(r[10]),plan:r[12]});
+    else detail.ins.push({name:r[0],due:r[5],maturity:r[6],plan:r[8],premiumAnnual:num(r[9]),premiumMonthly:num(r[10])});
+  });
+  const wl=T.find(t=>/^stock name/i.test(t.header[0]||''));
+  detail.watch= wl? wl.rows.map(r=>({name:r[0],code:r[1],cmp:num(r[2]),buyLow:num(r[3]),buyHigh:num(r[4]),base:num(r[6]),status:cleanStatus(r[10]),upside:cleanStatus(r[11])})).filter(x=>x.name&&x.cmp&&x.buyLow):[];
+  const dell=T.find(t=>/^dell shares/i.test(t.header[0]||''));
+  detail.dellShares= dell? num(dell.rows[0]?dell.rows[0][0]:dell.header[1]) : null;
+
+  return {series, summary, updated: series[series.length-1].date, detail};
+}
+
+function conv(v,native){ native=native||'INR'; if(v==null)return 0; if(native===CUR)return v; if(native==='INR'&&CUR==='MYR')return v*RATE; if(native==='MYR'&&CUR==='INR')return v/RATE; return v; }
+const sym=()=>CUR==='INR'?'₹':'RM';
+function fmt(v,n){ return sym()+' '+conv(v,n).toLocaleString(undefined,{maximumFractionDigits:0}); }
+function fmtC(v,n){ v=conv(v,n); const a=Math.abs(v); let s; if(CUR==='INR') s=a>=1e7?(v/1e7).toFixed(2)+' Cr':a>=1e5?(v/1e5).toFixed(2)+' L':v.toFixed(0); else s=a>=1e6?(v/1e6).toFixed(2)+'M':a>=1e3?(v/1e3).toFixed(1)+'k':v.toFixed(0); return sym()+' '+s; }
+const tick=v=>{ if(CUR==='INR')return v>=1e7?'₹'+(v/1e7).toFixed(1)+'Cr':'₹'+(v/1e5).toFixed(0)+'L'; return 'RM'+(v/1e6).toFixed(1)+'M'; };
+const plc=v=> v>=0?'pos':'neg';
+
+function catAgg(){
+  const last=D.series[D.series.length-1];
+  return CATS.map(c=>{ let cur=0,inv=0; c.cols.forEach(col=>{cur+=last[col]||0; const s=D.summary[col]; if(s&&s.invested!=null)inv+=s.invested;});
+    return {...c,current:cur,invested:inv,pl:cur-inv}; }).filter(c=>c.current>0||c.invested>0);
+}
+
+function render(){
+  if(!D)return;
+  const cats=catAgg();
+  const total=cats.reduce((a,c)=>a+c.current,0);
+  const totInv=cats.reduce((a,c)=>a+c.invested,0);
+  const totPL=total-totInv, plPct=totInv?totPL/totInv*100:0;
+  const other=CUR==='INR'?('RM '+(total*RATE).toLocaleString(undefined,{maximumFractionDigits:0})):('₹ '+total.toLocaleString(undefined,{maximumFractionDigits:0}));
+  document.getElementById('kpis').innerHTML=`
+   <div class="card kpi"><div class="lab">Net Worth</div><div class="val">${fmt(total)}</div><div class="alt">${other}</div></div>
+   <div class="card kpi"><div class="lab">Total Invested</div><div class="val">${fmt(totInv)}</div><div class="alt">cost basis (where tracked)</div></div>
+   <div class="card kpi"><div class="lab">Unrealised P/L</div><div class="val ${plc(totPL)}">${totPL>=0?'+':''}${fmt(totPL)}</div><div class="alt ${plc(totPL)}">${plPct>=0?'+':''}${plPct.toFixed(2)}%</div></div>
+   <div class="card kpi"><div class="lab">Asset Classes</div><div class="val">${cats.length}</div><div class="alt">click any row to drill down</div></div>`;
+
+  const tb=document.querySelector('#tbl tbody');
+  const sorted=cats.slice().sort((a,b)=>b.current-a.current);
+  tb.innerHTML=sorted.map(c=>{ const pct=c.invested?c.pl/c.invested*100:0,w=total?c.current/total*100:0;
+    return `<tr data-key="${c.key}" class="${SEL===c.key?'sel':''}"><td><span class="dot" style="background:${c.color}"></span>${c.name}</td>
+      <td>${fmtC(c.invested)}</td><td>${fmtC(c.current)}</td>
+      <td class="${plc(c.pl)}">${c.pl>=0?'+':''}${fmtC(c.pl)}</td>
+      <td class="${plc(c.pl)}">${c.invested?(pct>=0?'+':'')+pct.toFixed(1)+'%':'—'}</td>
+      <td>${w.toFixed(1)}%</td></tr>`; }).join('');
+  tb.querySelectorAll('tr').forEach(tr=>tr.onclick=()=>selectCat(tr.dataset.key));
+
+  document.getElementById('subline').textContent=`Last updated ${D.updated} • values in ${CUR} • ${D.series.length} days of history`;
+  document.getElementById('foot').innerHTML=`Live from Google Sheet "Finance". Sheet stored in INR; MYR at 1 INR = ${RATE} MYR (editable). PRS &amp; EPF holding-level figures are native RM. Unrealised P/L vs recorded cost basis; cash &amp; FD show no cost-basis gain.`;
+
+  if(!SEL) SEL='mf';
+  buildTabs(cats);
+  renderDetail();
+  renderAnalysis(cats,total);
+  renderMFRebalance();
+  renderEquityRec();
+  renderIncomeForecaster();
+  renderInsurance();
+  drawOverviewCharts(cats,total);
+}
+
+function buildTabs(cats){
+  const t=document.getElementById('tabs');
+  t.innerHTML=cats.map(c=>`<button class="${SEL===c.key?'on':''}" data-k="${c.key}">${c.name}</button>`).join('');
+  t.querySelectorAll('button').forEach(b=>b.onclick=()=>selectCat(b.dataset.k));
+}
+function selectCat(k){ SEL=k; render(); document.getElementById('drill').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+
+function buildTxTable(txd){
+  if(!txd||!txd.tranches||!txd.tranches.length) return '<small class="note">No tranche data.</small>';
+  let h='<div style="background:#f6f8fc;border-radius:8px;padding:12px;margin:6px 0">';
+  h+='<table style="font-size:12px"><thead><tr><th style="text-align:left">Period / Tranche</th><th>Invested</th><th>Months held</th><th>Tax type</th><th>P/L</th><th>Note</th></tr></thead><tbody>';
+  h+=txd.tranches.map(t=>{
+    const taxBadge=t.ltcg?'<span class="badge b-grn">LTCG</span>':'<span class="badge b-red">STCG</span>';
+    const pl=t.pl!=null?(t.pl>=0?`<span class="pos">+₹${Math.abs(t.pl).toLocaleString()}</span>`:`<span class="neg">-₹${Math.abs(t.pl).toLocaleString()}</span>`):'—';
+    return `<tr><td style="text-align:left">${t.period}</td><td>₹${(t.inv/100000).toFixed(1)}L</td><td>${t.months}m</td><td>${taxBadge}</td><td>${pl}</td><td><small class="note">${t.note||''}</small></td></tr>`;
+  }).join('');
+  h+='</tbody></table>';
+  if(txd.ltcgGain>0) h+=`<div style="margin-top:8px;font-size:12px">Est. LTCG gain: <b>₹${(txd.ltcgGain/100000).toFixed(2)}L</b> · Est. tax: <b>₹${(txd.estLtcgTax/1000).toFixed(0)}K</b> <small class="note">(12.5% on gain above ₹1.25L exemption)</small></div>`;
+  if(txd.ltcgGain<0) h+=`<div style="margin-top:8px;font-size:12px"><span class="pos">LTCG loss: ₹${Math.abs(txd.ltcgGain/1000).toFixed(0)}K — can offset gains elsewhere</span></div>`;
+  h+='</div>';
+  return h;
+}
+function expandTx(row,name){
+  const id='tx-'+name.replace(/\s/g,'-');
+  const el=document.getElementById(id);
+  if(el) el.style.display=el.style.display==='none'?'':'none';
+}
+
+function renderDetail(){
+  const c=CATS.find(x=>x.key===SEL); const det=D.detail; const nat=c.native;
+  document.getElementById('drillTitle').innerHTML=`${c.name} — holdings`;
+  let rows=[], totCur=0, totInv=0, body='';
+  const head=(cols)=>`<table><thead><tr>${cols.map((h,i)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  if(SEL==='mf'){ rows=det.mf; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Fund','Invested','Current','Return','CAGR','Action','LTCG status'])+rows.sort((a,b)=>b.cur-a.cur).map(x=>{
+      const p=x.inv?(x.cur-x.inv)/x.inv*100:0;
+      const tx=findTx(x.name);
+      const txd=tx?tx[1]:null;
+      const actionBadge=txd?`<span class="badge ${txd.badge}">${txd.label}</span>`:'—';
+      let ltcgSummary='—';
+      if(txd){
+        const ltcgCount=txd.tranches.filter(t=>t.ltcg).length;
+        const total=txd.tranches.length;
+        ltcgSummary=ltcgCount===total?'<span class="badge b-grn">All LTCG</span>':
+          ltcgCount===0?'<span class="badge b-red">All STCG</span>':
+          `<span class="badge b-amb">${ltcgCount}/${total} LTCG</span>`;
+      }
+      return `<tr onclick="expandTx(this,'${x.name.replace(/'/g,"\\'")}')"><td><b>${x.name}</b>${txd?'<br><small class="note">'+txd.note+'</small>':''}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.cur-x.inv)}">${(p>=0?'+':'')+p.toFixed(1)}%</td><td>${x.cagr||'—'}</td><td>${actionBadge}</td><td>${ltcgSummary}</td></tr>`+
+        `<tr class="tx-detail" id="tx-${x.name.replace(/\s/g,'-')}" style="display:none"><td colspan="7">${buildTxTable(txd)}</td></tr>`;
+    }).join('')+'</tbody></table><small class="note">Click any fund row to expand tranche-level LTCG/STCG detail. LTCG = held &gt;12 months, taxed at 12.5% above ₹1.25L/yr exemption.</small>';
+  } else if(SEL==='eq'){ rows=det.eq; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Stock','Qty','Avg buy','LTP','Invested','Current','P/L','ROE'])+rows.sort((a,b)=>b.cur-a.cur).map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${(x.avg||0).toFixed(1)}</td><td>${(x.ltp||0).toFixed(1)}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.pl)}">${fmtC(x.pl,nat)}</td><td class="${(x.roe||'').includes('-')?'neg':'pos'}">${x.roe}</td></tr>`).join('')+'</tbody></table>'
+      +'<small class="note">Only positions with open quantity are shown. Cash/derivative legs sit in the Equity asset-class total.</small>';
+  } else if(SEL==='cash'){ rows=det.cash; totCur=rows.reduce((a,x)=>a+(x.bal||0),0); totInv=0;
+    body=head(['Account','Type','Last updated','Balance'])+rows.sort((a,b)=>b.bal-a.bal).map(x=>`<tr><td>${x.acct}</td><td>${x.type}</td><td>${x.updated}</td><td>${fmtC(x.bal,nat)}</td></tr>`).join('')+'</tbody></table>';
+  } else if(SEL==='prs'){ rows=det.prs; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Account','Invested','Current','P/L','Return'])+rows.map(x=>{const p=x.inv?(x.cur-x.inv)/x.inv*100:0;return `<tr><td>${x.acct}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.cur-x.inv)}">${fmtC(x.cur-x.inv,nat)}</td><td class="${plc(p)}">${(p>=0?'+':'')+p.toFixed(1)}%</td></tr>`;}).join('')+'</tbody></table>'
+      +'<small class="note">Public Mutual PRS Islamic Strategic Equity Fund (Jijo &amp; Ansa). Values native in RM.</small>';
+  } else if(SEL==='epf'){ rows=det.epf; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=0;
+    body=head(['Account (KWSP)','Current'])+rows.map(x=>`<tr><td>${x.acct}</td><td>${fmtC(x.cur,nat)}</td></tr>`).join('')+'</tbody></table>'
+      +'<small class="note">Malaysia EPF (KWSP). Values native in RM.</small>';
+  } else if(SEL==='dell'){ const last=D.series[D.series.length-1]; totCur=last['DELL Shares']||0;
+    body=`<table><tbody><tr><td>Shares held</td><td style="text-align:right">${det.dellShares||'—'}</td></tr><tr><td>Current value</td><td style="text-align:right">${fmtC(totCur,'INR')}</td></tr></tbody></table><small class="note">Employer DELL (US-listed) stock; valued in INR in the sheet.</small>`;
+  } else if(SEL==='fd'){ const s=D.summary['Fixed Deposit']||{}; totCur=s.current||0; totInv=s.invested||0;
+    body=`<table><tbody><tr><td>Principal</td><td style="text-align:right">${fmtC(totInv,'INR')}</td></tr><tr><td>Current value</td><td style="text-align:right">${fmtC(totCur,'INR')}</td></tr></tbody></table><small class="note">Fixed deposit principal; no mark-to-market gain recorded.</small>`;
+  }
+  document.getElementById('drillBody').innerHTML=body;
+  const pl=totCur-totInv, p=totInv?pl/totInv*100:0;
+  const showInv = totInv>0;
+  document.getElementById('drillChips').innerHTML=`
+    <div class="chip"><div class="l">Holdings</div><div class="v">${rows.length||1}</div></div>
+    ${showInv?`<div class="chip"><div class="l">Invested</div><div class="v">${fmtC(totInv,nat)}</div></div>`:''}
+    <div class="chip"><div class="l">Current</div><div class="v">${fmtC(totCur,nat)}</div></div>
+    ${showInv?`<div class="chip"><div class="l">P/L</div><div class="v ${plc(pl)}">${(pl>=0?'+':'')+fmtC(pl,nat)}</div></div>`:''}
+    ${showInv?`<div class="chip"><div class="l">Return</div><div class="v ${plc(p)}">${(p>=0?'+':'')+p.toFixed(1)}%</div></div>`:''}`;
+  drawCatTrend(c);
+}
+
+function classifyFund(n){ n=(n||'').toLowerCase();
+  if(/multi[ -]?asset|asset alloc/.test(n)) return {k:'Multi-Asset',c:'#06b6d4'};
+  if(/small/.test(n)) return {k:'Small Cap',c:'#e23b5a'};
+  if(/mid/.test(n)) return {k:'Mid Cap',c:'#f97316'};
+  if(/flexi|multi[ -]?cap|multicap/.test(n)) return {k:'Flexi / Multi Cap',c:'#8b5cf6'};
+  if(/large|blue ?chip|bluechip/.test(n)) return {k:'Large Cap',c:'#3b6fff'};
+  return {k:'Other',c:'#94a3c4'};
+}
+const pnum=s=>{ const v=parseFloat((''+s).replace(/[%,\\]/g,'')); return isNaN(v)?null:v; };
+
+function renderAnalysis(cats,total){
+  const mf=D.detail.mf, eq=D.detail.eq, last=D.series[D.series.length-1];
+  const byCat={};
+  mf.forEach(f=>{ const c=classifyFund(f.name); byCat[c.k]=byCat[c.k]||{v:0,c:c.c,funds:0}; byCat[c.k].v+=f.cur||0; byCat[c.k].funds++; });
+  const mfTot=mf.reduce((a,f)=>a+(f.cur||0),0)||1;
+  const order=Object.entries(byCat).sort((a,b)=>b[1].v-a[1].v);
+  document.getElementById('styleMix').innerHTML=order.map(([k,o])=>{
+    const p=o.v/mfTot*100;
+    return `<div class="smix"><div class="lab"><span>${k} <small class="note">(${o.funds})</small></span><span>${p.toFixed(0)}% · ${fmtC(o.v,'INR')}</span></div><div class="bar"><i style="width:${p.toFixed(1)}%;background:${o.c}"></i></div></div>`;
+  }).join('') || '<small class="note">No fund data.</small>';
+
+  const I=[];
+
+  // ── Transaction-level MF insights (from June 2026 report) ──
+  I.push(['red',`<b>🚨 Immediate action: Exit Nippon India Large Cap (₹20L)</b> — Every single tranche across all 10 purchases is in the red. The NAV actively fell from ₹105 (Dec 2025) to ₹97.48 today. The ₹28K crystallised loss can offset LTCG gains (e.g. from Axis Midcap). All Jan–Jun 2025 tranches are past 12 months (LTCG) — verify exit load before redeeming. Compare: Canara Robeco Large Cap, bought the same month (Jan 2024), is +18.5%. This is a fund selection error, not a category mistake.`]);
+  I.push(['grn',`<b>👑 Axis Midcap — Crown Jewel (LTCG ✓):</b> ₹9.5L switch-in (Jun 2023, 36 months) has grown to ₹15.21L — +60.1% absolute, 17.53% CAGR. 100% LTCG. Est. tax ~₹57K if you redeem above ₹1.25L exemption. <b>Do not

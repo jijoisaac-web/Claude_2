@@ -1,0 +1,20 @@
+[
+ {
+  "script": "07_open_portfolio_tracker.bat",
+  "time": "13-Jun 23:11",
+  "exit": 0,
+  "secs": 0.3
+ },
+ {
+  "script": "run_indian_backtester.bat",
+  "time": "14-Jun 20:38",
+  "exit": 0,
+  "secs": 241.6
+ },
+ {
+  "script": "09_run_indian_backtester.bat",
+  "time": "15-Jun 08:56",
+  "exit": 0,
+  "secs": 43859.0
+ }
+]

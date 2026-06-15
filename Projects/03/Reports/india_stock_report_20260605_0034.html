@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>India Equity Research Report — 2026-06-05</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --card2: #243447;
+    --border: #334155; --text: #e2e8f0; --muted: #94a3b8;
+    --accent: #38bdf8; --green: #4ade80; --red: #f87171;
+    --yellow: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg);
+          color: var(--text); line-height: 1.6; }
+  a { color: var(--accent); text-decoration: none; }
+
+  /* ── Header ── */
+  .report-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+    padding: 48px 32px 36px; text-align: center;
+    border-bottom: 2px solid #1d4ed8;
+  }
+  .report-header .flag { font-size: 2.5rem; }
+  .report-header h1 { font-size: 2rem; font-weight: 800; color: #fff;
+                       letter-spacing: -0.5px; margin: 8px 0 4px; }
+  .report-header .subtitle { color: var(--muted); font-size: 0.95rem; }
+  .report-date { display: inline-block; margin-top: 12px; padding: 4px 14px;
+                  background: #1d4ed8; border-radius: 20px; font-size: 0.8rem;
+                  color: #bfdbfe; }
+
+  /* ── Nav ── */
+  .nav { background: var(--card); border-bottom: 1px solid var(--border);
+          padding: 12px 32px; display: flex; gap: 24px; flex-wrap: wrap;
+          position: sticky; top: 0; z-index: 100; }
+  .nav a { color: var(--muted); font-size: 0.85rem; font-weight: 500;
+            transition: color .2s; }
+  .nav a:hover { color: var(--accent); }
+
+  /* ── Layout ── */
+  .container { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+  section { margin-bottom: 52px; }
+
+  /* ── Section titles ── */
+  .section-title { display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+                    padding-left: 16px; }
+  .section-title h2 { font-size: 1.4rem; font-weight: 700; color: #fff; }
+  .section-title h2 small { font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+  .section-label { padding: 4px 12px; border-radius: 6px; font-weight: 800;
+                    font-size: 1rem; color: #fff; }
+
+  /* ── Macro grid ── */
+  .macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+                 gap: 14px; }
+  .macro-card { background: var(--card); border: 1px solid var(--border);
+                 border-radius: 10px; padding: 16px; }
+  .macro-card label { display: block; font-size: 0.75rem; color: var(--muted);
+                       text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .macro-card value { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; border-radius: 10px;
+                 border: 1px solid var(--border); }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .data-table thead tr { background: #0f172a; }
+  .data-table th { padding: 12px 14px; text-align: left; color: var(--muted);
+                    font-weight: 600; font-size: 0.78rem; text-transform: uppercase;
+                    letter-spacing: .4px; white-space: nowrap; }
+  .data-table td { padding: 11px 14px; border-top: 1px solid var(--border);
+                    vertical-align: top; }
+  .data-table tbody tr:hover { background: rgba(255,255,255,.03); }
+  .data-table .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .data-table .note { font-size: 0.78rem; color: var(--muted); max-width: 260px; }
+  .upside { color: var(--green); font-weight: 700; }
+  .risk-text { color: #fca5a5 !important; }
+
+  /* ── Badges / tags ── */
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 600; }
+  .badge-neutral { background: #334155; color: var(--muted); }
+  .sector-tag { display: inline-block; padding: 3px 10px; border-radius: 20px;
+                 font-size: 0.72rem; font-weight: 600; color: #e2e8f0;
+                 white-space: nowrap; }
+  .ticker { color: var(--muted); font-size: 0.72rem; }
+  .ticker-sm { color: var(--muted); font-size: 0.72rem; margin-left: 6px; }
+
+  /* ── Stars ── */
+  .stars { color: var(--yellow); }
+  .stars-empty { color: #334155; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .progress-bar { height: 6px; border-radius: 3px; min-width: 4px; transition: width .4s; }
+  .progress-label { font-size: 0.78rem; color: var(--text); font-weight: 700; white-space: nowrap; }
+
+  /* ── Pick cards ── */
+  .picks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px,1fr));
+                 gap: 20px; }
+  .pick-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                padding: 20px; }
+  .pick-header { display: flex; justify-content: space-between; align-items: flex-start;
+                  margin-bottom: 14px; }
+  .pick-name { font-size: 1.1rem; font-weight: 700; color: #fff; display: block; }
+  .pick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+                margin-bottom: 14px; }
+  .pick-stat { background: var(--card2); border-radius: 8px; padding: 8px 10px; }
+  .pick-stat label { display: block; font-size: 0.68rem; color: var(--muted);
+                      text-transform: uppercase; letter-spacing: .4px; margin-bottom: 2px; }
+  .pick-stat value { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+  .pick-stat.sl value { color: var(--red); }
+  .pick-stat.t1 value, .pick-stat.t2 value { color: var(--green); }
+  .pick-success { margin-bottom: 12px; }
+  .pick-success label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase;
+                         letter-spacing: .4px; display: block; margin-bottom: 4px; }
+  .pick-thesis { font-size: 0.8rem; color: var(--muted); line-height: 1.5;
+                  border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+  .pick-thesis strong { color: var(--text); }
+
+  /* ── Category section ── */
+  .category-section { margin-bottom: 52px; }
+
+  /* ── Portfolio cards ── */
+  .portfolios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px,1fr));
+                      gap: 24px; }
+  .portfolio-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+                     overflow: hidden; }
+  .portfolio-header { padding: 20px 24px 14px; background: rgba(255,255,255,.02); }
+  .portfolio-header h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .portfolio-meta { display: flex; gap: 18px; font-size: 0.82rem; color: var(--muted);
+                     margin-bottom: 6px; flex-wrap: wrap; }
+  .portfolio-meta strong { color: var(--text); }
+  .portfolio-desc { font-size: 0.8rem; color: var(--muted); }
+  .portfolio-card .data-table { font-size: 0.82rem; }
+
+  /* ── Verdict box ── */
+  .verdict-box { background: linear-gradient(135deg, #1e3a5f, #1e293b);
+                  border: 1px solid #1d4ed8; border-radius: 12px; padding: 28px 32px; }
+  .verdict-box h3 { color: var(--accent); margin-bottom: 12px; font-size: 1.1rem; }
+  .verdict-box p { color: var(--text); line-height: 1.8; font-size: 0.92rem; }
+
+  /* ── Footer ── */
+  .footer { background: var(--card); border-top: 1px solid var(--border);
+             padding: 24px 32px; text-align: center; color: var(--muted); font-size: 0.78rem; }
+  .disclaimer { background: #1c1008; border: 1px solid #92400e; border-radius: 8px;
+                 padding: 14px 18px; font-size: 0.78rem; color: #fcd34d; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div class="flag">🇮🇳</div>
+  <h1>India Equity Research Report</h1>
+  <div class="subtitle">NSE &amp; BSE Investment &amp; Swing Trading Opportunities — Compiled by Multi-Analyst Team</div>
+  <div class="report-date">📅 05 Jun 2026, 12:34 AM</div>
+</div>
+
+<nav class="nav">
+  <a href="#macro">Macro</a>
+  <a href="#master">Master Table</a>
+  <a href="#picks-a">Long-Term</a>
+  <a href="#picks-b">Growth</a>
+  <a href="#picks-c">Swing Trades</a>
+  <a href="#picks-d">Multibaggers</a>
+  <a href="#portfolios">Portfolios</a>
+  <a href="#risks">Risks</a>
+</nav>
+
+<div class="container">
+
+  <!-- MACRO -->
+  <section id="macro">
+    <div class="section-title" style="border-left:5px solid #38bdf8">
+      <span class="section-label" style="background:#0369a1">📊</span>
+      <h2>Macro Snapshot</h2>
+    </div>
+    <div class="macro-grid">
+      <div class="macro-card"><label>Nifty50</label><value>23,417</value></div>
+<div class="macro-card"><label>Sensex</label><value>74,360</value></div>
+<div class="macro-card"><label>Rbi Rate</label><value>5.25%</value></div>
+<div class="macro-card"><label>India Vix</label><value>16.5</value></div>
+<div class="macro-card"><label>Gdp Growth</label><value>6.5–7% (FY26–27E)</value></div>
+<div class="macro-card"><label>Fii Stance</label><value>Net Sellers</value></div>
+<div class="macro-card"><label>Dii Stance</label><value>Net Buyers</value></div>
+<div class="macro-card"><label>Top Sectors</label><value>Defence, Capital Goods, IT, Pharma, Banking, Consumption</value></div>
+    </div>
+  </section>
+
+  <!-- MASTER TABLE -->
+  <section id="master">
+    <div class="section-title" style="border-left:5px solid #7c3aed">
+      <span class="section-label" style="background:#7c3aed">📋</span>
+      <h2>Master Opportunity Table</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Stock</th><th>Sector</th><th>CMP</th><th>Fair Value</th>
+            <th>Upside</th><th>Horizon</th><th>Conviction</th>
+            <th>Key Catalysts</th><th>Key Risks</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+              <td><strong>HAL</strong><br><small class="ticker">NSE:HAL</small></td>
+              <td><span class="sector-tag" style="background:#1e3a5f">Defence & Aerospace</span></td>
+              <td class="num">₹3,800</td>
+              <td class="num">₹5,000</td>
+              <td class="num upside">32%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★★</span><span class="stars-empty">☆</span></td>
+              <td class="note">Tejas MkI-A (83 jets), HTT-40, MRO expansion, ₹94K cr order book</td>
+              <td class="note risk-text">Execution delays, premium valuation</td>
+            </tr>
+            <tr>
+              <td><strong>ICICI Bank</strong><br><small class="ticker">NSE:ICICIBANK</small></td>
+              <td><span class="sector-tag" style="background:#14532d">Private Banking</span></td>
+              <td class="num">₹1,185</td>
+              <td class="num">₹1,650</td>
+              <td class="num upside">39%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★★</span><span class="stars-empty">☆</span></td>
+              <td class="note">NII growth, retail lending, digital (iMobile 15M users)</td>
+              <td class="note risk-text">NPA spike, credit cycle reversal</td>
+            </tr>
+            <tr>
+              <td><strong>Bajaj Finance</strong><br><small class="ticker">NSE:BAJFINANCE</small></td>
+              <td><span class="sector-tag" style="background:#064e3b">NBFC</span></td>
+              <td class="num">₹890</td>
+              <td class="num">₹1,250</td>
+              <td class="num upside">40%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">AUM ₹4.16L cr, 101M customers, Bajaj Housing Finance unlock</td>
+              <td class="note risk-text">RBI regulation tightening, competition</td>
+            </tr>
+            <tr>
+              <td><strong>Dixon Technologies</strong><br><small class="ticker">NSE:DIXON</small></td>
+              <td><span class="sector-tag" style="background:#7c2d12">Electronics / PLI</span></td>
+              <td class="num">₹10,489</td>
+              <td class="num">₹15,000</td>
+              <td class="num upside">43%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">PLI electronics, Apple supply chain, ₹50K cr revenue target FY28</td>
+              <td class="note risk-text">Client concentration, margin pressure</td>
+            </tr>
+            <tr>
+              <td><strong>Polycab India</strong><br><small class="ticker">NSE:POLYCAB</small></td>
+              <td><span class="sector-tag" style="background:#78350f">Cables & Wires</span></td>
+              <td class="num">₹4,800</td>
+              <td class="num">₹6,500</td>
+              <td class="num upside">35%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">Real estate/infra upcycle, FMEG scaling, export opportunity</td>
+              <td class="note risk-text">Raw material cost volatility, competition</td>
+            </tr>
+            <tr>
+              <td><strong>Kaynes Technology</strong><br><small class="ticker">NSE:KAYN</small></td>
+              <td><span class="sector-tag" style="background:#1e3a5f">ESDM / Defence Electronics</span></td>
+              <td class="num">₹4,200</td>
+              <td class="num">₹6,000</td>
+              <td class="num upside">43%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">33% FY26 revenue growth, defence + EV + industrial, new plant ramp</td>
+              <td class="note risk-text">Execution risk, working capital intensity</td>
+            </tr>
+            <tr>
+              <td><strong>Trent Ltd</strong><br><small class="ticker">NSE:TRENT</small></td>
+              <td><span class="sector-tag" style="background:#4c1d95">Retail / Consumer Disc.</span></td>
+              <td class="num">₹5,000</td>
+              <td class="num">₹7,000</td>
+              <td class="num upside">40%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">Zudio 600+ stores, same-store sales +15–18%, Tata Group backing</td>
+              <td class="note risk-text">Macro slowdown, fast-fashion competition</td>
+            </tr>
+            <tr>
+              <td><strong>L&T</strong><br><small class="ticker">NSE:LT</small></td>
+              <td><span class="sector-tag" style="background:#1e3a8a">Engineering & Infra</span></td>
+              <td class="num">₹3,500</td>
+              <td class="num">₹4,500</td>
+              <td class="num upside">29%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">₹5.6L cr order book, data centres, green hydrogen, nuclear</td>
+              <td class="note risk-text">Order execution delays, global capex cycle</td>
+            </tr>
+            <tr>
+              <td><strong>Zomato</strong><br><small class="ticker">NSE:ZOMATO</small></td>
+              <td><span class="sector-tag" style="background:#831843">Quick Commerce / Tech</span></td>
+              <td class="num">₹210</td>
+              <td class="num">₹310</td>
+              <td class="num upside">48%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★</span><span class="stars-empty">☆☆☆</span></td>
+              <td class="note">Blinkit GMV doubling, Hyperpure B2B, District events platform</td>
+              <td class="note risk-text">Competitive intensity (Swiggy Instamart), burn rate</td>
+            </tr>
+            <tr>
+              <td><strong>Bharti Airtel</strong><br><small class="ticker">NSE:BHARTIARTL</small></td>
+              <td><span class="sector-tag" style="background:#134e4a">Telecom</span></td>
+              <td class="num">₹1,680</td>
+              <td class="num">₹2,200</td>
+              <td class="num upside">31%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">ARPU ₹208→₹300+ target, 5G monetisation, Africa EBITDA $600M+</td>
+              <td class="note risk-text">Regulatory risk, tariff caps</td>
+            </tr>
+            <tr>
+              <td><strong>SBI</strong><br><small class="ticker">NSE:SBIN</small></td>
+              <td><span class="sector-tag" style="background:#166534">PSU Banking</span></td>
+              <td class="num">₹810</td>
+              <td class="num">₹1,100</td>
+              <td class="num upside">36%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★</span><span class="stars-empty">☆☆☆</span></td>
+              <td class="note">Loan growth, dividend yield 2.5%, cheap P/B valuation</td>
+              <td class="note risk-text">SME asset quality, political interference risk</td>
+            </tr>
+            <tr>
+              <td><strong>Clean Science & Tech</strong><br><small class="ticker">NSE:CLEANSCIENCE</small></td>
+              <td><span class="sector-tag" style="background:#422006">Specialty Chemicals</span></td>
+              <td class="num">₹1,200</td>
+              <td class="num">₹1,800</td>
+              <td class="num upside">50%</td>
+              <td>3 yr</td>
+              <td><span class="stars">★★★★★★★</span><span class="stars-empty">☆☆☆</span></td>
+              <td class="note">China+1, MEHQ/BHA niche leader 30–45% global share, new molecules</td>
+              <td class="note risk-text">Pricing pressure, capex ramp-up period</td>
+            </tr>
+            <tr>
+              <td><strong>Ion Exchange India</strong><br><small class="ticker">NSE:IONEXCHANG</small></td>
+              <td><span class="sector-tag" style="background:#0c4a6e">Water Treatment</span></td>
+              <td class="num">₹550</td>
+              <td class="num">₹950</td>
+              <td class="num upside">73%</td>
+              <td>3 yr</td>
+              <td><span class="stars">★★★★★★★</span><span class="stars-empty">☆☆☆</span></td>
+              <td class="note">Jal Jeevan Mission, industrial water treatment, semiconductor fab orders</td>
+              <td class="note risk-text">Order concentration, long project cycles</td>
+            </tr>
+            <tr>
+              <td><strong>CDSL</strong><br><small class="ticker">NSE:CDSL</small></td>
+              <td><span class="sector-tag" style="background:#1c1917">Financial Infrastructure</span></td>
+              <td class="num">₹1,450</td>
+              <td class="num">₹2,000</td>
+              <td class="num upside">38%</td>
+              <td>2 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">160M+ demat accounts, SIP boom, asset-light 80%+ margins</td>
+              <td class="note risk-text">Capital market downturn reduces volumes</td>
+            </tr>
+            <tr>
+              <td><strong>BEL</strong><br><small class="ticker">NSE:BEL</small></td>
+              <td><span class="sector-tag" style="background:#1e3a5f">Defence Electronics</span></td>
+              <td class="num">₹290</td>
+              <td class="num">₹420</td>
+              <td class="num upside">45%</td>
+              <td>2–3 yr</td>
+              <td><span class="stars">★★★★★★★★</span><span class="stars-empty">☆☆</span></td>
+              <td class="note">₹75K cr order book, EW systems, radars, avionics, MoD preferred vendor</td>
+              <td class="note risk-text">PSU execution pace, government budget cuts</td>
+            </tr>
+            <tr>
+              <td><strong>Nesco Ltd</strong><br><small class="ticker">NSE:NESCO</small></td>
+              <td><span class="sector-tag" style="background:#3b0764">IT Parks / MICE</span></td>
+              <td class="num">₹850</td>
+              <td class="num">₹1,400</td>
+              <td class="num upside">65%</td>
+              <td>3 yr</td>
+              <td><span class="stars">★★★★★★★</span><span class="stars-empty">☆☆☆</span></td>
+              <td class="note">MICE monopoly (Bombay Exhibition Centre), IT park expansion, zero debt</td>
+              <td class="note risk-text">Mumbai infra bottleneck, MICE demand cyclicality</td>
+            </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CATEGORY PICKS -->
+  <div id="picks-a"></div>
+  <div id="picks-b"></div>
+  <div id="picks-c"></div>
+  <div id="picks-d"></div>
+  
+        <section class="category-section">
+          <div class="section-title" style="border-left:5px solid #1e40af">
+            <span class="section-label" style="background:#1e40af">A</span>
+            <h2>Long-Term Compounders <small>(3–5 Years)</small></h2>
+          </div>
+          <div class="picks-grid">
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">HAL</span>
+              <span class="ticker-sm">NSE:HAL</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a5f">Defence</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹3,800</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹3600–3900</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹3200–3400</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹3,100</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹4,500</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹5,000</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹6,500</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>22–28%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–5 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:82%;background:#22c55e"></div><span class="progress-label">82%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Largest defence PSU; Tejas/HTT-40 orders; 820+ aircraft pipeline; net cash; 3-yr ROE 26%</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">ICICI Bank</span>
+              <span class="ticker-sm">NSE:ICICIBANK</span>
+            </div>
+            <div><span class="sector-tag" style="background:#14532d">Banking</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,185</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1140–1200</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹1050–1100</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹990</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,450</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,650</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹2,000</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>18–22%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–5 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:85%;background:#22c55e"></div><span class="progress-label">85%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> India's cleanest private bank; ROA 2.4%, ROE 18%; gaining market share; digital moat</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Dixon Technologies</span>
+              <span class="ticker-sm">NSE:DIXON</span>
+            </div>
+            <div><span class="sector-tag" style="background:#7c2d12">Electronics/PLI</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹10,489</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹9500–10800</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹8000–8500</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹7,500</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹13,500</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹17,000</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹22,000</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>25–30%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–5 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:75%;background:#f59e0b"></div><span class="progress-label">75%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> India's #1 contract electronics mfr; Apple supply chain entry; ₹50K cr revenue target FY28</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Bajaj Finance</span>
+              <span class="ticker-sm">NSE:BAJFINANCE</span>
+            </div>
+            <div><span class="sector-tag" style="background:#064e3b">NBFC</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹890</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹850–920</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹750–800</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹700</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,100</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,250</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹1,600</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>20–25%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–5 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:80%;background:#22c55e"></div><span class="progress-label">80%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> AUM ₹4.16L cr; 101M customers; OPM 66%; Bajaj Housing Finance valuation unlock</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Trent Ltd</span>
+              <span class="ticker-sm">NSE:TRENT</span>
+            </div>
+            <div><span class="sector-tag" style="background:#4c1d95">Retail</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹5,000</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹4700–5200</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹4000–4400</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹3,700</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹6,200</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹7,000</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹9,000</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>22–27%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–5 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:78%;background:#f59e0b"></div><span class="progress-label">78%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Zudio fastest-growing value fashion brand; 600+ stores; SSSG 15–18%; Tata Group backing</div>
+        </div></div>
+        </section>
+        <section class="category-section">
+          <div class="section-title" style="border-left:5px solid #15803d">
+            <span class="section-label" style="background:#15803d">B</span>
+            <h2>Growth Stocks <small>(1–3 Years)</small></h2>
+          </div>
+          <div class="picks-grid">
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Bharti Airtel</span>
+              <span class="ticker-sm">NSE:BHARTIARTL</span>
+            </div>
+            <div><span class="sector-tag" style="background:#134e4a">Telecom</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,680</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1600–1720</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹1450</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹1,320</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹2,000</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹2,200</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹2,700</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>18–22%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:80%;background:#22c55e"></div><span class="progress-label">80%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> ARPU ₹208→₹300+ target; 5G monetisation; Africa EBITDA $600M+; ICICI Direct BUY</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Polycab India</span>
+              <span class="ticker-sm">NSE:POLYCAB</span>
+            </div>
+            <div><span class="sector-tag" style="background:#78350f">Cables & Wires</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹4,800</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹4600–5000</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹4000–4200</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹3,700</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹5,800</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹6,500</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹8,000</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>20–25%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:78%;background:#f59e0b"></div><span class="progress-label">78%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Market leader wires/cables; FMEG scaling to ₹5K cr; real estate + infra upcycle</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Zomato</span>
+              <span class="ticker-sm">NSE:ZOMATO</span>
+            </div>
+            <div><span class="sector-tag" style="background:#831843">Quick Commerce</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹210</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹195–220</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹165–180</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹148</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹265</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹310</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹400</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>25–35%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:72%;background:#f59e0b"></div><span class="progress-label">72%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Blinkit GMV doubling YoY; moving to FCF positive; 500M smartphone user TAM</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">L&T</span>
+              <span class="ticker-sm">NSE:LT</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a8a">Engineering & Infra</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹3,500</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹3300–3600</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹3000–3100</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹2,750</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹4,000</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹4,500</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹5,500</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>16–20%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:82%;background:#22c55e"></div><span class="progress-label">82%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> ₹5.6L cr order book record; data centres + green hydrogen expansion; 8–10 yr visibility</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">CDSL</span>
+              <span class="ticker-sm">NSE:CDSL</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1c1917">Financial Infra</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,450</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1350–1500</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹1150–1250</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹1,050</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,800</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹2,000</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹2,500</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>20–25%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:78%;background:#f59e0b"></div><span class="progress-label">78%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> 160M+ demat accounts; 20M new/year; SIP boom; 80%+ margins; zero capex model</div>
+        </div></div>
+        </section>
+        <section class="category-section">
+          <div class="section-title" style="border-left:5px solid #b45309">
+            <span class="section-label" style="background:#b45309">C</span>
+            <h2>Swing Trading Picks <small>(1–3 Months)</small></h2>
+          </div>
+          <div class="picks-grid">
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">ICICI Bank</span>
+              <span class="ticker-sm">NSE:ICICIBANK</span>
+            </div>
+            <div><span class="sector-tag" style="background:#14532d">Banking</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,185</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1160–1190</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹—</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹1,110</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,320</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,380</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>—</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>10–16% (6–8 wks)</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>1–2 months</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:72%;background:#f59e0b"></div><span class="progress-label">72%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Bounced off 50-DMA (₹1,165); bullish reversal candle; deep liquidity</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">HAL</span>
+              <span class="ticker-sm">NSE:HAL</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a5f">Defence</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹3,800</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹3600–3800</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹—</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹3,320</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹4,200</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹4,500</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>—</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>12–18% (8–10 wks)</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–3 months</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:70%;background:#f59e0b"></div><span class="progress-label">70%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> RSI ~42 approaching oversold; near 52-wk low support ₹3,400–3,500</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Reliance Industries</span>
+              <span class="ticker-sm">NSE:RELIANCE</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a8a">Conglomerate</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,335</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1310–1360</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹—</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹1,240</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,520</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,600</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>—</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>12–18% (8–12 wks)</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–3 months</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:68%;background:#ef4444"></div><span class="progress-label">68%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Consolidating at ₹1,300–1,400 base; Jio IPO news-flow catalyst; massive liquidity</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">SBI</span>
+              <span class="ticker-sm">NSE:SBIN</span>
+            </div>
+            <div><span class="sector-tag" style="background:#166534">PSU Banking</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹810</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹790–820</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹—</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹740</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹920</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹980</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>—</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>14–20% (10–12 wks)</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–3 months</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:70%;background:#f59e0b"></div><span class="progress-label">70%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Cheap P/B 1.1x; dividend yield 2.5%; DII buying support; Q1 FY27 rebound play</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Dixon Technologies</span>
+              <span class="ticker-sm">NSE:DIXON</span>
+            </div>
+            <div><span class="sector-tag" style="background:#7c2d12">Electronics/PLI</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹10,489</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹9800–10600</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹—</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹8,800</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹12,500</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹13,500</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>—</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>20–28% (8–12 wks)</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–3 months</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:65%;background:#ef4444"></div><span class="progress-label">65%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Down 34% from peak; institutional bottom-fishing; PLI policy unchanged; reversal candle</div>
+        </div></div>
+        </section>
+        <section class="category-section">
+          <div class="section-title" style="border-left:5px solid #7e22ce">
+            <span class="section-label" style="background:#7e22ce">D</span>
+            <h2>Small/Mid-Cap Multibagger Candidates <small>(2–4 Years)</small></h2>
+          </div>
+          <div class="picks-grid">
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Kaynes Technology</span>
+              <span class="ticker-sm">NSE:KAYN</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a5f">ESDM / Defence Electronics</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹4,200</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹3900–4400</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹3400–3600</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹3,000</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹5,200</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹6,000</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹8,500</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>28–35%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–4 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:72%;background:#f59e0b"></div><span class="progress-label">72%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> FY26 revenue ₹3,626 cr (+33%); defence + EV + industrial; 21 analysts avg target ₹4,514</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Ion Exchange India</span>
+              <span class="ticker-sm">NSE:IONEXCHANG</span>
+            </div>
+            <div><span class="sector-tag" style="background:#0c4a6e">Water Treatment</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹550</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹500–580</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹420–460</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹380</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹720</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹950</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹1,400</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>30–40%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–4 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:70%;background:#f59e0b"></div><span class="progress-label">70%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Jal Jeevan Mission + industrial water treatment; zero debt; ROE >18%; 73% upside analyst target</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Clean Science & Tech</span>
+              <span class="ticker-sm">NSE:CLEANSCIENCE</span>
+            </div>
+            <div><span class="sector-tag" style="background:#422006">Specialty Chemicals</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹1,200</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹1100–1260</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹950–1020</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹870</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,600</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,800</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹2,500</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>25–35%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–4 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:68%;background:#ef4444"></div><span class="progress-label">68%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Global niche leader MEHQ/BHA (30–45% market share); ROCE >35%; debt-free; China+1 beneficiary</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">BEL</span>
+              <span class="ticker-sm">NSE:BEL</span>
+            </div>
+            <div><span class="sector-tag" style="background:#1e3a5f">Defence Electronics</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹290</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹270–300</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹240–255</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹215</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹360</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹420</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹560</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>22–28%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>2–3 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:78%;background:#f59e0b"></div><span class="progress-label">78%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> ₹75K cr order book; EW systems/radars/avionics; Navaratna PSU; revenue CAGR 15–20%</div>
+        </div>
+        <div class="pick-card">
+          <div class="pick-header">
+            <div>
+              <span class="pick-name">Nesco Ltd</span>
+              <span class="ticker-sm">NSE:NESCO</span>
+            </div>
+            <div><span class="sector-tag" style="background:#3b0764">IT Parks / MICE</span></div>
+          </div>
+          <div class="pick-grid">
+            <div class="pick-stat"><label>CMP</label><value>₹850</value></div>
+            <div class="pick-stat"><label>Entry Zone</label><value>₹800–880</value></div>
+            <div class="pick-stat"><label>Add-on</label><value>₹680–720</value></div>
+            <div class="pick-stat sl"><label>Stop Loss</label><value>₹600</value></div>
+            <div class="pick-stat t1"><label>Target 1</label><value>₹1,100</value></div>
+            <div class="pick-stat t2"><label>Target 2</label><value>₹1,400</value></div>
+            <div class="pick-stat t3"><label>Target 3</label><value>₹1,900</value></div>
+            <div class="pick-stat"><label>CAGR / Return</label><value>28–35%</value></div>
+            <div class="pick-stat"><label>Horizon</label><value>3–4 yr</value></div>
+          </div>
+          <div class="pick-success">
+            <label>Probability of Success</label>
+            <div class="progress-wrap"><div class="progress-bar" style="width:70%;background:#f59e0b"></div><span class="progress-label">70%</span></div>
+          </div>
+          <div class="pick-thesis"><strong>Thesis:</strong> Mumbai MICE monopoly; IT park fully leased; zero debt; FCF generating; P/E ~18x — deeply undervalued</div>
+        </div></div>
+        </section>
+
+  <!-- PORTFOLIOS -->
+  <section id="portfolios">
+    <div class="section-title" style="border-left:5px solid #f59e0b">
+      <span class="section-label" style="background:#b45309">💼</span>
+      <h2>Portfolio Construction <small>(₹10 Lakh Each)</small></h2>
+    </div>
+    <div class="portfolios-grid">
+        <div class="portfolio-card">
+          <div class="portfolio-header" style="border-left:6px solid #16a34a">
+            <h3 style="color:#16a34a">Conservative Portfolio</h3>
+            <div class="portfolio-meta">
+              <span>🎯 Target CAGR: <strong>16–19%</strong></span>
+              <span>📉 Max Drawdown: <strong>15–20%</strong></span>
+            </div>
+            <p class="portfolio-desc">Large-cap quality, low volatility, strong dividends and moats</p>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Stock</th><th>Allocation</th><th>Amount</th><th>Rationale</th></tr></thead>
+            <tbody>
+            <tr>
+              <td><strong>ICICI Bank</strong><br><small class="ticker">NSE:ICICIBANK</small></td>
+              <td class="num">25%</td>
+              <td class="num">₹250,000</td>
+              <td class="note">Safest large private bank; consistent compounder</td>
+            </tr>
+            <tr>
+              <td><strong>Bharti Airtel</strong><br><small class="ticker">NSE:BHARTIARTL</small></td>
+              <td class="num">20%</td>
+              <td class="num">₹200,000</td>
+              <td class="note">Telecom monopoly; ARPU upcycle; Africa kicker</td>
+            </tr>
+            <tr>
+              <td><strong>L&T</strong><br><small class="ticker">NSE:LT</small></td>
+              <td class="num">20%</td>
+              <td class="num">₹200,000</td>
+              <td class="note">Order book visibility; infrastructure proxy</td>
+            </tr>
+            <tr>
+              <td><strong>Polycab India</strong><br><small class="ticker">NSE:POLYCAB</small></td>
+              <td class="num">20%</td>
+              <td class="num">₹200,000</td>
+              <td class="note">Infra play; predictable earnings; dividend</td>
+            </tr>
+            <tr>
+              <td><strong>SBI</strong><br><small class="ticker">NSE:SBIN</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">Cheap valuation; PSU re-rating candidate</td>
+            </tr></tbody>
+          </table>
+        </div>
+        <div class="portfolio-card">
+          <div class="portfolio-header" style="border-left:6px solid #d97706">
+            <h3 style="color:#d97706">Balanced Portfolio</h3>
+            <div class="portfolio-meta">
+              <span>🎯 Target CAGR: <strong>20–25%</strong></span>
+              <span>📉 Max Drawdown: <strong>22–28%</strong></span>
+            </div>
+            <p class="portfolio-desc">Mix of large-cap compounders + quality mid-caps</p>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Stock</th><th>Allocation</th><th>Amount</th><th>Rationale</th></tr></thead>
+            <tbody>
+            <tr>
+              <td><strong>HAL</strong><br><small class="ticker">NSE:HAL</small></td>
+              <td class="num">20%</td>
+              <td class="num">₹200,000</td>
+              <td class="note">Defence compounder near 52-wk low</td>
+            </tr>
+            <tr>
+              <td><strong>ICICI Bank</strong><br><small class="ticker">NSE:ICICIBANK</small></td>
+              <td class="num">18%</td>
+              <td class="num">₹180,000</td>
+              <td class="note">Core banking holding</td>
+            </tr>
+            <tr>
+              <td><strong>Dixon Technologies</strong><br><small class="ticker">NSE:DIXON</small></td>
+              <td class="num">17%</td>
+              <td class="num">₹170,000</td>
+              <td class="note">PLI electronics champion</td>
+            </tr>
+            <tr>
+              <td><strong>Bajaj Finance</strong><br><small class="ticker">NSE:BAJFINANCE</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">NBFC leader; digital lending moat</td>
+            </tr>
+            <tr>
+              <td><strong>CDSL</strong><br><small class="ticker">NSE:CDSL</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">Capital market infra; asset-light</td>
+            </tr>
+            <tr>
+              <td><strong>Kaynes Technology</strong><br><small class="ticker">NSE:KAYN</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">High-growth ESDM; defence electronics</td>
+            </tr></tbody>
+          </table>
+        </div>
+        <div class="portfolio-card">
+          <div class="portfolio-header" style="border-left:6px solid #dc2626">
+            <h3 style="color:#dc2626">Aggressive Portfolio</h3>
+            <div class="portfolio-meta">
+              <span>🎯 Target CAGR: <strong>28–38%</strong></span>
+              <span>📉 Max Drawdown: <strong>30–40%</strong></span>
+            </div>
+            <p class="portfolio-desc">High-conviction mid/small caps + growth stocks</p>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Stock</th><th>Allocation</th><th>Amount</th><th>Rationale</th></tr></thead>
+            <tbody>
+            <tr>
+              <td><strong>Kaynes Technology</strong><br><small class="ticker">NSE:KAYN</small></td>
+              <td class="num">20%</td>
+              <td class="num">₹200,000</td>
+              <td class="note">Defence + EV electronics; 33% revenue growth</td>
+            </tr>
+            <tr>
+              <td><strong>Zomato</strong><br><small class="ticker">NSE:ZOMATO</small></td>
+              <td class="num">18%</td>
+              <td class="num">₹180,000</td>
+              <td class="note">Quick commerce scale; Blinkit inflection</td>
+            </tr>
+            <tr>
+              <td><strong>Trent</strong><br><small class="ticker">NSE:TRENT</small></td>
+              <td class="num">17%</td>
+              <td class="num">₹170,000</td>
+              <td class="note">Zudio — fastest growing value retailer</td>
+            </tr>
+            <tr>
+              <td><strong>Ion Exchange India</strong><br><small class="ticker">NSE:IONEXCHANG</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">Water infra; 73% analyst upside; zero debt</td>
+            </tr>
+            <tr>
+              <td><strong>Clean Science</strong><br><small class="ticker">NSE:CLEANSCIENCE</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">Specialty chem; China+1; ROCE >35%</td>
+            </tr>
+            <tr>
+              <td><strong>Nesco Ltd</strong><br><small class="ticker">NSE:NESCO</small></td>
+              <td class="num">15%</td>
+              <td class="num">₹150,000</td>
+              <td class="note">Deeply undervalued MICE monopoly; FCF rich</td>
+            </tr></tbody>
+          </table>
+        </div></div>
+  </section>
+
+  <!-- RISKS -->
+  <section id="risks">
+    <div class="section-title" style="border-left:5px solid #ef4444">
+      <span class="section-label" style="background:#b91c1c">⚠️</span>
+      <h2>Key Risks to Monitor</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Risk Factor</th><th>Severity</th><th>Description</th></tr></thead>
+        <tbody>
+            <tr>
+              <td><strong>RBI Policy Surprise</strong></td>
+              <td><span class="badge" style="background:#dc2626;color:#fff">High</span></td>
+              <td class="note">Any rate hike would hit NBFCs and rate-sensitive sectors</td>
+            </tr>
+            <tr>
+              <td><strong>US Recession / Global Slowdown</strong></td>
+              <td><span class="badge" style="background:#d97706;color:#fff">Medium</span></td>
+              <td class="note">IT exports and commodity stocks most exposed</td>
+            </tr>
+            <tr>
+              <td><strong>FII Continued Selling</strong></td>
+              <td><span class="badge" style="background:#d97706;color:#fff">Medium</span></td>
+              <td class="note">Rupee weakness compounds valuation headwinds</td>
+            </tr>
+            <tr>
+              <td><strong>Defence Execution Delays</strong></td>
+              <td><span class="badge" style="background:#d97706;color:#fff">Medium</span></td>
+              <td class="note">HAL/BEL order-to-revenue conversion has historically lagged</td>
+            </tr>
+            <tr>
+              <td><strong>Premium Valuation Risk</strong></td>
+              <td><span class="badge" style="background:#d97706;color:#fff">Medium</span></td>
+              <td class="note">Dixon, Kaynes still trade at elevated P/E; earnings must deliver</td>
+            </tr>
+            <tr>
+              <td><strong>China Re-entry</strong></td>
+              <td><span class="badge" style="background:#16a34a;color:#fff">Low</span></td>
+              <td class="note">Any reversal of China+1 hurts specialty chemicals</td>
+            </tr>
+            <tr>
+              <td><strong>India VIX Spike</strong></td>
+              <td><span class="badge" style="background:#d97706;color:#fff">Medium</span></td>
+              <td class="note">Current 16.5 could move to 22–25 on global risk-off; hold cash buffer</td>
+            </tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="verdict-box">
+      <h3>🎯 Team Verdict</h3>
+      <p>
+        The market at Nifty ~23,400 is at a historically attractive accumulation zone.
+        FII selling has created a gift for disciplined domestic investors.
+        The best posture: <strong>deploy 60–70% now</strong> in high-conviction names,
+        keep <strong>30–40% dry powder</strong> to buy any further weakness toward Nifty 22,500–23,000.
+        Defence, banking, capital goods, and electronics manufacturing remain the four pillars
+        of the next bull leg. Reassess if Nifty closes below 22,000 on a weekly basis.
+      </p>
+    </div>
+    <div class="disclaimer">
+      ⚠️ <strong>Disclaimer:</strong> This report is for educational and informational purposes only.
+      It does not constitute registered investment advice. Please consult a SEBI-registered advisor
+      before making investment decisions. Past performance and analyst targets do not guarantee future returns.
+      All prices as of June 2026. Verify current prices before acting.
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  Generated by India Equity Research Script &nbsp;|&nbsp; 05 Jun 2026, 12:34 AM &nbsp;|&nbsp;
+  NSE &amp; BSE Listed Securities
+</div>
+
+</body>
+</html>

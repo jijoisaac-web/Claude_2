@@ -1,0 +1,101 @@
+Symbol,Company,Industry,cs,trend,earnings,flows,composite
+GVT&D,GE Vernova T&D India Ltd.,Capital Goods,97.25,89.8,92.9,45.4,89.18
+RRKABEL,R R Kabel Ltd.,Capital Goods,94.71,94.55,87.2,41.8,88.25
+ABSLAMC,Aditya Birla Sun Life AMC Ltd.,Financial Services,93.45,96.36,85.6,42.9,88.09
+SYRMA,Syrma SGS Technology Ltd.,Capital Goods,95.56,98.99,86.1,23.2,87.93
+LAURUSLABS,Laurus Labs Ltd.,Healthcare,98.52,93.74,75.9,35.8,87.42
+ACUTAAS,Acutaas Chemicals Ltd.,Healthcare,99.58,91.72,77.9,33.4,87.35
+FEDERALBNK,Federal Bank Ltd.,Financial Services,83.09,98.79,,60.7,85.99
+TORNTPHARM,Torrent Pharmaceuticals Ltd.,Healthcare,94.5,97.07,53.7,54.2,85.12
+APOLLOHOSP,Apollo Hospitals Enterprise Ltd.,Healthcare,84.14,98.08,,49.3,84.96
+WELCORP,Welspun Corp Ltd.,Capital Goods,97.89,94.04,60.1,33.7,84.65
+BELRISE,Belrise Industries Ltd.,Automobile and Auto Components,96.62,95.56,58.6,34.2,84.35
+ASTERDM,Aster DM Healthcare Ltd.,Healthcare,85.41,99.19,,32.5,84.05
+APARINDS,Apar Industries Ltd.,Capital Goods,92.6,99.9,55.8,40.4,84.05
+HSCL,Himadri Speciality Chemical Ltd.,Chemicals,86.68,97.78,,30.4,83.98
+RBLBANK,RBL Bank Ltd.,Financial Services,85.2,97.58,,31.6,83.26
+JBCHEPHARM,J.B. Chemicals & Pharmaceuticals Ltd.,Healthcare,91.33,98.08,57.3,39.9,83.11
+J&KBANK,Jammu & Kashmir Bank Ltd.,Financial Services,84.36,98.48,,31.2,83.09
+HFCL,HFCL Ltd.,Telecommunication,98.94,78.48,70.1,43.0,82.88
+BSE,BSE Ltd.,Financial Services,92.39,85.05,84.8,28.8,82.69
+NYKAA,FSN E-Commerce Ventures Ltd.,Consumer Services,82.24,91.31,,58.5,82.65
+ACMESOLAR,ACME Solar Holdings Ltd.,Power,80.55,96.06,,48.2,82.22
+SAILIFE,Sai Life Sciences Ltd.,Healthcare,90.06,97.37,60.7,33.7,82.22
+POLYCAB,Polycab India Ltd.,Capital Goods,94.29,93.33,63.5,22.5,82.21
+ATHERENERG,Ather Energy Ltd.,Automobile and Auto Components,98.31,96.77,41.7,23.2,81.84
+CGPOWER,CG Power and Industrial Solutions Ltd.,Capital Goods,84.78,92.32,,36.8,81.8
+NAM-INDIA,Nippon Life India Asset Management Ltd.,Financial Services,87.32,88.28,,36.7,81.7
+CUMMINSIND,Cummins India Ltd.,Capital Goods,95.14,88.28,57.7,34.1,81.36
+KEI,KEI Industries Ltd.,Capital Goods,90.27,92.73,64.8,27.9,80.95
+ADANIPORTS,Adani Ports and Special Economic Zone Ltd.,Services,83.3,92.73,,33.5,80.77
+DATAPATTNS,Data Patterns (India) Ltd.,Capital Goods,89.22,97.07,59.5,24.9,80.68
+LLOYDSME,Lloyds Metals And Energy Ltd.,Metals & Mining,86.47,88.28,,31.4,80.63
+NETWEB,Netweb Technologies India Ltd.,Information Technology,89.85,90.81,62.0,36.0,80.58
+POWERINDIA,Hitachi Energy India Ltd.,Capital Goods,97.46,71.62,73.3,40.3,80.37
+ADANIENSOL,Adani Energy Solutions Ltd.,Power,91.75,88.89,65.4,25.5,80.32
+IFCI,IFCI Ltd.,Financial Services,72.73,99.6,,56.6,80.31
+MARICO,Marico Ltd.,Fast Moving Consumer Goods,87.95,85.35,70.4,44.1,80.15
+HINDALCO,Hindalco Industries Ltd.,Metals & Mining,99.37,62.12,78.6,48.1,79.95
+FORTIS,Fortis Healthcare Ltd.,Healthcare,82.66,87.27,,44.9,79.85
+BANDHANBNK,Bandhan Bank Ltd.,Financial Services,83.51,90.51,,28.5,79.51
+MAHABANK,Bank of Maharashtra,Financial Services,93.66,99.9,33.3,23.8,79.49
+NMDC,NMDC Ltd.,Metals & Mining,92.18,87.88,50.6,40.5,79.48
+ANANDRATHI,Anand Rathi Wealth Ltd.,Financial Services,97.67,65.76,70.5,51.7,79.43
+ADANIPOWER,Adani Power Ltd.,Power,99.15,71.21,71.6,26.3,79.35
+JSWSTEEL,JSW Steel Ltd.,Metals & Mining,88.79,90.81,53.3,38.4,79.04
+BAJAJ-AUTO,Bajaj Auto Ltd.,Automobile and Auto Components,86.89,81.62,,35.5,78.98
+CCL,CCL Products (I) Ltd.,Fast Moving Consumer Goods,79.92,84.55,,57.5,78.91
+KIRLOSENG,Kirloskar Oil Eng Ltd.,Capital Goods,95.35,68.08,75.2,40.7,78.68
+VTL,Vardhman Textiles Ltd.,Textiles,87.74,95.76,54.1,23.3,78.65
+EMCURE,Emcure Pharmaceuticals Ltd.,Healthcare,82.03,89.29,,30.6,78.54
+GESHIP,Great Eastern Shipping Co. Ltd.,Services,94.93,59.9,78.4,60.2,78.47
+USHAMART,Usha Martin Ltd.,Capital Goods,83.93,83.54,,38.4,78.44
+CHENNPETRO,Chennai Petroleum Corporation Ltd.,Oil Gas & Consumable Fuels,81.61,95.15,,13.6,78.39
+NAVINFLUOR,Navin Fluorine International Ltd.,Chemicals,91.97,68.28,87.8,30.2,78.06
+AJANTPHARM,Ajanta Pharmaceuticals Ltd.,Healthcare,90.49,75.35,70.5,41.1,78.01
+NESTLEIND,Nestle India Ltd.,Fast Moving Consumer Goods,91.54,74.95,70.2,37.8,77.99
+HONASA,Honasa Consumer Ltd.,Fast Moving Consumer Goods,84.57,68.48,,74.2,77.67
+ADANIGREEN,Adani Green Energy Ltd.,Power,88.16,92.73,54.5,19.9,77.66
+KIMS,Krishna Institute of Medical Sciences Ltd.,Healthcare,76.32,91.92,,40.1,77.57
+MCX,Multi Commodity Exchange of India Ltd.,Financial Services,100.0,62.53,66.4,37.9,77.51
+GRASIM,Grasim Industries Ltd.,Construction Materials,75.69,93.33,,38.2,77.5
+COALINDIA,Coal India Ltd.,Oil Gas & Consumable Fuels,89.01,74.14,62.9,57.7,77.5
+GRANULES,Granules India Ltd.,Healthcare,93.02,61.72,85.1,41.5,77.29
+ZYDUSLIFE,Zydus Lifesciences Ltd.,Healthcare,68.29,94.75,,65.2,77.26
+THERMAX,Thermax Ltd.,Capital Goods,95.77,66.87,63.0,41.1,76.72
+BHEL,Bharat Heavy Electricals Ltd.,Capital Goods,96.83,70.0,64.4,24.7,76.7
+SCHNEIDER,Schneider Electric Infrastructure Ltd.,Capital Goods,98.1,60.2,50.0,67.3,76.43
+BIOCON,Biocon Ltd.,Healthcare,79.7,86.46,,28.9,76.11
+FINCABLES,Finolex Cables Ltd.,Capital Goods,87.1,71.62,,39.8,76.07
+ADANIENT,Adani Enterprises Ltd.,Metals & Mining,75.26,93.33,,27.5,76.02
+MOTHERSON,Samvardhana Motherson International Ltd.,Automobile and Auto Components,71.46,92.12,,45.5,75.7
+AUBANK,AU Small Finance Bank Ltd.,Financial Services,77.17,86.67,,35.8,75.65
+SAIL,Steel Authority of India Ltd.,Metals & Mining,96.41,63.23,66.5,33.0,75.63
+ABCAPITAL,Aditya Birla Capital Ltd.,Financial Services,77.38,88.89,,27.0,75.51
+ZYDUSWELL,Zydus Wellness Ltd.,Fast Moving Consumer Goods,81.82,84.55,,19.1,75.4
+SONACOMS,Sona BLW Precision Forgings Ltd.,Automobile and Auto Components,80.76,83.54,,25.7,75.26
+EICHERMOT,Eicher Motors Ltd.,Automobile and Auto Components,76.74,86.16,,32.7,74.89
+VIJAYA,Vijaya Diagnostic Centre Ltd.,Healthcare,85.84,66.06,,49.7,74.6
+AUROPHARMA,Aurobindo Pharma Ltd.,Healthcare,93.23,67.27,55.2,39.3,74.35
+LUPIN,Lupin Ltd.,Healthcare,79.07,78.48,,39.2,74.17
+JINDALSAW,Jindal Saw Ltd.,Capital Goods,81.18,77.58,,30.9,73.99
+ELGIEQUIP,Elgi Equipments Ltd.,Capital Goods,60.04,96.57,,65.8,73.61
+BHARATFORG,Bharat Forge Ltd.,Automobile and Auto Components,96.19,66.87,49.7,27.8,73.58
+KARURVYSYA,Karur Vysya Bank Ltd.,Financial Services,87.53,64.24,72.8,34.8,73.06
+SHYAMMETL,Shyam Metalics and Energy Ltd.,Capital Goods,65.54,94.34,,41.4,72.87
+SBIN,State Bank of India,Financial Services,74.84,81.01,,37.8,72.66
+GMRAIRPORT,GMR Airports Ltd.,Services,60.25,96.06,,57.7,72.59
+CRAFTSMAN,Craftsman Automation Ltd.,Automobile and Auto Components,88.58,55.35,90.4,25.3,72.56
+NLCINDIA,NLC India Ltd.,Power,97.04,62.12,39.1,42.0,72.37
+HINDZINC,Hindustan Zinc Ltd.,Metals & Mining,89.64,59.9,76.9,25.2,72.36
+MANAPPURAM,Manappuram Finance Ltd.,Financial Services,76.53,82.22,,23.6,72.31
+SUNPHARMA,Sun Pharmaceutical Industries Ltd.,Healthcare,73.78,82.93,,32.9,72.2
+CGCL,Capri Global Capital Ltd.,Financial Services,58.77,99.39,,50.9,72.18
+ANGELONE,Angel One Ltd.,Financial Services,68.5,91.52,,29.4,72.02
+BALRAMCHIN,Balrampur Chini Mills Ltd.,Fast Moving Consumer Goods,74.42,83.54,,25.8,71.92
+TITAN,Titan Company Ltd.,Consumer Durables,76.96,77.17,,31.8,71.72
+LALPATHLAB,Dr. Lal Path Labs Ltd.,Healthcare,71.67,85.76,,29.5,71.68
+INDUSINDBK,IndusInd Bank Ltd.,Financial Services,68.92,88.89,,28.4,71.2
+CEMPRO,Cemindia Projects Ltd.,Construction,70.19,87.07,,25.4,70.88
+GLAND,Gland Pharma Ltd.,Healthcare,75.48,63.03,,73.3,70.83
+GPIL,Godawari Power & Ispat Ltd.,Capital Goods,90.7,42.63,74.9,57.8,70.62

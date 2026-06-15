@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Finance Portfolio Dashboard",
+  "schemaVersion": 1,
+  "description": "Live personal finance portfolio dashboard. Pulls the Google Sheet \"Finance\" on each open, parses the summary + daily time series, and shows net worth, allocation, trend, composition-over-time and a holdings table across Mutual Funds, Indian Equity, DELL Shares, Cash, Fixed Deposit, PRS Malaysia and EPF Malaysia. INR/MYR toggle with editable FX rate. Sheet values are in INR.",
+  "mcpTools": [
+    "mcp__13cc7b57-0f3b-4edd-8dec-1cabf9b8d326__read_file_content"
+  ],
+  "mcpServerNames": [
+    "Google Drive"
+  ]
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Portfolio Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{ color-scheme: light;
+  --bg:#f6f8fc; --panel:#ffffff; --line:#e3e8f2; --txt:#1c2538;
+  --mut:#6b7794; --acc:#3b6fff; --grn:#12a86b; --red:#e23b5a; --amb:#d98a00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,Roboto,sans-serif;padding:22px;max-width:1320px;margin:0 auto}
+h1{font-size:22px;font-weight:680}
+.sub{color:var(--mut);font-size:13px;margin-top:4px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toggle{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.toggle button{background:transparent;color:var(--mut);border:0;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.toggle button.on{background:var(--acc);color:#fff}
+.rate{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;color:var(--mut)}
+.rate input{width:74px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;color:var(--txt);background:#fbfcff}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(20,30,60,.04)}
+.kpi .lab{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.kpi .val{font-size:24px;font-weight:730;margin-top:7px}
+.kpi .alt{color:var(--mut);font-size:13px;margin-top:3px}
+.pos{color:var(--grn)} .neg{color:var(--red)} .amber{color:var(--amb)}
+.row{display:grid;grid-template-columns:1.05fr 1fr;gap:14px;margin-top:14px}
+.row3{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+.ctitle{font-size:14px;font-weight:670;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.hint{font-size:11px;color:var(--mut);font-weight:500}
+.cwrap{position:relative;height:300px}
+.cwrap.tall{height:330px}
+.cwrap.mini{height:170px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+tbody.clk tr{cursor:pointer}
+tbody.clk tr:hover{background:#f0f4ff}
+tbody.clk tr.sel{background:#e8efff}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.foot{color:var(--mut);font-size:12px;margin-top:20px;text-align:center;line-height:1.6}
+.state{padding:40px;text-align:center;color:var(--mut);font-size:14px}
+.chips{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.chip .l{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
+.chip .v{font-size:18px;font-weight:700;margin-top:2px}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:650}
+.detailgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.tabs button{border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:20px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+small.note{color:var(--mut);font-size:11px}
+.insight{border-left:3px solid var(--line);padding:9px 12px;margin-bottom:9px;background:#fbfcff;border-radius:0 8px 8px 0;font-size:13px;line-height:1.45}
+.insight.red{border-color:var(--red)} .insight.amb{border-color:var(--amb)} .insight.grn{border-color:var(--grn)} .insight.info{border-color:var(--acc)}
+.insight b{font-weight:680}
+.smix{margin-bottom:8px}
+.smix .lab{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.smix .bar{height:9px;border-radius:6px;background:#eef1f7;overflow:hidden}
+.smix .bar i{display:block;height:100%;border-radius:6px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.row,.detailgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <h1>Finance Portfolio Dashboard</h1>
+    <div class="sub" id="subline">Loading from Google Sheet…</div>
+  </div>
+  <div class="controls">
+    <div class="rate">1 ₹ = <input id="rate" type="number" step="0.0001" value="0.0412"/> RM</div>
+    <div class="toggle">
+      <button id="bINR" class="on" onclick="setCur('INR')">₹ INR</button>
+      <button id="bMYR" onclick="setCur('MYR')">RM MYR</button>
+    </div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="grid kpis" id="kpis"></div>
+  <div class="row">
+    <div class="card"><div class="ctitle">Allocation by asset class</div><div class="cwrap"><canvas id="alloc"></canvas></div></div>
+    <div class="card"><div class="ctitle">Net worth — recent history</div><div class="cwrap"><canvas id="trend"></canvas></div></div>
+  </div>
+  <div class="row3">
+    <div class="card">
+      <div class="ctitle">Holdings by asset class <span class="hint">click a row to drill down ↓</span></div>
+      <table id="tbl"><thead><tr>
+        <th>Asset class</th><th>Invested</th><th>Current</th><th>Profit / Loss</th><th>Return</th><th>Weight</th>
+      </tr></thead><tbody class="clk"></tbody></table>
+    </div>
+  </div>
+
+  <div class="row3"><div class="card" id="drill">
+     <div class="tabs" id="tabs"></div>
+     <div class="ctitle" id="drillTitle"></div>
+     <div class="detailgrid">
+       <div><div class="cwrap mini"><canvas id="catTrend"></canvas></div><div id="drillChips" class="chips" style="margin-top:14px"></div></div>
+       <div id="drillBody"></div>
+     </div>
+  </div></div>
+
+  <div class="row3"><div class="card">
+     <div class="ctitle">Analysis &amp; rebalancing notes <span class="hint">auto-generated from your data — not financial advice</span></div>
+     <div class="detailgrid">
+       <div><div style="font-size:12px;font-weight:670;color:var(--mut);margin-bottom:10px">MUTUAL FUND STYLE MIX</div><div id="styleMix"></div></div>
+       <div id="analysisBody"></div>
+     </div>
+  </div></div>
+
+  <div class="row3">
+    <div class="card"><div class="ctitle">Insurance &amp; pension commitments</div><div id="insBody"></div></div>
+  </div>
+
+  <div class="row3"><div class="card"><div class="ctitle">Composition over time</div><div class="cwrap tall"><canvas id="stack"></canvas></div></div></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<div class="state" id="state">Fetching latest data from your “Finance” sheet…</div>
+
+<script>
+const FILE_ID='1rb88bBTcS3Zq_VYTCc9hvdJhVgXdd_KdmI-auAc2_Mc';
+const TOOL='mcp__13cc7b57-0f3b-4edd-8dec-1cabf9b8d326__read_file_content';
+const CATS=[
+  {key:'mf',   name:'Mutual Funds',     cols:['Mutual Fund'], color:'#3b6fff', native:'INR'},
+  {key:'dell', name:'DELL Shares (US)', cols:['DELL Shares'], color:'#8b5cf6', native:'INR'},
+  {key:'cash', name:'Cash',             cols:['Cash NRE','Cash NRO'], color:'#12a86b', native:'INR'},
+  {key:'fd',   name:'Fixed Deposit',    cols:['Fixed Deposit'], color:'#06b6d4', native:'INR'},
+  {key:'eq',   name:'Indian Equity',    cols:['Equity','NRO-Derivatives','Zerodha Orbis'], color:'#e0a90f', native:'INR'},
+  {key:'prs',  name:'PRS Malaysia',     cols:['PRS Malaysia'], color:'#e23b5a', native:'MYR'},
+  {key:'epf',  name:'EPF Malaysia',     cols:['EPF Malaysia'], color:'#f97316', native:'MYR'},
+];
+let CUR='INR', RATE=parseFloat(localStorage.getItem('inrmyr')||'0.0412');
+let D=null, charts={}, SEL=null;
+document.getElementById('rate').value=RATE;
+
+const num=s=>{ if(s==null)return null; s=(''+s).replace(/,/g,'').replace(/\\/g,'').replace(/[₹$]/g,'').trim(); const v=parseFloat(s); return isNaN(v)?null:v; };
+const cells=l=>l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim());
+const isSep=l=>/^\|?[\s:|-]+\|?$/.test(l)&&l.includes('-');
+function parseTables(t){const lines=t.split('\n');const bl=[];let c=[];for(const l of lines){if(l.trim().startsWith('|'))c.push(l);else{if(c.length)bl.push(c);c=[]}}if(c.length)bl.push(c);return bl.map(b=>{const rows=b.filter(l=>!isSep(l)).map(cells);return{header:rows[0]||[],rows:rows.slice(1)}});}
+
+function extractText(res){
+  if(res==null) return '';
+  if(typeof res==='string'){ try{return extractText(JSON.parse(res));}catch(e){ return res; } }
+  if(res.fileContent) return res.fileContent;
+  if(res.content){ if(typeof res.content==='string') return res.content;
+    if(Array.isArray(res.content)) return res.content.map(c=>c.text||c.fileContent||'').join('\n'); }
+  if(res.result) return extractText(res.result);
+  if(res.text) return res.text;
+  return JSON.stringify(res);
+}
+function cleanStatus(s){ return (s||'').replace(/[^\x20-\x7E]/g,'').trim(); }
+
+function buildModel(text){
+  const T=parseTables(text);
+  const ts=T.find(t=>t.header[0]&&/^date/i.test(t.header[0]));
+  const hdr=ts.header;
+  const series=ts.rows.filter(r=>/^\d{4}-\d{2}-\d{2}/.test(r[0]||'')).map(r=>{const rec={date:r[0]};hdr.forEach((h,j)=>{if(j>1)rec[h]=num(r[j]);});return rec;}).sort((a,b)=>a.date<b.date?-1:1);
+  const sm=T.find(t=>/^name/i.test(t.header[0]||'')&&t.header.some(h=>/invested/i.test(h))&&t.header.length<=6);
+  const summary={}; if(sm) sm.rows.forEach(r=>{ if(r[0]) summary[r[0]]={invested:num(r[1]),current:num(r[2])}; });
+
+  const detail={};
+  const eq=T.find(t=>/zerodha/i.test(t.header[0]||''));
+  detail.eq= eq? eq.rows.map(r=>({name:(r[1]||'').replace('NSE:',''),qty:num(r[2]),avg:num(r[3]),inv:num(r[4]),ltp:num(r[5]),cur:num(r[6]),pl:num(r[8]),roe:cleanStatus(r[12]),sector:r[15]})).filter(x=>x.name&&x.qty>0):[];
+  const mf=T.find(t=>/^start date/i.test(t.header[0]||'')&&t.header.some(h=>/liquidate/i.test(h)));
+  detail.mf= mf? mf.rows.map(r=>({house:r[2],name:r[4],inv:num(r[9]),cur:num(r[11]),pl:num(r[12]),ret:cleanStatus(r[13])})).filter(x=>x.inv>0):[];
+  const ev=T.filter(t=>/^start date/i.test(t.header[0]||'')&&t.header.some(h=>/evaluation/i.test(h)));
+  detail.prs=[];detail.epf=[];
+  ev.forEach(t=>t.rows.forEach(r=>{const h=r[2]||'';if(!h)return;
+    if(/public mutual/i.test(h)) detail.prs.push({acct:h,name:r[4],inv:num(r[9]),cur:num(r[11]),pl:num(r[12]),ret:cleanStatus(r[13])});
+    else if(/kwsp/i.test(h)){ const cur=Math.max(num(r[10])||0,num(r[11])||0,num(r[12])||0); detail.epf.push({acct:h,cur:cur}); }
+  }));
+  const cash=T.find(t=>/^account/i.test(t.header[0]||'')&&t.header.some(h=>/closing balance/i.test(h)));
+  detail.cash= cash? cash.rows.map(r=>({acct:r[0],updated:r[1],bal:num(r[2]),type:r[3]})).filter(x=>x.acct):[];
+  const ins=T.find(t=>/^name/i.test(t.header[0]||'')&&t.header.some(h=>/premium due/i.test(h)));
+  detail.ins=[];
+  if(ins) ins.rows.filter(r=>r[0]&&!/^PRS Malaysia/i.test(r[0])).forEach(r=>{
+    const isLIC=/^LIC/i.test(r[0]);
+    if(isLIC) detail.ins.push({name:r[0].replace(/\\/,'').trim()+' ('+r[1]+')',due:r[6],term:r[7],maturity:r[8],premium:r[9],sum:num(r[10]),plan:r[12]});
+    else detail.ins.push({name:r[0],due:r[5],maturity:r[6],plan:r[8],premiumAnnual:num(r[9]),premiumMonthly:num(r[10])});
+  });
+  const dell=T.find(t=>/^dell shares/i.test(t.header[0]||''));
+  detail.dellShares= dell? num(dell.rows[0]?dell.rows[0][0]:dell.header[1]) : null;
+
+  return {series, summary, updated: series[series.length-1].date, detail};
+}
+
+function conv(v,native){ native=native||'INR'; if(v==null)return 0; if(native===CUR)return v; if(native==='INR'&&CUR==='MYR')return v*RATE; if(native==='MYR'&&CUR==='INR')return v/RATE; return v; }
+const sym=()=>CUR==='INR'?'₹':'RM';
+function fmt(v,n){ return sym()+' '+conv(v,n).toLocaleString(undefined,{maximumFractionDigits:0}); }
+function fmtC(v,n){ v=conv(v,n); const a=Math.abs(v); let s; if(CUR==='INR') s=a>=1e7?(v/1e7).toFixed(2)+' Cr':a>=1e5?(v/1e5).toFixed(2)+' L':v.toFixed(0); else s=a>=1e6?(v/1e6).toFixed(2)+'M':a>=1e3?(v/1e3).toFixed(1)+'k':v.toFixed(0); return sym()+' '+s; }
+const tick=v=>{ if(CUR==='INR')return v>=1e7?'₹'+(v/1e7).toFixed(1)+'Cr':'₹'+(v/1e5).toFixed(0)+'L'; return 'RM'+(v/1e6).toFixed(1)+'M'; };
+const plc=v=> v>=0?'pos':'neg';
+
+function catAgg(){
+  const last=D.series[D.series.length-1];
+  return CATS.map(c=>{ let cur=0,inv=0; c.cols.forEach(col=>{cur+=last[col]||0; const s=D.summary[col]; if(s&&s.invested!=null)inv+=s.invested;});
+    return {...c,current:cur,invested:inv,pl:cur-inv}; }).filter(c=>c.current>0||c.invested>0);
+}
+
+function render(){
+  if(!D)return;
+  const cats=catAgg();
+  const total=cats.reduce((a,c)=>a+c.current,0);
+  const totInv=cats.reduce((a,c)=>a+c.invested,0);
+  const totPL=total-totInv, plPct=totInv?totPL/totInv*100:0;
+  const other=CUR==='INR'?('RM '+(total*RATE).toLocaleString(undefined,{maximumFractionDigits:0})):('₹ '+total.toLocaleString(undefined,{maximumFractionDigits:0}));
+  document.getElementById('kpis').innerHTML=`
+   <div class="card kpi"><div class="lab">Net Worth</div><div class="val">${fmt(total)}</div><div class="alt">${other}</div></div>
+   <div class="card kpi"><div class="lab">Total Invested</div><div class="val">${fmt(totInv)}</div><div class="alt">cost basis (where tracked)</div></div>
+   <div class="card kpi"><div class="lab">Unrealised P/L</div><div class="val ${plc(totPL)}">${totPL>=0?'+':''}${fmt(totPL)}</div><div class="alt ${plc(totPL)}">${plPct>=0?'+':''}${plPct.toFixed(2)}%</div></div>
+   <div class="card kpi"><div class="lab">Asset Classes</div><div class="val">${cats.length}</div><div class="alt">click any row to drill down</div></div>`;
+
+  const tb=document.querySelector('#tbl tbody');
+  const sorted=cats.slice().sort((a,b)=>b.current-a.current);
+  tb.innerHTML=sorted.map(c=>{ const pct=c.invested?c.pl/c.invested*100:0,w=total?c.current/total*100:0;
+    return `<tr data-key="${c.key}" class="${SEL===c.key?'sel':''}"><td><span class="dot" style="background:${c.color}"></span>${c.name}</td>
+      <td>${fmtC(c.invested)}</td><td>${fmtC(c.current)}</td>
+      <td class="${plc(c.pl)}">${c.pl>=0?'+':''}${fmtC(c.pl)}</td>
+      <td class="${plc(c.pl)}">${c.invested?(pct>=0?'+':'')+pct.toFixed(1)+'%':'—'}</td>
+      <td>${w.toFixed(1)}%</td></tr>`; }).join('');
+  tb.querySelectorAll('tr').forEach(tr=>tr.onclick=()=>selectCat(tr.dataset.key));
+
+  document.getElementById('subline').textContent=`Last updated ${D.updated} • values in ${CUR} • ${D.series.length} days of history`;
+  document.getElementById('foot').innerHTML=`Live from Google Sheet “Finance”. Sheet stored in INR; MYR at 1 INR = ${RATE} MYR (editable). PRS &amp; EPF holding-level figures are native RM. Unrealised P/L vs recorded cost basis; cash &amp; FD show no cost-basis gain.`;
+
+  if(!SEL) SEL='mf';
+  buildTabs(cats);
+  renderDetail();
+  renderAnalysis(cats,total);
+  renderInsurance();
+  drawOverviewCharts(cats,total);
+}
+
+function buildTabs(cats){
+  const t=document.getElementById('tabs');
+  t.innerHTML=cats.map(c=>`<button class="${SEL===c.key?'on':''}" data-k="${c.key}">${c.name}</button>`).join('');
+  t.querySelectorAll('button').forEach(b=>b.onclick=()=>selectCat(b.dataset.k));
+}
+function selectCat(k){ SEL=k; render(); document.getElementById('drill').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+
+function renderDetail(){
+  const c=CATS.find(x=>x.key===SEL); const det=D.detail; const nat=c.native;
+  document.getElementById('drillTitle').innerHTML=`${c.name} — holdings`;
+  let rows=[], totCur=0, totInv=0, body='';
+  const head=(cols)=>`<table><thead><tr>${cols.map((h,i)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  if(SEL==='mf'){ rows=det.mf; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Fund','Invested','Current','P/L','Return'])+rows.sort((a,b)=>b.cur-a.cur).map(x=>{const p=x.inv?(x.cur-x.inv)/x.inv*100:0;return `<tr><td>${x.name}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.cur-x.inv)}">${fmtC(x.cur-x.inv,nat)}</td><td class="${plc(p)}">${(p>=0?'+':'')+p.toFixed(1)}%</td></tr>`;}).join('')+'</tbody></table>';
+  } else if(SEL==='eq'){ rows=det.eq; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Stock','Qty','Avg buy','LTP','Invested','Current','P/L','ROE'])+rows.sort((a,b)=>b.cur-a.cur).map(x=>`<tr><td>${x.name}</td><td>${x.qty}</td><td>${(x.avg||0).toFixed(1)}</td><td>${(x.ltp||0).toFixed(1)}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.pl)}">${fmtC(x.pl,nat)}</td><td class="${(x.roe||'').includes('-')?'neg':'pos'}">${x.roe}</td></tr>`).join('')+'</tbody></table>'
+      +'<small class="note">Only positions with open quantity are shown. Cash/derivative legs sit in the Equity asset-class total.</small>';
+  } else if(SEL==='cash'){ rows=det.cash; totCur=rows.reduce((a,x)=>a+(x.bal||0),0); totInv=0;
+    body=head(['Account','Type','Last updated','Balance'])+rows.sort((a,b)=>b.bal-a.bal).map(x=>`<tr><td>${x.acct}</td><td>${x.type}</td><td>${x.updated}</td><td>${fmtC(x.bal,nat)}</td></tr>`).join('')+'</tbody></table>';
+  } else if(SEL==='prs'){ rows=det.prs; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=rows.reduce((a,x)=>a+(x.inv||0),0);
+    body=head(['Account','Invested','Current','P/L','Return'])+rows.map(x=>{const p=x.inv?(x.cur-x.inv)/x.inv*100:0;return `<tr><td>${x.acct}</td><td>${fmtC(x.inv,nat)}</td><td>${fmtC(x.cur,nat)}</td><td class="${plc(x.cur-x.inv)}">${fmtC(x.cur-x.inv,nat)}</td><td class="${plc(p)}">${(p>=0?'+':'')+p.toFixed(1)}%</td></tr>`;}).join('')+'</tbody></table>'
+      +'<small class="note">Public Mutual PRS Islamic Strategic Equity Fund (Jijo &amp; Ansa). Values native in RM.</small>';
+  } else if(SEL==='epf'){ rows=det.epf; totCur=rows.reduce((a,x)=>a+(x.cur||0),0); totInv=0;
+    body=head(['Account (KWSP)','Current'])+rows.map(x=>`<tr><td>${x.acct}</td><td>${fmtC(x.cur,nat)}</td></tr>`).join('')+'</tbody></table>'
+      +'<small class="note">Malaysia EPF (KWSP). Values native in RM.</small>';
+  } else if(SEL==='dell'){ const last=D.series[D.series.length-1]; totCur=last['DELL Shares']||0;
+    body=`<table><tbody><tr><td>Shares held</td><td style="text-align:right">${det.dellShares||'—'}</td></tr><tr><td>Current value</td><td style="text-align:right">${fmtC(totCur,'INR')}</td></tr></tbody></table><small class="note">Employer DELL (US-listed) stock; valued in INR in the sheet.</small>`;
+  } else if(SEL==='fd'){ const s=D.summary['Fixed Deposit']||{}; totCur=s.current||0; totInv=s.invested||0;
+    body=`<table><tbody><tr><td>Principal</td><td style="text-align:right">${fmtC(totInv,'INR')}</td></tr><tr><td>Current value</td><td style="text-align:right">${fmtC(totCur,'INR')}</td></tr></tbody></table><small class="note">Fixed deposit principal; no mark-to-market gain recorded.</small>`;
+  }
+  document.getElementById('drillBody').innerHTML=body;
+  const pl=totCur-totInv, p=totInv?pl/totInv*100:0;
+  const showInv = totInv>0;
+  document.getElementById('drillChips').innerHTML=`
+    <div class="chip"><div class="l">Holdings</div><div class="v">${rows.length||1}</div></div>
+    ${showInv?`<div class="chip"><div class="l">Invested</div><div class="v">${fmtC(totInv,nat)}</div></div>`:''}
+    <div class="chip"><div class="l">Current</div><div class="v">${fmtC(totCur,nat)}</div></div>
+    ${showInv?`<div class="chip"><div class="l">P/L</div><div class="v ${plc(pl)}">${(pl>=0?'+':'')+fmtC(pl,nat)}</div></div>`:''}
+    ${showInv?`<div class="chip"><div class="l">Return</div><div class="v ${plc(p)}">${(p>=0?'+':'')+p.toFixed(1)}%</div></div>`:''}`;
+  drawCatTrend(c);
+}
+
+function classifyFund(n){ n=(n||'').toLowerCase();
+  if(/multi[ -]?asset|asset alloc/.test(n)) return {k:'Multi-Asset',c:'#06b6d4'};
+  if(/small/.test(n)) return {k:'Small Cap',c:'#e23b5a'};
+  if(/mid/.test(n)) return {k:'Mid Cap',c:'#f97316'};
+  if(/flexi|multi[ -]?cap|multicap/.test(n)) return {k:'Flexi / Multi Cap',c:'#8b5cf6'};
+  if(/large|blue ?chip|bluechip/.test(n)) return {k:'Large Cap',c:'#3b6fff'};
+  return {k:'Other',c:'#94a3c4'};
+}
+const pnum=s=>{ const v=parseFloat((''+s).replace(/[%,]/g,'')); return isNaN(v)?null:v; };
+
+function renderAnalysis(cats,total){
+  const mf=D.detail.mf, eq=D.detail.eq, last=D.series[D.series.length-1];
+  const byCat={};
+  mf.forEach(f=>{ const c=classifyFund(f.name); byCat[c.k]=byCat[c.k]||{v:0,c:c.c,funds:0}; byCat[c.k].v+=f.cur||0; byCat[c.k].funds++; });
+  const mfTot=mf.reduce((a,f)=>a+(f.cur||0),0)||1;
+  const order=Object.entries(byCat).sort((a,b)=>b[1].v-a[1].v);
+  document.getElementById('styleMix').innerHTML=order.map(([k,o])=>{
+    const p=o.v/mfTot*100;
+    return `<div class="smix"><div class="lab"><span>${k} <small class="note">(${o.funds})</small></span><span>${p.toFixed(0)}% · ${fmtC(o.v,'INR')}</span></div><div class="bar"><i style="width:${p.toFixed(1)}%;background:${o.c}"></i></div></div>`;
+  }).join('') || '<small class="note">No fund data.</small>';
+
+  const I=[];
+  const mid=(byCat['Mid Cap']?(byCat['Mid Cap'].v):0), small=(byCat['Small Cap']?(byCat['Small Cap'].v):0);
+  const midSmallPct=(mid+small)/mfTot*100;
+  if(midSmallPct>=50) I.push(['red',`<b>Mid &amp; small-cap make up ${midSmallPct.toFixed(0)}% of your funds.</b> That's an aggressive, high-volatility tilt. Consider rotating some toward large-cap/flexi to steady the ride.`]);
+  else if(midSmallPct>=35) I.push(['amb',`Mid &amp; small-cap are ${midSmallPct.toFixed(0)}% of funds — moderately aggressive; fine for a long horizon, watch the volatility.`]);
+  else I.push(['grn',`Mid &amp; small-cap are a contained ${midSmallPct.toFixed(0)}% of funds — reasonably balanced.`]);
+  const dup=Object.entries(byCat).filter(([k,o])=>o.funds>1).map(([k,o])=>`${o.funds} ${k}`);
+  if(dup.length) I.push(['amb',`<b>Fund overlap:</b> you hold ${dup.join(', ')} funds. Same-style funds tend to own the same stocks — consolidating to the best one per style cuts redundancy and effort.`]);
+  const ranked=mf.map(f=>({n:f.name,r:pnum(f.ret)})).filter(x=>x.r!=null).sort((a,b)=>b.r-a.r);
+  if(ranked.length){ const best=ranked[0]; I.push(['grn',`<b>Top performer:</b> ${best.n} at ${best.r>=0?'+':''}${best.r.toFixed(1)}%. Trimming a winner is also a natural way to rebalance and book gains.`]); }
+  const lag=ranked.filter(x=>x.r<5);
+  if(lag.length) I.push(['amb',`<b>Laggards (&lt;5% total return):</b> ${lag.map(x=>x.n.split(' ').slice(0,4).join(' ')+' ('+(x.r>=0?'+':'')+x.r.toFixed(1)+'%)').join('; ')}. Worth reviewing vs a low-cost index alternative; verify NAV entries for any that look off.`]);
+  if(eq.length){ const et=eq.reduce((a,x)=>a+(x.cur||0),0)||1; const top=eq.slice().sort((a,b)=>b.cur-a.cur)[0]; const tp=top.cur/et*100;
+    I.push([tp>=50?'amb':'grn',`<b>Direct equity:</b> ${eq.length} stock${eq.length>1?'s':''}, with ${top.name} at ${tp.toFixed(0)}% of the basket. ${eq.length<=2?'Two names is concentrated — either diversify the basket or fold it into funds.':''}`]); }
+  const dell=last['DELL Shares']||0; const dpct=dell/total*100;
+  if(dpct>=15) I.push(['red',`<b>Single-stock risk:</b> DELL is ${dpct.toFixed(0)}% of your total net worth (${fmtC(dell,'INR')}) — and likely correlated with your job. A systematic trim/diversify plan (tax permitting) reduces your biggest concentration.`]);
+  const eqObj=cats.find(c=>c.key==='eq');
+  const eqLike=(last['Mutual Fund']||0)+(eqObj?eqObj.current:0)+dell;
+  const eqPct=eqLike/total*100;
+  const defPct=((last['Cash NRE']||0)+(last['Cash NRO']||0)+(last['Fixed Deposit']||0))/total*100;
+  I.push([eqPct>75?'amb':'info',`<b>Overall mix:</b> ~${eqPct.toFixed(0)}% of net worth is equity-type, ~${defPct.toFixed(0)}% in cash/FD. ${eqPct>75?'Aggressive — appropriate only with a long horizon and stomach for drawdowns.':'A growth-oriented but cushioned allocation.'}`]);
+  I.push(['info',`<b>Tax on rebalancing:</b> Indian equity/MF units held &gt;1yr are taxed at 12.5% LTCG above the ₹1.25L yearly exemption. Spreading sells across financial years uses the exemption each year and trims the tax drag.`]);
+
+  document.getElementById('analysisBody').innerHTML=I.map(([lv,t])=>`<div class="insight ${lv}">${t}</div>`).join('')
+   +'<small class="note">Observations generated from your sheet to inform your own decisions; not a recommendation. Consider a SEBI-registered adviser.</small>';
+}
+
+function renderInsurance(){
+  const ins=D.detail.ins;
+  if(!ins.length){document.getElementById('insBody').innerHTML='<small class="note">No insurance data.</small>';return;}
+  let h='<table><thead><tr><th>Policy</th><th>Premium</th><th>Due</th><th>Maturity</th></tr></thead><tbody>';
+  h+=ins.map(x=>{ const prem = x.premiumAnnual!=null? ('₹'+x.premiumAnnual.toLocaleString()+'/yr') : (x.premium||'—');
+    return `<tr><td>${x.name}${x.plan&&isNaN(x.plan)?'<br><small class="note">'+x.plan+'</small>':''}</td><td>${prem}</td><td>${x.due||'—'}</td><td>${x.maturity||'—'}</td></tr>`;
+  }).join('')+'</tbody></table><small class="note">Premium commitments &amp; maturity timeline (informational; not counted in net worth).</small>';
+  document.getElementById('insBody').innerHTML=h;
+}
+
+function drawOverviewCharts(cats,total){
+  ['alloc','trend','stack'].forEach(k=>{if(charts[k])charts[k].destroy();});
+  Chart.defaults.color='#6b7794'; Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif"; const g='#e3e8f2';
+  charts.alloc=new Chart(alloc,{type:'doughnut',
+    data:{labels:cats.map(c=>c.name),datasets:[{data:cats.map(c=>conv(c.current,'INR')),backgroundColor:cats.map(c=>c.color),borderColor:'#fff',borderWidth:2}]},
+    options:{cutout:'62%',plugins:{legend:{position:'right',labels:{boxWidth:11,padding:9,font:{size:11}}},tooltip:{callbacks:{label:x=>{const p=(x.raw/conv(total,'INR')*100).toFixed(1);return ` ${x.label}: ${sym()} ${x.raw.toLocaleString(undefined,{maximumFractionDigits:0})} (${p}%)`;}}}}}});
+  const labels=D.series.map(r=>r.date.slice(5));
+  const gt=r=> r['Grand Total']!=null? r['Grand Total'] : Object.keys(r).filter(k=>k!=='date').reduce((a,k)=>a+(r[k]||0),0);
+  charts.trend=new Chart(trend,{type:'line',data:{labels,datasets:[{data:D.series.map(r=>conv(gt(r),'INR')),borderColor:'#3b6fff',backgroundColor:'rgba(59,111,255,.10)',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
+    options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>' '+sym()+' '+x.raw.toLocaleString(undefined,{maximumFractionDigits:0})}}},scales:{x:{grid:{color:g},ticks:{maxTicksLimit:8}},y:{grid:{color:g},ticks:{callback:tick}}}}});
+  const ds=CATS.map(c=>({label:c.name,backgroundColor:c.color,borderColor:c.color,data:D.series.map(r=>conv(c.cols.reduce((a,col)=>a+(r[col]||0),0),'INR')),fill:true,stack:'s',borderWidth:0,pointRadius:0,tension:.2}));
+  charts.stack=new Chart(stack,{type:'line',data:{labels,datasets:ds},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:11,padding:8,font:{size:11}}},tooltip:{mode:'index',intersect:false,callbacks:{label:x=>' '+x.dataset.label+': '+sym()+' '+x.raw.toLocaleString(undefined,{maximumFractionDigits:0})}}},scales:{x:{grid:{color:g},ticks:{maxTicksLimit:8}},y:{stacked:true,grid:{color:g},ticks:{callback:tick}}}}});
+}
+function drawCatTrend(c){
+  if(charts.cat)charts.cat.destroy(); const g='#e3e8f2';
+  const labels=D.series.map(r=>r.date.slice(5));
+  const data=D.series.map(r=>conv(c.cols.reduce((a,col)=>a+(r[col]||0),0),'INR'));
+  charts.cat=new Chart(catTrend,{type:'line',data:{labels,datasets:[{data,borderColor:c.color,backgroundColor:c.color+'22',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
+    options:{plugins:{legend:{display:false},title:{display:true,text:c.name+' — 29-day value',color:'#6b7794',font:{size:11}},tooltip:{callbacks:{label:x=>' '+sym()+' '+x.raw.toLocaleString(undefined,{maximumFractionDigits:0})}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6,font:{size:9}}},y:{grid:{color:g},ticks:{callback:tick,font:{size:9}}}}}});
+}
+
+function setCur(c){ CUR=c; bINR.classList.toggle('on',c==='INR'); bMYR.classList.toggle('on',c==='MYR'); render(); }
+document.getElementById('rate').addEventListener('change',e=>{const v=parseFloat(e.target.value);if(v>0){RATE=v;localStorage.setItem('inrmyr',v);render();}});
+
+async function load(){
+  try{
+    const res=await window.cowork.callMcpTool(TOOL,{fileId:FILE_ID});
+    const text=extractText(res);
+    if(!text||text.length<50) throw new Error('Empty response');
+    D=buildModel(text);
+    document.getElementById('state').style.display='none';
+    document.getElementById('app').style.display='block';
+    render();
+  }catch(err){ document.getElementById('state').innerHTML='Could not load the sheet.<br><small>'+(err&&err.message?err.message:err)+'</small>'; }
+}
+load();
+</script>
+</body>
+</html>

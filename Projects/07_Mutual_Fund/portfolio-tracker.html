@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jijo's Mutual Fund Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --card2:#1c2330; --border:#2d3748;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --green:#3fb950;
+    --red:#f85149; --gold:#d29922; --purple:#bc8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;padding:20px;max-width:1280px;margin:0 auto}
+  h1{font-size:1.6rem;margin-bottom:4px}
+  h2{font-size:1.15rem;margin:0 0 14px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:18px}
+  .grid{display:grid;gap:14px}
+  .cards4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .stat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .stat .lbl{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}
+  .stat .val{font-size:1.3rem;font-weight:700;margin-top:4px}
+  .pos{color:var(--green)} .neg{color:var(--red)}
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th{color:var(--muted);text-align:right;padding:8px 6px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:8px 6px;border-bottom:1px solid #21262d;text-align:right;white-space:nowrap}
+  tr.frow:hover td{background:#1c2330;cursor:pointer}
+  .txn-panel td{background:#10151d;text-align:left;cursor:default}
+  .txn-panel table{font-size:.78rem;max-width:560px}
+  .txn-panel th,.txn-panel td{padding:4px 8px}
+  input,select,button{font-family:inherit;font-size:.85rem}
+  input[type=number],input[type=text]{background:#0d1117;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 7px;width:110px;text-align:right}
+  select{background:#0d1117;border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px}
+  button{background:var(--accent);color:#0d1117;border:none;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+  button:hover{opacity:.88}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:900px){.row2{grid-template-columns:1fr}}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.83rem}
+  .bar-name{width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-track{flex:1;background:#21262d;border-radius:5px;height:18px}
+  .bar-fill{height:100%;border-radius:5px}
+  .bar-val{width:90px;text-align:right;font-weight:600}
+  .note{background:var(--card2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:10px;font-size:.86rem;line-height:1.5}
+  .note b{color:var(--accent)}
+  .note.warn{border-left-color:var(--gold)} .note.warn b{color:var(--gold)}
+  .note.good{border-left-color:var(--green)} .note.good b{color:var(--green)}
+  .note.bad{border-left-color:var(--red)} .note.bad b{color:var(--red)}
+  .small{font-size:.78rem;color:var(--muted)}
+  .chartbox{position:relative;height:300px}
+  #status{font-size:.8rem;color:var(--muted)}
+  .tgt-input{width:60px!important}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;padding:14px 0 30px;line-height:1.5}
+  .chip{font-size:.7rem;border:1px solid var(--border);border-radius:20px;padding:1px 8px;color:var(--muted);margin-left:6px}
+  #printHeader{display:none}
+  #topNav{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.97);border-bottom:1px solid var(--border);
+    display:flex;gap:4px;overflow-x:auto;padding:8px 2px;margin:0 -20px 14px;padding-left:20px;scrollbar-width:thin}
+  #topNav a{color:var(--muted);font-size:.78rem;white-space:nowrap;text-decoration:none;padding:4px 10px;border-radius:20px;border:1px solid transparent}
+  #topNav a:hover{color:var(--accent);border-color:var(--accent)}
+  .card h2{cursor:pointer;user-select:none}
+  .card h2 .cv{float:right;color:var(--muted);font-size:.85rem}
+  .card.collapsed > *:not(h2){display:none!important}
+  .card.collapsed{padding-bottom:10px}
+  @media print{
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:var(--bg);padding:10px;max-width:none}
+    .toolbar,button,#monthlyInv,#topNav{display:none!important}
+    .card{break-inside:avoid;page-break-inside:avoid;margin-bottom:12px}
+    .row2{display:block}
+    .row2 .card{margin-bottom:12px}
+    .chartbox{height:260px}
+    #printHeader{display:block;text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:10px}
+    .txn-panel{display:table-row!important}
+  }
+</style>
+</head>
+<body>
+
+<div id="printHeader"></div>
+<h1>📊 Mutual Fund Portfolio Tracker</h1>
+<div class="sub">Jijo Isaac · Live NAVs via api.mfapi.in · Transaction-level XIRR &amp; tax · Click any fund row to see its transactions · Click a section title to collapse it</div>
+
+<nav id="topNav"></nav>
+
+<div class="toolbar">
+  <button onclick="refreshNAVs()">🔄 Refresh Live NAVs</button>
+  <button class="ghost" onclick="loadTrends()">📈 Load Growth Chart</button>
+  <button class="ghost" onclick="exportJSON()">⬇ Export JSON</button>
+  <button class="ghost" onclick="exportPDF()">🖨 Export PDF</button>
+  <button class="ghost" onclick="resetData()">Reset to Defaults</button>
+  <span id="status"></span>
+</div>
+
+<div class="grid cards4" id="summary"></div>
+
+<div class="card">
+  <h2>Holdings <span class="chip">click a row for transactions</span></h2>
+  <div style="overflow-x:auto"><table id="tbl">
+    <thead><tr>
+      <th>Fund</th><th>Category</th><th>NAV ₹</th><th>Units</th><th>Invested ₹</th>
+      <th>Value ₹</th><th>P/L ₹</th><th>Abs.</th><th>XIRR</th><th>1Y</th><th>3Y</th><th>5Y</th>
+    </tr></thead>
+    <tbody></tbody>
+    <tfoot></tfoot>
+  </table></div>
+  <div class="small" style="margin-top:8px">1Y/3Y/5Y = the fund's trailing NAV returns (3Y/5Y annualized), loaded automatically from history — this is the fund's performance, not your personal return (that's XIRR).</div>
+  <div style="margin-top:14px">
+    <button class="ghost" onclick="loadTrail()">📈 Trailing Returns (3M → 5Y)</button>
+    <div id="trailOut" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>💸 If You Sell Today — Gains &amp; Taxes</h2>
+  <div style="overflow-x:auto"><table id="taxTbl">
+    <thead><tr><th>Fund</th><th>LT Gain ₹</th><th>ST Gain ₹</th><th>Units &lt; 1yr</th><th>Exit-load risk</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <div id="taxNotes" style="margin-top:14px"></div>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h2>🏆 Performers by XIRR (annualized)</h2>
+    <div id="performers"></div>
+  </div>
+  <div class="card">
+    <h2>🥧 Allocation by Category</h2>
+    <div class="chartbox"><canvas id="allocChart"></canvas></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>⚖️ Rebalancing Plan</h2>
+  <div class="small" style="margin-bottom:10px">Compare strategies below, then Apply one (or edit targets manually). Two routes for each: <b>sell &amp; switch now</b> (instant, costs tax + exit load) vs <b>no-sell</b> (redirect future investments — free, but slower).</div>
+  <div style="margin-bottom:10px">Monthly investment for the no-sell route: ₹<input type="number" id="monthlyInv" value="200000" style="width:100px"></div>
+  <div id="stratCompare" style="overflow-x:auto;margin-bottom:14px"></div>
+  <div style="overflow-x:auto"><table id="rebalTbl">
+    <thead><tr><th>Category</th><th>Current ₹</th><th>Current %</th><th>Target %</th><th>Target ₹</th><th>Gap ₹</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <div id="rebalNotes" style="margin-top:14px"></div>
+</div>
+
+<div class="card">
+  <h2>🔍 Fund-by-Fund Analysis</h2>
+  <div id="analysis"></div>
+</div>
+
+<div class="card">
+  <h2>🔁 Better-Fund Finder</h2>
+  <div class="small" style="margin-bottom:10px">Compares each of your funds against well-known category peers on live trailing NAV returns. ⭐ = alternative beating your best held fund's 3Y return by &gt;2 points.</div>
+  <button onclick="loadAlternatives()">🔎 Compare Alternatives</button>
+  <div id="altOut" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+  <h2>📅 Year-by-Year Performance vs Index</h2>
+  <div class="small" style="margin-bottom:10px">Money-weighted XIRR and rupee gain for each calendar year, rebuilt from your actual transactions and NAV history, compared against index funds (Nifty 50 &amp; Nifty Midcap 150) over the same windows.</div>
+  <button onclick="loadYearly()">📊 Compute Yearly Returns</button>
+  <div id="yearlyOut" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+  <h2>📉 Risk Metrics (3-Year Window)</h2>
+  <div class="small" style="margin-bottom:10px">How bumpy the ride is, not just where it ended. Volatility = annualized daily swings; Max Drawdown = worst peak-to-trough fall; Sharpe = return earned per unit of risk above a 6.5% risk-free rate (higher is better, &gt;1 is good).</div>
+  <button onclick="loadRisk()">📐 Compute Risk Metrics</button>
+  <div id="riskOut" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+  <h2>🗓️ Tax Harvest &amp; Exit-Load Calendar</h2>
+  <div id="taxCalOut"></div>
+</div>
+
+<div class="card">
+  <h2>🧩 Portfolio Composition Insights</h2>
+  <div class="small" style="margin-bottom:10px">Correlation of daily moves (3Y) is a practical overlap detector — two funds moving in lockstep (&gt;0.90) are buying you the same risk twice. Plus fund-house concentration.</div>
+  <button onclick="loadComposition()">🔗 Analyze Composition</button>
+  <div id="compOut" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+  <h2>💰 Cash-Flow &amp; Goal Insights</h2>
+  <div id="cashflowOut"></div>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h2>🎯 SIP Goal Planner</h2>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;max-width:420px">
+      <label>Target amount ₹</label><input type="number" id="sipTarget" value="30000000">
+      <label>Years</label><input type="number" id="sipYears" value="10">
+      <label>Expected return % p.a.</label><input type="number" id="sipRet" value="12">
+    </div>
+    <div id="sipOut" style="margin-top:14px"></div>
+  </div>
+  <div class="card">
+    <h2>📈 Invested vs Value Over Time</h2>
+    <div class="chartbox"><canvas id="trendChart"></canvas></div>
+    <div class="small" id="trendNote" style="margin-top:8px">Click "Load Growth Chart" — plots your actual cumulative investment (step line) against portfolio value using real purchase dates and full NAV history.</div>
+  </div>
+</div>
+
+<footer>Educational tool, not investment or tax advice — confirm tax figures with a CA. Equity MF tax assumed: STCG 20% (≤12m), LTCG 12.5% above ₹1.25L/FY (&gt;12m). NAV data: api.mfapi.in (AMFI).<br>Host this single file anywhere (GitHub Pages, Netlify) — it works as-is.</footer>
+
+<script>
+const CATS = ['Large Cap','Mid Cap','Small Cap','Flexi Cap','Multi Asset'];
+const CATCOLORS = {'Large Cap':'#58a6ff','Mid Cap':'#bc8cff','Small Cap':'#f85149','Flexi Cap':'#3fb950','Multi Asset':'#d29922'};
+const DEFAULT_TARGETS = {'Large Cap':35,'Mid Cap':25,'Small Cap':10,'Flexi Cap':15,'Multi Asset':15};
+const LTCG_RATE=.125, STCG_RATE=.20, LTCG_EXEMPT=125000;
+
+// txns: [date, amountInvested, units]
+const DEFAULT_FUNDS = [
+ {id:1, name:'Axis Midcap Fund - Direct Growth', code:120505, category:'Mid Cap', nav:136.27, navDate:'31-05-2026', folio:'910116656423',
+  txns:[['2023-06-27',945541.65,11282.749]]},
+ {id:2, name:'HDFC Small Cap Fund - Direct Growth', code:130503, category:'Small Cap', nav:141.691, navDate:'07-04-2026', folio:'15045815',
+  txns:[['2023-06-27',383601.71,3681.744],['2023-12-27',200000,1557.191],['2024-05-02',200000,1414.797],['2025-01-31',200000,1388.424]]},
+ {id:4, name:'Kotak Midcap Fund - Direct Growth (SIP)', code:119775, category:'Mid Cap', nav:160.189, navDate:'08-06-2026', folio:'12734790',
+  txns:[['2023-08-01',25000,251.59],['2023-08-30',25000,243.99],['2023-10-03',25000,240.109],['2023-10-31',25000,245.321],['2023-11-30',25000,229.262],['2024-01-01',25000,218.614],['2024-01-30',25000,220.151],['2024-03-01',25000,212.113],['2024-04-02',25000,207.917],['2024-04-30',25000,198.813],['2024-05-30',25000,188.454],['2024-07-01',25000,170.485],['2024-07-30',25000,164.778],['2024-08-30',25000,162.749],['2024-10-01',25000,158.861],['2024-10-30',25000,166.493],['2024-12-02',25000,162.386],['2024-12-31',25000,161.93],['2025-01-30',25000,179.42],['2025-03-03',25000,197.697],['2025-04-01',25000,186.022],['2025-04-30',25000,179.204],['2025-05-30',25000,167.247],['2025-06-03',200000,1335.082],['2025-07-01',25000,158.559],['2025-07-18',200000,1265.84],['2025-07-30',25000,157.955],['2025-09-01',25000,158.554],['2025-09-30',25000,159.23],['2025-10-30',25000,154.065],['2025-12-01',25000,156.923],['2025-12-30',25000,159.361],['2026-01-30',25000,162.745],['2026-03-04',25000,162.638],['2026-04-02',25000,172.809],['2026-04-30',25000,155.738]]},
+ {id:5, name:'Parag Parikh Flexi Cap - Direct Growth', code:122639, category:'Flexi Cap', nav:88.8675, navDate:'09-06-2026', folio:'17029743',
+  txns:[['2025-05-12',200000,2233.609],['2025-05-21',200000,2225.432],['2025-05-22',200000,2234.937],['2025-05-29',200000,2224.147],['2025-06-10',200000,2173.868]]},
+ {id:6, name:'Nippon India Growth (Mid Cap) - Direct Growth', code:118668, category:'Mid Cap', nav:4835.9261, navDate:'29-05-2026', folio:'499310094065',
+  txns:[['2023-12-27',200000,58.322],['2024-07-12',200000,46.266],['2025-05-06',100000,24.128],['2025-06-10',200000,43.546],['2025-07-25',200000,44.114],['2025-08-12',200000,44.887],['2025-09-25',200000,44.041],['2025-11-12',200000,42.554],['2025-12-12',200000,43.23],['2026-02-16',200000,42.043],['2026-02-23',200000,42.017],['2026-04-01',200000,46.628]]},
+ {id:7, name:'Nippon India Large Cap - Direct Growth', code:118632, category:'Large Cap', nav:99.4356, navDate:'26-05-2026', folio:'499310094065',
+  txns:[['2024-01-02',200000,2488.722],['2025-01-24',200000,2186.668],['2025-03-04',200000,2294.403],['2025-05-12',200000,2042.592],['2025-05-22',200000,2042.588],['2025-05-29',200000,2011.282],['2025-06-10',200000,1975.686],['2025-07-09',200000,1959.937],['2025-10-01',200000,1959.57],['2025-12-31',200000,1898.481]]},
+ {id:9, name:'Canara Robeco Large Cap - Direct Growth', code:118269, category:'Large Cap', nav:70.14, navDate:'27-05-2026', folio:'19959900451',
+  txns:[['2024-01-02',200000,3451.674],['2024-12-31',200000,2884.61]]},
+ {id:10,name:'quant Multi Asset Allocation - Direct Growth', code:120821, category:'Multi Asset', nav:178.1951, navDate:'11-06-2026', folio:'51065408774',
+  txns:[['2024-04-12',200000,1475.277],['2025-12-31',200000,1174.495],['2026-04-01',200000,1204.519],['2026-04-01',200000,1204.519],['2026-05-06',200000,1121.631]]}
+];
+
+const FUND_NOTES = {
+ 120505:'Quality-growth midcap, single 2023 switch-in. Best XIRR in your portfolio — but the whole position is one lot; all long-term now, tax-efficient to trim if needed.',
+ 130503:'Small cap, value tilt, large AUM. All units now long-term. NAV reporting on the API lags occasionally — refresh before decisions.',
+ 119775:'Your only SIP — exactly the right vehicle for midcap volatility. Recent SIP lots (<1yr) carry exit load + 20% STCG if sold early.',
+ 122639:'Bought as 5 lumpsums in May–Jun 2025 near a market high; flat since. PPFAS holds cash + foreign equity — designed to lag in rallies and cushion falls. Judge it after 3+ years.',
+ 118668:'Largest holding (~22%). Bulk of recent buys are short-term — selling now triggers 20% STCG on those lots.',
+ 118632:'Weakest XIRR among large holdings. Most 2025 buys are still short-term; recent lots are underwater.',
+ 118269:'(Formerly Bluechip Equity) Conservative quality large cap. Both lots long-term as of Dec 2025.',
+ 120821:'Your only non-pure-equity fund — carries the entire debt/gold cushion. Strong 15.5% XIRR. Note: 3 of 5 lots are short-term.'
+};
+
+let funds, targets, goals, histCache={}, histRet={};
+const DEFAULT_GOALS=[{name:'Retirement', target:50000000, year:2040}];
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem('mfTracker_v2'));
+    funds = d.funds; targets = d.targets; goals = d.goals || JSON.parse(JSON.stringify(DEFAULT_GOALS));
+    if(!Array.isArray(funds) || !funds.length) throw 0;
+  }catch(e){ funds = JSON.parse(JSON.stringify(DEFAULT_FUNDS)); targets = {...DEFAULT_TARGETS}; goals = JSON.parse(JSON.stringify(DEFAULT_GOALS)); }
+}
+function save(){ localStorage.setItem('mfTracker_v2', JSON.stringify({funds,targets,goals})); }
+function resetData(){ if(confirm('Reset to the original pre-loaded portfolio?')){ localStorage.removeItem('mfTracker_v2'); load(); renderAll(); } }
+/* Reports folder: C:\Users\Ansa\Claude\Projects\07_Mutual_Fund\Reports
+   Picked once via folder dialog, then remembered permanently (IndexedDB).
+   Later sessions need at most a one-click permission confirm — no navigation. */
+let reportsDir=null;
+function idbOpen(){ return new Promise((res,rej)=>{ const r=indexedDB.open('mfTrackerFS',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function idbSet(k,v){ const db=await idbOpen(); return new Promise((res,rej)=>{
+  const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
+async function idbGet(k){ const db=await idbOpen(); return new Promise((res,rej)=>{
+  const rq=db.transaction('kv').objectStore('kv').get(k); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
+
+async function getReportsDir(){
+  if(reportsDir) return reportsDir;
+  if(!window.showDirectoryPicker) return null; // Firefox/Safari: fall back to download
+  try{ // re-use the previously chosen Reports folder
+    const h=await idbGet('reportsDir');
+    if(h){
+      let p=await h.queryPermission({mode:'readwrite'});
+      if(p!=='granted') p=await h.requestPermission({mode:'readwrite'});
+      if(p==='granted'){ reportsDir=h; return h; }
+    }
+  }catch(e){}
+  try{ // first time: pick 07_Mutual_Fund\Reports once
+    reportsDir=await showDirectoryPicker({id:'mfReports', mode:'readwrite'});
+    try{ await idbSet('reportsDir', reportsDir); }catch(e){}
+    return reportsDir;
+  }catch(e){ return null; } // user cancelled
+}
+async function writeToReports(name, content){
+  const dir=await getReportsDir();
+  if(!dir) return false;
+  try{
+    const fh=await dir.getFileHandle(name,{create:true});
+    const w=await fh.createWritable(); await w.write(content); await w.close();
+    return true;
+  }catch(e){ return false; }
+}
+async function exportJSON(){
+  const data=JSON.stringify({funds,targets,goals},null,2);
+  const ts=new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+  const name='portfolio-backup-'+ts+'.json';
+  if(await writeToReports(name,data)){ setStatus('✓ Backup saved to Reports folder: '+name); return; }
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(data);
+  a.download=name; a.click();
+  setStatus('Backup downloaded: '+name+' (move it to the Reports folder)');
+}
+async function exportPDF(){
+  await exportJSON(); // auto-save a JSON backup alongside every PDF report
+  // expand all collapsed sections and transaction panels so the PDF is complete
+  document.querySelectorAll('.card.collapsed').forEach(c=>c.classList.remove('collapsed'));
+  funds.forEach(f=>{ const el=document.getElementById('txn-'+f.id); if(el) el.style.display=''; });
+  document.getElementById('printHeader').innerHTML=
+    'Portfolio Report · Jijo Isaac · generated '+new Date().toLocaleString('en-IN')+
+    ' · choose "Save as PDF" as the printer destination (pick the Reports folder)';
+  setTimeout(()=>{
+    window.print();
+    funds.forEach(f=>{ const el=document.getElementById('txn-'+f.id); if(el) el.style.display='none'; });
+  },150);
+}
+
+const inr = n => (n<0?'-₹':'₹')+Math.round(Math.abs(n)).toLocaleString('en-IN');
+const pct = n => (n>=0?'+':'')+n.toFixed(1)+'%';
+const D = s => new Date(s+'T00:00:00');
+const units = f => f.txns.reduce((s,t)=>s+t[2],0);
+const invested = f => f.txns.reduce((s,t)=>s+t[1],0);
+const val = f => units(f)*f.nav;
+
+function xirr(flows){ // [[Date, amount]], negative = outflow
+  if(flows.length<2) return 0;
+  flows=[...flows].sort((a,b)=>a[0]-b[0]);
+  const t0=flows[0][0];
+  const npv=r=>flows.reduce((s,[d,a])=>s+a/Math.pow(1+r,(d-t0)/31557600000),0);
+  let lo=-0.99, hi=10;
+  if(npv(lo)*npv(hi)>0) return NaN;
+  for(let i=0;i<200;i++){ const m=(lo+hi)/2; if(npv(m)>0) lo=m; else hi=m; }
+  return 100*(lo+hi)/2;
+}
+function fundXIRR(f){
+  return xirr(f.txns.map(t=>[D(t[0]),-t[1]]).concat([[new Date(),val(f)]]));
+}
+function portXIRR(){
+  let fl=[];
+  funds.forEach(f=>fl=fl.concat(f.txns.map(t=>[D(t[0]),-t[1]])));
+  fl.push([new Date(),totals().v]);
+  return xirr(fl);
+}
+function taxSplit(f){ // unrealized gains by holding period
+  const cut=new Date(); cut.setFullYear(cut.getFullYear()-1);
+  let lt=0, st=0, stUnits=0;
+  f.txns.forEach(t=>{
+    const g=t[2]*f.nav - t[1];
+    if(D(t[0])<=cut) lt+=g; else { st+=g; stUnits+=t[2]; }
+  });
+  return {lt,st,stUnits};
+}
+function totals(){
+  let inv=0,v=0;
+  funds.forEach(f=>{inv+=invested(f); v+=val(f);});
+  return {inv,v,pl:v-inv,ret:inv?100*(v-inv)/inv:0};
+}
+
+/* ---------- render ---------- */
+let allocChart, trendChart, openRow=null;
+function renderAll(){ save(); renderSummary(); renderTable(); renderTax(); renderPerformers(); renderAlloc(); renderStrategies(); renderRebal(); renderAnalysis(); renderSIP(); if(window.renderTaxCal) renderTaxCal(); if(window.renderCashflow) renderCashflow(); }
+
+function renderSummary(){
+  const t=totals(), x=portXIRR();
+  let lt=0,st=0; funds.forEach(f=>{const s=taxSplit(f); lt+=s.lt; st+=s.st;});
+  const tax=Math.max(0,lt-LTCG_EXEMPT)*LTCG_RATE + Math.max(0,st)*STCG_RATE;
+  document.getElementById('summary').innerHTML = `
+   <div class="stat"><div class="lbl">Invested</div><div class="val">${inr(t.inv)}</div></div>
+   <div class="stat"><div class="lbl">Current Value</div><div class="val">${inr(t.v)}</div></div>
+   <div class="stat"><div class="lbl">Profit / Loss</div><div class="val ${t.pl>=0?'pos':'neg'}">${inr(t.pl)}</div></div>
+   <div class="stat"><div class="lbl">Portfolio XIRR</div><div class="val ${x>=0?'pos':'neg'}">${isNaN(x)?'—':pct(x)}</div></div>
+   <div class="stat"><div class="lbl">Tax if sold today</div><div class="val" style="color:var(--gold)">${inr(tax)}</div></div>`;
+}
+
+function renderTable(){
+  const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
+  funds.forEach(f=>{
+    const u=units(f), inv=invested(f), v=val(f), pl=v-inv, r=inv?100*pl/inv:0, x=fundXIRR(f);
+    const tr=document.createElement('tr'); tr.className='frow';
+    tr.onclick=()=>toggleTxns(f.id);
+    tr.innerHTML=`
+     <td>${f.name}<div class="small">code ${f.code} · folio ${f.folio} · NAV as of ${f.navDate} · ${f.txns.length} txns ▾</div></td>
+     <td>${f.category}</td>
+     <td>${f.nav.toFixed(2)}</td>
+     <td>${u.toFixed(3)}</td>
+     <td>${inr(inv)}</td>
+     <td>${inr(v)}</td>
+     <td class="${pl>=0?'pos':'neg'}">${inr(pl)}</td>
+     <td class="${r>=0?'pos':'neg'}">${pct(r)}</td>
+     <td class="${x>=0?'pos':'neg'}" style="font-weight:700">${isNaN(x)?'—':pct(x)}</td>
+     ${retCell(f.code,'y1')}${retCell(f.code,'y3')}${retCell(f.code,'y5')}`;
+    tb.appendChild(tr);
+    const tp=document.createElement('tr'); tp.className='txn-panel'; tp.id='txn-'+f.id; tp.style.display='none';
+    const cut=new Date(); cut.setFullYear(cut.getFullYear()-1);
+    tp.innerHTML=`<td colspan="12"><table>
+      <thead><tr><th>Date</th><th>Amount</th><th>Units</th><th>Buy NAV</th><th>Now Worth</th><th>Gain</th><th>Term</th></tr></thead>
+      <tbody>${f.txns.map(t=>{
+        const bn=t[1]/t[2], w=t[2]*f.nav, g=w-t[1], lt=D(t[0])<=cut;
+        return `<tr><td>${t[0]}</td><td>${inr(t[1])}</td><td>${t[2]}</td><td>${bn.toFixed(2)}</td><td>${inr(w)}</td><td class="${g>=0?'pos':'neg'}">${inr(g)}</td><td>${lt?'LT':'<span class="neg">ST</span>'}</td></tr>`;
+      }).join('')}</tbody></table></td>`;
+    tb.appendChild(tp);
+  });
+  const t=totals(), x=portXIRR();
+  document.querySelector('#tbl tfoot').innerHTML=`<tr style="font-weight:700">
+    <td>TOTAL</td><td></td><td></td><td></td><td>${inr(t.inv)}</td><td>${inr(t.v)}</td>
+    <td class="${t.pl>=0?'pos':'neg'}">${inr(t.pl)}</td><td class="${t.ret>=0?'pos':'neg'}">${pct(t.ret)}</td><td class="${x>=0?'pos':'neg'}">${isNaN(x)?'—':pct(x)}</td><td></td><td></td><td></td></tr>`;
+}
+function retCell(code,k){
+  const v=(histRet[code]||{})[k];
+  return v===undefined||v===null ? '<td class="small">—</td>' : `<td class="${v>=0?'pos':'neg'}">${pct(v)}</td>`;
+}
+function toggleTxns(id){
+  const el=document.getElementById('txn-'+id);
+  el.style.display = el.style.display==='none' ? '' : 'none';
+}
+
+function renderTax(){
+  const tb=document.querySelector('#taxTbl tbody'); tb.innerHTML='';
+  let LT=0, ST=0;
+  funds.forEach(f=>{
+    const s=taxSplit(f); LT+=s.lt; ST+=s.st;
+    const u=units(f);
+    tb.innerHTML+=`<tr><td>${f.name.split(' - ')[0]}</td>
+      <td class="${s.lt>=0?'pos':'neg'}">${inr(s.lt)}</td>
+      <td class="${s.st>=0?'pos':'neg'}">${s.st?inr(s.st):'—'}</td>
+      <td>${s.stUnits?s.stUnits.toFixed(1)+' ('+(100*s.stUnits/u).toFixed(0)+'%)':'—'}</td>
+      <td>${s.stUnits? '<span class="neg">likely 1% on recent lots</span>':'<span class="pos">none</span>'}</td></tr>`;
+  });
+  const ltTax=Math.max(0,LT-LTCG_EXEMPT)*LTCG_RATE, stTax=Math.max(0,ST)*STCG_RATE;
+  document.getElementById('taxNotes').innerHTML=`
+   <div class="note"><b>Unrealized long-term gains: ${inr(LT)}</b> → tax ${inr(ltTax)} after the ₹1.25L annual LTCG exemption (12.5% rate).</div>
+   <div class="note"><b>Unrealized short-term gains: ${inr(ST)}</b> → tax ${inr(stTax)} at 20%. Waiting for these lots to turn long-term saves ~7.5 percentage points of tax.</div>
+   <div class="note good"><b>Total tax if everything were sold today: ${inr(ltTax+stTax)}.</b> Strategy: harvest up to ₹1.25L of LTCG <i>every FY</i> tax-free (sell &amp; rebuy long-term units) — over the years this steps up your cost basis for free.</div>
+   <div class="note warn"><b>Exit loads:</b> most of your equity funds charge ~1% if redeemed within 1 year of each purchase (each SIP installment has its own clock). Recent lots in Kotak Midcap, Nippon Growth, quant Multi Asset and Nippon Large Cap are still inside that window.</div>`;
+}
+
+function renderPerformers(){
+  const arr=funds.map(f=>({n:f.name.split(' - ')[0],x:fundXIRR(f)})).filter(a=>!isNaN(a.x)).sort((a,b)=>b.x-a.x);
+  const max=Math.max(...arr.map(a=>Math.abs(a.x)),1);
+  document.getElementById('performers').innerHTML = arr.map((a,i)=>{
+    const tag=i===0?' 🥇':(i===arr.length-1?' ⚠️':'');
+    return `<div class="bar-row"><div class="bar-name" title="${a.n}">${a.n}${tag}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.abs(a.x)/max*100}%;background:${a.x>=0?'var(--green)':'var(--red)'}"></div></div>
+      <div class="bar-val ${a.x>=0?'pos':'neg'}">${pct(a.x)}</div></div>`;
+  }).join('')+`<div class="small" style="margin-top:8px">XIRR = annualized money-weighted return from your actual transaction dates. Young positions (&lt;1yr, like Parag Parikh) show noisy XIRR — judge after 2–3 years.</div>`;
+}
+
+function catTotals(){
+  const m={}; CATS.forEach(c=>m[c]=0);
+  funds.forEach(f=>m[f.category]+=val(f));
+  return m;
+}
+
+function renderAlloc(){
+  const m=catTotals(), labels=CATS.filter(c=>m[c]>0);
+  if(allocChart) allocChart.destroy();
+  allocChart=new Chart(document.getElementById('allocChart'),{
+    type:'doughnut',
+    data:{labels, datasets:[{data:labels.map(c=>m[c]), backgroundColor:labels.map(c=>CATCOLORS[c]), borderColor:'#161b22', borderWidth:2}]},
+    options:{maintainAspectRatio:false, plugins:{legend:{position:'right',labels:{color:'#e6edf3'}},
+      tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${inr(ctx.raw)} (${(100*ctx.raw/totals().v).toFixed(1)}%)`}}}}
+  });
+}
+
+const STRATEGIES = {
+ aggressive:  {name:'🚀 Aggressive Growth', t:{'Large Cap':25,'Mid Cap':35,'Small Cap':15,'Flexi Cap':15,'Multi Asset':10},
+   desc:'Maximize long-run growth; accept 30–40% drawdowns. Horizon 10+ yrs, strong stomach.'},
+ moderate:    {name:'⚖️ Moderate Balanced', t:{'Large Cap':35,'Mid Cap':25,'Small Cap':10,'Flexi Cap':15,'Multi Asset':15},
+   desc:'Growth with a cushion — the classic middle path. Horizon 7–10 yrs.'},
+ conservative:{name:'🛡️ Conservative', t:{'Large Cap':40,'Mid Cap':15,'Small Cap':5,'Flexi Cap':20,'Multi Asset':20},
+   desc:'Protect the ₹1.1Cr corpus; smaller drawdowns, lower expected return. Nearing a goal or <7 yrs.'},
+ market:      {name:'📈 Market-Cap Mirror', t:{'Large Cap':50,'Mid Cap':25,'Small Cap':10,'Flexi Cap':10,'Multi Asset':5},
+   desc:'Roughly index-like weights; fewest active bets, rebalancing rarely needed.'},
+ allweather:  {name:'🌦️ All-Weather (Multi-Asset tilt)', t:{'Large Cap':30,'Mid Cap':20,'Small Cap':5,'Flexi Cap':15,'Multi Asset':30},
+   desc:'Leans on multi-asset (equity+debt+gold) as the core — your quant MAA has led its category (3Y ~25%). Smoother ride, built-in rebalancing inside the fund. Concentration risk: one AMC/style at 30%.'}
+};
+function applyStrategy(key){ targets={...STRATEGIES[key].t}; renderAll(); }
+
+function estimateSellTax(tg){ // est. tax to rebalance by selling today to targets tg
+  const m=catTotals(), T=totals().v;
+  let ltSold=0, stSold=0;
+  CATS.forEach(c=>{
+    const over=m[c]-T*(tg[c]||0)/100;
+    if(over<=0||!m[c]) return;
+    funds.filter(f=>f.category===c).forEach(f=>{
+      const v=val(f); if(!v) return;
+      const sell=over*v/m[c];
+      const gainFrac=Math.max(0,(v-invested(f))/v);
+      const s=taxSplit(f);
+      const ltw=Math.max(0,s.lt), stw=Math.max(0,s.st), tot=ltw+stw;
+      const g=sell*gainFrac;
+      if(tot>0){ ltSold+=g*ltw/tot; stSold+=g*stw/tot; }
+    });
+  });
+  return Math.max(0,(ltSold-LTCG_EXEMPT))*LTCG_RATE + stSold*STCG_RATE;
+}
+function turnover(tg){
+  const m=catTotals(), T=totals().v;
+  return CATS.reduce((s,c)=>s+Math.max(0,m[c]-T*(tg[c]||0)/100),0);
+}
+function monthsNoSell(tg,M){ // months of redirected contributions until no category is overweight
+  const m=catTotals(), T=totals().v;
+  let need=0;
+  CATS.forEach(c=>{
+    const tp=(tg[c]||0)/100;
+    if(tp>0 && m[c]/T>tp) need=Math.max(need, m[c]/tp - T);
+  });
+  return M>0 ? Math.ceil(need/M) : Infinity;
+}
+function renderStrategies(){
+  const M=+document.getElementById('monthlyInv').value||0;
+  const rows=Object.entries(STRATEGIES).map(([k,s])=>{
+    const ms=(s.t['Mid Cap']||0)+(s.t['Small Cap']||0);
+    const tv=turnover(s.t), tax=estimateSellTax(s.t), mo=monthsNoSell(s.t,M);
+    const mix=CATS.map(c=>s.t[c]||0).join('/');
+    return `<tr>
+      <td><b>${s.name}</b><div class="small" style="white-space:normal;max-width:260px">${s.desc}</div></td>
+      <td title="Large/Mid/Small/Flexi/MultiAsset">${mix}</td>
+      <td>${ms}%</td>
+      <td>${inr(tv)}</td>
+      <td style="color:var(--gold)">${inr(tax)}</td>
+      <td>${mo===Infinity?'—':mo+' mo'}</td>
+      <td><button style="padding:4px 12px" onclick="applyStrategy('${k}')">Apply</button></td></tr>`;
+  }).join('');
+  document.getElementById('stratCompare').innerHTML=`<table>
+    <thead><tr><th>Strategy</th><th>Mix L/M/S/F/MA</th><th>Mid+Small</th><th>Sell-route turnover</th><th>Est. tax if sold now</th><th>No-sell time @ ₹${(M/100000).toFixed(1)}L/mo</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <div class="small" style="margin-top:6px">Est. tax assumes proportional selling from overweight categories today (12.5% LTCG after ₹1.25L exemption, 20% STCG); excludes exit loads. No-sell time = months of redirecting the full monthly amount to underweight categories until nothing is overweight (ignores market moves). Hybrid is usually best: sell only long-term lots up to the exemption each FY + redirect contributions.</div>`;
+}
+
+function renderRebal(){
+  const m=catTotals(), t=totals(), tb=document.querySelector('#rebalTbl tbody');
+  tb.innerHTML='';
+  let over=[];
+  CATS.forEach(c=>{
+    const cur=m[c], curP=t.v?100*cur/t.v:0, tgtP=targets[c]||0, tgt=t.v*tgtP/100, gap=tgt-cur;
+    const act = Math.abs(gap)<t.v*0.03 ? '<span class="pos">✓ On target</span>'
+      : gap>0 ? `<span style="color:var(--green);font-weight:600">Add ${inr(gap)}</span>`
+              : `<span style="color:var(--gold);font-weight:600">Trim ${inr(-gap)}</span>`;
+    tb.innerHTML+=`<tr><td style="color:${CATCOLORS[c]};font-weight:600">${c}</td><td>${inr(cur)}</td><td>${curP.toFixed(1)}%</td>
+      <td><input class="tgt-input" type="number" value="${tgtP}" onchange="targets['${c}']=+this.value;renderAll()"></td>
+      <td>${inr(tgt)}</td><td class="${gap>=0?'pos':'neg'}">${inr(gap)}</td><td>${act}</td></tr>`;
+    if(gap<-t.v*0.03) over.push({c,gap});
+  });
+  const tSum=CATS.reduce((s,c)=>s+(targets[c]||0),0);
+  let html='';
+  if(Math.round(tSum)!==100) html+=`<div class="note warn"><b>Targets sum to ${tSum}%</b> — adjust so they total 100%.</div>`;
+  over.sort((a,b)=>a.gap-b.gap).forEach(n=>{
+    const fin=funds.filter(f=>f.category===n.c).map(f=>({f,s:taxSplit(f)})).sort((a,b)=>val(b.f)-val(a.f));
+    const best=fin.filter(x=>x.s.st<=0||x.s.stUnits===0).map(x=>x.f.name.split(' - ')[0]);
+    html+=`<div class="note warn"><b>${n.c} is overweight by ${inr(-n.gap)}.</b>
+      Cheapest fix: redirect <i>future</i> SIPs/lumpsums to underweight categories — zero tax, zero exit load.
+      If selling, prefer 100%-long-term positions${best.length?' ('+best.join(', ')+')':''} and stay within the ₹1.25L LTCG exemption per FY.</div>`;
+  });
+  if(!over.length && Math.round(tSum)===100) html+=`<div class="note good"><b>Within 3% of all targets.</b> Review quarterly or after ±5% drift.</div>`;
+  document.getElementById('rebalNotes').innerHTML=html;
+}
+
+function renderAnalysis(){
+  const t=totals(), m=catTotals();
+  let html='';
+  const midP=100*m['Mid Cap']/t.v, smP=100*m['Small Cap']/t.v;
+  if(midP+smP>45) html+=`<div class="note warn"><b>${(midP+smP).toFixed(0)}% in mid+small caps.</b> Three midcap funds (Axis, Kotak, Nippon Growth) hold heavily overlapping stocks — consolidating to 1–2 and routing new money to large/flexi cap improves diversification without selling.</div>`;
+  const sorted=[...funds].sort((a,b)=>val(b)-val(a));
+  if(val(sorted[0])/t.v>0.2) html+=`<div class="note warn"><b>Single-fund concentration:</b> ${sorted[0].name.split(' - ')[0]} is ${(100*val(sorted[0])/t.v).toFixed(1)}% of the portfolio.</div>`;
+  html+=`<div class="note"><b>Equity exposure ≈ ${(100-100*m['Multi Asset']*0.35/t.v).toFixed(0)}%+.</b> Only quant Multi Asset holds debt/gold. A larger non-equity cushion would soften drawdowns at this corpus size (₹${(t.v/10000000).toFixed(2)} Cr).</div>`;
+  html+=`<div class="note good"><b>Good practices:</b> all Direct plans, a disciplined midcap SIP, and most large gains already long-term (tax-efficient).</div>`;
+  funds.forEach(f=>{
+    const inv=invested(f), r=inv?100*(val(f)-inv)/inv:0, w=100*val(f)/t.v, x=fundXIRR(f);
+    html+=`<div class="note"><b>${f.name.split(' - ')[0]}</b> — ${w.toFixed(1)}% of portfolio · abs <span class="${r>=0?'pos':'neg'}">${pct(r)}</span> · XIRR <span class="${x>=0?'pos':'neg'}">${isNaN(x)?'—':pct(x)}</span>.<br>${FUND_NOTES[f.code]||''}</div>`;
+  });
+  document.getElementById('analysis').innerHTML=html;
+}
+
+function renderSIP(){
+  const T=+document.getElementById('sipTarget').value||0,
+        Y=+document.getElementById('sipYears').value||1,
+        R=+document.getElementById('sipRet').value||0;
+  const i=R/1200, n=Y*12, t=totals();
+  const fvExisting = t.v*Math.pow(1+R/100,Y);
+  const remaining = Math.max(0,T-fvExisting);
+  const sip = i>0 ? remaining*i/((Math.pow(1+i,n)-1)*(1+i)) : remaining/n;
+  document.getElementById('sipOut').innerHTML=`
+   <div class="note">Your current ${inr(t.v)} growing at ${R}% becomes <b>${inr(fvExisting)}</b> in ${Y} years.</div>
+   ${remaining>0
+     ? `<div class="note good">To reach ${inr(T)}, invest <b>${inr(sip)}/month</b> (covers the remaining ${inr(remaining)}).</div>`
+     : `<div class="note good"><b>Goal already covered</b> by projected growth of existing corpus. 🎉</div>`}
+   <div class="small">Assumes monthly compounding, SIP at month-start.</div>`;
+}
+['sipTarget','sipYears','sipRet'].forEach(id=>document.getElementById(id).addEventListener('input',renderSIP));
+document.getElementById('monthlyInv').addEventListener('input',renderStrategies);
+
+/* ---------- live data ---------- */
+const setStatus = s => document.getElementById('status').textContent = s;
+
+async function refreshNAVs(){
+  setStatus('Fetching latest NAVs…');
+  let ok=0, fail=0;
+  await Promise.all(funds.filter(f=>f.code).map(async f=>{
+    try{
+      const r=await fetch(`https://api.mfapi.in/mf/${f.code}/latest`);
+      const d=await r.json();
+      if(d.data && d.data[0]){ f.nav=+d.data[0].nav; f.navDate=d.data[0].date; ok++; } else fail++;
+    }catch(e){ fail++; }
+  }));
+  setStatus(`Updated ${ok} NAVs${fail?`, ${fail} failed`:''} · ${new Date().toLocaleString('en-IN')}`);
+  renderAll();
+}
+
+async function ensureHist(){
+  await Promise.all(funds.map(async f=>{
+    if(histCache[f.code]) return;
+    try{ const r=await fetch(`https://api.mfapi.in/mf/${f.code}`); const d=await r.json(); histCache[f.code]=d.data; }catch(e){}
+  }));
+  return histCache;
+}
+
+function trailMulti(code){ // returns over multiple windows; <12m absolute, ≥12m annualized
+  const h=histCache[code]; if(!h||!h.length) return null;
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const now=+h[0].nav, out={};
+  [['3M',3],['6M',6],['9M',9],['1Y',12],['2Y',24],['3Y',36],['4Y',48],['5Y',60]].forEach(([k,mo])=>{
+    const tgt=new Date(); tgt.setMonth(tgt.getMonth()-mo);
+    const e=h.find(x=>parse(x.date)<=tgt);
+    if(!e){ out[k]=null; return; }
+    const r=now/+e.nav;
+    out[k]= mo<12 ? 100*(r-1) : 100*(Math.pow(r,12/mo)-1);
+  });
+  return out;
+}
+function renderTrailTable(){
+  const periods=['3M','6M','9M','1Y','2Y','3Y','4Y','5Y'];
+  const fmt=v=>v==null?'<span class="small">—</span>':`<span class="${v>=0?'pos':'neg'}">${pct(v)}</span>`;
+  let html=`<div style="overflow-x:auto"><table><thead><tr><th>Fund</th>${periods.map(p=>`<th>${p}</th>`).join('')}</tr></thead><tbody>`;
+  funds.forEach(f=>{
+    const t=trailMulti(f.code);
+    html+=`<tr><td>${f.name.split(' - ')[0]}</td>${periods.map(p=>`<td>${t?fmt(t[p]):'—'}</td>`).join('')}</tr>`;
+  });
+  html+=`</tbody></table></div><div class="small" style="margin-top:6px">3M/6M/9M are absolute returns; 1Y–5Y are annualized (CAGR). Fund NAV performance, not your personal XIRR. "—" = fund younger than the window or history unavailable.</div>`;
+  document.getElementById('trailOut').innerHTML=html;
+}
+async function loadTrail(){
+  setStatus('Loading trailing returns…');
+  await ensureHist();
+  renderTrailTable();
+  setStatus('Trailing returns ready · '+new Date().toLocaleString('en-IN'));
+}
+
+async function loadHistReturns(){ // fund-level trailing returns (NAV CAGR)
+  setStatus('Loading 1Y/3Y/5Y returns…');
+  await ensureHist();
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  funds.forEach(f=>{
+    const h=histCache[f.code]; if(!h||!h.length) return;
+    const now=+h[0].nav;
+    const at=yrs=>{
+      const tgt=new Date(); tgt.setFullYear(tgt.getFullYear()-yrs);
+      const e=h.find(x=>parse(x.date)<=tgt);
+      if(!e) return null;
+      const r=now/+e.nav;
+      return yrs===1 ? 100*(r-1) : 100*(Math.pow(r,1/yrs)-1);
+    };
+    histRet[f.code]={y1:at(1),y3:at(3),y5:at(5)};
+  });
+  renderTable();
+  renderTrailTable(); // history is already cached — populate the 3M→5Y table too
+  setStatus('Trailing returns loaded · '+new Date().toLocaleString('en-IN'));
+}
+
+async function loadTrends(){
+  setStatus('Loading full NAV history…');
+  const hist=await ensureHist();
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const firstBuy = new Date(Math.min(...funds.map(f=>+D(f.txns[0][0]))));
+  // build per-fund date->nav maps within range
+  const maps={};
+  funds.forEach(f=>{
+    maps[f.code]={};
+    (hist[f.code]||[]).forEach(x=>{ const d=parse(x.date); if(d>=firstBuy) maps[f.code][d.toISOString().slice(0,10)]=+x.nav; });
+  });
+  // weekly sampling from firstBuy to today
+  const labels=[], valSeries=[], invSeries=[], lastNav={};
+  for(let d=new Date(firstBuy); d<=new Date(); d.setDate(d.getDate()+7)){
+    const key=d.toISOString().slice(0,10);
+    let v=0, inv=0;
+    funds.forEach(f=>{
+      // nearest available nav on/before d (check back up to 10 days)
+      for(let k=0;k<10;k++){
+        const dd=new Date(d); dd.setDate(dd.getDate()-k);
+        const nv=maps[f.code][dd.toISOString().slice(0,10)];
+        if(nv!==undefined){ lastNav[f.code]=nv; break; }
+      }
+      let u=0;
+      f.txns.forEach(t=>{ if(D(t[0])<=d){ u+=t[2]; inv+=t[1]; } });
+      if(lastNav[f.code]!==undefined) v+=u*lastNav[f.code];
+    });
+    labels.push(key); valSeries.push(v); invSeries.push(inv);
+  }
+  if(trendChart) trendChart.destroy();
+  trendChart=new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels, datasets:[
+      {label:'Portfolio value', data:valSeries, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,.1)', fill:true, pointRadius:0, tension:.2},
+      {label:'Amount invested', data:invSeries, borderColor:'#8b949e', borderDash:[6,4], stepped:true, pointRadius:0}
+    ]},
+    options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#e6edf3'}},
+      tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+inr(c.raw)}}},
+      scales:{x:{ticks:{color:'#8b949e',maxTicksLimit:10},grid:{color:'#21262d'}},
+              y:{ticks:{color:'#8b949e',callback:v=>'₹'+(v/100000).toFixed(0)+'L'},grid:{color:'#21262d'}}}}
+  });
+  document.getElementById('trendNote').textContent='Green: actual portfolio value (real purchase dates × NAV history). Grey steps: cumulative amount invested. The vertical gap is your profit.';
+  setStatus('Growth chart loaded · '+new Date().toLocaleString('en-IN'));
+}
+
+/* ---------- alternatives ---------- */
+const ALTERNATIVES = {
+ 'Mid Cap':[
+  {name:'Motilal Oswal Midcap', code:127042},
+  {name:'HDFC Mid Cap', code:118989},
+  {name:'Edelweiss Mid Cap', code:140228}],
+ 'Small Cap':[
+  {name:'Nippon India Small Cap', code:118778},
+  {name:'quant Small Cap', code:120828},
+  {name:'Tata Small Cap', code:145206}],
+ 'Large Cap':[
+  {name:'ICICI Pru Large Cap (Bluechip)', code:120586},
+  {name:'HDFC Large Cap', code:119018}],
+ 'Flexi Cap':[
+  {name:'HDFC Flexi Cap', code:118955},
+  {name:'JM Flexicap', code:120492}],
+ 'Multi Asset':[
+  {name:'ICICI Pru Multi-Asset', code:120334},
+  {name:'UTI Multi Asset Allocation', code:120760}]
+};
+function trail(code){ // trailing returns from cached history
+  const h=histCache[code]; if(!h||!h.length) return null;
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const now=+h[0].nav;
+  const at=yrs=>{
+    const tgt=new Date(); tgt.setFullYear(tgt.getFullYear()-yrs);
+    const e=h.find(x=>parse(x.date)<=tgt);
+    if(!e) return null;
+    const r=now/+e.nav;
+    return yrs===1 ? 100*(r-1) : 100*(Math.pow(r,1/yrs)-1);
+  };
+  return {y1:at(1),y3:at(3),y5:at(5)};
+}
+async function loadAlternatives(){
+  setStatus('Fetching alternative fund histories…');
+  const alts=[].concat(...Object.values(ALTERNATIVES));
+  await Promise.all(alts.map(async a=>{
+    if(histCache[a.code]) return;
+    try{ const r=await fetch(`https://api.mfapi.in/mf/${a.code}`); const d=await r.json(); histCache[a.code]=d.data; }catch(e){}
+  }));
+  await ensureHist();
+  renderAlternatives();
+  setStatus('Alternatives loaded · '+new Date().toLocaleString('en-IN'));
+}
+function renderAlternatives(){
+  const fmt=v=>v==null?'—':`<span class="${v>=0?'pos':'neg'}">${pct(v)}</span>`;
+  let html='';
+  CATS.forEach(cat=>{
+    const held=funds.filter(f=>f.category===cat);
+    if(!held.length) return;
+    const rows=[];
+    held.forEach(f=>{ const t=trail(f.code); rows.push({name:f.name.split(' - ')[0], held:true, ...(t||{})}); });
+    (ALTERNATIVES[cat]||[]).forEach(a=>{ const t=trail(a.code); if(t) rows.push({name:a.name, held:false, ...t}); });
+    rows.sort((a,b)=>((b.y3??-99))-((a.y3??-99)));
+    const heldY3=rows.filter(r=>r.held&&r.y3!=null).map(r=>r.y3);
+    const bestHeld=heldY3.length?Math.max(...heldY3):null;
+    html+=`<h3 style="color:${CATCOLORS[cat]};font-size:.95rem;margin:16px 0 6px">${cat}</h3>
+     <table><thead><tr><th>Fund</th><th></th><th>1Y</th><th>3Y</th><th>5Y</th></tr></thead><tbody>`;
+    rows.forEach(r=>{
+      const star = !r.held && r.y3!=null && bestHeld!=null && r.y3>bestHeld+2;
+      html+=`<tr${r.held?' style="background:#1c2330"':''}>
+        <td>${star?'⭐ ':''}${r.name}</td>
+        <td>${r.held?'<span class="chip">HELD</span>':''}</td>
+        <td>${fmt(r.y1)}</td><td>${fmt(r.y3)}</td><td>${fmt(r.y5)}</td></tr>`;
+    });
+    html+='</tbody></table>';
+  });
+  html+=`<div class="note warn" style="margin-top:14px"><b>Before switching, remember:</b> past returns don't persist — top funds rotate every cycle, so demand a consistent 3Y <i>and</i> 5Y edge, not a hot 1Y. A "switch" is a redemption: STCG/LTCG tax + possible exit load apply (see tax section). The cheapest upgrade path is keeping existing units and pointing <i>new</i> SIPs/lumpsums at the better fund. Also check expense ratio and fund-manager changes before acting — NAV returns alone don't capture everything.</div>`;
+  document.getElementById('altOut').innerHTML=html;
+}
+
+/* ---------- year-by-year analysis ---------- */
+const BENCHMARKS = [
+ {name:'Nifty 50', code:120716},      // UTI Nifty 50 Index Fund Direct
+ {name:'Midcap 150', code:147622}     // Motilal Oswal Nifty Midcap 150 Index Direct
+];
+function navOn(code, d){ // most recent NAV on/before date d
+  const h=histCache[code]; if(!h) return null;
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const e=h.find(x=>parse(x.date)<=d);
+  return e?+e.nav:null;
+}
+function unitsAt(f, d){ return f.txns.reduce((s,t)=>s+(D(t[0])<=d?t[2]:0),0); }
+
+async function loadYearly(){
+  setStatus('Computing yearly returns…');
+  await ensureHist();
+  await Promise.all(BENCHMARKS.map(async b=>{
+    if(histCache[b.code]) return;
+    try{ const r=await fetch(`https://api.mfapi.in/mf/${b.code}`); const d=await r.json(); histCache[b.code]=d.data; }catch(e){}
+  }));
+  renderYearly();
+  setStatus('Yearly analysis ready · '+new Date().toLocaleString('en-IN'));
+}
+
+function yearStats(f, y, today){
+  const start=new Date(y,0,1), end=new Date(Math.min(+new Date(y,11,31), +today));
+  const u0=unitsAt(f,start), u1=unitsAt(f,end);
+  if(u1===0) return null;
+  const n0=navOn(f.code,start), n1=navOn(f.code,end);
+  if(n1==null) return null;
+  const V0=(u0&&n0)?u0*n0:0;
+  const flows=[];
+  if(V0>0) flows.push([start,-V0]);
+  let contrib=0;
+  f.txns.forEach(t=>{ const d=D(t[0]); if(d>start&&d<=end){ flows.push([d,-t[1]]); contrib+=t[1]; } });
+  const V1=u1*n1;
+  if(!flows.length) return null;
+  flows.push([end,V1]);
+  return {gain:V1-V0-contrib, contrib, V0, V1, flows, x:xirr(flows)};
+}
+
+function renderYearly(){
+  const today=new Date();
+  const y0=Math.min(...funds.map(f=>+f.txns[0][0].slice(0,4)));
+  const years=[]; for(let y=y0;y<=today.getFullYear();y++) years.push(y);
+  const fmt=v=>v==null||isNaN(v)?'—':`<span class="${v>=0?'pos':'neg'}">${pct(v)}</span>`;
+
+  // per-fund XIRR matrix
+  let matrix=`<div style="overflow-x:auto"><table><thead><tr><th>Fund</th>${years.map(y=>`<th>${y}${y===today.getFullYear()?' YTD':''}</th>`).join('')}</tr></thead><tbody>`;
+  funds.forEach(f=>{
+    matrix+=`<tr><td>${f.name.split(' - ')[0]}</td>`;
+    years.forEach(y=>{ const s=yearStats(f,y,today); matrix+=`<td>${s?fmt(s.x):'—'}</td>`; });
+    matrix+='</tr>';
+  });
+  matrix+='</tbody></table></div>';
+
+  // portfolio per-year + benchmarks
+  let beat=0, lag=0, mid=0;
+  let port=`<div style="overflow-x:auto;margin-top:16px"><table><thead><tr><th>Year</th><th>Added ₹</th><th>Gain ₹</th><th>Your XIRR</th><th>Nifty 50</th><th>Midcap 150</th><th>Verdict</th></tr></thead><tbody>`;
+  years.forEach(y=>{
+    const start=new Date(y,0,1), end=new Date(Math.min(+new Date(y,11,31),+today));
+    let flows=[], gain=0, contrib=0, any=false;
+    funds.forEach(f=>{
+      const s=yearStats(f,y,today);
+      if(!s) return;
+      any=true; gain+=s.gain; contrib+=s.contrib;
+      flows=flows.concat(s.flows.slice(0,-1)); // all outflows
+      flows.push([end,s.V1]);
+    });
+    if(!any){ return; }
+    const px=xirr(flows);
+    const days=(end-start)/86400000;
+    const bench=BENCHMARKS.map(b=>{
+      const n0=navOn(b.code,start), n1=navOn(b.code,end);
+      if(!n0||!n1) return null;
+      return 100*(Math.pow(n1/n0,365/days)-1); // annualized to match XIRR
+    });
+    let verdict='—';
+    const valid=bench.filter(b=>b!=null);
+    if(valid.length&&!isNaN(px)){
+      if(px>Math.max(...valid)){ verdict='<span class="pos">✓ Beat both indices</span>'; beat++; }
+      else if(px<Math.min(...valid)){ verdict='<span class="neg">✗ Lagged both</span>'; lag++; }
+      else { verdict='<span style="color:var(--gold)">≈ In between</span>'; mid++; }
+    }
+    port+=`<tr><td><b>${y}${y===today.getFullYear()?' YTD':''}</b></td><td>${inr(contrib)}</td>
+      <td class="${gain>=0?'pos':'neg'}">${inr(gain)}</td><td style="font-weight:700">${fmt(px)}</td>
+      <td>${fmt(bench[0])}</td><td>${fmt(bench[1])}</td><td>${verdict}</td></tr>`;
+  });
+  port+='</tbody></table></div>';
+
+  let analysis=`<div class="note" style="margin-top:14px"><b>Industry-return check:</b> you beat both indices in ${beat} year(s), landed between them in ${mid}, and lagged both in ${lag}. `;
+  analysis += lag>beat
+    ? 'Overall the portfolio has not been earning its risk premium vs simply indexing — consider whether the active-fund picks (and 49% midcap tilt) are paying for themselves.'
+    : beat>lag
+      ? 'Overall the portfolio has earned more than plain indexing — the active picks have added value so far.'
+      : 'Overall roughly index-like results — you are taking active-fund risk for market-level returns; simplifying into index funds would give similar outcomes with less monitoring.';
+  analysis+=`</div><div class="small">Notes: yearly XIRR is annualized (a partial year like ${today.getFullYear()} YTD extrapolates — read it directionally). Gain = end value − start value − money added during the year. Index figures use index-fund NAVs (Nifty 50: UTI, Midcap 150: Motilal Oswal) annualized over the same window. Benchmarks ignore your mid-year timing of contributions, so this is an approximation, not a strict apples-to-apples.</div>`;
+
+  document.getElementById('yearlyOut').innerHTML=matrix+port+analysis;
+}
+
+/* ---------- risk metrics ---------- */
+const RISK_FREE=6.5;
+function riskStats(code){
+  const h=histCache[code]; if(!h||h.length<60) return null;
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const cut=new Date(); cut.setFullYear(cut.getFullYear()-3);
+  const series=h.filter(x=>parse(x.date)>=cut).map(x=>+x.nav).reverse(); // oldest→newest
+  if(series.length<60) return null;
+  // daily returns
+  const rets=[];
+  for(let i=1;i<series.length;i++) rets.push(series[i]/series[i-1]-1);
+  const mean=rets.reduce((s,r)=>s+r,0)/rets.length;
+  const vol=Math.sqrt(rets.reduce((s,r)=>s+(r-mean)*(r-mean),0)/(rets.length-1))*Math.sqrt(252)*100;
+  // max drawdown
+  let peak=series[0], dd=0;
+  series.forEach(v=>{ if(v>peak) peak=v; dd=Math.min(dd,(v-peak)/peak); });
+  // CAGR over window
+  const yrs=(series.length-1)/252;
+  const cagr=100*(Math.pow(series[series.length-1]/series[0],1/yrs)-1);
+  const sharpe=vol?(cagr-RISK_FREE)/vol:null;
+  return {vol, maxDD:100*dd, cagr, sharpe};
+}
+async function loadRisk(){
+  setStatus('Computing risk metrics…');
+  await ensureHist();
+  const fmt=(v,s)=>v==null?'—':v.toFixed(s===undefined?1:s);
+  let rows='';
+  const all=[];
+  funds.forEach(f=>{
+    const r=riskStats(f.code); if(!r) return;
+    all.push({f,r});
+    rows+=`<tr><td>${f.name.split(' - ')[0]}</td>
+      <td class="${r.cagr>=0?'pos':'neg'}">${pct(r.cagr)}</td>
+      <td>${fmt(r.vol)}%</td>
+      <td class="neg">${fmt(r.maxDD)}%</td>
+      <td style="font-weight:700;color:${r.sharpe>1?'var(--green)':r.sharpe>0.5?'var(--gold)':'var(--red)'}">${fmt(r.sharpe,2)}</td></tr>`;
+  });
+  let notes='';
+  if(all.length){
+    const best=[...all].sort((a,b)=>b.r.sharpe-a.r.sharpe)[0];
+    const worst=[...all].sort((a,b)=>a.r.sharpe-b.r.sharpe)[0];
+    const deepest=[...all].sort((a,b)=>a.r.maxDD-b.r.maxDD)[0];
+    notes=`<div class="note good" style="margin-top:12px"><b>Most efficient: ${best.f.name.split(' - ')[0]}</b> — Sharpe ${best.r.sharpe.toFixed(2)}; it earned its returns with the least drama.</div>
+    <div class="note warn"><b>Least efficient: ${worst.f.name.split(' - ')[0]}</b> — Sharpe ${worst.r.sharpe.toFixed(2)}. Risk taken hasn't been fully paid for.</div>
+    <div class="note"><b>Deepest fall: ${deepest.f.name.split(' - ')[0]}</b> dropped ${Math.abs(deepest.r.maxDD).toFixed(0)}% peak-to-trough in 3 years — size your allocation assuming this repeats.</div>`;
+  }
+  document.getElementById('riskOut').innerHTML=`<div style="overflow-x:auto"><table>
+    <thead><tr><th>Fund</th><th>3Y CAGR</th><th>Volatility</th><th>Max Drawdown</th><th>Sharpe</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>${notes}`;
+  setStatus('Risk metrics ready · '+new Date().toLocaleString('en-IN'));
+}
+
+/* ---------- tax harvest & exit-load calendar ---------- */
+function renderTaxCal(){
+  const now=new Date(), cut=new Date(); cut.setFullYear(cut.getFullYear()-1);
+  const upcoming=[];
+  let ltAvail=0;
+  funds.forEach(f=>{
+    f.txns.forEach(t=>{
+      const d=D(t[0]), g=t[2]*f.nav-t[1];
+      if(d<=cut){ if(g>0) ltAvail+=g; return; }
+      const ltOn=new Date(d); ltOn.setFullYear(ltOn.getFullYear()+1);
+      upcoming.push({ltOn, fund:f.name.split(' - ')[0], amt:t[1], gain:g});
+    });
+  });
+  upcoming.sort((a,b)=>a.ltOn-b.ltOn);
+  let rows=upcoming.map(u=>{
+    const days=Math.ceil((u.ltOn-now)/86400000);
+    return `<tr><td>${u.ltOn.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td>${u.fund}</td><td>${inr(u.amt)}</td>
+      <td class="${u.gain>=0?'pos':'neg'}">${inr(u.gain)}</td>
+      <td>${days<=0?'<span class="pos">now LT</span>':days+' days'}</td></tr>`;
+  }).join('');
+  const fyEnd=new Date(now.getMonth()>=3?now.getFullYear()+1:now.getFullYear(),2,31);
+  const save=Math.min(ltAvail,LTCG_EXEMPT)*LTCG_RATE;
+  document.getElementById('taxCalOut').innerHTML=`
+   <div class="note good"><b>LTCG harvest opportunity this FY (ends ${fyEnd.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}):</b>
+    you hold ${inr(ltAvail)} of unrealized long-term gains. Selling &amp; rebuying enough units to realize <b>${inr(Math.min(ltAvail,LTCG_EXEMPT))}</b> of gain costs zero tax (₹1.25L exemption) and saves <b>${inr(save)}</b> in future LTCG — repeatable every FY.</div>
+   ${upcoming.length?`<div class="small" style="margin:10px 0 6px">Short-term lots and when they turn long-term (12.5% tax instead of 20%; ~1% exit load typically ends the same day):</div>
+   <div style="overflow-x:auto"><table><thead><tr><th>Turns LT on</th><th>Fund</th><th>Invested</th><th>Gain now</th><th>Wait</th></tr></thead><tbody>${rows}</tbody></table></div>`
+   :'<div class="note">All lots are already long-term — no exit-load or STCG constraints on selling.</div>'}`;
+}
+
+/* ---------- composition insights ---------- */
+async function loadComposition(){
+  setStatus('Analyzing composition…');
+  await ensureHist();
+  const parse=s=>{const[a,b,c]=s.split('-');return new Date(+c,+b-1,+a);};
+  const cut=new Date(); cut.setFullYear(cut.getFullYear()-3);
+  const maps={};
+  funds.forEach(f=>{
+    const h=histCache[f.code]; if(!h) return;
+    const w=h.filter(x=>parse(x.date)>=cut).reverse(); // oldest→newest
+    const m={};
+    for(let i=1;i<w.length;i++) m[w[i].date]=+w[i].nav/+w[i-1].nav-1;
+    maps[f.code]=m;
+  });
+  function corr(a,b){
+    const ks=Object.keys(a).filter(k=>b[k]!==undefined);
+    if(ks.length<100) return null;
+    const xs=ks.map(k=>a[k]), ys=ks.map(k=>b[k]);
+    const mx=xs.reduce((s,v)=>s+v,0)/xs.length, my=ys.reduce((s,v)=>s+v,0)/ys.length;
+    let cov=0,sx=0,sy=0;
+    for(let i=0;i<xs.length;i++){ cov+=(xs[i]-mx)*(ys[i]-my); sx+=(xs[i]-mx)**2; sy+=(ys[i]-my)**2; }
+    return (sx&&sy)?cov/Math.sqrt(sx*sy):null;
+  }
+  const fs=funds.filter(f=>maps[f.code]);
+  const short=f=>f.name.split(' ')[0]+' '+(f.category.split(' ')[0]);
+  let matrix='<div style="overflow-x:auto"><table><thead><tr><th></th>'+fs.map(f=>`<th>${short(f)}</th>`).join('')+'</tr></thead><tbody>';
+  const dupes=[];
+  fs.forEach((f1,i)=>{
+    matrix+=`<tr><td><b>${short(f1)}</b></td>`;
+    fs.forEach((f2,j)=>{
+      if(i===j){ matrix+='<td style="color:var(--muted)">1.00</td>'; return; }
+      const r=corr(maps[f1.code],maps[f2.code]);
+      if(r==null){ matrix+='<td>—</td>'; return; }
+      const col=r>0.9?'var(--red)':r>0.75?'var(--gold)':'var(--green)';
+      matrix+=`<td style="color:${col};font-weight:${r>0.9?700:400}">${r.toFixed(2)}</td>`;
+      if(i<j && r>0.9) dupes.push({a:f1,b:f2,r});
+    });
+    matrix+='</tr>';
+  });
+  matrix+='</tbody></table></div>';
+  // AMC concentration
+  const t=totals(), amc={};
+  funds.forEach(f=>{ const k=f.name.split(' ')[0]; amc[k]=(amc[k]||0)+val(f); });
+  let amcHtml='<div style="margin-top:14px">'+Object.entries(amc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
+    const p=100*v/t.v;
+    return `<div class="bar-row"><div class="bar-name">${k}</div>
+     <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${p>30?'var(--gold)':'var(--accent)'}"></div></div>
+     <div class="bar-val">${p.toFixed(1)}%</div></div>`;
+  }).join('')+'</div>';
+  let notes='';
+  dupes.forEach(d=>{
+    notes+=`<div class="note warn"><b>${d.a.name.split(' - ')[0]} ↔ ${d.b.name.split(' - ')[0]}: correlation ${d.r.toFixed(2)}.</b> These move almost identically — holding both adds fees, not diversification. Keep the one with the better Sharpe/3Y and route its twin's future money elsewhere.</div>`;
+  });
+  const topAmc=Object.entries(amc).sort((a,b)=>b[1]-a[1])[0];
+  if(topAmc && topAmc[1]/t.v>0.3) notes+=`<div class="note"><b>${topAmc[0]} manages ${(100*topAmc[1]/t.v).toFixed(0)}% of your money.</b> AMC-level risk (fund-manager exits, governance issues) is concentrated — consider capping any one fund house near 25–30%.</div>`;
+  if(!dupes.length) notes+='<div class="note good"><b>No extreme overlap detected</b> — no pair exceeds 0.90 correlation.</div>';
+  document.getElementById('compOut').innerHTML=matrix+amcHtml+notes;
+  setStatus('Composition analysis ready');
+}
+
+/* ---------- cash-flow & goals ---------- */
+function upGoal(i,k,v){ goals[i][k]=k==='name'?v:+v; renderAll(); }
+function addGoal(){ goals.push({name:'New Goal', target:1000000, year:new Date().getFullYear()+5}); renderAll(); }
+function delGoal(i){ goals.splice(i,1); renderAll(); }
+
+function renderCashflow(){
+  const t=totals(), now=new Date();
+  // SIP vs lumpsum attribution (txns < ₹1L treated as SIP installments)
+  const modes={'SIP (<₹1L)':{inv:0,val:0,flows:[]}, 'Lumpsum (≥₹1L)':{inv:0,val:0,flows:[]}};
+  funds.forEach(f=>{
+    f.txns.forEach(tx=>{
+      const m=tx[1]<100000?'SIP (<₹1L)':'Lumpsum (≥₹1L)';
+      modes[m].inv+=tx[1]; modes[m].val+=tx[2]*f.nav;
+      modes[m].flows.push([D(tx[0]),-tx[1]]);
+    });
+  });
+  let modeRows='';
+  Object.entries(modes).forEach(([k,m])=>{
+    if(!m.inv) return;
+    m.flows.push([now,m.val]);
+    const x=xirr(m.flows);
+    modeRows+=`<tr><td>${k}</td><td>${inr(m.inv)}</td><td>${inr(m.val)}</td>
+     <td class="${m.val>=m.inv?'pos':'neg'}">${inr(m.val-m.inv)}</td>
+     <td class="${x>=0?'pos':'neg'}" style="font-weight:700">${isNaN(x)?'—':pct(x)}</td></tr>`;
+  });
+  const sipX=modes['SIP (<₹1L)'].inv?xirr(modes['SIP (<₹1L)'].flows):null;
+  const lsX=modes['Lumpsum (≥₹1L)'].inv?xirr(modes['Lumpsum (≥₹1L)'].flows):null;
+  let modeNote='';
+  if(sipX!=null&&lsX!=null&&!isNaN(sipX)&&!isNaN(lsX)){
+    modeNote = sipX>lsX
+      ? `<div class="note good"><b>Your SIPs are out-earning your lumpsums by ${(sipX-lsX).toFixed(1)} points/yr.</b> Timing large amounts has cost you — prefer spreading big deployments via STP/SIP over 6–12 months.</div>`
+      : `<div class="note"><b>Lumpsums have out-earned SIPs by ${(lsX-sipX).toFixed(1)} points/yr</b> — your entry timing has worked so far, but it's the harder game to keep winning.</div>`;
+  }
+  // goals
+  const r=+(document.getElementById('goalRet')?.value||12);
+  let goalRows='';
+  goals.forEach((g,i)=>{
+    const yrs=Math.max(0.1,g.year-now.getFullYear()-(now.getMonth()/12));
+    const proj=t.v*Math.pow(1+r/100,yrs);
+    const gap=Math.max(0,g.target-proj);
+    const im=r/1200, n=Math.round(yrs*12);
+    const sip=gap>0?(im>0?gap*im/((Math.pow(1+im,n)-1)*(1+im)):gap/n):0;
+    const pctDone=Math.min(100,100*proj/g.target);
+    goalRows+=`<tr>
+     <td><input type="text" value="${g.name}" style="width:110px" onchange="upGoal(${i},'name',this.value)"></td>
+     <td><input type="number" value="${g.target}" onchange="upGoal(${i},'target',this.value)"></td>
+     <td><input type="number" value="${g.year}" style="width:70px" onchange="upGoal(${i},'year',this.value)"></td>
+     <td>${inr(proj)}</td>
+     <td><div class="bar-track" style="min-width:80px"><div class="bar-fill" style="width:${pctDone}%;background:${pctDone>=100?'var(--green)':'var(--gold)'}"></div></div></td>
+     <td>${gap>0?`<span class="neg">${inr(gap)} short</span> → SIP ${inr(sip)}/mo`:'<span class="pos">✓ On track</span>'}</td>
+     <td><button class="danger" onclick="delGoal(${i})">✕</button></td></tr>`;
+  });
+  // withdrawal simulator
+  const W=+(document.getElementById('wdAmt')?.value||100000),
+        wr=+(document.getElementById('wdRet')?.value||10),
+        inf=+(document.getElementById('wdInf')?.value||6);
+  let corpus=t.v, w=W, months=0;
+  while(corpus>0&&months<1200){ corpus=corpus*(1+wr/1200)-w; w*=(1+inf/1200); months++; }
+  const lasts = months>=1200?'100+ years (effectively perpetual)':(months/12).toFixed(1)+' years';
+  document.getElementById('cashflowOut').innerHTML=`
+   <h3 style="font-size:.95rem;color:var(--accent);margin-bottom:8px">SIP vs Lumpsum — which entry style earns more?</h3>
+   <div style="overflow-x:auto"><table><thead><tr><th>Mode</th><th>Invested</th><th>Value</th><th>Gain</th><th>XIRR</th></tr></thead><tbody>${modeRows}</tbody></table></div>
+   ${modeNote}
+   <h3 style="font-size:.95rem;color:var(--accent);margin:18px 0 8px">Goals <button class="ghost" style="padding:2px 10px;font-size:.75rem" onclick="addGoal()">＋ Add</button>
+    <span class="small" style="font-weight:400">· assumed return <input type="number" id="goalRet" value="12" style="width:55px" onchange="renderCashflow()">% p.a. · projects the whole current corpus, ignores future SIPs</span></h3>
+   <div style="overflow-x:auto"><table><thead><tr><th>Goal</th><th>Target ₹</th><th>Year</th><th>Projected</th><th>Progress</th><th>Gap / action</th><th></th></tr></thead><tbody>${goalRows}</tbody></table></div>
+   <h3 style="font-size:.95rem;color:var(--accent);margin:18px 0 8px">Withdrawal simulator (FIRE check)</h3>
+   <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.85rem">
+     Withdraw ₹<input type="number" id="wdAmt" value="${W}" style="width:100px" onchange="renderCashflow()">/month ·
+     return <input type="number" id="wdRet" value="${wr}" style="width:55px" onchange="renderCashflow()">% ·
+     inflation <input type="number" id="wdInf" value="${inf}" style="width:55px" onchange="renderCashflow()">%
+   </div>
+   <div class="note" style="margin-top:10px">Your current ${inr(t.v)} corpus would last <b>${lasts}</b> withdrawing ${inr(W)}/month (inflation-adjusted).</div>`;
+}
+
+/* ---------- collapsible sections + nav ---------- */
+function initNav(){
+  const nav=document.getElementById('topNav');
+  let links='';
+  document.querySelectorAll('.card').forEach((c,i)=>{
+    const h=c.querySelector('h2'); if(!h) return;
+    const title=h.textContent.replace(/click a row.*/i,'').trim();
+    const id='sec-'+i;
+    c.id=id;
+    links+=`<a href="#${id}">${title.length>26?title.slice(0,24)+'…':title}</a>`;
+    if(!h.querySelector('.cv')){
+      const s=document.createElement('span'); s.className='cv'; s.textContent='▾'; h.appendChild(s);
+    }
+    h.addEventListener('click',e=>{
+      if(e.target.closest('button')) return; // don't collapse when clicking buttons inside h2
+      c.classList.toggle('collapsed');
+      h.querySelector('.cv').textContent=c.classList.contains('collapsed')?'▸':'▾';
+    });
+  });
+  nav.innerHTML=links+`<a href="#" onclick="toggleAll();return false" style="margin-left:auto;color:var(--accent)">⇕ Collapse/Expand all</a>`;
+}
+let allCollapsed=false;
+function toggleAll(){
+  allCollapsed=!allCollapsed;
+  document.querySelectorAll('.card').forEach(c=>{
+    c.classList.toggle('collapsed',allCollapsed);
+    const cv=c.querySelector('h2 .cv'); if(cv) cv.textContent=allCollapsed?'▸':'▾';
+  });
+}
+
+load();
+renderAll();
+renderTaxCal();
+renderCashflow();
+initNav();
+loadHistReturns(); // auto-fetch trailing 1Y/3Y/5Y fund returns on open
+// v2 transactions+XIRR+tax build
+</script>
+</body>
+</html>

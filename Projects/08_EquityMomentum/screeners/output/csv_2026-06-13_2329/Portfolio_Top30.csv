@@ -1,0 +1,31 @@
+Symbol,Company,Industry,composite_score,weight
+GVT&D,GE Vernova T&D India Ltd.,Capital Goods,89.2,0.0065
+RRKABEL,R R Kabel Ltd.,Capital Goods,88.2,0.0076
+ABSLAMC,Aditya Birla Sun Life AMC Ltd.,Financial Services,88.1,0.0078
+SYRMA,Syrma SGS Technology Ltd.,Capital Goods,87.9,0.0065
+LAURUSLABS,Laurus Labs Ltd.,Healthcare,87.4,0.0093
+ACUTAAS,Acutaas Chemicals Ltd.,Healthcare,87.3,0.0065
+FEDERALBNK,Federal Bank Ltd.,Financial Services,86.0,0.011
+TORNTPHARM,Torrent Pharmaceuticals Ltd.,Healthcare,85.1,0.0132
+APOLLOHOSP,Apollo Hospitals Enterprise Ltd.,Healthcare,85.0,0.0136
+WELCORP,Welspun Corp Ltd.,Capital Goods,84.6,0.0078
+BELRISE,Belrise Industries Ltd.,Automobile and Auto Components,84.4,0.0068
+ASTERDM,Aster DM Healthcare Ltd.,Healthcare,84.1,0.0091
+APARINDS,Apar Industries Ltd.,Capital Goods,84.0,0.006
+HSCL,Himadri Speciality Chemical Ltd.,Chemicals,84.0,0.008
+RBLBANK,RBL Bank Ltd.,Financial Services,83.3,0.0085
+JBCHEPHARM,J.B. Chemicals & Pharmaceuticals Ltd.,Healthcare,83.1,0.012
+J&KBANK,Jammu & Kashmir Bank Ltd.,Financial Services,83.1,0.0077
+HFCL,HFCL Ltd.,Telecommunication,82.9,0.006
+BSE,BSE Ltd.,Financial Services,82.7,0.0067
+NYKAA,FSN E-Commerce Ventures Ltd.,Consumer Services,82.6,0.0095
+ACMESOLAR,ACME Solar Holdings Ltd.,Power,82.2,0.0069
+SAILIFE,Sai Life Sciences Ltd.,Healthcare,82.2,0.0077
+POLYCAB,Polycab India Ltd.,Capital Goods,82.2,0.0094
+ATHERENERG,Ather Energy Ltd.,Automobile and Auto Components,81.8,0.0056
+CGPOWER,CG Power and Industrial Solutions Ltd.,Capital Goods,81.8,0.0086
+NAM-INDIA,Nippon Life India Asset Management Ltd.,Financial Services,81.7,0.0071
+CUMMINSIND,Cummins India Ltd.,Capital Goods,81.4,0.01
+KEI,KEI Industries Ltd.,Capital Goods,81.0,0.0088
+ADANIPORTS,Adani Ports and Special Economic Zone Ltd.,Services,80.8,0.01
+DATAPATTNS,Data Patterns (India) Ltd.,Capital Goods,80.7,0.0057

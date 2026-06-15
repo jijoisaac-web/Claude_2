@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NRI Finance Hub — Live Remittance Rates & Calculators for Indians Abroad</title>
+<meta name="description" content="Compare live remittance rates, NRE/NRO bank interest rates, home loan amortization, and inflation-adjusted return planner for Indians abroad."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#050b18;--surface:#0c1524;--elevated:#132035;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.12);--amber-glow:rgba(245,166,35,0.25);
+  --indigo:#818cf8;--green:#34d399;--green-dim:rgba(52,211,153,0.12);
+  --red:#fb7185;--red-dim:rgba(251,113,133,0.12);
+  --text:#f1f5f9;--muted:#64748b;--subtle:#334155;
+  --radius:14px;--radius-sm:9px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--surface);}
+::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:3px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(5,11,24,0.85);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo-mark{width:34px;height:34px;background:linear-gradient(135deg,#f5a623,#d97706);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(245,166,35,0.45);flex-shrink:0;}
+.nav-logo-mark svg{width:18px;height:18px;fill:none;stroke:#000;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.nav-logo-text strong{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.2px;display:block;}
+.nav-logo-text span{font-size:10.5px;color:var(--indigo);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.live-pill{display:flex;align-items:center;gap:5px;background:var(--green-dim);border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:5px 11px;font-size:11.5px;font-weight:600;color:var(--green);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.cur-pill{display:flex;align-items:center;gap:6px;background:var(--elevated);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:500;}
+.cur-pill select{background:transparent;border:none;outline:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;}
+.cur-pill select option{background:#1e293b;}
+
+/* HERO */
+.hero{padding:108px 28px 56px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 40%,rgba(99,102,241,0.12) 0%,transparent 60%),radial-gradient(ellipse 50% 60% at 80% 20%,rgba(245,166,35,0.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 60% 80%,rgba(52,211,153,0.06) 0%,transparent 60%);pointer-events:none;}
+.hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);}
+.hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--amber-dim);border:1px solid var(--amber-glow);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:22px;animation:fadeUp 0.6s ease both;}
+.hero h1{font-size:clamp(32px,5vw,58px);font-weight:800;line-height:1.12;letter-spacing:-1.5px;color:#fff;margin-bottom:16px;animation:fadeUp 0.6s 0.1s ease both;}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,#f5a623,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:17px;color:var(--muted);max-width:560px;margin:0 auto 36px;line-height:1.65;animation:fadeUp 0.6s 0.2s ease both;}
+.hero-input-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeUp 0.6s 0.3s ease both;margin-bottom:40px;}
+.hero-input{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:13px 18px;font-size:16px;font-weight:600;color:var(--text);width:160px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+.hero-input:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
+.hero-label{background:var(--elevated);border:1px solid var(--border2);border-radius:var(--radius);padding:13px 16px;font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.hero-btn{background:linear-gradient(135deg,#f5a623,#d97706);color:#000;border:none;border-radius:var(--radius);padding:13px 24px;font-size:15px;font-weight:700;transition:transform 0.15s,box-shadow 0.15s;white-space:nowrap;}
+.hero-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,166,35,0.4);}
+.stats-bar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;animation:fadeUp 0.6s 0.4s ease both;}
+.stat{display:flex;flex-direction:column;align-items:center;padding:16px 32px;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-val{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* MAIN */
+.main{max-width:960px;margin:0 auto;padding:0 20px 80px;}
+.sec-head{margin-bottom:24px;}
+.sec-head h2{font-size:22px;font-weight:700;letter-spacing:-0.3px;}
+.sec-head p{font-size:13.5px;color:var(--muted);margin-top:4px;}
+
+/* TABS */
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-btn{padding:12px 20px;background:none;border:none;font-size:13.5px;font-weight:500;color:var(--muted);white-space:nowrap;position:relative;transition:color 0.2s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--amber);border-bottom-color:var(--amber);font-weight:600;}
+.tool-section{display:none;animation:fadeIn 0.25s ease;}
+.tool-section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;transition:border-color 0.2s;}
+.card:hover{border-color:var(--border2);}
+.card-hd{font-size:15px;font-weight:600;margin-bottom:4px;letter-spacing:-0.2px;}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px;margin-bottom:20px;}
+.fg3{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.f label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:7px;}
+.f input,.f select{width:100%;background:var(--elevated);border:1px solid var(--border2);color:var(--text);padding:11px 14px;border-radius:var(--radius-sm);font-size:15px;transition:border-color 0.2s,box-shadow 0.2s;}
+.f input:focus,.f select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
+.f select option{background:#1e293b;}
+.btn{border:none;border-radius:var(--radius-sm);padding:12px 26px;font-size:14px;font-weight:700;transition:transform 0.15s,box-shadow 0.15s;}
+.btn-amber{background:linear-gradient(135deg,#f5a623,#d97706);color:#000;}
+.btn-amber:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(245,166,35,0.35);}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:13px;padding:9px 16px;}
+.btn-outline:hover{border-color:var(--amber);color:var(--amber);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;}
+
+/* RESULT GRID */
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px;}
+.ri{background:var(--elevated);border-radius:var(--radius-sm);padding:15px;}
+.ri-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.ri-val{font-size:22px;font-weight:800;color:var(--amber);letter-spacing:-0.5px;}
+.ri-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* INFO BOXES */
+.info{background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:var(--radius-sm);padding:13px 16px;font-size:13px;color:#a5b4fc;line-height:1.65;margin-bottom:16px;}
+.box-green{background:var(--green-dim);border:1px solid rgba(52,211,153,0.2);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:#6ee7b7;margin-top:14px;line-height:1.65;}
+.box-amber{background:var(--amber-dim);border:1px solid var(--amber-glow);border-radius:var(--radius-sm);padding:16px;margin-top:14px;}
+.box-red{background:var(--red-dim);border:1px solid rgba(251,113,133,0.2);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:#fda4af;margin-top:14px;line-height:1.65;}
+
+/* LIVE RATES */
+.rates-wrap{display:flex;flex-direction:column;gap:8px;}
+.rates-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;color:var(--muted);gap:14px;font-size:14px;}
+.spin{width:26px;height:26px;border:2.5px solid rgba(245,166,35,0.2);border-top-color:var(--amber);border-radius:50%;animation:rot 0.75s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+.rate-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:14px;transition:background 0.15s,border-color 0.15s,transform 0.15s;position:relative;overflow:hidden;}
+.rate-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;border-radius:3px 0 0 3px;transition:background 0.2s;}
+.rate-row.best::before{background:var(--green);}
+.rate-row:hover{background:var(--elevated);border-color:var(--border2);transform:translateX(2px);}
+.rate-row.best{border-color:rgba(52,211,153,0.25);}
+.pbadge{width:42px;height:42px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:-0.5px;border:1px solid rgba(255,255,255,0.1);}
+.pname{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+.best-tag{background:var(--green-dim);border:1px solid rgba(52,211,153,0.25);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.3px;}
+.pmeta{font-size:12px;color:var(--muted);}
+.pbar-col{display:flex;flex-direction:column;gap:5px;min-width:120px;}
+.pbar-track{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:2px;transition:width 0.6s cubic-bezier(0.34,1.56,0.64,1);}
+.pamount{font-size:18px;font-weight:800;letter-spacing:-0.5px;}
+.pamount-sub{font-size:12px;color:var(--muted);}
+.rate-cta{background:linear-gradient(135deg,#f5a623,#d97706);color:#000;border:none;padding:9px 16px;border-radius:8px;font-size:12.5px;font-weight:700;white-space:nowrap;transition:transform 0.15s,box-shadow 0.15s;display:inline-block;}
+.rate-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,166,35,0.4);}
+.rate-cta.disabled{opacity:0.35;pointer-events:none;}
+.rate-note{margin-top:14px;padding:12px 16px;background:var(--elevated);border-radius:var(--radius-sm);font-size:12.5px;color:var(--muted);line-height:1.6;display:flex;align-items:flex-start;gap:8px;}
+.amount-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;background:var(--elevated);border:1px solid var(--border2);border-radius:var(--radius);padding:14px 18px;}
+.amount-strip label{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.amount-strip input{background:transparent;border:none;font-size:22px;font-weight:800;color:var(--text);width:130px;outline:none;letter-spacing:-0.5px;}
+.amount-strip .cur-tag{font-size:13px;font-weight:600;color:var(--amber);background:var(--amber-dim);padding:4px 10px;border-radius:6px;}
+
+/* NRE/NRO TABLE */
+.cmp-wrap{overflow-x:auto;}
+.cmp-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;}
+.cmp-table th{background:var(--elevated);padding:13px 16px;text-align:center;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);}
+.cmp-table th:first-child{text-align:left;border-radius:8px 0 0 0;color:var(--text);}
+.cmp-table th:last-child{border-radius:0 8px 0 0;}
+.cmp-table td{padding:13px 16px;border-bottom:1px solid var(--border);}
+.cmp-table td:not(:first-child){text-align:center;}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-table tr:hover td{background:rgba(255,255,255,0.02);}
+.yes{color:var(--green);font-weight:600;}
+.no{color:var(--red);font-weight:600;}
+.par{color:var(--amber);font-weight:600;}
+.rec-result{background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.2);border-radius:var(--radius);padding:18px;font-size:14px;color:#c7d2fe;line-height:1.7;margin-top:16px;}
+.rec-result a{color:var(--amber);}
+.rec-result strong{color:#e0e7ff;}
+
+/* BANK RATES TABLE */
+.bank-rates-grid{display:grid;gap:10px;margin-top:8px;}
+.bank-row{background:var(--elevated);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr repeat(4,80px);align-items:center;gap:12px;}
+.bank-logo{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,0.1);}
+.bank-name-col .bname{font-size:14px;font-weight:600;}
+.bank-name-col .btype{font-size:11px;color:var(--muted);}
+.rate-cell{text-align:center;}
+.rate-cell .rv{font-size:15px;font-weight:700;color:var(--amber);}
+.rate-cell .rl{font-size:10px;color:var(--muted);}
+.rates-thead{display:grid;grid-template-columns:auto 1fr repeat(4,80px);gap:12px;padding:8px 16px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.rates-thead span:not(:first-child):not(:nth-child(2)){text-align:center;}
+.bank-row.highlight{border:1px solid rgba(52,211,153,0.25);}
+.highest-tag{background:var(--green-dim);border:1px solid rgba(52,211,153,0.2);color:var(--green);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;}
+
+/* AMORTIZATION TABLE */
+.amort-wrap{overflow-x:auto;margin-top:20px;}
+.amort-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
+.amort-table th{background:var(--elevated);padding:11px 14px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);white-space:nowrap;}
+.amort-table th:first-child{text-align:center;border-radius:8px 0 0 0;}
+.amort-table th:last-child{border-radius:0 8px 0 0;}
+.amort-table td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;}
+.amort-table td:first-child{text-align:center;font-weight:600;color:var(--muted);}
+.amort-table tr:last-child td{border-bottom:none;background:var(--elevated);font-weight:700;}
+.amort-table tr:hover td{background:rgba(255,255,255,0.02);}
+.amort-table .principal{color:var(--green);}
+.amort-table .interest{color:var(--red);}
+.prog-bar-mini{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;}
+
+/* RETURN PLANNER */
+.expense-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.expense-item{background:var(--elevated);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;}
+.expense-item .ei-icon{font-size:22px;margin-bottom:8px;}
+.expense-item .ei-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+.expense-item input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:7px;font-size:15px;font-weight:600;}
+.expense-item input:focus{outline:none;border-color:var(--amber);}
+.expense-total-strip{background:linear-gradient(135deg,rgba(245,166,35,0.12),rgba(245,166,35,0.05));border:1px solid var(--amber-glow);border-radius:var(--radius-sm);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.exp-total-lbl{font-size:13px;color:var(--muted);font-weight:600;}
+.exp-total-val{font-size:24px;font-weight:800;color:var(--amber);letter-spacing:-0.5px;}
+
+/* YEAR TABLE */
+.year-table-wrap{overflow-x:auto;margin-top:20px;}
+.year-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
+.year-table th{background:var(--elevated);padding:10px 14px;text-align:right;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);white-space:nowrap;}
+.year-table th:first-child{text-align:center;border-radius:8px 0 0 0;}
+.year-table th:last-child{border-radius:0 8px 0 0;}
+.year-table td{padding:10px 14px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;font-size:13px;}
+.year-table td:first-child{text-align:center;font-weight:600;color:var(--muted);}
+.year-table tr:last-child td{background:var(--elevated);font-weight:700;border-bottom:none;}
+.year-table tr:hover td{background:rgba(255,255,255,0.02);}
+.city-btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.city-btn{background:var(--elevated);border:1px solid var(--border2);color:var(--muted);font-size:13px;font-weight:500;padding:8px 16px;border-radius:20px;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.city-btn.active,.city-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:48px 28px 32px;max-width:960px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:40px;}
+.footer-brand strong{font-size:16px;font-weight:700;color:#fff;}
+.footer-brand p{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6;max-width:300px;}
+.footer-col h4{font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;}
+.footer-col a{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;transition:color 0.15s;}
+.footer-col a:hover{color:var(--amber);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-bottom p{font-size:12px;color:var(--muted);line-height:1.6;}
+
+@media(max-width:640px){
+  nav{padding:0 16px;}
+  .live-pill{display:none;}
+  .hero{padding:90px 16px 44px;}
+  .hero h1{font-size:32px;letter-spacing:-1px;}
+  .main{padding:0 14px 60px;}
+  .rate-row{grid-template-columns:auto 1fr auto;gap:10px;}
+  .pbar-col{display:none;}
+  .bank-row{grid-template-columns:auto 1fr repeat(2,70px);}
+  .footer-grid{grid-template-columns:1fr;}
+}
+@media print{
+  nav,footer,.tab-nav,.btn-row,.hero,.stats-bar,.info{display:none!important;}
+  body{background:#fff;color:#000;}
+  .amort-table th{background:#f3f4f6;color:#374151;}
+  .amort-table td{color:#111;}
+  .card{border:1px solid #e5e7eb;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="nav-logo-text">
+      <strong>NRI Finance Hub</strong>
+      <span>For Indians working abroad</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <div class="live-pill"><div class="live-dot"></div> Live Rates</div>
+    <div class="cur-pill">
+      <span style="font-size:12px;color:var(--muted)">Send from</span>
+      <select id="baseCurrency" onchange="updateAll()">
+        <optgroup label="Gulf">
+          <option value="AED">🇦🇪 UAE (AED)</option>
+          <option value="SAR">🇸🇦 Saudi (SAR)</option>
+          <option value="QAR">🇶🇦 Qatar (QAR)</option>
+          <option value="KWD">🇰🇼 Kuwait (KWD)</option>
+          <option value="BHD">🇧🇭 Bahrain (BHD)</option>
+          <option value="OMR">🇴🇲 Oman (OMR)</option>
+        </optgroup>
+        <optgroup label="SE Asia">
+          <option value="MYR">🇲🇾 Malaysia (MYR)</option>
+          <option value="SGD">🇸🇬 Singapore (SGD)</option>
+        </optgroup>
+        <optgroup label="Oceania">
+          <option value="AUD">🇦🇺 Australia (AUD)</option>
+          <option value="NZD">🇳🇿 New Zealand (NZD)</option>
+        </optgroup>
+        <optgroup label="Americas">
+          <option value="USD">🇺🇸 USA (USD)</option>
+          <option value="CAD">🇨🇦 Canada (CAD)</option>
+        </optgroup>
+        <optgroup label="Europe">
+          <option value="EUR">🇪🇺 Europe (EUR)</option>
+          <option value="GBP">🇬🇧 UK (GBP)</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🟢 Free · No signup · Updated daily</div>
+    <h1>Send money home.<br/><em>Keep more of it.</em></h1>
+    <p class="hero-sub">Compare live remittance rates from local providers in your country. Plus NRI-specific calculators built for your financial life abroad.</p>
+    <div class="hero-input-row">
+      <input class="hero-input" type="number" id="heroAmount" value="1000" placeholder="Amount" oninput="syncAmount(this.value)"/>
+      <div class="hero-label" id="heroFromLabel">AED</div>
+      <div class="hero-label">→ &nbsp;₹ INR</div>
+      <button class="hero-btn" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">Compare Rates →</button>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-val">14</div><div class="stat-lbl">Currencies</div></div>
+      <div class="stat"><div class="stat-val">50+</div><div class="stat-lbl">Providers</div></div>
+      <div class="stat"><div class="stat-val">5</div><div class="stat-lbl">NRI Tools</div></div>
+      <div class="stat"><div class="stat-val">Free</div><div class="stat-lbl">Always</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="rates"    onclick="showTab('rates',this)">📊 Live Rates</button>
+    <button class="tab-btn"        data-tab="invest"   onclick="showTab('invest',this)">📈 SIP &amp; SWP</button>
+    <button class="tab-btn"        data-tab="nrenro"   onclick="showTab('nrenro',this)">🏛 NRE vs NRO</button>
+    <button class="tab-btn"        data-tab="homeloan" onclick="showTab('homeloan',this)">🏠 Home Loan</button>
+    <button class="tab-btn"        data-tab="return"   onclick="showTab('return',this)">✈️ Return Planner</button>
+  </div>
+
+  <!-- ═══ TAB 1: LIVE RATES ═══ -->
+  <div class="tool-section active" id="tab-rates">
+    <div class="sec-head">
+      <h2>Today's Best Rates to India</h2>
+      <p>Sorted by most rupees received · Local providers for your country · Click "Send Now" to confirm rate on provider's site</p>
+    </div>
+    <div class="amount-strip">
+      <label>You send</label>
+      <input type="number" id="sendAmount" value="1000" oninput="syncAmountFromMain(this.value);renderRates()"/>
+      <span class="cur-tag" id="curTag">AED</span>
+      <span style="color:var(--muted);font-size:18px">→</span>
+      <span style="font-size:13px;font-weight:600;color:var(--muted)">Recipient gets in <strong style="color:var(--amber)">₹ INR</strong></span>
+    </div>
+    <div id="rates-loading" class="rates-loading"><div class="spin"></div><span>Fetching live rates…</span></div>
+    <div id="rates-container" class="rates-wrap" style="display:none"></div>
+    <div id="rate-note" class="rate-note" style="display:none"><span>ℹ️</span><span id="rate-note-text"></span></div>
+    <div class="info" style="margin-top:16px"><strong>How to read this:</strong> Each provider's INR shown = amount after their typical margin + fee, applied to today's mid-market rate. Visual bars show relative value — the longer the bar, the more rupees your family receives.</div>
+  </div>
+
+  <!-- ═══ TAB 2: SIP & SWP ═══ -->
+  <div class="tool-section" id="tab-invest">
+    <div class="sec-head">
+      <h2>SIP &amp; SWP Calculator</h2>
+      <p>SIP — grow your India corpus with monthly investments · SWP — plan monthly withdrawals without depleting your corpus</p>
+    </div>
+
+    <!-- SIP -->
+    <div class="card">
+      <div class="card-hd">📈 SIP — Systematic Investment Plan</div>
+      <div class="card-sub">How much will your monthly mutual fund investment grow to? Models XIRR-style compounding with step-up option.</div>
+      <div class="fg">
+        <div class="f"><label>Monthly SIP Amount (₹)</label><input type="number" id="sip-amount" value="25000" placeholder="e.g. 25000"/></div>
+        <div class="f"><label>Expected Annual Return (%)</label><input type="number" id="sip-return" value="12" step="0.5"/></div>
+        <div class="f"><label>Investment Period (Years)</label><input type="number" id="sip-years" value="15" min="1" max="40"/></div>
+        <div class="f"><label>Annual Step-Up (% increase/yr)</label><input type="number" id="sip-stepup" value="10" step="1" min="0"/></div>
+      </div>
+      <button class="btn btn-amber" onclick="calcSIP()">Calculate SIP Growth →</button>
+      <div id="sip-result" style="display:none">
+        <div class="rg" id="sip-result-grid"></div>
+        <div class="box-green" id="sip-tip"></div>
+        <div class="btn-row"><button class="btn btn-outline" onclick="downloadSIPCSV()">⬇ Download Year-wise CSV</button></div>
+        <div class="year-table-wrap">
+          <table class="year-table" id="sip-year-table">
+            <thead><tr><th>Year</th><th>Monthly SIP</th><th>Invested in Year</th><th>Total Invested</th><th>Corpus Value</th><th>Wealth Gained</th></tr></thead>
+            <tbody id="sip-year-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SWP -->
+    <div class="card">
+      <div class="card-hd">📉 SWP — Systematic Withdrawal Plan</div>
+      <div class="card-sub">You've built a corpus. How long will it last with monthly withdrawals? Accounts for portfolio returns and inflation.</div>
+      <div class="fg">
+        <div class="f"><label>Starting Corpus (₹ Lakhs)</label><input type="number" id="swp-corpus" value="200" step="10"/></div>
+        <div class="f"><label>Monthly Withdrawal (₹)</label><input type="number" id="swp-monthly" value="75000"/></div>
+        <div class="f"><label>Expected Portfolio Return (% p.a.)</label><input type="number" id="swp-return" value="9" step="0.5"/></div>
+        <div class="f"><label>Inflation Rate (% p.a.)</label><input type="number" id="swp-inflation" value="6" step="0.5"/></div>
+        <div class="f"><label>Increase Withdrawal Each Year? (%)</label><input type="number" id="swp-stepup" value="6" step="1" min="0"/></div>
+      </div>
+      <button class="btn btn-amber" onclick="calcSWP()">Calculate Sustainability →</button>
+      <div id="swp-result" style="display:none">
+        <div class="rg" id="swp-result-grid"></div>
+        <div id="swp-verdict"></div>
+        <div class="btn-row"><button class="btn btn-outline" onclick="downloadSWPCSV()">⬇ Download Year-wise CSV</button></div>
+        <div class="year-table-wrap">
+          <table class="year-table" id="swp-year-table">
+            <thead><tr><th>Year</th><th>Monthly Withdrawal</th><th>Annual Withdrawal</th><th>Portfolio Return</th><th>Closing Corpus</th><th>Status</th></tr></thead>
+            <tbody id="swp-year-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">💡 <strong>NRI Tip:</strong> SIP into ELSS, Flexi-cap or Index funds via NRE/NRO account. Returns from equity MFs held >1 year taxed at 10% LTCG (above ₹1L). SWP from a balanced advantage fund can give tax-efficient monthly income in India post-return. Consult a SEBI-RIA before investing.</div>
+  </div>
+
+  <!-- ═══ TAB 3: NRE vs NRO ═══ -->
+  <div class="tool-section" id="tab-nrenro">
+    <div class="sec-head">
+      <h2>NRE vs NRO Account</h2>
+      <p>Current NRE FD rates from leading banks · Account comparison · Personalised recommendation</p>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">🏦 Current NRE Fixed Deposit Rates</div>
+      <div class="card-sub">Tax-free interest for NRIs · Updated periodically · Click bank name to open FD on their site</div>
+      <div class="rates-thead">
+        <span></span><span>Bank</span><span>1 Year</span><span>2 Years</span><span>3 Years</span><span>5 Years</span>
+      </div>
+      <div class="bank-rates-grid">
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#1a3040;color:#60a5fa">SBI</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.sbi.co.in/portal/web/interest-rates/nre-fixed-deposits" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">State Bank of India ↗</a></div><div class="btype">Public sector · Govt-backed</div></div>
+          <div class="rate-cell"><div class="rv">6.80%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.75%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#1a2a40;color:#93c5fd">HDFC</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.hdfcbank.com/nri-banking/save/deposits/fixed-deposit-rupee-account/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">HDFC Bank ↗</a></div><div class="btype">Private sector · Large cap</div></div>
+          <div class="rate-cell"><div class="rv">6.60%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#102030;color:#38bdf8">ICICI</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.icicibank.com/nri-banking/deposits/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">ICICI Bank ↗</a></div><div class="btype">Private sector · Large cap</div></div>
+          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.90%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#20102a;color:#c084fc">AXIS</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.axisbank.com/nri-banking/deposits/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Axis Bank ↗</a></div><div class="btype">Private sector · Mid-large cap</div></div>
+          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#102820;color:#4ade80">KOTA</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.kotak.com/en/personal-banking/deposits/nre-fixed-deposit.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Kotak Mahindra Bank ↗</a></div><div class="btype">Private sector</div></div>
+          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.20%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row highlight">
+          <div class="bank-logo" style="background:#1a2010;color:#a3e635">YES</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.yesbank.in/personal-banking/nri-banking/nri-deposits/fixed-deposits/nre-fixed-deposits-new" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Yes Bank ↗</a> <span class="highest-tag">Highest</span></div><div class="btype">Private sector · Mid cap</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.25%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.25%</div><div class="rl">p.a.</div></div>
+        </div>
+        <div class="bank-row">
+          <div class="bank-logo" style="background:#20181a;color:#f87171">BOB</div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.bankofbaroda.in/nre-rupee-fixed-deposits.htm" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Bank of Baroda ↗</a></div><div class="btype">Public sector · Govt-backed</div></div>
+          <div class="rate-cell"><div class="rv">6.85%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.85%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.80%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+        </div>
+      </div>
+      <div class="info" style="margin-top:14px">⚠️ <strong>Note:</strong> Rates shown are indicative (approximate mid-2025). NRE FD interest is <strong>100% tax-free in India</strong> and fully repatriable. Yes Bank offers higher rates — check CRISIL/ICRA rating before investing large sums. Always verify current rates on the bank's site before opening an FD.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">Which Account is Right for You?</div>
+      <div class="card-sub">Answer 3 questions for an instant recommendation.</div>
+      <div class="fg">
+        <div class="f"><label>Do you have income in India? (rent, dividends, pension)</label>
+          <select id="nro-q1"><option value="no">No — income only from abroad</option><option value="yes">Yes — I also earn in India</option></select>
+        </div>
+        <div class="f"><label>Do you need to repatriate money back abroad?</label>
+          <select id="nro-q2"><option value="yes">Yes — I may need to send money back</option><option value="no">No — money stays in India</option></select>
+        </div>
+        <div class="f"><label>Do you want interest to be tax-free in India?</label>
+          <select id="nro-q3"><option value="yes">Yes — want tax-free interest</option><option value="no">No — okay with 30% TDS</option></select>
+        </div>
+      </div>
+      <button class="btn btn-amber" onclick="nreNroRecommend()">Get Recommendation →</button>
+      <div class="rec-result" id="nrenro-rec" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">NRE · NRO · FCNR — Full Comparison</div>
+      <div class="card-sub">Key differences at a glance</div>
+      <div class="cmp-wrap">
+        <table class="cmp-table">
+          <thead><tr><th>Feature</th><th>NRE Account</th><th>NRO Account</th><th>FCNR Deposit</th></tr></thead>
+          <tbody>
+            <tr><td>Currency</td><td>INR</td><td>INR</td><td>Foreign (USD/GBP/AED…)</td></tr>
+            <tr><td>Fund source</td><td>Foreign income only</td><td>Foreign + India income</td><td>Foreign income only</td></tr>
+            <tr><td>Repatriation abroad</td><td class="yes">✔ Fully free</td><td class="par">⚡ Up to $1M/year</td><td class="yes">✔ Fully free</td></tr>
+            <tr><td>Interest taxable in India</td><td class="yes">✔ Tax-free</td><td class="no">✘ 30% TDS</td><td class="yes">✔ Tax-free</td></tr>
+            <tr><td>Joint with resident Indian</td><td class="no">✘ Not allowed</td><td class="yes">✔ Allowed</td><td class="no">✘ Not allowed</td></tr>
+            <tr><td>FX / currency risk</td><td class="no">✘ Yes (INR)</td><td class="no">✘ Yes (INR)</td><td class="yes">✔ None — held in forex</td></tr>
+            <tr><td>Best suited for</td><td>Parking foreign savings</td><td>Managing India income</td><td>Large forex savings</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 4: HOME LOAN EMI ═══ -->
+  <div class="tool-section" id="tab-homeloan">
+    <div class="sec-head">
+      <h2>NRI Home Loan EMI Calculator</h2>
+      <p>Monthly EMI · Yearly amortization schedule · Download as CSV or PDF</p>
+    </div>
+    <div class="card">
+      <div class="card-hd">Loan Details</div>
+      <div class="card-sub">NRI home loan rates typically range from 8.5%–10% p.a. Fill in your details for the full schedule.</div>
+      <div class="fg">
+        <div class="f"><label>Property Value (₹ Lakhs)</label><input type="number" id="hl-propval" value="80" placeholder="e.g. 80"/></div>
+        <div class="f"><label>Down Payment (%)</label><input type="number" id="hl-down" value="20" min="10" max="80"/></div>
+        <div class="f"><label>Interest Rate (% p.a.)</label><input type="number" id="hl-rate" value="9" step="0.1"/></div>
+        <div class="f"><label>Loan Tenure (Years)</label><input type="number" id="hl-tenure" value="20" min="1" max="30"/></div>
+      </div>
+      <button class="btn btn-amber" onclick="calcHomeLoan()">Calculate & Show Schedule →</button>
+      <div id="hl-result" style="display:none">
+        <div class="rg" id="hl-result-grid"></div>
+        <div class="box-amber" id="hl-tip"></div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="downloadLoanCSV()">⬇ Download CSV</button>
+          <button class="btn btn-outline" onclick="downloadLoanPDF()">🖨 Print / Save PDF</button>
+        </div>
+        <div class="amort-wrap" id="hl-amort-wrap">
+          <table class="amort-table" id="hl-amort-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Opening Balance</th>
+                <th>Annual EMI</th>
+                <th>Principal Paid</th>
+                <th>Interest Paid</th>
+                <th>% Principal</th>
+                <th>Closing Balance</th>
+              </tr>
+            </thead>
+            <tbody id="hl-amort-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="info">🏦 <strong>NRI Checklist:</strong> EMI must be debited from NRE/NRO account via ECS mandate · Power of Attorney required for local representative · Tax deduction on interest under Sec 24b up to ₹2L/yr · Sec 80C benefit up to ₹1.5L/yr on principal</div>
+
+    <div class="card">
+      <div class="card-hd">🏠 NRI Home Loan Rates — Top 10 Banks</div>
+      <div class="card-sub">Sorted by starting rate · Click bank name to go to their NRI home loan page · Rates indicative (mid-2025) — always confirm before applying</div>
+      <div style="overflow-x:auto">
+        <table class="amort-table" style="font-size:13.5px">
+          <thead>
+            <tr>
+              <th style="text-align:left;border-radius:8px 0 0 0">Bank</th>
+              <th>Starting Rate</th>
+              <th>Max Tenure</th>
+              <th>Processing Fee</th>
+              <th>Max LTV</th>
+              <th style="border-radius:0 8px 0 0">Key Feature</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2010;color:#a3e635;flex-shrink:0">CAN</div>
+                  <div><div style="font-weight:600"><a href="https://canarabank.com/home-loan-for-nris" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Canara Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div>
+                </div>
+              </td>
+              <td style="color:var(--green);font-weight:700">7.90%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Lowest rate; women get extra 0.05% off</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a3040;color:#60a5fa;flex-shrink:0">SBI</div>
+                  <div><div style="font-weight:600"><a href="https://sbi.co.in/portal/web/nri/nri-home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">State Bank of India ↗</a></div><div style="font-size:11px;color:var(--muted)">Public sector · Most trusted</div></div>
+                </div>
+              </td>
+              <td style="color:var(--green);font-weight:700">8.00%+</td><td>30 yrs</td><td>0.35% (max ₹10K)</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Largest NRI branch network; lowest processing fee</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a1f3b;color:#a5b4fc;flex-shrink:0">PNB</div>
+                  <div><div style="font-weight:600"><a href="https://www.pnbhousing.com/nri-loans/" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">PNB Housing Finance ↗</a></div><div style="font-size:11px;color:var(--muted)">Housing finance company</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.25%+</td><td>30 yrs</td><td>Up to 0.50%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Dedicated NRI division; fast processing</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20181a;color:#f87171;flex-shrink:0">BOB</div>
+                  <div><div style="font-weight:600"><a href="https://www.bankofbaroda.in/nri-banking/products-services/loans/baroda-home-loan-for-nri" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Bank of Baroda ↗</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.40%+</td><td>30 yrs</td><td>0.25–0.50%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Good for Gulf NRIs; wide branch network</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2a40;color:#93c5fd;flex-shrink:0">HDFC</div>
+                  <div><div style="font-weight:600"><a href="https://www.hdfcbank.com/nri-banking/borrow/popular-loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">HDFC Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Private sector · Large cap</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.45%+</td><td>20 yrs</td><td>Up to 1.25%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Zero prepayment charges; women discount</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">IDBI</div>
+                  <div><div style="font-weight:600"><a href="https://www.idbibank.in/home-loan.aspx" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">IDBI Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.55%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Competitive rates for salaried NRIs</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">AXIS</div>
+                  <div><div style="font-weight:600"><a href="https://www.axisbank.com/nri/home-loans" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Axis Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Private sector · Mid-large cap</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.75%+</td><td>30 yrs</td><td>Up to 1% (min ₹10K)</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Best rates for CIBIL 751+; no prepayment penalty</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102820;color:#4ade80;flex-shrink:0">KOT</div>
+                  <div><div style="font-weight:600"><a href="https://www.kotak.com/en/personal-banking/nri/loans.html" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Kotak Mahindra ↗</a></div><div style="font-size:11px;color:var(--muted)">Private sector</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.75%+</td><td>20 yrs</td><td>Up to 1%</td><td>80%</td>
+              <td style="font-size:12px;color:var(--muted)">Digital-first; quick sanction for NRIs</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102020;color:#2dd4bf;flex-shrink:0">FED</div>
+                  <div><div style="font-weight:600"><a href="https://www.federalbank.co.in/home-loans" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Federal Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Private sector · Kerala NRI favourite</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700">8.80%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Top choice for Kerala/South India NRIs</td>
+            </tr>
+            <tr>
+              <td style="text-align:left">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102030;color:#38bdf8;flex-shrink:0">ICICI</div>
+                  <div><div style="font-weight:600"><a href="https://www.icicibank.com/nri-banking/loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">ICICI Bank ↗</a></div><div style="font-size:11px;color:var(--muted)">Private sector · Large cap</div></div>
+                </div>
+              </td>
+              <td style="font-weight:700;color:var(--amber)">9.00%+</td><td>30 yrs</td><td>0.50% + taxes</td><td>90%</td>
+              <td style="font-size:12px;color:var(--muted)">Best for US/UK/Singapore NRIs; 30yr tenure</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="info" style="margin-top:14px">
+        📋 <strong>How to choose:</strong> Canara/SBI for lowest rate · HDFC/ICICI for US/UK NRIs with strong digital support · Federal Bank for South India NRIs · Axis for excellent CIBIL scores ·
+        <strong>All NRI home loans require:</strong> NRE/NRO account · POA (Power of Attorney) · Overseas credit bureau report · Minimum 1yr overseas employment
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 5: RETURN PLANNER ═══ -->
+  <div class="tool-section" id="tab-return">
+    <div class="sec-head">
+      <h2>Return to India Planner</h2>
+      <p>Build your expense profile · Apply real India inflation · See year-by-year projections · Know exactly how much corpus you need</p>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">Step 1 — Choose Your City Tier</div>
+      <div class="card-sub">Pre-fills typical monthly expenses. You can edit every figure below.</div>
+      <div class="city-btn-row">
+        <button class="city-btn active" onclick="setCity('metro',this)">🏙 Metro (Mumbai/Delhi/Bangalore)</button>
+        <button class="city-btn" onclick="setCity('tier2',this)">🏘 Tier 2 (Kochi/Pune/Hyderabad)</button>
+        <button class="city-btn" onclick="setCity('tier3',this)">🌳 Tier 3 / Small Town</button>
+      </div>
+
+      <div class="card-hd">Step 2 — Your Monthly Expense Breakdown</div>
+      <div class="card-sub" style="margin-top:6px">All amounts in Indian Rupees (₹) per month</div>
+      <div class="expense-grid">
+        <div class="expense-item"><div class="ei-icon">🛒</div><label class="ei-label">Food & Groceries</label><input type="number" id="exp-food" value="20000"/></div>
+        <div class="expense-item"><div class="ei-icon">🏠</div><label class="ei-label">Rent / Housing</label><input type="number" id="exp-rent" value="25000"/></div>
+        <div class="expense-item"><div class="ei-icon">🚗</div><label class="ei-label">Transport & Travel</label><input type="number" id="exp-transport" value="8000"/></div>
+        <div class="expense-item"><div class="ei-icon">💡</div><label class="ei-label">Utilities (electric, internet…)</label><input type="number" id="exp-util" value="5000"/></div>
+        <div class="expense-item"><div class="ei-icon">🛡</div><label class="ei-label">Life & Term Insurance</label><input type="number" id="exp-lifeins" value="5000"/></div>
+        <div class="expense-item"><div class="ei-icon">🏥</div><label class="ei-label">Health Insurance</label><input type="number" id="exp-healthins" value="4000"/></div>
+        <div class="expense-item"><div class="ei-icon">💊</div><label class="ei-label">Medical & Healthcare</label><input type="number" id="exp-medical" value="5000"/></div>
+        <div class="expense-item"><div class="ei-icon">🎓</div><label class="ei-label">Kids Education</label><input type="number" id="exp-edu" value="15000"/></div>
+        <div class="expense-item"><div class="ei-icon">🎉</div><label class="ei-label">Entertainment & Dining Out</label><input type="number" id="exp-ent" value="8000"/></div>
+        <div class="expense-item"><div class="ei-icon">✈️</div><label class="ei-label">Annual Holidays (÷12)</label><input type="number" id="exp-travel" value="5000"/></div>
+        <div class="expense-item"><div class="ei-icon">👕</div><label class="ei-label">Clothing & Personal Care</label><input type="number" id="exp-clothing" value="4000"/></div>
+        <div class="expense-item"><div class="ei-icon">📦</div><label class="ei-label">Miscellaneous</label><input type="number" id="exp-misc" value="5000"/></div>
+      </div>
+      <div class="expense-total-strip">
+        <div><div class="exp-total-lbl">Total Monthly Expenses</div><div style="font-size:12px;color:var(--muted)">Tap Calculate to update</div></div>
+        <div class="exp-total-val" id="exp-total-display">₹0</div>
+      </div>
+
+      <div class="card-hd">Step 3 — Planning Parameters</div>
+      <div class="fg" style="margin-top:14px">
+        <div class="f"><label>India Inflation Rate (% p.a.)</label><input type="number" id="rp-inflation" value="6" step="0.5"/></div>
+        <div class="f"><label>Investment Return on Corpus (% p.a.)</label><input type="number" id="rp-roi" value="8" step="0.5"/></div>
+        <div class="f"><label>Expected India Income After Return (₹/mo)</label><input type="number" id="rp-income" value="50000"/></div>
+        <div class="f"><label>Years Until You Return</label><input type="number" id="rp-years" value="5" min="1" max="30"/></div>
+        <div class="f"><label>Current Savings Abroad (₹ Lakhs)</label><input type="number" id="rp-savings" value="50"/></div>
+        <div class="f"><label>Monthly Savings Rate (₹ Lakhs/mo)</label><input type="number" id="rp-monthly" value="1.5" step="0.1"/></div>
+      </div>
+      <button class="btn btn-amber" onclick="calcReturn()">Plan My Return →</button>
+      <div id="rp-result" style="display:none">
+        <div class="rg" id="rp-result-grid"></div>
+        <div id="rp-verdict"></div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-outline" onclick="downloadReturnCSV()">⬇ Download Projection CSV</button>
+        </div>
+        <div class="year-table-wrap">
+          <table class="year-table" id="rp-year-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Monthly Expenses</th>
+                <th>Annual Expenses</th>
+                <th>Inflation Added</th>
+                <th>Monthly Shortfall</th>
+                <th>Corpus Needed</th>
+              </tr>
+            </thead>
+            <tbody id="rp-year-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="info">📋 <strong>India Inflation Reality:</strong> CPI has averaged 5–7% p.a. over the last decade. Healthcare and education inflate faster (~8–10%). Kids education fees in metro schools: ₹10K–40K/month. Family health floater: ₹15K–40K/year. Build in a 20% buffer for unexpected expenses.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:0 28px;">
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <strong>🇮🇳 NRI Finance Hub</strong>
+        <p>The only finance tool built specifically for Indians working in Gulf, Southeast Asia, Australia, Americas, and Europe. Free, live, no signup required.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tools</h4>
+        <a href="#" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));return false;">Live Remittance Rates</a>
+        <a href="#" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));return false;">SIP &amp; SWP Calculator</a>
+        <a href="#" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));return false;">NRE vs NRO + Bank Rates</a>
+        <a href="#" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));return false;">Home Loan Planner</a>
+        <a href="#" onclick="showTab('return',document.querySelector('[data-tab=return]'));return false;">Return Planner</a>
+      </div>
+      <div class="footer-col">
+        <h4>Open NRI Accounts</h4>
+        <a href="https://www.hdfcbank.com/personal/save/accounts/nre-savings-account" target="_blank" rel="noopener">HDFC NRE Account →</a>
+        <a href="https://www.icicibank.com/nri-banking/bank-accounts/nre-savings-account" target="_blank" rel="noopener">ICICI NRE Account →</a>
+        <a href="https://www.sbi.co.in/web/nri" target="_blank" rel="noopener">SBI NRI Banking →</a>
+        <a href="https://wise.com" target="_blank" rel="noopener">Open Wise Account →</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Exchange rates via <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" style="color:var(--amber)">@fawazahmed0 Currency API</a> · Bank FD rates approximate (mid-2025) — verify before investing</p>
+      <p><em>Affiliate disclosure: Some links may earn a referral fee · Not financial advice · Consult a SEBI-RIA or CA for personalised guidance</em></p>
+    </div>
+  </footer>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────
+let midRate=null,baseCur='AED',loanAmortData=[],returnProjData=[];
+
+// ── PROVIDER BADGE STYLES ──────────────────────
+const BADGE={
+  'Wise':          {bg:'#1a3d2b',color:'#4ade80',text:'W'},
+  'LuluMoney':     {bg:'#2d1f47',color:'#a78bfa',text:'LM'},
+  'eRemit':        {bg:'#1a2f4a',color:'#60a5fa',text:'eR'},
+  'Lotus Money':   {bg:'#3b1f35',color:'#f9a8d4',text:'LO'},
+  'Merchantrade':  {bg:'#3b2a10',color:'#fbbf24',text:'MT'},
+  'BigPay':        {bg:'#3b1a1a',color:'#f87171',text:'BP'},
+  'SkyRemit':      {bg:'#1a2e3b',color:'#7dd3fc',text:'SR'},
+  'Western Union': {bg:'#3b2e00',color:'#fde68a',text:'WU'},
+  'MoneyGram':     {bg:'#3b1a20',color:'#fca5a5',text:'MG'},
+  'Al Ansari Exchange':{bg:'#1a2a3b',color:'#93c5fd',text:'AA'},
+  'UAE Exchange':  {bg:'#1a2e3b',color:'#67e8f9',text:'UE'},
+  'Al Fardan Exchange':{bg:'#2a1f10',color:'#fdba74',text:'AF'},
+  'Sharaf Exchange':{bg:'#1f2a1a',color:'#86efac',text:'SX'},
+  'Remitly':       {bg:'#1a2040',color:'#818cf8',text:'RM'},
+  'STC Pay':       {bg:'#2a1040',color:'#c084fc',text:'ST'},
+  'Al Rajhi Bank': {bg:'#0d2a1a',color:'#34d399',text:'AR'},
+  'Alinma Pay':    {bg:'#1a2040',color:'#60a5fa',text:'AP'},
+  'Al Zaman Exchange':{bg:'#3b2010',color:'#fb923c',text:'AZ'},
+  'BFC Exchange':  {bg:'#1a1f3b',color:'#a5b4fc',text:'BF'},
+  'InstaReM':      {bg:'#1a2f4a',color:'#38bdf8',text:'IR'},
+  'SingX':         {bg:'#2a1020',color:'#e879f9',text:'SX'},
+  'OFX':           {bg:'#2a1f10',color:'#f97316',text:'OX'},
+  'TorFX':         {bg:'#102a2a',color:'#2dd4bf',text:'TX'},
+  'Xoom (PayPal)': {bg:'#101f3b',color:'#6366f1',text:'XM'},
+  'Xe.com':        {bg:'#1a2a10',color:'#a3e635',text:'XE'},
+  'default':       {bg:'#1a2a3b',color:'#94a3b8',text:'?'},
+};
+function badge(name){
+  const s=BADGE[name]||BADGE['default'];
+  return `<div class="pbadge" style="background:${s.bg};color:${s.color}">${s.text}</div>`;
+}
+
+// ── PROVIDERS ──────────────────────────────────
+const P={
+  MYR:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com',note:'At Lulu outlets'},
+    {name:'eRemit',spread:.013,fee:0,link:'https://eremit.my',note:'Malaysia digital'},
+    {name:'Lotus Money',spread:.015,fee:0,link:'https://lotusmoney.com.my',note:'Local exchange'},
+    {name:'Merchantrade',spread:.016,fee:0,link:'https://merchantrade.com.my',note:'Nationwide agents'},
+    {name:'BigPay',spread:.018,fee:2,link:'https://bigpay.com.my',note:'AirAsia fintech'},
+    {name:'SkyRemit',spread:.020,fee:0,link:'https://skyremit.com',note:'MY–India specialist'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Maybank (SWIFT)',spread:.040,fee:12,link:'#',note:'Bank wire'},
+  ],
+  AED:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com',note:'At Lulu Hypermarkets'},
+    {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange"},
+    {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branches'},
+    {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Competitive rates'},
+    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Bank (SWIFT)',spread:.040,fee:25,link:'#',note:'ENBD/Mashreq/ADCB'},
+  ],
+  SAR:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'STC Pay',spread:.010,fee:0,link:'https://stcpay.com.sa',note:'Saudi telco fintech'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com',note:'At Lulu KSA'},
+    {name:'Alinma Pay',spread:.013,fee:0,link:'https://alinma.com',note:'Digital wallet KSA'},
+    {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most used bank KSA'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Large agent network'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'Bank (SWIFT)',spread:.040,fee:25,link:'#',note:'NCB/Riyad Bank'},
+  ],
+  QAR:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com',note:'At Lulu Qatar'},
+    {name:'Al Zaman Exchange',spread:.012,fee:0,link:'https://alzamanexchange.com',note:'Popular in Doha'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Doha Bank',spread:.038,fee:20,link:'#',note:'Bank wire'},
+  ],
+  KWD:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Gulf Bank FX',spread:.035,fee:5,link:'#',note:'Bank wire'},
+  ],
+  BHD:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'BFC Exchange',spread:.013,fee:0,link:'https://bfcgroup.com',note:"Bahrain's top exchange"},
+    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Available at agents'},
+    {name:'NBB (Bank)',spread:.038,fee:10,link:'#',note:'National Bank Bahrain'},
+  ],
+  OMR:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'BankMuscat',spread:.038,fee:8,link:'#',note:'Bank wire'},
+  ],
+  SGD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore fintech'},
+    {name:'SingX',spread:.011,fee:0,link:'https://singx.co',note:'SG–India specialist'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'DBS (SWIFT)',spread:.040,fee:20,link:'#',note:'Bank wire'},
+  ],
+  AUD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.012,fee:0,link:'https://remitly.com',note:'Popular in AU'},
+    {name:'TorFX',spread:.013,fee:0,link:'https://torfx.com',note:'No transfer fees'},
+    {name:'OFX',spread:.014,fee:0,link:'https://ofx.com',note:'AU FX specialist'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'ANZ (SWIFT)',spread:.040,fee:22,link:'#',note:'Bank wire'},
+  ],
+  NZD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://remitly.com',note:'Digital, fast'},
+    {name:'OFX',spread:.014,fee:0,link:'https://ofx.com',note:'NZ registered'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'ASB (SWIFT)',spread:.040,fee:20,link:'#',note:'Bank wire'},
+  ],
+  USD:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://remitly.com',note:'Popular US–India'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://xe.com',note:'No transfer fee'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://xoom.com',note:"PayPal's remit app"},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Bank (Wire)',spread:.040,fee:25,link:'#',note:'Chase/BofA/Wells'},
+  ],
+  CAD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://remitly.com',note:'Popular in Canada'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://xe.com',note:'No fee transfers'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'RBC (SWIFT)',spread:.040,fee:20,link:'#',note:'Bank wire'},
+  ],
+  EUR:[
+    {name:'Wise',spread:.005,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://remitly.com',note:'Fast digital'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://xe.com',note:'No transfer fee'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'EU-wide agents'},
+    {name:'Bank (SEPA/SWIFT)',spread:.040,fee:20,link:'#',note:'Deutsche/BNP/ING'},
+  ],
+  GBP:[
+    {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://remitly.com',note:'Popular UK–India'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://xe.com',note:'No transfer fee'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Available at agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Post Office & agents'},
+    {name:'Barclays (SWIFT)',spread:.040,fee:25,link:'#',note:'Bank wire'},
+  ],
+};
+
+// ── FALLBACK RATES ─────────────────────────────
+const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:18.8,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
+let rateIsLive=false;
+
+// ── FETCH ──────────────────────────────────────
+async function fetchRate(c){
+  const cu=c.toLowerCase();
+  try{const r=await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${cu}.json`);if(r.ok){const d=await r.json();const v=d[cu]&&d[cu]['inr'];if(v){rateIsLive=true;return v;}}}catch(e){}
+  try{const r=await fetch(`https://latest.currency-api.pages.dev/v1/currencies/${cu}.json`);if(r.ok){const d=await r.json();const v=d[cu]&&d[cu]['inr'];if(v){rateIsLive=true;return v;}}}catch(e){}
+  try{const r=await fetch(`https://api.frankfurter.app/latest?from=${c}&to=INR`);if(r.ok){const d=await r.json();if(d.rates&&d.rates.INR){rateIsLive=true;return d.rates.INR;}}}catch(e){}
+  rateIsLive=false;return FB[c]||null;
+}
+
+async function updateAll(){
+  baseCur=document.getElementById('baseCurrency').value;
+  document.getElementById('heroFromLabel').textContent=baseCur;
+  document.getElementById('curTag').textContent=baseCur;
+  const ld=document.getElementById('rates-loading');
+  ld.style.display='flex';ld.innerHTML='<div class="spin"></div><span>Fetching live rates for '+baseCur+'…</span>';
+  document.getElementById('rates-container').style.display='none';
+  document.getElementById('rate-note').style.display='none';
+  midRate=await fetchRate(baseCur);
+  ld.style.display='none';
+  if(midRate){
+    document.getElementById('rates-container').style.display='flex';
+    document.getElementById('rate-note').style.display='flex';
+    renderRates();
+  }else{
+    ld.innerHTML='<span style="color:var(--red)">⚠ Could not load rates. Check internet connection.</span>';
+    ld.style.display='flex';
+  }
+}
+
+function syncAmount(v){document.getElementById('sendAmount').value=v;}
+function syncAmountFromMain(v){document.getElementById('heroAmount').value=v;}
+
+function renderRates(){
+  if(!midRate)return;
+  const amt=parseFloat(document.getElementById('sendAmount').value)||1000;
+  const providers=P[baseCur]||P['USD'];
+  const rows=providers.map(p=>{
+    const rate=midRate*(1-p.spread);
+    const inr=Math.max(0,amt-p.fee)*rate;
+    return{...p,rate,inr};
+  }).sort((a,b)=>b.inr-a.inr);
+  const best=rows[0].inr,worst=rows[rows.length-1].inr;
+  document.getElementById('rates-container').innerHTML=rows.map((p,i)=>{
+    const isBest=i===0;
+    const pct=worst===best?100:Math.round(70+(p.inr-worst)/(best-worst)*30);
+    const barColor=isBest?'var(--green)':i===rows.length-1?'var(--red)':'var(--amber)';
+    const diff=isBest?'':`<span style="font-size:12px;color:var(--red);font-weight:600"> -₹${Math.round(best-p.inr).toLocaleString('en-IN')}</span>`;
+    return`<div class="rate-row${isBest?' best':''}">
+      ${badge(p.name)}
+      <div class="pinfo"><div class="pname">${p.name}${isBest?'<span class="best-tag">BEST TODAY</span>':''}</div>
+      <div class="pmeta">${p.note} · ${p.fee>0?`Fee: ${baseCur} ${p.fee}`:'No fee'} · ${(p.spread*100).toFixed(1)}% margin</div></div>
+      <div class="pbar-col">
+        <div class="pamount" style="color:${isBest?'var(--green)':'var(--text)'}">₹${Math.round(p.inr).toLocaleString('en-IN')}${diff}</div>
+        <div class="pamount-sub">₹${p.rate.toFixed(2)} per ${baseCur}</div>
+        <div class="pbar-track"><div class="pbar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </div>
+      <a class="rate-cta${p.link==='#'?' disabled':''}" href="${p.link}" target="_blank" rel="noopener">Send Now →</a>
+    </div>`;
+  }).join('');
+  const now=new Date();
+  const lbl=rateIsLive?`<span style="color:var(--green);font-weight:600">🟢 Live</span> · Updated ${now.toLocaleTimeString()}`
+    :`<span style="color:var(--amber);font-weight:600">🟡 Offline</span> · Approximate rates (mid-2025)`;
+  document.getElementById('rate-note-text').innerHTML=`Mid-market: <strong>1 ${baseCur} = ₹${midRate.toFixed(4)}</strong> · ${lbl} · Rates are estimates — verify on provider site before transferring.`;
+}
+
+// ── SIP CALCULATOR ─────────────────────────────
+let sipData=[],swpData=[];
+function calcSIP(){
+  const sip0=parseFloat(document.getElementById('sip-amount').value)||25000;
+  const rate=parseFloat(document.getElementById('sip-return').value)/100;
+  const yrs=parseInt(document.getElementById('sip-years').value);
+  const stepup=parseFloat(document.getElementById('sip-stepup').value)/100;
+  const mr=rate/12;
+  let corpus=0,totalInvested=0,sipM=sip0;
+  sipData=[];
+  let tbody='';
+  for(let y=1;y<=yrs;y++){
+    const annInvested=sipM*12;
+    for(let m=0;m<12;m++){corpus=(corpus+sipM)*(1+mr);}
+    totalInvested+=annInvested;
+    const wealthGain=corpus-totalInvested;
+    sipData.push({year:y,sipM:Math.round(sipM),annInvested:Math.round(annInvested),totalInvested:Math.round(totalInvested),corpus:Math.round(corpus),gain:Math.round(wealthGain)});
+    const gainPct=Math.round(wealthGain/corpus*100);
+    tbody+=`<tr>
+      <td>${y}</td>
+      <td>₹${Math.round(sipM).toLocaleString('en-IN')}</td>
+      <td>₹${Math.round(annInvested).toLocaleString('en-IN')}</td>
+      <td>₹${(totalInvested/100000).toFixed(1)}L</td>
+      <td style="color:var(--amber);font-weight:700">₹${(corpus/100000).toFixed(1)}L</td>
+      <td style="color:var(--green)">₹${(wealthGain/100000).toFixed(1)}L (${gainPct}%)</td>
+    </tr>`;
+    sipM*=(1+stepup);
+  }
+  document.getElementById('sip-year-body').innerHTML=tbody;
+  const finalCorpus=sipData[sipData.length-1].corpus;
+  const finalInvested=sipData[sipData.length-1].totalInvested;
+  const finalGain=finalCorpus-finalInvested;
+  const xirr=((finalCorpus/finalInvested)-1)*100/yrs;
+  document.getElementById('sip-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Total Invested</div><div class="ri-val" style="font-size:18px">₹${(finalInvested/100000).toFixed(1)}L</div><div class="ri-sub">over ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Wealth Created</div><div class="ri-val">₹${(finalGain/100000).toFixed(1)}L</div><div class="ri-sub">returns earned</div></div>
+    <div class="ri"><div class="ri-lbl">Final Corpus</div><div class="ri-val" style="color:var(--green)">₹${(finalCorpus/100000).toFixed(1)}L</div><div class="ri-sub">at ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Wealth Multiplier</div><div class="ri-val">×${(finalCorpus/finalInvested).toFixed(1)}</div><div class="ri-sub">your money grew</div></div>
+  `;
+  document.getElementById('sip-tip').innerHTML=`🎯 Starting at ₹${sip0.toLocaleString('en-IN')}/mo and stepping up ${(stepup*100).toFixed(0)}% annually at <strong>${rate*100}% returns</strong> turns ₹${(finalInvested/100000).toFixed(0)}L invested into <strong>₹${(finalCorpus/100000).toFixed(1)}L</strong> — ${((finalCorpus/finalInvested)).toFixed(1)}× your money.`;
+  document.getElementById('sip-result').style.display='block';
+}
+function downloadSIPCSV(){
+  const rows=[['Year','Monthly SIP (₹)','Invested in Year (₹)','Total Invested (₹)','Corpus Value (₹)','Wealth Gained (₹)']];
+  sipData.forEach(r=>rows.push([r.year,r.sipM,r.annInvested,r.totalInvested,r.corpus,r.gain]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','sip-projection.csv');
+}
+
+// ── SWP CALCULATOR ─────────────────────────────
+function calcSWP(){
+  let corpus=parseFloat(document.getElementById('swp-corpus').value)*100000;
+  const wd0=parseFloat(document.getElementById('swp-monthly').value)||75000;
+  const ret=parseFloat(document.getElementById('swp-return').value)/100;
+  const infl=parseFloat(document.getElementById('swp-inflation').value)/100;
+  const stepup=parseFloat(document.getElementById('swp-stepup').value)/100;
+  const mr=ret/12;
+  let wdM=wd0,exhaustYear=null;
+  swpData=[];
+  let tbody='';
+  for(let y=1;y<=40;y++){
+    const openCorpus=corpus;
+    let annWd=0,annRet=0;
+    for(let m=0;m<12;m++){
+      const retM=corpus*mr;
+      corpus=corpus+retM-wdM;
+      annWd+=wdM;
+      annRet+=retM;
+      if(corpus<=0){corpus=0;}
+    }
+    const close=Math.max(0,corpus);
+    swpData.push({year:y,wdM:Math.round(wdM),annWd:Math.round(annWd),annRet:Math.round(annRet),close});
+    const depleted=close<=0;
+    if(depleted&&!exhaustYear)exhaustYear=y;
+    tbody+=`<tr${depleted?' style="opacity:0.5"':''}>
+      <td>${y}</td>
+      <td>₹${Math.round(wdM).toLocaleString('en-IN')}</td>
+      <td>₹${Math.round(annWd).toLocaleString('en-IN')}</td>
+      <td style="color:var(--green)">₹${Math.round(annRet).toLocaleString('en-IN')}</td>
+      <td style="color:${close>0?'var(--amber)':'var(--red)'};font-weight:700">₹${(close/100000).toFixed(1)}L</td>
+      <td style="color:${close>0?'var(--green)':'var(--red)'}">${close>0?'✔ Active':'✘ Depleted'}</td>
+    </tr>`;
+    wdM*=(1+stepup);
+    if(depleted)break;
+  }
+  document.getElementById('swp-year-body').innerHTML=tbody;
+  const initCorpus=parseFloat(document.getElementById('swp-corpus').value)*100000;
+  const finalClose=swpData[swpData.length-1].close;
+  const totalWd=swpData.reduce((s,r)=>s+r.annWd,0);
+  document.getElementById('swp-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Starting Corpus</div><div class="ri-val" style="font-size:18px">₹${(initCorpus/100000).toFixed(0)}L</div><div class="ri-sub"></div></div>
+    <div class="ri"><div class="ri-lbl">Monthly Withdrawal</div><div class="ri-val">₹${wd0.toLocaleString('en-IN')}</div><div class="ri-sub">starting amount</div></div>
+    <div class="ri"><div class="ri-lbl">Total Withdrawn</div><div class="ri-val">₹${(totalWd/100000).toFixed(1)}L</div><div class="ri-sub">over plan period</div></div>
+    <div class="ri"><div class="ri-lbl">${exhaustYear?'Corpus Lasts':'Corpus After 40yr'}</div><div class="ri-val" style="color:${exhaustYear?'var(--red)':'var(--green)'};">${exhaustYear?exhaustYear+' years':'₹'+(finalClose/100000).toFixed(1)+'L'}</div><div class="ri-sub">${exhaustYear?'then corpus depleted':'still remaining'}</div></div>
+  `;
+  document.getElementById('swp-verdict').innerHTML=exhaustYear
+    ?`<div class="box-red">⚠️ <strong>Corpus runs out in Year ${exhaustYear}.</strong> Options: reduce monthly withdrawal to ₹${Math.round(initCorpus*mr/(1-(1+mr)**-(exhaustYear*12))).toLocaleString('en-IN')} · increase portfolio return · add an income source · consider a larger starting corpus.</div>`
+    :`<div class="box-green">✅ <strong>Corpus is sustainable.</strong> At ${ret*100}% returns with ${(stepup*100).toFixed(0)}% annual withdrawal increase, your corpus of ₹${(initCorpus/100000).toFixed(0)}L outlasts the 40-year projection. Corpus remaining: ₹${(finalClose/100000).toFixed(1)}L.</div>`;
+  document.getElementById('swp-result').style.display='block';
+}
+function downloadSWPCSV(){
+  const rows=[['Year','Monthly Withdrawal (₹)','Annual Withdrawal (₹)','Portfolio Return (₹)','Closing Corpus (₹)']];
+  swpData.forEach(r=>rows.push([r.year,r.wdM,r.annWd,r.annRet,r.close]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','swp-projection.csv');
+}
+
+// ── NRE vs NRO ─────────────────────────────────
+function nreNroRecommend(){
+  const q1=document.getElementById('nro-q1').value;
+  const q2=document.getElementById('nro-q2').value;
+  const q3=document.getElementById('nro-q3').value;
+  let rec='';
+  if(q1==='no'&&q2==='yes'&&q3==='yes')rec=`<strong>Open an NRE Account.</strong> You earn only abroad, want full repatriation, and prefer tax-free interest. NRE is perfect. Consider FCNR for large amounts to eliminate FX risk.`;
+  else if(q1==='yes'&&q2==='no')rec=`<strong>Open an NRO Account.</strong> Your India-based income (rent, dividends) can only be deposited into NRO. You can still repatriate up to $1M/year after tax.`;
+  else if(q1==='yes'&&q2==='yes')rec=`<strong>Open Both NRE + NRO.</strong> Route foreign income into NRE (tax-free, full repatriation) and India income into NRO. Most NRIs with mixed income use both.`;
+  else rec=`<strong>Start with an NRE Account.</strong> Tax-free interest, full repatriation, ideal for foreign earnings. Add NRO later if you develop India income.`;
+  document.getElementById('nrenro-rec').innerHTML=`✅ <strong>Recommendation:</strong> ${rec}<br/><br/><a href="https://www.hdfcbank.com/personal/save/accounts/nre-savings-account" target="_blank">Open NRE at HDFC →</a> &nbsp;·&nbsp; <a href="https://www.icicibank.com/nri-banking/bank-accounts/nre-savings-account" target="_blank">Open NRE at ICICI →</a>`;
+  document.getElementById('nrenro-rec').style.display='block';
+}
+
+// ── HOME LOAN EMI + AMORTIZATION ───────────────
+function calcHomeLoan(){
+  const pv=parseFloat(document.getElementById('hl-propval').value)*100000;
+  const dp=parseFloat(document.getElementById('hl-down').value)/100;
+  const ar=parseFloat(document.getElementById('hl-rate').value)/100;
+  const yrs=parseInt(document.getElementById('hl-tenure').value);
+  const loan=pv*(1-dp),mr=ar/12,n=yrs*12;
+  const emi=loan*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
+  const totalPaid=emi*n,totalInt=totalPaid-loan;
+  const fxEMI=midRate?`<div class="ri"><div class="ri-lbl">EMI in ${baseCur}</div><div class="ri-val" style="font-size:18px">${baseCur} ${Math.round(emi/midRate).toLocaleString()}</div><div class="ri-sub">at today's rate</div></div>`:'';
+  document.getElementById('hl-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Loan Amount</div><div class="ri-val" style="font-size:18px">₹${(loan/100000).toFixed(1)}L</div><div class="ri-sub">${(dp*100).toFixed(0)}% down paid</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly EMI</div><div class="ri-val">₹${Math.round(emi).toLocaleString('en-IN')}</div><div class="ri-sub">for ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Total Interest</div><div class="ri-val" style="color:var(--red)">₹${(totalInt/100000).toFixed(1)}L</div><div class="ri-sub">cost of borrowing</div></div>
+    <div class="ri"><div class="ri-lbl">Total Amount Paid</div><div class="ri-val" style="font-size:18px">₹${(totalPaid/100000).toFixed(1)}L</div><div class="ri-sub">principal + interest</div></div>
+    ${fxEMI}
+  `;
+  document.getElementById('hl-tip').innerHTML=`
+    <div style="font-size:13px;color:var(--amber);font-weight:700;margin-bottom:8px">💡 NRI Home Loan Checklist</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.75">
+      • EMI debited from NRE/NRO account via ECS/NACH mandate<br/>
+      • Power of Attorney required for local India representative<br/>
+      • Sec 24b deduction: up to ₹2L/yr interest if filing India returns<br/>
+      • Pre-payment: most banks allow 2 free pre-payments/yr — reduces interest significantly
+    </div>`;
+
+  // Build yearly amortization
+  loanAmortData=[];
+  let bal=loan;
+  let tbody='',totalPrinc=0,totalInterest=0,totalEMIPaid=0;
+  for(let y=1;y<=yrs;y++){
+    const open=bal;
+    let annPrinc=0,annInt=0;
+    for(let m=0;m<12&&bal>0;m++){
+      const intM=bal*mr;
+      const princM=Math.min(emi-intM,bal);
+      annInt+=intM;annPrinc+=princM;bal-=princM;
+    }
+    const annEMI=annPrinc+annInt;
+    totalPrinc+=annPrinc;totalInterest+=annInt;totalEMIPaid+=annEMI;
+    const princPct=Math.round(annPrinc/annEMI*100);
+    loanAmortData.push({year:y,open,annEMI,annPrinc,annInt,close:Math.max(0,bal)});
+    tbody+=`<tr>
+      <td>${y}</td>
+      <td>₹${(open/100000).toFixed(2)}L</td>
+      <td>₹${Math.round(annEMI).toLocaleString('en-IN')}</td>
+      <td class="principal">₹${Math.round(annPrinc).toLocaleString('en-IN')}</td>
+      <td class="interest">₹${Math.round(annInt).toLocaleString('en-IN')}</td>
+      <td><div>${princPct}% principal</div><div class="prog-bar-mini"><div class="prog-fill" style="width:${princPct}%"></div></div></td>
+      <td>₹${(Math.max(0,bal)/100000).toFixed(2)}L</td>
+    </tr>`;
+  }
+  tbody+=`<tr>
+    <td>Total</td>
+    <td>—</td>
+    <td>₹${Math.round(totalEMIPaid).toLocaleString('en-IN')}</td>
+    <td class="principal">₹${(totalPrinc/100000).toFixed(2)}L</td>
+    <td class="interest">₹${(totalInterest/100000).toFixed(2)}L</td>
+    <td>—</td>
+    <td>₹0</td>
+  </tr>`;
+  document.getElementById('hl-amort-body').innerHTML=tbody;
+  document.getElementById('hl-result').style.display='block';
+}
+
+function downloadLoanCSV(){
+  const rows=[['Year','Opening Balance (₹)','Annual EMI (₹)','Principal Paid (₹)','Interest Paid (₹)','Closing Balance (₹)']];
+  loanAmortData.forEach(r=>rows.push([r.year,Math.round(r.open),Math.round(r.annEMI),Math.round(r.annPrinc),Math.round(r.annInt),Math.round(r.close)]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  triggerDownload(csv,'text/csv','home-loan-schedule.csv');
+}
+
+function downloadLoanPDF(){
+  const tbl=document.getElementById('hl-amort-table');
+  const rate=document.getElementById('hl-rate').value;
+  const tenure=document.getElementById('hl-tenure').value;
+  const propval=document.getElementById('hl-propval').value;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Home Loan Schedule</title>
+  <style>body{font-family:Arial,sans-serif;padding:24px;color:#111;}h2{font-size:18px;margin-bottom:4px;}p{font-size:12px;color:#555;margin-bottom:20px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f3f4f6;padding:8px 12px;text-align:right;border:1px solid #ddd;font-size:11px;}
+  th:first-child{text-align:center;}td{padding:7px 12px;border:1px solid #e5e7eb;text-align:right;}td:first-child{text-align:center;}
+  tr:last-child{background:#f9fafb;font-weight:700;}tr:nth-child(even){background:#fafafa;}
+  .principal{color:#059669;}.interest{color:#dc2626;}</style></head>
+  <body><h2>Home Loan Amortization Schedule</h2>
+  <p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>
+  ${tbl.outerHTML}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{win.print();},400);
+}
+
+// ── CITY PRESETS ───────────────────────────────
+const CITY_PRESETS={
+  metro:{food:20000,rent:30000,transport:8000,util:6000,lifeins:5000,healthins:5000,medical:5000,edu:20000,ent:10000,travel:6000,clothing:5000,misc:5000},
+  tier2:{food:15000,rent:18000,transport:5000,util:4000,lifeins:4000,healthins:3500,medical:4000,edu:12000,ent:6000,travel:4000,clothing:3000,misc:3500},
+  tier3:{food:10000,rent:8000,transport:3000,util:2500,lifeins:3000,healthins:2500,medical:3000,edu:7000,ent:3000,travel:2500,clothing:2000,misc:2000},
+};
+function setCity(tier,btn){
+  document.querySelectorAll('.city-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const p=CITY_PRESETS[tier];
+  document.getElementById('exp-food').value=p.food;
+  document.getElementById('exp-rent').value=p.rent;
+  document.getElementById('exp-transport').value=p.transport;
+  document.getElementById('exp-util').value=p.util;
+  document.getElementById('exp-lifeins').value=p.lifeins;
+  document.getElementById('exp-healthins').value=p.healthins;
+  document.getElementById('exp-medical').value=p.medical;
+  document.getElementById('exp-edu').value=p.edu;
+  document.getElementById('exp-ent').value=p.ent;
+  document.getElementById('exp-travel').value=p.travel;
+  document.getElementById('exp-clothing').value=p.clothing;
+  document.getElementById('exp-misc').value=p.misc;
+  updateExpTotal();
+}
+function updateExpTotal(){
+  const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
+  const total=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
+  document.getElementById('exp-total-display').textContent='₹'+Math.round(total).toLocaleString('en-IN');
+  return total;
+}
+// Live total update
+document.addEventListener('input',e=>{if(e.target.id&&e.target.id.startsWith('exp-'))updateExpTotal();});
+
+// ── RETURN PLANNER ─────────────────────────────
+function calcReturn(){
+  const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
+  const baseMonthly=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
+  const inflation=parseFloat(document.getElementById('rp-inflation').value)/100;
+  const roi=parseFloat(document.getElementById('rp-roi').value)/100;
+  const indiaIncome=parseFloat(document.getElementById('rp-income').value)||0;
+  const years=parseInt(document.getElementById('rp-years').value);
+  const savingsNow=parseFloat(document.getElementById('rp-savings').value)*100000;
+  const monthlySavings=parseFloat(document.getElementById('rp-monthly').value)*100000;
+
+  // Update total display
+  document.getElementById('exp-total-display').textContent='₹'+Math.round(baseMonthly).toLocaleString('en-IN');
+
+  // Project corpus
+  const mr=roi/12,n=years*12;
+  const fvSavings=savingsNow*Math.pow(1+mr,n);
+  const fvContrib=monthlySavings*(Math.pow(1+mr,n)-1)/mr;
+  const projCorpus=fvSavings+fvContrib;
+
+  // Year 0 (return year) monthly expenses = inflated
+  const returnMonthly=baseMonthly*Math.pow(1+inflation,years);
+  const shortfall=Math.max(0,returnMonthly-indiaIncome);
+  // Corpus needed using Gordon growth model: C = shortfall*12 / (roi - inflation)
+  const netRate=roi-inflation;
+  const corpusNeeded=netRate>0?shortfall*12/netRate:shortfall*12*30; // 30yr if netRate<=0
+
+  // Sustainability
+  const sustain=shortfall>0?corpusNeeded/shortfall/12:99;
+
+  returnProjData=[];
+  let expM=returnMonthly;
+  let tbody='';
+  for(let y=1;y<=Math.min(years+15,30);y++){
+    const annExp=expM*12;
+    const inflAdded=expM*(inflation);
+    const sf=Math.max(0,expM-indiaIncome);
+    const cn=netRate>0?sf*12/netRate:sf*12*30;
+    returnProjData.push({year:y,expM:Math.round(expM),annExp:Math.round(annExp),inflAdded:Math.round(inflAdded),sf:Math.round(sf),cn:Math.round(cn)});
+    const isReturn=y===years;
+    tbody+=`<tr${isReturn?' style="border-left:3px solid var(--amber)"':''}>
+      <td>${y}${isReturn?' 🏠':''}</td>
+      <td>₹${Math.round(expM).toLocaleString('en-IN')}</td>
+      <td>₹${Math.round(annExp).toLocaleString('en-IN')}</td>
+      <td style="color:var(--red)">+₹${Math.round(inflAdded).toLocaleString('en-IN')}</td>
+      <td style="color:var(--amber)">₹${Math.round(sf).toLocaleString('en-IN')}</td>
+      <td><strong>₹${(cn/100000).toFixed(1)}L</strong></td>
+    </tr>`;
+    expM*=(1+inflation);
+  }
+  document.getElementById('rp-year-body').innerHTML=tbody;
+
+  document.getElementById('rp-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Monthly Expenses Today</div><div class="ri-val" style="font-size:18px">₹${Math.round(baseMonthly).toLocaleString('en-IN')}</div><div class="ri-sub">before inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly Expenses at Return</div><div class="ri-val">₹${Math.round(returnMonthly).toLocaleString('en-IN')}</div><div class="ri-sub">after ${years}yr × ${(inflation*100).toFixed(0)}% inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Projected Corpus</div><div class="ri-val" style="color:${projCorpus>=corpusNeeded?'var(--green)':'var(--red)'}">₹${(projCorpus/100000).toFixed(1)}L</div><div class="ri-sub">at return date</div></div>
+    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="ri-val" style="font-size:18px">₹${(corpusNeeded/100000).toFixed(1)}L</div><div class="ri-sub">for inflation-adjusted income</div></div>
+  `;
+
+  const onTrack=projCorpus>=corpusNeeded*0.9;
+  document.getElementById('rp-verdict').innerHTML=onTrack
+    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L covers your inflation-adjusted lifestyle. Ensure you're invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
+    :`<div class="box-red">⚠️ <strong>Gap of ~₹${((corpusNeeded-projCorpus)/100000).toFixed(1)}L.</strong> Options: stay ${Math.ceil((corpusNeeded-fvSavings)/monthlySavings/12)} more years · increase monthly savings by ₹${Math.round((corpusNeeded-projCorpus)/(n)*12/12).toLocaleString('en-IN')} · reduce expenses by switching from metro to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
+  document.getElementById('rp-result').style.display='block';
+}
+
+function downloadReturnCSV(){
+  const rows=[['Year','Monthly Expenses (₹)','Annual Expenses (₹)','Inflation Added (₹)','Monthly Shortfall (₹)','Corpus Needed (₹)']];
+  returnProjData.forEach(r=>rows.push([r.year,r.expM,r.annExp,r.inflAdded,r.sf,r.cn]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  triggerDownload(csv,'text/csv','return-india-projection.csv');
+}
+
+// ── DOWNLOAD HELPER ────────────────────────────
+function triggerDownload(content,type,filename){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
+}
+
+// ── TAB SWITCHER ─────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  document.querySelector('.main').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── INIT ──────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  updateAll();
+  updateExpTotal();
+});
+</script>
+</body>
+</html>
