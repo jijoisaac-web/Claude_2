@@ -1847,4 +1847,9 @@ function calcRealty(){
 
   const verdict=parseFloat(effROI)>fdRate
     ?`<div class="info" style="border-color:var(--green)">✅ <strong>Good investment:</strong> Your total ROI of ${effROI}% beats the NRE FD benchmark of ${fdRate}%. The property generates both rental income and capital appreciation. Ensure you factor in stamp duty (5–7%), registration fees, and FEMA repatriation rules.</div>`
-    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real 
+    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real estate has illiquidity risk.</div>`;
+  document.getElementById('realty-verdict').innerHTML=verdict;
+}
+</script>
+</body>
+</html>
