@@ -477,7 +477,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <div class="hero-left">
       <div class="hero-badge">🟢 Live rates &middot; 14 currencies &middot; Always free</div>
       <h1>Send money home.<br/><em>Keep more of it.</em></h1>
-      <p class="hero-sub">Compare live remittance rates from local providers in your country. Plus 5 NRI-specific financial tools — FD rates, SIP/SWP, home loans and your return plan.</p>
+      <p class="hero-sub">Compare live remittance rates from local providers in your country. Plus 7 NRI-specific financial tools — FD rates, SIP/SWP, home loans, DTAA tax savings and more.</p>
       <div class="hero-input-group">
         <input class="hero-input" type="number" id="heroAmount" value="1000" placeholder="Amount" oninput="syncAmount(this.value)"/>
         <div class="hero-from-tag">from <span id="heroFromLabel">AED</span> &rarr; &#8377; INR</div>
@@ -486,7 +486,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="hero-stats">
         <div class="hstat"><div class="hstat-v">14</div><div class="hstat-l">Currencies</div></div>
         <div class="hstat"><div class="hstat-v">50+</div><div class="hstat-l">Providers</div></div>
-        <div class="hstat"><div class="hstat-v">5</div><div class="hstat-l">NRI Tools</div></div>
+        <div class="hstat"><div class="hstat-v">7</div><div class="hstat-l">NRI Tools</div></div>
         <div class="hstat"><div class="hstat-v">Free</div><div class="hstat-l">Always</div></div>
       </div>
     </div>
@@ -1668,6 +1668,8 @@ function showTab(id,btn){
 // ── INIT ─────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
   updateExpTotal();
+  // ── Render default (AED) IMMEDIATELY so page isn't blank ──
+  updateAll();
   // Country → supported currency map
   const COUNTRY_CUR={
     AE:'AED',SA:'SAR',QA:'QAR',KW:'KWD',BH:'BHD',OM:'OMR', // Gulf
@@ -1705,7 +1707,10 @@ window.addEventListener('DOMContentLoaded',()=>{
     Promise.race([fetch('https://ipinfo.io/json').then(r=>r.json()).then(d=>d.country),t(4000)]),
   ]).then(cc=>{if(cc&&cc!=='timeout')applyDetectedCur(cc);})
     .catch(()=>{})
-    .finally(()=>updateAll());
+    .finally(()=>{
+      // Re-render with detected currency (or keep AED if detection failed)
+      updateAll();
+    });
 });
 // ══ DTAA TAX CALCULATOR ═════════════════════════════════════════════════════
 const DTAA_RATES={
