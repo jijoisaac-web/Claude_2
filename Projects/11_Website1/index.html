@@ -289,7 +289,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   .tab-btn{font-size:12px;padding:11px 12px;}
 }
 @media print{
-  nav,footer,.tab-nav-shell,.btn-row,.hero,.features,.info{display:none!important;}
+  nav,footer,.tab-nav-shell,.active-tool-bar,.drawer,.drawer-overlay,.btn-row,.hero,.features,.info{display:none!important;}
   body{background:#fff;color:#000;}
   .amort-table th{background:#f3f4f6;color:#374151;}
   .amort-table td{color:#111;}
@@ -378,6 +378,41 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   .mkt-right{text-align:left;}
 }
 
+/* ── LEFT DRAWER NAV ─────────────────────────────────────────────────────── */
+.drawer-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0);backdrop-filter:blur(0px);pointer-events:none;transition:background 0.3s,backdrop-filter 0.3s;}
+.drawer-overlay.open{background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);pointer-events:all;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:300px;z-index:201;background:var(--surface);border-right:1px solid var(--border2);transform:translateX(-100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;overflow-y:auto;}
+.drawer.open{transform:translateX(0);}
+.drawer-head{padding:22px 20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.drawer-brand{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;}
+.drawer-brand span{color:var(--amber);}
+.drawer-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.drawer-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--elevated);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.drawer-close:hover{color:var(--text);background:var(--subtle);}
+.drawer-section-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:18px 20px 8px;}
+.drawer-item{display:flex;align-items:center;gap:14px;padding:12px 20px;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none;}
+.drawer-item:hover{background:var(--elevated);}
+.drawer-item.active{border-left-color:var(--amber);background:var(--amber-dim);}
+.drawer-icon{width:42px;height:42px;border-radius:11px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:background 0.15s;}
+.drawer-item.active .drawer-icon{background:var(--amber-dim);}
+.drawer-info{flex:1;min-width:0;}
+.drawer-name{font-size:13.5px;font-weight:700;color:var(--text);}
+.drawer-item.active .drawer-name{color:var(--amber);}
+.drawer-desc{font-size:11px;color:var(--muted);margin-top:1px;}
+.drawer-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.6;}
+/* Tools trigger in nav */
+.tools-trigger{display:flex;align-items:center;gap:8px;background:var(--elevated);border:1px solid var(--border2);border-radius:10px;padding:8px 14px;color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.tools-trigger:hover{color:var(--text);border-color:var(--amber-glow);}
+.tools-trigger svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+/* Active tool header bar */
+.active-tool-bar{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding:14px 20px;background:var(--surface);border-radius:14px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.2s;}
+.active-tool-bar:hover{border-color:var(--border2);}
+.atb-icon{font-size:22px;line-height:1;}
+.atb-info{flex:1;}
+.atb-name{font-size:15px;font-weight:800;color:var(--text);}
+.atb-hint{font-size:11px;color:var(--muted);margin-top:1px;}
+.atb-chevron{color:var(--muted);font-size:18px;}
+@media(max-width:600px){.drawer{width:85vw;}}
 </style>
 </head>
 <body>
@@ -394,6 +429,10 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     </div>
   </a>
   <div class="nav-right">
+    <button class="tools-trigger" onclick="openDrawer()">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      Tools
+    </button>
     <div class="live-pill"><div class="live-dot"></div> Live Rates</div>
     <div class="cur-dropdown" id="curDropdown">
       <button class="cur-btn" id="curBtn" onclick="toggleCurDropdown(event)">
@@ -496,14 +535,58 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
 <!-- MAIN -->
 <div class="main">
-  <div class="tab-nav-shell">
-    <button class="tab-btn active" data-tab="rates"    onclick="showTab('rates',this)">&#128202; Live Rates</button>
-    <button class="tab-btn"        data-tab="invest"   onclick="showTab('invest',this)">&#128200; SIP &amp; SWP</button>
-    <button class="tab-btn"        data-tab="nrenro"   onclick="showTab('nrenro',this)">&#127963; NRE vs NRO</button>
-    <button class="tab-btn"        data-tab="homeloan" onclick="showTab('homeloan',this)">&#127968; Home Loan</button>
-    <button class="tab-btn"        data-tab="return"   onclick="showTab('return',this)">&#9992;&#65039; Return Planner</button>
-    <button class="tab-btn"        data-tab="dtaa"     onclick="showTab('dtaa',this)">&#128200; Tax &amp; DTAA</button>
-    <button class="tab-btn"        data-tab="realty"   onclick="showTab('realty',this)">&#127968; Real Estate ROI</button>
+  <!-- LEFT DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <div class="drawer" id="navDrawer">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-brand">NRI <span>Finance Hub</span></div>
+        <div class="drawer-sub">7 tools for Indians abroad</div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-section-lbl">Money Transfer</div>
+    <div class="drawer-item active" data-tab="rates" onclick="showTab('rates',this)">
+      <div class="drawer-icon">📊</div>
+      <div class="drawer-info"><div class="drawer-name">Live Rates</div><div class="drawer-desc">Compare 50+ remittance providers</div></div>
+    </div>
+    <div class="drawer-section-lbl">Investments & Planning</div>
+    <div class="drawer-item" data-tab="invest" onclick="showTab('invest',this)">
+      <div class="drawer-icon">📈</div>
+      <div class="drawer-info"><div class="drawer-name">SIP &amp; SWP</div><div class="drawer-desc">Mutual fund wealth calculator</div></div>
+    </div>
+    <div class="drawer-item" data-tab="nrenro" onclick="showTab('nrenro',this)">
+      <div class="drawer-icon">🏛</div>
+      <div class="drawer-info"><div class="drawer-name">NRE vs NRO</div><div class="drawer-desc">Account types + best FD rates</div></div>
+    </div>
+    <div class="drawer-item" data-tab="homeloan" onclick="showTab('homeloan',this)">
+      <div class="drawer-icon">🏠</div>
+      <div class="drawer-info"><div class="drawer-name">Home Loan</div><div class="drawer-desc">EMI, amortization &amp; overpayment</div></div>
+    </div>
+    <div class="drawer-item" data-tab="realty" onclick="showTab('realty',this)">
+      <div class="drawer-icon">🏘️</div>
+      <div class="drawer-info"><div class="drawer-name">Real Estate ROI</div><div class="drawer-desc">Rental yield vs NRE FD</div></div>
+    </div>
+    <div class="drawer-section-lbl">Tax & Return</div>
+    <div class="drawer-item" data-tab="dtaa" onclick="showTab('dtaa',this)">
+      <div class="drawer-icon">💰</div>
+      <div class="drawer-info"><div class="drawer-name">Tax &amp; DTAA</div><div class="drawer-desc">Save TDS with India's tax treaties</div></div>
+    </div>
+    <div class="drawer-item" data-tab="return" onclick="showTab('return',this)">
+      <div class="drawer-icon">✈️</div>
+      <div class="drawer-info"><div class="drawer-name">Return Planner</div><div class="drawer-desc">Corpus needed to move back</div></div>
+    </div>
+    <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
+  </div>
+
+  <!-- ACTIVE TOOL BAR (replaces tab nav) -->
+  <div class="active-tool-bar" onclick="openDrawer()">
+    <div class="atb-icon" id="atbIcon">📊</div>
+    <div class="atb-info">
+      <div class="atb-name" id="atbName">Live Rates</div>
+      <div class="atb-hint">Tap to switch tool</div>
+    </div>
+    <div class="atb-chevron">☰</div>
   </div>
 
   <!-- TAB 1: LIVE RATES -->
@@ -934,8 +1017,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="footer-bottom">
-      <p>Exchange rates via <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" style="color:var(--amber)">@fawazahmed0 Currency API</a> &middot; Bank FD rates approximate (mid-2025) &mdash; verify before investing</p>
-      <p><em>Affiliate disclosure: Some links may earn a referral fee &middot; Not financial advice &middot; Consult a SEBI-RIA or CA for personalised guidance</em></p>
+      <p>Exchange rates via <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" style="color:var(--amber)">@fawazahmed0 Currency API</a> &middot; Bank FD &amp; DTAA rates approximate (2025–26) &mdash; verify before investing &middot; DTAA rates per India IT Act; consult a CA for exact applicability</p>
+      <p><em>Affiliate disclosure: Some &ldquo;Send Now&rdquo; links may earn a referral fee at no cost to you &middot; Not financial advice &middot; Consult a SEBI-RIA or CA for personalised guidance</em></p>
     </div>
   </footer>
 </div>
@@ -1544,11 +1627,41 @@ function triggerDownload(content,type,filename){
   const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
 }
+// ── DRAWER ──────────────────────────────────────
+const TOOL_META={
+  rates:{icon:'📊',name:'Live Rates'},
+  invest:{icon:'📈',name:'SIP & SWP'},
+  nrenro:{icon:'🏛',name:'NRE vs NRO'},
+  homeloan:{icon:'🏠',name:'Home Loan'},
+  realty:{icon:'🏘️',name:'Real Estate ROI'},
+  dtaa:{icon:'💰',name:'Tax & DTAA'},
+  return:{icon:'✈️',name:'Return Planner'},
+};
+function openDrawer(){
+  document.getElementById('navDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
 function showTab(id,btn){
   document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.drawer-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
-  if(btn)btn.classList.add('active');
+  // Mark active in drawer
+  const drawerItem=document.querySelector(`.drawer-item[data-tab="${id}"]`);
+  if(drawerItem)drawerItem.classList.add('active');
+  // Update active tool bar
+  const meta=TOOL_META[id]||{icon:'📊',name:'Tools'};
+  const icon=document.getElementById('atbIcon');
+  const name=document.getElementById('atbName');
+  if(icon)icon.textContent=meta.icon;
+  if(name)name.textContent=meta.name;
+  // Close drawer & scroll
+  closeDrawer();
   document.querySelector('.main').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -1729,9 +1842,4 @@ function calcRealty(){
 
   const verdict=parseFloat(effROI)>fdRate
     ?`<div class="info" style="border-color:var(--green)">✅ <strong>Good investment:</strong> Your total ROI of ${effROI}% beats the NRE FD benchmark of ${fdRate}%. The property generates both rental income and capital appreciation. Ensure you factor in stamp duty (5–7%), registration fees, and FEMA repatriation rules.</div>`
-    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real estate has illiquidity risk.</div>`;
-  document.getElementById('realty-verdict').innerHTML=verdict;
-}
-</script>
-</body>
-</html>
+    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real 
