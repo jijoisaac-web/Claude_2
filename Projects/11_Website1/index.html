@@ -283,6 +283,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .city-btn.active,.city-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);}
 
 /* YEAR TABLE */
+/* ── FEATURED ARTICLES SECTION ── */
+.feat-section{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:48px 24px;}
+.feat-inner{max-width:1200px;margin:0 auto;}
+.feat-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;gap:16px;flex-wrap:wrap;}
+.feat-eyebrow{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.feat-title{font-size:22px;font-weight:800;color:var(--text);margin:0;}
+.feat-all-btn{background:transparent;border:1px solid var(--border2);color:var(--teal);font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.feat-all-btn:hover{background:rgba(0,212,170,0.08);border-color:var(--teal);}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.feat-card{background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:20px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:all .2s;cursor:pointer;}
+.feat-card:hover{border-color:rgba(0,212,170,0.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.feat-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:20px;width:fit-content;}
+.feat-tag.banking{background:rgba(59,130,246,0.15);color:#60a5fa;}
+.feat-tag.transfer{background:rgba(245,158,11,0.15);color:#fbbf24;}
+.feat-tag.tax{background:rgba(168,85,247,0.15);color:#c084fc;}
+.feat-tag.planning{background:rgba(99,102,241,0.15);color:#818cf8;}
+.feat-tag.property{background:rgba(16,185,129,0.15);color:#34d399;}
+.feat-card-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.4;}
+.feat-card-desc{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
+.feat-card-meta{font-size:12px;color:var(--teal);font-weight:600;margin-top:auto;}
+
 .ed-ref-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .2s;}
 .ed-ref-card:hover{border-color:var(--teal);background:rgba(0,212,170,0.06);}
 .ed-ref-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
@@ -791,9 +812,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
             <span class="tl-ico">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
           </div>
           <div class="tl-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'))">
-            <div class="tl-icon">🎓</div>
-            <div class="tl-name">Education Planner</div>
-            <div class="tl-desc">Corpus for child's education</div>
+            <span class="tl-ico">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child education corpus</div>
           </div>
           <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
             <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return Planner</div><div class="tl-ds">Corpus & checklist</div>
@@ -847,12 +866,63 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="dm-icon" style="background:var(--indigo-dim)">&#128295;</div>
       <div>
         <div class="dm-lbl">Free NRI Tools</div>
-        <div class="dm-val">7 Tools</div>
+        <div class="dm-val">9 Tools</div>
         <div class="dm-sub">No sign-up &middot; No ads</div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- FEATURED ARTICLES -->
+<section class="feat-section">
+  <div class="feat-inner">
+    <div class="feat-header">
+      <div>
+        <div class="feat-eyebrow">📚 NRI Knowledge Hub</div>
+        <h2 class="feat-title">Guides Every NRI Should Read</h2>
+      </div>
+      <button class="feat-all-btn" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});setTimeout(()=>showTab('articles',document.querySelector('[data-tab=articles]')),100)">All Guides →</button>
+    </div>
+    <div class="feat-grid">
+      <a href="nre-nro.html" class="feat-card">
+        <div class="feat-tag banking">Banking</div>
+        <div class="feat-card-title">NRE vs NRO Account: Which One Do You Actually Need?</div>
+        <div class="feat-card-desc">Tax treatment, repatriation rules, FD rates and when to use each account type.</div>
+        <div class="feat-card-meta">6 min read →</div>
+      </a>
+      <a href="send-money.html" class="feat-card">
+        <div class="feat-tag transfer">Transfer</div>
+        <div class="feat-card-title">Best Ways to Send Money to India: Full Cost Comparison</div>
+        <div class="feat-card-desc">Wise vs InstaReM vs Remitly — who wins on rates, fees and speed in 2026.</div>
+        <div class="feat-card-meta">5 min read →</div>
+      </a>
+      <a href="tax-saving.html" class="feat-card">
+        <div class="feat-tag tax">Tax</div>
+        <div class="feat-card-title">How NRIs Can Save Tax in 2026 — DTAA, Form 15CA & More</div>
+        <div class="feat-card-desc">Use DTAA to avoid double taxation. Section 80C options, ELSS, LTCG exemptions.</div>
+        <div class="feat-card-meta">8 min read →</div>
+      </a>
+      <a href="return-planner.html" class="feat-card">
+        <div class="feat-tag planning">Planning</div>
+        <div class="feat-card-title">How to Use the Return Planner — Simulate Your Corpus</div>
+        <div class="feat-card-desc">Step-by-step: enter your savings, years abroad, expenses and see how long corpus lasts.</div>
+        <div class="feat-card-meta">5 min read →</div>
+      </a>
+      <a href="home-buying.html" class="feat-card">
+        <div class="feat-tag property">Property</div>
+        <div class="feat-card-title">The Complete NRI Home Buying Guide (2026)</div>
+        <div class="feat-card-desc">FEMA rules, NRI loan eligibility, EMI from NRE account and repatriation of sale proceeds.</div>
+        <div class="feat-card-meta">10 min read →</div>
+      </a>
+      <a href="retirement.html" class="feat-card">
+        <div class="feat-tag planning">Planning</div>
+        <div class="feat-card-title">NRI Retirement Planning with SIP & SWP — India Guide</div>
+        <div class="feat-card-desc">Build corpus abroad with SIP, withdraw sustainably in India with SWP. Real numbers.</div>
+        <div class="feat-card-meta">7 min read →</div>
+      </a>
+    </div>
+  </div>
+</section>
 
 <!-- MAIN -->
 <div class="main">
