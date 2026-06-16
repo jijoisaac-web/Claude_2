@@ -37,10 +37,37 @@
       "potentialAction":{"@type":"SearchAction","target":"https://nri-finance-hub.pages.dev/#search={search_term_string}","query-input":"required name=search_term_string"}
     },
     {
-      "@type":"Organization",
-      "@id":"https://nri-finance-hub.pages.dev/#org",
+      "@type":"FinancialService",
+      "@id":"https://nri-finance-hub.pages.dev/#service",
       "name":"NRI Finance Hub",
-      "url":"https://nri-finance-hub.pages.dev/"
+      "url":"https://nri-finance-hub.pages.dev/",
+      "description":"Free financial calculators and live remittance rates for Non-Resident Indians. Tools include SIP/SWP calculator, home loan EMI, DTAA tax calculator, NRE/NRO FD rates, return planner and education corpus planner.",
+      "serviceType":"Financial Calculator and Information Service",
+      "areaServed":["AE","SA","MY","SG","AU","US","GB","CA","NZ","QA","KW","BH","OM"],
+      "audience":{"@type":"Audience","audienceType":"Non-Resident Indians (NRI)"},
+      "provider":{"@type":"Organization","name":"NRI Finance Hub","url":"https://nri-finance-hub.pages.dev/"}
+    },
+    {
+      "@type":"FAQPage",
+      "@id":"https://nri-finance-hub.pages.dev/#faq",
+      "mainEntity":[
+        {"@type":"Question","name":"What is the best way to send money to India as an NRI?","acceptedAnswer":{"@type":"Answer","text":"Wise and InstaReM consistently offer the best exchange rates for NRIs sending money to India, with low fees and fast transfers. Always compare rates on NRI Finance Hub before sending as rates change daily."}},
+        {"@type":"Question","name":"What is the difference between NRE and NRO accounts?","acceptedAnswer":{"@type":"Answer","text":"NRE (Non-Resident External) accounts hold foreign earnings converted to INR and are fully repatriable and tax-free in India. NRO (Non-Resident Ordinary) accounts hold India-sourced income like rent and dividends, which are taxable and have repatriation limits of USD 1 million per year."}},
+        {"@type":"Question","name":"How much SIP should an NRI do to build a retirement corpus?","acceptedAnswer":{"@type":"Answer","text":"To build a retirement corpus of ₹5 crore in 15 years, an NRI would need to invest approximately ₹1,00,000 per month in equity mutual funds assuming 12% annual returns. Use the NRI Finance Hub SIP calculator to model your specific scenario."}},
+        {"@type":"Question","name":"Can NRIs get a home loan in India?","acceptedAnswer":{"@type":"Answer","text":"Yes, NRIs can get home loans in India from banks like SBI, HDFC, ICICI, and Axis Bank. NRI home loan rates start from 7.25% p.a. (June 2026). The loan can be repaid from an NRE or NRO account."}},
+        {"@type":"Question","name":"What is DTAA and how does it benefit NRIs?","acceptedAnswer":{"@type":"Answer","text":"DTAA (Double Tax Avoidance Agreement) is a treaty between India and other countries that prevents NRIs from paying tax on the same income in both countries. For example, NRIs in UAE pay no tax on Indian interest income under the India-UAE DTAA by submitting Form 10F and a Tax Residency Certificate."}},
+        {"@type":"Question","name":"What is RNOR status and how long does it last?","acceptedAnswer":{"@type":"Answer","text":"RNOR (Resident but Not Ordinarily Resident) is a transitional tax status for NRIs returning to India. Under RNOR, foreign income remains tax-free in India for typically 2-3 years after returning, giving returning NRIs a tax holiday on overseas earnings."}},
+        {"@type":"Question","name":"How much corpus do I need to retire in India?","acceptedAnswer":{"@type":"Answer","text":"Using the 25x rule: multiply your expected annual expenses in India by 25. If you need ₹2 lakh per month (₹24L/year), your target corpus is ₹6 crore. Use the NRI Finance Hub Return Planner to simulate exactly how long your corpus will last based on your specific expenses and returns."}}
+      ]
+    },
+    {
+      "@type":"SoftwareApplication",
+      "name":"NRI Finance Hub — Free NRI Calculators",
+      "applicationCategory":"FinanceApplication",
+      "operatingSystem":"Web",
+      "url":"https://nri-finance-hub.pages.dev/",
+      "offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},
+      "featureList":["Live remittance rate comparison","SIP and SWP calculator","NRE/NRO FD rate comparison","Home loan EMI calculator","DTAA tax calculator","Tax residency checker","India return planner","Education corpus planner"]
     }
   ]
 }
@@ -2062,8 +2089,36 @@ const P={
 
 const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.34,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
 let rateIsLive=false;
+const CACHE_TTL=10*60*1000; // 10 minutes
+
+function getCachedRate(c){
+  try{
+    const raw=sessionStorage.getItem('rate_'+c);
+    if(!raw)return null;
+    const {rate,ts}=JSON.parse(raw);
+    if(Date.now()-ts<CACHE_TTL)return rate;
+  }catch(e){}
+  return null;
+}
+function setCachedRate(c,rate){
+  try{sessionStorage.setItem('rate_'+c,JSON.stringify({rate,ts:Date.now()}));}catch(e){}
+}
+function getLastUpdatedStr(){
+  try{
+    const raw=sessionStorage.getItem('rate_'+baseCur);
+    if(!raw)return null;
+    const {ts}=JSON.parse(raw);
+    const diff=Math.round((Date.now()-ts)/1000);
+    if(diff<60)return 'Updated just now';
+    if(diff<3600)return `Updated ${Math.floor(diff/60)}m ago`;
+    return `Updated ${Math.floor(diff/3600)}h ago`;
+  }catch(e){return null;}
+}
 
 async function fetchRate(c){
+  // Return cache if fresh
+  const cached=getCachedRate(c);
+  if(cached){rateIsLive=true;return cached;}
   const cu=c.toLowerCase();
   // Race all 3 sources in parallel — fastest wins
   const tout=(ms)=>new Promise((_,rej)=>setTimeout(()=>rej('timeout'),ms));
@@ -2071,7 +2126,12 @@ async function fetchRate(c){
   const s1=safe(fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${cu}.json`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
   const s2=safe(fetch(`https://latest.currency-api.pages.dev/v1/currencies/${cu}.json`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
   const s3=safe(fetch(`https://api.frankfurter.app/latest?from=${c}&to=INR`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d.rates&&d.rates.INR;if(v)return v;throw 0;}));
-  try{const v=await Promise.any([s1,s2,s3]);rateIsLive=true;return v;}
+  try{
+    const v=await Promise.any([s1,s2,s3]);
+    rateIsLive=true;
+    setCachedRate(c,v);
+    return v;
+  }
   catch(e){rateIsLive=false;return FB[c]||null;}
 }
 
@@ -2100,10 +2160,21 @@ async function updateAll(){
   const live=await fetchRate(baseCur);
   ld.style.display='none';
   if(live){
-    midRate=live;updateHeroRate();
+    midRate=live;rateIsLive=true;updateHeroRate();
     rc.style.display='flex';rn.style.display='flex';
     renderRates();renderRatePreview();renderMarketRate();
-  } else if(!FB[baseCur]){
+    // Show last-updated timestamp
+    const ts=getLastUpdatedStr();
+    const hrdStatus=document.getElementById('hrd-status');
+    if(hrdStatus&&ts)hrdStatus.innerHTML=`<div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div> Live rate · ${ts}`;
+  } else if(FB[baseCur]){
+    // Graceful fallback — show FB rate with clear label
+    midRate=FB[baseCur];rateIsLive=false;
+    rc.style.display='flex';rn.style.display='flex';
+    renderRates();renderRatePreview();renderMarketRate();
+    const hrdStatus=document.getElementById('hrd-status');
+    if(hrdStatus)hrdStatus.innerHTML=`<span style="color:var(--amber)">⚠ Using reference rate — live fetch failed. Verify on provider site.</span>`;
+  } else {
     ld.innerHTML='<span style="color:var(--red)">⚠ Could not load rates. Check your internet connection.</span>';
     ld.style.display='flex';
   }
