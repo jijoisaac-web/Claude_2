@@ -283,6 +283,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .city-btn.active,.city-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);}
 
 /* YEAR TABLE */
+.ed-ref-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .2s;}
+.ed-ref-card:hover{border-color:var(--teal);background:rgba(0,212,170,0.06);}
+.ed-ref-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ed-ref-cost{font-size:11px;color:var(--teal);}
 .year-table-wrap{overflow-x:auto;margin-top:22px;}
 .year-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .year-table th{background:var(--elevated);padding:11px 16px;text-align:right;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);white-space:nowrap;}
@@ -786,6 +790,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
           <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
             <span class="tl-ico">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
           </div>
+          <div class="tl-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'))">
+            <div class="tl-icon">🎓</div>
+            <div class="tl-name">Education Planner</div>
+            <div class="tl-desc">Corpus for child's education</div>
+          </div>
           <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
             <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return Planner</div><div class="tl-ds">Corpus & checklist</div>
           </div>
@@ -893,6 +902,10 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="drawer-info"><div class="drawer-name">Return Planner</div><div class="drawer-desc">Corpus needed to move back</div></div>
     </div>
     <div class="drawer-section-lbl">Learn</div>
+    <div class="drawer-item" data-tab="edplan" onclick="showTab('edplan',this)">
+      <span class="drawer-icon">🎓</span>
+      <div><div class="drawer-title">Education Planner</div><div class="drawer-sub">Child education corpus</div></div>
+    </div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
       <div class="drawer-icon">📚</div>
       <div class="drawer-info"><div class="drawer-name">NRI Guides</div><div class="drawer-desc">Tax, banking, property & more</div></div>
@@ -1541,6 +1554,65 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     </div>
     <div class="info">&#128203; <strong>NRI Repatriation Rule:</strong> You can repatriate up to USD 1 million per year from property sale proceeds (if purchased via NRE/foreign remittance). Rental income from NRO account: repatriate up to USD 1M/year with CA certificate. Always consult a FEMA-qualified CA before large transactions.</div>
   </div>
+
+  <!-- TAB: EDUCATION CORPUS PLANNER -->
+  <div class="tool-section" id="tab-edplan">
+    <div class="sec-head">
+      <h2>Education Corpus Planner</h2>
+      <p>Calculate how much you need to save for your child's education in India or abroad</p>
+    </div>
+
+    <!-- Quick reference costs -->
+    <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:24px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">📚 Typical Education Costs (Today's ₹)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">
+        <div class="ed-ref-card" onclick="setEdCost(3.5)"><div class="ed-ref-name">IIT / IIM</div><div class="ed-ref-cost">₹3–4L/yr</div></div>
+        <div class="ed-ref-card" onclick="setEdCost(2)"><div class="ed-ref-name">Private Engg / BBA</div><div class="ed-ref-cost">₹1.5–2.5L/yr</div></div>
+        <div class="ed-ref-card" onclick="setEdCost(8)"><div class="ed-ref-name">MBBS (Private)</div><div class="ed-ref-cost">₹6–10L/yr</div></div>
+        <div class="ed-ref-card" onclick="setEdCost(30)"><div class="ed-ref-name">UK / Australia</div><div class="ed-ref-cost">₹25–35L/yr</div></div>
+        <div class="ed-ref-card" onclick="setEdCost(40)"><div class="ed-ref-name">USA / Canada</div><div class="ed-ref-cost">₹35–45L/yr</div></div>
+        <div class="ed-ref-card" onclick="setEdCost(15)"><div class="ed-ref-name">Singapore / NUS</div><div class="ed-ref-cost">₹12–18L/yr</div></div>
+      </div>
+    </div>
+
+    <div class="calc-grid">
+      <div class="calc-inputs">
+        <div class="cinput-group">
+          <div class="cinput-label">Child Profile</div>
+          <div class="f"><label>Child's Current Age (years)</label><input type="number" id="ed-age" value="5" min="0" max="17" oninput="calcEdPlan()"/></div>
+          <div class="f"><label>Age When Education Starts</label><input type="number" id="ed-start-age" value="18" min="5" max="25" oninput="calcEdPlan()"/></div>
+          <div class="f"><label>Course Duration (years)</label><input type="number" id="ed-duration" value="4" min="1" max="6" oninput="calcEdPlan()"/></div>
+        </div>
+        <div class="cinput-group">
+          <div class="cinput-label">Education Cost</div>
+          <div class="f"><label>Annual Cost Today (₹ Lakhs)</label><input type="number" id="ed-cost" value="3.5" step="0.5" oninput="calcEdPlan()"/><div id="ed-cost-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
+          <div class="f"><label>Education Inflation Rate (% p.a.)</label><input type="number" id="ed-inflation" value="8" step="0.5" oninput="calcEdPlan()"/></div>
+        </div>
+        <div class="cinput-group">
+          <div class="cinput-label">Your Savings</div>
+          <div class="f"><label>Current Education Savings (₹ Lakhs)</label><input type="number" id="ed-savings" value="0" step="0.5" oninput="calcEdPlan()"/></div>
+          <div class="f"><label>Monthly SIP for Education (₹)</label><input type="number" id="ed-sip" value="10000" step="1000" oninput="calcEdPlan()"/><div id="ed-sip-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
+          <div class="f"><label>Expected Investment Return (% p.a.)</label><input type="number" id="ed-roi" value="12" step="0.5" oninput="calcEdPlan()"/></div>
+        </div>
+        <button class="btn" onclick="calcEdPlan()">Calculate Education Corpus</button>
+      </div>
+
+      <div class="calc-results" id="ed-results" style="display:none">
+        <div class="res-grid" id="ed-res-tiles"></div>
+        <div id="ed-status-box" style="margin-top:16px;border-radius:12px;padding:16px 20px;"></div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-outline" id="ed-table-toggle" onclick="toggleEdTable()" style="display:flex;align-items:center;gap:6px">▶ Year-by-Year Growth</button>
+          <div id="ed-table-wrap" style="display:none;margin-top:12px;overflow-x:auto;">
+            <table class="year-table">
+              <thead><tr><th>Year</th><th>Child Age</th><th>Corpus (₹L)</th><th>Ed. Cost That Year (₹L)</th></tr></thead>
+              <tbody id="ed-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- TAB: NRI GUIDES / ARTICLES -->
   <div class="tool-section" id="tab-articles">
@@ -2379,6 +2451,7 @@ const TOOL_META={
   realty:{icon:'🏘️',name:'Real Estate ROI'},
   dtaa:{icon:'💰',name:'Tax & DTAA'},
   return:{icon:'✈️',name:'Return Planner'},
+  edplan:{icon:'🎓',name:'Education Planner'},
 };
 function openDrawer(){
   document.getElementById('navDrawer').classList.add('open');
@@ -2753,6 +2826,7 @@ function calcTaxResidency(){
 const CCB_TABS=['invest','nrenro','homeloan','return','dtaa','realty','taxres'];
 function syncCurrencyToCalcs(){
   if(typeof updateRpLocal==='function')updateRpLocal();
+  if(typeof calcEdPlan==='function')calcEdPlan();
   if(!midRate||!baseCur)return;
   const meta=CUR_META[baseCur]||{flag:'',name:baseCur,region:''};
   CCB_TABS.forEach(tid=>{
@@ -2852,6 +2926,107 @@ function renderChecklist(){
 document.addEventListener('DOMContentLoaded',()=>{renderChecklist();});
 
 // ── RATE ALERT SIGNUP ─────────────────────────────────────────────────────────
+
+// ── EDUCATION CORPUS PLANNER ─────────────────────────────────────────────
+function setEdCost(val){
+  document.getElementById('ed-cost').value=val;
+  calcEdPlan();
+}
+
+function calcEdPlan(){
+  const age=parseInt(document.getElementById('ed-age').value)||0;
+  const startAge=parseInt(document.getElementById('ed-start-age').value)||18;
+  const duration=parseInt(document.getElementById('ed-duration').value)||4;
+  const costToday=(parseFloat(document.getElementById('ed-cost').value)||0)*100000;
+  const edInf=(parseFloat(document.getElementById('ed-inflation').value)||8)/100;
+  const savings=(parseFloat(document.getElementById('ed-savings').value)||0)*100000;
+  const sipM=parseFloat(document.getElementById('ed-sip').value)||0;
+  const roi=(parseFloat(document.getElementById('ed-roi').value)||12)/100;
+
+  const yrsToStart=Math.max(0,startAge-age);
+  const mr=roi/12;
+  const n=yrsToStart*12;
+
+  // Local currency sub-labels
+  const cl=document.getElementById('ed-cost-local');
+  const sl=document.getElementById('ed-sip-local');
+  if(cl)cl.textContent=midRate>0&&costToday>0?'≈ '+baseCur+' '+Math.round(costToday/midRate).toLocaleString('en-IN')+'/yr':'';
+  if(sl)sl.textContent=midRate>0&&sipM>0?'≈ '+baseCur+' '+Math.round(sipM/midRate).toLocaleString('en-IN')+'/mo':'';
+
+  if(yrsToStart<0||costToday===0)return;
+
+  // Total corpus needed: sum of inflated annual costs over duration
+  let totalNeeded=0;
+  const annualCosts=[];
+  for(let d=0;d<duration;d++){
+    const inflatedCost=costToday*Math.pow(1+edInf,yrsToStart+d);
+    annualCosts.push(inflatedCost);
+    totalNeeded+=inflatedCost;
+  }
+
+  // Projected corpus at start age
+  const fvSavings=savings*Math.pow(1+mr,n);
+  const fvSip=mr>0?sipM*(Math.pow(1+mr,n)-1)/mr:sipM*n;
+  const projCorpus=fvSavings+fvSip;
+
+  const gap=totalNeeded-projCorpus;
+  const onTrack=projCorpus>=totalNeeded;
+
+  // Required SIP to meet target
+  let reqSip=0;
+  if(gap>0&&n>0){
+    const fvNeeded=totalNeeded-fvSavings;
+    reqSip=mr>0?fvNeeded*mr/(Math.pow(1+mr,n)-1):fvNeeded/n;
+  }
+
+  // Year-by-year table
+  let tbody='',edDataRows=[];
+  const tableYears=yrsToStart+duration;
+  let corpus=savings;
+  for(let y=1;y<=tableYears;y++){
+    // Monthly compounding
+    corpus=corpus*(1+mr)+sipM;
+    const childAge=age+y;
+    const isEdYear=childAge>=startAge&&childAge<startAge+duration;
+    const edCostThisYear=isEdYear?costToday*Math.pow(1+edInf,y):0;
+    const corpusL=(corpus/100000).toFixed(1);
+    const edCostL=isEdYear?(edCostThisYear/100000).toFixed(1):'—';
+    const rowClass=isEdYear?'style="background:rgba(240,165,32,0.06)"':'';
+    tbody+=`<tr ${rowClass}><td>${y}</td><td>${childAge}</td><td>₹${corpusL}L</td><td>${isEdYear?'₹'+edCostL+'L':'—'}</td></tr>`;
+  }
+  document.getElementById('ed-table-body').innerHTML=tbody;
+
+  // Render tiles
+  const lc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
+  document.getElementById('ed-res-tiles').innerHTML=`
+    <div class="res-tile"><div class="res-label">Total Corpus Needed</div><div class="res-value">₹${(totalNeeded/100000).toFixed(1)}L</div>${lc(totalNeeded)}</div>
+    <div class="res-tile"><div class="res-label">Projected Corpus</div><div class="res-value" style="color:${onTrack?'var(--green)':'var(--amber)'}">₹${(projCorpus/100000).toFixed(1)}L</div>${lc(projCorpus)}</div>
+    <div class="res-tile"><div class="res-label">Years to Save</div><div class="res-value">${yrsToStart} yrs</div><div class="ri-local">Child is ${age}, starts at ${startAge}</div></div>
+    <div class="res-tile"><div class="res-label">${onTrack?'Surplus':'Gap'}</div><div class="res-value" style="color:${onTrack?'var(--green)':'var(--red)'}">₹${(Math.abs(gap)/100000).toFixed(1)}L</div>${lc(Math.abs(gap))}</div>
+  `;
+
+  // Status box
+  const statusBox=document.getElementById('ed-status-box');
+  if(onTrack){
+    statusBox.style.background='rgba(34,197,94,0.08)';
+    statusBox.style.border='1px solid rgba(34,197,94,0.25)';
+    statusBox.innerHTML=`<strong style="color:var(--green)">✓ You are on track!</strong> Your projected corpus of <strong>₹${(projCorpus/100000).toFixed(1)}L</strong> covers the full education cost of <strong>₹${(totalNeeded/100000).toFixed(1)}L</strong> with a surplus of ₹${(gap*-1/100000).toFixed(1)}L.`;
+  } else {
+    statusBox.style.background='rgba(244,63,94,0.07)';
+    statusBox.style.border='1px solid rgba(244,63,94,0.2)';
+    statusBox.innerHTML=`<strong style="color:var(--amber)">⚠ Shortfall of ₹${(gap/100000).toFixed(1)}L.</strong> Increase your monthly SIP to <strong style="color:var(--teal)">₹${Math.round(reqSip).toLocaleString('en-IN')}/mo</strong>${midRate>0?' (≈ '+baseCur+' '+Math.round(reqSip/midRate).toLocaleString('en-IN')+'/mo)':''} to fully fund your child's education.`;
+  }
+
+  document.getElementById('ed-results').style.display='block';
+}
+
+function toggleEdTable(){
+  const wrap=document.getElementById('ed-table-wrap');
+  const btn=document.getElementById('ed-table-toggle');
+  const hidden=wrap.style.display==='none';
+  wrap.style.display=hidden?'block':'none';
+  btn.innerHTML=hidden?'▼ Year-by-Year Growth':'▶ Year-by-Year Growth';
+}
 
 // ── ARTICLES ──────────────────────────────────────
 const ARTICLES={
