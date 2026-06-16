@@ -413,6 +413,90 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .atb-hint{font-size:11px;color:var(--muted);margin-top:1px;}
 .atb-chevron{color:var(--muted);font-size:18px;}
 @media(max-width:600px){.drawer{width:85vw;}}
+
+/* ── DASHBOARD REDESIGN ─────────────────────────────────────────────────────── */
+
+/* Hero rate display */
+.hrd-eyebrow{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.hrd-main{display:flex;align-items:flex-end;gap:4px;margin-bottom:12px;line-height:1;}
+.hrd-sym{font-size:40px;font-weight:900;color:var(--text2);padding-bottom:8px;}
+.hrd-val{font-size:80px;font-weight:900;color:var(--amber);letter-spacing:-3px;transition:all 0.45s cubic-bezier(0.34,1.56,0.64,1);}
+.hrd-status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:22px;min-height:20px;}
+
+/* Amount conversion bar */
+.har{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:13px 18px;margin-bottom:18px;flex-wrap:wrap;transition:border-color 0.2s;}
+.har:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
+.har-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.har-inp{background:transparent;border:none;font-size:24px;font-weight:900;color:var(--text);width:110px;outline:none;letter-spacing:-0.5px;}
+.har-cur{font-size:12px;font-weight:800;color:var(--amber);background:var(--amber-dim);padding:5px 10px;border-radius:7px;white-space:nowrap;}
+.har-sep{color:var(--muted);font-size:16px;flex-shrink:0;}
+.har-rcv{font-size:22px;font-weight:900;color:var(--green);letter-spacing:-0.5px;white-space:nowrap;transition:all 0.35s;}
+
+/* Country flag pills */
+.cflags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:26px;}
+.cflag{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:100px;border:1px solid var(--border);background:var(--elevated);color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
+.cflag:hover{border-color:var(--amber-glow);background:var(--amber-dim);color:var(--amber);}
+.cflag.active{border-color:var(--amber);background:var(--amber-dim);color:var(--amber);}
+
+/* Tool launcher */
+.tool-launcher{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:22px;box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.03);position:relative;overflow:hidden;}
+.tool-launcher::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,165,32,0.45),transparent);}
+.tl-hd{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:14px;}
+.tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tl-card{background:var(--elevated);border:1px solid var(--border);border-radius:13px;padding:14px 15px;cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.tl-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--amber-dim),transparent);opacity:0;transition:opacity 0.18s;pointer-events:none;}
+.tl-card:hover{border-color:var(--amber-glow);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
+.tl-card:hover::after{opacity:1;}
+.tl-card:active{transform:scale(0.97);}
+.tl-card-wide{grid-column:1/-1;display:flex;align-items:center;gap:14px;}
+.tl-card-wide .tl-ds{margin-top:0;}
+.tl-ico{font-size:20px;margin-bottom:5px;display:block;position:relative;z-index:1;}
+.tl-card-wide .tl-ico{margin-bottom:0;font-size:22px;}
+.tl-nm{font-size:13px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
+.tl-ds{font-size:11px;color:var(--muted);margin-top:3px;position:relative;z-index:1;line-height:1.4;}
+.tl-card-wide .tl-body{flex:1;}
+
+/* Dashboard metrics strip */
+.dash-strip{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.dash-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.dash-m{padding:16px 20px;display:flex;align-items:center;gap:13px;border-right:1px solid var(--border);}
+.dash-m:last-child{border-right:none;}
+.dm-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.dm-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:2px;}
+.dm-val{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-0.5px;line-height:1;}
+.dm-sub{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.3;}
+
+/* Bottom tab bar (mobile) */
+.bottom-tabs{display:none;position:fixed;bottom:0;left:0;right:0;z-index:199;background:rgba(10,18,44,0.97);border-top:1px solid var(--border2);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding-bottom:env(safe-area-inset-bottom,0px);}
+.btab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px 6px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:color 0.15s;-webkit-tap-highlight-color:transparent;position:relative;}
+.btab.active{color:var(--amber);}
+.btab-ico{font-size:20px;line-height:1;}
+.btab-lbl{font-size:9.5px;font-weight:700;letter-spacing:0.2px;}
+.btab::after{content:'';position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--amber);border-radius:0 0 3px 3px;opacity:0;transition:opacity 0.15s;}
+.btab.active::after{opacity:1;}
+
+/* Responsive updates */
+@media(max-width:900px){
+  .dash-inner{grid-template-columns:repeat(2,1fr);}
+  .dash-m:nth-child(2){border-right:none;}
+  .dash-m:nth-child(3){border-top:1px solid var(--border);}
+  .dash-m:nth-child(4){border-right:none;border-top:1px solid var(--border);}
+}
+@media(max-width:768px){
+  .bottom-tabs{display:flex;}
+  .main{padding-bottom:80px!important;}
+}
+@media(max-width:640px){
+  .hero-right .rate-preview-card{display:none;}
+  .hrd-val{font-size:60px;letter-spacing:-2px;}
+  .hrd-sym{font-size:32px;}
+  .cflags{gap:5px;}
+  .cflag{font-size:11.5px;padding:6px 10px;}
+}
+@media(max-width:480px){
+  .tl-grid{grid-template-columns:1fr 1fr;}
+  .dash-inner{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
 <body>
@@ -473,61 +557,122 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-    <div class="hero-inner">
+  <div class="hero-inner">
+
+    <!-- LEFT: Live Rate Ticker + Country Quick-Select -->
     <div class="hero-left">
-      <div class="hero-badge">🟢 Live rates &middot; 14 currencies &middot; Always free</div>
-      <h1>Send money home.<br/><em>Keep more of it.</em></h1>
-      <p class="hero-sub">Compare live remittance rates from local providers in your country. Plus 7 NRI-specific financial tools — FD rates, SIP/SWP, home loans, DTAA tax savings and more.</p>
-      <div class="hero-input-group">
-        <input class="hero-input" type="number" id="heroAmount" value="1000" placeholder="Amount" oninput="syncAmount(this.value)"/>
-        <div class="hero-from-tag">from <span id="heroFromLabel">AED</span> &rarr; &#8377; INR</div>
-        <button class="hero-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">Compare Rates &rarr;</button>
+      <div class="hero-badge">&#127327; Live rates &middot; 14 currencies &middot; Always free</div>
+      <div class="hrd-eyebrow">1 <span id="heroFromLabel">AED</span> equals</div>
+      <div class="hrd-main">
+        <span class="hrd-sym">&#8377;</span>
+        <span class="hrd-val" id="hero-rate-val">&#8212;</span>
       </div>
-      <div class="hero-stats">
-        <div class="hstat"><div class="hstat-v">14</div><div class="hstat-l">Currencies</div></div>
-        <div class="hstat"><div class="hstat-v">50+</div><div class="hstat-l">Providers</div></div>
-        <div class="hstat"><div class="hstat-v">7</div><div class="hstat-l">NRI Tools</div></div>
-        <div class="hstat"><div class="hstat-v">Free</div><div class="hstat-l">Always</div></div>
+      <div class="hrd-status" id="hrd-status">
+        <div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div>
+        Fetching live rate&hellip;
       </div>
+      <!-- Amount bar -->
+      <div class="har">
+        <span class="har-lbl">Send</span>
+        <input class="har-inp" type="number" id="heroAmount" value="1000" placeholder="1000" oninput="syncAmount(this.value);updateHeroReceive()"/>
+        <span class="har-cur" id="curTag">AED</span>
+        <span class="har-sep">&rarr;</span>
+        <span class="har-rcv" id="har-rcv">&#8377;&mdash;</span>
+      </div>
+      <!-- Country flag quick-select -->
+      <div class="cflags">
+        <button class="cflag active" onclick="quickSelectCur('AED',this)">&#127462;&#127466; AED</button>
+        <button class="cflag" onclick="quickSelectCur('SAR',this)">&#127462;&#127464; SAR</button>
+        <button class="cflag" onclick="quickSelectCur('QAR',this)">&#127474;&#127480; QAR</button>
+        <button class="cflag" onclick="quickSelectCur('KWD',this)">&#127472;&#127484; KWD</button>
+        <button class="cflag" onclick="quickSelectCur('MYR',this)">&#127474;&#127486; MYR</button>
+        <button class="cflag" onclick="quickSelectCur('SGD',this)">&#127480;&#127468; SGD</button>
+        <button class="cflag" onclick="quickSelectCur('AUD',this)">&#127462;&#127482; AUD</button>
+        <button class="cflag" onclick="quickSelectCur('USD',this)">&#127482;&#127480; USD</button>
+        <button class="cflag" onclick="quickSelectCur('GBP',this)">&#127468;&#127463; GBP</button>
+        <button class="cflag" onclick="quickSelectCur('EUR',this)">&#127466;&#127482; EUR</button>
+      </div>
+      <button class="hero-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">Compare All Providers &rarr;</button>
     </div>
+
+    <!-- RIGHT: Tool Launcher + Mini Rate Preview -->
     <div class="hero-right">
-      <div class="rate-preview-card">
-        <div class="rpc-label">Today&apos;s top rates &middot; <span id="rpc-cur">AED</span> &rarr; INR</div>
+      <div class="tool-launcher">
+        <div class="tl-hd">Your NRI Dashboard</div>
+        <div class="tl-grid">
+          <div class="tl-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
+            <span class="tl-ico">&#128202;</span><div class="tl-nm">Live Rates</div><div class="tl-ds">Compare 50+ providers</div>
+          </div>
+          <div class="tl-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">
+            <span class="tl-ico">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank FD rates</div>
+          </div>
+          <div class="tl-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'))">
+            <span class="tl-ico">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
+          </div>
+          <div class="tl-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">
+            <span class="tl-ico">&#127968;</span><div class="tl-nm">Home Loan</div><div class="tl-ds">EMI &amp; amortization</div>
+          </div>
+          <div class="tl-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))">
+            <span class="tl-ico">&#128176;</span><div class="tl-nm">Tax &amp; DTAA</div><div class="tl-ds">Save on TDS</div>
+          </div>
+          <div class="tl-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'))">
+            <span class="tl-ico">&#127864;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
+          </div>
+          <div class="tl-card tl-card-wide" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
+            <span class="tl-ico">&#9992;&#65039;</span>
+            <div class="tl-body"><div class="tl-nm">Return Planner</div><div class="tl-ds">How much corpus to retire back to India?</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="rate-preview-card" style="margin-top:12px">
+        <div class="rpc-label">Top providers &middot; <span id="rpc-cur">AED</span> &rarr; INR</div>
         <div class="rpc-rows" id="rpc-rows">
-          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">
-            <div class="spin" style="margin:0 auto 14px"></div>Loading rates&hellip;
+          <div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">
+            <div class="spin" style="margin:0 auto 10px"></div>Loading&hellip;
           </div>
         </div>
         <div class="rpc-footer" id="rpc-footer">
-          <span class="rpc-live-tag"><div class="live-dot"></div> Live</span> &middot; Confirm on provider site before transferring.
+          <span class="rpc-live-tag"><div class="live-dot" style="display:inline-block"></div> Live</span> &middot; Confirm on provider site.
         </div>
       </div>
     </div>
+
   </div>
 </section>
 
-<!-- FEATURE STRIP -->
-<div class="features">
-  <div class="features-inner">
-    <div class="feat">
-      <div class="feat-icon" style="background:rgba(240,165,32,0.12)">&#9889;</div>
-      <div class="feat-text">
-        <strong>Live rate comparison</strong>
-        <span>50+ providers across 14 currencies &middot; Sorted by best rate received</span>
+<!-- DASHBOARD METRICS STRIP -->
+<div class="dash-strip">
+  <div class="dash-inner">
+    <div class="dash-m">
+      <div class="dm-icon" style="background:var(--amber-dim)">&#128177;</div>
+      <div>
+        <div class="dm-lbl">Mid Rate</div>
+        <div class="dm-val" id="dash-rate">Loading&hellip;</div>
+        <div class="dm-sub">1 <span id="dash-cur">AED</span> &rarr; INR &middot; Live</div>
       </div>
     </div>
-    <div class="feat">
-      <div class="feat-icon" style="background:rgba(34,211,154,0.1)">&#128274;</div>
-      <div class="feat-text">
-        <strong>No signup required</strong>
-        <span>100% free, zero ads, no registration &middot; Bookmark and share anytime</span>
+    <div class="dash-m">
+      <div class="dm-icon" style="background:var(--green-dim)">&#127963;</div>
+      <div>
+        <div class="dm-lbl">Best NRE FD</div>
+        <div class="dm-val">7.25%</div>
+        <div class="dm-sub">Yes Bank &middot; p.a. tax-free</div>
       </div>
     </div>
-    <div class="feat">
-      <div class="feat-icon" style="background:rgba(129,140,248,0.1)">&#129518;</div>
-      <div class="feat-text">
-        <strong>NRI-specific tools</strong>
-        <span>SIP, SWP, NRE/NRO rates, home loan &amp; return planner &mdash; built for you</span>
+    <div class="dash-m">
+      <div class="dm-icon" style="background:var(--teal-dim)">&#127968;</div>
+      <div>
+        <div class="dm-lbl">NRI Home Loan</div>
+        <div class="dm-val">7.25%</div>
+        <div class="dm-sub">SBI &middot; p.a. (June 2026)</div>
+      </div>
+    </div>
+    <div class="dash-m">
+      <div class="dm-icon" style="background:var(--indigo-dim)">&#128295;</div>
+      <div>
+        <div class="dm-lbl">Free NRI Tools</div>
+        <div class="dm-val">7 Tools</div>
+        <div class="dm-sub">No sign-up &middot; No ads</div>
       </div>
     </div>
   </div>
@@ -693,62 +838,62 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="bank-rates-grid">
         <div class="bank-row">
           <div class="bank-logo" style="background:#1a3040;color:#60a5fa">SBI</div>
-          <div class="bank-name-col"><div class="bname"><a href="https://www.sbi.co.in/portal/web/interest-rates/nre-fixed-deposits" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">State Bank of India &#8599;</a></div><div class="btype">Public sector &middot; Govt-backed</div></div>
-          <div class="rate-cell"><div class="rv">6.80%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.75%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="bank-name-col"><div class="bname"><a href="https://sbi.co.in/web/interest-rates/interest-rates/sbi-nri-services-interest-rates/sbi-nri-services-nre-fixed-deposit-interest-rate" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">State Bank of India &#8599;</a></div><div class="btype">Public sector &middot; Govt-backed &middot; Peak: 6.45% (444 days)</div></div>
+          <div class="rate-cell"><div class="rv">6.30%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.45%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.40%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.35%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row">
           <div class="bank-logo" style="background:#1a2a40;color:#93c5fd">HDFC</div>
-          <div class="bank-name-col"><div class="bname"><a href="https://www.hdfcbank.com/nri-banking/save/deposits/fixed-deposit-rupee-account/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">HDFC Bank &#8599;</a></div><div class="btype">Private sector &middot; Large cap</div></div>
-          <div class="rate-cell"><div class="rv">6.60%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.hdfcbank.com/nri-banking/save/deposits/fixed-deposit-rupee-account/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">HDFC Bank &#8599;</a></div><div class="btype">Private sector &middot; Large cap &middot; Peak: 6.45% (18m+)</div></div>
+          <div class="rate-cell"><div class="rv">6.35%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.45%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.45%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.40%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row">
           <div class="bank-logo" style="background:#102030;color:#38bdf8">ICICI</div>
-          <div class="bank-name-col"><div class="bname"><a href="https://www.icicibank.com/nri-banking/deposits/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">ICICI Bank &#8599;</a></div><div class="btype">Private sector &middot; Large cap</div></div>
-          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.90%</div><div class="rl">p.a.</div></div>
+          <div class="bank-name-col"><div class="bname"><a href="https://www.icici.bank.in/interest-rate?ITM=nli_nriBankingHome_nriBankingHome_na_depositjourney_3_CMS_viewInterestRates_NLI" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">ICICI Bank &#8599;</a></div><div class="btype">Private sector &middot; Large cap</div></div>
+          <div class="rate-cell"><div class="rv">6.40%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.40%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row">
           <div class="bank-logo" style="background:#20102a;color:#c084fc">AXIS</div>
           <div class="bank-name-col"><div class="bname"><a href="https://www.axisbank.com/nri-banking/deposits/nre-fixed-deposit" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Axis Bank &#8599;</a></div><div class="btype">Private sector &middot; Mid-large cap</div></div>
-          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.75%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.75%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row">
           <div class="bank-logo" style="background:#102820;color:#4ade80">KOTA</div>
           <div class="bank-name-col"><div class="bname"><a href="https://www.kotak.com/en/personal-banking/deposits/nre-fixed-deposit.html" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Kotak Mahindra Bank &#8599;</a></div><div class="btype">Private sector</div></div>
-          <div class="rate-cell"><div class="rv">7.10%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">7.00%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.20%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.70%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.00%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row highlight">
           <div class="bank-logo" style="background:#1a2010;color:#a3e635">YES</div>
           <div class="bank-name-col"><div class="bname"><a href="https://www.yesbank.in/personal-banking/nri-banking/nri-deposits/fixed-deposits/nre-fixed-deposits-new" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Yes Bank &#8599;</a><span class="highest-tag">Highest</span></div><div class="btype">Private sector &middot; Mid cap</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.00%</div><div class="rl">p.a.</div></div>
           <div class="rate-cell"><div class="rv" style="color:var(--green)">7.25%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.50%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.50%</div><div class="rl">p.a.</div></div>
           <div class="rate-cell"><div class="rv" style="color:var(--green)">7.25%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv" style="color:var(--green)">7.00%</div><div class="rl">p.a.</div></div>
         </div>
         <div class="bank-row">
           <div class="bank-logo" style="background:#20181a;color:#f87171">BOB</div>
           <div class="bank-name-col"><div class="bname"><a href="https://www.bankofbaroda.in/nre-rupee-fixed-deposits.htm" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">Bank of Baroda &#8599;</a></div><div class="btype">Public sector &middot; Govt-backed</div></div>
-          <div class="rate-cell"><div class="rv">6.85%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.85%</div><div class="rl">p.a.</div></div>
-          <div class="rate-cell"><div class="rv">6.80%</div><div class="rl">p.a.</div></div>
           <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.50%</div><div class="rl">p.a.</div></div>
+          <div class="rate-cell"><div class="rv">6.25%</div><div class="rl">p.a.</div></div>
         </div>
       </div>
-      <div class="info" style="margin-top:14px">&#9888;&#65039; <strong>Note:</strong> Rates shown are indicative (approximate mid-2025). NRE FD interest is <strong>100% tax-free in India</strong> and fully repatriable. Yes Bank offers higher rates &mdash; check CRISIL/ICRA rating before investing large sums. Always verify current rates on the bank&apos;s site before opening an FD.</div>
+      <div class="info" style="margin-top:14px">&#9888;&#65039; <strong>Note:</strong> SBI &amp; HDFC rates verified June 2026 (post RBI cuts). Other banks estimated — always verify on the bank&apos;s site before opening an FD. NRE FD interest is <strong>100% tax-free in India</strong> and fully repatriable. Yes Bank offers higher rates &mdash; check CRISIL/ICRA rating before investing large sums.</div>
     </div>
 
     <div class="card">
@@ -794,11 +939,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Loan Details</div>
-      <div class="card-sub">NRI home loan rates typically range from 8.5%&ndash;10% p.a. Fill in your details for the full schedule.</div>
+      <div class="card-sub">NRI home loan rates now range from 7.25%&ndash;9% p.a. (post RBI rate cuts, June 2026). Fill in your details for the full schedule.</div>
       <div class="fg">
         <div class="f"><label>Property Value (&#8377; Lakhs)</label><input type="number" id="hl-propval" value="80" placeholder="e.g. 80"/></div>
         <div class="f"><label>Down Payment (%)</label><input type="number" id="hl-down" value="20" min="10" max="80"/></div>
-        <div class="f"><label>Interest Rate (% p.a.)</label><input type="number" id="hl-rate" value="9" step="0.1"/></div>
+        <div class="f"><label>Interest Rate (% p.a.)</label><input type="number" id="hl-rate" value="8.5" step="0.1"/></div>
         <div class="f"><label>Loan Tenure (Years)</label><input type="number" id="hl-tenure" value="20" min="1" max="30"/></div>
       </div>
       <button class="btn btn-amber" onclick="calcHomeLoan()">Calculate &amp; Show Schedule &rarr;</button>
@@ -821,7 +966,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>NRI Home Loan Rates &mdash; Top 10 Banks</div>
-      <div class="card-sub">Sorted by starting rate &middot; Click bank name to go to their NRI home loan page &middot; Rates indicative (mid-2025)</div>
+      <div class="card-sub">Sorted by starting rate &middot; Click bank name to go to their NRI home loan page &middot; Rates indicative (June 2026, post RBI cuts)</div>
       <div style="overflow-x:auto">
         <table class="amort-table" style="font-size:13.5px">
           <thead><tr>
@@ -830,20 +975,20 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
             <th style="border-radius:0 10px 0 0">Key Feature</th>
           </tr></thead>
           <tbody>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2010;color:#a3e635;flex-shrink:0">CAN</div><div><div style="font-weight:700"><a href="https://canarabank.com/home-loan-for-nris" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Canara Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="color:var(--green);font-weight:700">7.90%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Lowest rate; women get extra 0.05% off</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a3040;color:#60a5fa;flex-shrink:0">SBI</div><div><div style="font-weight:700"><a href="https://sbi.co.in/portal/web/nri/nri-home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">State Bank of India &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector &middot; Most trusted</div></div></div></td><td style="color:var(--green);font-weight:700">8.00%+</td><td>30 yrs</td><td>0.35% (max &#8377;10K)</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Largest NRI branch network; lowest processing fee</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a3040;color:#60a5fa;flex-shrink:0">SBI</div><div><div style="font-weight:700"><a href="https://sbi.co.in/web/nri/loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">State Bank of India &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector &middot; Most trusted</div></div></div></td><td style="color:var(--green);font-weight:700">7.25%+</td><td>30 yrs</td><td>0.35% (max &#8377;10K)</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Largest NRI branch network; lowest processing fee</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102030;color:#38bdf8;flex-shrink:0">ICICI</div><div><div style="font-weight:700"><a href="https://www.icicibank.com/nri-banking/loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">ICICI Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Large cap</div></div></div></td><td style="color:var(--green);font-weight:700">7.45%+</td><td>30 yrs</td><td>0.50% + taxes</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Best for US/UK/Singapore NRIs; 30yr tenure</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2010;color:#a3e635;flex-shrink:0">CAN</div><div><div style="font-weight:700"><a href="https://canarabank.com/nri-home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Canara Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="font-weight:700">7.65%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Women borrowers get extra 0.05% off</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2a40;color:#93c5fd;flex-shrink:0">HDFC</div><div><div style="font-weight:700"><a href="https://www.hdfcbank.com/nri-banking/borrow/popular-loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">HDFC Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Large cap</div></div></div></td><td style="font-weight:700">7.90%+</td><td>30 yrs</td><td>Up to 1.25%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Zero prepayment charges; strong NRI digital support</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20181a;color:#f87171;flex-shrink:0">BOB</div><div><div style="font-weight:700"><a href="https://www.bankofbaroda.in/nri-banking/products-services/loans/baroda-home-loan-for-nri" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Bank of Baroda &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="font-weight:700">7.90%+</td><td>30 yrs</td><td>0.25&ndash;0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Good for Gulf NRIs; wide branch network</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">AXIS</div><div><div style="font-weight:700"><a href="https://www.axisbank.com/nri/home-loans" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Axis Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Mid-large cap</div></div></div></td><td style="font-weight:700">8.00%+</td><td>30 yrs</td><td>Up to 1% (min &#8377;10K)</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Best rates for CIBIL 751+; no prepayment penalty</td></tr>
             <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a1f3b;color:#a5b4fc;flex-shrink:0">PNB</div><div><div style="font-weight:700"><a href="https://www.pnbhousing.com/nri-loans/" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">PNB Housing Finance &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Housing finance company</div></div></div></td><td style="font-weight:700">8.25%+</td><td>30 yrs</td><td>Up to 0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Dedicated NRI division; fast processing</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20181a;color:#f87171;flex-shrink:0">BOB</div><div><div style="font-weight:700"><a href="https://www.bankofbaroda.in/nri-banking/products-services/loans/baroda-home-loan-for-nri" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Bank of Baroda &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="font-weight:700">8.40%+</td><td>30 yrs</td><td>0.25&ndash;0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Good for Gulf NRIs; wide branch network</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#1a2a40;color:#93c5fd;flex-shrink:0">HDFC</div><div><div style="font-weight:700"><a href="https://www.hdfcbank.com/nri-banking/borrow/popular-loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">HDFC Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Large cap</div></div></div></td><td style="font-weight:700">8.45%+</td><td>20 yrs</td><td>Up to 1.25%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Zero prepayment charges; women discount</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">IDBI</div><div><div style="font-weight:700"><a href="https://www.idbibank.in/home-loan.aspx" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">IDBI Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="font-weight:700">8.55%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Competitive rates for salaried NRIs</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">AXIS</div><div><div style="font-weight:700"><a href="https://www.axisbank.com/nri/home-loans" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Axis Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Mid-large cap</div></div></div></td><td style="font-weight:700">8.75%+</td><td>30 yrs</td><td>Up to 1% (min &#8377;10K)</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Best rates for CIBIL 751+; no prepayment penalty</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#20102a;color:#c084fc;flex-shrink:0">IDBI</div><div><div style="font-weight:700"><a href="https://www.idbibank.in/home-loan.aspx" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">IDBI Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Public sector</div></div></div></td><td style="font-weight:700">8.35%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Competitive rates for salaried NRIs</td></tr>
+            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102020;color:#2dd4bf;flex-shrink:0">FED</div><div><div style="font-weight:700"><a href="https://www.federalbank.co.in/nri-home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Federal Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private &middot; Kerala NRI favourite</div></div></div></td><td style="font-weight:700">8.55%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Top choice for Kerala/South India NRIs</td></tr>
             <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102820;color:#4ade80;flex-shrink:0">KOT</div><div><div style="font-weight:700"><a href="https://www.kotak.com/en/personal-banking/nri/loans.html" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Kotak Mahindra &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector</div></div></div></td><td style="font-weight:700">8.75%+</td><td>20 yrs</td><td>Up to 1%</td><td>80%</td><td style="font-size:12px;color:var(--muted)">Digital-first; quick sanction for NRIs</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102020;color:#2dd4bf;flex-shrink:0">FED</div><div><div style="font-weight:700"><a href="https://www.federalbank.co.in/home-loans" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">Federal Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private &middot; Kerala NRI favourite</div></div></div></td><td style="font-weight:700">8.80%+</td><td>30 yrs</td><td>0.50%</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Top choice for Kerala/South India NRIs</td></tr>
-            <tr><td style="text-align:left"><div style="display:flex;align-items:center;gap:10px"><div class="bank-logo" style="width:32px;height:32px;font-size:10px;background:#102030;color:#38bdf8;flex-shrink:0">ICICI</div><div><div style="font-weight:700"><a href="https://www.icicibank.com/nri-banking/loans/home-loan" target="_blank" rel="noopener" style="color:var(--text);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.25)">ICICI Bank &#8599;</a></div><div style="font-size:11px;color:var(--muted)">Private sector &middot; Large cap</div></div></div></td><td style="font-weight:700;color:var(--amber)">9.00%+</td><td>30 yrs</td><td>0.50% + taxes</td><td>90%</td><td style="font-size:12px;color:var(--muted)">Best for US/UK/Singapore NRIs; 30yr tenure</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="info" style="margin-top:14px">&#128203; <strong>How to choose:</strong> Canara/SBI for lowest rate &middot; HDFC/ICICI for US/UK NRIs with strong digital support &middot; Federal Bank for South India NRIs &middot; Axis for excellent CIBIL scores &middot; <strong>All NRI home loans require:</strong> NRE/NRO account &middot; POA &middot; Overseas credit bureau report &middot; Min 1yr overseas employment</div>
+      <div class="info" style="margin-top:14px">&#128203; <strong>How to choose:</strong> SBI/ICICI for lowest rates (7.25%–7.45%) &middot; HDFC for US/UK/Australia NRIs with digital support &middot; Federal Bank for South India / Kerala NRIs &middot; Axis for high CIBIL score applicants &middot; Bank of Baroda for Gulf NRIs &middot; <strong>All NRI home loans require:</strong> NRE/NRO account &middot; POA &middot; Overseas credit report &middot; Min 1 yr overseas employment</div>
     </div>
   </div>
 
@@ -1309,7 +1454,7 @@ async function updateAll(){
 
   // Show fallback rates INSTANTLY so UI is never blank
   if(FB[baseCur]){
-    midRate=FB[baseCur];rateIsLive=false;
+    midRate=FB[baseCur];rateIsLive=false;updateHeroRate();
     rc.style.display='flex';ld.style.display='none';rn.style.display='flex';
     renderRates();renderRatePreview();renderMarketRate();
     // Show subtle "updating" badge in note
@@ -1324,7 +1469,7 @@ async function updateAll(){
   const live=await fetchRate(baseCur);
   ld.style.display='none';
   if(live){
-    midRate=live;
+    midRate=live;updateHeroRate();
     rc.style.display='flex';rn.style.display='flex';
     renderRates();renderRatePreview();renderMarketRate();
   } else if(!FB[baseCur]){
@@ -1549,7 +1694,16 @@ function downloadLoanPDF(){
   const tenure=document.getElementById('hl-tenure').value;
   const propval=document.getElementById('hl-propval').value;
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>Home Loan Schedule</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111;}h2{font-size:18px;margin-bottom:4px;}p{font-size:12px;color:#555;margin-bottom:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f3f4f6;padding:8px 12px;text-align:right;border:1px solid #ddd;font-size:11px;}th:first-child{text-align:center;}td{padding:7px 12px;border:1px solid #e5e7eb;text-align:right;}td:first-child{text-align:center;}tr:last-child{background:#f9fafb;font-weight:700;}tr:nth-child(even){background:#fafafa;}.principal{color:#059669;}.interest{color:#dc2626;}</style></head><body><h2>Home Loan Amortization Schedule</h2><p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>${tbl.outerHTML}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>Home Loan Schedule</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111;}h2{font-size:18px;margin-bottom:4px;}p{font-size:12px;color:#555;margin-bottom:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f3f4f6;padding:8px 12px;text-align:right;border:1px solid #ddd;font-size:11px;}th:first-child{text-align:center;}td{padding:7px 12px;border:1px solid #e5e7eb;text-align:right;}td:first-child{text-align:center;}tr:last-child{background:#f9fafb;font-weight:700;}tr:nth-child(even){background:#fafafa;}.principal{color:#059669;}.interest{color:#dc2626;}</style></head><body><h2>Home Loan Amortization Schedule</h2><p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>${tbl.outerHTML}
+<!-- BOTTOM TAB BAR (mobile) -->
+<nav class="bottom-tabs" id="bottomTabs">
+  <button class="btab active" id="btab-rates" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))"><span class="btab-ico">&#128202;</span><span class="btab-lbl">Rates</span></button>
+  <button class="btab" id="btab-nrenro" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))"><span class="btab-ico">&#127963;</span><span class="btab-lbl">FD</span></button>
+  <button class="btab" id="btab-homeloan" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))"><span class="btab-ico">&#127968;</span><span class="btab-lbl">Loan</span></button>
+  <button class="btab" id="btab-dtaa" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))"><span class="btab-ico">&#128176;</span><span class="btab-lbl">Tax</span></button>
+  <button class="btab" id="btab-more" onclick="openDrawer()"><span class="btab-ico">&#9776;</span><span class="btab-lbl">More</span></button>
+</nav>
+</body></html>`);
   win.document.close();setTimeout(()=>{win.print();},400);
 }
 
@@ -1647,7 +1801,7 @@ function closeDrawer(){
   document.getElementById('drawerOverlay').classList.remove('open');
   document.body.style.overflow='';
 }
-function showTab(id,btn){
+function showTab(id,btn){setActiveBottomTab(id);
   document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.drawer-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
@@ -1850,6 +2004,41 @@ function calcRealty(){
     :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real estate has illiquidity risk.</div>`;
   document.getElementById('realty-verdict').innerHTML=verdict;
 }
+
+// ── DASHBOARD REDESIGN JS ──────────────────────────────────────────────────
+function quickSelectCur(cur, btn) {
+  document.querySelectorAll('.cflag').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const item = document.querySelector('.cur-item[data-val="' + cur + '"]');
+  if(item) selectCurrency(item);
+}
+
+function setActiveBottomTab(id) {
+  document.querySelectorAll('.btab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('btab-' + id);
+  if(el) el.classList.add('active');
+}
+
+function updateHeroRate() {
+  const v = document.getElementById('hero-rate-val');
+  if(v && midRate) v.textContent = midRate.toFixed(2);
+  const st = document.getElementById('hrd-status');
+  if(st) st.innerHTML = rateIsLive
+    ? '<div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div>&nbsp;Live rate &middot; Updated ' + new Date().toLocaleTimeString()
+    : '<span style="color:var(--amber)">&#127313; Approximate rate (offline fallback)</span>';
+  const dr = document.getElementById('dash-rate');
+  if(dr && midRate) dr.textContent = '&#8377;' + midRate.toFixed(4);
+  const dc = document.getElementById('dash-cur');
+  if(dc) dc.textContent = baseCur;
+  updateHeroReceive();
+}
+
+function updateHeroReceive() {
+  const amt = parseFloat(document.getElementById('heroAmount') && document.getElementById('heroAmount').value) || 1000;
+  const el = document.getElementById('har-rcv');
+  if(el && midRate) el.textContent = '\u20B9' + (amt * midRate).toLocaleString('en-IN', {maximumFractionDigits:0});
+}
+
 </script>
 </body>
 </html>
