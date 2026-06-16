@@ -3,8 +3,47 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NRI Finance Hub — Live Remittance Rates & Calculators for Indians Abroad</title>
-<meta name="description" content="Compare live remittance rates, NRE/NRO bank interest rates, home loan amortization, and inflation-adjusted return planner for Indians abroad."/>
+<title>NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad</title>
+<meta name="description" content="Free tools for NRIs: compare live remittance rates (Wise, InstaReM, Remitly), NRE/NRO FD rates, home loan EMI calculator, SIP/SWP planner, DTAA tax guide, and India return planner. Trusted by Indians in UAE, Malaysia, USA, UK, Australia & Singapore."/>
+<meta name="keywords" content="NRI remittance rates, NRE FD rates 2026, NRI home loan calculator, SIP calculator NRI, NRI return to India planner, DTAA India tax, NRO account, Wise vs InstaReM, NRI finance guide"/>
+<meta name="author" content="NRI Finance Hub"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://nri-finance-hub.pages.dev/"/>
+<!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://nri-finance-hub.pages.dev/"/>
+<meta property="og:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
+<meta property="og:description" content="Free NRI tools: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner, DTAA tax calculator & India return planner."/>
+<meta property="og:image" content="https://nri-finance-hub.pages.dev/og-image.png"/>
+<meta property="og:site_name" content="NRI Finance Hub"/>
+<meta property="og:locale" content="en_IN"/>
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
+<meta name="twitter:description" content="Free NRI tools: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner & India return planner."/>
+<!-- JSON-LD: WebSite + SearchAction -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@graph":[
+    {
+      "@type":"WebSite",
+      "@id":"https://nri-finance-hub.pages.dev/#website",
+      "url":"https://nri-finance-hub.pages.dev/",
+      "name":"NRI Finance Hub",
+      "description":"Free financial tools and guides for Indians living abroad — remittance rates, NRE/NRO FD, home loan, SIP/SWP, DTAA tax and India return planning.",
+      "inLanguage":"en-IN",
+      "potentialAction":{"@type":"SearchAction","target":"https://nri-finance-hub.pages.dev/#search={search_term_string}","query-input":"required name=search_term_string"}
+    },
+    {
+      "@type":"Organization",
+      "@id":"https://nri-finance-hub.pages.dev/#org",
+      "name":"NRI Finance Hub",
+      "url":"https://nri-finance-hub.pages.dev/"
+    }
+  ]
+}
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -174,7 +213,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .rate-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:10px 18px;border-radius:9px;font-size:12.5px;font-weight:800;white-space:nowrap;transition:transform 0.15s,box-shadow 0.15s;display:inline-block;}
 .rate-cta:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(240,165,32,0.45);}
 .rate-cta.disabled{opacity:0.3;pointer-events:none;}
-.rate-note{margin-top:14px;padding:13px 18px;background:var(--elevated);border-radius:12px;font-size:12.5px;color:var(--muted);line-height:1.65;display:flex;align-items:flex-start;gap:10px;}
+.rate-note{margin-top:14px;padding:14px 18px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:12px;font-size:12.5px;color:var(--text);line-height:1.75;display:flex;align-items:flex-start;gap:10px;}
 .amount-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;background:var(--elevated);border:1px solid var(--border2);border-radius:14px;padding:16px 20px;}
 .amount-strip label{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;}
 .amount-strip input{background:transparent;border:none;font-size:26px;font-weight:900;color:var(--text);width:140px;outline:none;letter-spacing:-1px;}
@@ -581,6 +620,47 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .hl-lead-inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;box-sizing:border-box;font-family:inherit;}
 .hl-lead-inp:focus{outline:none;border-color:var(--amber);}
 @media(max-width:640px){.hl-lead-grid{grid-template-columns:1fr;}}
+
+.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:20px;}
+.art-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px 22px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.art-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--amber),var(--teal));opacity:0;transition:opacity 0.2s;}
+.art-card:hover{border-color:var(--amber-glow);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.art-card:hover::before{opacity:1;}
+.art-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:10px;}
+.art-tag.tax{background:rgba(99,102,241,0.15);color:#818cf8;}
+.art-tag.banking{background:rgba(20,184,166,0.15);color:var(--teal);}
+.art-tag.property{background:rgba(240,165,32,0.15);color:var(--amber);}
+.art-tag.transfer{background:rgba(74,222,128,0.15);color:var(--green);}
+.art-tag.planning{background:rgba(251,146,60,0.15);color:#fb923c;}
+.art-title{font-size:15px;font-weight:800;color:var(--text);line-height:1.4;margin-bottom:8px;}
+.art-summary{font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px;}
+.art-meta{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted);}
+.art-read-btn{font-size:11px;font-weight:700;color:var(--amber);display:flex;align-items:center;gap:4px;}
+.art-reader{max-width:760px;margin:0 auto;}
+.art-reader-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;padding:8px 0;margin-bottom:20px;border:none;background:none;}
+.art-reader-back:hover{color:var(--amber);}
+.art-reader-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:14px;}
+.art-reader h1{font-size:26px;font-weight:900;color:var(--text);line-height:1.3;margin-bottom:8px;}
+.art-reader-meta{font-size:12px;color:var(--muted);margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.art-reader h2{font-size:17px;font-weight:800;color:var(--text);margin:28px 0 12px;}
+.art-reader h3{font-size:14px;font-weight:700;color:var(--amber);margin:20px 0 8px;text-transform:uppercase;letter-spacing:.4px;}
+.art-reader p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:14px;}
+.art-reader ul,.art-reader ol{font-size:14px;color:var(--muted);line-height:1.8;margin:0 0 14px 0;padding-left:20px;}
+.art-reader li{margin-bottom:6px;}
+.art-reader strong{color:var(--text);}
+.art-callout{background:rgba(240,165,32,0.07);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:14px 18px;margin:20px 0;font-size:13.5px;color:var(--text);line-height:1.7;}
+.art-callout.green{background:rgba(74,222,128,0.07);border-left-color:var(--green);}
+.art-callout.indigo{background:rgba(99,102,241,0.07);border-left-color:#818cf8;}
+.art-cta{background:linear-gradient(135deg,rgba(240,165,32,0.1),rgba(20,184,166,0.07));border:1px solid rgba(240,165,32,0.25);border-radius:12px;padding:18px 20px;margin-top:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.art-cta-text{font-size:13.5px;color:var(--text);font-weight:700;}
+.art-cta-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.art-cta-btn{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.art-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;}
+.art-table th{background:var(--elevated);padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border);}
+.art-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted);line-height:1.5;}
+.art-table tr:last-child td{border-bottom:none;}
+.art-table td:first-child{font-weight:700;color:var(--text);}
+@media(max-width:640px){.art-grid{grid-template-columns:1fr;}.art-reader h1{font-size:20px;}}
 </style>
 </head>
 <body>
@@ -811,6 +891,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="drawer-icon">✈️</div>
       <div class="drawer-info"><div class="drawer-name">Return Planner</div><div class="drawer-desc">Corpus needed to move back</div></div>
     </div>
+    <div class="drawer-section-lbl">Learn</div>
+    <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
+      <div class="drawer-icon">📚</div>
+      <div class="drawer-info"><div class="drawer-name">NRI Guides</div><div class="drawer-desc">Tax, banking, property & more</div></div>
+    </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
   </div>
 
@@ -857,7 +942,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <div id="rates-container" class="rates-wrap" style="display:none"></div>
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
 
-    <div class="info" style="margin-top:16px"><strong>How to read this:</strong> Each provider&apos;s INR shown = amount after their typical margin + fee, applied to today&apos;s mid-market rate. Visual bars show relative value &mdash; the longer the bar, the more rupees your family receives.</div>
+    <div class="info" style="margin-top:16px;border-left:3px solid rgba(99,102,241,0.5)"><strong>How to read this:</strong> INR shown = today&apos;s mid-market rate minus each provider&apos;s <em>typical</em> margin &amp; fee. Visual bars show relative value — longer bar = more rupees received. <strong>Providers run promotions and change rates in real time</strong> — always click a provider to confirm the live rate before transferring. Promos (like zero-fee first transfers) will make the actual rate better than shown here.</div>
   </div>
 
   <!-- TAB 2: SIP & SWP -->
@@ -1144,9 +1229,9 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="card-hd" style="margin-bottom:14px"><div class="card-hd-bar"></div>Step 3 &mdash; Planning Parameters</div>
       <div class="fg">
         <div class="f"><label>India Inflation Rate (% p.a.)</label><input type="number" id="rp-inflation" value="6" step="0.5"/></div>
-        <div class="f"><label>Investment Return on Corpus (% p.a.)</label><input type="number" id="rp-roi" value="8" step="0.5"/></div>
+        <div class="f"><label>Investment Return on Corpus (% p.a.)</label><input type="number" id="rp-roi" value="8" step="0.5" oninput="updateRpLocal()"/></div>
         <div class="f"><label>Expected India Income After Return (&#8377;/mo)</label><input type="number" id="rp-income" value="50000"/></div>
-        <div class="f"><label>Years Until You Return</label><input type="number" id="rp-years" value="5" min="1" max="30"/></div>
+        <div class="f"><label>Years Until You Return</label><input type="number" id="rp-years" value="5" min="1" max="30" oninput="updateRpLocal()"/><div id="rp-years-corpus" style="font-size:12px;color:var(--amber);margin-top:4px;font-weight:600;"></div></div>
         <div class="f"><label>Current Savings Abroad (&#8377; Lakhs)</label><input type="number" id="rp-savings" value="50" oninput="updateRpLocal()"/><div id="rp-savings-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
         <div class="f"><label>Monthly Savings Rate (&#8377; Lakhs/mo)</label><input type="number" id="rp-monthly" value="1.5" step="0.1" oninput="updateRpLocal()"/><div id="rp-monthly-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
       </div>
@@ -1154,10 +1239,13 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div id="rp-result" style="display:none">
         <div class="rg" id="rp-result-grid"></div>
         <div id="rp-verdict"></div>
-        <div class="btn-row" style="margin-top:16px"><button class="btn btn-outline" onclick="downloadReturnCSV()">&#11015; Download Projection CSV</button></div>
-        <div class="year-table-wrap">
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn btn-outline" onclick="downloadReturnCSV()">&#11015; Download Projection CSV</button>
+          <button class="btn btn-outline" id="rp-table-toggle" onclick="toggleRpTable()" style="display:flex;align-items:center;gap:6px">&#9660; Year-by-Year Table</button>
+        </div>
+        <div id="rp-table-wrap" class="year-table-wrap">
           <table class="year-table" id="rp-year-table">
-            <thead><tr><th>Year</th><th>Monthly Expenses</th><th>Annual Expenses</th><th>Inflation Added</th><th>Monthly Shortfall</th><th>Corpus Needed</th></tr></thead>
+            <thead><tr><th>Year</th><th>Opening Corpus</th><th>Annual Expenses</th><th>India Income</th><th>Returns Earned</th><th>Closing Corpus</th><th>Status</th></tr></thead>
             <tbody id="rp-year-body"></tbody>
           </table>
         </div>
@@ -1451,6 +1539,59 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="info">&#128203; <strong>NRI Repatriation Rule:</strong> You can repatriate up to USD 1 million per year from property sale proceeds (if purchased via NRE/foreign remittance). Rental income from NRO account: repatriate up to USD 1M/year with CA certificate. Always consult a FEMA-qualified CA before large transactions.</div>
+  </div>
+
+  <!-- TAB: NRI GUIDES / ARTICLES -->
+  <div class="tool-section" id="tab-articles">
+    <div class="sec-head">
+      <h2>NRI Financial Guides</h2>
+      <p>Practical, jargon-free guides written for Indians living abroad</p>
+    </div>
+    <div id="art-list">
+      <div class="art-grid">
+        <div class="art-card" onclick="window.location.href='nre-nro.html'">
+          <div><span class="art-tag banking">Banking</span></div>
+          <div class="art-title">NRE vs NRO Account: Which One Do You Actually Need?</div>
+          <div class="art-summary">Confused between NRE and NRO? This guide cuts through the jargon — when to open each, tax rules, and what most NRIs get wrong.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='tax-saving.html'">
+          <div><span class="art-tag tax">Tax</span></div>
+          <div class="art-title">How NRIs Can Save Tax in 2026 (DTAA, Form 15CA &amp; More)</div>
+          <div class="art-summary">Most NRIs overpay tax simply because they don't know the rules. Learn how DTAA, NRE accounts, and proper filing can save you lakhs.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='home-buying.html'">
+          <div><span class="art-tag property">Property</span></div>
+          <div class="art-title">The Complete NRI Home Buying Guide (2026)</div>
+          <div class="art-summary">From FEMA rules to POA, loan eligibility to registration — a step-by-step walkthrough of buying property in India while living abroad.</div>
+          <div class="art-meta"><span>&#128337; 10 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='send-money.html'">
+          <div><span class="art-tag transfer">Transfer</span></div>
+          <div class="art-title">Best Ways to Send Money to India: Full Cost Comparison</div>
+          <div class="art-summary">Bank wire vs Wise vs exchange houses — we break down the real cost of each method and show you how to save 2–4% on every transfer.</div>
+          <div class="art-meta"><span>&#128337; 5 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='return-planner.html'">
+          <div><span class="art-tag planning">Planning</span></div>
+          <div class="art-title">How to Use the Return Planner: Simulate Your Corpus &amp; Retirement</div>
+          <div class="art-summary">A step-by-step walkthrough of the Return Planner tool — how to set inputs, read the year-by-year table, and stress-test your retirement numbers.</div>
+          <div class="art-meta"><span>&#128337; 5 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='retirement.html'">
+          <div><span class="art-tag planning">Planning</span></div>
+          <div class="art-title">How to Plan Your India Retirement Using SIP &amp; SWP</div>
+          <div class="art-summary">What corpus do you need to retire in India? How do SIP and SWP work together? A practical framework with real numbers for NRIs.</div>
+          <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+      </div>
+      <div class="info" style="margin-top:20px">&#9888;&#65039; These guides are for informational purposes only. Consult a SEBI-registered advisor or CA for personalised advice.</div>
+    </div>
+    <div id="art-reader" class="art-reader" style="display:none">
+      <button class="art-reader-back" onclick="closeArticle()">&#8592; Back to Guides</button>
+      <div id="art-content"></div>
+    </div>
   </div>
 </div>
 
@@ -1831,7 +1972,7 @@ function renderRatePreview(){
     </div>`;
   }).join('');
   const rpcFooter=document.getElementById('rpc-footer');
-  if(rpcFooter)rpcFooter.innerHTML=`<span class="rpc-live-tag"><div class="live-dot" style="display:inline-block"></div> ${rateIsLive?'Live':'Approx'} · 1 ${baseCur} = ₹${midRate.toFixed(4)}</span> · Confirm on provider site.`;
+  if(rpcFooter)rpcFooter.innerHTML=`<span class="rpc-live-tag"><div class="live-dot" style="display:inline-block"></div> ${rateIsLive?'Live':'Approx'} · 1 ${baseCur} = ₹${midRate.toFixed(4)}</span> · Estimates only — promotions may apply · <strong>Verify live rate on provider site before sending</strong>`;
 }
 
 function renderRates(){
@@ -1868,7 +2009,7 @@ function renderRates(){
 
   const now=new Date();
   const lbl=rateIsLive?`<span style="color:var(--green);font-weight:700">🟢 Live</span> · Updated ${now.toLocaleTimeString()}`:`<span style="color:var(--amber);font-weight:700">🟡 Offline</span> · Approximate rates (mid-2025)`;
-  document.getElementById('rate-note-text').innerHTML=`Mid-market: <strong>1 ${baseCur} = ₹${midRate.toFixed(4)}</strong> · ${lbl} · Rates are estimates — verify on provider site before transferring.`;
+  document.getElementById('rate-note-text').innerHTML=`<strong>ℹ️ These are estimates only.</strong> Rates shown = today's mid-market rate (1 ${baseCur} = ₹${midRate.toFixed(4)}) minus each provider's typical margin & fee. <strong>Actual rates change every few minutes</strong> and providers may run promotions (zero-fee offers, bonus rates) not reflected here. <span style="color:var(--amber);font-weight:700">Always click through to the provider and confirm the live rate before sending money.</span>`;
   renderRatePreview();
   renderMarketRate();
 }
@@ -2146,26 +2287,60 @@ function calcReturn(){
   const shortfall=Math.max(0,returnMonthly-indiaIncome);
   const netRate=roi-inflation;
   const corpusNeeded=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // Drawdown simulation — starts at return date with projCorpus
   returnProjData=[];
-  let expM=returnMonthly,tbody='';
-  for(let y=1;y<=Math.min(years+15,30);y++){
-    const annExp=expM*12;const inflAdded=expM*(inflation);const sf=Math.max(0,expM-indiaIncome);
-    const cn=netRate>0?sf*12/netRate:sf*12*30;
-    returnProjData.push({year:y,expM:Math.round(expM),annExp:Math.round(annExp),inflAdded:Math.round(inflAdded),sf:Math.round(sf),cn:Math.round(cn)});
-    const isReturn=y===years;
-    tbody+=`<tr${isReturn?' style="border-left:3px solid var(--amber)"':''}><td>${y}${isReturn?' 🏠':''}</td><td><div>₹${Math.round(expM).toLocaleString('en-IN')}</div>${midRate>0?`<div class="rp-local">${baseCur} ${Math.round(expM/midRate).toLocaleString('en-IN')}</div>`:''}</td><td>₹${Math.round(annExp).toLocaleString('en-IN')}</td><td style="color:var(--red)">+₹${Math.round(inflAdded).toLocaleString('en-IN')}</td><td style="color:var(--amber)"><div>₹${Math.round(sf).toLocaleString('en-IN')}</div>${midRate>0?`<div class="rp-local">${baseCur} ${Math.round(sf/midRate).toLocaleString('en-IN')}</div>`:''}</td><td><strong>₹${(cn/100000).toFixed(1)}L</strong>${midRate>0?`<div class="rp-local">${baseCur} ${(cn/midRate/100000).toFixed(2)}L</div>`:''}</td></tr>`;
+  let corpus=projCorpus,expM=returnMonthly,tbody='',surviveYears=0,depleted=false;
+  const maxSimYears=40;
+  for(let y=1;y<=maxSimYears;y++){
+    const open=corpus;
+    const annExp=expM*12;
+    const annIncome=indiaIncome*12;
+    const netWithdraw=Math.max(0,annExp-annIncome);
+    const returns=corpus*roi;
+    corpus=Math.max(0,corpus+returns-netWithdraw);
+    const close=corpus;
+    returnProjData.push({year:y,open:Math.round(open),annExp:Math.round(annExp),annIncome:Math.round(annIncome),returns:Math.round(returns),close:Math.round(close)});
+    if(close>0)surviveYears=y; else if(!depleted){depleted=true;surviveYears=y;}
+    const pct=projCorpus>0?close/projCorpus:0;
+    const colr=close<=0?'var(--red)':pct>0.5?'var(--green)':pct>0.15?'var(--amber)':'var(--red)';
+    const status=close<=0?'✘ Depleted':pct>0.5?'✔ Healthy':pct>0.15?'⚠ Low':'⚠ Critical';
+    const rowStyle=close<=0?' style="opacity:0.5"':'';
+    const lcClose=midRate>0&&close>0?`<div class="rp-local">${baseCur} ${(close/midRate/100000).toFixed(1)}L</div>`:'';
+    tbody+=`<tr${rowStyle}><td>${y}</td>`;
+    tbody+=`<td>₹${(open/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--red)">₹${(annExp/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--muted)">₹${(annIncome/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--green)">₹${(returns/100000).toFixed(1)}L</td>`;
+    tbody+=`<td><strong style="color:${colr}">₹${(close/100000).toFixed(1)}L</strong>${lcClose}</td>`;
+    tbody+=`<td style="color:${colr};font-weight:700">${status}</td></tr>`;
     expM*=(1+inflation);
+    if(depleted)break;
   }
   document.getElementById('rp-year-body').innerHTML=tbody;
   const lc=(inr)=>midRate>0?baseCur+' '+Math.round(inr/midRate).toLocaleString('en-IN'):null;
   const lcL=(inr)=>midRate>0?baseCur+' '+(inr/midRate/100000).toFixed(1)+'L':null;
   const lcSub=(inr)=>lc(inr)?`<div class="ri-local">≈ ${lc(inr)}</div>`:'';
   const lcLSub=(inr)=>lcL(inr)?`<div class="ri-local">≈ ${lcL(inr)}</div>`:'';
+  const survivalLabel=depleted?`${surviveYears} years`:'40+ years';
+  const survivalColor=depleted?(surviveYears<15?'var(--red)':'var(--amber)'):'var(--green)';
+  const survivalSub=depleted?`corpus runs out in year ${surviveYears}`:'sustainable through 40 years';
+  // Break-even monthly: max withdrawal so corpus hits ₹0 exactly at year 40
+  // PV of inflation-growing annuity: PV = PMT × [1 - ((1+g)/(1+r))^n] / (r-g)
+  const beNetRate=roi-inflation;
+  const beN=40;
+  const beFactor=beNetRate>0.0001?(1-Math.pow((1+inflation)/(1+roi),beN))/beNetRate:beN/(1+inflation);
+  const beAnnual=projCorpus>0&&beFactor>0?projCorpus/beFactor:0;
+  const beMonthly=Math.round(beAnnual/12);
+  // Sustainable forever (real perpetuity): corpus × (roi-inflation) / 12
+  const beSustainMonthly=beNetRate>0?Math.round(projCorpus*beNetRate/12):0;
+  const beLcSub=midRate>0&&beMonthly>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(beMonthly/midRate).toLocaleString('en-IN')}/mo</div>`:'';
   document.getElementById('rp-result-grid').innerHTML=`
     <div class="ri"><div class="ri-lbl">Monthly Expenses Today</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${Math.round(baseMonthly).toLocaleString('en-IN')}</div>${lcSub(baseMonthly)}</div><div class="ri-sub">before inflation</div></div>
     <div class="ri"><div class="ri-lbl">Monthly at Return</div><div class="rp-dual"><div class="ri-val">₹${Math.round(returnMonthly).toLocaleString('en-IN')}</div>${lcSub(returnMonthly)}</div><div class="ri-sub">after ${years}yr × ${(inflation*100).toFixed(0)}% inflation</div></div>
     <div class="ri"><div class="ri-lbl">Projected Corpus</div><div class="rp-dual"><div class="ri-val" style="color:${projCorpus>=corpusNeeded?'var(--green)':'var(--red)'}">₹${(projCorpus/100000).toFixed(1)}L</div>${lcLSub(projCorpus)}</div><div class="ri-sub">at return date</div></div>
-    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${(corpusNeeded/100000).toFixed(1)}L</div>${lcLSub(corpusNeeded)}</div><div class="ri-sub">for inflation-adjusted income</div></div>`;
+    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${(corpusNeeded/100000).toFixed(1)}L</div>${lcLSub(corpusNeeded)}</div><div class="ri-sub">for inflation-adjusted income</div></div>
+    <div class="ri" style="border-color:${survivalColor};background:${depleted&&surviveYears<15?'rgba(239,68,68,0.06)':'rgba(74,222,128,0.05)'}"><div class="ri-lbl">&#9200; Corpus Survives</div><div class="ri-val" style="color:${survivalColor}">${survivalLabel}</div><div class="ri-sub">${survivalSub}</div></div>
+    <div class="ri" style="border-color:var(--teal);background:rgba(20,184,166,0.05);grid-column:1/-1"><div class="ri-lbl">&#128181; Max Monthly Take-Home from Corpus</div><div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end;margin-top:6px"><div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">40-year drawdown (corpus → ₹0)</div><div class="ri-val" style="color:var(--teal);font-size:22px">₹${beMonthly.toLocaleString('en-IN')}<span style="font-size:13px;font-weight:500">/mo</span></div>${beLcSub}</div><div style="width:1px;background:var(--border);align-self:stretch"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">Sustainable forever (corpus stays intact)</div><div class="ri-val" style="color:var(--green);font-size:22px">₹${beSustainMonthly.toLocaleString('en-IN')}<span style="font-size:13px;font-weight:500">/mo</span></div>${midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(beSustainMonthly/midRate).toLocaleString('en-IN')}/mo</div>`:''}</div></div><div style="font-size:11px;color:var(--muted);margin-top:8px">&#128161; Starting monthly — grows with ${(inflation*100).toFixed(0)}% inflation each year · add India income of ₹${indiaIncome.toLocaleString('en-IN')}/mo on top</div></div>`;
   const onTrack=projCorpus>=corpusNeeded*0.9;
   const gapInr=(corpusNeeded-projCorpus);
   const gapLocal=midRate>0?` (${baseCur} ${(gapInr/midRate/100000).toFixed(1)}L)`:'';
@@ -2175,9 +2350,16 @@ function calcReturn(){
     :`<div class="box-red">⚠️ <strong>Gap of ~₹${(gapInr/100000).toFixed(1)}L${gapLocal}.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
   document.getElementById('rp-result').style.display='block';
 }
+function toggleRpTable(){
+  const wrap=document.getElementById('rp-table-wrap');
+  const btn=document.getElementById('rp-table-toggle');
+  const hidden=wrap.style.display==='none';
+  wrap.style.display=hidden?'block':'none';
+  btn.innerHTML=hidden?'&#9660; Year-by-Year Table':'&#9658; Year-by-Year Table';
+}
 function downloadReturnCSV(){
-  const rows=[['Year','Monthly Expenses (₹)','Annual Expenses (₹)','Inflation Added (₹)','Monthly Shortfall (₹)','Corpus Needed (₹)']];
-  returnProjData.forEach(r=>rows.push([r.year,r.expM,r.annExp,r.inflAdded,r.sf,r.cn]));
+  const rows=[['Year','Opening Corpus (₹)','Annual Expenses (₹)','India Income (₹)','Returns Earned (₹)','Closing Corpus (₹)']];
+  returnProjData.forEach(r=>rows.push([r.year,r.open,r.annExp,r.annIncome,r.returns,r.close]));
   triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','return-india-projection.csv');
 }
 
@@ -2220,13 +2402,23 @@ function showTab(id,btn){setActiveBottomTab(id);
   const name=document.getElementById('atbName');
   if(icon)icon.textContent=meta.icon;
   if(name)name.textContent=meta.name;
-  // Close drawer & scroll
+  // Close drawer & scroll to the active tab section (skip hero/rates header)
   closeDrawer();
-  document.querySelector('.main').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(()=>{
+    const el=document.getElementById('tab-'+id);
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
 }
 
 // ── INIT ─────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
+  // Deep-link: handle #article/key in URL
+  const hash=location.hash;
+  if(hash.startsWith('#article/')){
+    const key=hash.replace('#article/','');
+    showTab('articles',document.querySelector('[data-tab=articles]'));
+    setTimeout(()=>openArticle(key),100);
+  }
   updateExpTotal();
   // ── Render default (AED) IMMEDIATELY so page isn't blank ──
   updateAll();
@@ -2586,9 +2778,22 @@ function ccbConvert(tid){
 }
 
 function updateRpLocal(){
-  if(!midRate)return;
   const sav=parseFloat(document.getElementById('rp-savings').value)||0;
   const mon=parseFloat(document.getElementById('rp-monthly').value)||0;
+  const roi=(parseFloat(document.getElementById('rp-roi').value)||8)/100;
+  const yrs=parseInt(document.getElementById('rp-years').value)||0;
+  // Projected corpus at return date
+  const mr=roi/12,n=yrs*12;
+  const fvSav=(sav*100000)*Math.pow(1+mr,n);
+  const fvCon=mr>0?(mon*100000)*(Math.pow(1+mr,n)-1)/mr:(mon*100000)*n;
+  const proj=fvSav+fvCon;
+  const yc=document.getElementById('rp-years-corpus');
+  if(yc&&yrs>0){
+    const inrStr='₹'+(proj/100000).toFixed(1)+'L projected corpus';
+    const lcStr=midRate>0?' (≈ '+baseCur+' '+(proj/midRate/100000).toFixed(1)+'L)':'';
+    yc.textContent=inrStr+lcStr;
+  }
+  if(!midRate)return;
   const sl=document.getElementById('rp-savings-local');
   const ml=document.getElementById('rp-monthly-local');
   if(sl)sl.textContent=sav>0?'≈ '+baseCur+' '+(sav*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'';
@@ -2646,6 +2851,353 @@ function renderChecklist(){
 document.addEventListener('DOMContentLoaded',()=>{renderChecklist();});
 
 // ── RATE ALERT SIGNUP ─────────────────────────────────────────────────────────
+
+// ── ARTICLES ──────────────────────────────────────
+const ARTICLES={
+  'nre-nro':{
+    tag:'banking',tagLabel:'Banking',readTime:'6 min read',
+    metaTitle:'NRE vs NRO Account: Which Is Better for NRIs? (2026 Guide)',
+    metaDesc:'Understand the key differences between NRE and NRO accounts — tax treatment, repatriation rules, FD interest rates, and when to use each account type.',
+    metaKw:'NRE account, NRO account, NRE vs NRO difference, NRI bank account India 2026',
+    title:'NRE vs NRO Account: Which One Do You Actually Need?',
+    content:`
+      <div class="art-callout indigo"><strong>Quick answer:</strong> If you earn abroad and want tax-free returns — open an NRE account. If you have income in India (rent, dividends, pension) — you need an NRO account. Most NRIs with both income types should have both.</div>
+      <h2>What Is an NRE Account?</h2>
+      <p>A <strong>Non-Resident External (NRE)</strong> account lets you park your foreign earnings in India in Indian Rupees. The key benefits are hard to beat:</p>
+      <ul>
+        <li><strong>Tax-free interest</strong> — interest earned is completely exempt from Indian income tax</li>
+        <li><strong>Fully repatriable</strong> — you can move both principal and interest back abroad at any time</li>
+        <li><strong>Rupee account</strong> — you convert your foreign currency to INR at the time of deposit, so you take the exchange rate risk</li>
+        <li>Available as savings accounts and fixed deposits (FDs)</li>
+      </ul>
+      <div class="art-callout green"><strong>Best for:</strong> Parking overseas salary savings you might want to bring back one day, or investing in Indian markets via SIP/mutual funds from a clean, tax-free account.</div>
+      <h2>What Is an NRO Account?</h2>
+      <p>A <strong>Non-Resident Ordinary (NRO)</strong> account is designed for income that originates in India — rent from a property, dividends from Indian stocks, pension payments, or money gifted by Indian residents.</p>
+      <ul>
+        <li><strong>Interest is taxable</strong> — TDS of 30% is deducted at source (can be reduced via DTAA)</li>
+        <li><strong>Repatriation limit</strong> — you can repatriate up to USD 1 million per financial year after paying tax</li>
+        <li>You cannot freely move money from NRO to an overseas account without satisfying FEMA conditions</li>
+      </ul>
+      <h2>Side-by-Side Comparison</h2>
+      <table class="art-table">
+        <thead><tr><th>Feature</th><th>NRE Account</th><th>NRO Account</th></tr></thead>
+        <tbody>
+          <tr><td>Purpose</td><td>Foreign earnings in India</td><td>India-sourced income</td></tr>
+          <tr><td>Tax on Interest</td><td>Nil (fully exempt)</td><td>30% TDS</td></tr>
+          <tr><td>Repatriation</td><td>Freely repatriable</td><td>Up to $1M/yr after tax</td></tr>
+          <tr><td>Joint account</td><td>With another NRI only</td><td>With NRI or resident Indian</td></tr>
+          <tr><td>Currency</td><td>INR (converted from forex)</td><td>INR</td></tr>
+          <tr><td>Deposits from India</td><td>Not allowed</td><td>Allowed</td></tr>
+        </tbody>
+      </table>
+      <h2>What About FCNR Accounts?</h2>
+      <p>There's a third option: <strong>Foreign Currency Non-Resident (FCNR)</strong> deposits. These are fixed deposits held in your home currency (USD, AED, GBP, EUR, etc.) — so you eliminate exchange rate risk entirely. Interest is tax-free. Great for large sums you don't want to convert to INR yet.</p>
+      <h2>Common Mistakes NRIs Make</h2>
+      <ul>
+        <li><strong>Keeping a regular savings account after becoming NRI</strong> — illegal under FEMA. Must convert to NRO within 6 months of becoming NRI.</li>
+        <li><strong>Mixing foreign and India income in one account</strong> — defeats the purpose and creates tax complexity.</li>
+        <li><strong>Not claiming DTAA benefit on NRO interest</strong> — you can reduce TDS from 30% to 10–15% in many countries.</li>
+      </ul>
+      <div class="art-callout"><strong>Action checklist:</strong> 1) Open NRE account for your overseas salary · 2) Convert your old Indian savings account to NRO · 3) Check DTAA with your country of residence to reduce NRO TDS · 4) Consider FCNR FD for amounts above ₹20L you won't touch for 1–5 years</div>
+      <div class="art-cta"><div><div class="art-cta-text">Compare NRE FD Rates Across Banks</div><div class="art-cta-sub">See which bank offers the best NRE fixed deposit rate right now</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">Open FD Calculator &#8594;</button></div>
+    `},
+  'tax-saving':{
+    tag:'tax',
+    metaTitle:'NRI Tax Saving Guide India 2026 — DTAA, ELSS, NRE FD & More',
+    metaDesc:'Complete tax-saving guide for NRIs: how to use DTAA to avoid double taxation, best tax-saving investments, Section 80C options, and LTCG exemptions.',
+    metaKw:'NRI tax saving India, DTAA double tax, Section 80C NRI, NRI capital gains tax 2026',tagLabel:'Tax',readTime:'8 min read',
+    title:'How NRIs Can Save Tax in 2026 (DTAA, Form 15CA & More)',
+    content:`
+      <div class="art-callout indigo"><strong>Key principle:</strong> India taxes you on income that arises or is received in India. Foreign income is generally not taxable in India if you are an NRI. The real savings come from structuring your India-based income correctly.</div>
+      <h2>Your Residential Status Determines Everything</h2>
+      <p>India's tax system is residence-based, not citizenship-based. Your tax liability depends entirely on whether you are classified as:</p>
+      <ul>
+        <li><strong>NRI (Non-Resident Indian)</strong> — present in India fewer than 182 days in the financial year</li>
+        <li><strong>RNOR (Resident but Not Ordinarily Resident)</strong> — transitional status, taxed like NRI for most foreign income</li>
+        <li><strong>Resident</strong> — taxed on global income</li>
+      </ul>
+      <div class="art-callout"><strong>Watch your days:</strong> If you plan to visit India for extended periods, track your days carefully. Crossing 182 days in a year — or 120 days under certain conditions — can flip your status and expose your entire global income to Indian tax.</div>
+      <h2>Tax-Free Income as an NRI</h2>
+      <p>Several income sources are completely exempt from Indian tax for NRIs:</p>
+      <ul>
+        <li><strong>NRE account interest</strong> — fully exempt, no TDS, no declaration needed</li>
+        <li><strong>FCNR deposit interest</strong> — fully exempt</li>
+        <li><strong>Long-term capital gains on equity mutual funds</strong> — up to ₹1.25L per year tax-free (FY 2024–25 onwards)</li>
+        <li><strong>Overseas income</strong> — your foreign salary, business income, or rental income abroad is not taxable in India</li>
+      </ul>
+      <h2>DTAA: Your Most Powerful Tax Tool</h2>
+      <p>India has <strong>Double Tax Avoidance Agreements (DTAA)</strong> with 90+ countries. These treaties prevent you from paying tax twice on the same income. Key benefits:</p>
+      <table class="art-table">
+        <thead><tr><th>Country</th><th>NRO Interest TDS (Normal)</th><th>With DTAA</th></tr></thead>
+        <tbody>
+          <tr><td>UAE</td><td>30%</td><td>0% (UAE has no income tax)</td></tr>
+          <tr><td>UK</td><td>30%</td><td>15%</td></tr>
+          <tr><td>USA</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Malaysia</td><td>30%</td><td>10%</td></tr>
+          <tr><td>Singapore</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Australia</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Canada</td><td>30%</td><td>25%</td></tr>
+        </tbody>
+      </table>
+      <p>To claim DTAA benefit, submit a <strong>Tax Residency Certificate (TRC)</strong> from your country of residence to your Indian bank, along with <strong>Form 10F</strong>. The bank will then deduct TDS at the lower DTAA rate.</p>
+      <h2>Form 15CA and 15CB</h2>
+      <p>When you repatriate money from India (especially large amounts from NRO accounts), you need these forms:</p>
+      <ul>
+        <li><strong>Form 15CA</strong> — a declaration you file online on the Income Tax portal confirming tax has been paid</li>
+        <li><strong>Form 15CB</strong> — a CA certificate verifying the remittance is legal and taxes are settled. Required for amounts above ₹5 lakh</li>
+      </ul>
+      <h2>Filing Indian Tax Returns as an NRI</h2>
+      <p>You must file an Indian tax return (ITR-2) if your India-sourced income exceeds the basic exemption limit (₹2.5L under old regime, ₹3L under new regime). Even if you have no tax liability, filing is good practice and required for loan applications.</p>
+      <div class="art-callout green"><strong>Big opportunity:</strong> NRIs can claim a deduction under Section 80C (up to ₹1.5L) on ELSS mutual fund investments, home loan principal, and life insurance premiums paid in India. Section 24b allows ₹2L deduction on home loan interest. These can significantly reduce your taxable India income.</div>
+      <div class="art-cta"><div><div class="art-cta-text">Check Your Tax Residency Status</div><div class="art-cta-sub">Use our calculator to determine NRI / RNOR / Resident status</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('taxres',document.querySelector('[data-tab=taxres]'))">Open Tax Residency Tool &#8594;</button></div>
+    `},
+  'home-buying':{
+    tag:'property',
+    metaTitle:'NRI Home Buying Guide India 2026 — Eligibility, Loan & Repatriation',
+    metaDesc:'Can NRIs buy property in India? Yes. Here is everything: FEMA rules, NRI home loan eligibility, EMI from NRE account, and how to repatriate sale proceeds.',
+    metaKw:'NRI home buying India, NRI property purchase, NRI home loan 2026, FEMA property NRI',tagLabel:'Property',readTime:'10 min read',
+    title:'The Complete NRI Home Buying Guide (2026)',
+    content:`
+      <div class="art-callout indigo"><strong>Can NRIs buy property in India?</strong> Yes. NRIs and PIOs can buy residential and commercial property in India without RBI approval. Agricultural land, plantation property, and farmhouses are not permitted.</div>
+      <h2>Step 1: Decide Your Structure</h2>
+      <p>Before searching for property, decide:</p>
+      <ul>
+        <li><strong>Self-use or investment?</strong> — Tax treatment and loan eligibility differ</li>
+        <li><strong>Jointly or solo?</strong> — Many NRIs add a local family member as co-owner for practical reasons (signing, possession)</li>
+        <li><strong>Loan or self-funded?</strong> — NRI home loans are available from most major banks at 7.25–9% p.a.</li>
+      </ul>
+      <h2>Step 2: Power of Attorney (POA)</h2>
+      <p>Since you're abroad, you'll need a <strong>Power of Attorney</strong> — a legal document authorising a trusted person in India (parent, sibling, spouse) to act on your behalf for signing agreements, registering the property, and taking possession.</p>
+      <ul>
+        <li>POA must be executed before an Indian consulate or notarised and apostilled in the country where you reside</li>
+        <li>The original POA must be sent to India; your representative will get it stamped and registered</li>
+        <li>Use a specific POA (limited to this transaction) rather than a general POA for security</li>
+      </ul>
+      <h2>Step 3: NRI Home Loan Eligibility</h2>
+      <p>Most major banks (SBI, ICICI, HDFC, Axis) offer NRI home loans. Key requirements:</p>
+      <table class="art-table">
+        <thead><tr><th>Requirement</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>NRE/NRO Account</td><td>Mandatory — EMI must be debited from your Indian account</td></tr>
+          <tr><td>Min Employment</td><td>Usually 1–2 years in current job abroad</td></tr>
+          <tr><td>Income proof</td><td>3–6 months payslips, employment contract, overseas bank statements</td></tr>
+          <tr><td>Credit score</td><td>CIBIL score 700+ preferred; some banks accept overseas credit reports</td></tr>
+          <tr><td>Max LTV</td><td>Up to 90% of property value</td></tr>
+          <tr><td>Max tenure</td><td>Up to 30 years</td></tr>
+        </tbody>
+      </table>
+      <h2>Step 4: Payment Rules (FEMA)</h2>
+      <p>All payments for property must come from:</p>
+      <ul>
+        <li>Inward remittance from abroad via normal banking channels</li>
+        <li>Funds in your NRE or NRO account</li>
+        <li>Home loan proceeds</li>
+      </ul>
+      <p>Cash transactions are <strong>not permitted</strong>. Keep all payment records — you'll need them to prove source of funds when you sell.</p>
+      <h2>Step 5: Registration and Stamp Duty</h2>
+      <p>Property must be registered in India. Your POA holder can execute this in your absence. Stamp duty varies by state (typically 3–7% of property value). Registration fee is typically 1%. Budget 6–8% of property value for total acquisition costs including stamp duty, registration, and legal fees.</p>
+      <h2>Tax on Rental Income</h2>
+      <p>If you rent out the property, rental income is taxable in India under "Income from House Property." TDS of 30% is deducted by the tenant if the tenant is an Indian resident paying rent above ₹50,000/month. You can claim deductions for municipal taxes paid and 30% standard deduction on net rent.</p>
+      <h2>Selling the Property</h2>
+      <ul>
+        <li><strong>Short-term capital gains</strong> (held &lt;2 years): Taxed at your slab rate</li>
+        <li><strong>Long-term capital gains</strong> (held &gt;2 years): 12.5% (from FY25) with no indexation benefit</li>
+        <li>Buyer must deduct TDS of 20% on sale amount if seller is NRI</li>
+        <li>You can repatriate sale proceeds up to the original investment amount from NRO account</li>
+      </ul>
+      <div class="art-callout"><strong>Pro tip:</strong> Invest in under-construction property from a RERA-registered developer. This gives legal protection, allows you to verify project status online, and ensures the builder cannot deviate from approved plans.</div>
+      <div class="art-cta"><div><div class="art-cta-text">Calculate Your NRI Home Loan EMI</div><div class="art-cta-sub">See EMI, amortization schedule, and interest saved with prepayments</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">Open Home Loan Calculator &#8594;</button></div>
+    `},
+  'send-money':{
+    tag:'transfer',
+    metaTitle:'Best Way to Send Money to India as NRI in 2026 — Wise vs InstaReM vs Remitly',
+    metaDesc:'Compare the top remittance services for sending money to India: exchange rates, fees, transfer speed, and which service wins for your country.',
+    metaKw:'best way to send money to India NRI, Wise vs InstaReM, remittance India 2026, lowest fee money transfer India',tagLabel:'Transfer',readTime:'5 min read',
+    title:'Best Ways to Send Money to India: Full Cost Comparison',
+    content:`
+      <div class="art-callout green"><strong>The hidden cost:</strong> The exchange rate margin — not the fee — is where you lose the most money. A provider charging "zero fee" but offering a rate 2% below mid-market costs far more than one charging a small fee at a near-perfect rate.</div>
+      <h2>How Transfer Costs Work</h2>
+      <p>Every international money transfer has two components:</p>
+      <ul>
+        <li><strong>Exchange rate margin (spread)</strong> — the gap between the mid-market rate (what banks trade between themselves) and what you actually receive. This is the invisible cost.</li>
+        <li><strong>Transfer fee</strong> — the flat or percentage fee charged per transaction. Easier to see, but often not the biggest cost.</li>
+      </ul>
+      <p>Example: You're sending AED 5,000 to India. Mid-market rate = ₹22.80 per AED. If a provider gives you ₹22.35 instead, that's a 2% margin — you lose ₹2,250 on that one transfer.</p>
+      <h2>The Main Transfer Methods Compared</h2>
+      <table class="art-table">
+        <thead><tr><th>Method</th><th>Typical Margin</th><th>Fee</th><th>Speed</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Wise</td><td>0.4–0.6%</td><td>Small flat fee</td><td>Seconds–hours</td><td>Best overall rate</td></tr>
+          <tr><td>InstaReM</td><td>0.2–0.5%</td><td>Low/nil</td><td>2–4 hours</td><td>Best for Gulf & SE Asia</td></tr>
+          <tr><td>LuluMoney</td><td>0.8–1.2%</td><td>None</td><td>Same day</td><td>Gulf NRIs, cash pickup</td></tr>
+          <tr><td>Bank wire (SWIFT)</td><td>2–4%</td><td>₹500–2,000</td><td>1–3 days</td><td>Large regulated transfers</td></tr>
+          <tr><td>Exchange house</td><td>1–2.5%</td><td>Varies</td><td>Same day</td><td>Cash, large amounts</td></tr>
+          <tr><td>Western Union / MoneyGram</td><td>2–3%</td><td>0–small</td><td>Minutes</td><td>Urgency only</td></tr>
+        </tbody>
+      </table>
+      <h2>How to Get the Best Rate Every Time</h2>
+      <ul>
+        <li><strong>Always compare on our rates tab</strong> — we show estimated INR received side by side for your currency</li>
+        <li><strong>Send larger amounts less frequently</strong> — many providers have flat fees, so the effective cost drops on bigger amounts</li>
+        <li><strong>Time your transfers</strong> — rates fluctuate. Sending on weekdays (Tuesday–Thursday) typically gives better rates than weekends</li>
+        <li><strong>Lock in a rate</strong> — Wise and some others let you lock the rate for a few hours or days. Use this if you see a good rate</li>
+        <li><strong>Check for promos</strong> — InstaReM, Remitly, and others frequently run zero-fee first-transfer promotions</li>
+      </ul>
+      <h2>What's the Real Annual Cost?</h2>
+      <p>If you send ₹5L to India per year via bank wire at a 3% margin, you lose roughly ₹15,000/year. Switching to Wise or InstaReM (0.5% margin) cuts that to ₹2,500/year — a saving of ₹12,500 every year for the same transfers.</p>
+      <div class="art-callout"><strong>Tax note:</strong> Remittances to India from NRE funds are not taxable. Money in NRO accounts being repatriated may require Form 15CA/15CB above ₹5L. Gifts to parents up to ₹50,000/year from relatives are tax-free for the recipient.</div>
+      <div class="art-cta"><div><div class="art-cta-text">See Live Rates for Your Currency</div><div class="art-cta-sub">Compare all providers side-by-side right now</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('rates',document.querySelector('[data-tab=rates]'))">Compare Rates Now &#8594;</button></div>
+    `},
+  'return-planner':{
+    tag:'planning',
+    metaTitle:'How to Use the NRI Return Planner — Simulate Corpus & Retirement (2026)',
+    metaDesc:'Step-by-step guide to using the Return Planner tool: enter savings, years abroad, monthly expenses, and see exactly how long your corpus will last in India.',
+    metaKw:'NRI return to India planner, NRI retirement corpus calculator, return to India financial planning, NRI corpus simulation',tagLabel:'Planning',readTime:'5 min read',
+    title:'How to Use the Return Planner: Simulate Your Corpus & Retirement',
+    content:`
+      <div class="art-callout indigo"><strong>What this tool does:</strong> The Return Planner projects your corpus at the time you return to India, then simulates year-by-year how long that corpus survives based on your expenses, income, inflation, and investment returns.</div>
+
+      <h2>Step 1 — Enter Your Savings Profile</h2>
+      <p><strong>Current Savings Abroad (₹ Lakhs):</strong> The total amount you have invested or saved today — NRE FDs, mutual funds, PPF, overseas savings converted to ₹. If you hold foreign currency, use today's exchange rate to estimate the ₹ equivalent.</p>
+      <p><strong>Monthly Savings Rate (₹ Lakhs/mo):</strong> How much you add to this corpus every month. Include SIP, FD instalments, or any disciplined savings. Even ₹50,000/month (₹0.5L) makes a dramatic difference over 10 years.</p>
+      <p>As you type, the tool shows you the <strong>local currency equivalent</strong> (e.g., MYR, USD, AED) so you can quickly cross-check against your payslip.</p>
+
+      <h2>Step 2 — Set Your Return Timeline</h2>
+      <p><strong>Years Until You Return:</strong> How many more years you plan to stay abroad and keep saving. The tool instantly shows you the <strong>projected corpus at return date</strong>, compounding your current savings and monthly contributions at your chosen ROI.</p>
+      <p>Try changing this number and watch the projected corpus update — this is the most powerful input. An extra 2–3 years abroad can add crores to your corpus.</p>
+      <table class="art-table">
+        <thead><tr><th>Current Savings</th><th>Monthly SIP</th><th>ROI</th><th>5 Years</th><th>10 Years</th><th>15 Years</th></tr></thead>
+        <tbody>
+          <tr><td>₹50L</td><td>₹1.5L/mo</td><td>8%</td><td>~₹1.9 Cr</td><td>~₹4.0 Cr</td><td>~₹7.0 Cr</td></tr>
+          <tr><td>₹1 Cr</td><td>₹2L/mo</td><td>8%</td><td>~₹3.1 Cr</td><td>~₹5.7 Cr</td><td>~₹9.2 Cr</td></tr>
+          <tr><td>₹50L</td><td>₹1.5L/mo</td><td>10%</td><td>~₹2.1 Cr</td><td>~₹4.9 Cr</td><td>~₹9.5 Cr</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Step 3 — Set Your Post-Return Expenses</h2>
+      <p><strong>Monthly Expenses in India (₹/mo):</strong> Your expected spending after returning — rent/EMI, groceries, utilities, education, healthcare, travel, lifestyle. Be realistic. Most NRIs underestimate this because they forget how expensive children's education and healthcare become.</p>
+      <p>A practical benchmark: if you currently spend MYR 8,000/month abroad, a comfortable India equivalent is around ₹1.5–2L/month in a metro.</p>
+      <p><strong>India Inflation Rate (% p.a.):</strong> Default is 6%, which is the historical average for India. Healthcare and education inflate faster (8–10%), so if those are major buckets for you, nudge this to 7%.</p>
+
+      <h2>Step 4 — Set Corpus Return & Income</h2>
+      <p><strong>Investment Return on Corpus (% p.a.):</strong> The return your corpus earns after you return. Assume 8–9% for a balanced equity+debt portfolio, or 6–7% for a conservative FD-heavy approach. Do not use aggressive equity-only assumptions for money you'll actually be spending.</p>
+      <p><strong>Expected India Income After Return (₹/mo):</strong> Any income you'll earn in India — consultancy, rental income, part-time work, pension, interest from FDs. This reduces how much you withdraw from the corpus each month. Even ₹30,000/month in rental income can add 5–7 years to corpus life.</p>
+
+      <h2>Reading the Results</h2>
+      <p>After clicking Calculate, you'll see four key outputs:</p>
+      <ul>
+        <li><strong>Projected Corpus at Return:</strong> What you'll have when you land in India, based on your savings + contributions + ROI over the years until return.</li>
+        <li><strong>Corpus Survives X Years:</strong> How many years your money lasts given your expenses, income, inflation, and investment returns.</li>
+        <li><strong>Break-Even Monthly (Zero in 40 yrs):</strong> The maximum monthly spend that allows your corpus to last exactly 40 years — useful for setting a budget ceiling.</li>
+        <li><strong>Sustainable Monthly (Forever):</strong> Monthly spend at which your corpus never depletes — the interest earned covers all withdrawals indefinitely.</li>
+      </ul>
+
+      <h2>The Year-by-Year Table</h2>
+      <p>Click <strong>▼ Year-by-Year Table</strong> to expand the full simulation. Each row shows:</p>
+      <ul>
+        <li><strong>Opening / Closing Corpus:</strong> Balance at start and end of each year. Watch for the year the closing balance turns red — that is when you run out of money.</li>
+        <li><strong>Investment Returns:</strong> What your corpus earned that year (grows as the corpus grows).</li>
+        <li><strong>Net Annual Expenses:</strong> Your total spend minus any income — this is what actually gets withdrawn from the corpus.</li>
+      </ul>
+      <div class="art-callout"><strong>Pro tip — stress test your plan:</strong> Run the calculation twice. First with your "base case" numbers. Then increase expenses by 20% and reduce ROI by 1%. If the corpus still survives 30+ years in the stress case, your plan is solid. If it collapses to 15 years, you need a larger corpus or lower expenses.</div>
+
+      <h2>Common Mistakes to Avoid</h2>
+      <p><strong>Ignoring inflation:</strong> Many people enter today's expenses and use a 0% inflation assumption. At 6% inflation, ₹1L/month today becomes ₹1.8L/month in 10 years. The planner auto-escalates expenses by your entered inflation rate each year.</p>
+      <p><strong>Over-estimating ROI:</strong> Using 12–15% equity returns for your post-retirement corpus is dangerous. You can't afford a 3-year market downturn when you're actually spending the money. Use 7–9% max.</p>
+      <p><strong>Forgetting one-time costs:</strong> Children's higher education, medical emergencies, home purchase. Add ₹30–50L to your required corpus as a one-time buffer for these.</p>
+
+      <div class="art-cta"><div><div class="art-cta-text">Open the Return Planner</div><div class="art-cta-sub">Run your numbers with the interactive simulation</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('return',document.querySelector('[data-tab=return]'))">Open Return Planner &#8594;</button></div>
+    `},
+  'retirement':{
+    tag:'planning',
+    metaTitle:'NRI Retirement Planning with SIP and SWP — Complete India Guide 2026',
+    metaDesc:'How to build a retirement corpus using SIP while abroad and sustainably withdraw using SWP after returning to India. With real corpus numbers and tax tips.',
+    metaKw:'NRI retirement planning India, SIP SWP NRI, retire in India corpus, NRI retirement calculator 2026',tagLabel:'Planning',readTime:'7 min read',
+    title:'How to Plan Your India Retirement Using SIP & SWP',
+    content:`
+      <div class="art-callout indigo"><strong>The two-phase framework:</strong> Phase 1 — Accumulate a corpus using SIP (Systematic Investment Plan) while you're earning abroad. Phase 2 — Withdraw sustainably using SWP (Systematic Withdrawal Plan) after you return to India.</div>
+      <h2>What Corpus Do You Actually Need?</h2>
+      <p>The most common question — and the most personal. But here's a framework:</p>
+      <ul>
+        <li>Estimate your monthly expenses in India in today's money (include rent/EMI, food, healthcare, lifestyle, travel)</li>
+        <li>Apply the <strong>25× rule</strong>: corpus needed = annual expenses × 25. This assumes a 4% annual withdrawal rate, which is considered sustainable for 30 years</li>
+        <li>Add a buffer of 20% for healthcare costs that rise faster than inflation</li>
+      </ul>
+      <p>Example: If you need ₹1.5L/month (₹18L/year), your target corpus is ₹18L × 25 = <strong>₹4.5 crore</strong>. With 20% healthcare buffer, aim for ₹5.4 crore.</p>
+      <h2>Building the Corpus with SIP</h2>
+      <p>SIP in Indian equity mutual funds is the most efficient accumulation tool for NRIs. Key facts:</p>
+      <ul>
+        <li>NRIs can invest in Indian mutual funds from their NRE account (tax-free returns on equity gains up to ₹1.25L/year)</li>
+        <li>Historical equity mutual fund returns: 12–15% CAGR over 10+ year periods</li>
+        <li>Use <strong>step-up SIP</strong> — increase your SIP by 10% each year to match salary growth. This dramatically accelerates corpus building</li>
+      </ul>
+      <table class="art-table">
+        <thead><tr><th>Monthly SIP</th><th>Step-Up</th><th>Years</th><th>Corpus (at 12%)</th></tr></thead>
+        <tbody>
+          <tr><td>₹25,000</td><td>10%/yr</td><td>15</td><td>~₹1.8 Cr</td></tr>
+          <tr><td>₹50,000</td><td>10%/yr</td><td>15</td><td>~₹3.7 Cr</td></tr>
+          <tr><td>₹1,00,000</td><td>10%/yr</td><td>15</td><td>~₹7.4 Cr</td></tr>
+          <tr><td>₹50,000</td><td>10%/yr</td><td>20</td><td>~₹8.5 Cr</td></tr>
+        </tbody>
+      </table>
+      <h2>Withdrawing Sustainably with SWP</h2>
+      <p>Once you return to India and stop earning, switch to SWP from your corpus. Instead of selling mutual fund units in a lump sum, SWP sells just enough units each month to fund your withdrawal — while the remaining corpus keeps compounding.</p>
+      <ul>
+        <li>Keep withdrawal rate at or below 4–5% of corpus per year for long-term sustainability</li>
+        <li>Step up your withdrawal by 5–6% per year to offset inflation</li>
+        <li>Keep 1–2 years of expenses in liquid funds / FD as a buffer — don't touch equity in a market downturn</li>
+      </ul>
+      <div class="art-callout"><strong>The bucket strategy:</strong> Bucket 1 — 2 years expenses in FD/liquid fund. Bucket 2 — next 5 years in balanced/hybrid funds. Bucket 3 — remaining in equity funds. Refill Bucket 1 from Bucket 2 annually, and Bucket 2 from Bucket 3 every 3–4 years.</div>
+      <h2>Tax on SWP After Return to India</h2>
+      <p>When you return and become a resident, your SWP withdrawals from equity funds are taxed as capital gains:</p>
+      <ul>
+        <li><strong>LTCG</strong> (units held &gt;1 year): 12.5% on gains above ₹1.25L/year</li>
+        <li><strong>STCG</strong> (units held &lt;1 year): 20%</li>
+        <li>Debt fund gains: Taxed at slab rate regardless of holding period (post-2023)</li>
+      </ul>
+      <p>Structure your SWP to stay within the ₹1.25L LTCG exemption where possible, especially in early retirement years.</p>
+      <div class="art-cta"><div><div class="art-cta-text">Try the SIP &amp; SWP Calculator</div><div class="art-cta-sub">Model your accumulation and withdrawal plan with real numbers</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('invest',document.querySelector('[data-tab=invest]'))">Open SIP / SWP Calculator &#8594;</button></div>
+    `}
+};
+function openArticle(key){
+  const art=ARTICLES[key];
+  if(!art)return;
+  // ── SEO: update title, meta description, og tags & URL hash ──
+  const seoTitle=art.metaTitle||art.title+' | NRI Finance Hub';
+  const seoDesc=art.metaDesc||art.title;
+  document.title=seoTitle;
+  let dm=document.querySelector('meta[name="description"]');
+  if(dm)dm.setAttribute('content',seoDesc);
+  let ogT=document.querySelector('meta[property="og:title"]');
+  if(ogT)ogT.setAttribute('content',seoTitle);
+  let ogD=document.querySelector('meta[property="og:description"]');
+  if(ogD)ogD.setAttribute('content',seoDesc);
+  let ogU=document.querySelector('meta[property="og:url"]');
+  if(ogU)ogU.setAttribute('content','https://nri-finance-hub.pages.dev/#article/'+key);
+  history.replaceState(null,'','#article/'+key);
+  // ── Render article ──
+  const tagClass=art.tag;
+  document.getElementById('art-content').innerHTML=`
+    <span class="art-reader-tag art-tag ${tagClass}">${art.tagLabel}</span>
+    <h1>${art.title}</h1>
+    <div class="art-reader-meta">&#128337; ${art.readTime} &nbsp;·&nbsp; Last updated June 2026 &nbsp;·&nbsp; For informational purposes only</div>
+    ${art.content}`;
+  document.getElementById('art-list').style.display='none';
+  document.getElementById('art-reader').style.display='block';
+  setTimeout(()=>{
+    const el=document.getElementById('tab-articles');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  },30);
+}
+function closeArticle(){
+  document.getElementById('art-reader').style.display='none';
+  document.getElementById('art-list').style.display='block';
+  // Restore base meta
+  document.title='NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad';
+  let dm=document.querySelector('meta[name="description"]');
+  if(dm)dm.setAttribute('content','Free tools for NRIs: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner, DTAA tax guide and India return planner.');
+  history.replaceState(null,'','#guides');
+}
 </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
