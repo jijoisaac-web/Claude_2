@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NRI Finance Hub — Live Remittance Rates & Calculators for Indians Abroad</title>
 <meta name="description" content="Compare live remittance rates, NRE/NRO bank interest rates, home loan amortization, and inflation-adjusted return planner for Indians abroad."/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -46,14 +47,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .cur-select-wrap select option{background:#182248;}
 
 /* HERO */
-.hero{padding-top:68px;position:relative;overflow:hidden;min-height:100vh;display:flex;align-items:center;}
+.hero{padding-top:68px;position:relative;overflow:hidden;min-height:auto;display:flex;align-items:center;}
 .hero-bg{position:absolute;inset:0;z-index:0;background:url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;opacity:0.13;pointer-events:none;}
 .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--bg) 0%,transparent 60%,var(--bg) 100%);}
 .hero-inner{position:relative;z-index:1;}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 15% 45%,rgba(99,102,241,0.14) 0%,transparent 65%),radial-gradient(ellipse 40% 50% at 85% 25%,rgba(240,165,32,0.1) 0%,transparent 65%),radial-gradient(ellipse 30% 40% at 70% 75%,rgba(0,205,176,0.08) 0%,transparent 60%);pointer-events:none;}
 .hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(100,130,220,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(100,130,220,0.04) 1px,transparent 1px);background-size:72px 72px;pointer-events:none;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);}
-.hero-inner{max-width:1100px;margin:0 auto;padding:60px 32px;display:grid;grid-template-columns:1fr 400px;gap:60px;align-items:center;position:relative;z-index:1;width:100%;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--amber-dim);border:1px solid var(--amber-glow);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--amber);margin-bottom:28px;animation:fadeUp 0.6s ease both;}
+.hero-inner{max-width:1100px;margin:0 auto;padding:28px 32px 24px;display:grid;grid-template-columns:1fr 380px;gap:44px;align-items:start;position:relative;z-index:1;width:100%;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--amber-dim);border:1px solid var(--amber-glow);border-radius:100px;padding:5px 14px;font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:14px;animation:fadeUp 0.6s ease both;}
 .hero h1{font-size:clamp(40px,5.5vw,70px);font-weight:900;line-height:1.06;letter-spacing:-2.5px;color:#fff;margin-bottom:20px;animation:fadeUp 0.6s 0.1s ease both;}
 .hero h1 em{font-style:normal;background:linear-gradient(135deg,#f0a520,#fbbf24,#f0a520);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hero-sub{font-size:17px;color:var(--text2);line-height:1.7;margin-bottom:40px;animation:fadeUp 0.6s 0.2s ease both;max-width:500px;}
@@ -62,7 +63,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .hero-input:focus{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
 .hero-from-tag{background:var(--elevated);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;font-size:14px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:6px;white-space:nowrap;}
 .hero-from-tag span{color:var(--amber);}
-.hero-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;border-radius:12px;padding:14px 26px;font-size:15px;font-weight:800;letter-spacing:-0.2px;transition:transform 0.15s,box-shadow 0.15s;white-space:nowrap;box-shadow:0 6px 24px rgba(240,165,32,0.35);}
+.hero-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:transform 0.15s,box-shadow 0.15s;white-space:nowrap;box-shadow:0 6px 24px rgba(240,165,32,0.35);}
 .hero-cta:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(240,165,32,0.5);}
 .hero-stats{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:fadeUp 0.6s 0.4s ease both;width:fit-content;}
 .hstat{padding:16px 26px;display:flex;flex-direction:column;align-items:center;border-right:1px solid var(--border);}
@@ -72,11 +73,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 
 /* HERO RIGHT - Rate Preview Card */
 .hero-right{animation:fadeUp 0.7s 0.35s ease both;}
-.rate-preview-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:24px;position:relative;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.03);}
+.rate-preview-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:14px;position:relative;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.03);}
 .rate-preview-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,165,32,0.5),transparent);}
 .rpc-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;}
-.rpc-rows{display:flex;flex-direction:column;gap:10px;}
-.rpc-row{display:flex;align-items:center;gap:12px;background:var(--elevated);border-radius:12px;padding:12px 16px;}
+.rpc-rows{display:flex;flex-direction:column;gap:6px;}
+.rpc-row{display:flex;align-items:center;gap:10px;background:var(--elevated);border-radius:10px;padding:8px 12px;}
 .rpc-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;}
 .rpc-info{flex:1;}
 .rpc-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
@@ -284,8 +285,16 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   .hero h1{font-size:36px;letter-spacing:-1.5px;}
   .hero-sub{font-size:15px;}
   .main{padding:32px 16px 72px;}
-  .rate-row{grid-template-columns:auto 1fr auto;gap:10px;}
-  .pbar-col{display:none;}
+  .rate-row{grid-template-columns:auto 1fr;gap:10px;padding:13px 14px;}
+  .rate-row .rate-cta{display:none;}
+  .pbar-col{min-width:0;width:100%;}
+  .pamount{font-size:16px;}
+  .pname{font-size:13px;}
+  .pmeta{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pbar-col .rate-cta-mobile{display:inline-block !important;}
+  .rate-row-mobile-cta{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;}
+  .rate-cta-sm{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;}
+  .rate-row-mobile-cta{display:flex;}
   .tab-btn{font-size:12px;padding:11px 12px;}
 }
 @media print{
@@ -307,7 +316,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 }
 .cur-btn:hover{border-color:var(--amber);}
 .cur-btn-inner{display:flex;align-items:center;gap:8px;}
-.cur-btn-flag{font-size:20px;line-height:1;}
+.cur-btn-flag{display:flex;align-items:center;line-height:1;}
 .cur-btn-meta{display:flex;flex-direction:column;align-items:flex-start;}
 .cur-btn-code{font-size:14px;font-weight:800;line-height:1.2;}
 .cur-btn-region{font-size:10px;color:var(--muted);font-weight:500;line-height:1;}
@@ -338,7 +347,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 }
 .cur-item:hover{background:var(--elevated);}
 .cur-item.active{background:var(--amber-dim);border:1px solid var(--amber-glow);}
-.ci-flag{font-size:22px;line-height:1;flex-shrink:0;}
+.ci-flag{display:flex;align-items:center;line-height:1;flex-shrink:0;}
 .ci-info{flex:1;}
 .ci-code{font-size:14px;font-weight:800;color:var(--text);display:block;line-height:1.2;}
 .ci-name{font-size:11px;color:var(--muted);line-height:1.4;}
@@ -417,14 +426,14 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 /* ── DASHBOARD REDESIGN ─────────────────────────────────────────────────────── */
 
 /* Hero rate display */
-.hrd-eyebrow{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.hrd-main{display:flex;align-items:flex-end;gap:4px;margin-bottom:12px;line-height:1;}
-.hrd-sym{font-size:40px;font-weight:900;color:var(--text2);padding-bottom:8px;}
-.hrd-val{font-size:80px;font-weight:900;color:var(--amber);letter-spacing:-3px;transition:all 0.45s cubic-bezier(0.34,1.56,0.64,1);}
+.hrd-eyebrow{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.hrd-main{display:flex;align-items:flex-end;gap:4px;margin-bottom:8px;line-height:1;}
+.hrd-sym{font-size:30px;font-weight:900;color:var(--text2);padding-bottom:5px;}
+.hrd-val{font-size:64px;font-weight:900;color:var(--amber);letter-spacing:-2px;transition:all 0.45s cubic-bezier(0.34,1.56,0.64,1);}
 .hrd-status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:22px;min-height:20px;}
 
 /* Amount conversion bar */
-.har{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;padding:13px 18px;margin-bottom:18px;flex-wrap:wrap;transition:border-color 0.2s;}
+.har{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;padding:10px 14px;margin-bottom:12px;flex-wrap:wrap;transition:border-color 0.2s;}
 .har:focus-within{border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
 .har-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;}
 .har-inp{background:transparent;border:none;font-size:24px;font-weight:900;color:var(--text);width:110px;outline:none;letter-spacing:-0.5px;}
@@ -433,26 +442,26 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .har-rcv{font-size:22px;font-weight:900;color:var(--green);letter-spacing:-0.5px;white-space:nowrap;transition:all 0.35s;}
 
 /* Country flag pills */
-.cflags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:26px;}
+.cflags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
 .cflag{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:100px;border:1px solid var(--border);background:var(--elevated);color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;-webkit-tap-highlight-color:transparent;}
 .cflag:hover{border-color:var(--amber-glow);background:var(--amber-dim);color:var(--amber);}
 .cflag.active{border-color:var(--amber);background:var(--amber-dim);color:var(--amber);}
 
 /* Tool launcher */
-.tool-launcher{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:22px;box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.03);position:relative;overflow:hidden;}
+.tool-launcher{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:16px;box-shadow:0 24px 64px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.03);position:relative;overflow:hidden;}
 .tool-launcher::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,165,32,0.45),transparent);}
-.tl-hd{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:14px;}
-.tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.tl-card{background:var(--elevated);border:1px solid var(--border);border-radius:13px;padding:14px 15px;cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
+.tl-hd{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:10px;}
+.tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tl-card{background:var(--elevated);border:1px solid var(--border);border-radius:11px;padding:10px 12px;cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 .tl-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--amber-dim),transparent);opacity:0;transition:opacity 0.18s;pointer-events:none;}
 .tl-card:hover{border-color:var(--amber-glow);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .tl-card:hover::after{opacity:1;}
 .tl-card:active{transform:scale(0.97);}
 .tl-card-wide{grid-column:1/-1;display:flex;align-items:center;gap:14px;}
 .tl-card-wide .tl-ds{margin-top:0;}
-.tl-ico{font-size:20px;margin-bottom:5px;display:block;position:relative;z-index:1;}
+.tl-ico{font-size:18px;margin-bottom:4px;display:block;position:relative;z-index:1;}
 .tl-card-wide .tl-ico{margin-bottom:0;font-size:22px;}
-.tl-nm{font-size:13px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
+.tl-nm{font-size:12px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
 .tl-ds{font-size:11px;color:var(--muted);margin-top:3px;position:relative;z-index:1;line-height:1.4;}
 .tl-card-wide .tl-body{flex:1;}
 
@@ -497,6 +506,61 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   .tl-grid{grid-template-columns:1fr 1fr;}
   .dash-inner{grid-template-columns:1fr 1fr;}
 }
+
+.calc-cur-bar{display:flex;align-items:center;gap:10px;background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:20px;flex-wrap:wrap;}
+.ccb-flag{display:flex;align-items:center;flex-shrink:0;}
+.ccb-rate{font-size:13px;font-weight:700;color:var(--text);}
+.ccb-rate span{color:var(--teal);}
+.ccb-sep{color:var(--border2);margin:0 2px;}
+.ccb-convert{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.ccb-inp{width:90px;padding:5px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;outline:none;}
+.ccb-inp:focus{border-color:var(--amber);}
+.ccb-result{font-size:13px;font-weight:700;color:var(--green);min-width:80px;}
+@media(max-width:600px){.ccb-convert{margin-left:0;width:100%;}}
+
+
+.ri-local{font-size:11.5px;color:var(--teal);font-weight:700;margin-top:3px;opacity:0.9;}
+.ri-local-val{font-size:12px;color:var(--teal);font-weight:700;}
+.rp-dual{display:flex;flex-direction:column;gap:2px;}
+.rp-local{font-size:12px;color:var(--teal);font-weight:700;margin-top:2px;}
+
+
+/* ── RETURN CHECKLIST ─────────────────────────────────────────────────── */
+.checklist-card{margin-top:24px;}
+.cl-progress-wrap{margin-bottom:24px;}
+.cl-progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.cl-progress-label{font-size:13px;font-weight:700;color:var(--text2);}
+.cl-progress-pct{font-size:18px;font-weight:900;color:var(--green);}
+.cl-progress-bar{height:8px;background:var(--elevated);border-radius:100px;overflow:hidden;}
+.cl-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:100px;transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+.cl-phase{margin-bottom:28px;}
+.cl-phase-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.cl-phase-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;}
+.cl-phase-num.p1{background:var(--amber-dim);color:var(--amber);border:1.5px solid var(--amber-glow);}
+.cl-phase-num.p2{background:var(--teal-dim);color:var(--teal);border:1.5px solid rgba(0,205,176,0.3);}
+.cl-phase-num.p3{background:var(--green-dim);color:var(--green);border:1.5px solid rgba(34,211,154,0.3);}
+.cl-phase-title{font-size:14px;font-weight:800;color:var(--text);}
+.cl-phase-sub{font-size:12px;color:var(--muted);margin-left:auto;white-space:nowrap;}
+.cl-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:11px;margin-bottom:6px;border:1px solid transparent;transition:all 0.2s;cursor:pointer;position:relative;}
+.cl-item:hover{background:var(--elevated);border-color:var(--border);}
+.cl-item.done{background:rgba(34,211,154,0.05);border-color:rgba(34,211,154,0.15);}
+.cl-cb{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);background:var(--surface);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.cl-item.done .cl-cb{background:var(--green);border-color:var(--green);}
+.cl-cb-check{color:#fff;font-size:12px;font-weight:900;opacity:0;transition:opacity 0.15s;}
+.cl-item.done .cl-cb-check{opacity:1;}
+.cl-body{flex:1;min-width:0;}
+.cl-title{font-size:13.5px;font-weight:700;color:var(--text);line-height:1.35;transition:color 0.2s;}
+.cl-item.done .cl-title{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(106,127,168,0.5);}
+.cl-tip{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.cl-link{font-size:12px;color:var(--amber);font-weight:600;text-decoration:none;cursor:pointer;background:none;border:none;padding:0;margin-top:4px;display:inline-block;}
+.cl-link:hover{text-decoration:underline;}
+.cl-reset{margin-top:16px;text-align:right;}
+.cl-reset-btn{background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;}
+.cl-reset-btn:hover{border-color:var(--red);color:var(--red);}
+
+
+.rate-row-mobile-cta{display:none;}
+
 </style>
 </head>
 <body>
@@ -521,7 +585,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <div class="cur-dropdown" id="curDropdown">
       <button class="cur-btn" id="curBtn" onclick="toggleCurDropdown(event)">
         <div class="cur-btn-inner">
-          <span class="cur-btn-flag" id="curBtnFlag">&#127462;&#127466;</span>
+          <span class="cur-btn-flag" id="curBtnFlag"><span class="fi fi-ae fis" style="font-size:24px;border-radius:3px;line-height:1;"></span></span>
           <div class="cur-btn-meta">
             <span class="cur-btn-code" id="curBtnCode">AED</span>
             <span class="cur-btn-region" id="curBtnRegion">Gulf</span>
@@ -531,24 +595,24 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </button>
       <div class="cur-panel" id="curPanel">
         <div class="cur-group-hd"><span>&#127944; Gulf</span></div>
-        <div class="cur-item active" data-val="AED" data-flag="&#127462;&#127466;" data-name="UAE Dirham" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127462;&#127466;</span><div class="ci-info"><span class="ci-code">AED</span><span class="ci-name">UAE &mdash; Dirham</span></div><span class="ci-check" id="ck-AED">&#10003;</span></div>
-        <div class="cur-item" data-val="SAR" data-flag="&#127462;&#127464;" data-name="Saudi Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127462;&#127464;</span><div class="ci-info"><span class="ci-code">SAR</span><span class="ci-name">Saudi Arabia &mdash; Riyal</span></div><span class="ci-check" id="ck-SAR" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="QAR" data-flag="&#127474;&#127480;" data-name="Qatari Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127474;&#127480;</span><div class="ci-info"><span class="ci-code">QAR</span><span class="ci-name">Qatar &mdash; Riyal</span></div><span class="ci-check" id="ck-QAR" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="KWD" data-flag="&#127472;&#127484;" data-name="Kuwaiti Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127472;&#127484;</span><div class="ci-info"><span class="ci-code">KWD</span><span class="ci-name">Kuwait &mdash; Dinar</span></div><span class="ci-check" id="ck-KWD" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="BHD" data-flag="&#127463;&#127469;" data-name="Bahraini Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127463;&#127469;</span><div class="ci-info"><span class="ci-code">BHD</span><span class="ci-name">Bahrain &mdash; Dinar</span></div><span class="ci-check" id="ck-BHD" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="OMR" data-flag="&#127476;&#127474;" data-name="Omani Rial" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag">&#127476;&#127474;</span><div class="ci-info"><span class="ci-code">OMR</span><span class="ci-name">Oman &mdash; Rial</span></div><span class="ci-check" id="ck-OMR" style="display:none">&#10003;</span></div>
+        <div class="cur-item active" data-val="AED" data-flag="&#127462;&#127466;" data-name="UAE Dirham" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ae" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">AED</span><span class="ci-name">UAE &mdash; Dirham</span></div><span class="ci-check" id="ck-AED">&#10003;</span></div>
+        <div class="cur-item" data-val="SAR" data-flag="&#127462;&#127464;" data-name="Saudi Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">SAR</span><span class="ci-name">Saudi Arabia &mdash; Riyal</span></div><span class="ci-check" id="ck-SAR" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="QAR" data-flag="&#127474;&#127480;" data-name="Qatari Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-qa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">QAR</span><span class="ci-name">Qatar &mdash; Riyal</span></div><span class="ci-check" id="ck-QAR" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="KWD" data-flag="&#127472;&#127484;" data-name="Kuwaiti Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-kw" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">KWD</span><span class="ci-name">Kuwait &mdash; Dinar</span></div><span class="ci-check" id="ck-KWD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="BHD" data-flag="&#127463;&#127469;" data-name="Bahraini Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-bh" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">BHD</span><span class="ci-name">Bahrain &mdash; Dinar</span></div><span class="ci-check" id="ck-BHD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="OMR" data-flag="&#127476;&#127474;" data-name="Omani Rial" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-om" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">OMR</span><span class="ci-name">Oman &mdash; Rial</span></div><span class="ci-check" id="ck-OMR" style="display:none">&#10003;</span></div>
         <div class="cur-group-hd"><span>&#127758; SE Asia</span></div>
-        <div class="cur-item" data-val="MYR" data-flag="&#127474;&#127486;" data-name="Malaysian Ringgit" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag">&#127474;&#127486;</span><div class="ci-info"><span class="ci-code">MYR</span><span class="ci-name">Malaysia &mdash; Ringgit</span></div><span class="ci-check" id="ck-MYR" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="SGD" data-flag="&#127480;&#127468;" data-name="Singapore Dollar" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag">&#127480;&#127468;</span><div class="ci-info"><span class="ci-code">SGD</span><span class="ci-name">Singapore &mdash; Dollar</span></div><span class="ci-check" id="ck-SGD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="MYR" data-flag="&#127474;&#127486;" data-name="Malaysian Ringgit" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-my" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">MYR</span><span class="ci-name">Malaysia &mdash; Ringgit</span></div><span class="ci-check" id="ck-MYR" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="SGD" data-flag="&#127480;&#127468;" data-name="Singapore Dollar" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sg" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">SGD</span><span class="ci-name">Singapore &mdash; Dollar</span></div><span class="ci-check" id="ck-SGD" style="display:none">&#10003;</span></div>
         <div class="cur-group-hd"><span>&#127758; Oceania</span></div>
-        <div class="cur-item" data-val="AUD" data-flag="&#127462;&#127482;" data-name="Australian Dollar" data-region="Oceania" onclick="selectCurrency(this)"><span class="ci-flag">&#127462;&#127482;</span><div class="ci-info"><span class="ci-code">AUD</span><span class="ci-name">Australia &mdash; Dollar</span></div><span class="ci-check" id="ck-AUD" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="NZD" data-flag="&#127475;&#127487;" data-name="NZ Dollar" data-region="Oceania" onclick="selectCurrency(this)"><span class="ci-flag">&#127475;&#127487;</span><div class="ci-info"><span class="ci-code">NZD</span><span class="ci-name">New Zealand &mdash; Dollar</span></div><span class="ci-check" id="ck-NZD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="AUD" data-flag="&#127462;&#127482;" data-name="Australian Dollar" data-region="Oceania" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-au" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">AUD</span><span class="ci-name">Australia &mdash; Dollar</span></div><span class="ci-check" id="ck-AUD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="NZD" data-flag="&#127475;&#127487;" data-name="NZ Dollar" data-region="Oceania" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-nz" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">NZD</span><span class="ci-name">New Zealand &mdash; Dollar</span></div><span class="ci-check" id="ck-NZD" style="display:none">&#10003;</span></div>
         <div class="cur-group-hd"><span>&#127468;&#127463; Americas</span></div>
-        <div class="cur-item" data-val="USD" data-flag="&#127482;&#127480;" data-name="US Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag">&#127482;&#127480;</span><div class="ci-info"><span class="ci-code">USD</span><span class="ci-name">USA &mdash; Dollar</span></div><span class="ci-check" id="ck-USD" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="CAD" data-flag="&#127464;&#127462;" data-name="Canadian Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag">&#127464;&#127462;</span><div class="ci-info"><span class="ci-code">CAD</span><span class="ci-name">Canada &mdash; Dollar</span></div><span class="ci-check" id="ck-CAD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="USD" data-flag="&#127482;&#127480;" data-name="US Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-us" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">USD</span><span class="ci-name">USA &mdash; Dollar</span></div><span class="ci-check" id="ck-USD" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="CAD" data-flag="&#127464;&#127462;" data-name="Canadian Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ca" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">CAD</span><span class="ci-name">Canada &mdash; Dollar</span></div><span class="ci-check" id="ck-CAD" style="display:none">&#10003;</span></div>
         <div class="cur-group-hd"><span>&#127482;&#127462; Europe</span></div>
-        <div class="cur-item" data-val="EUR" data-flag="&#127466;&#127482;" data-name="Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag">&#127466;&#127482;</span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Eurozone &mdash; Euro</span></div><span class="ci-check" id="ck-EUR" style="display:none">&#10003;</span></div>
-        <div class="cur-item" data-val="GBP" data-flag="&#127468;&#127463;" data-name="British Pound" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag">&#127468;&#127463;</span><div class="ci-info"><span class="ci-code">GBP</span><span class="ci-name">UK &mdash; Pound Sterling</span></div><span class="ci-check" id="ck-GBP" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="EUR" data-flag="&#127466;&#127482;" data-name="Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-eu" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Eurozone &mdash; Euro</span></div><span class="ci-check" id="ck-EUR" style="display:none">&#10003;</span></div>
+        <div class="cur-item" data-val="GBP" data-flag="&#127468;&#127463;" data-name="British Pound" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-gb" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">GBP</span><span class="ci-name">UK &mdash; Pound Sterling</span></div><span class="ci-check" id="ck-GBP" style="display:none">&#10003;</span></div>
       </div>
     </div>
   </div>
@@ -581,16 +645,16 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <!-- Country flag quick-select -->
       <div class="cflags">
-        <button class="cflag active" onclick="quickSelectCur('AED',this)">&#127462;&#127466; AED</button>
-        <button class="cflag" onclick="quickSelectCur('SAR',this)">&#127462;&#127464; SAR</button>
-        <button class="cflag" onclick="quickSelectCur('QAR',this)">&#127474;&#127480; QAR</button>
-        <button class="cflag" onclick="quickSelectCur('KWD',this)">&#127472;&#127484; KWD</button>
-        <button class="cflag" onclick="quickSelectCur('MYR',this)">&#127474;&#127486; MYR</button>
-        <button class="cflag" onclick="quickSelectCur('SGD',this)">&#127480;&#127468; SGD</button>
-        <button class="cflag" onclick="quickSelectCur('AUD',this)">&#127462;&#127482; AUD</button>
-        <button class="cflag" onclick="quickSelectCur('USD',this)">&#127482;&#127480; USD</button>
-        <button class="cflag" onclick="quickSelectCur('GBP',this)">&#127468;&#127463; GBP</button>
-        <button class="cflag" onclick="quickSelectCur('EUR',this)">&#127466;&#127482; EUR</button>
+        <button class="cflag active" onclick="quickSelectCur('AED',this)"><span class="fi fi-ae" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AED</button>
+        <button class="cflag" onclick="quickSelectCur('SAR',this)"><span class="fi fi-sa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SAR</button>
+        <button class="cflag" onclick="quickSelectCur('QAR',this)"><span class="fi fi-qa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> QAR</button>
+        <button class="cflag" onclick="quickSelectCur('KWD',this)"><span class="fi fi-kw" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> KWD</button>
+        <button class="cflag" onclick="quickSelectCur('MYR',this)"><span class="fi fi-my" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> MYR</button>
+        <button class="cflag" onclick="quickSelectCur('SGD',this)"><span class="fi fi-sg" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SGD</button>
+        <button class="cflag" onclick="quickSelectCur('AUD',this)"><span class="fi fi-au" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AUD</button>
+        <button class="cflag" onclick="quickSelectCur('USD',this)"><span class="fi fi-us" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> USD</button>
+        <button class="cflag" onclick="quickSelectCur('GBP',this)"><span class="fi fi-gb" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> GBP</button>
+        <button class="cflag" onclick="quickSelectCur('EUR',this)"><span class="fi fi-eu" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> EUR</button>
       </div>
       <button class="hero-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">Compare All Providers &rarr;</button>
     </div>
@@ -616,15 +680,17 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
             <span class="tl-ico">&#128176;</span><div class="tl-nm">Tax &amp; DTAA</div><div class="tl-ds">Save on TDS</div>
           </div>
           <div class="tl-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'))">
-            <span class="tl-ico">&#127864;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
+            <span class="tl-ico">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
           </div>
-          <div class="tl-card tl-card-wide" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
-            <span class="tl-ico">&#9992;&#65039;</span>
-            <div class="tl-body"><div class="tl-nm">Return Planner</div><div class="tl-ds">How much corpus to retire back to India?</div></div>
+          <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
+            <span class="tl-ico">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
+          </div>
+          <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
+            <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return Planner</div><div class="tl-ds">Corpus & checklist</div>
           </div>
         </div>
       </div>
-      <div class="rate-preview-card" style="margin-top:12px">
+      <div class="rate-preview-card" style="margin-top:8px">
         <div class="rpc-label">Top providers &middot; <span id="rpc-cur">AED</span> &rarr; INR</div>
         <div class="rpc-rows" id="rpc-rows">
           <div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">
@@ -717,6 +783,10 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="drawer-icon">💰</div>
       <div class="drawer-info"><div class="drawer-name">Tax &amp; DTAA</div><div class="drawer-desc">Save TDS with India's tax treaties</div></div>
     </div>
+    <div class="drawer-item" data-tab="taxres" onclick="showTab('taxres',this)">
+      <div class="drawer-icon">&#128196;</div>
+      <div class="drawer-info"><div class="drawer-name">Tax Residency</div><div class="drawer-desc">NRI / RNOR / Resident status</div></div>
+    </div>
     <div class="drawer-item" data-tab="return" onclick="showTab('return',this)">
       <div class="drawer-icon">✈️</div>
       <div class="drawer-info"><div class="drawer-name">Return Planner</div><div class="drawer-desc">Corpus needed to move back</div></div>
@@ -771,6 +841,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB 2: SIP & SWP -->
   <div class="tool-section" id="tab-invest">
+  <div class="calc-cur-bar" id="ccb-invest"><span class="ccb-flag" id="ccb-flag-invest"></span><span class="ccb-rate" id="ccb-rate-invest">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-invest" type="number" placeholder="Amount" oninput="ccbConvert('invest')"/><span id="ccb-cur-invest" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-invest">₹—</span></div></div>
     <div class="sec-head">
       <h2>SIP &amp; SWP Calculator</h2>
       <p>SIP &mdash; grow your India corpus with monthly investments &middot; SWP &mdash; plan monthly withdrawals without depleting your corpus</p>
@@ -825,6 +896,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB 3: NRE vs NRO -->
   <div class="tool-section" id="tab-nrenro">
+  <div class="calc-cur-bar" id="ccb-nrenro"><span class="ccb-flag" id="ccb-flag-nrenro"></span><span class="ccb-rate" id="ccb-rate-nrenro">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-nrenro" type="number" placeholder="Amount" oninput="ccbConvert('nrenro')"/><span id="ccb-cur-nrenro" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-nrenro">₹—</span></div></div>
     <div class="sec-head">
       <h2>NRE vs NRO Account</h2>
       <p>Current NRE FD rates from leading banks &middot; Account comparison &middot; Personalised recommendation</p>
@@ -933,6 +1005,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB 4: HOME LOAN -->
   <div class="tool-section" id="tab-homeloan">
+  <div class="calc-cur-bar" id="ccb-homeloan"><span class="ccb-flag" id="ccb-flag-homeloan"></span><span class="ccb-rate" id="ccb-rate-homeloan">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-homeloan" type="number" placeholder="Amount" oninput="ccbConvert('homeloan')"/><span id="ccb-cur-homeloan" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-homeloan">₹—</span></div></div>
     <div class="sec-head">
       <h2>NRI Home Loan EMI Calculator</h2>
       <p>Monthly EMI &middot; Yearly amortization schedule &middot; Download as CSV or PDF</p>
@@ -994,6 +1067,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB 5: RETURN PLANNER -->
   <div class="tool-section" id="tab-return">
+  <div class="calc-cur-bar" id="ccb-return"><span class="ccb-flag" id="ccb-flag-return"></span><span class="ccb-rate" id="ccb-rate-return">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-return" type="number" placeholder="Amount" oninput="ccbConvert('return')"/><span id="ccb-cur-return" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-return">₹—</span></div></div>
     <div class="sec-head">
       <h2>Return to India Planner</h2>
       <p>Build your expense profile &middot; Apply real India inflation &middot; See year-by-year projections &middot; Know exactly how much corpus you need</p>
@@ -1032,8 +1106,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
         <div class="f"><label>Investment Return on Corpus (% p.a.)</label><input type="number" id="rp-roi" value="8" step="0.5"/></div>
         <div class="f"><label>Expected India Income After Return (&#8377;/mo)</label><input type="number" id="rp-income" value="50000"/></div>
         <div class="f"><label>Years Until You Return</label><input type="number" id="rp-years" value="5" min="1" max="30"/></div>
-        <div class="f"><label>Current Savings Abroad (&#8377; Lakhs)</label><input type="number" id="rp-savings" value="50"/></div>
-        <div class="f"><label>Monthly Savings Rate (&#8377; Lakhs/mo)</label><input type="number" id="rp-monthly" value="1.5" step="0.1"/></div>
+        <div class="f"><label>Current Savings Abroad (&#8377; Lakhs)</label><input type="number" id="rp-savings" value="50" oninput="updateRpLocal()"/><div id="rp-savings-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
+        <div class="f"><label>Monthly Savings Rate (&#8377; Lakhs/mo)</label><input type="number" id="rp-monthly" value="1.5" step="0.1" oninput="updateRpLocal()"/><div id="rp-monthly-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
       </div>
       <button class="btn btn-amber" onclick="calcReturn()">Plan My Return &rarr;</button>
       <div id="rp-result" style="display:none">
@@ -1048,10 +1122,211 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
         </div>
       </div>
     </div>
+
+    <!-- ── PANEL B: RETURN CHECKLIST ──────────────────────────────────────── -->
+    <div class="card checklist-card" id="returnChecklist">
+      <div class="card-hd"><div class="card-hd-bar"></div>Return-to-India Checklist</div>
+      <div class="card-sub">Track your preparation across 3 phases. Progress saves automatically.</div>
+
+      <!-- Progress bar -->
+      <div class="cl-progress-wrap">
+        <div class="cl-progress-header">
+          <span class="cl-progress-label">Overall Progress</span>
+          <span class="cl-progress-pct" id="cl-pct">0%</span>
+        </div>
+        <div class="cl-progress-bar"><div class="cl-progress-fill" id="cl-fill" style="width:0%"></div></div>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="cl-phase">
+        <div class="cl-phase-hd">
+          <div class="cl-phase-num p1">1</div>
+          <div>
+            <div class="cl-phase-title">6–12 Months Before Return</div>
+          </div>
+          <div class="cl-phase-sub" id="cl-phase1-sub">0 / 5 done</div>
+        </div>
+        <div class="cl-item" id="cl-1" onclick="toggleCheck('cl-1')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Calculate your RNOR window</div>
+            <div class="cl-tip">RNOR status shields foreign income from India tax for up to 2 years after return. Know your window before you book the flight.</div>
+            <button class="cl-link" onclick="event.stopPropagation();showTab('taxres',document.querySelector('[data-tab=taxres]'))">→ Open Tax Residency Calculator</button>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-2" onclick="toggleCheck('cl-2')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Start repatriating NRE FD maturity proceeds</div>
+            <div class="cl-tip">NRE FD interest is fully tax-free while you're an NRI. Redeem maturing FDs and wire funds abroad — once you become Resident, NRE interest becomes taxable.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-3" onclick="toggleCheck('cl-3')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Stop new NRO deposits — plan NRO repatriation</div>
+            <div class="cl-tip">NRO repatriation is capped at USD 1M/year and requires CA certificate (Form 15CA/15CB). Start the process early — bank processing takes 2–4 weeks per transfer.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-4" onclick="toggleCheck('cl-4')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Review overseas investments — sell tax-efficiently</div>
+            <div class="cl-tip">Capital gains on overseas assets are not taxable in India during RNOR period. Review your portfolio abroad and consider selling appreciated positions before you lose RNOR status.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-5" onclick="toggleCheck('cl-5')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Arrange health insurance in India</div>
+            <div class="cl-tip">Your overseas employer insurance ends when you leave. Get a family floater health policy (₹10–20L cover) before arrival — pre-existing conditions may have a waiting period of 1–4 years.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="cl-phase">
+        <div class="cl-phase-hd">
+          <div class="cl-phase-num p2">2</div>
+          <div>
+            <div class="cl-phase-title">1–3 Months Before Return</div>
+          </div>
+          <div class="cl-phase-sub" id="cl-phase2-sub">0 / 4 done</div>
+        </div>
+        <div class="cl-item" id="cl-6" onclick="toggleCheck('cl-6')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Convert NRE account → Resident or RFC account</div>
+            <div class="cl-tip">You must convert your NRE account within a reasonable time of becoming Resident. RFC (Resident Foreign Currency) account lets you hold foreign currency without converting to INR — useful if you earn abroad even after returning.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-7" onclick="toggleCheck('cl-7')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Convert NRO account → Resident savings</div>
+            <div class="cl-tip">NRO account should be re-designated as a regular resident savings account. Contact your bank's NRI desk — they'll require address proof and updated KYC documents.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-8" onclick="toggleCheck('cl-8')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Update KYC with banks (new India address)</div>
+            <div class="cl-tip">Failure to update KYC can freeze your accounts. Visit branch or use net banking portal to upload new address proof (Aadhaar/utility bill). Do this for every bank you hold accounts with.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-9" onclick="toggleCheck('cl-9')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">File Form 10F if DTAA claim is pending</div>
+            <div class="cl-tip">If you have pending TDS refunds or active DTAA claims in India, file Form 10F with your Tax Residency Certificate before leaving your host country. This can be done online on the Indian Income Tax portal.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="cl-phase" style="margin-bottom:0">
+        <div class="cl-phase-hd">
+          <div class="cl-phase-num p3">3</div>
+          <div>
+            <div class="cl-phase-title">After Return — Within 6 Months</div>
+          </div>
+          <div class="cl-phase-sub" id="cl-phase3-sub">0 / 3 done</div>
+        </div>
+        <div class="cl-item" id="cl-10" onclick="toggleCheck('cl-10')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Update Aadhaar with new India address</div>
+            <div class="cl-tip">Visit an Aadhaar enrollment centre or use the UIDAI online portal with a valid address proof. Updated Aadhaar is required for bank KYC, mutual fund investments, and income tax filing.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-11" onclick="toggleCheck('cl-11')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">Notify all investments of resident status change</div>
+            <div class="cl-tip">Mutual funds, demat account, and brokers must be notified. Your Demat account operating as NRI-PIS needs to be re-designated. Failure to notify may cause tax-withholding issues at redemption.</div>
+          </div>
+        </div>
+        <div class="cl-item" id="cl-12" onclick="toggleCheck('cl-12')">
+          <div class="cl-cb"><span class="cl-cb-check">✓</span></div>
+          <div class="cl-body">
+            <div class="cl-title">File IT return — declare as RNOR for up to 2 years</div>
+            <div class="cl-tip">File your Income Tax Return declaring RNOR status. Include Schedule FA to disclose foreign assets. Under RNOR, foreign income is still exempt — maximise this before your 2-year window closes.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cl-reset">
+        <button class="cl-reset-btn" onclick="resetChecklist()">↺ Reset checklist</button>
+      </div>
+    </div>
+
     <div class="info">&#128203; <strong>India Inflation Reality:</strong> CPI has averaged 5&ndash;7% p.a. over the last decade. Healthcare and education inflate faster (~8&ndash;10%). Kids education fees in metro schools: &#8377;10K&ndash;40K/month. Family health floater: &#8377;15K&ndash;40K/year. Build in a 20% buffer for unexpected expenses.</div>
   </div>
+  <!-- ══ TAX RESIDENCY CALCULATOR ══════════════════════════════════════════ -->
+  <div class="tool-section" id="tab-taxres">
+  <div class="calc-cur-bar" id="ccb-taxres"><span class="ccb-flag" id="ccb-flag-taxres"></span><span class="ccb-rate" id="ccb-rate-taxres">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-taxres" type="number" placeholder="Amount" oninput="ccbConvert('taxres')"/><span id="ccb-cur-taxres" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-taxres">₹—</span></div></div>
+    <div class="tool-inner">
+      <h2>Tax Residency Status Calculator</h2>
+      <p>Your residency status — <strong>NRI</strong>, <strong>RNOR</strong>, or <strong>Resident</strong> — controls which income is taxable in India and at what rate. Enter days spent inside India for each year.</p>
+      <div class="calc-grid">
+        <div class="form-group">
+          <label>Current year (FY 2025-26) — days in India</label>
+          <input type="number" id="tr-y0" value="60" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2024-25 — days in India</label>
+          <input type="number" id="tr-y1" value="45" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2023-24 — days in India</label>
+          <input type="number" id="tr-y2" value="30" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2022-23 — days in India</label>
+          <input type="number" id="tr-y3" value="20" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2021-22 — days in India</label>
+          <input type="number" id="tr-y4" value="15" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2020-21 — days in India</label>
+          <input type="number" id="tr-y5" value="10" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2019-20 — days in India</label>
+          <input type="number" id="tr-y6" value="5" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2018-19 — days in India</label>
+          <input type="number" id="tr-y7" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2017-18 — days in India</label>
+          <input type="number" id="tr-y8" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+        <div class="form-group">
+          <label>FY 2016-17 — days in India</label>
+          <input type="number" id="tr-y9" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        </div>
+      </div>
+      <button class="btn btn-amber" onclick="calcTaxResidency()">Determine My Status &rarr;</button>
+      <div id="tr-result" style="display:none;margin-top:28px">
+        <div id="tr-badge-wrap" style="text-align:center;margin-bottom:24px">
+          <div id="tr-badge" style="display:inline-block;padding:16px 40px;border-radius:16px;font-size:32px;font-weight:900;letter-spacing:1px;"></div>
+          <div id="tr-subtitle" style="margin-top:10px;font-size:15px;color:var(--text2)"></div>
+        </div>
+        <div class="rg" id="tr-grid"></div>
+        <div id="tr-rules" class="info" style="margin-top:20px"></div>
+        <div id="tr-implications" style="margin-top:20px"></div>
+        <div id="tr-nextyear" style="margin-top:20px"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ DTAA TAX CALCULATOR ══════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-dtaa">
+  <div class="calc-cur-bar" id="ccb-dtaa"><span class="ccb-flag" id="ccb-flag-dtaa"></span><span class="ccb-rate" id="ccb-rate-dtaa">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-dtaa" type="number" placeholder="Amount" oninput="ccbConvert('dtaa')"/><span id="ccb-cur-dtaa" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-dtaa">₹—</span></div></div>
     <div class="sec-head">
       <h2>DTAA Tax Calculator</h2>
       <p>India has Double Tax Avoidance Agreements (DTAA) with 90+ countries. NRIs can claim reduced TDS rates — often saving 15–20% on their India income.</p>
@@ -1103,6 +1378,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   </div>
   <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-realty">
+  <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
     <div class="sec-head">
       <h2>Real Estate ROI Calculator</h2>
       <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
@@ -1172,20 +1448,20 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
 // ── CURRENCY DATA MAP ──────────────────────────────
 const CUR_META={
-  AED:{flag:'🇦🇪',name:'UAE Dirham',region:'Gulf'},
-  SAR:{flag:'🇸🇦',name:'Saudi Riyal',region:'Gulf'},
-  QAR:{flag:'🇶🇦',name:'Qatari Riyal',region:'Gulf'},
-  KWD:{flag:'🇰🇼',name:'Kuwaiti Dinar',region:'Gulf'},
-  BHD:{flag:'🇧🇭',name:'Bahraini Dinar',region:'Gulf'},
-  OMR:{flag:'🇴🇲',name:'Omani Rial',region:'Gulf'},
-  MYR:{flag:'🇲🇾',name:'Malaysian Ringgit',region:'SE Asia'},
-  SGD:{flag:'🇸🇬',name:'Singapore Dollar',region:'SE Asia'},
-  AUD:{flag:'🇦🇺',name:'Australian Dollar',region:'Oceania'},
-  NZD:{flag:'🇳🇿',name:'NZ Dollar',region:'Oceania'},
-  USD:{flag:'🇺🇸',name:'US Dollar',region:'Americas'},
-  CAD:{flag:'🇨🇦',name:'Canadian Dollar',region:'Americas'},
-  EUR:{flag:'🇪🇺',name:'Euro',region:'Europe'},
-  GBP:{flag:'🇬🇧',name:'British Pound',region:'Europe'},
+  AED:{flag:'<span class="fi fi-ae fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ae',name:'UAE Dirham',region:'Gulf'},
+  SAR:{flag:'<span class="fi fi-sa fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'sa',name:'Saudi Riyal',region:'Gulf'},
+  QAR:{flag:'<span class="fi fi-qa fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'qa',name:'Qatari Riyal',region:'Gulf'},
+  KWD:{flag:'<span class="fi fi-kw fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'kw',name:'Kuwaiti Dinar',region:'Gulf'},
+  BHD:{flag:'<span class="fi fi-bh fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'bh',name:'Bahraini Dinar',region:'Gulf'},
+  OMR:{flag:'<span class="fi fi-om fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'om',name:'Omani Rial',region:'Gulf'},
+  MYR:{flag:'<span class="fi fi-my fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'my',name:'Malaysian Ringgit',region:'SE Asia'},
+  SGD:{flag:'<span class="fi fi-sg fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'sg',name:'Singapore Dollar',region:'SE Asia'},
+  AUD:{flag:'<span class="fi fi-au fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'au',name:'Australian Dollar',region:'Oceania'},
+  NZD:{flag:'<span class="fi fi-nz fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'nz',name:'NZ Dollar',region:'Oceania'},
+  USD:{flag:'<span class="fi fi-us fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'us',name:'US Dollar',region:'Americas'},
+  CAD:{flag:'<span class="fi fi-ca fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ca',name:'Canadian Dollar',region:'Americas'},
+  EUR:{flag:'<span class="fi fi-eu fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'eu',name:'Euro',region:'Europe'},
+  GBP:{flag:'<span class="fi fi-gb fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'gb',name:'British Pound',region:'Europe'},
 };
 
 // ── CUSTOM DROPDOWN ────────────────────────────────
@@ -1207,7 +1483,7 @@ function selectCurrency(el){
   if(ck)ck.style.display='';
   // Update button display
   const meta=CUR_META[val]||{flag:'🌐',name:val,region:''};
-  document.getElementById('curBtnFlag').textContent=meta.flag;
+  document.getElementById('curBtnFlag').innerHTML=meta.flag;
   document.getElementById('curBtnCode').textContent=val;
   document.getElementById('curBtnRegion').textContent=meta.region;
   // Close panel
@@ -1542,6 +1818,10 @@ function renderRates(){
         <div class="pbar-track"><div class="pbar-fill" style="width:${pct}%;background:${barColor}"></div></div>
       </div>
       <a class="rate-cta${p.link==='#'?' disabled':''}" href="${p.link}" target="_blank" rel="noopener">Send Now →</a>
+      <div class="rate-row-mobile-cta">
+        <span style="font-size:11px;color:var(--muted)">${p.note}</span>
+        <a class="rate-cta-sm${p.link==='#'?' disabled':''}" href="${p.link}" target="_blank" rel="noopener">Send Now →</a>
+      </div>
     </div>`;
   }).join('');
   const now=new Date();
@@ -1754,19 +2034,26 @@ function calcReturn(){
     const cn=netRate>0?sf*12/netRate:sf*12*30;
     returnProjData.push({year:y,expM:Math.round(expM),annExp:Math.round(annExp),inflAdded:Math.round(inflAdded),sf:Math.round(sf),cn:Math.round(cn)});
     const isReturn=y===years;
-    tbody+=`<tr${isReturn?' style="border-left:3px solid var(--amber)"':''}><td>${y}${isReturn?' 🏠':''}</td><td>₹${Math.round(expM).toLocaleString('en-IN')}</td><td>₹${Math.round(annExp).toLocaleString('en-IN')}</td><td style="color:var(--red)">+₹${Math.round(inflAdded).toLocaleString('en-IN')}</td><td style="color:var(--amber)">₹${Math.round(sf).toLocaleString('en-IN')}</td><td><strong>₹${(cn/100000).toFixed(1)}L</strong></td></tr>`;
+    tbody+=`<tr${isReturn?' style="border-left:3px solid var(--amber)"':''}><td>${y}${isReturn?' 🏠':''}</td><td><div>₹${Math.round(expM).toLocaleString('en-IN')}</div>${midRate>0?`<div class="rp-local">${baseCur} ${Math.round(expM/midRate).toLocaleString('en-IN')}</div>`:''}</td><td>₹${Math.round(annExp).toLocaleString('en-IN')}</td><td style="color:var(--red)">+₹${Math.round(inflAdded).toLocaleString('en-IN')}</td><td style="color:var(--amber)"><div>₹${Math.round(sf).toLocaleString('en-IN')}</div>${midRate>0?`<div class="rp-local">${baseCur} ${Math.round(sf/midRate).toLocaleString('en-IN')}</div>`:''}</td><td><strong>₹${(cn/100000).toFixed(1)}L</strong>${midRate>0?`<div class="rp-local">${baseCur} ${(cn/midRate/100000).toFixed(2)}L</div>`:''}</td></tr>`;
     expM*=(1+inflation);
   }
   document.getElementById('rp-year-body').innerHTML=tbody;
+  const lc=(inr)=>midRate>0?baseCur+' '+Math.round(inr/midRate).toLocaleString('en-IN'):null;
+  const lcL=(inr)=>midRate>0?baseCur+' '+(inr/midRate/100000).toFixed(1)+'L':null;
+  const lcSub=(inr)=>lc(inr)?`<div class="ri-local">≈ ${lc(inr)}</div>`:'';
+  const lcLSub=(inr)=>lcL(inr)?`<div class="ri-local">≈ ${lcL(inr)}</div>`:'';
   document.getElementById('rp-result-grid').innerHTML=`
-    <div class="ri"><div class="ri-lbl">Monthly Expenses Today</div><div class="ri-val" style="font-size:20px">₹${Math.round(baseMonthly).toLocaleString('en-IN')}</div><div class="ri-sub">before inflation</div></div>
-    <div class="ri"><div class="ri-lbl">Monthly at Return</div><div class="ri-val">₹${Math.round(returnMonthly).toLocaleString('en-IN')}</div><div class="ri-sub">after ${years}yr × ${(inflation*100).toFixed(0)}% inflation</div></div>
-    <div class="ri"><div class="ri-lbl">Projected Corpus</div><div class="ri-val" style="color:${projCorpus>=corpusNeeded?'var(--green)':'var(--red)'}">₹${(projCorpus/100000).toFixed(1)}L</div><div class="ri-sub">at return date</div></div>
-    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="ri-val" style="font-size:20px">₹${(corpusNeeded/100000).toFixed(1)}L</div><div class="ri-sub">for inflation-adjusted income</div></div>`;
+    <div class="ri"><div class="ri-lbl">Monthly Expenses Today</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${Math.round(baseMonthly).toLocaleString('en-IN')}</div>${lcSub(baseMonthly)}</div><div class="ri-sub">before inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly at Return</div><div class="rp-dual"><div class="ri-val">₹${Math.round(returnMonthly).toLocaleString('en-IN')}</div>${lcSub(returnMonthly)}</div><div class="ri-sub">after ${years}yr × ${(inflation*100).toFixed(0)}% inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Projected Corpus</div><div class="rp-dual"><div class="ri-val" style="color:${projCorpus>=corpusNeeded?'var(--green)':'var(--red)'}">₹${(projCorpus/100000).toFixed(1)}L</div>${lcLSub(projCorpus)}</div><div class="ri-sub">at return date</div></div>
+    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${(corpusNeeded/100000).toFixed(1)}L</div>${lcLSub(corpusNeeded)}</div><div class="ri-sub">for inflation-adjusted income</div></div>`;
   const onTrack=projCorpus>=corpusNeeded*0.9;
+  const gapInr=(corpusNeeded-projCorpus);
+  const gapLocal=midRate>0?` (${baseCur} ${(gapInr/midRate/100000).toFixed(1)}L)`:'';
+  const projLocal=midRate>0?` · ${baseCur} ${(projCorpus/midRate/100000).toFixed(1)}L`:'';
   document.getElementById('rp-verdict').innerHTML=onTrack
-    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L covers your inflation-adjusted lifestyle. Ensure you're invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
-    :`<div class="box-red">⚠️ <strong>Gap of ~₹${((corpusNeeded-projCorpus)/100000).toFixed(1)}L.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
+    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L${projLocal} covers your inflation-adjusted lifestyle. Ensure you're invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
+    :`<div class="box-red">⚠️ <strong>Gap of ~₹${(gapInr/100000).toFixed(1)}L${gapLocal}.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
   document.getElementById('rp-result').style.display='block';
 }
 function downloadReturnCSV(){
@@ -1848,7 +2135,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         el.classList.add('active');
         const ck=document.getElementById('ck-'+cur);if(ck)ck.style.display='';
         const meta=CUR_META[cur]||{flag:'🌐',region:''};
-        document.getElementById('curBtnFlag').textContent=meta.flag;
+        document.getElementById('curBtnFlag').innerHTML=meta.flag;
         document.getElementById('curBtnCode').textContent=cur;
         document.getElementById('curBtnRegion').textContent=meta.region;
       }
@@ -2031,6 +2318,7 @@ function updateHeroRate() {
   const dc = document.getElementById('dash-cur');
   if(dc) dc.textContent = baseCur;
   updateHeroReceive();
+  syncCurrencyToCalcs();
 }
 
 function updateHeroReceive() {
@@ -2038,6 +2326,205 @@ function updateHeroReceive() {
   const el = document.getElementById('har-rcv');
   if(el && midRate) el.textContent = '\u20B9' + (amt * midRate).toLocaleString('en-IN', {maximumFractionDigits:0});
 }
+
+// ── TAX RESIDENCY CALCULATOR ─────────────────────────────────────────────────
+function calcTaxResidency(){
+  const days=[];
+  for(let i=0;i<=9;i++){
+    const el=document.getElementById('tr-y'+i);
+    days.push(el?Math.min(366,Math.max(0,parseInt(el.value)||0)):0);
+  }
+  const y0=days[0]; // current year
+  const prev4=days[1]+days[2]+days[3]+days[4]; // FY last 4 years
+  const prev7nri=days.slice(1,8); // 7 preceding years for RNOR check
+
+  // ── STEP 1: Is person Resident in current year? ──────────────────────────
+  // Primary rule: >=182 days
+  const basicResident = y0>=182;
+  // Secondary rule: >=60 days AND >=365 in preceding 4 years
+  // (Citizens leaving for employment abroad: secondary rule does NOT apply — treated as NRI if <182 days)
+  // We assume general case (not crew/employment exception) for simplicity
+  const secondaryResident = y0>=60 && prev4>=365;
+  const isResident = basicResident || secondaryResident;
+
+  // ── STEP 2: If Resident, check RNOR conditions ──────────────────────────
+  // RNOR if: (a) NRI in 9 of preceding 10 years, OR (b) India stay <=729 days in preceding 7 years
+  let status='NRI', statusColor='var(--teal)', bgColor='var(--teal-dim)', subtitle='';
+  let rnorCondA=false, rnorCondB=false;
+
+  if(isResident){
+    // Count NRI years in preceding 10 years (days[1]..days[9] + one more but we only have 9 slots after y0)
+    const nriYears=days.slice(1).filter(d=>d<182).length; // out of 9 collected years
+    rnorCondA = nriYears>=9; // effectively: 9 of 9 collected, or close enough
+
+    const prev7total=days.slice(1,8).reduce((a,b)=>a+b,0);
+    rnorCondB = prev7total<=729;
+
+    if(rnorCondA||rnorCondB){
+      status='RNOR';
+      statusColor='var(--amber)';
+      bgColor='var(--amber-dim)';
+      subtitle='Resident but Not Ordinarily Resident';
+    } else {
+      status='Resident';
+      statusColor='var(--red)';
+      bgColor='var(--red-dim)';
+      subtitle='Resident & Ordinarily Resident';
+    }
+  } else {
+    subtitle='Non-Resident Indian';
+  }
+
+  // ── STEP 3: Days remaining this year ────────────────────────────────────
+  const daysLeft=366-y0; // approximate
+  const daysTo182=Math.max(0,182-y0);
+  const daysTo60=Math.max(0,60-y0);
+
+  // ── RENDER ───────────────────────────────────────────────────────────────
+  const badge=document.getElementById('tr-badge');
+  badge.textContent=status;
+  badge.style.background=bgColor;
+  badge.style.color=statusColor;
+  badge.style.border='2px solid '+statusColor;
+
+  document.getElementById('tr-subtitle').textContent=subtitle;
+
+  // Summary grid
+  const gridData=[
+    {l:'Current Year Days in India',v:y0+' / 366'},
+    {l:'Prior 4-Year Total',v:prev4+' days'},
+    {l:'Prior 7-Year Total',v:days.slice(1,8).reduce((a,b)=>a+b,0)+' days'},
+    {l:'Basic Resident Rule (≥182 days)?',v:basicResident?'Yes ✓':'No'},
+    {l:'Secondary Resident Rule (≥60 + ≥365 prev-4)?',v:secondaryResident?'Yes ✓':'No'},
+  ];
+  if(isResident){
+    gridData.push({l:'RNOR: NRI in ≥9 of prior 10 years?',v:rnorCondA?'Yes ✓':'No'});
+    gridData.push({l:'RNOR: Prior 7-year stay ≤729 days?',v:rnorCondB?'Yes ✓':'No'});
+  }
+  document.getElementById('tr-grid').innerHTML=gridData.map(d=>
+    '<div class="rg-row"><span class="rg-label">'+d.l+'</span><span class="rg-value">'+d.v+'</span></div>'
+  ).join('');
+
+  // Rules explanation
+  const rules={
+    'NRI':'<b>NRI rule:</b> You spent <b>'+y0+' days</b> in India this year — under the 182-day threshold. Neither the secondary condition (60+ days + 365 days in prior 4 years) applies. You are a <b>Non-Resident Indian</b> for FY 2025-26.',
+    'RNOR':'<b>RNOR rule:</b> You are a Resident ('+y0+' days this year), but qualify as RNOR because: '+(rnorCondA?'you were NRI for 9+ of the preceding 10 years. ':'')+(rnorCondB?'your total India stay in the prior 7 years is ≤729 days.':'')+'  RNOR status protects you for up to <b>2 fiscal years</b> after returning to India.',
+    'Resident':'<b>Resident (ROR) rule:</b> You spent <b>'+y0+' days</b> in India this year and do not qualify for RNOR. All your global income is taxable in India.'
+  };
+  document.getElementById('tr-rules').innerHTML=rules[status];
+
+  // Implications
+  const imp={
+    'NRI':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li>Only income <em>earned or received in India</em> is taxable here</li><li>Foreign salary, business income, capital gains abroad — <em>not taxable in India</em></li><li>NRE account interest is tax-free; NRO interest is taxable (TDS applies)</li><li>You can claim DTAA benefits to avoid double taxation</li><li>No wealth tax; FEMA rules apply for remittances</li></ul></div>',
+    'RNOR':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li>Only India-sourced income and income from a business controlled in India is taxable</li><li>Foreign income is <em>still exempt</em> — same as NRI, for now</li><li>NRE account interest remains tax-free during RNOR period</li><li><b>Ideal window to repatriate overseas assets</b> before becoming fully Resident</li><li>RNOR lasts at most 2 financial years — plan conversions now</li></ul></div>',
+    'Resident':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li><b>Global income</b> — including foreign salary and overseas investment gains — is taxable in India</li><li>NRE account must be converted to Resident/RFC account</li><li>Foreign assets must be disclosed in Schedule FA of your ITR</li><li>FBAR/FATCA reporting obligations may apply</li><li>Use DTAA to avoid double taxation on India-sourced income</li></ul></div>'
+  };
+  document.getElementById('tr-implications').innerHTML=imp[status];
+
+  // Next-year outlook
+  let outlook='';
+  if(status==='NRI'){
+    if(daysTo182>0){
+      outlook='<div class="info" style="margin-top:0"><b>Next year outlook:</b> You can stay up to <b>'+(181-y0)+' more days</b> this year and remain NRI. Stay '+(182-y0)+' more days or more and you trigger the basic Resident rule.</div>';
+    }
+  } else if(status==='RNOR'){
+    outlook='<div class="info" style="margin-top:0"><b>Action window:</b> RNOR status is temporary. Use this period to:<br>• Repatriate NRE FD maturity proceeds<br>• Sell overseas assets (gains not taxable in India yet)<br>• Convert NRE/NRO accounts before the window closes</div>';
+  } else {
+    outlook='<div class="info" style="margin-top:0"><b>Filing requirement:</b> As a Resident (ROR), you must file an ITR disclosing global income and foreign assets (Schedule FA). Consult a CA if you have overseas income or investments.</div>';
+  }
+  document.getElementById('tr-nextyear').innerHTML=outlook;
+  document.getElementById('tr-result').style.display='block';
+}
+
+
+// ── CURRENCY CONTEXT BARS ─────────────────────────────────────────────────────
+const CCB_TABS=['invest','nrenro','homeloan','return','dtaa','realty','taxres'];
+function syncCurrencyToCalcs(){
+  if(typeof updateRpLocal==='function')updateRpLocal();
+  if(!midRate||!baseCur)return;
+  const meta=CUR_META[baseCur]||{flag:'',name:baseCur,region:''};
+  CCB_TABS.forEach(tid=>{
+    const flagEl=document.getElementById('ccb-flag-'+tid);
+    const rateEl=document.getElementById('ccb-rate-'+tid);
+    const curEl=document.getElementById('ccb-cur-'+tid);
+    if(flagEl)flagEl.innerHTML=meta.flag;
+    if(rateEl)rateEl.innerHTML='1 <strong>'+baseCur+'</strong> = <span>₹'+midRate.toFixed(4)+'</span>';
+    if(curEl)curEl.textContent=baseCur;
+    ccbConvert(tid);
+  });
+}
+function ccbConvert(tid){
+  if(!midRate)return;
+  const inp=document.getElementById('ccb-inp-'+tid);
+  const out=document.getElementById('ccb-out-'+tid);
+  if(!inp||!out)return;
+  const amt=parseFloat(inp.value);
+  if(!isNaN(amt)&&amt>0){
+    out.textContent='₹'+(amt*midRate).toLocaleString('en-IN',{maximumFractionDigits:0});
+  } else {
+    out.textContent='₹—';
+  }
+}
+
+function updateRpLocal(){
+  if(!midRate)return;
+  const sav=parseFloat(document.getElementById('rp-savings').value)||0;
+  const mon=parseFloat(document.getElementById('rp-monthly').value)||0;
+  const sl=document.getElementById('rp-savings-local');
+  const ml=document.getElementById('rp-monthly-local');
+  if(sl)sl.textContent=sav>0?'≈ '+baseCur+' '+(sav*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'';
+  if(ml)ml.textContent=mon>0?'≈ '+baseCur+' '+(mon*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0})+'/mo':'';
+}
+
+// ── RETURN CHECKLIST ──────────────────────────────────────────────────────────
+const CL_KEY='nri_return_checklist';
+const CL_PHASES={1:[1,2,3,4,5],2:[6,7,8,9],3:[10,11,12]};
+const CL_TOTAL=12;
+
+function clLoad(){
+  try{return JSON.parse(localStorage.getItem(CL_KEY)||'{}');}catch(e){return {};}
+}
+function clSave(state){
+  try{localStorage.setItem(CL_KEY,JSON.stringify(state));}catch(e){}
+}
+function toggleCheck(id){
+  const state=clLoad();
+  state[id]=!state[id];
+  clSave(state);
+  renderChecklist();
+}
+function resetChecklist(){
+  if(!confirm('Reset all checklist items?'))return;
+  clSave({});
+  renderChecklist();
+}
+function renderChecklist(){
+  const state=clLoad();
+  let done=0;
+  for(let i=1;i<=CL_TOTAL;i++){
+    const el=document.getElementById('cl-'+i);
+    if(!el)continue;
+    if(state['cl-'+i]){el.classList.add('done');done++;}
+    else el.classList.remove('done');
+  }
+  // Progress bar
+  const pct=Math.round((done/CL_TOTAL)*100);
+  const fill=document.getElementById('cl-fill');
+  const pctEl=document.getElementById('cl-pct');
+  if(fill)fill.style.width=pct+'%';
+  if(pctEl){
+    pctEl.textContent=pct+'%';
+    pctEl.style.color=pct===100?'var(--green)':pct>=50?'var(--teal)':'var(--amber)';
+  }
+  // Phase subtitles
+  Object.entries(CL_PHASES).forEach(([phase,ids])=>{
+    const phaseDone=ids.filter(i=>state['cl-'+i]).length;
+    const sub=document.getElementById('cl-phase'+phase+'-sub');
+    if(sub)sub.textContent=phaseDone+' / '+ids.length+' done';
+  });
+}
+// Init checklist on page load
+document.addEventListener('DOMContentLoaded',()=>{renderChecklist();});
 
 </script>
 </body>
