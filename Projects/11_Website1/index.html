@@ -332,7 +332,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .feat-card-meta{font-size:12px;color:var(--teal);font-weight:600;margin-top:auto;}
 
 /* ── TOOL SECTION BANNERS ── */
-.tool-banner{position:relative;overflow:hidden;border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:flex-end;min-height:120px;}
+.tool-banner{position:relative;overflow:hidden;border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:flex-end;min-height:120px;background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;}
 .tool-banner::before{content:'';position:absolute;inset:0;background:inherit;z-index:0;}
 .tool-banner-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.18;z-index:0;}
 .tool-banner-pattern{position:absolute;inset:0;z-index:1;opacity:0.07;}
@@ -1044,7 +1044,6 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 1: LIVE RATES -->
   <div class="tool-section active" id="tab-rates">
     <div class="tool-banner tb-rates">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">💱</div>
       <div class="tool-banner-body">
         <h2>Today's Best Rates to India</h2>
@@ -1085,7 +1084,6 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-invest">
   <div class="calc-cur-bar" id="ccb-invest"><span class="ccb-flag" id="ccb-flag-invest"></span><span class="ccb-rate" id="ccb-rate-invest">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-invest" type="number" placeholder="Amount" oninput="ccbConvert('invest')"/><span id="ccb-cur-invest" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-invest">₹—</span></div></div>
     <div class="tool-banner tb-invest">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">📈</div>
       <div class="tool-banner-body">
         <h2>SIP &amp; SWP Calculator</h2>
@@ -1143,7 +1141,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 3: NRE vs NRO -->
   <div class="tool-section" id="tab-nrenro">
   <div class="calc-cur-bar" id="ccb-nrenro"><span class="ccb-flag" id="ccb-flag-nrenro"></span><span class="ccb-rate" id="ccb-rate-nrenro">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-nrenro" type="number" placeholder="Amount" oninput="ccbConvert('nrenro')"/><span id="ccb-cur-nrenro" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-nrenro">₹—</span></div></div>
-    <div class="tool-banner tb-nrenro" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+    <div class="tool-banner tb-nrenro">
       <div class="tool-banner-icon">🏛</div>
       <div class="tool-banner-body">
         <h2>NRE vs NRO Account</h2>
@@ -1255,7 +1253,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 4: HOME LOAN -->
   <div class="tool-section" id="tab-homeloan">
   <div class="calc-cur-bar" id="ccb-homeloan"><span class="ccb-flag" id="ccb-flag-homeloan"></span><span class="ccb-rate" id="ccb-rate-homeloan">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-homeloan" type="number" placeholder="Amount" oninput="ccbConvert('homeloan')"/><span id="ccb-cur-homeloan" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-homeloan">₹—</span></div></div>
-    <div class="tool-banner tb-homeloan" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+    <div class="tool-banner tb-homeloan">
       <div class="tool-banner-icon">🏠</div>
       <div class="tool-banner-body">
         <h2>NRI Home Loan EMI Calculator</h2>
@@ -1340,7 +1338,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 5: RETURN PLANNER -->
   <div class="tool-section" id="tab-return">
   <div class="calc-cur-bar" id="ccb-return"><span class="ccb-flag" id="ccb-flag-return"></span><span class="ccb-rate" id="ccb-rate-return">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-return" type="number" placeholder="Amount" oninput="ccbConvert('return')"/><span id="ccb-cur-return" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-return">₹—</span></div></div>
-    <div class="tool-banner tb-return" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+    <div class="tool-banner tb-return">
       <div class="tool-banner-icon">✈️</div>
       <div class="tool-banner-body">
         <h2>Return to India Planner</h2>
@@ -1606,7 +1604,6 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-dtaa">
   <div class="calc-cur-bar" id="ccb-dtaa"><span class="ccb-flag" id="ccb-flag-dtaa"></span><span class="ccb-rate" id="ccb-rate-dtaa">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-dtaa" type="number" placeholder="Amount" oninput="ccbConvert('dtaa')"/><span id="ccb-cur-dtaa" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-dtaa">₹—</span></div></div>
     <div class="tool-banner tb-dtaa">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">📋</div>
       <div class="tool-banner-body">
         <h2>DTAA Tax Calculator</h2>
@@ -1661,11 +1658,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
     <div class="tool-banner tb-realty">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">🏘️</div>
       <div class="tool-banner-body">
         <h2>Real Estate ROI Calculator</h2>
-      <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
+        <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Property Details</div>
@@ -1699,7 +1696,6 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB: EDUCATION CORPUS PLANNER -->
   <div class="tool-section" id="tab-edplan">
     <div class="tool-banner tb-edplan">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">🎓</div>
       <div class="tool-banner-body">
         <h2>Education Corpus Planner</h2>
@@ -1761,7 +1757,6 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB: NRI GUIDES / ARTICLES -->
   <div class="tool-section" id="tab-articles">
     <div class="tool-banner tb-articles">
-      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
       <div class="tool-banner-icon">📚</div>
       <div class="tool-banner-body">
         <h2>NRI Financial Guides</h2>
