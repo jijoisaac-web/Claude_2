@@ -331,6 +331,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .feat-card-desc{font-size:12px;color:var(--muted);line-height:1.5;flex:1;}
 .feat-card-meta{font-size:12px;color:var(--teal);font-weight:600;margin-top:auto;}
 
+/* ── TOOL SECTION BANNERS ── */
+.tool-banner{position:relative;overflow:hidden;border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:flex-end;min-height:120px;}
+.tool-banner::before{content:'';position:absolute;inset:0;background:inherit;z-index:0;}
+.tool-banner-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.18;z-index:0;}
+.tool-banner-pattern{position:absolute;inset:0;z-index:1;opacity:0.07;}
+.tool-banner-icon{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:80px;opacity:0.18;z-index:1;line-height:1;user-select:none;filter:saturate(0) brightness(2);}
+.tool-banner-body{position:relative;z-index:2;}
+.tool-banner h2{font-size:clamp(18px,2.5vw,24px);font-weight:800;color:#fff;margin:0 0 6px;text-shadow:0 1px 8px rgba(0,0,0,0.4);}
+.tool-banner p{font-size:13px;color:rgba(255,255,255,0.75);margin:0;max-width:600px;line-height:1.5;}
+/* Per-tool gradient themes */
+.tb-rates{background:linear-gradient(135deg,#1a2a1a 0%,#0f2a1f 50%,#0d3320 100%);border:1px solid rgba(0,212,170,0.2);}
+.tb-invest{background:linear-gradient(135deg,#1a2810 0%,#1f3a0a 50%,#162d08 100%);border:1px solid rgba(34,197,94,0.2);}
+.tb-nrenro{background:linear-gradient(135deg,#0d1a3a 0%,#0a1f4a 50%,#0c2060 100%);border:1px solid rgba(59,130,246,0.2);}
+.tb-homeloan{background:linear-gradient(135deg,#1a1a2e 0%,#162040 50%,#0f1a3a 100%);border:1px solid rgba(99,102,241,0.25);}
+.tb-return{background:linear-gradient(135deg,#1a0d2e 0%,#200a3a 50%,#2a0a4a 100%);border:1px solid rgba(139,92,246,0.25);}
+.tb-dtaa{background:linear-gradient(135deg,#2a1a0a 0%,#3a2005 50%,#2a1500 100%);border:1px solid rgba(240,165,32,0.2);}
+.tb-taxres{background:linear-gradient(135deg,#0a1a2e 0%,#0a2040 50%,#051530 100%);border:1px solid rgba(14,165,233,0.2);}
+.tb-realty{background:linear-gradient(135deg,#0a2a1a 0%,#082a20 50%,#062820 100%);border:1px solid rgba(16,185,129,0.2);}
+.tb-edplan{background:linear-gradient(135deg,#1a0a2a 0%,#22083a 50%,#1a0535 100%);border:1px solid rgba(168,85,247,0.25);}
+.tb-articles{background:linear-gradient(135deg,#1a1010 0%,#2a1a08 50%,#201505 100%);border:1px solid rgba(251,191,36,0.2);}
+@media(max-width:640px){.tool-banner{padding:20px 20px;min-height:100px;}.tool-banner-icon{font-size:56px;right:14px;}.tool-banner h2{font-size:17px;}}
 .ed-ref-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:all .2s;}
 .ed-ref-card:hover{border-color:var(--teal);background:rgba(0,212,170,0.06);}
 .ed-ref-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
@@ -1022,9 +1043,13 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB 1: LIVE RATES -->
   <div class="tool-section active" id="tab-rates">
-    <div class="sec-head">
-      <h2>Today&apos;s Best Rates to India</h2>
-      <p>Sorted by most rupees received &middot; Local providers for your country &middot; Click &ldquo;Send Now&rdquo; to confirm rate on provider&apos;s site</p>
+    <div class="tool-banner tb-rates">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">💱</div>
+      <div class="tool-banner-body">
+        <h2>Today's Best Rates to India</h2>
+        <p>Sorted by most rupees received · Local providers for your country · Click "Send Now" to confirm rate on provider's site</p>
+      </div>
     </div>
     <div class="amount-strip">
       <label>You send</label>
@@ -1059,9 +1084,13 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 2: SIP & SWP -->
   <div class="tool-section" id="tab-invest">
   <div class="calc-cur-bar" id="ccb-invest"><span class="ccb-flag" id="ccb-flag-invest"></span><span class="ccb-rate" id="ccb-rate-invest">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-invest" type="number" placeholder="Amount" oninput="ccbConvert('invest')"/><span id="ccb-cur-invest" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-invest">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>SIP &amp; SWP Calculator</h2>
-      <p>SIP &mdash; grow your India corpus with monthly investments &middot; SWP &mdash; plan monthly withdrawals without depleting your corpus</p>
+    <div class="tool-banner tb-invest">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">📈</div>
+      <div class="tool-banner-body">
+        <h2>SIP &amp; SWP Calculator</h2>
+        <p>SIP — grow your India corpus with monthly investments · SWP — plan monthly withdrawals without depleting your corpus</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
@@ -1114,9 +1143,12 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 3: NRE vs NRO -->
   <div class="tool-section" id="tab-nrenro">
   <div class="calc-cur-bar" id="ccb-nrenro"><span class="ccb-flag" id="ccb-flag-nrenro"></span><span class="ccb-rate" id="ccb-rate-nrenro">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-nrenro" type="number" placeholder="Amount" oninput="ccbConvert('nrenro')"/><span id="ccb-cur-nrenro" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-nrenro">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>NRE vs NRO Account</h2>
-      <p>Current NRE FD rates from leading banks &middot; Account comparison &middot; Personalised recommendation</p>
+    <div class="tool-banner tb-nrenro" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+      <div class="tool-banner-icon">🏛</div>
+      <div class="tool-banner-body">
+        <h2>NRE vs NRO Account</h2>
+        <p>Current NRE FD rates from leading banks &middot; Account comparison &middot; Personalised recommendation</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Current NRE Fixed Deposit Rates</div>
@@ -1223,9 +1255,12 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 4: HOME LOAN -->
   <div class="tool-section" id="tab-homeloan">
   <div class="calc-cur-bar" id="ccb-homeloan"><span class="ccb-flag" id="ccb-flag-homeloan"></span><span class="ccb-rate" id="ccb-rate-homeloan">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-homeloan" type="number" placeholder="Amount" oninput="ccbConvert('homeloan')"/><span id="ccb-cur-homeloan" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-homeloan">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>NRI Home Loan EMI Calculator</h2>
-      <p>Monthly EMI &middot; Yearly amortization schedule &middot; Download as CSV or PDF</p>
+    <div class="tool-banner tb-homeloan" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+      <div class="tool-banner-icon">🏠</div>
+      <div class="tool-banner-body">
+        <h2>NRI Home Loan EMI Calculator</h2>
+        <p>Monthly EMI &middot; Yearly amortization schedule &middot; Download as CSV or PDF</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Loan Details</div>
@@ -1305,9 +1340,12 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 5: RETURN PLANNER -->
   <div class="tool-section" id="tab-return">
   <div class="calc-cur-bar" id="ccb-return"><span class="ccb-flag" id="ccb-flag-return"></span><span class="ccb-rate" id="ccb-rate-return">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-return" type="number" placeholder="Amount" oninput="ccbConvert('return')"/><span id="ccb-cur-return" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-return">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>Return to India Planner</h2>
-      <p>Build your expense profile &middot; Apply real India inflation &middot; See year-by-year projections &middot; Know exactly how much corpus you need</p>
+    <div class="tool-banner tb-return" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;">
+      <div class="tool-banner-icon">✈️</div>
+      <div class="tool-banner-body">
+        <h2>Return to India Planner</h2>
+        <p>Build your expense profile &middot; Apply real India inflation &middot; See year-by-year projections &middot; Know exactly how much corpus you need</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Step 1 &mdash; Choose Your City Tier</div>
@@ -1567,8 +1605,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- ══ DTAA TAX CALCULATOR ══════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-dtaa">
   <div class="calc-cur-bar" id="ccb-dtaa"><span class="ccb-flag" id="ccb-flag-dtaa"></span><span class="ccb-rate" id="ccb-rate-dtaa">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-dtaa" type="number" placeholder="Amount" oninput="ccbConvert('dtaa')"/><span id="ccb-cur-dtaa" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-dtaa">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>DTAA Tax Calculator</h2>
+    <div class="tool-banner tb-dtaa">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">📋</div>
+      <div class="tool-banner-body">
+        <h2>DTAA Tax Calculator</h2>
       <p>India has Double Tax Avoidance Agreements (DTAA) with 90+ countries. NRIs can claim reduced TDS rates — often saving 15–20% on their India income.</p>
     </div>
     <div class="card">
@@ -1619,8 +1660,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
-    <div class="sec-head">
-      <h2>Real Estate ROI Calculator</h2>
+    <div class="tool-banner tb-realty">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">🏘️</div>
+      <div class="tool-banner-body">
+        <h2>Real Estate ROI Calculator</h2>
       <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
     </div>
     <div class="card">
@@ -1654,8 +1698,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB: EDUCATION CORPUS PLANNER -->
   <div class="tool-section" id="tab-edplan">
-    <div class="sec-head">
-      <h2>Education Corpus Planner</h2>
+    <div class="tool-banner tb-edplan">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">🎓</div>
+      <div class="tool-banner-body">
+        <h2>Education Corpus Planner</h2>
       <p>Calculate how much you need to save for your child's education in India or abroad</p>
     </div>
 
@@ -1713,9 +1760,13 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- TAB: NRI GUIDES / ARTICLES -->
   <div class="tool-section" id="tab-articles">
-    <div class="sec-head">
-      <h2>NRI Financial Guides</h2>
+    <div class="tool-banner tb-articles">
+      <div class="tool-banner-pattern" style="background-image:url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E");background-size:20px 20px;"></div>
+      <div class="tool-banner-icon">📚</div>
+      <div class="tool-banner-body">
+        <h2>NRI Financial Guides</h2>
       <p>Practical, jargon-free guides written for Indians living abroad</p>
+      </div>
     </div>
     <div id="art-list">
       <div class="art-grid">
