@@ -561,6 +561,26 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
 .rate-row-mobile-cta{display:none;}
 
+
+/* ── AFFILIATE BAR ─────────────────────────────────────────────── */
+
+
+
+
+
+
+
+.aff-alert-inp:focus{border-color:var(--amber);}
+
+.aff-alert-btn:hover{background:#d4891a;}
+@media(max-width:640px){}
+
+
+.hl-lead-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.hl-lead-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.hl-lead-inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;box-sizing:border-box;font-family:inherit;}
+.hl-lead-inp:focus{outline:none;border-color:var(--amber);}
+@media(max-width:640px){.hl-lead-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -836,6 +856,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <div id="rates-loading" class="rates-loading" style="display:none"></div>
     <div id="rates-container" class="rates-wrap" style="display:none"></div>
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
+
     <div class="info" style="margin-top:16px"><strong>How to read this:</strong> Each provider&apos;s INR shown = amount after their typical margin + fee, applied to today&apos;s mid-market rate. Visual bars show relative value &mdash; the longer the bar, the more rupees your family receives.</div>
   </div>
 
@@ -1019,7 +1040,25 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
         <div class="f"><label>Interest Rate (% p.a.)</label><input type="number" id="hl-rate" value="8.5" step="0.1"/></div>
         <div class="f"><label>Loan Tenure (Years)</label><input type="number" id="hl-tenure" value="20" min="1" max="30"/></div>
       </div>
-      <button class="btn btn-amber" onclick="calcHomeLoan()">Calculate &amp; Show Schedule &rarr;</button>
+      <div class="prepay-toggle-row">
+        <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="togglePrepay()">&#10010; Add Lump Sum Prepayments (Optional)</button>
+        <span id="prepay-badge" style="display:none;font-size:12px;color:var(--amber);font-weight:700;margin-left:10px"></span>
+      </div>
+      <div id="prepay-section" style="display:none;margin-top:12px;padding:14px 16px;background:rgba(240,165,32,0.06);border:1px solid rgba(240,165,32,0.2);border-radius:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--amber)">&#128179; Lump Sum Prepayments <span style="font-size:11px;font-weight:400;color:var(--muted)">(up to 5)</span></div>
+          <button id="prepay-add-btn" onclick="addPrepayRow()" style="background:rgba(240,165,32,0.15);border:1px solid rgba(240,165,32,0.35);color:var(--amber);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">&#10010; Add</button>
+        </div>
+        <div id="prepay-rows">
+          <div class="prepay-row" id="pr-1" style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px">
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">&#35;1 Amount (&#8377; Lakhs)</label><input type="number" id="pp-amt-1" placeholder="e.g. 10" min="0" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div>
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">After Year</label><input type="number" id="pp-yr-1" placeholder="e.g. 5" min="1" max="30" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div>
+            <div style="padding-bottom:1px"><button onclick="removePrepayRow(1)" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);width:34px;height:36px;border-radius:7px;cursor:pointer;font-size:15px;line-height:1">&#10005;</button></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">&#128161; EMI stays same &rarr; loan closes early &middot; Sort by year; multiple prepayments all applied</div>
+      </div>
+      <button class="btn btn-amber" style="margin-top:16px" onclick="calcHomeLoan()">Calculate &amp; Show Schedule &rarr;</button>
       <div id="hl-result" style="display:none">
         <div class="rg" id="hl-result-grid"></div>
         <div class="box-amber" id="hl-tip"></div>
@@ -1033,6 +1072,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
             <tbody id="hl-amort-body"></tbody>
           </table>
         </div>
+
+        
       </div>
     </div>
     <div class="info">&#127968; <strong>NRI Checklist:</strong> EMI must be debited from NRE/NRO account via ECS mandate &middot; Power of Attorney required for local representative &middot; Tax deduction on interest under Sec 24b up to &#8377;2L/yr &middot; Sec 80C benefit up to &#8377;1.5L/yr on principal</div>
@@ -1591,117 +1632,117 @@ const P={
     {name:'InstaReM',spread:0.003,fee:6,link:'https://instarem.com/en-my/',note:'FPX transfer · 2hr delivery'},
     {name:'eRemit',spread:0.002,fee:13,link:'https://eremit.com.my/home',note:'eRemit Malaysia · MYR 13 fee'},
     {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Lotus Remit · MYR 5 fee'},
-    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com',note:'At Lulu outlets'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu outlets'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   AED:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com',note:'At Lulu Hypermarkets'},
+    {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
     {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange"},
     {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branches'},
     {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Competitive rates'},
     {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG'},
-    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   SAR:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
     {name:'STC Pay',spread:.010,fee:0,link:'https://stcpay.com.sa',note:'Saudi telco fintech'},
-    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com',note:'At Lulu KSA'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu KSA'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across KSA'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-sa/',note:'Digital · fast transfers'},
     {name:'Alinma Pay',spread:.013,fee:0,link:'https://alinma.com',note:'Digital wallet KSA'},
     {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most used bank KSA'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Large agent network'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Large agent network'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   QAR:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com',note:'At Lulu Qatar'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Qatar'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across Qatar'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-qa/',note:'Digital · fast transfers'},
     {name:'Al Zaman Exchange',spread:.012,fee:0,link:'https://alzamanexchange.com',note:'Popular in Doha'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   KWD:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Kuwait branches'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-kw/',note:'Digital · fast transfers'},
-    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
-    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   BHD:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
     {name:'BFC Exchange',spread:.013,fee:0,link:'https://bfcgroup.com',note:"Bahrain's top exchange"},
     {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Bahrain branches'},
     {name:'InstaReM',spread:.014,fee:0,link:'https://instarem.com/en-bh/',note:'Digital · fast transfers'},
-    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
-    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Available at agents'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Available at agents'},
   ],
   OMR:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Oman branches'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-om/',note:'Digital · fast transfers'},
-    {name:'Remitly',spread:.014,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
-    {name:'MoneyGram',spread:.022,fee:1,link:'https://moneygram.com',note:'Nationwide agents'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   SGD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
     {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore fintech'},
-    {name:'SingX',spread:.011,fee:0,link:'https://singx.co',note:'SG–India specialist'},
-    {name:'Remitly',spread:.013,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'SingX',spread:.011,fee:0,link:'https://singx.co/',note:'SG–India specialist'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   AUD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
     {name:'InstaReM',spread:.008,fee:0,link:'https://instarem.com/en-au/',note:'SG fintech · ASIC licensed'},
-    {name:'Remitly',spread:.012,fee:0,link:'https://remitly.com',note:'Popular in AU'},
-    {name:'TorFX',spread:.013,fee:0,link:'https://torfx.com',note:'No transfer fees'},
-    {name:'OFX',spread:.014,fee:0,link:'https://ofx.com',note:'AU FX specialist'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'Remitly',spread:.012,fee:0,link:'https://www.remitly.com/',note:'Popular in AU'},
+    {name:'TorFX',spread:.013,fee:0,link:'https://www.torfx.com/',note:'No transfer fees'},
+    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'AU FX specialist'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   NZD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.013,fee:0,link:'https://remitly.com',note:'Digital, fast'},
-    {name:'OFX',spread:.014,fee:0,link:'https://ofx.com',note:'NZ registered'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Via agents'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'NZ registered'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   USD:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://remitly.com',note:'Popular US–India'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular US–India'},
     {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-us/',note:'Digital · fast'},
-    {name:'Xe.com',spread:.014,fee:0,link:'https://xe.com',note:'No transfer fee'},
-    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://xoom.com',note:"PayPal's remit app"},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:"PayPal's remit app"},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   CAD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.011,fee:0,link:'https://remitly.com',note:'Popular in Canada'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Popular in Canada'},
     {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-ca/',note:'Digital · fast'},
-    {name:'Xe.com',spread:.014,fee:0,link:'https://xe.com',note:'No fee transfers'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Cash & digital'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No fee transfers'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   EUR:[
     {name:'Wise',spread:.005,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.011,fee:0,link:'https://remitly.com',note:'Fast digital'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Fast digital'},
     {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-eu/',note:'EU licensed · digital'},
-    {name:'Xe.com',spread:.013,fee:0,link:'https://xe.com',note:'No transfer fee'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Nationwide agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'EU-wide agents'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'EU-wide agents'},
   ],
   GBP:[
     {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://remitly.com',note:'Popular UK–India'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular UK–India'},
     {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-gb/',note:'FCA regulated · digital'},
-    {name:'Xe.com',spread:.013,fee:0,link:'https://xe.com',note:'No transfer fee'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://moneygram.com',note:'Available at agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://westernunion.com',note:'Post Office & agents'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Available at agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Post Office & agents'},
   ],
 };
 
@@ -1824,6 +1865,7 @@ function renderRates(){
       </div>
     </div>`;
   }).join('');
+
   const now=new Date();
   const lbl=rateIsLive?`<span style="color:var(--green);font-weight:700">🟢 Live</span> · Updated ${now.toLocaleTimeString()}`:`<span style="color:var(--amber);font-weight:700">🟡 Offline</span> · Approximate rates (mid-2025)`;
   document.getElementById('rate-note-text').innerHTML=`Mid-market: <strong>1 ${baseCur} = ₹${midRate.toFixed(4)}</strong> · ${lbl} · Rates are estimates — verify on provider site before transferring.`;
@@ -1856,10 +1898,12 @@ function calcSIP(){
   const finalCorpus=sipData[sipData.length-1].corpus;
   const finalInvested=sipData[sipData.length-1].totalInvested;
   const finalGain=finalCorpus-finalInvested;
+  const sipLcL=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
+  const sipLc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(inr/midRate).toLocaleString('en-IN')}</div>`:'';
   document.getElementById('sip-result-grid').innerHTML=`
-    <div class="ri"><div class="ri-lbl">Total Invested</div><div class="ri-val" style="font-size:20px">₹${(finalInvested/100000).toFixed(1)}L</div><div class="ri-sub">over ${yrs} years</div></div>
-    <div class="ri"><div class="ri-lbl">Wealth Created</div><div class="ri-val">₹${(finalGain/100000).toFixed(1)}L</div><div class="ri-sub">returns earned</div></div>
-    <div class="ri"><div class="ri-lbl">Final Corpus</div><div class="ri-val" style="color:var(--green)">₹${(finalCorpus/100000).toFixed(1)}L</div><div class="ri-sub">at ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Total Invested</div><div class="ri-val" style="font-size:20px">₹${(finalInvested/100000).toFixed(1)}L</div>${sipLcL(finalInvested)}<div class="ri-sub">over ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Wealth Created</div><div class="ri-val">₹${(finalGain/100000).toFixed(1)}L</div>${sipLcL(finalGain)}<div class="ri-sub">returns earned</div></div>
+    <div class="ri"><div class="ri-lbl">Final Corpus</div><div class="ri-val" style="color:var(--green)">₹${(finalCorpus/100000).toFixed(1)}L</div>${sipLcL(finalCorpus)}<div class="ri-sub">at ${yrs} years</div></div>
     <div class="ri"><div class="ri-lbl">Wealth Multiplier</div><div class="ri-val">×${(finalCorpus/finalInvested).toFixed(1)}</div><div class="ri-sub">your money grew</div></div>`;
   document.getElementById('sip-tip').innerHTML=`🎯 Starting at ₹${sip0.toLocaleString('en-IN')}/mo and stepping up ${(stepup*100).toFixed(0)}% annually at <strong>${rate*100}% returns</strong> turns ₹${(finalInvested/100000).toFixed(0)}L invested into <strong>₹${(finalCorpus/100000).toFixed(1)}L</strong> — ${((finalCorpus/finalInvested)).toFixed(1)}× your money.`;
   document.getElementById('sip-result').style.display='block';
@@ -1898,11 +1942,14 @@ function calcSWP(){
   const initCorpus=parseFloat(document.getElementById('swp-corpus').value)*100000;
   const finalClose=swpData[swpData.length-1].close;
   const totalWd=swpData.reduce((s,r)=>s+r.annWd,0);
+  const swpLcL=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
+  const swpLc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(inr/midRate).toLocaleString('en-IN')}</div>`:'';
+  const swpRemL=exhaustYear?'':swpLcL(finalClose);
   document.getElementById('swp-result-grid').innerHTML=`
-    <div class="ri"><div class="ri-lbl">Starting Corpus</div><div class="ri-val" style="font-size:20px">₹${(initCorpus/100000).toFixed(0)}L</div></div>
-    <div class="ri"><div class="ri-lbl">Monthly Withdrawal</div><div class="ri-val">₹${wd0.toLocaleString('en-IN')}</div><div class="ri-sub">starting amount</div></div>
-    <div class="ri"><div class="ri-lbl">Total Withdrawn</div><div class="ri-val">₹${(totalWd/100000).toFixed(1)}L</div><div class="ri-sub">over plan period</div></div>
-    <div class="ri"><div class="ri-lbl">${exhaustYear?'Corpus Lasts':'Corpus After 40yr'}</div><div class="ri-val" style="color:${exhaustYear?'var(--red)':'var(--green)'};">${exhaustYear?exhaustYear+' years':'₹'+(finalClose/100000).toFixed(1)+'L'}</div><div class="ri-sub">${exhaustYear?'then corpus depleted':'still remaining'}</div></div>`;
+    <div class="ri"><div class="ri-lbl">Starting Corpus</div><div class="ri-val" style="font-size:20px">₹${(initCorpus/100000).toFixed(0)}L</div>${swpLcL(initCorpus)}</div>
+    <div class="ri"><div class="ri-lbl">Monthly Withdrawal</div><div class="ri-val">₹${wd0.toLocaleString('en-IN')}</div>${swpLc(wd0)}<div class="ri-sub">starting amount</div></div>
+    <div class="ri"><div class="ri-lbl">Total Withdrawn</div><div class="ri-val">₹${(totalWd/100000).toFixed(1)}L</div>${swpLcL(totalWd)}<div class="ri-sub">over plan period</div></div>
+    <div class="ri"><div class="ri-lbl">${exhaustYear?'Corpus Lasts':'Corpus After 40yr'}</div><div class="ri-val" style="color:${exhaustYear?'var(--red)':'var(--green)'};">${exhaustYear?exhaustYear+' years':'₹'+(finalClose/100000).toFixed(1)+'L'}</div>${swpRemL}<div class="ri-sub">${exhaustYear?'then corpus depleted':'still remaining'}</div></div>`;
   document.getElementById('swp-verdict').innerHTML=exhaustYear
     ?`<div class="box-red">⚠️ <strong>Corpus runs out in Year ${exhaustYear}.</strong> Options: reduce monthly withdrawal · increase portfolio return · add an income source · consider a larger starting corpus.</div>`
     :`<div class="box-green">✅ <strong>Corpus is sustainable.</strong> At ${ret*100}% returns with ${(stepup*100).toFixed(0)}% annual withdrawal increase, your corpus outlasts the 40-year projection. Remaining: ₹${(finalClose/100000).toFixed(1)}L.</div>`;
@@ -1929,38 +1976,110 @@ function nreNroRecommend(){
 }
 
 // ── HOME LOAN ────────────────────────────────────
+let prepayRowCount=1;
+const MAX_PREPAY=5;
+function togglePrepay(){
+  const sec=document.getElementById('prepay-section');
+  sec.style.display=sec.style.display==='none'?'block':'none';
+}
+function addPrepayRow(){
+  if(prepayRowCount>=MAX_PREPAY)return;
+  prepayRowCount++;
+  const n=prepayRowCount;
+  const row=document.createElement('div');
+  row.className='prepay-row';row.id='pr-'+n;
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px';
+  row.innerHTML=`<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">#${n} Amount (₹ Lakhs)</label><input type="number" id="pp-amt-${n}" placeholder="e.g. 5" min="0" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div><div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">After Year</label><input type="number" id="pp-yr-${n}" placeholder="e.g. 10" min="1" max="30" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div><div style="padding-bottom:1px"><button onclick="removePrepayRow(${n})" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);width:34px;height:36px;border-radius:7px;cursor:pointer;font-size:15px;line-height:1">✕</button></div>`;
+  document.getElementById('prepay-rows').appendChild(row);
+  document.getElementById('prepay-add-btn').style.opacity=prepayRowCount>=MAX_PREPAY?'0.4':'1';
+  document.getElementById('prepay-add-btn').disabled=prepayRowCount>=MAX_PREPAY;
+  updatePrepayBadge();
+}
+function removePrepayRow(n){
+  const row=document.getElementById('pr-'+n);
+  if(row)row.remove();
+  if(n===prepayRowCount)prepayRowCount--;
+  document.getElementById('prepay-add-btn').style.opacity='1';
+  document.getElementById('prepay-add-btn').disabled=false;
+  updatePrepayBadge();
+}
+function getPrepayments(){
+  const list=[];
+  for(let i=1;i<=MAX_PREPAY;i++){
+    const aEl=document.getElementById('pp-amt-'+i);
+    const yEl=document.getElementById('pp-yr-'+i);
+    if(!aEl||!yEl)continue;
+    const amt=(parseFloat(aEl.value)||0)*100000;
+    const yr=parseInt(yEl.value)||0;
+    if(amt>0&&yr>=1)list.push({amt,yr});
+  }
+  list.sort((a,b)=>a.yr-b.yr);
+  return list;
+}
+function updatePrepayBadge(){
+  const list=getPrepayments();
+  const badge=document.getElementById('prepay-badge');
+  if(list.length===0){badge.style.display='none';return;}
+  badge.style.display='inline';
+  const total=list.reduce((s,p)=>s+p.amt,0);
+  badge.textContent=`${list.length} prepayment${list.length>1?'s':''} · ₹${(total/100000).toFixed(0)}L total`;
+}
 function calcHomeLoan(){
   const pv=parseFloat(document.getElementById('hl-propval').value)*100000;
   const dp=parseFloat(document.getElementById('hl-down').value)/100;
   const ar=parseFloat(document.getElementById('hl-rate').value)/100;
   const yrs=parseInt(document.getElementById('hl-tenure').value);
+  const prepays=getPrepayments().filter(p=>p.yr<=yrs);
+  const hasPrepay=prepays.length>0;
+  // Group by year (sum if same year)
+  const prepayMap={};
+  prepays.forEach(p=>{prepayMap[p.yr]=(prepayMap[p.yr]||0)+p.amt;});
   const loan=pv*(1-dp),mr=ar/12,n=yrs*12;
   const emi=loan*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
-  const totalPaid=emi*n,totalInt=totalPaid-loan;
-  const fxEMI=midRate?`<div class="ri"><div class="ri-lbl">EMI in ${baseCur}</div><div class="ri-val" style="font-size:20px">${baseCur} ${Math.round(emi/midRate).toLocaleString()}</div><div class="ri-sub">at today's rate</div></div>`:'';
-  document.getElementById('hl-result-grid').innerHTML=`
-    <div class="ri"><div class="ri-lbl">Loan Amount</div><div class="ri-val" style="font-size:20px">₹${(loan/100000).toFixed(1)}L</div><div class="ri-sub">${(dp*100).toFixed(0)}% down paid</div></div>
-    <div class="ri"><div class="ri-lbl">Monthly EMI</div><div class="ri-val">₹${Math.round(emi).toLocaleString('en-IN')}</div><div class="ri-sub">for ${yrs} years</div></div>
-    <div class="ri"><div class="ri-lbl">Total Interest</div><div class="ri-val" style="color:var(--red)">₹${(totalInt/100000).toFixed(1)}L</div><div class="ri-sub">cost of borrowing</div></div>
-    <div class="ri"><div class="ri-lbl">Total Amount Paid</div><div class="ri-val" style="font-size:20px">₹${(totalPaid/100000).toFixed(1)}L</div><div class="ri-sub">principal + interest</div></div>
-    ${fxEMI}`;
-  document.getElementById('hl-tip').innerHTML=`<div style="font-size:13px;color:var(--amber);font-weight:800;margin-bottom:8px">💡 NRI Home Loan Checklist</div><div style="font-size:13px;color:var(--muted);line-height:1.75">• EMI debited from NRE/NRO account via ECS/NACH mandate<br/>• Power of Attorney required for local India representative<br/>• Sec 24b deduction: up to ₹2L/yr interest if filing India returns<br/>• Pre-payment: most banks allow 2 free pre-payments/yr — reduces interest significantly</div>`;
+  const baseTotal=emi*n,baseTotalInt=baseTotal-loan;
   loanAmortData=[];
-  let bal=loan,tbody='',totalPrinc=0,totalInterest=0,totalEMIPaid=0;
+  let bal=loan,tbody='',totalPrinc=0,totalInterest=0,totalEMIPaid=0,totalPrepaid=0;
+  let effectiveTenure=yrs,loanPaidOff=false;
+  const prepayTh=hasPrepay?'<th style="color:var(--amber)">Prepayment</th>':'';
+  document.querySelector('#hl-amort-table thead tr').innerHTML=`<th>Year</th><th>Opening Balance</th><th>Annual EMI</th>${prepayTh}<th>Principal Paid</th><th>Interest Paid</th><th>Closing Balance</th>`;
   for(let y=1;y<=yrs;y++){
+    if(loanPaidOff)break;
     const open=bal;let annPrinc=0,annInt=0;
     for(let m=0;m<12&&bal>0;m++){
       const intM=bal*mr;const princM=Math.min(emi-intM,bal);
       annInt+=intM;annPrinc+=princM;bal-=princM;
     }
+    let prepayThisYear=0;
+    if(hasPrepay&&prepayMap[y]&&bal>0){
+      prepayThisYear=Math.min(prepayMap[y],bal);
+      bal=Math.max(0,bal-prepayThisYear);
+      totalPrepaid+=prepayThisYear;
+    }
     const annEMI=annPrinc+annInt;
-    totalPrinc+=annPrinc;totalInterest+=annInt;totalEMIPaid+=annEMI;
-    const princPct=Math.round(annPrinc/annEMI*100);
-    loanAmortData.push({year:y,open,annEMI,annPrinc,annInt,close:Math.max(0,bal)});
-    tbody+=`<tr><td>${y}</td><td>₹${(open/100000).toFixed(2)}L</td><td>₹${Math.round(annEMI).toLocaleString('en-IN')}</td><td class="principal">₹${Math.round(annPrinc).toLocaleString('en-IN')}</td><td class="interest">₹${Math.round(annInt).toLocaleString('en-IN')}</td><td><div>${princPct}% principal</div><div class="prog-bar-mini"><div class="prog-fill" style="width:${princPct}%"></div></div></td><td>₹${(Math.max(0,bal)/100000).toFixed(2)}L</td></tr>`;
+    totalPrinc+=annPrinc+prepayThisYear;totalInterest+=annInt;totalEMIPaid+=annEMI;
+    if(bal<=0&&!loanPaidOff){effectiveTenure=y;loanPaidOff=true;}
+    loanAmortData.push({year:y,open,annEMI,prepay:prepayThisYear,annPrinc,annInt,close:Math.max(0,bal)});
+    const prepayCell=hasPrepay?(prepayThisYear>0?`<td style="color:var(--amber);font-weight:800">₹${(prepayThisYear/100000).toFixed(1)}L ✓</td>`:`<td style="color:var(--muted)">—</td>`):'';
+    const rowStyle=prepayThisYear>0?' style="background:rgba(240,165,32,0.1)"':'';
+    tbody+=`<tr${rowStyle}><td>${y}</td><td>₹${(open/100000).toFixed(2)}L</td><td>₹${Math.round(annEMI).toLocaleString('en-IN')}</td>${prepayCell}<td class="principal">₹${Math.round(annPrinc).toLocaleString('en-IN')}</td><td class="interest">₹${Math.round(annInt).toLocaleString('en-IN')}</td><td>₹${(Math.max(0,bal)/100000).toFixed(2)}L</td></tr>`;
   }
-  tbody+=`<tr><td>Total</td><td>—</td><td>₹${Math.round(totalEMIPaid).toLocaleString('en-IN')}</td><td class="principal">₹${(totalPrinc/100000).toFixed(2)}L</td><td class="interest">₹${(totalInterest/100000).toFixed(2)}L</td><td>—</td><td>₹0</td></tr>`;
+  const prepayTotalCell=hasPrepay?`<td style="color:var(--amber);font-weight:800">₹${(totalPrepaid/100000).toFixed(1)}L</td>`:'';
+  tbody+=`<tr><td>Total</td><td>—</td><td>₹${Math.round(totalEMIPaid).toLocaleString('en-IN')}</td>${prepayTotalCell}<td class="principal">₹${(totalPrinc/100000).toFixed(2)}L</td><td class="interest">₹${(totalInterest/100000).toFixed(2)}L</td><td>₹0</td></tr>`;
   document.getElementById('hl-amort-body').innerHTML=tbody;
+  const interestSaved=hasPrepay?Math.max(0,baseTotalInt-totalInterest):0;
+  const yrsSaved=hasPrepay?yrs-effectiveTenure:0;
+  const prepayDesc=prepays.length>1?`${prepays.length} prepayments`:`₹${(prepays[0]?.amt/100000||0).toFixed(0)}L in yr ${prepays[0]?.yr||''}`;
+  const fxEMI=midRate?`<div class="ri"><div class="ri-lbl">EMI in ${baseCur}</div><div class="ri-val" style="font-size:20px">${baseCur} ${Math.round(emi/midRate).toLocaleString()}</div><div class="ri-sub">at today's rate</div></div>`:'';
+  const prepayResult=hasPrepay?`
+    <div class="ri" style="border:1px solid rgba(74,222,128,0.3);background:rgba(74,222,128,0.06)"><div class="ri-lbl">&#127881; Interest Saved</div><div class="ri-val" style="color:var(--green)">₹${(interestSaved/100000).toFixed(1)}L</div><div class="ri-sub">${prepayDesc}</div></div>
+    <div class="ri" style="border:1px solid rgba(240,165,32,0.3);background:rgba(240,165,32,0.06)"><div class="ri-lbl">&#9200; New Tenure</div><div class="ri-val" style="color:var(--amber)">${effectiveTenure} yrs</div><div class="ri-sub">${yrsSaved} year${yrsSaved!==1?'s':''} saved!</div></div>`:'';
+  document.getElementById('hl-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Loan Amount</div><div class="ri-val" style="font-size:20px">₹${(loan/100000).toFixed(1)}L</div><div class="ri-sub">${(dp*100).toFixed(0)}% down paid</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly EMI</div><div class="ri-val">₹${Math.round(emi).toLocaleString('en-IN')}</div><div class="ri-sub">for ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Total Interest</div><div class="ri-val" style="color:var(--red)">₹${(baseTotalInt/100000).toFixed(1)}L</div><div class="ri-sub">${hasPrepay?'without prepayment':'cost of borrowing'}</div></div>
+    <div class="ri"><div class="ri-lbl">Total Paid</div><div class="ri-val" style="font-size:20px">₹${((totalEMIPaid+totalPrepaid)/100000).toFixed(1)}L</div><div class="ri-sub">EMI${hasPrepay?' + ₹'+(totalPrepaid/100000).toFixed(1)+'L prepaid':''}</div></div>
+    ${fxEMI}${prepayResult}`;
+  document.getElementById('hl-tip').innerHTML=`<div style="font-size:13px;color:var(--amber);font-weight:800;margin-bottom:8px">💡 NRI Home Loan Checklist</div><div style="font-size:13px;color:var(--muted);line-height:1.75">• EMI debited from NRE/NRO account via ECS/NACH mandate<br/>• Power of Attorney required for local India representative<br/>• Sec 24b deduction: up to ₹2L/yr interest if filing India returns<br/>• Pre-payment: most banks allow 2 free pre-payments/yr — reduces interest significantly</div>`;
   document.getElementById('hl-result').style.display='block';
 }
 function downloadLoanCSV(){
@@ -2526,6 +2645,8 @@ function renderChecklist(){
 // Init checklist on page load
 document.addEventListener('DOMContentLoaded',()=>{renderChecklist();});
 
+// ── RATE ALERT SIGNUP ─────────────────────────────────────────────────────────
 </script>
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
