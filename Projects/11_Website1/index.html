@@ -750,6 +750,47 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .art-table tr:last-child td{border-bottom:none;}
 .art-table td:first-child{font-weight:700;color:var(--text);}
 @media(max-width:640px){.art-grid{grid-template-columns:1fr;}.art-reader h1{font-size:20px;}}
+
+/* ── INTENT BAR ──────────────────────────────────────────────────────────── */
+.intent-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
+.intent-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.intent-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.intent-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.intent-btn{display:flex;align-items:center;gap:6px;background:var(--elevated);border:1px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.intent-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);transform:translateY(-1px);}
+
+/* ── TRUST STRIP ─────────────────────────────────────────────────────────── */
+.trust-strip{display:inline-flex;align-items:center;gap:0;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:6px 12px;flex-wrap:nowrap;}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;padding:2px 8px;}
+.trust-icon{font-size:13px;}
+.trust-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
+
+/* ── COUNTRY WELCOME ─────────────────────────────────────────────────────── */
+.country-welcome{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--teal-dim),transparent);border:1px solid rgba(0,205,176,0.2);border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.4;}
+.country-welcome strong{color:var(--teal);}
+
+/* ── NRI JOURNEY ROADMAP ─────────────────────────────────────────────────── */
+.journey-section{padding:60px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--surface) 50%,var(--bg) 100%);}
+.journey-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
+.journey-header{text-align:center;margin-bottom:40px;}
+.journey-eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
+.journey-title{font-size:clamp(20px,3vw,28px);font-weight:900;color:var(--text);margin:0;}
+.journey-steps{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;}
+.journey-step{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;cursor:pointer;transition:all 0.2s;position:relative;text-align:center;}
+.journey-step:hover{border-color:var(--amber-glow);background:var(--elevated);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3);}
+.js-icon{font-size:32px;margin-bottom:8px;line-height:1;}
+.js-num{font-size:10px;font-weight:800;color:var(--amber);letter-spacing:1px;margin-bottom:6px;}
+.js-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.js-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.js-cta{font-size:11px;font-weight:700;color:var(--amber);opacity:0.8;}
+.journey-step:hover .js-cta{opacity:1;}
+.journey-arrow{display:flex;align-items:center;padding:0 8px;color:var(--border2);font-size:20px;flex-shrink:0;align-self:center;}
+@media(max-width:768px){
+  .journey-steps{gap:10px;}
+  .journey-arrow{display:none;}
+  .journey-step{min-width:140px;}
+  .intent-lbl{display:none;}
+}
 </style>
 </head>
 <body>
@@ -2716,7 +2757,7 @@ function downloadLoanPDF(){
 /* ── HERO LEFT: Must-Read Guides ─────────────────────────────────────────── */
 .hero-reads{margin-top:20px;}
 .hr-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-.hr-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:7px;text-decoration:none;transition:border-color 0.15s,background 0.15s;cursor:pointer;}
+.hr-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:7px;text-decoration:none;transition:border-color 0.15s,background 0.15s;cursor:pointer;overflow:hidden;}
 .hr-card:hover{border-color:var(--amber-glow);background:var(--elevated);}
 .hr-tag{font-size:10px;font-weight:700;background:var(--amber-dim);color:var(--amber);padding:3px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;}
 .hr-title{font-size:12px;font-weight:600;color:var(--text2);flex:1;line-height:1.3;}
@@ -2724,47 +2765,6 @@ function downloadLoanPDF(){
 .hr-meta{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
 .hr-view-all{text-align:center;font-size:12px;font-weight:700;color:var(--amber);cursor:pointer;padding:8px;opacity:0.8;transition:opacity 0.15s;}
 .hr-view-all:hover{opacity:1;}
-
-/* ── INTENT BAR ──────────────────────────────────────────────────────────── */
-.intent-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
-.intent-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.intent-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0;}
-.intent-btns{display:flex;gap:8px;flex-wrap:wrap;}
-.intent-btn{display:flex;align-items:center;gap:6px;background:var(--elevated);border:1px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;}
-.intent-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);transform:translateY(-1px);}
-
-/* ── TRUST STRIP ─────────────────────────────────────────────────────────── */
-.trust-strip{display:flex;align-items:center;gap:0;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:8px 14px;flex-wrap:wrap;gap:4px;}
-.trust-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;padding:2px 8px;}
-.trust-icon{font-size:13px;}
-.trust-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
-
-/* ── COUNTRY WELCOME ─────────────────────────────────────────────────────── */
-.country-welcome{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--teal-dim),transparent);border:1px solid rgba(0,205,176,0.2);border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.4;}
-.country-welcome strong{color:var(--teal);}
-
-/* ── NRI JOURNEY ROADMAP ─────────────────────────────────────────────────── */
-.journey-section{padding:60px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--surface) 50%,var(--bg) 100%);}
-.journey-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
-.journey-header{text-align:center;margin-bottom:40px;}
-.journey-eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
-.journey-title{font-size:clamp(20px,3vw,28px);font-weight:900;color:var(--text);margin:0;}
-.journey-steps{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;}
-.journey-step{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;cursor:pointer;transition:all 0.2s;position:relative;text-align:center;}
-.journey-step:hover{border-color:var(--amber-glow);background:var(--elevated);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3);}
-.js-icon{font-size:32px;margin-bottom:8px;line-height:1;}
-.js-num{font-size:10px;font-weight:800;color:var(--amber);letter-spacing:1px;margin-bottom:6px;}
-.js-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;}
-.js-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
-.js-cta{font-size:11px;font-weight:700;color:var(--amber);opacity:0.8;}
-.journey-step:hover .js-cta{opacity:1;}
-.journey-arrow{display:flex;align-items:center;padding:0 8px;color:var(--border2);font-size:20px;flex-shrink:0;align-self:center;}
-@media(max-width:768px){
-  .journey-steps{gap:10px;}
-  .journey-arrow{display:none;}
-  .journey-step{min-width:140px;}
-  .intent-lbl{display:none;}
-}
 </style></head><body><h2>Home Loan Amortization Schedule</h2><p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>${tbl.outerHTML}
 <!-- BOTTOM TAB BAR (mobile) -->
 <nav class="bottom-tabs" id="bottomTabs">
@@ -3303,7 +3303,7 @@ function updateCountryPersonalization(){
   const flagEl = document.getElementById('countryWelcomeFlag');
   const txtEl = document.getElementById('countryWelcomeText');
   if(!el||!hub)return;
-  flagEl.textContent = hub.emoji + ' ';
+  flagEl.innerHTML = '<img src="https://flagcdn.com/20x15/' + baseCur.toLowerCase().slice(0,2) + '.png" width="20" height="15" style="border-radius:2px;vertical-align:middle;margin-right:4px;" alt=""/> ';
   txtEl.innerHTML = '<strong>' + hub.label + '</strong> &mdash; rates, tax &amp; guides for ' + hub.name + ' NRIs';
   el.style.display = 'flex';
 }
