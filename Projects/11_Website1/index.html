@@ -2006,6 +2006,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
   </div>
+  </div>
   <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
@@ -2278,7 +2279,7 @@ function selectCurrency(el){
   // Update baseCur and reload rates
   baseCur=val;
   document.getElementById('heroFromLabel').textContent=val;
-  document.getElementById('curTag').textContent=val;
+  document.getElementById('curTag').textContent=val;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=val);
   updateHeroBg(val);
   // Sync quick-select pills to match chosen currency
   document.querySelectorAll('.cflag').forEach(b=>b.classList.remove('active'));
@@ -2634,7 +2635,7 @@ async function fetchRate(c){
 async function updateAll(){
   // baseCur is managed by the custom dropdown (selectCurrency); use global as-is
   document.getElementById('heroFromLabel').textContent=baseCur;
-  document.getElementById('curTag').textContent=baseCur;
+  document.getElementById('curTag').textContent=baseCur;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=baseCur);
   const ld=document.getElementById('rates-loading');
   const rc=document.getElementById('rates-container');
   const rn=document.getElementById('rate-note');
