@@ -814,6 +814,21 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .hr-card:hover .hr-arrow{color:var(--amber);}
 .hr-view-all{width:100%;margin-top:6px;background:transparent;border:1px dashed var(--border2);border-radius:10px;padding:8px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
 .hr-view-all:hover{border-color:var(--amber-glow);color:var(--amber);}
+
+/* ── JUMP NAV ─────────────────────────────────────────────────────────── */
+.jump-nav{display:none;position:sticky;top:57px;z-index:90;background:rgba(6,11,28,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(100,130,220,0.1);padding:0 20px;}
+.jump-nav-inner{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;max-width:1400px;margin:0 auto;}
+.jump-nav-inner::-webkit-scrollbar{display:none;}
+.jn-link{flex-shrink:0;font-size:12px;font-weight:600;color:var(--muted);padding:9px 14px;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;letter-spacing:.02em;}
+.jn-link:hover,.jn-link.active{color:var(--teal);border-bottom-color:var(--teal);}
+
+/* ── ARTICLE SEARCH ───────────────────────────────────────────────────── */
+.art-search-wrap{margin-bottom:20px;position:relative;}
+.art-search-input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 16px 12px 42px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;}
+.art-search-input::placeholder{color:var(--muted);}
+.art-search-input:focus{border-color:var(--teal);}
+.art-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5;}
+.art-no-results{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;display:none;}
 </style>
 </head>
 <body>
@@ -868,6 +883,19 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
         <div class="cur-item" data-val="GBP" data-flag="&#127468;&#127463;" data-name="British Pound" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-gb" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span></span><div class="ci-info"><span class="ci-code">GBP</span><span class="ci-name">UK &mdash; Pound Sterling</span></div><span class="ci-check" id="ck-GBP" style="display:none">&#10003;</span></div>
       </div>
     </div>
+  </div>
+</nav>
+
+<!-- Jump navigation -->
+<nav id="jumpNav" style="display:none;position:sticky;top:57px;z-index:90;background:rgba(6,11,28,0.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(100,130,220,0.1);padding:0 20px;">
+  <div style="display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;max-width:1400px;margin:0 auto;">
+    <span class="jn-link" onclick="jumpTo('dash-send')">💸 Remittance</span>
+    <span class="jn-link" onclick="jumpTo('dash-bank')">🏦 Banking</span>
+    <span class="jn-link" onclick="jumpTo('dash-prop')">🏠 Property</span>
+    <span class="jn-link" onclick="jumpTo('dash-tax')">🛡 Tax</span>
+    <span class="jn-link" onclick="jumpTo('dash-plan')">🗓 Planning</span>
+    <span class="jn-link" onclick="jumpTo('dash-guides')">📚 Guides</span>
+    <span class="jn-link" onclick="jumpTo('art-list')">📖 Articles</span>
   </div>
 </nav>
 
@@ -1015,14 +1043,14 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="tool-launcher">
         <div class="tl-hd">Your NRI Dashboard</div>
 
-        <div class="tl-cat-lbl">💸 Send Money</div>
+        <div id="dash-send" class="tl-cat-lbl">💸 Send Money</div>
         <div class="tl-grid tl-grid-1">
           <div class="tl-card tl-card-wide" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
             <span class="tl-ico tl-c-teal">&#128202;</span><div><div class="tl-nm">Live Remittance Rates</div><div class="tl-ds">Compare 50+ providers · Best rate to India today</div></div>
           </div>
         </div>
 
-        <div class="tl-cat-lbl">🏦 Banking &amp; Savings</div>
+        <div id="dash-bank" class="tl-cat-lbl">🏦 Banking &amp; Savings</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">
             <span class="tl-ico tl-c-blue">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank rates</div>
@@ -1032,7 +1060,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
           </div>
         </div>
 
-        <div class="tl-cat-lbl">🏠 Property</div>
+        <div id="dash-prop" class="tl-cat-lbl">🏠 Property</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">
             <span class="tl-ico tl-c-amber">&#127968;</span><div class="tl-nm">Home Loan EMI</div><div class="tl-ds">Full amortization</div>
@@ -1042,7 +1070,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
           </div>
         </div>
 
-        <div class="tl-cat-lbl">🛡 Tax &amp; Compliance</div>
+        <div id="dash-tax" class="tl-cat-lbl">🛡 Tax &amp; Compliance</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
             <span class="tl-ico tl-c-sky">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
@@ -1052,7 +1080,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
           </div>
         </div>
 
-        <div class="tl-cat-lbl">🗓 Life Planning</div>
+        <div id="dash-plan" class="tl-cat-lbl">🗓 Life Planning</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
             <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return to India</div><div class="tl-ds">Corpus &amp; checklist</div>
@@ -1062,7 +1090,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
           </div>
         </div>
 
-        <div class="tl-cat-lbl">📚 Guides</div>
+        <div id="dash-guides" class="tl-cat-lbl">📚 Guides</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="document.querySelector('.feat-section').scrollIntoView({behavior:'smooth'})">
             <span class="tl-ico">📖</span><div class="tl-nm">NRI Articles</div><div class="tl-ds">11 guides below</div>
@@ -2023,7 +2051,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="tool-banner-icon">🎓</div>
       <div class="tool-banner-body">
         <h2>Education Corpus Planner</h2>
-      <p>Calculate how much you need to save for your child's education in India or abroad</p>
+        <p>Calculate how much you need to save for your child's education in India or abroad</p>
+      </div>
     </div>
 
     <!-- Quick reference costs -->
@@ -2088,6 +2117,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div id="art-list">
+      <div class="art-search-wrap">
+        <span class="art-search-icon">🔍</span>
+        <input class="art-search-input" id="artSearch" type="text" placeholder="Search guides… e.g. TDS, NRE, capital gains" oninput="searchArticles(this.value)"/>
+      </div>
+      <div class="art-no-results" id="artNoResults">No guides match your search.</div>
       <div class="art-grid">
         <div class="art-card" onclick="window.location.href='nre-nro.html'">
           <div><span class="art-tag banking">Banking</span></div>
@@ -4042,6 +4076,58 @@ function closeArticle(){
   history.replaceState(null,'','#guides');
 }
 </script>
-<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'>
+// ── JUMP NAV ──────────────────────────────────────────────────────────────
+function jumpTo(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const offset=57+40; // nav height + jump nav height
+  const top=el.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top,behavior:'smooth'});
+}
+
+// Show/hide jump nav based on scroll position (show after hero)
+(function(){
+  let ticking=false;
+  const sections=['dash-send','dash-bank','dash-prop','dash-tax','dash-plan','dash-guides'];
+  window.addEventListener('scroll',function(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      const jn=document.getElementById('jumpNav');
+      if(!jn){ticking=false;return;}
+      // Show after user scrolls 300px
+      jn.style.display=window.scrollY>300?'block':'none';
+      // Highlight active section
+      const links=jn.querySelectorAll('.jn-link');
+      let active='';
+      sections.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el&&el.getBoundingClientRect().top<120)active=id;
+      });
+      links.forEach(l=>{
+        const target=l.getAttribute('onclick').replace("jumpTo('","").replace("')","");
+        l.classList.toggle('active',target===active);
+      });
+      ticking=false;
+    });
+  },{passive:true});
+})();
+
+// ── ARTICLE SEARCH ────────────────────────────────────────────────────────
+function searchArticles(q){
+  const cards=document.querySelectorAll('#art-list .art-card');
+  const noRes=document.getElementById('artNoResults');
+  const term=q.trim().toLowerCase();
+  let visible=0;
+  cards.forEach(card=>{
+    const text=card.textContent.toLowerCase();
+    const show=!term||text.includes(term);
+    card.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  if(noRes)noRes.style.display=(visible===0&&term)?'block':'none';
+}
+</script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
