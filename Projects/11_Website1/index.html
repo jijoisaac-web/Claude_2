@@ -807,6 +807,30 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   </div>
 </nav>
 
+<!-- INTENT CTA -->
+<div class="intent-bar">
+  <div class="intent-inner">
+    <span class="intent-lbl">What do you want to do today?</span>
+    <div class="intent-btns">
+      <button class="intent-btn" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>💸</span> Send Money
+      </button>
+      <button class="intent-btn" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>📈</span> Grow Wealth
+      </button>
+      <button class="intent-btn" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>🛡</span> Save Tax
+      </button>
+      <button class="intent-btn" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>🏠</span> Buy Property
+      </button>
+      <button class="intent-btn" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>✈️</span> Return to India
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
@@ -815,6 +839,19 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <!-- LEFT: Live Rate Ticker + Country Quick-Select -->
     <div class="hero-left">
       <div class="hero-badge">&#127327; Live rates &middot; 14 currencies &middot; Always free</div>
+      <div class="trust-strip">
+        <div class="trust-item"><span class="trust-icon">✅</span>50+ providers compared</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🔄</span>Rates updated live</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🔒</span>No signup needed</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🆓</span>Free forever</div>
+      </div>
+      <div class="country-welcome" id="countryWelcome" style="display:none">
+        <span id="countryWelcomeFlag"></span>
+        <span id="countryWelcomeText"></span>
+      </div>
       <div class="hrd-eyebrow">1 <span id="heroFromLabel">AED</span> equals</div>
       <div class="hrd-main">
         <span class="hrd-sym">&#8377;</span>
@@ -988,6 +1025,57 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     </div>
   </div>
 </div>
+
+<!-- NRI JOURNEY ROADMAP -->
+<section class="journey-section">
+  <div class="journey-inner">
+    <div class="journey-header">
+      <div class="journey-eyebrow">Your NRI Financial Journey</div>
+      <h2 class="journey-title">Every stage of life abroad — covered</h2>
+    </div>
+    <div class="journey-steps">
+      <div class="journey-step" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">💸</div>
+        <div class="js-num">01</div>
+        <div class="js-title">Send Money</div>
+        <div class="js-desc">Compare 50+ providers. Get the best AED/MYR/SGD → INR rate today.</div>
+        <div class="js-cta">Compare Rates →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">🏦</div>
+        <div class="js-num">02</div>
+        <div class="js-title">Build Savings</div>
+        <div class="js-desc">Park money in NRE FDs at up to 7.25% — fully tax-free and repatriable.</div>
+        <div class="js-cta">See FD Rates →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">📈</div>
+        <div class="js-num">03</div>
+        <div class="js-title">Invest &amp; Grow</div>
+        <div class="js-desc">SIP into Indian mutual funds. Model corpus growth over 10–25 years.</div>
+        <div class="js-cta">Start SIP Calc →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">🏠</div>
+        <div class="js-num">04</div>
+        <div class="js-title">Buy Property</div>
+        <div class="js-desc">Calculate EMI, compare NRI home loan rates, plan your investment property.</div>
+        <div class="js-cta">EMI Calculator →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">✈️</div>
+        <div class="js-num">05</div>
+        <div class="js-title">Return to India</div>
+        <div class="js-desc">Know exactly how much corpus you need. Month-by-month projection.</div>
+        <div class="js-cta">Plan Return →</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- FEATURED ARTICLES -->
 <section class="feat-section">
@@ -2636,6 +2724,47 @@ function downloadLoanPDF(){
 .hr-meta{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
 .hr-view-all{text-align:center;font-size:12px;font-weight:700;color:var(--amber);cursor:pointer;padding:8px;opacity:0.8;transition:opacity 0.15s;}
 .hr-view-all:hover{opacity:1;}
+
+/* ── INTENT BAR ──────────────────────────────────────────────────────────── */
+.intent-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
+.intent-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.intent-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.intent-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.intent-btn{display:flex;align-items:center;gap:6px;background:var(--elevated);border:1px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.intent-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);transform:translateY(-1px);}
+
+/* ── TRUST STRIP ─────────────────────────────────────────────────────────── */
+.trust-strip{display:flex;align-items:center;gap:0;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:8px 14px;flex-wrap:wrap;gap:4px;}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;padding:2px 8px;}
+.trust-icon{font-size:13px;}
+.trust-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
+
+/* ── COUNTRY WELCOME ─────────────────────────────────────────────────────── */
+.country-welcome{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--teal-dim),transparent);border:1px solid rgba(0,205,176,0.2);border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.4;}
+.country-welcome strong{color:var(--teal);}
+
+/* ── NRI JOURNEY ROADMAP ─────────────────────────────────────────────────── */
+.journey-section{padding:60px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--surface) 50%,var(--bg) 100%);}
+.journey-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
+.journey-header{text-align:center;margin-bottom:40px;}
+.journey-eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
+.journey-title{font-size:clamp(20px,3vw,28px);font-weight:900;color:var(--text);margin:0;}
+.journey-steps{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;}
+.journey-step{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;cursor:pointer;transition:all 0.2s;position:relative;text-align:center;}
+.journey-step:hover{border-color:var(--amber-glow);background:var(--elevated);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3);}
+.js-icon{font-size:32px;margin-bottom:8px;line-height:1;}
+.js-num{font-size:10px;font-weight:800;color:var(--amber);letter-spacing:1px;margin-bottom:6px;}
+.js-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.js-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.js-cta{font-size:11px;font-weight:700;color:var(--amber);opacity:0.8;}
+.journey-step:hover .js-cta{opacity:1;}
+.journey-arrow{display:flex;align-items:center;padding:0 8px;color:var(--border2);font-size:20px;flex-shrink:0;align-self:center;}
+@media(max-width:768px){
+  .journey-steps{gap:10px;}
+  .journey-arrow{display:none;}
+  .journey-step{min-width:140px;}
+  .intent-lbl{display:none;}
+}
 </style></head><body><h2>Home Loan Amortization Schedule</h2><p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>${tbl.outerHTML}
 <!-- BOTTOM TAB BAR (mobile) -->
 <nav class="bottom-tabs" id="bottomTabs">
@@ -3153,9 +3282,36 @@ function calcTaxResidency(){
 
 // ── CURRENCY CONTEXT BARS ─────────────────────────────────────────────────────
 const CCB_TABS=['invest','nrenro','homeloan','return','dtaa','realty','taxres'];
+
+// ── COUNTRY PERSONALIZATION ──────────────────────────────────────────────────
+const COUNTRY_HUB = {
+  AED:{name:'UAE',emoji:'🇦🇪',label:'UAE NRI Hub',guide:'tax-saving.html',guideLbl:'UAE DTAA Guide'},
+  SAR:{name:'Saudi Arabia',emoji:'🇸🇦',label:'Saudi NRI Hub',guide:'tax-saving.html',guideLbl:'KSA DTAA Guide'},
+  QAR:{name:'Qatar',emoji:'🇶🇦',label:'Qatar NRI Hub',guide:'tax-saving.html',guideLbl:'Qatar DTAA Guide'},
+  KWD:{name:'Kuwait',emoji:'🇰🇼',label:'Kuwait NRI Hub',guide:'tax-saving.html',guideLbl:'Kuwait DTAA Guide'},
+  MYR:{name:'Malaysia',emoji:'🇲🇾',label:'Malaysia NRI Hub',guide:'tax-saving.html',guideLbl:'Malaysia DTAA Guide'},
+  SGD:{name:'Singapore',emoji:'🇸🇬',label:'Singapore NRI Hub',guide:'tax-saving.html',guideLbl:'Singapore DTAA Guide'},
+  GBP:{name:'UK',emoji:'🇬🇧',label:'UK NRI Hub',guide:'tax-saving.html',guideLbl:'UK DTAA Guide'},
+  USD:{name:'USA',emoji:'🇺🇸',label:'USA NRI Hub',guide:'tax-saving.html',guideLbl:'US DTAA Guide'},
+  AUD:{name:'Australia',emoji:'🇦🇺',label:'Australia NRI Hub',guide:'tax-saving.html',guideLbl:'Australia DTAA Guide'},
+  CAD:{name:'Canada',emoji:'🇨🇦',label:'Canada NRI Hub',guide:'tax-saving.html',guideLbl:'Canada DTAA Guide'},
+  EUR:{name:'Europe',emoji:'🇪🇺',label:'Europe NRI Hub',guide:'tax-saving.html',guideLbl:'Europe DTAA Guide'},
+};
+function updateCountryPersonalization(){
+  const hub = COUNTRY_HUB[baseCur];
+  const el = document.getElementById('countryWelcome');
+  const flagEl = document.getElementById('countryWelcomeFlag');
+  const txtEl = document.getElementById('countryWelcomeText');
+  if(!el||!hub)return;
+  flagEl.textContent = hub.emoji + ' ';
+  txtEl.innerHTML = '<strong>' + hub.label + '</strong> &mdash; rates, tax &amp; guides for ' + hub.name + ' NRIs';
+  el.style.display = 'flex';
+}
+
 function syncCurrencyToCalcs(){
   if(typeof updateRpLocal==='function')updateRpLocal();
   if(typeof calcEdPlan==='function')calcEdPlan();
+  updateCountryPersonalization();
   if(!midRate||!baseCur)return;
   const meta=CUR_META[baseCur]||{flag:'',name:baseCur,region:''};
   CCB_TABS.forEach(tid=>{
