@@ -84,7 +84,7 @@
   --indigo:#818cf8;--indigo-dim:rgba(129,140,248,0.1);
   --green:#22d39a;--green-dim:rgba(34,211,154,0.1);
   --red:#f56570;--red-dim:rgba(245,101,112,0.1);
-  --text:#e8eeff;--text2:#b4c4e8;--muted:#6a7fa8;--subtle:#1e2e50;
+  --text:#f0f4ff;--text2:#c8d8f0;--muted:#8fa8cc;--subtle:#1e2e50;
   --radius:16px;--radius-sm:10px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -244,7 +244,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .rate-note{margin-top:14px;padding:14px 18px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:12px;font-size:12.5px;color:var(--text);line-height:1.75;display:flex;align-items:flex-start;gap:10px;}
 .amount-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;background:var(--elevated);border:1px solid var(--border2);border-radius:14px;padding:16px 20px;}
 .amount-strip label{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;}
-.amount-strip input{background:transparent;border:none;font-size:26px;font-weight:900;color:var(--text);width:140px;outline:none;letter-spacing:-1px;}
+.amount-strip input{background:rgba(255,255,255,0.06);border:none;border-bottom:2px solid var(--amber);border-radius:6px 6px 0 0;font-size:26px;font-weight:900;color:var(--text);width:140px;outline:none;letter-spacing:-1px;padding:4px 6px;transition:background 0.2s;}.amount-strip input:focus{background:rgba(240,165,32,0.08);}
 .amount-strip .cur-tag{font-size:13px;font-weight:800;color:var(--amber);background:var(--amber-dim);padding:5px 12px;border-radius:8px;}
 
 /* NRE/NRO TABLE */
@@ -423,9 +423,10 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .cur-btn{
   display:flex;align-items:center;gap:8px;
   background:var(--elevated);border:1px solid var(--border2);border-radius:10px;
-  padding:8px 12px;cursor:pointer;color:var(--text);
+  padding:12px 16px;cursor:pointer;color:var(--text);
   font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
   transition:border-color 0.2s;min-width:160px;justify-content:space-between;
+  min-height:44px;
 }
 .cur-btn:hover{border-color:var(--amber);}
 .cur-btn-inner{display:flex;align-items:center;gap:8px;}
@@ -573,6 +574,14 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .tl-card-wide{grid-column:1/-1;display:flex;align-items:center;gap:14px;}
 .tl-card-wide .tl-ds{margin-top:0;}
 .tl-ico{font-size:18px;margin-bottom:4px;display:block;position:relative;z-index:1;}
+.tl-c-teal{filter:drop-shadow(0 0 6px rgba(0,205,176,0.6));}
+.tl-c-amber{filter:drop-shadow(0 0 6px rgba(240,165,32,0.6));}
+.tl-c-blue{filter:drop-shadow(0 0 6px rgba(99,130,246,0.6));}
+.tl-c-green{filter:drop-shadow(0 0 6px rgba(34,211,154,0.6));}
+.tl-c-purple{filter:drop-shadow(0 0 6px rgba(168,85,247,0.6));}
+.tl-c-red{filter:drop-shadow(0 0 6px rgba(245,101,112,0.6));}
+.tl-c-sky{filter:drop-shadow(0 0 6px rgba(14,165,233,0.6));}
+.tl-c-indigo{filter:drop-shadow(0 0 6px rgba(129,140,248,0.6));}
 .tl-card-wide .tl-ico{margin-bottom:0;font-size:22px;}
 .tl-nm{font-size:12px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
 .tl-ds{font-size:11px;color:var(--muted);margin-top:3px;position:relative;z-index:1;line-height:1.4;}
@@ -839,28 +848,28 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
         <div class="tl-hd">Your NRI Dashboard</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
-            <span class="tl-ico">&#128202;</span><div class="tl-nm">Live Rates</div><div class="tl-ds">Compare 50+ providers</div>
+            <span class="tl-ico tl-c-teal">&#128202;</span><div class="tl-nm">Live Rates</div><div class="tl-ds">Compare 50+ providers</div>
           </div>
           <div class="tl-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">
-            <span class="tl-ico">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank FD rates</div>
+            <span class="tl-ico tl-c-blue">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank FD rates</div>
           </div>
           <div class="tl-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'))">
-            <span class="tl-ico">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
+            <span class="tl-ico tl-c-green">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
           </div>
           <div class="tl-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">
-            <span class="tl-ico">&#127968;</span><div class="tl-nm">Home Loan</div><div class="tl-ds">EMI &amp; amortization</div>
+            <span class="tl-ico tl-c-amber">&#127968;</span><div class="tl-nm">Home Loan</div><div class="tl-ds">EMI &amp; amortization</div>
           </div>
           <div class="tl-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))">
-            <span class="tl-ico">&#128176;</span><div class="tl-nm">Tax &amp; DTAA</div><div class="tl-ds">Save on TDS</div>
+            <span class="tl-ico tl-c-red">&#128176;</span><div class="tl-nm">Tax &amp; DTAA</div><div class="tl-ds">Save on TDS</div>
           </div>
           <div class="tl-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'))">
-            <span class="tl-ico">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
+            <span class="tl-ico tl-c-teal">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
           </div>
           <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
-            <span class="tl-ico">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
+            <span class="tl-ico tl-c-sky">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
           </div>
           <div class="tl-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'))">
-            <span class="tl-ico">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child education corpus</div>
+            <span class="tl-ico tl-c-purple">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child education corpus</div>
           </div>
           <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
             <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return Planner</div><div class="tl-ds">Corpus & checklist</div>
@@ -1055,7 +1064,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <input type="number" id="sendAmount" value="1000" oninput="syncAmountFromMain(this.value);renderRates();renderMarketRate()"/>
       <span class="cur-tag" id="curTag">AED</span>
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
-      <span style="font-size:13px;font-weight:600;color:var(--muted)">Recipient gets in <strong style="color:var(--amber)">&#8377; INR</strong></span>
+      <span style="font-size:13px;font-weight:600;color:var(--text2)">→ Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
     </div>
     <div class="mkt-rate-card" id="mktRateCard">
       <div>
