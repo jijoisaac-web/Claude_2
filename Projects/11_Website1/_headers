@@ -1,0 +1,22 @@
+# Cloudflare Pages cache headers
+
+# HTML pages — short cache, always revalidate
+/*.html
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Root index
+/
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Static assets — long cache
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
+/robots.txt
+  Cache-Control: public, max-age=86400
