@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DriveWise Global — True Cost of Vehicle Ownership Worldwide</title>
+<meta name="description" content="Calculate and compare the total cost of owning any vehicle across 25+ countries and 100+ cities worldwide. TCO calculator, EV vs petrol comparison, global rankings.">
+<meta property="og:title" content="DriveWise Global — True Cost of Vehicle Ownership">
+<meta property="og:description" content="Know the real cost of owning any vehicle, anywhere in the world.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg:      #07090f;
+  --bg1:     #0c1018;
+  --bg2:     #101724;
+  --bg3:     #162035;
+  --border:  rgba(255,255,255,0.07);
+  --borda:   rgba(99,102,241,0.35);
+  --t1:      #f1f5f9;
+  --t2:      #94a3b8;
+  --t3:      #475569;
+  --blue:    #3b82f6;
+  --indigo:  #6366f1;
+  --purple:  #a855f7;
+  --cyan:    #06b6d4;
+  --teal:    #14b8a6;
+  --green:   #22c55e;
+  --yellow:  #eab308;
+  --orange:  #f97316;
+  --red:     #ef4444;
+  --r12: 12px; --r16: 16px; --r20: 20px; --r24: 24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;}
+::selection{background:rgba(99,102,241,0.4);}
+
+/* ─── SCROLLBAR ─────────────────────────────── */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg1);}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:99px;}
+
+/* ─── NAV ────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,9,15,0.85);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 24px;gap:8px;}
+.nav-logo{display:flex;align-items:center;gap:11px;text-decoration:none;margin-right:24px;}
+.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#6366f1 0%,#3b82f6 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 1px rgba(99,102,241,0.35),0 4px 12px rgba(99,102,241,0.3);flex-shrink:0;}
+.nav-logo-wordmark{display:flex;flex-direction:column;line-height:1;}
+.nav-logo-name{font-size:1rem;font-weight:800;letter-spacing:-0.01em;background:linear-gradient(90deg,#f1f5f9 40%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-logo-tag{font-size:0.58rem;font-weight:700;letter-spacing:0.12em;color:#6366f1;text-transform:uppercase;}
+.nav-links{display:flex;gap:2px;flex:1;}
+.nav-link{padding:6px 12px;font-size:0.82rem;font-weight:500;color:var(--t2);border-radius:8px;cursor:pointer;transition:all 0.2s;text-decoration:none;border:none;background:none;}
+.nav-link:hover,.nav-link.active{background:rgba(99,102,241,0.15);color:var(--t1);}
+.nav-badge{background:linear-gradient(90deg,#6366f1,#3b82f6);color:white;font-size:0.65rem;padding:2px 6px;border-radius:99px;font-weight:700;margin-left:6px;vertical-align:middle;}
+@media(max-width:640px){.nav-links{display:none;}}
+
+/* ─── HERO ───────────────────────────────────── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px 60px;position:relative;overflow:hidden;}
+.hero-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=1920&q=85');
+  background-size:cover;background-position:center 40%;
+}
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(to bottom, rgba(7,9,15,0.55) 0%, rgba(7,9,15,0.80) 60%, rgba(7,9,15,1) 100%),
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(99,102,241,0.22) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,rgba(6,182,212,0.10) 0%,transparent 55%);
+}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:1;}
+
+/* ─── PHOTO BANDS ────────────────────────────── */
+.photo-band{
+  width:100%;height:240px;position:relative;overflow:hidden;
+  background-size:cover;background-position:center;
+  background-attachment:fixed;
+}
+.photo-band::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(7,9,15,0.92) 0%,rgba(7,9,15,0.45) 50%,rgba(7,9,15,0.92) 100%);
+  z-index:1;
+}
+.photo-band-inner{
+  position:relative;z-index:2;height:100%;max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;padding:0 24px;gap:20px;
+}
+.photo-band-text h3{font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:800;line-height:1.2;margin-bottom:8px;}
+.photo-band-text p{font-size:0.9rem;color:var(--t2);max-width:480px;}
+.photo-band-icon{font-size:3.5rem;opacity:0.9;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.5));}
+.pb-tco  {background-image:url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1920&q=80');}
+.pb-ev   {background-image:url('https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1920&q=80');}
+.pb-rank {background-image:url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1920&q=80');}
+.pb-cmp  {background-image:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80');}
+.pb-fuel {background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1920&q=80');}
+.hero > *:not(.hero-bg):not(.hero-grid){position:relative;z-index:2;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:99px;padding:6px 16px;font-size:0.78rem;font-weight:600;color:#a5b4fc;margin-bottom:28px;letter-spacing:0.05em;text-transform:uppercase;}
+.hero-title{font-size:clamp(2rem,5vw,3.8rem);font-weight:800;text-align:center;line-height:1.1;margin-bottom:20px;max-width:800px;}
+.hero-title .grad{background:linear-gradient(135deg,#f1f5f9 0%,#6366f1 50%,#06b6d4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero-sub{font-size:1.05rem;color:var(--t2);text-align:center;max-width:560px;line-height:1.6;margin-bottom:48px;}
+
+/* ─── SELECTORS ──────────────────────────────── */
+.selector-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r24);padding:28px;width:100%;max-width:840px;margin-bottom:40px;position:relative;z-index:2;}
+.selector-panel::before{content:'';position:absolute;inset:-1px;border-radius:var(--r24);background:linear-gradient(135deg,rgba(99,102,241,0.2),transparent,rgba(6,182,212,0.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;pointer-events:none;}
+.sel-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:640px){.sel-row{grid-template-columns:1fr;}}
+.sel-group label{display:block;font-size:0.75rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.sel-group select,.sel-group input{width:100%;background:var(--bg1);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--t1);font-size:0.92rem;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all 0.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+.sel-group select:focus,.sel-group input:focus{outline:none;border-color:var(--indigo);background-color:#0f172a;}
+.sel-group input{background-image:none;}
+.annual-km-row{margin-top:16px;display:flex;gap:16px;align-items:flex-end;}
+.annual-km-row .sel-group{flex:1;}
+.btn-calc{background:linear-gradient(135deg,#6366f1,#3b82f6);border:none;border-radius:12px;padding:12px 28px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.02em;white-space:nowrap;}
+.btn-calc:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,0.4);}
+
+/* ─── METRIC CARDS ───────────────────────────── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%;max-width:840px;}
+@media(max-width:700px){.metrics-row{grid-template-columns:repeat(2,1fr);}}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:22px 20px;position:relative;overflow:hidden;transition:all 0.3s;}
+.metric-card:hover{border-color:rgba(99,102,241,0.3);transform:translateY(-2px);}
+.metric-card .mc-glow{position:absolute;width:100px;height:100px;border-radius:50%;filter:blur(50px);opacity:0.25;top:-20px;right:-20px;}
+.metric-card .mc-label{font-size:0.72rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:10px;}
+.metric-card .mc-value{font-size:1.55rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;margin-bottom:6px;}
+.metric-card .mc-sub{font-size:0.75rem;color:var(--t3);}
+.mc-monthly .mc-glow{background:#6366f1;}
+.mc-monthly .mc-value{background:linear-gradient(135deg,#f1f5f9,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.mc-annual .mc-glow{background:#06b6d4;}
+.mc-annual .mc-value{background:linear-gradient(135deg,#f1f5f9,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.mc-5yr .mc-glow{background:#22c55e;}
+.mc-5yr .mc-value{background:linear-gradient(135deg,#f1f5f9,#86efac);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.mc-10yr .mc-glow{background:#f59e0b;}
+.mc-10yr .mc-value{background:linear-gradient(135deg,#f1f5f9,#fde68a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* ─── SECTION LAYOUT ─────────────────────────── */
+.section{padding:80px 24px;max-width:1100px;margin:0 auto;}
+.section-header{margin-bottom:40px;}
+.section-eyebrow{font-size:0.75rem;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+.section-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;margin-bottom:12px;}
+.section-sub{font-size:0.95rem;color:var(--t2);max-width:520px;}
+
+/* ─── CARDS ──────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:24px;position:relative;overflow:hidden;}
+.card-title{font-size:0.95rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.card-title .icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* ─── COST BREAKDOWN ─────────────────────────── */
+.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+@media(max-width:700px){.breakdown-grid{grid-template-columns:1fr;}}
+.breakdown-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+.breakdown-item:last-child{border-bottom:none;}
+.bi-left{display:flex;align-items:center;gap:10px;}
+.bi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.bi-label{font-size:0.88rem;color:var(--t2);}
+.bi-value{font-size:0.92rem;font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* ─── TCO FORM ───────────────────────────────── */
+.tco-grid{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;}
+@media(max-width:800px){.tco-grid{grid-template-columns:1fr;}}
+.form-section{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:24px;}
+.form-section h4{font-size:0.88rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:0.78rem;font-weight:600;color:var(--t2);margin-bottom:6px;}
+.form-group input,.form-group select{width:100%;background:var(--bg1);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--t1);font-size:0.9rem;font-family:inherit;transition:border-color 0.2s;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--indigo);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ─── RESULTS PANEL ──────────────────────────── */
+.results-panel{display:flex;flex-direction:column;gap:20px;}
+.result-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:500px){.result-cards{grid-template-columns:1fr;}}
+.result-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r16);padding:20px;}
+.result-card .rc-label{font-size:0.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
+.result-card .rc-value{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,#f1f5f9,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.result-card .rc-sub{font-size:0.75rem;color:var(--t3);margin-top:4px;}
+
+/* ─── EV COMPARE ─────────────────────────────── */
+.ev-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:start;}
+@media(max-width:700px){.ev-grid{grid-template-columns:1fr;}}
+.ev-vs{display:flex;align-items:center;justify-content:center;padding-top:40px;}
+.ev-vs-badge{background:linear-gradient(135deg,#6366f1,#3b82f6);border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;}
+.ev-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:24px;}
+.ev-card.winner{border-color:rgba(34,197,94,0.5);box-shadow:0 0 30px rgba(34,197,94,0.1);}
+.ev-car-name{font-size:1.1rem;font-weight:800;margin-bottom:4px;}
+.ev-car-type{font-size:0.78rem;color:var(--t3);margin-bottom:20px;}
+.ev-stat{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.88rem;}
+.ev-stat:last-child{border-bottom:none;}
+.ev-stat-label{color:var(--t2);}
+.ev-stat-value{font-weight:700;}
+.ev-winner-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);border-radius:99px;padding:4px 12px;font-size:0.75rem;font-weight:700;color:#4ade80;margin-top:16px;}
+
+/* ─── GLOBAL RANKINGS ────────────────────────── */
+.ranking-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.rtab{padding:8px 16px;border-radius:10px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--t2);transition:all 0.2s;}
+.rtab.active{background:rgba(99,102,241,0.2);border-color:rgba(99,102,241,0.4);color:#a5b4fc;}
+.ranking-table{width:100%;border-collapse:collapse;}
+.ranking-table th{text-align:left;font-size:0.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;padding:12px 16px;border-bottom:1px solid var(--border);}
+.ranking-table td{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.9rem;vertical-align:middle;}
+.ranking-table tr:hover td{background:rgba(255,255,255,0.02);}
+.rank-num{font-size:0.75rem;font-weight:800;color:var(--t3);width:32px;}
+.rank-flag{font-size:1.3rem;margin-right:10px;}
+.rank-bar{height:6px;border-radius:99px;background:linear-gradient(90deg,#6366f1,#06b6d4);transition:width 0.6s ease;}
+.rank-bar-wrap{width:120px;background:var(--bg3);border-radius:99px;overflow:hidden;}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:0.75rem;font-weight:700;}
+.pill-green{background:rgba(34,197,94,0.15);color:#4ade80;}
+.pill-red{background:rgba(239,68,68,0.15);color:#f87171;}
+.pill-yellow{background:rgba(234,179,8,0.15);color:#fde047;}
+
+/* ─── VEHICLE COMPARE ────────────────────────── */
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr;}}
+.compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r20);padding:24px;position:relative;transition:all 0.3s;}
+.compare-card.best{border-color:rgba(99,102,241,0.5);box-shadow:0 0 40px rgba(99,102,241,0.12);}
+.best-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#6366f1,#3b82f6);border-radius:99px;padding:4px 16px;font-size:0.72rem;font-weight:800;white-space:nowrap;letter-spacing:0.03em;}
+.cc-name{font-size:1rem;font-weight:800;margin-bottom:4px;}
+.cc-type{font-size:0.75rem;color:var(--t3);margin-bottom:20px;display:flex;gap:6px;}
+.cc-stat{font-size:0.85rem;color:var(--t2);padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.cc-stat:last-child{border-bottom:none;}
+.cc-stat span{font-weight:700;color:var(--t1);}
+.cc-total{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;}
+.cc-total-label{font-size:0.8rem;color:var(--t2);}
+.cc-total-value{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.compare-select-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:700px){.compare-select-row{grid-template-columns:1fr;}}
+
+/* ─── FUEL INTELLIGENCE ──────────────────────── */
+.fuel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.fuel-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r16);padding:20px;}
+.fuel-country{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.fc-flag{font-size:1.5rem;}
+.fc-name{font-weight:700;}
+.fc-currency{font-size:0.75rem;color:var(--t3);}
+.fuel-prices{display:flex;gap:12px;}
+.fp-item{flex:1;background:var(--bg1);border-radius:12px;padding:12px;text-align:center;}
+.fp-label{font-size:0.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:4px;}
+.fp-value{font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;}
+.fp-petrol{color:#f97316;}
+.fp-diesel{color:#06b6d4;}
+.fp-ev{color:#22c55e;}
+
+/* ─── CHARTS WRAPPER ─────────────────────────── */
+.chart-wrap{position:relative;height:280px;}
+
+/* ─── COST PER KM ────────────────────────────── */
+.cpk-result{display:flex;align-items:center;gap:16px;background:var(--bg1);border-radius:var(--r16);padding:20px;margin-top:16px;}
+.cpk-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.cpk-value{font-size:2rem;font-weight:900;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,#f1f5f9,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cpk-label{font-size:0.8rem;color:var(--t2);}
+
+/* ─── AFFILIATE MODULES ──────────────────────── */
+.affiliate-strip{background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(6,182,212,0.05));border:1px solid rgba(99,102,241,0.2);border-radius:var(--r20);padding:28px;margin-top:40px;text-align:center;}
+.aff-title{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
+.aff-sub{font-size:0.88rem;color:var(--t2);margin-bottom:20px;}
+.aff-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.aff-btn{padding:10px 22px;border-radius:12px;font-size:0.85rem;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--t1);transition:all 0.2s;text-decoration:none;}
+.aff-btn:hover{border-color:rgba(99,102,241,0.5);background:rgba(99,102,241,0.1);}
+
+/* ─── FOOTER ─────────────────────────────────── */
+footer{background:var(--bg1);border-top:1px solid var(--border);padding:48px 24px 32px;text-align:center;}
+.footer-logo{font-size:1.3rem;font-weight:800;background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.footer-tagline{font-size:0.88rem;color:var(--t3);margin-bottom:24px;}
+.footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;}
+.footer-link{font-size:0.82rem;color:var(--t2);text-decoration:none;transition:color 0.2s;}
+.footer-link:hover{color:var(--t1);}
+.footer-copy{font-size:0.75rem;color:var(--t3);}
+
+/* ─── DIVIDER ────────────────────────────────── */
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);max-width:1100px;margin:0 auto;}
+
+/* ─── UTILS ──────────────────────────────────── */
+.flex{display:flex;} .items-center{align-items:center;} .gap-8{gap:8px;} .gap-16{gap:16px;}
+.mt-4{margin-top:4px;} .mt-8{margin-top:8px;} .mt-12{margin-top:12px;} .mt-16{margin-top:16px;} .mt-20{margin-top:20px;}
+.text-green{color:#4ade80;} .text-red{color:#f87171;} .text-yellow{color:#fde047;} .text-blue{color:#93c5fd;} .text-indigo{color:#a5b4fc;}
+.font-bold{font-weight:700;} .text-sm{font-size:0.85rem;} .text-xs{font-size:0.75rem;} .text-muted{color:var(--t2);}
+.w-full{width:100%;}
+
+/* ─── COUNTRY GATE ───────────────────────────── */
+.gate{position:fixed;inset:0;z-index:300;background:#07090f;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 40px;overflow-y:auto;}
+.gate.hidden{display:none;}
+.gate-logo{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:36px;}
+.gate-logo-icon{width:72px;height:72px;background:linear-gradient(135deg,#6366f1 0%,#3b82f6 100%);border-radius:20px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 1px rgba(99,102,241,0.4),0 16px 48px rgba(99,102,241,0.45),0 4px 16px rgba(59,130,246,0.3);}
+.gate-logo-words{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.gate-logo-name{font-size:1.7rem;font-weight:900;letter-spacing:-0.02em;background:linear-gradient(90deg,#f1f5f9 30%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.gate-logo-sub{font-size:0.68rem;font-weight:700;letter-spacing:0.22em;color:#6366f1;text-transform:uppercase;}
+.gate-step{font-size:0.72rem;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+.gate-title{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:800;text-align:center;margin-bottom:10px;}
+.gate-sub{font-size:0.95rem;color:var(--t2);text-align:center;margin-bottom:28px;max-width:480px;}
+.gate-search{width:100%;max-width:600px;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:14px 18px;color:var(--t1);font-size:0.95rem;font-family:inherit;margin-bottom:24px;transition:border-color 0.2s;}
+.gate-search:focus{outline:none;border-color:var(--indigo);}
+.country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;width:100%;max-width:960px;}
+.co-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;cursor:pointer;text-align:center;transition:all 0.22s;position:relative;}
+.co-card:hover{border-color:rgba(99,102,241,0.6);background:rgba(99,102,241,0.08);transform:translateY(-3px);box-shadow:0 8px 24px rgba(99,102,241,0.18);}
+.co-card:hover .co-flag-img{transform:scale(1.06);}
+.co-flag-wrap{width:100%;height:80px;overflow:hidden;border-radius:16px 16px 0 0;position:relative;background:#1e293b;}
+.co-flag-img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s;}
+.co-flag-emoji{font-size:2.4rem;line-height:80px;}
+.co-info{padding:10px 10px 12px;}
+.co-name{font-size:0.82rem;font-weight:700;margin-bottom:2px;color:var(--t1);}
+.co-curr{font-size:0.70rem;color:var(--t3);letter-spacing:0.03em;}
+.city-grid-gate{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:700px;margin-bottom:28px;}
+.city-btn{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px 22px;cursor:pointer;font-weight:600;font-size:0.9rem;color:var(--t1);transition:all 0.2s;}
+.city-btn:hover,.city-btn.sel{border-color:rgba(99,102,241,0.6);background:rgba(99,102,241,0.15);color:#a5b4fc;}
+.gate-back{background:none;border:none;color:var(--t2);cursor:pointer;font-size:0.88rem;margin-bottom:20px;display:flex;align-items:center;gap:6px;transition:color 0.2s;padding:0;}
+.gate-back:hover{color:var(--t1);}
+.gate-confirm{background:linear-gradient(135deg,#6366f1,#3b82f6);border:none;border-radius:14px;padding:14px 40px;color:white;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.gate-confirm:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,0.4);}
+.gate-confirm:disabled{opacity:0.4;cursor:default;transform:none;}
+
+/* ─── NAV COUNTRY PILL ───────────────────────── */
+.nav-country{display:none;align-items:center;gap:8px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:99px;padding:5px 14px;cursor:pointer;transition:all 0.2s;margin-left:auto;}
+.nav-country:hover{background:rgba(99,102,241,0.22);}
+.nav-country .nc-flag{font-size:1rem;}
+.nav-country .nc-text{font-size:0.8rem;font-weight:600;color:#a5b4fc;}
+.nav-country .nc-change{font-size:0.7rem;color:var(--t3);margin-left:4px;}
+
+/* ─── HERO COUNTRY BAR ───────────────────────── */
+.country-bar{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:pointer;transition:all 0.2s;width:100%;}
+.country-bar:hover{background:rgba(99,102,241,0.14);}
+.cb-flag{font-size:1.8rem;}
+.cb-info{flex:1;}
+.cb-name{font-size:1rem;font-weight:700;}
+.cb-city{font-size:0.8rem;color:var(--t2);}
+.cb-change{font-size:0.78rem;font-weight:600;color:#a5b4fc;background:rgba(99,102,241,0.2);border-radius:8px;padding:5px 12px;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ════════════════════════════════════════════════════════════════ -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 44 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:30px">
+        <circle cx="11" cy="28" r="6.5" fill="rgba(0,8,24,0.45)"/>
+        <circle cx="11" cy="28" r="2.8" fill="rgba(255,255,255,0.28)"/>
+        <circle cx="33" cy="28" r="6.5" fill="rgba(0,8,24,0.45)"/>
+        <circle cx="33" cy="28" r="2.8" fill="rgba(255,255,255,0.28)"/>
+        <rect x="4" y="19" width="36" height="10" rx="2.5" fill="white"/>
+        <path d="M11 19 Q13.5 9 18.5 7.5 H25.5 Q30.5 9 33 19Z" fill="white"/>
+        <path d="M14.5 19 Q16.5 11 19.5 9.5 H24.5 Q27.5 11 29.5 19Z" fill="rgba(0,0,0,0.22)"/>
+        <line x1="0" y1="15" x2="4" y2="15" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+        <line x1="0" y1="19.5" x2="4" y2="19.5" stroke="white" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+        <line x1="0.5" y1="24" x2="4" y2="24" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.45"/>
+      </svg>
+    </div>
+    <div class="nav-logo-wordmark">
+      <span class="nav-logo-name">DriveWise</span>
+      <span class="nav-logo-tag">Global</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link active" onclick="navScrollTo('hero')">Overview</a>
+    <a class="nav-link" onclick="navScrollTo('tco')">TCO Calculator</a>
+    <a class="nav-link" onclick="navScrollTo('ev')">EV vs Petrol</a>
+    <a class="nav-link" onclick="navScrollTo('rankings')">Rankings</a>
+    <a class="nav-link" onclick="navScrollTo('compare')">Compare</a>
+    <a class="nav-link" onclick="navScrollTo('fuel')">Fuel Intel</a>
+  </div>
+  <div class="nav-country" id="navCountry" onclick="openGate()">
+    <span class="nc-flag" id="navFlag">🌍</span>
+    <span class="nc-text" id="navCountryLabel">Select Country</span>
+    <span class="nc-change">Change</span>
+  </div>
+  <span class="nav-badge">BETA</span>
+</nav>
+
+<!-- ═══ COUNTRY GATE ══════════════════════════════════════════════════════ -->
+<div class="gate" id="countryGate">
+  <div class="gate-logo">
+    <div class="gate-logo-icon">
+      <svg viewBox="0 0 72 58" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:54px">
+        <!-- Globe meridians -->
+        <ellipse cx="36" cy="29" rx="26" ry="26" stroke="rgba(255,255,255,0.09)" stroke-width="0.9" fill="none"/>
+        <ellipse cx="36" cy="29" rx="13" ry="26" stroke="rgba(255,255,255,0.09)" stroke-width="0.9" fill="none"/>
+        <line x1="10" y1="29" x2="62" y2="29" stroke="rgba(255,255,255,0.09)" stroke-width="0.9"/>
+        <line x1="12" y1="18" x2="60" y2="18" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
+        <line x1="12" y1="40" x2="60" y2="40" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"/>
+        <!-- Wheels -->
+        <circle cx="18" cy="45" r="10" fill="rgba(0,8,24,0.45)"/>
+        <circle cx="18" cy="45" r="4.2" fill="rgba(255,255,255,0.26)"/>
+        <circle cx="54" cy="45" r="10" fill="rgba(0,8,24,0.45)"/>
+        <circle cx="54" cy="45" r="4.2" fill="rgba(255,255,255,0.26)"/>
+        <!-- Body -->
+        <rect x="7" y="32" width="58" height="14" rx="3.5" fill="white"/>
+        <!-- Cabin -->
+        <path d="M18 32 Q21.5 15 28 13 H44 Q50.5 15 54 32Z" fill="white"/>
+        <!-- Windows -->
+        <path d="M23 32 Q25.5 17.5 29.5 15.5 H42.5 Q46.5 17.5 49 32Z" fill="rgba(0,0,0,0.2)"/>
+        <!-- Speed lines -->
+        <line x1="0" y1="25" x2="7" y2="25" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <line x1="0" y1="31.5" x2="7" y2="31.5" stroke="white" stroke-width="2.6" stroke-linecap="round" opacity="0.8"/>
+        <line x1="0.5" y1="38" x2="7" y2="38" stroke="white" stroke-width="1.6" stroke-linecap="round" opacity="0.45"/>
+      </svg>
+    </div>
+    <div class="gate-logo-words">
+      <span class="gate-logo-name">DriveWise</span>
+      <span class="gate-logo-sub">Global Vehicle Intelligence</span>
+    </div>
+  </div>
+
+  <!-- Step 1: Pick country -->
+  <div id="gateStep1">
+    <div class="gate-step">Step 1 of 2 — Country</div>
+    <h2 class="gate-title">Where are you based?</h2>
+    <p class="gate-sub">We'll show all costs in your local currency across every tool.</p>
+    <input class="gate-search" id="gateSearch" placeholder="🔍  Search country…" oninput="filterCountryGrid(this.value)">
+    <div class="country-grid" id="countryGrid"></div>
+  </div>
+
+  <!-- Step 2: Pick city -->
+  <div id="gateStep2" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:900px">
+    <button class="gate-back" onclick="gateGoBack()">← Back to countries</button>
+    <div class="gate-step">Step 2 of 2 — City</div>
+    <h2 class="gate-title" id="gateStep2Title">Select your city</h2>
+    <p class="gate-sub">Costs vary by city. Pick the nearest one.</p>
+    <div class="city-grid-gate" id="cityGridGate"></div>
+    <button class="gate-confirm" id="gateConfirm" onclick="confirmGate()" disabled>View My Costs →</button>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">🌍 25+ Countries · 100+ Cities · 10+ Vehicles</div>
+  <h1 class="hero-title">Know the <span class="grad">TRUE cost</span> of owning<br>any vehicle, anywhere.</h1>
+  <p class="hero-sub">Compare purchase price, fuel, insurance, taxes, depreciation and more — across every major country and city in the world.</p>
+
+  <div class="selector-panel">
+    <!-- Country bar — click to change country -->
+    <div class="country-bar" onclick="openGate()" id="heroCountryBar">
+      <div class="cb-flag" id="heroCBFlag">🌍</div>
+      <div class="cb-info">
+        <div class="cb-name" id="heroCBName">Select your country to get started</div>
+        <div class="cb-city" id="heroCBCity">Click here to choose</div>
+      </div>
+      <div class="cb-change">🔄 Change Country</div>
+    </div>
+    <div class="sel-row">
+      <div class="sel-group">
+        <label>🚗 Vehicle Type</label>
+        <select id="heroVehicle" onchange="updateHero()">
+          <option value="petrol">⛽ Petrol</option>
+          <option value="diesel">🛢️ Diesel</option>
+          <option value="hybrid">⚡ Hybrid</option>
+          <option value="ev">🔋 Electric Vehicle</option>
+          <option value="motorcycle">🏍️ Motorcycle</option>
+        </select>
+      </div>
+      <div class="sel-group">
+        <label>📍 Annual Kilometres</label>
+        <input type="number" id="heroKm" value="15000" min="1000" max="100000" step="1000" oninput="updateHero()">
+      </div>
+      <div class="sel-group">
+        <label>💰 Vehicle Price (<span id="heroSymbol">Local Currency</span>)</label>
+        <input type="number" id="heroPrice" value="25000" min="1000" step="500" oninput="updateHero()">
+      </div>
+    </div>
+    <button class="btn-calc" style="margin-top:16px;width:100%" onclick="updateHero()">Calculate →</button>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card mc-monthly">
+      <div class="mc-glow"></div>
+      <div class="mc-label">Monthly Cost</div>
+      <div class="mc-value" id="m-monthly">—</div>
+      <div class="mc-sub">All-in ownership</div>
+    </div>
+    <div class="metric-card mc-annual">
+      <div class="mc-glow"></div>
+      <div class="mc-label">Annual Cost</div>
+      <div class="mc-value" id="m-annual">—</div>
+      <div class="mc-sub">Per year</div>
+    </div>
+    <div class="metric-card mc-5yr">
+      <div class="mc-glow"></div>
+      <div class="mc-label">5-Year Total</div>
+      <div class="mc-value" id="m-5yr">—</div>
+      <div class="mc-sub">Including depreciation</div>
+    </div>
+    <div class="metric-card mc-10yr">
+      <div class="mc-glow"></div>
+      <div class="mc-label">10-Year Total</div>
+      <div class="mc-value" id="m-10yr">—</div>
+      <div class="mc-sub">Long-term ownership</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══ COST BREAKDOWN ═══════════════════════════════════════════════════════ -->
+<section class="section" id="breakdown">
+  <div class="section-header">
+    <div class="section-eyebrow">Cost Intelligence</div>
+    <h2 class="section-title">Full Ownership Cost Breakdown</h2>
+    <p class="section-sub">Every cost component, calculated for your selected country, city and vehicle.</p>
+  </div>
+  <div class="breakdown-grid">
+    <div class="card">
+      <div class="card-title"><div class="icon" style="background:rgba(99,102,241,0.15)">📊</div>Cost Composition</div>
+      <div class="chart-wrap"><canvas id="costPieChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon" style="background:rgba(6,182,212,0.15)">💸</div>Annual Breakdown</div>
+      <div id="breakdownItems">
+        <div class="breakdown-item" style="color:var(--t3);font-size:0.88rem">Select a country and city above to see the full breakdown.</div>
+      </div>
+    </div>
+  </div>
+  <div class="card mt-20">
+    <div class="card-title"><div class="icon" style="background:rgba(34,197,94,0.15)">📈</div>10-Year Cost Projection</div>
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Photo Band: TCO -->
+<div class="photo-band pb-tco">
+  <div class="photo-band-inner">
+    <div class="photo-band-icon">🧮</div>
+    <div class="photo-band-text">
+      <h3>Advanced <span style="background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TCO Calculator</span></h3>
+      <p>Every cost component — fuel, insurance, depreciation, financing, taxes — modelled precisely for your country and city.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TCO CALCULATOR ═══════════════════════════════════════════════════════ -->
+<section class="section" id="tco">
+  <div class="section-header">
+    <div class="section-eyebrow">Total Cost of Ownership</div>
+    <h2 class="section-title">Advanced TCO Calculator</h2>
+    <p class="section-sub">Fine-tune every input to model your exact scenario.</p>
+  </div>
+  <div class="tco-grid">
+    <div class="form-section">
+      <h4>Vehicle Details</h4>
+      <div class="form-group">
+        <label>Vehicle Model</label>
+        <select id="tcoModel" onchange="syncTCOVehiclePrice();calcTCO()">
+          <option value="corolla">Toyota Corolla (Petrol)</option>
+          <option value="civic">Honda Civic (Petrol)</option>
+          <option value="bmw3">BMW 3 Series (Petrol)</option>
+          <option value="fortuner">Toyota Fortuner (Diesel)</option>
+          <option value="crv">Honda CR-V Hybrid</option>
+          <option value="camry_hybrid">Toyota Camry Hybrid</option>
+          <option value="tesla3">Tesla Model 3 (EV)</option>
+          <option value="leaf">Nissan Leaf (EV)</option>
+          <option value="ioniq6">Hyundai IONIQ 6 (EV)</option>
+          <option value="pcx">Honda PCX 150 (Motorcycle)</option>
+          <option value="nmax">Yamaha NMAX (Motorcycle)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Purchase Price</label>
+          <input type="number" id="tcoPrice" value="25000" step="500" oninput="calcTCO()">
+        </div>
+        <div class="form-group">
+          <label>Annual Km</label>
+          <input type="number" id="tcoKm" value="15000" step="1000" oninput="calcTCO()">
+        </div>
+      </div>
+      <h4 style="margin-top:16px">Local Costs <span id="tcoCountryLabel" style="color:var(--indigo);font-weight:400;font-size:0.8rem;text-transform:none;letter-spacing:0"></span></h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fuel Price (/L or /kWh)</label>
+          <input type="number" id="tcoFuelPrice" value="1.50" step="0.05" oninput="calcTCO()">
+        </div>
+        <div class="form-group">
+          <label>Fuel Efficiency</label>
+          <input type="number" id="tcoEfficiency" value="15" step="0.5" oninput="calcTCO()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Annual Insurance</label>
+          <input type="number" id="tcoInsurance" value="1200" step="50" oninput="calcTCO()">
+        </div>
+        <div class="form-group">
+          <label>Monthly Parking</label>
+          <input type="number" id="tcoParking" value="100" step="10" oninput="calcTCO()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Down Payment %</label>
+          <input type="number" id="tcoDown" value="20" min="0" max="100" oninput="calcTCO()">
+        </div>
+        <div class="form-group">
+          <label>Interest Rate %</label>
+          <input type="number" id="tcoInterest" value="6" step="0.1" oninput="calcTCO()">
+        </div>
+      </div>
+    </div>
+    <div class="results-panel">
+      <div class="result-cards" id="tcoResults">
+        <div class="result-card"><div class="rc-label">Monthly</div><div class="rc-value" id="tco-monthly">—</div><div class="rc-sub">All-in cost</div></div>
+        <div class="result-card"><div class="rc-label">Annual</div><div class="rc-value" id="tco-annual">—</div><div class="rc-sub">Per year</div></div>
+        <div class="result-card"><div class="rc-label">5-Year Total</div><div class="rc-value" id="tco-5yr">—</div><div class="rc-sub">Incl. depreciation</div></div>
+        <div class="result-card"><div class="rc-label">10-Year Total</div><div class="rc-value" id="tco-10yr">—</div><div class="rc-sub">Long-term view</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(99,102,241,0.15)">🔍</div>Cost Per Kilometre</div>
+        <div class="cpk-result">
+          <div class="cpk-icon">🛣️</div>
+          <div>
+            <div class="cpk-value" id="tco-cpk">—</div>
+            <div class="cpk-label">per kilometre driven</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="icon" style="background:rgba(99,102,241,0.15)">📋</div>Detailed Annual Costs</div>
+        <div id="tcoBreakdown"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Photo Band: EV -->
+<div class="photo-band pb-ev">
+  <div class="photo-band-inner">
+    <div class="photo-band-icon">⚡</div>
+    <div class="photo-band-text">
+      <h3>EV vs <span style="background:linear-gradient(90deg,#86efac,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Petrol</span> — The Real Numbers</h3>
+      <p>Find the exact break-even point and lifetime savings of switching to electric in your country.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EV VS PETROL ═════════════════════════════════════════════════════════ -->
+<section class="section" id="ev">
+  <div class="section-header">
+    <div class="section-eyebrow">EV Intelligence</div>
+    <h2 class="section-title">EV vs Petrol Comparison</h2>
+    <p class="section-sub">Find out when an EV pays for itself and the lifetime savings.</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:12px;padding:14px 18px">
+    <span style="font-size:1.4rem" id="evCBFlag">🌍</span>
+    <div style="flex:1"><div style="font-weight:700" id="evCBName">—</div><div style="font-size:0.78rem;color:var(--t2)" id="evCBCity">Select country above to load EV data</div></div>
+    <div class="form-group" style="margin:0">
+      <label style="font-size:0.75rem;font-weight:600;color:var(--t3);display:block;margin-bottom:4px">Annual KM</label>
+      <input type="number" id="evKm" value="15000" step="1000" oninput="calcEV()" style="width:120px;background:var(--bg1);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--t1);font-size:0.9rem;">
+    </div>
+  </div>
+  <div class="ev-grid">
+    <div class="ev-card" id="evCardPetrol">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">⛽ Petrol</div>
+      <div class="ev-car-name">Toyota Corolla 1.8</div>
+      <div class="ev-car-type">Sedan · 15.5 km/L · 2024 model</div>
+      <div class="ev-stat"><span class="ev-stat-label">Purchase Price</span><span class="ev-stat-value" id="ev-pet-price">$25,000</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Fuel</span><span class="ev-stat-value" id="ev-pet-fuel">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Maintenance</span><span class="ev-stat-value" id="ev-pet-maint">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Insurance</span><span class="ev-stat-value" id="ev-pet-ins">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Road Tax/Year</span><span class="ev-stat-value" id="ev-pet-tax">—</span></div>
+      <div class="ev-stat" style="border-top:1px solid var(--borda);margin-top:4px;padding-top:12px"><span class="ev-stat-label" style="font-weight:700;color:var(--t1)">Annual Total</span><span class="ev-stat-value" style="font-size:1.1rem" id="ev-pet-total">—</span></div>
+    </div>
+    <div class="ev-vs"><div class="ev-vs-badge">VS</div></div>
+    <div class="ev-card" id="evCardEV">
+      <div style="font-size:0.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">⚡ Electric</div>
+      <div class="ev-car-name">Tesla Model 3 SR+</div>
+      <div class="ev-car-type">Sedan · 6.5 km/kWh · 2024 model</div>
+      <div class="ev-stat"><span class="ev-stat-label">Purchase Price</span><span class="ev-stat-value" id="ev-ev-price">$42,000</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Charging</span><span class="ev-stat-value" id="ev-ev-fuel">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Maintenance</span><span class="ev-stat-value" id="ev-ev-maint">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">Annual Insurance</span><span class="ev-stat-value" id="ev-ev-ins">—</span></div>
+      <div class="ev-stat"><span class="ev-stat-label">EV Incentive</span><span class="ev-stat-value text-green" id="ev-ev-incentive">—</span></div>
+      <div class="ev-stat" style="border-top:1px solid var(--borda);margin-top:4px;padding-top:12px"><span class="ev-stat-label" style="font-weight:700;color:var(--t1)">Annual Total</span><span class="ev-stat-value" style="font-size:1.1rem" id="ev-ev-total">—</span></div>
+      <div class="ev-winner-badge" id="evWinnerBadge" style="display:none">✅ Better choice over 5 years</div>
+    </div>
+  </div>
+  <div class="card mt-20" id="evSummaryCard">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+      <div>
+        <div class="text-xs text-muted" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:0.07em">Annual Fuel Saving</div>
+        <div style="font-size:1.5rem;font-weight:900;" class="text-green" id="ev-saving-annual">—</div>
+      </div>
+      <div>
+        <div class="text-xs text-muted" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:0.07em">Break-Even Point</div>
+        <div style="font-size:1.5rem;font-weight:900;color:#a5b4fc" id="ev-breakeven">—</div>
+      </div>
+      <div>
+        <div class="text-xs text-muted" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:0.07em">10-Year Saving</div>
+        <div style="font-size:1.5rem;font-weight:900;" class="text-green" id="ev-saving-10yr">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="card mt-20">
+    <div class="card-title"><div class="icon" style="background:rgba(99,102,241,0.15)">📈</div>Cumulative Cost Over 10 Years</div>
+    <div class="chart-wrap"><canvas id="evChart"></canvas></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Photo Band: Rankings -->
+<div class="photo-band pb-rank">
+  <div class="photo-band-inner">
+    <div class="photo-band-icon">🌍</div>
+    <div class="photo-band-text">
+      <h3>Global <span style="background:linear-gradient(90deg,#fde68a,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ownership Rankings</span></h3>
+      <p>See which countries offer the cheapest — and most expensive — vehicle ownership in the world.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ GLOBAL RANKINGS ══════════════════════════════════════════════════════ -->
+<section class="section" id="rankings">
+  <div class="section-header">
+    <div class="section-eyebrow">Global Intelligence</div>
+    <h2 class="section-title">Vehicle Ownership Rankings</h2>
+    <p class="section-sub">Compare the true cost of car ownership across 25+ countries.</p>
+  </div>
+  <div class="ranking-tabs">
+    <div class="rtab active" onclick="showRanking('cheapest')">💚 Cheapest Countries</div>
+    <div class="rtab" onclick="showRanking('expensive')">🔴 Most Expensive</div>
+    <div class="rtab" onclick="showRanking('fuel')">⛽ Lowest Fuel</div>
+    <div class="rtab" onclick="showRanking('insurance')">🛡️ Lowest Insurance</div>
+    <div class="rtab" onclick="showRanking('ev')">⚡ Best for EV</div>
+  </div>
+  <div class="card">
+    <div class="chart-wrap" style="height:320px"><canvas id="rankingChart"></canvas></div>
+  </div>
+  <div class="card mt-20">
+    <table class="ranking-table" id="rankingTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Country</th>
+          <th>Annual Cost (USD)</th>
+          <th>Fuel/L (USD)</th>
+          <th>Insurance (USD)</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="rankingBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Photo Band: Compare -->
+<div class="photo-band pb-cmp">
+  <div class="photo-band-inner">
+    <div class="photo-band-icon">🏁</div>
+    <div class="photo-band-text">
+      <h3>Head-to-Head <span style="background:linear-gradient(90deg,#c4b5fd,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Vehicle Comparison</span></h3>
+      <p>Stack up to 3 vehicles side by side — petrol, diesel, hybrid, or EV — and find the real winner.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VEHICLE COMPARE ══════════════════════════════════════════════════════ -->
+<section class="section" id="compare">
+  <div class="section-header">
+    <div class="section-eyebrow">Side-by-Side</div>
+    <h2 class="section-title">Vehicle Comparison</h2>
+    <p class="section-sub">Compare up to 3 vehicles head-to-head on every cost dimension.</p>
+  </div>
+  <div class="compare-select-row">
+    <div>
+      <div class="form-group">
+        <label style="font-size:0.75rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:8px">Vehicle A</label>
+        <select id="cmpA" onchange="calcCompare()" style="width:100%;background:var(--bg2);border:1.5px solid rgba(99,102,241,0.4);border-radius:12px;padding:12px;color:var(--t1);font-size:0.88rem;font-family:inherit;">
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="form-group">
+        <label style="font-size:0.75rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:8px">Vehicle B</label>
+        <select id="cmpB" onchange="calcCompare()" style="width:100%;background:var(--bg2);border:1.5px solid rgba(6,182,212,0.4);border-radius:12px;padding:12px;color:var(--t1);font-size:0.88rem;font-family:inherit;">
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="form-group">
+        <label style="font-size:0.75rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:8px">Vehicle C</label>
+        <select id="cmpC" onchange="calcCompare()" style="width:100%;background:var(--bg2);border:1.5px solid rgba(168,85,247,0.4);border-radius:12px;padding:12px;color:var(--t1);font-size:0.88rem;font-family:inherit;">
+        </select>
+      </div>
+    </div>
+  </div>
+  <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:8px 14px">
+      <span id="cmpCBFlag">🌍</span>
+      <span style="font-weight:600;font-size:0.88rem" id="cmpCBName">—</span>
+    </div>
+    <div class="form-group" style="margin:0;display:flex;align-items:center;gap:8px">
+      <label style="font-size:0.82rem;color:var(--t2);white-space:nowrap">Annual KM:</label>
+      <input type="number" id="cmpKm" value="15000" step="1000" oninput="calcCompare()" style="width:100px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--t1);font-size:0.85rem;">
+    </div>
+  </div>
+  <div class="compare-grid" id="compareCards"></div>
+  <div class="card mt-20">
+    <div class="card-title"><div class="icon" style="background:rgba(99,102,241,0.15)">📊</div>Annual Cost Comparison</div>
+    <div class="chart-wrap"><canvas id="compareChart"></canvas></div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Photo Band: Fuel -->
+<div class="photo-band pb-fuel">
+  <div class="photo-band-inner">
+    <div class="photo-band-icon">⛽</div>
+    <div class="photo-band-text">
+      <h3>Fuel Price <span style="background:linear-gradient(90deg,#fca5a5,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Intelligence</span></h3>
+      <p>Live petrol, diesel and EV charging costs across every country — in local currency and USD equivalent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FUEL INTELLIGENCE ═════════════════════════════════════════════════════ -->
+<section class="section" id="fuel">
+  <div class="section-header">
+    <div class="section-eyebrow">Fuel Intelligence</div>
+    <h2 class="section-title">Global Fuel Price Dashboard</h2>
+    <p class="section-sub">Real-world fuel and electricity prices across 25+ countries.</p>
+  </div>
+  <div class="fuel-grid" id="fuelGrid"></div>
+  <div class="card mt-20">
+    <div class="card-title"><div class="icon" style="background:rgba(247,179,8,0.15)">📊</div>Petrol Price Comparison (USD/L)</div>
+    <div class="chart-wrap" style="height:340px"><canvas id="fuelChart"></canvas></div>
+  </div>
+</section>
+
+<!-- ═══ AFFILIATE MODULE ══════════════════════════════════════════════════════ -->
+<div style="max-width:1100px;margin:0 auto;padding:0 24px 60px">
+  <div class="affiliate-strip">
+    <div class="aff-title">🚀 Save More On Your Vehicle Costs</div>
+    <div class="aff-sub">Connect with trusted partners for insurance, financing, and more.</div>
+    <div class="aff-buttons">
+      <a class="aff-btn" href="#">🛡️ Compare Insurance</a>
+      <a class="aff-btn" href="#">💳 Vehicle Loans</a>
+      <a class="aff-btn" href="#">⚡ EV Charging Plans</a>
+      <a class="aff-btn" href="#">🏪 Find Dealers</a>
+      <a class="aff-btn" href="#">🔧 Extended Warranty</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">🚗 DriveWise Global</div>
+  <div class="footer-tagline">The world's most comprehensive vehicle cost intelligence platform.</div>
+  <div class="footer-links">
+    <a class="footer-link" href="#">About</a>
+    <a class="footer-link" href="#">Methodology</a>
+    <a class="footer-link" href="#">Data Sources</a>
+    <a class="footer-link" href="#">API Access</a>
+    <a class="footer-link" href="#">Privacy</a>
+    <a class="footer-link" href="#">Terms</a>
+    <a class="footer-link" href="#">Contact</a>
+  </div>
+  <div class="footer-copy">© 2026 DriveWise Global. Data sourced from public fuel price indices, government registration databases, and insurance industry averages. For informational purposes only.</div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DATA LAYER
+══════════════════════════════════════════════════════ */
+const COUNTRIES = {
+  USA:    { name:'United States',  flag:'🇺🇸', currency:'USD', symbol:'$',  rate:1.00,
+            fuel:{p:0.95,d:1.05,ev:0.16}, insurance:1800, reg:250, roadTax:0,  duty:2.5,  evInc:7500, depRate:0.15,
+            cities:{
+              'New York':{mul:1.8,park:500},'Los Angeles':{mul:1.5,park:300},'Dallas':{mul:1.0,park:100},
+              'Miami':{mul:1.3,park:200},'Seattle':{mul:1.3,park:250},'Chicago':{mul:1.4,park:350},
+              'Houston':{mul:1.0,park:120},'San Francisco':{mul:1.8,park:450} }},
+  CAN:    { name:'Canada',         flag:'🇨🇦', currency:'CAD', symbol:'C$', rate:1.36,
+            fuel:{p:1.62,d:1.80,ev:0.21}, insurance:2176, reg:408, roadTax:0,  duty:6.1,  evInc:6800, depRate:0.15,
+            cities:{
+              'Toronto':{mul:1.5,park:270},'Vancouver':{mul:1.6,park:300},'Montreal':{mul:1.2,park:150},
+              'Calgary':{mul:1.1,park:130},'Ottawa':{mul:1.1,park:140} }},
+  GBR:    { name:'United Kingdom', flag:'🇬🇧', currency:'GBP', symbol:'£',  rate:0.79,
+            fuel:{p:1.42,d:1.48,ev:0.26}, insurance:792,  reg:158, roadTax:174, duty:0,   evInc:3175, depRate:0.16,
+            cities:{
+              'London':{mul:2.2,park:500},'Manchester':{mul:1.2,park:150},'Birmingham':{mul:1.1,park:130},
+              'Edinburgh':{mul:1.2,park:160},'Leeds':{mul:1.0,park:120} }},
+  DEU:    { name:'Germany',        flag:'🇩🇪', currency:'EUR', symbol:'€',  rate:0.92,
+            fuel:{p:1.61,d:1.55,ev:0.30}, insurance:828,  reg:166, roadTax:230, duty:0,   evInc:4140, depRate:0.15,
+            cities:{
+              'Munich':{mul:1.4,park:220},'Berlin':{mul:1.2,park:180},'Hamburg':{mul:1.3,park:200},
+              'Frankfurt':{mul:1.3,park:210},'Cologne':{mul:1.1,park:160} }},
+  FRA:    { name:'France',         flag:'🇫🇷', currency:'EUR', symbol:'€',  rate:0.92,
+            fuel:{p:1.67,d:1.55,ev:0.25}, insurance:690,  reg:147, roadTax:276, duty:0,   evInc:4600, depRate:0.15,
+            cities:{
+              'Paris':{mul:1.8,park:350},'Lyon':{mul:1.2,park:160},'Marseille':{mul:1.1,park:140},
+              'Bordeaux':{mul:1.1,park:130} }},
+  AUS:    { name:'Australia',      flag:'🇦🇺', currency:'AUD', symbol:'A$', rate:1.54,
+            fuel:{p:2.00,d:2.10,ev:0.30}, insurance:1694, reg:770, roadTax:0,   duty:5,   evInc:4620, depRate:0.15,
+            cities:{
+              'Sydney':{mul:1.5,park:280},'Melbourne':{mul:1.4,park:250},'Brisbane':{mul:1.2,park:180},
+              'Perth':{mul:1.1,park:160},'Adelaide':{mul:1.0,park:130} }},
+  NZL:    { name:'New Zealand',    flag:'🇳🇿', currency:'NZD', symbol:'NZ$',rate:1.64,
+            fuel:{p:2.30,d:2.20,ev:0.30}, insurance:1476, reg:656, roadTax:0,   duty:0,   evInc:14139, depRate:0.15,
+            cities:{
+              'Auckland':{mul:1.4,park:200},'Wellington':{mul:1.2,park:180},'Christchurch':{mul:1.0,park:130} }},
+  ARE:    { name:'UAE',            flag:'🇦🇪', currency:'AED', symbol:'د.إ',rate:3.67,
+            fuel:{p:2.83,d:2.62,ev:0.40}, insurance:2569, reg:1469,roadTax:0,   duty:5,   evInc:0,    depRate:0.20,
+            cities:{
+              'Dubai':{mul:1.2,park:180},'Abu Dhabi':{mul:1.0,park:150},'Sharjah':{mul:0.9,park:80} }},
+  SAU:    { name:'Saudi Arabia',   flag:'🇸🇦', currency:'SAR', symbol:'﷼',  rate:3.75,
+            fuel:{p:0.90,d:0.84,ev:0.24}, insurance:1875, reg:1125,roadTax:0,   duty:5,   evInc:0,    depRate:0.18,
+            cities:{
+              'Riyadh':{mul:1.0,park:100},'Jeddah':{mul:1.1,park:110},'Dammam':{mul:0.9,park:80} }},
+  QAT:    { name:'Qatar',          flag:'🇶🇦', currency:'QAR', symbol:'QR',  rate:3.64,
+            fuel:{p:0.91,d:0.87,ev:0.27}, insurance:2184, reg:911, roadTax:0,   duty:5,   evInc:0,    depRate:0.20,
+            cities:{'Doha':{mul:1.0,park:120},'Al Wakrah':{mul:0.9,park:80}} },
+  BHR:    { name:'Bahrain',        flag:'🇧🇭', currency:'BHD', symbol:'BD',  rate:0.377,
+            fuel:{p:0.106,d:0.098,ev:0.038}, insurance:151, reg:75,  roadTax:0, duty:5,   evInc:0,    depRate:0.18,
+            cities:{'Manama':{mul:1.0,park:100},'Muharraq':{mul:0.9,park:70}} },
+  OMN:    { name:'Oman',           flag:'🇴🇲', currency:'OMR', symbol:'OMR', rate:0.385,
+            fuel:{p:0.111,d:0.104,ev:0.042}, insurance:193, reg:96,  roadTax:0, duty:5,   evInc:0,    depRate:0.18,
+            cities:{'Muscat':{mul:1.0,park:100},'Salalah':{mul:0.9,park:70}} },
+  KWT:    { name:'Kuwait',         flag:'🇰🇼', currency:'KWD', symbol:'KD',  rate:0.307,
+            fuel:{p:0.062,d:0.055,ev:0.031}, insurance:123, reg:61,  roadTax:0, duty:5,   evInc:0,    depRate:0.18,
+            cities:{'Kuwait City':{mul:1.0,park:80},'Salmiya':{mul:0.9,park:60}} },
+  SGP:    { name:'Singapore',      flag:'🇸🇬', currency:'SGD', symbol:'S$',  rate:1.34,
+            fuel:{p:2.95,d:2.80,ev:0.35}, insurance:1608, reg:8000, roadTax:938, duty:0,  evInc:0,    depRate:0.25,
+            cities:{'Singapore':{mul:1.0,park:200}} },
+  MYS:    { name:'Malaysia',       flag:'🇲🇾', currency:'MYR', symbol:'RM',  rate:4.72,
+            fuel:{p:2.05,d:2.15,ev:0.43}, insurance:2360, reg:1416,roadTax:708,  duty:30,  evInc:2360, depRate:0.18,
+            cities:{
+              'Kuala Lumpur':{mul:1.2,park:180},'Penang':{mul:1.0,park:120},'Johor Bahru':{mul:0.9,park:80},
+              'Kota Kinabalu':{mul:0.9,park:70},'Ipoh':{mul:0.85,park:60} }},
+  IND:    { name:'India',          flag:'🇮🇳', currency:'INR', symbol:'₹',   rate:83.5,
+            fuel:{p:103,d:90,ev:7}, insurance:15000, reg:125000, roadTax:16700, duty:100, evInc:15000, depRate:0.15,
+            cities:{
+              'Bangalore':{mul:1.3,park:1200},'Mumbai':{mul:1.6,park:2000},'Delhi':{mul:1.4,park:1500},
+              'Chennai':{mul:1.1,park:800},'Hyderabad':{mul:1.2,park:900},'Pune':{mul:1.1,park:800} }},
+  IDN:    { name:'Indonesia',      flag:'🇮🇩', currency:'IDR', symbol:'Rp',  rate:16000,
+            fuel:{p:12500,d:11000,ev:1600}, insurance:4800000, reg:8000000, roadTax:4000000, duty:40, evInc:0, depRate:0.18,
+            cities:{
+              'Jakarta':{mul:1.3,park:1500000},'Surabaya':{mul:1.0,park:800000},'Bandung':{mul:1.0,park:600000},
+              'Bali':{mul:1.1,park:700000} }},
+  THA:    { name:'Thailand',       flag:'🇹🇭', currency:'THB', symbol:'฿',   rate:35.5,
+            fuel:{p:39,d:34,ev:4.5}, insurance:14200, reg:10650, roadTax:3550, duty:80, evInc:0, depRate:0.18,
+            cities:{
+              'Bangkok':{mul:1.3,park:1800},'Chiang Mai':{mul:1.0,park:800},'Pattaya':{mul:1.0,park:700} }},
+  PHL:    { name:'Philippines',    flag:'🇵🇭', currency:'PHP', symbol:'₱',   rate:56.5,
+            fuel:{p:65,d:60,ev:9}, insurance:22600, reg:16950, roadTax:11300, duty:30, evInc:0, depRate:0.18,
+            cities:{
+              'Manila':{mul:1.4,park:3000},'Cebu':{mul:1.1,park:1800},'Davao':{mul:1.0,park:1200} }},
+  ZAF:    { name:'South Africa',   flag:'🇿🇦', currency:'ZAR', symbol:'R',   rate:18.8,
+            fuel:{p:21.5,d:19.8,ev:3.5}, insurance:11280, reg:3760, roadTax:0,    duty:25,  evInc:0,    depRate:0.18,
+            cities:{
+              'Johannesburg':{mul:1.3,park:1500},'Cape Town':{mul:1.2,park:1400},'Durban':{mul:1.0,park:900} }},
+  BRA:    { name:'Brazil',         flag:'🇧🇷', currency:'BRL', symbol:'R$',  rate:5.05,
+            fuel:{p:5.84,d:5.55,ev:1.05}, insurance:4040, reg:3030, roadTax:0,    duty:35,  evInc:0,    depRate:0.18,
+            cities:{
+              'São Paulo':{mul:1.5,park:2200},'Rio de Janeiro':{mul:1.4,park:2000},'Brasília':{mul:1.1,park:1200} }},
+  MEX:    { name:'Mexico',         flag:'🇲🇽', currency:'MXN', symbol:'MX$', rate:17.2,
+            fuel:{p:22,d:24,ev:3.0}, insurance:6020, reg:4300, roadTax:0,    duty:15,  evInc:0,    depRate:0.18,
+            cities:{
+              'Mexico City':{mul:1.3,park:1800},'Guadalajara':{mul:1.1,park:1200},'Monterrey':{mul:1.1,park:1200} }},
+  JPN:    { name:'Japan',          flag:'🇯🇵', currency:'JPY', symbol:'¥',   rate:149,
+            fuel:{p:168,d:155,ev:25}, insurance:74500, reg:149000, roadTax:74500, duty:0, evInc:596000, depRate:0.20,
+            cities:{
+              'Tokyo':{mul:1.8,park:60000},'Osaka':{mul:1.3,park:35000},'Kyoto':{mul:1.2,park:30000},
+              'Nagoya':{mul:1.1,park:20000},'Yokohama':{mul:1.4,park:40000} }},
+  KOR:    { name:'South Korea',    flag:'🇰🇷', currency:'KRW', symbol:'₩',   rate:1335,
+            fuel:{p:1680,d:1560,ev:220}, insurance:934500, reg:534000, roadTax:400500, duty:8, evInc:8010000, depRate:0.18,
+            cities:{
+              'Seoul':{mul:1.5,park:250000},'Busan':{mul:1.2,park:150000},'Incheon':{mul:1.2,park:160000} }},
+};
+
+const VEHICLES = {
+  corolla:     { name:'Toyota Corolla 1.8', type:'Petrol',   fuelKey:'p', eff:15.5, maint:800,  tires:400, price:25000, dep:0.15, icon:'🚗' },
+  civic:       { name:'Honda Civic 1.5T',   type:'Petrol',   fuelKey:'p', eff:14.5, maint:850,  tires:420, price:28000, dep:0.15, icon:'🚗' },
+  bmw3:        { name:'BMW 3 Series',        type:'Petrol',   fuelKey:'p', eff:13.0, maint:1500, tires:600, price:48000, dep:0.20, icon:'🚘' },
+  fortuner:    { name:'Toyota Fortuner 2.8', type:'Diesel',   fuelKey:'d', eff:11.5, maint:1200, tires:700, price:38000, dep:0.17, icon:'🚙' },
+  crv:         { name:'Honda CR-V Hybrid',   type:'Hybrid',   fuelKey:'p', eff:20.0, maint:900,  tires:500, price:35000, dep:0.16, icon:'🚙' },
+  camry_hybrid:{ name:'Toyota Camry Hybrid', type:'Hybrid',   fuelKey:'p', eff:22.0, maint:850,  tires:500, price:32000, dep:0.16, icon:'🚗' },
+  tesla3:      { name:'Tesla Model 3 SR+',   type:'EV',       fuelKey:'ev',eff:6.5,  maint:400,  tires:500, price:42000, dep:0.20, icon:'⚡' },
+  leaf:        { name:'Nissan Leaf',          type:'EV',       fuelKey:'ev',eff:5.5,  maint:350,  tires:400, price:28000, dep:0.22, icon:'⚡' },
+  ioniq6:      { name:'Hyundai IONIQ 6',      type:'EV',       fuelKey:'ev',eff:7.2,  maint:380,  tires:460, price:38000, dep:0.19, icon:'⚡' },
+  pcx:         { name:'Honda PCX 150',        type:'Petrol',   fuelKey:'p', eff:40.0, maint:300,  tires:200, price:4500,  dep:0.12, icon:'🏍️' },
+  nmax:        { name:'Yamaha NMAX 155',      type:'Petrol',   fuelKey:'p', eff:38.0, maint:250,  tires:180, price:3800,  dep:0.12, icon:'🏍️' },
+};
+
+/* ══════════════════════════════════════════════════════
+   COUNTRY-SPECIFIC VEHICLE LINEUPS
+   Each vehicle: { id, name, brand, type, fuelKey, eff (km/L or km/kWh),
+                   maintLocal, tiresLocal, localPrice, dep, icon }
+   All prices/costs in LOCAL currency of that country.
+══════════════════════════════════════════════════════ */
+const V = (id,name,brand,type,fuelKey,eff,maintLocal,tiresLocal,localPrice,dep,icon='🚗')=>
+  ({id,name,brand,type,fuelKey,eff,maintLocal,tiresLocal,localPrice,dep,icon});
+
+const COUNTRY_VEHICLES = {
+  /* ── MALAYSIA (MYR) ─────────────────────────── */
+  MYS:[
+    V('axia',     'Perodua Axia 1.0 G',     'Perodua',       'Petrol','p', 18.0, 1200, 500,  40000,0.12),
+    V('bezza',    'Perodua Bezza 1.3 X',    'Perodua',       'Petrol','p', 17.0, 1300, 550,  47000,0.13),
+    V('myvi',     'Perodua Myvi 1.5 AV',    'Perodua',       'Petrol','p', 16.5, 1500, 600,  58000,0.13),
+    V('alza',     'Perodua Alza 1.5 AV',    'Perodua',       'Petrol','p', 15.0, 1600, 650,  75000,0.14),
+    V('saga',     'Proton Saga 1.3 Premium', 'Proton',        'Petrol','p', 16.0, 1400, 600,  43000,0.14),
+    V('x50',      'Proton X50 1.5T Premium','Proton',        'Petrol','p', 14.0, 2000, 700,  82000,0.15),
+    V('x70',      'Proton X70 1.8T AWD',    'Proton',        'Petrol','p', 12.5, 2500, 800, 115000,0.16),
+    V('vios_my',  'Toyota Vios 1.5 G',      'Toyota',        'Petrol','p', 15.5, 2200, 700,  93000,0.15),
+    V('city_my',  'Honda City 1.5 V',       'Honda',         'Petrol','p', 15.0, 2300, 700,  99000,0.15),
+    V('civic_my', 'Honda Civic 1.5T FC',    'Honda',         'Petrol','p', 13.5, 2800, 800, 145000,0.16),
+    V('creta_my', 'Hyundai Creta 1.5',      'Hyundai',       'Petrol','p', 13.0, 2500, 800, 130000,0.16),
+    V('tesla3_my','Tesla Model 3 SR+',      'Tesla',         'EV',   'ev', 6.5,  1500, 900, 199000,0.20,'⚡'),
+    V('pcx_my',   'Honda PCX 160',          'Honda',         'Petrol','p', 42.0,  600, 300,  12500,0.12,'🏍️'),
+    V('nmax_my',  'Yamaha NMax 155',        'Yamaha',        'Petrol','p', 38.0,  550, 280,  10500,0.12,'🏍️'),
+  ],
+  /* ── INDIA (INR) ────────────────────────────── */
+  IND:[
+    V('alto',    'Maruti Alto K10 VXi',     'Maruti Suzuki', 'Petrol','p', 24.0,  8000,  4000,  450000,0.15),
+    V('swift',   'Maruti Swift ZXi',        'Maruti Suzuki', 'Petrol','p', 21.0, 10000,  5000,  650000,0.15),
+    V('baleno',  'Maruti Baleno Alpha',     'Maruti Suzuki', 'Petrol','p', 19.0, 10000,  5500,  750000,0.15),
+    V('brezza',  'Maruti Brezza ZXi+',      'Maruti Suzuki', 'Petrol','p', 17.0, 12000,  6000, 1100000,0.15),
+    V('i20',     'Hyundai i20 Asta',        'Hyundai',       'Petrol','p', 18.0, 11000,  5500,  850000,0.15),
+    V('creta',   'Hyundai Creta SX',        'Hyundai',       'Petrol','p', 14.5, 14000,  7000, 1450000,0.16),
+    V('venue',   'Hyundai Venue SX+',       'Hyundai',       'Petrol','p', 17.0, 12000,  6000, 1000000,0.16),
+    V('seltos',  'Kia Seltos HTX+',         'Kia',           'Petrol','p', 14.0, 14000,  7000, 1500000,0.16),
+    V('nexon',   'Tata Nexon XZ+',          'Tata',          'Petrol','p', 17.5, 12000,  6000,  950000,0.16),
+    V('nexonev', 'Tata Nexon EV Max',       'Tata',          'EV',   'ev', 5.5,  8000,  6000, 1900000,0.18,'⚡'),
+    V('innova',  'Toyota Innova Crysta GX', 'Toyota',        'Diesel','d', 14.5, 18000,  9000, 2000000,0.16,'🚙'),
+    V('city_in', 'Honda City ZX CVT',       'Honda',         'Petrol','p', 17.0, 13000,  6500, 1350000,0.15),
+    V('pulsar',  'Bajaj Pulsar N150',       'Bajaj',         'Petrol','p', 45.0,  4000,  2000,  125000,0.12,'🏍️'),
+    V('activa',  'Honda Activa 6G',         'Honda',         'Petrol','p', 55.0,  3000,  1500,   80000,0.12,'🛵'),
+  ],
+  /* ── USA (USD) ──────────────────────────────── */
+  USA:[
+    V('camry_us', 'Toyota Camry LE',        'Toyota',        'Petrol','p', 14.5, 700,  400,  28000,0.15),
+    V('accord',   'Honda Accord Sport',     'Honda',         'Petrol','p', 13.5, 750,  420,  30000,0.15),
+    V('f150',     'Ford F-150 XLT',         'Ford',          'Petrol','p', 10.5,1000,  650,  40000,0.17,'🚙'),
+    V('rav4',     'Toyota RAV4 XLE',        'Toyota',        'Petrol','p', 13.0, 800,  500,  32000,0.16,'🚙'),
+    V('silverado','Chevrolet Silverado LT',  'Chevrolet',     'Petrol','p', 10.0,1100,  700,  42000,0.17,'🚙'),
+    V('tesla3_us','Tesla Model 3 RWD',      'Tesla',         'EV',   'ev', 6.5,  400,  500,  42000,0.20,'⚡'),
+    V('modely',   'Tesla Model Y RWD',      'Tesla',         'EV',   'ev', 6.0,  420,  550,  48000,0.20,'⚡'),
+    V('mustang',  'Ford Mustang GT',        'Ford',          'Petrol','p', 10.0,1200,  700,  37000,0.18,'🚘'),
+    V('crv_us',   'Honda CR-V Hybrid',      'Honda',         'Hybrid','p', 19.5, 800,  500,  35000,0.16,'🚙'),
+    V('rav4h',    'Toyota RAV4 Hybrid',     'Toyota',        'Hybrid','p', 20.0, 750,  500,  37000,0.15,'🚙'),
+    V('jeepwrang','Jeep Wrangler Sport',    'Jeep',          'Petrol','p',  9.5,1100,  750,  33000,0.18,'🚙'),
+    V('bmw3_us',  'BMW 330i xDrive',        'BMW',           'Petrol','p', 12.5,1500,  600,  50000,0.20,'🚘'),
+  ],
+  /* ── UK (GBP) ───────────────────────────────── */
+  GBR:[
+    V('fiesta',   'Ford Fiesta Titanium',   'Ford',          'Petrol','p', 16.5, 600,  350,  20000,0.16),
+    V('corsa',    'Vauxhall Corsa SRi',     'Vauxhall',      'Petrol','p', 15.5, 650,  360,  22000,0.16),
+    V('golf_uk',  'VW Golf Life 1.5',       'Volkswagen',    'Petrol','p', 15.0, 800,  420,  28000,0.16),
+    V('qashqai',  'Nissan Qashqai Acenta',  'Nissan',        'Petrol','p', 13.5, 850,  480,  27000,0.16,'🚙'),
+    V('mini',     'MINI Cooper Classic',    'MINI',          'Petrol','p', 14.0, 900,  450,  27000,0.18),
+    V('yaris_h',  'Toyota Yaris Hybrid GR', 'Toyota',        'Hybrid','p', 21.0, 650,  400,  23000,0.15),
+    V('tesla3_uk','Tesla Model 3 RWD',      'Tesla',         'EV',   'ev', 6.5,  350,  480,  43000,0.20,'⚡'),
+    V('leaf_uk',  'Nissan Leaf Acenta',     'Nissan',        'EV',   'ev', 5.5,  300,  420,  29000,0.22,'⚡'),
+    V('bmw3_uk',  'BMW 320i M Sport',       'BMW',           'Petrol','p', 12.5,1200,  550,  40000,0.20,'🚘'),
+    V('jag_xe',   'Jaguar XE P250 R-Dyn',  'Jaguar',        'Petrol','p', 11.5,1500,  650,  42000,0.22,'🚘'),
+  ],
+  /* ── GERMANY (EUR) ──────────────────────────── */
+  DEU:[
+    V('golf_de',  'VW Golf 8 Life 1.5',     'Volkswagen',    'Petrol','p', 15.0, 700,  420,  27000,0.15),
+    V('astra',    'Opel Astra Edition',     'Opel',          'Petrol','p', 14.0, 700,  400,  24000,0.16),
+    V('passat',   'VW Passat Business',     'Volkswagen',    'Diesel','d', 17.0, 800,  500,  38000,0.15,'🚗'),
+    V('bmw3_de',  'BMW 320d M Sport',       'BMW',           'Diesel','d', 16.0,1300,  600,  48000,0.19,'🚘'),
+    V('merc_c',   'Mercedes-Benz C200',     'Mercedes-Benz', 'Petrol','p', 14.0,1400,  620,  50000,0.19,'🚘'),
+    V('audi_a4',  'Audi A4 40 TFSI',        'Audi',          'Petrol','p', 14.5,1300,  600,  46000,0.19,'🚘'),
+    V('id4',      'VW ID.4 Pro',            'Volkswagen',    'EV',   'ev', 6.8,  600,  500,  42000,0.19,'⚡'),
+    V('bmwi4',    'BMW i4 eDrive40',        'BMW',           'EV',   'ev', 6.5,  800,  600,  60000,0.20,'⚡'),
+  ],
+  /* ── FRANCE (EUR) ───────────────────────────── */
+  FRA:[
+    V('clio',     'Renault Clio Intens 1.0','Renault',       'Petrol','p', 16.0, 650,  380,  20000,0.17),
+    V('p208',     'Peugeot 208 Allure',     'Peugeot',       'Petrol','p', 15.5, 670,  380,  22000,0.16),
+    V('c3',       'Citroën C3 Shine',       'Citroën',       'Petrol','p', 15.0, 600,  360,  19000,0.17),
+    V('megane',   'Renault Megane E-Tech',  'Renault',       'Hybrid','p', 20.0, 700,  420,  32000,0.15),
+    V('golf_fr',  'VW Golf 8 Style',        'Volkswagen',    'Petrol','p', 15.0, 750,  420,  30000,0.15),
+    V('renault_ev','Renault Zoe R135',      'Renault',       'EV',   'ev', 5.8,  500,  400,  34000,0.20,'⚡'),
+    V('pe208ev',  'Peugeot e-208 GT',       'Peugeot',       'EV',   'ev', 6.0,  500,  400,  37000,0.20,'⚡'),
+  ],
+  /* ── AUSTRALIA (AUD) ────────────────────────── */
+  AUS:[
+    V('hilux_au', 'Toyota HiLux SR5 AT',   'Toyota',        'Diesel','d', 10.5,1800,  850,  52000,0.15,'🚙'),
+    V('ranger_au','Ford Ranger XLT 4WD',   'Ford',          'Diesel','d', 10.0,1900,  900,  55000,0.16,'🚙'),
+    V('rav4_au',  'Toyota RAV4 GXL',       'Toyota',        'Petrol','p', 13.0,1200,  650,  42000,0.15,'🚙'),
+    V('mazda_cx5','Mazda CX-5 Touring',    'Mazda',         'Petrol','p', 12.5,1100,  620,  40000,0.16,'🚙'),
+    V('hyundi30', 'Hyundai i30 Elite',     'Hyundai',       'Petrol','p', 14.5, 900,  500,  28000,0.16),
+    V('triton',   'Mitsubishi Triton GLS', 'Mitsubishi',    'Diesel','d', 11.0,1700,  800,  47000,0.16,'🚙'),
+    V('rav4h_au', 'Toyota RAV4 Hybrid',    'Toyota',        'Hybrid','p', 19.5,1100,  650,  48000,0.14,'🚙'),
+    V('tesla3_au','Tesla Model 3 RWD',     'Tesla',         'EV',   'ev', 6.5,  700,  800,  63000,0.20,'⚡'),
+  ],
+  /* ── NEW ZEALAND (NZD) ──────────────────────── */
+  NZL:[
+    V('corolla_nz','Toyota Corolla GX',    'Toyota',        'Petrol','p', 15.0,1000,  600,  38000,0.15),
+    V('cxf_nz',   'Mazda CX-5 GSX',       'Mazda',         'Petrol','p', 13.0,1100,  650,  48000,0.16,'🚙'),
+    V('ranger_nz','Ford Ranger XLT',       'Ford',          'Diesel','d', 11.0,1600,  800,  55000,0.16,'🚙'),
+    V('rav4h_nz', 'Toyota RAV4 Hybrid',   'Toyota',        'Hybrid','p', 19.5,1000,  650,  58000,0.14,'🚙'),
+    V('tesla3_nz','Tesla Model 3 RWD',    'Tesla',         'EV',   'ev', 6.5,  700,  800,  75000,0.20,'⚡'),
+  ],
+  /* ── UAE (AED) ──────────────────────────────── */
+  ARE:[
+    V('camry_ae', 'Toyota Camry 2.5 GLE',  'Toyota',        'Petrol','p', 13.5,3000, 1200,  85000,0.15),
+    V('corolla_ae','Toyota Corolla 1.6 XLI','Toyota',       'Petrol','p', 15.5,2500, 1000,  68000,0.15),
+    V('lc_ae',    'Toyota Land Cruiser GXR','Toyota',       'Petrol','p',  8.5,5000, 2000, 270000,0.14,'🚙'),
+    V('patrol_ae','Nissan Patrol Platinum', 'Nissan',        'Petrol','p',  8.0,5000, 2000, 220000,0.15,'🚙'),
+    V('paj_ae',   'Mitsubishi Pajero GLS',  'Mitsubishi',   'Petrol','p', 10.0,4000, 1500, 130000,0.15,'🚙'),
+    V('bmw7_ae',  'BMW 730Li',              'BMW',           'Petrol','p', 10.5,8000, 2500, 380000,0.22,'🚘'),
+    V('lexus_lx', 'Lexus LX 600 Luxury',   'Lexus',         'Petrol','p',  7.5,6000, 2200, 430000,0.14,'🚙'),
+    V('sonata_ae','Hyundai Sonata 2.0',     'Hyundai',       'Petrol','p', 13.0,2800, 1100,  90000,0.16),
+  ],
+  /* ── SAUDI ARABIA (SAR) ─────────────────────── */
+  SAU:[
+    V('camry_sa', 'Toyota Camry 2.5 GLE',  'Toyota',        'Petrol','p', 13.5,2500, 1200,  85000,0.15),
+    V('corolla_sa','Toyota Corolla 1.6 SE', 'Toyota',        'Petrol','p', 16.0,2000, 1000,  68000,0.15),
+    V('lc_sa',    'Toyota Land Cruiser GXR','Toyota',        'Petrol','p',  8.5,5000, 2500, 250000,0.14,'🚙'),
+    V('patrol_sa','Nissan Patrol Platinum', 'Nissan',        'Petrol','p',  8.0,5000, 2500, 200000,0.15,'🚙'),
+    V('sonata_sa','Hyundai Sonata 2.0',     'Hyundai',       'Petrol','p', 13.0,2500, 1100,  75000,0.16),
+    V('sportage_sa','Kia Sportage EX',      'Kia',           'Petrol','p', 12.5,2800, 1200,  80000,0.16,'🚙'),
+  ],
+  /* ── QATAR (QAR) ────────────────────────────── */
+  QAT:[
+    V('camry_qa', 'Toyota Camry 2.5',      'Toyota',        'Petrol','p', 13.5,3000, 1200,  85000,0.15),
+    V('lc_qa',    'Toyota Land Cruiser',   'Toyota',        'Petrol','p',  8.5,5500, 2200, 260000,0.14,'🚙'),
+    V('patrol_qa','Nissan Patrol',         'Nissan',        'Petrol','p',  8.0,5000, 2200, 210000,0.15,'🚙'),
+    V('bmw5_qa',  'BMW 530i',              'BMW',           'Petrol','p', 11.0,8000, 2500, 290000,0.20,'🚘'),
+    V('lexus_qa', 'Lexus LX 600',         'Lexus',         'Petrol','p',  7.5,6500, 2500, 450000,0.14,'🚙'),
+  ],
+  /* ── BAHRAIN (BHD) ──────────────────────────── */
+  BHR:[
+    V('camry_bh', 'Toyota Camry 2.5',      'Toyota',        'Petrol','p', 13.5,3000, 1200,   8000,0.15),
+    V('corolla_bh','Toyota Corolla 1.6',   'Toyota',        'Petrol','p', 15.5,2200, 1000,   6500,0.15),
+    V('sonata_bh','Hyundai Sonata 2.0',    'Hyundai',       'Petrol','p', 13.0,2800, 1100,   7500,0.16),
+    V('patrol_bh','Nissan Patrol V8',      'Nissan',        'Petrol','p',  8.0,5000, 2200,  18000,0.15,'🚙'),
+  ],
+  /* ── OMAN (OMR) ─────────────────────────────── */
+  OMN:[
+    V('camry_om', 'Toyota Camry 2.5',      'Toyota',        'Petrol','p', 13.5,3000, 1200,   8000,0.15),
+    V('lc_om',    'Toyota Land Cruiser',   'Toyota',        'Petrol','p',  8.5,5000, 2200,  25000,0.14,'🚙'),
+    V('patrol_om','Nissan Patrol',         'Nissan',        'Petrol','p',  8.0,5000, 2200,  20000,0.15,'🚙'),
+    V('tucson_om','Hyundai Tucson 2.0',    'Hyundai',       'Petrol','p', 13.0,2800, 1200,   9000,0.16,'🚙'),
+  ],
+  /* ── KUWAIT (KWD) ───────────────────────────── */
+  KWT:[
+    V('camry_kw', 'Toyota Camry 2.5',      'Toyota',        'Petrol','p', 13.5,2500, 1200,   6500,0.15),
+    V('lc_kw',    'Toyota Land Cruiser',   'Toyota',        'Petrol','p',  8.5,5000, 2200,  18000,0.14,'🚙'),
+    V('patrol_kw','Nissan Patrol',         'Nissan',        'Petrol','p',  8.0,5000, 2200,  15000,0.15,'🚙'),
+    V('bmw5_kw',  'BMW 530i',             'BMW',           'Petrol','p', 11.0,7000, 2200,  20000,0.20,'🚘'),
+  ],
+  /* ── SINGAPORE (SGD) ────────────────────────── */
+  SGP:[
+    V('corolla_sg','Toyota Corolla Altis', 'Toyota',        'Petrol','p', 15.0,1800,  900, 120000,0.22),
+    V('civic_sg', 'Honda Civic 1.5T',      'Honda',         'Petrol','p', 14.0,1900,  950, 135000,0.22),
+    V('mazda3_sg','Mazda 3 Sedan',         'Mazda',         'Petrol','p', 14.5,1700,  900, 125000,0.22),
+    V('cxf_sg',   'Mazda CX-5 2.0',        'Mazda',         'Petrol','p', 12.0,2000, 1100, 150000,0.22,'🚙'),
+    V('bmw3_sg',  'BMW 320i M Sport',      'BMW',           'Petrol','p', 12.5,3500, 1200, 210000,0.22,'🚘'),
+    V('ioniq5_sg','Hyundai IONIQ 5',       'Hyundai',       'EV',   'ev', 6.2,1200, 1100, 180000,0.22,'⚡'),
+  ],
+  /* ── JAPAN (JPY) ────────────────────────────── */
+  JPN:[
+    V('nbox',     'Honda N-Box Custom G',  'Honda',         'Petrol','p', 19.0, 60000,30000,1800000,0.18),
+    V('aqua',     'Toyota Aqua Z',         'Toyota',        'Hybrid','p', 34.0, 55000,28000,1990000,0.14),
+    V('prius',    'Toyota Prius Z',        'Hybrid',        'Hybrid','p', 32.0, 60000,30000,3200000,0.14),
+    V('fit',      'Honda Fit e:HEV Home',  'Honda',         'Hybrid','p', 29.0, 55000,28000,2200000,0.15),
+    V('move',     'Daihatsu Move Custom',  'Daihatsu',      'Petrol','p', 25.0, 50000,25000,1400000,0.18),
+    V('jimny',    'Suzuki Jimny XC',       'Suzuki',        'Petrol','p', 13.0, 60000,35000,1800000,0.16,'🚙'),
+    V('leaf_jp',  'Nissan Leaf X',         'Nissan',        'EV',   'ev', 5.5, 40000,30000,3500000,0.22,'⚡'),
+    V('lc_jp',    'Toyota Land Cruiser 300','Toyota',       'Diesel','d',  9.5,120000,60000,8000000,0.12,'🚙'),
+  ],
+  /* ── SOUTH KOREA (KRW) ──────────────────────── */
+  KOR:[
+    V('avante',   'Hyundai Avante CN7',    'Hyundai',       'Petrol','p', 14.5,600000,300000,22000000,0.16),
+    V('tucson_kr','Hyundai Tucson NX4',    'Hyundai',       'Petrol','p', 12.0,800000,400000,28000000,0.16,'🚙'),
+    V('sportage_kr','Kia Sportage NQ5',    'Kia',           'Petrol','p', 12.5,800000,400000,26000000,0.16,'🚙'),
+    V('k5',       'Kia K5 3세대',          'Kia',           'Petrol','p', 13.5,700000,350000,25000000,0.16),
+    V('ioniq6_kr','Hyundai IONIQ 6 RWD',  'Hyundai',       'EV',   'ev', 7.2,400000,350000,55000000,0.18,'⚡'),
+    V('ev6',      'Kia EV6 Air',           'Kia',           'EV',   'ev', 6.8,400000,350000,52000000,0.18,'⚡'),
+    V('genesis',  'Genesis G80 2.5T',      'Genesis',       'Petrol','p', 11.0,1500000,600000,58000000,0.20,'🚘'),
+    V('carnival', 'Kia Carnival HEV',      'Kia',           'Hybrid','p', 13.5,1000000,500000,42000000,0.15,'🚙'),
+  ],
+  /* ── INDONESIA (IDR) ────────────────────────── */
+  IDN:[
+    V('brio',     'Honda Brio Satya E CVT','Honda',         'Petrol','p', 18.0,3000000,1500000, 175000000,0.15),
+    V('avanza',   'Toyota Avanza 1.5 G AT','Toyota',        'Petrol','p', 14.5,3500000,1800000, 240000000,0.15,'🚙'),
+    V('xenia',    'Daihatsu Xenia 1.5 R',  'Daihatsu',      'Petrol','p', 15.0,3000000,1700000, 230000000,0.15,'🚙'),
+    V('xpander',  'Mitsubishi Xpander CVT','Mitsubishi',    'Petrol','p', 14.0,3800000,1900000, 275000000,0.16,'🚙'),
+    V('fortuner_id','Toyota Fortuner VRZ', 'Toyota',        'Diesel','d', 12.5,5000000,2500000, 430000000,0.15,'🚙'),
+    V('ertiga',   'Suzuki Ertiga GX AT',   'Suzuki',        'Petrol','p', 16.0,3000000,1500000, 230000000,0.15,'🚙'),
+    V('nmax_id',  'Yamaha NMax 155',        'Yamaha',        'Petrol','p', 40.0, 800000, 400000,  32000000,0.13,'🏍️'),
+    V('vario_id', 'Honda Vario 150',        'Honda',         'Petrol','p', 48.0, 600000, 350000,  23000000,0.13,'🛵'),
+  ],
+  /* ── THAILAND (THB) ─────────────────────────── */
+  THA:[
+    V('hilux_th', 'Toyota Hilux Revo Z GR','Toyota',        'Diesel','d', 12.0,25000,12000, 800000,0.14,'🚙'),
+    V('fortuner_th','Toyota Fortuner 2.8D','Toyota',        'Diesel','d', 12.5,30000,14000,1350000,0.14,'🚙'),
+    V('city_th',  'Honda City S+ CVT',     'Honda',         'Petrol','p', 17.0,18000, 8000, 630000,0.16),
+    V('dmax',     'Isuzu D-Max Spacecab',  'Isuzu',         'Diesel','d', 13.0,22000,11000, 700000,0.14,'🚙'),
+    V('cx5_th',   'Mazda CX-5 2.0 SP',    'Mazda',         'Petrol','p', 13.0,22000,10000, 950000,0.16,'🚙'),
+    V('corollacross','Toyota Corolla Cross HEV','Toyota',   'Hybrid','p', 23.0,20000, 9000, 950000,0.14,'🚙'),
+    V('pcx_th',   'Honda PCX 160',         'Honda',         'Petrol','p', 44.0, 5000, 2500,  85000,0.13,'🏍️'),
+  ],
+  /* ── PHILIPPINES (PHP) ──────────────────────── */
+  PHL:[
+    V('vios_ph',  'Toyota Vios G CVT',     'Toyota',        'Petrol','p', 16.5,20000,10000, 875000,0.16),
+    V('city_ph',  'Honda City V CVT',      'Honda',         'Petrol','p', 16.0,22000,10000, 875000,0.16),
+    V('dzire',    'Suzuki Dzire GL CVT',   'Suzuki',        'Petrol','p', 21.0,16000, 8000, 700000,0.16),
+    V('innova_ph','Toyota Innova G AT',    'Toyota',        'Diesel','d', 13.5,30000,14000,1200000,0.15,'🚙'),
+    V('montero',  'Mitsubishi Montero Sport GT','Mitsubishi','Diesel','d', 12.5,35000,16000,1500000,0.15,'🚙'),
+    V('ranger_ph','Ford Ranger Wildtrak',  'Ford',          'Diesel','d', 11.0,32000,16000,1250000,0.15,'🚙'),
+    V('nmax_ph',  'Yamaha NMax 155',        'Yamaha',        'Petrol','p', 40.0, 5000, 2500,  95000,0.13,'🏍️'),
+  ],
+  /* ── SOUTH AFRICA (ZAR) ─────────────────────── */
+  ZAF:[
+    V('polo_za',  'VW Polo 1.0 TSI Life',  'Volkswagen',    'Petrol','p', 17.0,12000, 6000, 350000,0.16),
+    V('hilux_za', 'Toyota Hilux 2.4 GD-6', 'Toyota',        'Diesel','d', 12.0,18000, 9000, 450000,0.14,'🚙'),
+    V('ranger_za','Ford Ranger 2.2 XL',    'Ford',          'Diesel','d', 11.5,17000, 9000, 500000,0.15,'🚙'),
+    V('tucson_za','Hyundai Tucson 2.0',    'Hyundai',       'Petrol','p', 13.5,14000, 7000, 480000,0.16,'🚙'),
+    V('rav4_za',  'Toyota RAV4 2.0 GX',    'Toyota',        'Petrol','p', 13.0,15000, 7500, 550000,0.15,'🚙'),
+    V('bmw3_za',  'BMW 320d M Sport',      'BMW',           'Diesel','d', 15.0,25000,12000, 750000,0.20,'🚘'),
+  ],
+  /* ── BRAZIL (BRL) ───────────────────────────── */
+  BRA:[
+    V('onix',     'Chevrolet Onix LTZ AT', 'Chevrolet',     'Petrol','p', 15.5,4000, 2000,  75000,0.16),
+    V('argo',     'Fiat Argo Drive 1.3',   'Fiat',          'Petrol','p', 15.0,3800, 1900,  85000,0.17),
+    V('hb20',     'Hyundai HB20 Diamond+', 'Hyundai',       'Petrol','p', 15.0,4000, 2000,  80000,0.16),
+    V('polo_br',  'VW Polo Highline 200T', 'Volkswagen',    'Petrol','p', 14.0,4500, 2200, 100000,0.16),
+    V('jeep_comp','Jeep Compass S T270',   'Jeep',          'Petrol','p', 12.0,6000, 3000, 155000,0.17,'🚙'),
+    V('corolla_br','Toyota Corolla Altis', 'Toyota',        'Hybrid','p', 16.5,5000, 2500, 140000,0.15),
+  ],
+  /* ── MEXICO (MXN) ───────────────────────────── */
+  MEX:[
+    V('versa',    'Nissan Versa Advance',   'Nissan',        'Petrol','p', 16.0,8000, 4000, 290000,0.16),
+    V('kia_rio',  'Kia Rio EX Sedán',       'Kia',           'Petrol','p', 17.0,8000, 4000, 265000,0.16),
+    V('jetta',    'VW Jetta Style',         'Volkswagen',    'Petrol','p', 14.5,9000, 4500, 380000,0.15),
+    V('corolla_mx','Toyota Corolla LE',     'Toyota',        'Petrol','p', 14.5,9000, 4500, 350000,0.15),
+    V('equinox',  'Chevrolet Equinox RS',   'Chevrolet',     'Petrol','p', 12.0,10000,5000, 430000,0.16,'🚙'),
+    V('tucson_mx','Hyundai Tucson GLS',     'Hyundai',       'Petrol','p', 12.5,10000,5500, 440000,0.16,'🚙'),
+  ],
+  /* ── CANADA (CAD) ───────────────────────────── */
+  CAN:[
+    V('f150_ca',  'Ford F-150 XLT',        'Ford',          'Petrol','p', 10.0,1400,  900,  52000,0.16,'🚙'),
+    V('rav4_ca',  'Toyota RAV4 XLE AWD',   'Toyota',        'Petrol','p', 12.5,1100,  700,  38000,0.15,'🚙'),
+    V('crv_ca',   'Honda CR-V Sport',      'Honda',         'Petrol','p', 13.0,1100,  680,  38000,0.15,'🚙'),
+    V('silverado_ca','Chevrolet Silverado LT','Chevrolet',  'Petrol','p',  9.5,1500,  900,  52000,0.17,'🚙'),
+    V('camryh_ca','Toyota Camry Hybrid LE', 'Toyota',       'Hybrid','p', 19.5, 900,  600,  34000,0.15),
+    V('tesla3_ca','Tesla Model 3 RWD',     'Tesla',         'EV',   'ev', 6.5,  600,  750,  57000,0.20,'⚡'),
+  ],
+};
+
+/* ── Helper: get vehicle list for a country ──── */
+function getVehiclesForCountry(code){
+  return COUNTRY_VEHICLES[code] || Object.values(VEHICLES).map(v=>({...v, localPrice: v.price, maintLocal: v.maint, tiresLocal: v.tires}));
+}
+
+/* ── Resolve a vehicle from country list by id ── */
+function getCountryVehicle(id, code){
+  const list = getVehiclesForCountry(code);
+  return list.find(v=>v.id===id) || list[0];
+}
+
+/* ══════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════ */
+function getCountry(code){ return COUNTRIES[code] || null; }
+
+function fmtLocal(usdAmount, country){
+  if(!country) return '$' + usdAmount.toLocaleString('en',{maximumFractionDigits:0});
+  const local = usdAmount * country.rate;
+  const big = ['JPY','KRW','IDR','INR','MMK'].includes(country.currency);
+  const opts = big ? {maximumFractionDigits:0} : {minimumFractionDigits:0,maximumFractionDigits:0};
+  return country.symbol + local.toLocaleString('en',opts);
+}
+
+function fmtUSD(v){ return '$' + Math.round(v).toLocaleString('en'); }
+
+function getLocalFuel(country, key){
+  // returns fuel price already in local currency per litre
+  return country.fuel[key];
+}
+
+function fuelToUSD(price, country){
+  // price is already in local currency — convert to USD
+  return price / country.rate;
+}
+
+function calcTCOData(vehicleKey, countryCode, cityName, annualKm, purchasePriceUSD, downPct, interestPct){
+  // Look up vehicle from country-specific list first, fall back to global
+  const c = getCountry(countryCode);
+  if(!c) return null;
+  const city = c.cities[cityName] || { mul:1.0, park:100 };
+
+  let v = getCountryVehicle(vehicleKey, countryCode);
+  if(!v) v = VEHICLES[vehicleKey];
+  if(!v) return null;
+
+  // Price: use override (from TCO form) if given, otherwise vehicle's localPrice / rate
+  const priceUSD = purchasePriceUSD || (v.localPrice ? v.localPrice / c.rate : v.price || 25000);
+  const fuelPriceLocal = c.fuel[v.fuelKey];
+  const fuelPriceUSD = fuelToUSD(fuelPriceLocal, c);
+
+  let annualFuelUSD;
+  if(v.type === 'EV'){
+    annualFuelUSD = (annualKm / v.eff) * fuelPriceUSD;
+  } else {
+    annualFuelUSD = (annualKm / v.eff) * fuelPriceUSD;
+  }
+
+  const annualInsUSD = (c.insurance / c.rate) * city.mul;
+  // Use local-currency maint/tires if available, else fall back to USD values
+  const annualMaintUSD = (v.maintLocal ? v.maintLocal / c.rate : v.maint || 800) * city.mul;
+  const annualTiresUSD = v.tiresLocal ? v.tiresLocal / c.rate : v.tires || 400;
+  const annualTaxUSD = (c.roadTax / c.rate);
+  const annualRegUSD = (c.reg / c.rate) / 5; // amortize 5 yrs
+  const annualParkUSD = (city.park * 12 / c.rate);
+  const deprecUSD = priceUSD * v.dep;
+
+  // Financing
+  const loan = priceUSD * (1 - downPct/100);
+  const monthlyRate = (interestPct/100)/12;
+  const nPayments = 60; // 5yr loan
+  const monthlyPay = loan * monthlyRate / (1 - Math.pow(1+monthlyRate,-nPayments));
+  const annualFinanceUSD = monthlyPay * 12;
+
+  const annualTotal = annualFuelUSD + annualInsUSD + annualMaintUSD + annualTiresUSD + annualTaxUSD + annualRegUSD + annualParkUSD + deprecUSD + annualFinanceUSD;
+  const evIncentiveUSD = v.type === 'EV' ? c.evInc / c.rate : 0;
+  const adjustedAnnual = annualTotal - (evIncentiveUSD / 5); // spread incentive over 5 yrs
+
+  return {
+    fuel: annualFuelUSD,
+    insurance: annualInsUSD,
+    maintenance: annualMaintUSD,
+    tires: annualTiresUSD,
+    tax: annualTaxUSD,
+    registration: annualRegUSD,
+    parking: annualParkUSD,
+    depreciation: deprecUSD,
+    financing: annualFinanceUSD,
+    total: adjustedAnnual,
+    monthly: adjustedAnnual / 12,
+    yr5: adjustedAnnual * 5 + priceUSD * (1 - Math.pow(1-v.dep,5)) * (-1) + priceUSD,
+    yr10: adjustedAnnual * 10 + priceUSD * (1 - Math.pow(1-v.dep,10)) * (-1) + priceUSD,
+    cpk: adjustedAnnual / annualKm,
+    country: c,
+    vehicle: v,
+    priceUSD
+  };
+}
+
+/* ══════════════════════════════════════════════════════
+   GLOBAL STATE
+══════════════════════════════════════════════════════ */
+const G = { code: null, city: null, c: null, cityData: null };
+
+/* ══════════════════════════════════════════════════════
+   COUNTRY GATE
+══════════════════════════════════════════════════════ */
+let _gateSelectedCode = null;
+let _gateSelectedCity = null;
+
+/* ISO-3 → ISO-2 map for flagcdn.com */
+const ISO2 = {
+  USA:'us',CAN:'ca',GBR:'gb',DEU:'de',FRA:'fr',AUS:'au',NZL:'nz',
+  ARE:'ae',SAU:'sa',QAT:'qa',BHR:'bh',OMN:'om',KWT:'kw',
+  SGP:'sg',MYS:'my',IND:'in',IDN:'id',THA:'th',PHL:'ph',
+  ZAF:'za',BRA:'br',MEX:'mx',JPN:'jp',KOR:'kr'
+};
+
+function buildCountryGrid(){
+  const grid = document.getElementById('countryGrid');
+  grid.innerHTML = Object.entries(COUNTRIES).map(([code,c])=>{
+    const iso2 = ISO2[code];
+    const flagImg = iso2
+      ? `<img class="co-flag-img" src="https://flagcdn.com/w320/${iso2}.png"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+             alt="${c.name} flag" loading="lazy">`
+      : '';
+    const flagFallback = `<span class="co-flag-emoji" style="display:${iso2?'none':'block'}">${c.flag}</span>`;
+    return `<div class="co-card" onclick="gateSelectCountry('${code}')">
+      <div class="co-flag-wrap">${flagImg}${flagFallback}</div>
+      <div class="co-info">
+        <div class="co-name">${c.flag} ${c.name}</div>
+        <div class="co-curr">${c.currency} · ${c.symbol}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterCountryGrid(q){
+  const lower = q.toLowerCase();
+  document.querySelectorAll('.co-card').forEach(card=>{
+    card.style.display = card.textContent.toLowerCase().includes(lower) ? '' : 'none';
+  });
+}
+
+function gateSelectCountry(code){
+  _gateSelectedCode = code;
+  _gateSelectedCity = null;
+  const c = COUNTRIES[code];
+  document.getElementById('gateStep1').style.display = 'none';
+  const s2 = document.getElementById('gateStep2');
+  s2.style.display = 'flex';
+  document.getElementById('gateStep2Title').textContent = `${c.flag} ${c.name} — Pick your city`;
+  document.getElementById('gateConfirm').disabled = true;
+  const cities = Object.keys(c.cities);
+  document.getElementById('cityGridGate').innerHTML = cities.map(city=>
+    `<div class="city-btn" onclick="gateSelectCity('${city}',this)">${city}</div>`
+  ).join('');
+}
+
+function gateSelectCity(city, el){
+  _gateSelectedCity = city;
+  document.querySelectorAll('.city-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('gateConfirm').disabled = false;
+}
+
+function gateGoBack(){
+  _gateSelectedCode = null; _gateSelectedCity = null;
+  document.getElementById('gateStep2').style.display = 'none';
+  document.getElementById('gateStep1').style.display = 'block';
+}
+
+function confirmGate(){
+  if(!_gateSelectedCode || !_gateSelectedCity) return;
+  applyCountry(_gateSelectedCode, _gateSelectedCity);
+}
+
+function openGate(){
+  document.getElementById('countryGate').classList.remove('hidden');
+  document.getElementById('gateStep1').style.display = 'block';
+  document.getElementById('gateStep2').style.display = 'none';
+  _gateSelectedCode = null; _gateSelectedCity = null;
+}
+
+/* ══════════════════════════════════════════════════════
+   APPLY COUNTRY — master function
+══════════════════════════════════════════════════════ */
+function applyCountry(code, city){
+  const c = COUNTRIES[code];
+  if(!c) return;
+  G.code = code; G.city = city; G.c = c;
+  G.cityData = c.cities[city] || {mul:1.0, park:100};
+
+  // Close gate
+  document.getElementById('countryGate').classList.add('hidden');
+
+  // Nav pill
+  document.getElementById('navFlag').textContent = c.flag;
+  document.getElementById('navCountryLabel').textContent = `${c.name} · ${city}`;
+  document.getElementById('navCountry').style.display = 'flex';
+
+  // Hero country bar
+  document.getElementById('heroCBFlag').textContent = c.flag;
+  document.getElementById('heroCBName').textContent = `${c.name}`;
+  document.getElementById('heroCBCity').textContent = `📍 ${city} · ${c.currency} (${c.symbol})`;
+  document.getElementById('heroSymbol').textContent = c.currency;
+
+  // Hero price default
+  const localDefault = Math.round(25000 * c.rate / 100) * 100;
+  document.getElementById('heroPrice').value = localDefault;
+
+  // TCO label
+  document.getElementById('tcoCountryLabel').textContent = `— ${c.flag} ${c.name} · ${c.currency}`;
+  // Sync TCO fuel/insurance/parking fields to local defaults
+  document.getElementById('tcoFuelPrice').value = c.fuel.p;
+  document.getElementById('tcoInsurance').value = Math.round(c.insurance);
+  document.getElementById('tcoParking').value   = Math.round(G.cityData.park);
+  const _firstV = getVehiclesForCountry(code)[0];
+  document.getElementById('tcoPrice').value     = _firstV ? Math.round(_firstV.localPrice) : Math.round(25000 * c.rate);
+
+  // EV country bar
+  document.getElementById('evCBFlag').textContent = c.flag;
+  document.getElementById('evCBName').textContent  = `${c.name} · ${c.currency}`;
+  document.getElementById('evCBCity').textContent  = `📍 ${city}`;
+
+  // Compare bar
+  document.getElementById('cmpCBFlag').textContent = c.flag;
+  document.getElementById('cmpCBName').textContent  = `${c.name} · ${c.currency}`;
+
+  // Populate country-specific vehicles then render all tools
+  populateVehicleSelects(code);
+  updateHero();
+  calcTCO();
+  calcEV();
+  calcCompare();
+  showRanking(currentRankMode || 'cheapest');
+}
+
+function syncTCOVehiclePrice(){
+  if(!G.code) return;
+  const vid = document.getElementById('tcoModel').value;
+  const v = getCountryVehicle(vid, G.code);
+  if(v && v.localPrice){
+    document.getElementById('tcoPrice').value = Math.round(v.localPrice);
+  }
+}
+
+function populateVehicleSelects(code){
+  const vehicles = getVehiclesForCountry(code);
+  const opts = vehicles.map(v=>`<option value="${v.id}">${v.icon||'🚗'} ${v.name}</option>`).join('');
+  // TCO model selector
+  const tcoSel = document.getElementById('tcoModel');
+  if(tcoSel){ tcoSel.innerHTML = opts; tcoSel.selectedIndex = 0; }
+  // Compare selectors
+  ['cmpA','cmpB','cmpC'].forEach((id,i)=>{
+    const sel = document.getElementById(id);
+    if(sel){ sel.innerHTML = opts; sel.selectedIndex = Math.min(i, vehicles.length-1); }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   HERO + CHARTS
+══════════════════════════════════════════════════════ */
+let pieInst, trendInst;
+
+function updateHero(){
+  if(!G.code || !G.city) return;
+  const code  = G.code;
+  const city  = G.city;
+  const vType = document.getElementById('heroVehicle').value;
+  const km    = parseInt(document.getElementById('heroKm').value)||15000;
+  const priceLocal = parseFloat(document.getElementById('heroPrice').value)||25000;
+  const priceUSD   = priceLocal / G.c.rate;
+
+  // pick a default vehicle matching type
+  const vKey = Object.keys(VEHICLES).find(k=>{
+    const t = VEHICLES[k].type.toLowerCase();
+    if(vType==='ev') return t==='ev';
+    if(vType==='hybrid') return t==='hybrid';
+    if(vType==='diesel') return t==='diesel';
+    if(vType==='motorcycle') return k==='pcx';
+    return t==='petrol' && !['pcx','nmax'].includes(k);
+  }) || 'corolla';
+
+  const d = calcTCOData(vKey, code, city, km, priceUSD, 20, 6);
+  if(!d) return;
+
+  const c = d.country;
+  document.getElementById('m-monthly').textContent = fmtLocal(d.monthly, c);
+  document.getElementById('m-annual').textContent  = fmtLocal(d.total, c);
+  document.getElementById('m-5yr').textContent     = fmtLocal(d.yr5, c);
+  document.getElementById('m-10yr').textContent    = fmtLocal(d.yr10, c);
+
+  renderBreakdownItems(d, c);
+  renderPieChart(d, c);
+  renderTrendChart(d, c, km, code, city, vKey);
+}
+
+function renderBreakdownItems(d, c){
+  const items = [
+    {label:'Fuel / Charging',  val:d.fuel,         color:'#f97316'},
+    {label:'Insurance',        val:d.insurance,     color:'#6366f1'},
+    {label:'Depreciation',     val:d.depreciation,  color:'#ef4444'},
+    {label:'Financing',        val:d.financing,     color:'#a855f7'},
+    {label:'Maintenance',      val:d.maintenance,   color:'#06b6d4'},
+    {label:'Parking',          val:d.parking,       color:'#eab308'},
+    {label:'Road Tax',         val:d.tax,           color:'#22c55e'},
+    {label:'Registration',     val:d.registration,  color:'#14b8a6'},
+    {label:'Tires',            val:d.tires,         color:'#94a3b8'},
+  ];
+  document.getElementById('breakdownItems').innerHTML = items.map(i=>
+    `<div class="breakdown-item">
+      <div class="bi-left"><div class="bi-dot" style="background:${i.color}"></div><div class="bi-label">${i.label}</div></div>
+      <div class="bi-value">${fmtLocal(i.val,c)}</div>
+    </div>`
+  ).join('');
+}
+
+function renderPieChart(d, c){
+  const data = [d.fuel, d.insurance, d.depreciation, d.financing, d.maintenance, d.parking, d.tax+d.registration, d.tires];
+  const labels = ['Fuel','Insurance','Depreciation','Financing','Maintenance','Parking','Taxes','Tires'];
+  const colors = ['#f97316','#6366f1','#ef4444','#a855f7','#06b6d4','#eab308','#22c55e','#94a3b8'];
+  if(pieInst) pieInst.destroy();
+  pieInst = new Chart(document.getElementById('costPieChart'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#101724'}]},
+    options:{plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:11},padding:8,boxWidth:12}}},cutout:'58%',maintainAspectRatio:false}
+  });
+}
+
+function renderTrendChart(d, c, km, code, city, vKey){
+  const yrs = Array.from({length:11},(_,i)=>i);
+  const annuals = Array.from({length:10},(_,i)=>d.total);
+  const cum = [d.priceUSD];
+  yrs.slice(1).forEach(i=>{ cum.push(cum[i-1]+annuals[i-1]); });
+  if(trendInst) trendInst.destroy();
+  trendInst = new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{
+      labels:yrs.map(i=>`Year ${i}`),
+      datasets:[{
+        label:'Cumulative Cost (USD)',
+        data:cum.map(v=>Math.round(v)),
+        borderColor:'#6366f1',
+        backgroundColor:'rgba(99,102,241,0.08)',
+        fill:true, tension:0.4, pointRadius:4,
+        pointBackgroundColor:'#6366f1',
+      }]
+    },
+    options:{
+      plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{color:'#475569',callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.04)'}}
+      },
+      maintainAspectRatio:false
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   TCO CALCULATOR
+══════════════════════════════════════════════════════ */
+function calcTCO(){
+  if(!G.code) return;
+  const vKey  = document.getElementById('tcoModel').value;
+  const code  = G.code;
+  const c     = G.c;
+  const price = parseFloat(document.getElementById('tcoPrice').value)||(25000 * c.rate);
+  const km    = parseInt(document.getElementById('tcoKm').value)||15000;
+  const down  = parseFloat(document.getElementById('tcoDown').value)||20;
+  const rate  = parseFloat(document.getElementById('tcoInterest').value)||6;
+  // Price entered in local currency
+  const priceUSD = price / c.rate;
+  const d = calcTCOData(vKey, code, Object.keys(c.cities)[0], km, priceUSD, down, rate);
+  if(!d) return;
+
+  // Override with custom inputs
+  const customFuel = parseFloat(document.getElementById('tcoFuelPrice').value);
+  const customEff  = parseFloat(document.getElementById('tcoEfficiency').value);
+  const customIns  = parseFloat(document.getElementById('tcoInsurance').value);
+  const customPark = parseFloat(document.getElementById('tcoParking').value);
+
+  const fuelUSD = (km / customEff) * (customFuel / c.rate);
+  const insUSD  = customIns / c.rate;
+  const parkUSD = customPark * 12 / c.rate;
+  const adjTotal = fuelUSD + insUSD + parkUSD + d.maintenance + d.tires + d.tax + d.registration + d.depreciation + d.financing;
+  const monthly  = adjTotal / 12;
+  const yr5      = adjTotal * 5 + price * (1-Math.pow(1-d.vehicle.dep,5))*(-1) + price;
+  const yr10     = adjTotal * 10 + price * (1-Math.pow(1-d.vehicle.dep,10))*(-1) + price;
+  const cpk      = adjTotal / km;
+
+  document.getElementById('tco-monthly').textContent = fmtLocal(monthly, c);
+  document.getElementById('tco-annual').textContent  = fmtLocal(adjTotal, c);
+  document.getElementById('tco-5yr').textContent     = fmtLocal(yr5, c);
+  document.getElementById('tco-10yr').textContent    = fmtLocal(yr10, c);
+  document.getElementById('tco-cpk').textContent     = c.symbol + (cpk * c.rate).toFixed(3);
+
+  const bd = [
+    {label:'⛽ Fuel / Charging', val:fuelUSD,     pct: Math.round(fuelUSD/adjTotal*100)},
+    {label:'🛡️ Insurance',       val:insUSD,      pct: Math.round(insUSD/adjTotal*100)},
+    {label:'📉 Depreciation',     val:d.depreciation, pct:Math.round(d.depreciation/adjTotal*100)},
+    {label:'🏦 Financing',        val:d.financing, pct: Math.round(d.financing/adjTotal*100)},
+    {label:'🔧 Maintenance',      val:d.maintenance,pct:Math.round(d.maintenance/adjTotal*100)},
+    {label:'🅿️ Parking',         val:parkUSD,     pct: Math.round(parkUSD/adjTotal*100)},
+    {label:'📋 Taxes & Rego',     val:d.tax+d.registration,pct:Math.round((d.tax+d.registration)/adjTotal*100)},
+    {label:'🔄 Tires',            val:d.tires,     pct: Math.round(d.tires/adjTotal*100)},
+  ];
+  document.getElementById('tcoBreakdown').innerHTML = bd.map(b=>
+    `<div class="breakdown-item">
+      <div class="bi-left"><div class="bi-label">${b.label}</div></div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:80px;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden">
+          <div style="width:${b.pct}%;height:100%;background:linear-gradient(90deg,#6366f1,#06b6d4);border-radius:99px"></div>
+        </div>
+        <div class="bi-value">${fmtLocal(b.val,c)}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   EV vs PETROL
+══════════════════════════════════════════════════════ */
+let evChartInst;
+
+function calcEV(){
+  if(!G.code) return;
+  const code = G.code;
+  const km   = parseInt(document.getElementById('evKm').value)||15000;
+  const c    = G.c;
+
+  const petPrice = 25000;
+  const evPrice  = 42000;
+  const petEff   = 15.5;  // km/L
+  const evEff    = 6.5;   // km/kWh
+
+  const petFuelUSD = (km / petEff) * fuelToUSD(c.fuel.p, c);
+  const evFuelUSD  = (km / evEff)  * fuelToUSD(c.fuel.ev, c);
+  const petInsUSD  = c.insurance / c.rate;
+  const evInsUSD   = (c.insurance / c.rate) * 1.05; // EV slightly higher
+  const petMaint   = 800;
+  const evMaint    = 400;
+  const petTax     = c.roadTax / c.rate;
+  const evTax      = 0;
+  const evIncentiveUSD = c.evInc / c.rate;
+
+  const petAnnual = petFuelUSD + petInsUSD + petMaint + petTax + 350; // 350 tires
+  const evAnnual  = evFuelUSD  + evInsUSD  + evMaint  + evTax  + 450  - evIncentiveUSD/5;
+
+  const annualSaving = petAnnual - evAnnual;
+  const priceDiff    = evPrice - petPrice;
+  const breakEven    = annualSaving > 0 ? (priceDiff / annualSaving).toFixed(1) : '∞';
+
+  document.getElementById('ev-pet-price').textContent  = fmtLocal(petPrice, c);
+  document.getElementById('ev-pet-fuel').textContent   = fmtLocal(petFuelUSD, c);
+  document.getElementById('ev-pet-maint').textContent  = fmtLocal(petMaint, c);
+  document.getElementById('ev-pet-ins').textContent    = fmtLocal(petInsUSD, c);
+  document.getElementById('ev-pet-tax').textContent    = fmtLocal(petTax, c);
+  document.getElementById('ev-pet-total').textContent  = fmtLocal(petAnnual, c);
+
+  document.getElementById('ev-ev-price').textContent     = fmtLocal(evPrice, c);
+  document.getElementById('ev-ev-fuel').textContent      = fmtLocal(evFuelUSD, c);
+  document.getElementById('ev-ev-maint').textContent     = fmtLocal(evMaint, c);
+  document.getElementById('ev-ev-ins').textContent       = fmtLocal(evInsUSD, c);
+  document.getElementById('ev-ev-incentive').textContent = evIncentiveUSD > 0 ? '-' + fmtLocal(evIncentiveUSD, c) + '/yr' : 'None';
+  document.getElementById('ev-ev-total').textContent     = fmtLocal(evAnnual, c);
+
+  const isEVCheaper = evAnnual < petAnnual;
+  document.getElementById('evCardEV').classList.toggle('winner', isEVCheaper);
+  document.getElementById('evCardPetrol').classList.toggle('winner', !isEVCheaper);
+  document.getElementById('evWinnerBadge').style.display = isEVCheaper ? 'inline-flex' : 'none';
+
+  document.getElementById('ev-saving-annual').textContent = annualSaving > 0 ? '+' + fmtLocal(annualSaving, c) : fmtLocal(annualSaving, c);
+  document.getElementById('ev-saving-annual').className   = annualSaving > 0 ? 'text-green' : 'text-red';
+  document.getElementById('ev-breakeven').textContent     = breakEven === '∞' ? '∞ yrs' : breakEven + ' yrs';
+  document.getElementById('ev-saving-10yr').textContent   = fmtLocal(annualSaving * 10, c);
+
+  // EV cumulative chart
+  const yrs = Array.from({length:11},(_,i)=>i);
+  const petCum = [petPrice];
+  const evCum  = [evPrice];
+  yrs.slice(1).forEach(i=>{ petCum.push(petCum[i-1]+petAnnual); evCum.push(evCum[i-1]+evAnnual); });
+
+  if(evChartInst) evChartInst.destroy();
+  evChartInst = new Chart(document.getElementById('evChart'),{
+    type:'line',
+    data:{
+      labels: yrs.map(i=>`Yr ${i}`),
+      datasets:[
+        {label:'Toyota Corolla (Petrol)',data:petCum.map(v=>Math.round(v)),borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.08)',fill:true,tension:0.4,pointRadius:3},
+        {label:'Tesla Model 3 (EV)',     data:evCum.map(v=>Math.round(v)), borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.08)', fill:true,tension:0.4,pointRadius:3},
+      ]
+    },
+    options:{
+      plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{color:'#475569',callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.04)'}}
+      },
+      maintainAspectRatio:false
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   GLOBAL RANKINGS
+══════════════════════════════════════════════════════ */
+let rankChartInst;
+let currentRankMode = 'cheapest';
+
+function annualCostUSD(code){
+  const c = getCountry(code);
+  const km = 15000;
+  const basePrice = 25000;
+  const fuelUSD = (km/15.5) * fuelToUSD(c.fuel.p, c);
+  const insUSD  = c.insurance / c.rate;
+  const taxUSD  = c.roadTax / c.rate;
+  const regUSD  = c.reg / c.rate / 5;
+  const dep = basePrice * 0.15;
+  const loan = basePrice * 0.8;
+  const fin = loan * 0.005 * 12; // ~6% annual approx
+  return fuelUSD + insUSD + taxUSD + regUSD + 800 + 400 + 350 + 100*12 + dep + fin;
+}
+
+function showRanking(mode){
+  currentRankMode = mode;
+  document.querySelectorAll('.rtab').forEach((t,i)=>t.classList.toggle('active', ['cheapest','expensive','fuel','insurance','ev'][i]===mode));
+  const data = Object.entries(COUNTRIES).map(([code,c])=>({
+    code, name:c.name, flag:c.flag, sym:c.symbol,
+    annualUSD: annualCostUSD(code),
+    fuelUSD: fuelToUSD(c.fuel.p, c),
+    insUSD: c.insurance / c.rate,
+    evScore: (c.evInc/c.rate) / 1000 + (1/(fuelToUSD(c.fuel.ev,c)+0.01)) * 0.5
+  }));
+
+  let sorted, colHeader;
+  if(mode==='cheapest'){ sorted=data.sort((a,b)=>a.annualUSD-b.annualUSD); colHeader='Annual Cost (USD)'; }
+  else if(mode==='expensive'){ sorted=data.sort((a,b)=>b.annualUSD-a.annualUSD); colHeader='Annual Cost (USD)'; }
+  else if(mode==='fuel'){ sorted=data.sort((a,b)=>a.fuelUSD-b.fuelUSD); colHeader='Fuel Price (USD/L)'; }
+  else if(mode==='insurance'){ sorted=data.sort((a,b)=>a.insUSD-b.insUSD); colHeader='Insurance (USD/yr)'; }
+  else { sorted=data.sort((a,b)=>b.evScore-a.evScore); colHeader='EV Score'; }
+
+  const top12 = sorted.slice(0,12);
+  const maxVal = Math.max(...top12.map(d=>mode==='fuel'?d.fuelUSD:mode==='insurance'?d.insUSD:mode==='ev'?d.evScore:d.annualUSD));
+
+  // Ranking chart
+  if(rankChartInst) rankChartInst.destroy();
+  rankChartInst = new Chart(document.getElementById('rankingChart'),{
+    type:'bar',
+    data:{
+      labels:top12.map(d=>d.flag+' '+d.name.split(' ')[0]),
+      datasets:[{
+        data:top12.map(d=>mode==='fuel'?+d.fuelUSD.toFixed(2):mode==='insurance'?Math.round(d.insUSD):mode==='ev'?+d.evScore.toFixed(1):Math.round(d.annualUSD)),
+        backgroundColor:top12.map((_,i)=>`hsla(${240-i*15},80%,65%,0.85)`),
+        borderRadius:8,borderSkipped:false,
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{color:'#94a3b8',font:{size:11}},grid:{color:'rgba(255,255,255,0.02)'}}
+      },
+      maintainAspectRatio:false
+    }
+  });
+
+  // Ranking table
+  const tbody = document.getElementById('rankingBody');
+  tbody.innerHTML = top12.map((d,i)=>{
+    const pct = Math.round((mode==='fuel'?d.fuelUSD:mode==='insurance'?d.insUSD:mode==='ev'?d.evScore:d.annualUSD)/maxVal*100);
+    const pill = i<4 ? (mode==='expensive'?'pill-red':'pill-green') : i<8 ? 'pill-yellow' : 'pill-red';
+    const pillText = mode==='ev' ? (i<4?'★ Top':'Good') : (i<4?'Best':'');
+    return `<tr>
+      <td class="rank-num">${i+1}</td>
+      <td><span class="rank-flag">${d.flag}</span>${d.name}</td>
+      <td class="font-bold">$${Math.round(mode==='fuel'?d.fuelUSD*100:mode==='insurance'?d.insUSD:d.annualUSD).toLocaleString()}</td>
+      <td>$${d.fuelUSD.toFixed(2)}</td>
+      <td>$${Math.round(d.insUSD).toLocaleString()}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div>${pillText?`<span class="pill ${pill}">${pillText}</span>`:''}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   VEHICLE COMPARISON
+══════════════════════════════════════════════════════ */
+let cmpChartInst;
+
+function calcCompare(){
+  if(!G.code) return;
+  const code = G.code;
+  const km   = parseInt(document.getElementById('cmpKm').value)||15000;
+  const c    = G.c;
+  const vIds = ['cmpA','cmpB','cmpC'].map(id=>document.getElementById(id).value);
+
+  const results = vIds.map(vid=>{
+    const city = G.city || Object.keys(c.cities)[0];
+    const v = getCountryVehicle(vid, code);
+    const priceUSD = v.localPrice ? v.localPrice / c.rate : v.price || 25000;
+    return { vid, data: calcTCOData(vid, code, city, km, priceUSD, 20, 6) };
+  });
+
+  const minAnnual = Math.min(...results.map(r=>r.data.total));
+  const colors = ['rgba(99,102,241,0.85)','rgba(6,182,212,0.85)','rgba(168,85,247,0.85)'];
+
+  document.getElementById('compareCards').innerHTML = results.map((r,i)=>{
+    const d = r.data;
+    const isBest = d.total === minAnnual;
+    return `<div class="compare-card ${isBest?'best':''}">
+      ${isBest?'<div class="best-badge">🏆 Best Value</div>':''}
+      <div class="cc-name">${d.vehicle.icon} ${d.vehicle.name}</div>
+      <div class="cc-type">
+        <span class="pill" style="background:${colors[i]}22;color:${colors[i].replace('0.85','1')}">${d.vehicle.type}</span>
+      </div>
+      <div class="cc-stat">⛽ Fuel / yr<span>${fmtLocal(d.fuel,c)}</span></div>
+      <div class="cc-stat">🛡️ Insurance / yr<span>${fmtLocal(d.insurance,c)}</span></div>
+      <div class="cc-stat">📉 Depreciation / yr<span>${fmtLocal(d.depreciation,c)}</span></div>
+      <div class="cc-stat">🔧 Maintenance / yr<span>${fmtLocal(d.maintenance,c)}</span></div>
+      <div class="cc-stat">🏦 Financing / yr<span>${fmtLocal(d.financing,c)}</span></div>
+      <div class="cc-stat">🛣️ Cost / km<span>${c.symbol}${(d.cpk*c.rate).toFixed(3)}</span></div>
+      <div class="cc-total">
+        <span class="cc-total-label">Annual Total</span>
+        <span class="cc-total-value">${fmtLocal(d.total,c)}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Chart
+  const cats = ['Fuel','Insurance','Depreciation','Maintenance','Parking','Tax/Reg','Tires'];
+  const datasets = results.map((r,i)=>{
+    const d = r.data;
+    return {
+      label: d.vehicle.name,
+      data: [d.fuel,d.insurance,d.depreciation,d.maintenance,d.parking,d.tax+d.registration,d.tires].map(v=>Math.round(v)),
+      backgroundColor: colors[i], borderRadius:6
+    };
+  });
+  if(cmpChartInst) cmpChartInst.destroy();
+  cmpChartInst = new Chart(document.getElementById('compareChart'),{
+    type:'bar',
+    data:{ labels:cats, datasets },
+    options:{
+      plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}},
+        y:{ticks:{color:'#475569',callback:v=>'$'+v},grid:{color:'rgba(255,255,255,0.04)'}}
+      },
+      maintainAspectRatio:false
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   FUEL INTELLIGENCE
+══════════════════════════════════════════════════════ */
+let fuelChartInst;
+
+function renderFuelDashboard(){
+  const grid = document.getElementById('fuelGrid');
+  grid.innerHTML = Object.entries(COUNTRIES).map(([code,c])=>{
+    const pet = c.fuel.p;
+    const die = c.fuel.d;
+    const ev  = c.fuel.ev;
+    const petUSD = fuelToUSD(pet, c);
+    const dieUSD = fuelToUSD(die, c);
+    return `<div class="fuel-card">
+      <div class="fuel-country">
+        <div class="fc-flag">${c.flag}</div>
+        <div><div class="fc-name">${c.name}</div><div class="fc-currency">${c.currency}</div></div>
+      </div>
+      <div class="fuel-prices">
+        <div class="fp-item">
+          <div class="fp-label">Petrol</div>
+          <div class="fp-value fp-petrol">${c.symbol}${pet % 1 === 0 ? pet : typeof pet === 'number' && pet > 10 ? Math.round(pet) : pet.toFixed(2)}<span style="font-size:0.65rem;font-weight:500;color:var(--t3)">/L</span></div>
+        </div>
+        <div class="fp-item">
+          <div class="fp-label">Diesel</div>
+          <div class="fp-value fp-diesel">${c.symbol}${typeof die === 'number' && die > 10 ? Math.round(die) : die.toFixed(2)}<span style="font-size:0.65rem;font-weight:500;color:var(--t3)">/L</span></div>
+        </div>
+        <div class="fp-item">
+          <div class="fp-label">EV /kWh</div>
+          <div class="fp-value fp-ev">${c.symbol}${typeof ev === 'number' && ev > 10 ? Math.round(ev) : ev.toFixed(2)}</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:0.72rem;color:var(--t3)">USD equiv: $${petUSD.toFixed(2)}/L · $${dieUSD.toFixed(2)}/L</div>
+    </div>`;
+  }).join('');
+
+  // Fuel chart
+  const entries = Object.entries(COUNTRIES);
+  const petUSD = entries.map(([code,c])=>+fuelToUSD(c.fuel.p,c).toFixed(2));
+  const labels = entries.map(([_,c])=>c.flag+' '+c.name.split(' ')[0]);
+  const sortIdx = petUSD.map((_,i)=>i).sort((a,b)=>petUSD[b]-petUSD[a]);
+
+  if(fuelChartInst) fuelChartInst.destroy();
+  fuelChartInst = new Chart(document.getElementById('fuelChart'),{
+    type:'bar',
+    data:{
+      labels:sortIdx.map(i=>labels[i]),
+      datasets:[
+        {label:'Petrol (USD/L)', data:sortIdx.map(i=>petUSD[i]), backgroundColor:'rgba(249,115,22,0.8)', borderRadius:6},
+        {label:'Diesel (USD/L)', data:sortIdx.map(i=>+fuelToUSD(entries[i][1].fuel.d,entries[i][1]).toFixed(2)), backgroundColor:'rgba(6,182,212,0.8)', borderRadius:6},
+      ]
+    },
+    options:{
+      plugins:{legend:{labels:{color:'#94a3b8'}}},
+      scales:{
+        x:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{ticks:{color:'#475569',callback:v=>'$'+v},grid:{color:'rgba(255,255,255,0.04)'}}
+      },
+      maintainAspectRatio:false
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+function navScrollTo(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+function init(){
+  buildCountryGrid();
+  populateVehicleSelects();
+  showRanking('cheapest');
+  renderFuelDashboard();
+  // Gate is visible by default — user must select country first
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
