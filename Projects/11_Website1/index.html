@@ -84,7 +84,7 @@
   --indigo:#818cf8;--indigo-dim:rgba(129,140,248,0.1);
   --green:#22d39a;--green-dim:rgba(34,211,154,0.1);
   --red:#f56570;--red-dim:rgba(245,101,112,0.1);
-  --text:#e8eeff;--text2:#b4c4e8;--muted:#6a7fa8;--subtle:#1e2e50;
+  --text:#f0f4ff;--text2:#c8d8f0;--muted:#8fa8cc;--subtle:#1e2e50;
   --radius:16px;--radius-sm:10px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -115,7 +115,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 
 /* HERO */
 .hero{padding-top:68px;position:relative;overflow:hidden;min-height:auto;display:flex;align-items:center;}
-.hero-bg{position:absolute;inset:0;z-index:0;background:url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;opacity:0.13;pointer-events:none;}
+.hero-loc-label{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;padding:3px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:20px;backdrop-filter:blur(4px);background:rgba(255,255,255,0.04);}
+.hero-loc-label::before{content:'📍';font-size:10px;}
+.hero-bg{position:absolute;inset:0;z-index:0;background:linear-gradient(135deg,#0a1a0a 0%,#0d2218 30%,#1a3a1a 60%,rgba(201,150,0,0.12) 100%);opacity:1;pointer-events:none;transition:opacity 0.3s ease;}
 .hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--bg) 0%,transparent 60%,var(--bg) 100%);}
 .hero-inner{position:relative;z-index:1;}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 15% 45%,rgba(99,102,241,0.14) 0%,transparent 65%),radial-gradient(ellipse 40% 50% at 85% 25%,rgba(240,165,32,0.1) 0%,transparent 65%),radial-gradient(ellipse 30% 40% at 70% 75%,rgba(0,205,176,0.08) 0%,transparent 60%);pointer-events:none;}
@@ -244,7 +246,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .rate-note{margin-top:14px;padding:14px 18px;background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:12px;font-size:12.5px;color:var(--text);line-height:1.75;display:flex;align-items:flex-start;gap:10px;}
 .amount-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;background:var(--elevated);border:1px solid var(--border2);border-radius:14px;padding:16px 20px;}
 .amount-strip label{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;}
-.amount-strip input{background:transparent;border:none;font-size:26px;font-weight:900;color:var(--text);width:140px;outline:none;letter-spacing:-1px;}
+.amount-strip input{background:rgba(255,255,255,0.06);border:none;border-bottom:2px solid var(--amber);border-radius:6px 6px 0 0;font-size:26px;font-weight:900;color:var(--text);width:140px;outline:none;letter-spacing:-1px;padding:4px 6px;transition:background 0.2s;}.amount-strip input:focus{background:rgba(240,165,32,0.08);}
 .amount-strip .cur-tag{font-size:13px;font-weight:800;color:var(--amber);background:var(--amber-dim);padding:5px 12px;border-radius:8px;}
 
 /* NRE/NRO TABLE */
@@ -319,10 +321,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .feat-all-btn{background:transparent;border:1px solid var(--border2);color:var(--teal);font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .feat-all-btn:hover{background:rgba(0,212,170,0.08);border-color:var(--teal);}
 .feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
-.feat-card{background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:20px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:all .2s;cursor:pointer;}
+.feat-card{position:relative;background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:20px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:all .2s;cursor:pointer;}
 .feat-card:hover{border-color:rgba(0,212,170,0.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .feat-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:20px;width:fit-content;}
 .feat-tag.banking{background:rgba(59,130,246,0.15);color:#60a5fa;}
+.feat-tag.invest{background:rgba(34,197,94,0.12);color:#4ade80;}
+.feat-card-hot{border-color:rgba(240,165,32,0.3)!important;}
+.feat-card-hot::before{content:'🔥';position:absolute;top:10px;right:12px;font-size:13px;}
 .feat-tag.transfer{background:rgba(245,158,11,0.15);color:#fbbf24;}
 .feat-tag.tax{background:rgba(168,85,247,0.15);color:#c084fc;}
 .feat-tag.planning{background:rgba(99,102,241,0.15);color:#818cf8;}
@@ -423,9 +428,10 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .cur-btn{
   display:flex;align-items:center;gap:8px;
   background:var(--elevated);border:1px solid var(--border2);border-radius:10px;
-  padding:8px 12px;cursor:pointer;color:var(--text);
+  padding:12px 16px;cursor:pointer;color:var(--text);
   font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
   transition:border-color 0.2s;min-width:160px;justify-content:space-between;
+  min-height:44px;
 }
 .cur-btn:hover{border-color:var(--amber);}
 .cur-btn-inner{display:flex;align-items:center;gap:8px;}
@@ -511,7 +517,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .drawer-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 .drawer-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--elevated);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
 .drawer-close:hover{color:var(--text);background:var(--subtle);}
-.drawer-section-lbl{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:18px 20px 8px;}
+.drawer-section-lbl{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);padding:18px 20px 8px;display:flex;align-items:center;gap:6px;}
 .drawer-item{display:flex;align-items:center;gap:14px;padding:12px 20px;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none;}
 .drawer-item:hover{background:var(--elevated);}
 .drawer-item.active{border-left-color:var(--amber);background:var(--amber-dim);}
@@ -565,6 +571,9 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .tool-launcher::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(240,165,32,0.45),transparent);}
 .tl-hd{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:10px;}
 .tl-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.tl-grid-1{grid-template-columns:1fr;}
+.tl-cat-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:10px 2px 5px;margin-top:6px;}
+.tl-cat-lbl:first-of-type{margin-top:0;}
 .tl-card{background:var(--elevated);border:1px solid var(--border);border-radius:11px;padding:10px 12px;cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;}
 .tl-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--amber-dim),transparent);opacity:0;transition:opacity 0.18s;pointer-events:none;}
 .tl-card:hover{border-color:var(--amber-glow);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
@@ -573,6 +582,14 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .tl-card-wide{grid-column:1/-1;display:flex;align-items:center;gap:14px;}
 .tl-card-wide .tl-ds{margin-top:0;}
 .tl-ico{font-size:18px;margin-bottom:4px;display:block;position:relative;z-index:1;}
+.tl-c-teal{filter:drop-shadow(0 0 6px rgba(0,205,176,0.6));}
+.tl-c-amber{filter:drop-shadow(0 0 6px rgba(240,165,32,0.6));}
+.tl-c-blue{filter:drop-shadow(0 0 6px rgba(99,130,246,0.6));}
+.tl-c-green{filter:drop-shadow(0 0 6px rgba(34,211,154,0.6));}
+.tl-c-purple{filter:drop-shadow(0 0 6px rgba(168,85,247,0.6));}
+.tl-c-red{filter:drop-shadow(0 0 6px rgba(245,101,112,0.6));}
+.tl-c-sky{filter:drop-shadow(0 0 6px rgba(14,165,233,0.6));}
+.tl-c-indigo{filter:drop-shadow(0 0 6px rgba(129,140,248,0.6));}
 .tl-card-wide .tl-ico{margin-bottom:0;font-size:22px;}
 .tl-nm{font-size:12px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
 .tl-ds{font-size:11px;color:var(--muted);margin-top:3px;position:relative;z-index:1;line-height:1.4;}
@@ -735,6 +752,83 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .art-table tr:last-child td{border-bottom:none;}
 .art-table td:first-child{font-weight:700;color:var(--text);}
 @media(max-width:640px){.art-grid{grid-template-columns:1fr;}.art-reader h1{font-size:20px;}}
+
+/* ── INTENT BAR ──────────────────────────────────────────────────────────── */
+.intent-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
+.intent-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.intent-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.intent-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.intent-btn{display:flex;align-items:center;gap:6px;background:var(--elevated);border:1px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.intent-btn:hover{background:var(--amber-dim);border-color:var(--amber-glow);color:var(--amber);transform:translateY(-1px);}
+
+/* ── TRUST STRIP ─────────────────────────────────────────────────────────── */
+.trust-strip{display:inline-flex;align-items:center;gap:0;margin-bottom:16px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:6px 12px;flex-wrap:nowrap;}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;padding:2px 8px;}
+.trust-icon{font-size:13px;}
+.trust-sep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
+
+/* ── COUNTRY WELCOME ─────────────────────────────────────────────────────── */
+.country-welcome{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--teal-dim),transparent);border:1px solid rgba(0,205,176,0.2);border-radius:10px;padding:8px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);line-height:1.4;}
+.country-welcome strong{color:var(--teal);}
+
+/* ── NRI JOURNEY ROADMAP ─────────────────────────────────────────────────── */
+.journey-section{padding:60px 0;background:linear-gradient(180deg,var(--bg) 0%,var(--surface) 50%,var(--bg) 100%);}
+.journey-inner{max-width:1200px;margin:0 auto;padding:0 24px;}
+.journey-header{text-align:center;margin-bottom:40px;}
+.journey-eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
+.journey-title{font-size:clamp(20px,3vw,28px);font-weight:900;color:var(--text);margin:0;}
+.journey-steps{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;}
+.journey-step{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 18px;cursor:pointer;transition:all 0.2s;position:relative;text-align:center;}
+.journey-step:hover{border-color:var(--amber-glow);background:var(--elevated);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.3);}
+.js-icon{font-size:32px;margin-bottom:8px;line-height:1;}
+.js-num{font-size:10px;font-weight:800;color:var(--amber);letter-spacing:1px;margin-bottom:6px;}
+.js-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;}
+.js-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.js-cta{font-size:11px;font-weight:700;color:var(--amber);opacity:0.8;}
+.journey-step:hover .js-cta{opacity:1;}
+.journey-arrow{display:flex;align-items:center;padding:0 8px;color:var(--border2);font-size:20px;flex-shrink:0;align-self:center;}
+@media(max-width:768px){
+  .journey-steps{gap:10px;}
+  .journey-arrow{display:none;}
+  .journey-step{min-width:140px;}
+  .intent-lbl{display:none;}
+}
+
+/* ── HERO LEFT: Must-Read Guides ─────────────────────────────────────────── */
+.hero-reads{margin-top:20px;}
+.hr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hr-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.hr-count{font-size:11px;font-weight:600;color:var(--muted);background:var(--elevated);padding:2px 8px;border-radius:20px;}
+.hr-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:6px;text-decoration:none;transition:all 0.15s;cursor:pointer;}
+.hr-card:hover{border-color:var(--amber-glow);background:var(--elevated);transform:translateX(2px);}
+.hr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.hr-dot-blue{background:#60a5fa;box-shadow:0 0 6px rgba(96,165,250,0.5);}
+.hr-dot-amber{background:var(--amber);box-shadow:0 0 6px rgba(240,165,32,0.5);}
+.hr-dot-green{background:var(--green);box-shadow:0 0 6px rgba(34,211,154,0.5);}
+.hr-body{flex:1;min-width:0;}
+.hr-title{font-size:12px;font-weight:600;color:var(--text2);line-height:1.3;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hr-card:hover .hr-title{color:var(--text);}
+.hr-meta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.hr-tag-pill{background:var(--elevated);color:var(--text2);padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;border:1px solid var(--border2);}
+.hr-arrow{color:var(--muted);font-size:18px;font-weight:300;flex-shrink:0;transition:color 0.15s;}
+.hr-card:hover .hr-arrow{color:var(--amber);}
+.hr-view-all{width:100%;margin-top:6px;background:transparent;border:1px dashed var(--border2);border-radius:10px;padding:8px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:'Inter',sans-serif;}
+.hr-view-all:hover{border-color:var(--amber-glow);color:var(--amber);}
+
+/* ── JUMP NAV ─────────────────────────────────────────────────────────── */
+.jump-nav{display:none;position:sticky;top:57px;z-index:90;background:rgba(6,11,28,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(100,130,220,0.1);padding:0 20px;}
+.jump-nav-inner{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;max-width:1400px;margin:0 auto;}
+.jump-nav-inner::-webkit-scrollbar{display:none;}
+.jn-link{flex-shrink:0;font-size:12px;font-weight:600;color:var(--muted);padding:9px 14px;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;letter-spacing:.02em;}
+.jn-link:hover,.jn-link.active{color:var(--teal);border-bottom-color:var(--teal);}
+
+/* ── ARTICLE SEARCH ───────────────────────────────────────────────────── */
+.art-search-wrap{margin-bottom:20px;position:relative;}
+.art-search-input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 16px 12px 42px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;}
+.art-search-input::placeholder{color:var(--muted);}
+.art-search-input:focus{border-color:var(--teal);}
+.art-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5;}
+.art-no-results{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;display:none;}
 </style>
 </head>
 <body>
@@ -792,6 +886,43 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   </div>
 </nav>
 
+<!-- Jump navigation -->
+<nav id="jumpNav" style="display:none;position:sticky;top:57px;z-index:90;background:rgba(6,11,28,0.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(100,130,220,0.1);padding:0 20px;">
+  <div style="display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;max-width:1400px;margin:0 auto;">
+    <span class="jn-link" onclick="jumpTo('dash-send')">💸 Remittance</span>
+    <span class="jn-link" onclick="jumpTo('dash-bank')">🏦 Banking</span>
+    <span class="jn-link" onclick="jumpTo('dash-prop')">🏠 Property</span>
+    <span class="jn-link" onclick="jumpTo('dash-tax')">🛡 Tax</span>
+    <span class="jn-link" onclick="jumpTo('dash-plan')">🗓 Planning</span>
+    <span class="jn-link" onclick="jumpTo('dash-guides')">📚 Guides</span>
+    <span class="jn-link" onclick="jumpTo('art-list')">📖 Articles</span>
+  </div>
+</nav>
+
+<!-- INTENT CTA -->
+<div class="intent-bar">
+  <div class="intent-inner">
+    <span class="intent-lbl">What do you want to do today?</span>
+    <div class="intent-btns">
+      <button class="intent-btn" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>💸</span> Send Money
+      </button>
+      <button class="intent-btn" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>📈</span> Grow Wealth
+      </button>
+      <button class="intent-btn" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>🛡</span> Save Tax
+      </button>
+      <button class="intent-btn" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>🏠</span> Buy Property
+      </button>
+      <button class="intent-btn" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <span>✈️</span> Return to India
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
@@ -800,6 +931,20 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <!-- LEFT: Live Rate Ticker + Country Quick-Select -->
     <div class="hero-left">
       <div class="hero-badge">&#127327; Live rates &middot; 14 currencies &middot; Always free</div>
+      <div class="hero-loc-label" id="heroLocLabel">Dubai, UAE</div>
+      <div class="trust-strip">
+        <div class="trust-item"><span class="trust-icon">✅</span>50+ providers compared</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🔄</span>Rates updated live</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🔒</span>No signup needed</div>
+        <div class="trust-sep"></div>
+        <div class="trust-item"><span class="trust-icon">🆓</span>Free forever</div>
+      </div>
+      <div class="country-welcome" id="countryWelcome" style="display:none">
+        <span id="countryWelcomeFlag"></span>
+        <span id="countryWelcomeText"></span>
+      </div>
       <div class="hrd-eyebrow">1 <span id="heroFromLabel">AED</span> equals</div>
       <div class="hrd-main">
         <span class="hrd-sym">&#8377;</span>
@@ -819,51 +964,139 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <!-- Country flag quick-select -->
       <div class="cflags">
-        <button class="cflag active" onclick="quickSelectCur('AED',this)"><span class="fi fi-ae" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AED</button>
-        <button class="cflag" onclick="quickSelectCur('SAR',this)"><span class="fi fi-sa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SAR</button>
-        <button class="cflag" onclick="quickSelectCur('QAR',this)"><span class="fi fi-qa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> QAR</button>
-        <button class="cflag" onclick="quickSelectCur('KWD',this)"><span class="fi fi-kw" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> KWD</button>
-        <button class="cflag" onclick="quickSelectCur('MYR',this)"><span class="fi fi-my" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> MYR</button>
-        <button class="cflag" onclick="quickSelectCur('SGD',this)"><span class="fi fi-sg" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SGD</button>
-        <button class="cflag" onclick="quickSelectCur('AUD',this)"><span class="fi fi-au" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AUD</button>
-        <button class="cflag" onclick="quickSelectCur('USD',this)"><span class="fi fi-us" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> USD</button>
-        <button class="cflag" onclick="quickSelectCur('GBP',this)"><span class="fi fi-gb" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> GBP</button>
-        <button class="cflag" onclick="quickSelectCur('EUR',this)"><span class="fi fi-eu" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> EUR</button>
+        <button data-cur="AED" class="cflag active" onclick="quickSelectCur('AED',this)"><span class="fi fi-ae" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AED</button>
+        <button data-cur="SAR" class="cflag" onclick="quickSelectCur('SAR',this)"><span class="fi fi-sa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SAR</button>
+        <button data-cur="QAR" class="cflag" onclick="quickSelectCur('QAR',this)"><span class="fi fi-qa" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> QAR</button>
+        <button data-cur="KWD" class="cflag" onclick="quickSelectCur('KWD',this)"><span class="fi fi-kw" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> KWD</button>
+        <button data-cur="BHD" class="cflag" onclick="quickSelectCur('BHD',this)"><span class="fi fi-bh" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> BHD</button>
+        <button data-cur="OMR" class="cflag" onclick="quickSelectCur('OMR',this)"><span class="fi fi-om" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> OMR</button>
+        <button data-cur="MYR" class="cflag" onclick="quickSelectCur('MYR',this)"><span class="fi fi-my" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> MYR</button>
+        <button data-cur="SGD" class="cflag" onclick="quickSelectCur('SGD',this)"><span class="fi fi-sg" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> SGD</button>
+        <button data-cur="GBP" class="cflag" onclick="quickSelectCur('GBP',this)"><span class="fi fi-gb" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> GBP</button>
+        <button data-cur="EUR" class="cflag" onclick="quickSelectCur('EUR',this)"><span class="fi fi-eu" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> EUR</button>
+        <button data-cur="USD" class="cflag" onclick="quickSelectCur('USD',this)"><span class="fi fi-us" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> USD</button>
+        <button data-cur="CAD" class="cflag" onclick="quickSelectCur('CAD',this)"><span class="fi fi-ca" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> CAD</button>
+        <button data-cur="AUD" class="cflag" onclick="quickSelectCur('AUD',this)"><span class="fi fi-au" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> AUD</button>
+        <button data-cur="NZD" class="cflag" onclick="quickSelectCur('NZD',this)"><span class="fi fi-nz" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span> NZD</button>
       </div>
       <button class="hero-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">Compare All Providers &rarr;</button>
+
+    <div class="hero-reads">
+      <div class="hr-header">
+        <span class="hr-label">📚 Must-Read Guides</span>
+        <span class="hr-count">18 articles</span>
+      </div>
+      <a href="nre-nro.html" class="hr-card">
+        <span class="hr-dot hr-dot-blue"></span>
+        <div class="hr-body">
+          <div class="hr-title">NRE vs NRO: Which account do you need?</div>
+          <div class="hr-meta"><span class="hr-tag-pill">Banking</span> · 6 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <a href="rnor-status.html" class="hr-card">
+        <span class="hr-dot hr-dot-amber"></span>
+        <div class="hr-body">
+          <div class="hr-title">RNOR Status: The tax-free window NRIs miss</div>
+          <div class="hr-meta"><span class="hr-tag-pill">Tax</span> · 7 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <a href="itr-nri.html" class="hr-card">
+        <span class="hr-dot hr-dot-amber"></span>
+        <div class="hr-body">
+          <div class="hr-title">NRI ITR Filing 2026: Who must file &amp; how</div>
+          <div class="hr-meta"><span class="hr-tag-pill">Tax</span> · 8 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <a href="nri-mutual-funds.html" class="hr-card">
+        <span class="hr-dot hr-dot-green"></span>
+        <div class="hr-body">
+          <div class="hr-title">NRI Mutual Funds: KYC, FATCA &amp; tax rules</div>
+          <div class="hr-meta"><span class="hr-tag-pill">Invest</span> · 7 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <a href="capital-gains-nri.html" class="hr-card">
+        <span class="hr-dot hr-dot-amber"></span>
+        <div class="hr-body">
+          <div class="hr-title">Capital Gains Tax: Stocks, MFs &amp; Property</div>
+          <div class="hr-meta"><span class="hr-tag-pill">Tax</span> · 8 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <a href="uae-nri-guide.html" class="hr-card">
+        <span class="hr-dot" style="background:#00a651;box-shadow:0 0 6px rgba(0,166,81,0.5);"></span>
+        <div class="hr-body">
+          <div class="hr-title">UAE NRI Finance Hub: Complete Guide</div>
+          <div class="hr-meta"><span class="hr-tag-pill">UAE</span> · 10 min read</div>
+        </div>
+        <span class="hr-arrow">›</span>
+      </a>
+      <button class="hr-view-all" onclick="document.querySelector('.feat-section').scrollIntoView({behavior:'smooth'})">View all 18 guides ↓</button>
+    </div>
     </div>
 
     <!-- RIGHT: Tool Launcher + Mini Rate Preview -->
     <div class="hero-right">
       <div class="tool-launcher">
         <div class="tl-hd">Your NRI Dashboard</div>
-        <div class="tl-grid">
-          <div class="tl-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
-            <span class="tl-ico">&#128202;</span><div class="tl-nm">Live Rates</div><div class="tl-ds">Compare 50+ providers</div>
+
+        <div id="dash-send" class="tl-cat-lbl">💸 Send Money</div>
+        <div class="tl-grid tl-grid-1">
+          <div class="tl-card tl-card-wide" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
+            <span class="tl-ico tl-c-teal">&#128202;</span><div><div class="tl-nm">Live Remittance Rates</div><div class="tl-ds">Compare 50+ providers · Best rate to India today</div></div>
           </div>
+        </div>
+
+        <div id="dash-bank" class="tl-cat-lbl">🏦 Banking &amp; Savings</div>
+        <div class="tl-grid">
           <div class="tl-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">
-            <span class="tl-ico">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank FD rates</div>
+            <span class="tl-ico tl-c-blue">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank rates</div>
           </div>
           <div class="tl-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'))">
-            <span class="tl-ico">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
+            <span class="tl-ico tl-c-green">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
           </div>
+        </div>
+
+        <div id="dash-prop" class="tl-cat-lbl">🏠 Property</div>
+        <div class="tl-grid">
           <div class="tl-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">
-            <span class="tl-ico">&#127968;</span><div class="tl-nm">Home Loan</div><div class="tl-ds">EMI &amp; amortization</div>
-          </div>
-          <div class="tl-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))">
-            <span class="tl-ico">&#128176;</span><div class="tl-nm">Tax &amp; DTAA</div><div class="tl-ds">Save on TDS</div>
+            <span class="tl-ico tl-c-amber">&#127968;</span><div class="tl-nm">Home Loan EMI</div><div class="tl-ds">Full amortization</div>
           </div>
           <div class="tl-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'))">
-            <span class="tl-ico">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Rental yield vs FD</div>
+            <span class="tl-ico tl-c-teal">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Yield vs FD</div>
           </div>
+        </div>
+
+        <div id="dash-tax" class="tl-cat-lbl">🛡 Tax &amp; Compliance</div>
+        <div class="tl-grid">
           <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
-            <span class="tl-ico">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
+            <span class="tl-ico tl-c-sky">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
+          </div>
+          <div class="tl-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))">
+            <span class="tl-ico tl-c-red">&#128176;</span><div class="tl-nm">DTAA Calculator</div><div class="tl-ds">Reduce TDS</div>
+          </div>
+        </div>
+
+        <div id="dash-plan" class="tl-cat-lbl">🗓 Life Planning</div>
+        <div class="tl-grid">
+          <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
+            <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return to India</div><div class="tl-ds">Corpus &amp; checklist</div>
           </div>
           <div class="tl-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'))">
-            <span class="tl-ico">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child education corpus</div>
+            <span class="tl-ico tl-c-purple">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child corpus &amp; SIP</div>
           </div>
-          <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
-            <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return Planner</div><div class="tl-ds">Corpus & checklist</div>
+        </div>
+
+        <div id="dash-guides" class="tl-cat-lbl">📚 Guides</div>
+        <div class="tl-grid">
+          <div class="tl-card" onclick="document.querySelector('.feat-section').scrollIntoView({behavior:'smooth'})">
+            <span class="tl-ico">📖</span><div class="tl-nm">NRI Articles</div><div class="tl-ds">11 guides below</div>
+          </div>
+          <div class="tl-card" onclick="showTab('articles',document.querySelector('[data-tab=articles]'))">
+            <span class="tl-ico">📚</span><div class="tl-nm">All Tools</div><div class="tl-ds">Open full guides</div>
           </div>
         </div>
       </div>
@@ -921,52 +1154,169 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   </div>
 </div>
 
+<!-- NRI JOURNEY ROADMAP -->
+<section class="journey-section">
+  <div class="journey-inner">
+    <div class="journey-header">
+      <div class="journey-eyebrow">Your NRI Financial Journey</div>
+      <h2 class="journey-title">Every stage of life abroad — covered</h2>
+    </div>
+    <div class="journey-steps">
+      <div class="journey-step" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">💸</div>
+        <div class="js-num">01</div>
+        <div class="js-title">Send Money</div>
+        <div class="js-desc">Compare 50+ providers. Get the best AED/MYR/SGD → INR rate today.</div>
+        <div class="js-cta">Compare Rates →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">🏦</div>
+        <div class="js-num">02</div>
+        <div class="js-title">Build Savings</div>
+        <div class="js-desc">Park money in NRE FDs at up to 7.25% — fully tax-free and repatriable.</div>
+        <div class="js-cta">See FD Rates →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">📈</div>
+        <div class="js-num">03</div>
+        <div class="js-title">Invest &amp; Grow</div>
+        <div class="js-desc">SIP into Indian mutual funds. Model corpus growth over 10–25 years.</div>
+        <div class="js-cta">Start SIP Calc →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">🏠</div>
+        <div class="js-num">04</div>
+        <div class="js-title">Buy Property</div>
+        <div class="js-desc">Calculate EMI, compare NRI home loan rates, plan your investment property.</div>
+        <div class="js-cta">EMI Calculator →</div>
+      </div>
+      <div class="journey-arrow">→</div>
+      <div class="journey-step" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+        <div class="js-icon">✈️</div>
+        <div class="js-num">05</div>
+        <div class="js-title">Return to India</div>
+        <div class="js-desc">Know exactly how much corpus you need. Month-by-month projection.</div>
+        <div class="js-cta">Plan Return →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FEATURED ARTICLES -->
 <section class="feat-section">
   <div class="feat-inner">
     <div class="feat-header">
       <div>
-        <div class="feat-eyebrow">📚 NRI Knowledge Hub</div>
+        <div class="feat-eyebrow">📚 NRI Knowledge Hub &middot; 18 Guides</div>
         <h2 class="feat-title">Guides Every NRI Should Read</h2>
       </div>
-      <button class="feat-all-btn" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});setTimeout(()=>showTab('articles',document.querySelector('[data-tab=articles]')),100)">All Guides →</button>
+      <button class="feat-all-btn" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});setTimeout(()=>showTab('articles',document.querySelector('[data-tab=articles]')),100)">All 18 Guides →</button>
     </div>
     <div class="feat-grid">
-      <a href="nre-nro.html" class="feat-card">
-        <div class="feat-tag banking">Banking</div>
+      <a href="nre-nro.html" class="feat-card feat-card-hot">
+        <div class="feat-tag banking">🏦 Banking</div>
         <div class="feat-card-title">NRE vs NRO Account: Which One Do You Actually Need?</div>
-        <div class="feat-card-desc">Tax treatment, repatriation rules, FD rates and when to use each account type.</div>
+        <div class="feat-card-desc">Tax treatment, repatriation rules, FD rates and when to use each account.</div>
+        <div class="feat-card-meta">6 min read →</div>
+      </a>
+      <a href="rnor-status.html" class="feat-card feat-card-hot">
+        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-card-title">RNOR Status: The Tax-Free Window NRIs Miss</div>
+        <div class="feat-card-desc">How returning NRIs can avoid Indian tax on foreign income for up to 3 years.</div>
+        <div class="feat-card-meta">7 min read →</div>
+      </a>
+      <a href="itr-nri.html" class="feat-card">
+        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-card-title">NRI ITR Filing Guide 2026: Who Must File & How</div>
+        <div class="feat-card-desc">When NRIs must file, which ITR form, TDS refunds and penalties to avoid.</div>
+        <div class="feat-card-meta">8 min read →</div>
+      </a>
+      <a href="tax-saving.html" class="feat-card">
+        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-card-title">How NRIs Can Save Tax in 2026 — DTAA, Form 15CA & More</div>
+        <div class="feat-card-desc">Use DTAA treaties to avoid double taxation. ELSS, LTCG exemptions explained.</div>
+        <div class="feat-card-meta">8 min read →</div>
+      </a>
+      <a href="nri-mutual-funds.html" class="feat-card">
+        <div class="feat-tag invest">📈 Invest</div>
+        <div class="feat-card-title">NRI Mutual Fund Investment Guide 2026</div>
+        <div class="feat-card-desc">Which funds NRIs can invest in, KYC process, FATCA rules and tax treatment.</div>
+        <div class="feat-card-meta">7 min read →</div>
+      </a>
+      <a href="home-buying.html" class="feat-card">
+        <div class="feat-tag property">🏠 Property</div>
+        <div class="feat-card-title">The Complete NRI Home Buying Guide (2026)</div>
+        <div class="feat-card-desc">FEMA rules, loan eligibility, EMI from NRE account and sale proceeds repatriation.</div>
+        <div class="feat-card-meta">10 min read →</div>
+      </a>
+      <a href="ppf-nps-nri.html" class="feat-card">
+        <div class="feat-tag invest">📈 Invest</div>
+        <div class="feat-card-title">PPF &amp; NPS for NRIs — What's Allowed in 2026?</div>
+        <div class="feat-card-desc">NRIs can't open PPF but can continue existing ones. NPS rules, benefits and exit.</div>
         <div class="feat-card-meta">6 min read →</div>
       </a>
       <a href="send-money.html" class="feat-card">
-        <div class="feat-tag transfer">Transfer</div>
+        <div class="feat-tag transfer">💸 Transfer</div>
         <div class="feat-card-title">Best Ways to Send Money to India: Full Cost Comparison</div>
         <div class="feat-card-desc">Wise vs InstaReM vs Remitly — who wins on rates, fees and speed in 2026.</div>
         <div class="feat-card-meta">5 min read →</div>
       </a>
-      <a href="tax-saving.html" class="feat-card">
-        <div class="feat-tag tax">Tax</div>
-        <div class="feat-card-title">How NRIs Can Save Tax in 2026 — DTAA, Form 15CA & More</div>
-        <div class="feat-card-desc">Use DTAA to avoid double taxation. Section 80C options, ELSS, LTCG exemptions.</div>
-        <div class="feat-card-meta">8 min read →</div>
+      <a href="repatriation.html" class="feat-card">
+        <div class="feat-tag banking">🏦 Banking</div>
+        <div class="feat-card-title">NRI Repatriation of Funds: FEMA Rules Simplified</div>
+        <div class="feat-card-desc">How much you can transfer abroad, which accounts qualify and the CA certificate process.</div>
+        <div class="feat-card-meta">6 min read →</div>
       </a>
       <a href="return-planner.html" class="feat-card">
-        <div class="feat-tag planning">Planning</div>
+        <div class="feat-tag planning">🗓 Planning</div>
         <div class="feat-card-title">How to Use the Return Planner — Simulate Your Corpus</div>
-        <div class="feat-card-desc">Step-by-step: enter your savings, years abroad, expenses and see how long corpus lasts.</div>
+        <div class="feat-card-desc">Enter your savings, years abroad, expenses — see exactly how long corpus lasts.</div>
         <div class="feat-card-meta">5 min read →</div>
       </a>
-      <a href="home-buying.html" class="feat-card">
-        <div class="feat-tag property">Property</div>
-        <div class="feat-card-title">The Complete NRI Home Buying Guide (2026)</div>
-        <div class="feat-card-desc">FEMA rules, NRI loan eligibility, EMI from NRE account and repatriation of sale proceeds.</div>
-        <div class="feat-card-meta">10 min read →</div>
-      </a>
       <a href="retirement.html" class="feat-card">
-        <div class="feat-tag planning">Planning</div>
-        <div class="feat-card-title">NRI Retirement Planning with SIP & SWP — India Guide</div>
+        <div class="feat-tag planning">🗓 Planning</div>
+        <div class="feat-card-title">NRI Retirement Planning with SIP &amp; SWP — India Guide</div>
         <div class="feat-card-desc">Build corpus abroad with SIP, withdraw sustainably in India with SWP. Real numbers.</div>
         <div class="feat-card-meta">7 min read →</div>
+      </a>
+      <a href="capital-gains-nri.html" class="feat-card feat-card-hot">
+        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-card-title">Capital Gains Tax for NRIs: Stocks, MFs & Property</div>
+        <div class="feat-card-desc">LTCG/STCG rates, TDS on property sales, Lower TDS certificate and Section 54 exemptions.</div>
+        <div class="feat-card-meta">8 min read →</div>
+      </a>
+      <a href="tds-refund-nri.html" class="feat-card">
+        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-card-title">TDS Refund for NRIs: Claim Back Excess Tax</div>
+        <div class="feat-card-desc">Why NRIs overpay TDS on property and interest — and the exact steps to get it back via ITR.</div>
+        <div class="feat-card-meta">7 min read →</div>
+      </a>
+      <a href="power-of-attorney-nri.html" class="feat-card">
+        <div class="feat-tag property">🏠 Property</div>
+        <div class="feat-card-title">NRI Power of Attorney: Manage Property from Abroad</div>
+        <div class="feat-card-desc">General vs Specific POA, how to create and register one, and how to prevent POA fraud.</div>
+        <div class="feat-card-meta">7 min read →</div>
+      </a>
+      <a href="nri-insurance.html" class="feat-card">
+        <div class="feat-tag planning">🗓 Planning</div>
+        <div class="feat-card-title">NRI Insurance Guide: Life & Health Coverage in India</div>
+        <div class="feat-card-desc">Term plans, health insurance for India visits, tax benefits and LIC for NRIs explained.</div>
+        <div class="feat-card-meta">8 min read →</div>
+      </a>
+      <a href="uae-nri-guide.html" class="feat-card feat-card-hot">
+        <div class="feat-tag transfer">🇦🇪 UAE Guide</div>
+        <div class="feat-card-title">UAE NRI Finance Hub: Complete Guide for Indians in UAE</div>
+        <div class="feat-card-desc">Best AED to INR rates, NRE/NRO accounts, DTAA benefits, investments and UAE Golden Visa impact.</div>
+        <div class="feat-card-meta">10 min read →</div>
+      </a>
+      <a href="fcnr-deposits.html" class="feat-card">
+        <div class="feat-tag banking">🏦 Banking</div>
+        <div class="feat-card-title">FCNR Deposits: Earn in USD, GBP or AED Without Currency Risk</div>
+        <div class="feat-card-desc">How FCNR works, current rates, FCNR vs NRE FD comparison and when to choose each.</div>
+        <div class="feat-card-meta">6 min read →</div>
       </a>
     </div>
   </div>
@@ -984,49 +1334,51 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
-    <div class="drawer-section-lbl">Money Transfer</div>
+    <div class="drawer-section-lbl">💸 Send Money</div>
     <div class="drawer-item active" data-tab="rates" onclick="showTab('rates',this)">
       <div class="drawer-icon">📊</div>
       <div class="drawer-info"><div class="drawer-name">Live Rates</div><div class="drawer-desc">Compare 50+ remittance providers</div></div>
     </div>
-    <div class="drawer-section-lbl">Investments & Planning</div>
+    <div class="drawer-section-lbl">🏦 Banking & Savings</div>
+    <div class="drawer-item" data-tab="nrenro" onclick="showTab('nrenro',this)">
+      <div class="drawer-icon">🏛</div>
+      <div class="drawer-info"><div class="drawer-name">NRE / NRO Accounts</div><div class="drawer-desc">Best FD rates &amp; account guide</div></div>
+    </div>
     <div class="drawer-item" data-tab="invest" onclick="showTab('invest',this)">
       <div class="drawer-icon">📈</div>
       <div class="drawer-info"><div class="drawer-name">SIP &amp; SWP</div><div class="drawer-desc">Mutual fund wealth calculator</div></div>
     </div>
-    <div class="drawer-item" data-tab="nrenro" onclick="showTab('nrenro',this)">
-      <div class="drawer-icon">🏛</div>
-      <div class="drawer-info"><div class="drawer-name">NRE vs NRO</div><div class="drawer-desc">Account types + best FD rates</div></div>
-    </div>
+    <div class="drawer-section-lbl">🏠 Property</div>
     <div class="drawer-item" data-tab="homeloan" onclick="showTab('homeloan',this)">
       <div class="drawer-icon">🏠</div>
-      <div class="drawer-info"><div class="drawer-name">Home Loan</div><div class="drawer-desc">EMI, amortization &amp; overpayment</div></div>
+      <div class="drawer-info"><div class="drawer-name">Home Loan</div><div class="drawer-desc">EMI, amortization &amp; prepayment</div></div>
     </div>
     <div class="drawer-item" data-tab="realty" onclick="showTab('realty',this)">
       <div class="drawer-icon">🏘️</div>
-      <div class="drawer-info"><div class="drawer-name">Real Estate ROI</div><div class="drawer-desc">Rental yield vs NRE FD</div></div>
+      <div class="drawer-info"><div class="drawer-name">Real Estate ROI</div><div class="drawer-desc">Rental yield vs NRE FD benchmark</div></div>
     </div>
-    <div class="drawer-section-lbl">Tax & Return</div>
-    <div class="drawer-item" data-tab="dtaa" onclick="showTab('dtaa',this)">
-      <div class="drawer-icon">💰</div>
-      <div class="drawer-info"><div class="drawer-name">Tax &amp; DTAA</div><div class="drawer-desc">Save TDS with India's tax treaties</div></div>
-    </div>
+    <div class="drawer-section-lbl">🛡 Tax & Compliance</div>
     <div class="drawer-item" data-tab="taxres" onclick="showTab('taxres',this)">
       <div class="drawer-icon">&#128196;</div>
-      <div class="drawer-info"><div class="drawer-name">Tax Residency</div><div class="drawer-desc">NRI / RNOR / Resident status</div></div>
+      <div class="drawer-info"><div class="drawer-name">Tax Residency</div><div class="drawer-desc">Am I NRI, RNOR or Resident?</div></div>
     </div>
+    <div class="drawer-item" data-tab="dtaa" onclick="showTab('dtaa',this)">
+      <div class="drawer-icon">💰</div>
+      <div class="drawer-info"><div class="drawer-name">DTAA Calculator</div><div class="drawer-desc">Reduce TDS with tax treaties</div></div>
+    </div>
+    <div class="drawer-section-lbl">🗓 Life Planning</div>
     <div class="drawer-item" data-tab="return" onclick="showTab('return',this)">
       <div class="drawer-icon">✈️</div>
-      <div class="drawer-info"><div class="drawer-name">Return Planner</div><div class="drawer-desc">Corpus needed to move back</div></div>
+      <div class="drawer-info"><div class="drawer-name">Return to India</div><div class="drawer-desc">How much corpus do you need?</div></div>
     </div>
-    <div class="drawer-section-lbl">Learn</div>
     <div class="drawer-item" data-tab="edplan" onclick="showTab('edplan',this)">
-      <span class="drawer-icon">🎓</span>
-      <div><div class="drawer-title">Education Planner</div><div class="drawer-sub">Child education corpus</div></div>
+      <div class="drawer-icon">🎓</div>
+      <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
     </div>
+    <div class="drawer-section-lbl">📚 Guides</div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
       <div class="drawer-icon">📚</div>
-      <div class="drawer-info"><div class="drawer-name">NRI Guides</div><div class="drawer-desc">Tax, banking, property & more</div></div>
+      <div class="drawer-info"><div class="drawer-name">NRI Finance Guides</div><div class="drawer-desc">Tax, banking, property &amp; more</div></div>
     </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
   </div>
@@ -1055,7 +1407,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <input type="number" id="sendAmount" value="1000" oninput="syncAmountFromMain(this.value);renderRates();renderMarketRate()"/>
       <span class="cur-tag" id="curTag">AED</span>
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
-      <span style="font-size:13px;font-weight:600;color:var(--muted)">Recipient gets in <strong style="color:var(--amber)">&#8377; INR</strong></span>
+      <span style="font-size:13px;font-weight:600;color:var(--text2)">→ Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
     </div>
     <div class="mkt-rate-card" id="mktRateCard">
       <div>
@@ -1654,6 +2006,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
   </div>
+  </div>
   <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
@@ -1699,7 +2052,8 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="tool-banner-icon">🎓</div>
       <div class="tool-banner-body">
         <h2>Education Corpus Planner</h2>
-      <p>Calculate how much you need to save for your child's education in India or abroad</p>
+        <p>Calculate how much you need to save for your child's education in India or abroad</p>
+      </div>
     </div>
 
     <!-- Quick reference costs -->
@@ -1764,6 +2118,11 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div id="art-list">
+      <div class="art-search-wrap">
+        <span class="art-search-icon">🔍</span>
+        <input class="art-search-input" id="artSearch" type="text" placeholder="Search guides… e.g. TDS, NRE, capital gains" oninput="searchArticles(this.value)"/>
+      </div>
+      <div class="art-no-results" id="artNoResults">No guides match your search.</div>
       <div class="art-grid">
         <div class="art-card" onclick="window.location.href='nre-nro.html'">
           <div><span class="art-tag banking">Banking</span></div>
@@ -1920,7 +2279,12 @@ function selectCurrency(el){
   // Update baseCur and reload rates
   baseCur=val;
   document.getElementById('heroFromLabel').textContent=val;
-  document.getElementById('curTag').textContent=val;
+  document.getElementById('curTag').textContent=val;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=val);
+  updateHeroBg(val);
+  // Sync quick-select pills to match chosen currency
+  document.querySelectorAll('.cflag').forEach(b=>b.classList.remove('active'));
+  const activePill=document.querySelector('.cflag[data-cur="'+val+'"]');
+  if(activePill)activePill.classList.add('active');
   updateAll();
 }
 // Close dropdown on outside click
@@ -2012,36 +2376,101 @@ function badge(name,link){
   return `<div class="pbadge" style="background:${s.bg};color:${s.color}">${s.text}</div>`;
 }
 
+// ── COUNTRY HERO THEMES (flag-color gradients) ───────────────────────────
+const COUNTRY_HERO={
+  // Gulf
+  AED:{grad:'linear-gradient(135deg,#0a1a0a 0%,#0d2218 30%,#1a3a1a 60%,#c9960020 100%)',glow:'rgba(201,150,0,0.15)',label:'Dubai, UAE 🇦🇪',dot:'#c9a227'},
+  SAR:{grad:'linear-gradient(135deg,#041a04 0%,#073d07 35%,#0a5a0a 70%,#ffffff08 100%)',glow:'rgba(21,126,21,0.18)',label:'Riyadh, Saudi Arabia 🇸🇦',dot:'#22c55e'},
+  QAR:{grad:'linear-gradient(135deg,#1a0410 0%,#3d0a22 35%,#5a1035 70%,#ffffff08 100%)',glow:'rgba(139,26,74,0.2)',label:'Doha, Qatar 🇶🇦',dot:'#c084fc'},
+  KWD:{grad:'linear-gradient(135deg,#041a04 0%,#0a3012 35%,#8b0000 0%,#8b000015 70%,#0a3012 100%)',glow:'rgba(10,107,46,0.18)',label:'Kuwait City 🇰🇼',dot:'#4ade80'},
+  BHD:{grad:'linear-gradient(135deg,#1a0404 0%,#3d0a0a 35%,#c1272d25 70%,#0a0f1e 100%)',glow:'rgba(193,39,45,0.18)',label:'Manama, Bahrain 🇧🇭',dot:'#f87171'},
+  OMR:{grad:'linear-gradient(135deg,#1a0404 0%,#2d0808 30%,#c1272d20 55%,#0a2010 100%)',glow:'rgba(193,39,45,0.15)',label:'Muscat, Oman 🇴🇲',dot:'#f87171'},
+  // SE Asia
+  MYR:{grad:'linear-gradient(135deg,#0a0420 0%,#14083a 30%,#cc000120 60%,#ffd70015 100%)',glow:'rgba(204,0,1,0.15)',label:'Kuala Lumpur, Malaysia 🇲🇾',dot:'#f43f5e'},
+  SGD:{grad:'linear-gradient(135deg,#1a0408 0%,#ef334018 30%,#0a1020 70%,#ef334010 100%)',glow:'rgba(239,51,64,0.15)',label:'Singapore 🇸🇬',dot:'#f87171'},
+  // Europe / Americas
+  GBP:{grad:'linear-gradient(135deg,#010d2a 0%,#012169 35%,#c8102e18 70%,#010d2a 100%)',glow:'rgba(1,33,105,0.3)',label:'London, UK 🇬🇧',dot:'#60a5fa'},
+  EUR:{grad:'linear-gradient(135deg,#00062a 0%,#003399 25%,#00339928 60%,#00062a 100%)',glow:'rgba(0,51,153,0.25)',label:'Europe 🇪🇺',dot:'#818cf8'},
+  USD:{grad:'linear-gradient(135deg,#00051a 0%,#002868 30%,#bf0a3018 65%,#00051a 100%)',glow:'rgba(0,40,104,0.3)',label:'United States 🇺🇸',dot:'#60a5fa'},
+  CAD:{grad:'linear-gradient(135deg,#1a0202 0%,#ff000020 30%,#0a0f20 60%,#ff000015 100%)',glow:'rgba(255,0,0,0.12)',label:'Canada 🇨🇦',dot:'#f87171'},
+  AUD:{grad:'linear-gradient(135deg,#00041a 0%,#00008b 30%,#00008b28 60%,#c9960018 100%)',glow:'rgba(0,0,139,0.25)',label:'Sydney, Australia 🇦🇺',dot:'#60a5fa'},
+  NZD:{grad:'linear-gradient(135deg,#00041a 0%,#00205b 30%,#cc142418 65%,#00041a 100%)',glow:'rgba(0,32,91,0.25)',label:'New Zealand 🇳🇿',dot:'#818cf8'},
+};
+
+function updateHeroBg(cur){
+  const theme=COUNTRY_HERO[cur]||COUNTRY_HERO['AED'];
+  const bg=document.querySelector('.hero-bg');
+  const hero=document.querySelector('.hero');
+  if(!bg)return;
+  // Fade out
+  bg.style.transition='opacity 0.3s ease';
+  bg.style.opacity='0';
+  setTimeout(()=>{
+    // Apply gradient as background (no external image needed)
+    bg.style.background=theme.grad;
+    bg.style.opacity='1';
+    // Shift hero glow color
+    if(hero)hero.style.setProperty('--hero-glow',theme.glow||'transparent');
+  },320);
+  // Update location label
+  const lbl=document.getElementById('heroLocLabel');
+  if(lbl){
+    lbl.textContent=theme.label;
+    lbl.style.borderColor=theme.dot+'55';
+    lbl.style.color=theme.dot;
+  }
+}
+
 // ── PROVIDERS ──────────────────────────────────
 const P={
   MYR:[
     {name:'Wise',spread:0.001,fee:12,link:'https://wise.com',note:'Mid-market rate · ~12 MYR fee'},
     {name:'InstaReM',spread:0.003,fee:6,link:'https://instarem.com/en-my/',note:'FPX transfer · 2hr delivery'},
     {name:'eRemit',spread:0.002,fee:13,link:'https://eremit.com.my/home',note:'eRemit Malaysia · MYR 13 fee'},
-    {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Lotus Remit · MYR 5 fee'},
+    {name:'Merchantrade Money',spread:0.008,fee:3,link:'https://merchantrademoney.com',note:'Malaysia\'s largest remittance player'},
+    {name:'EzyRemit',spread:0.009,fee:5,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY'},
+    {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Strong South Asian corridor'},
+    {name:'Remitly',spread:0.012,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'SingX',spread:0.011,fee:0,link:'https://singx.co/',note:'Good for larger transfers'},
+    {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates'},
+    {name:'Ria Money Transfer',spread:0.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
     {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu outlets'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   AED:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Emirates NBD DirectRemit',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
+    {name:'ADCB Money Transfer',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank transfer · fast'},
+    {name:'FAB India Transfers',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
     {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
-    {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange"},
-    {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branches'},
-    {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Competitive rates'},
-    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG'},
-    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
+    {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
+    {name:'GCC Exchange',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
+    {name:'Wall Street Exchange',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
+    {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
+    {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium exchange service'},
+    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   SAR:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'STC Pay',spread:.010,fee:0,link:'https://stcpay.com.sa',note:'Saudi telco fintech'},
-    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu KSA'},
+    {name:'STC Pay',spread:.010,fee:0,link:'https://stcpay.com.sa',note:'Very popular Saudi fintech app'},
+    {name:'UrPay',spread:.010,fee:0,link:'https://urpay.com.sa',note:'STC digital wallet · growing fast'},
+    {name:'Tahweel Al Rajhi',spread:.011,fee:0,link:'https://alrajhiexchange.com',note:'Al Rajhi exchange counters'},
+    {name:'Tahweel Al Bilad',spread:.012,fee:0,link:'https://albilad.com',note:'Bank Al Bilad exchange'},
+    {name:'Enjaz',spread:.012,fee:0,link:'https://enjazit.com.sa',note:'Al Rajhi Bank remittance service'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu KSA outlets'},
+    {name:'Alinma Pay',spread:.013,fee:0,link:'https://alinma.com',note:'Alinma Bank digital wallet'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across KSA'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-sa/',note:'Digital · fast transfers'},
-    {name:'Alinma Pay',spread:.013,fee:0,link:'https://alinma.com',note:'Digital wallet KSA'},
-    {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most used bank KSA'},
+    {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most widely used bank KSA'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Large agent network'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via KSA agents'},
   ],
   QAR:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
@@ -2079,17 +2508,25 @@ const P={
   ],
   SGD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore fintech'},
-    {name:'SingX',spread:.011,fee:0,link:'https://singx.co/',note:'SG–India specialist'},
-    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore-founded fintech · MAS licensed'},
+    {name:'DBS Remit',spread:.009,fee:0,link:'https://dbs.com.sg',note:'Zero fee for DBS/POSB customers'},
+    {name:'OCBC Global Transfer',spread:.010,fee:0,link:'https://ocbc.com',note:'Low fee for OCBC account holders'},
+    {name:'Standard Chartered Online',spread:.010,fee:0,link:'https://sc.com/sg',note:'SC Bank transfer · fast'},
+    {name:'SingX',spread:.011,fee:0,link:'https://singx.co/',note:'SG–India specialist · good large-transfer rates'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'WorldRemit',spread:.014,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India coverage'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   AUD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate · ASIC licensed'},
     {name:'InstaReM',spread:.008,fee:0,link:'https://instarem.com/en-au/',note:'SG fintech · ASIC licensed'},
-    {name:'Remitly',spread:.012,fee:0,link:'https://www.remitly.com/',note:'Popular in AU'},
-    {name:'TorFX',spread:.013,fee:0,link:'https://www.torfx.com/',note:'No transfer fees'},
-    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'AU FX specialist'},
+    {name:'OFX',spread:.010,fee:0,link:'https://www.ofx.com/',note:'Australia-founded FX specialist · very popular'},
+    {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
+    {name:'Remitly',spread:.012,fee:0,link:'https://www.remitly.com/',note:'Popular AU–India'},
+    {name:'TorFX',spread:.013,fee:0,link:'https://www.torfx.com/',note:'No transfer fees · personal dealer'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in AU'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'AU agent network'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   NZD:[
@@ -2099,19 +2536,29 @@ const P={
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   USD:[
-    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular US–India'},
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · FinCEN licensed'},
+    {name:'Revolut',spread:.006,fee:0,link:'https://www.revolut.com/',note:'US app users · free on standard (limits apply)'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular US–India · Express & Economy options'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · very popular with Indian Americans'},
     {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-us/',note:'Digital · fast'},
+    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'No fee · good for large amounts'},
     {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
-    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:"PayPal's remit app"},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Large US agent network'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   CAD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Popular in Canada'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Popular Canada–India corridor'},
+    {name:'Simplii Global Money Transfer',spread:.012,fee:0,link:'https://simplii.com',note:'CIBC-owned · popular with Indian Canadians'},
     {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-ca/',note:'Digital · fast'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · popular app'},
+    {name:'TD Global Transfer',spread:.018,fee:5,link:'https://td.com',note:'TD Bank customers · convenient'},
+    {name:'RBC International Transfer',spread:.019,fee:6,link:'https://rbc.com',note:'RBC account holders'},
     {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No fee transfers'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Canada-wide agent network'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
@@ -2124,11 +2571,15 @@ const P={
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'EU-wide agents'},
   ],
   GBP:[
-    {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular UK–India'},
+    {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate · FCA regulated'},
+    {name:'Revolut',spread:.005,fee:0,link:'https://www.revolut.com/',note:'App-based · free on standard plan (limits apply)'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular UK–India corridor'},
     {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-gb/',note:'FCA regulated · digital'},
-    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
-    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Available at agents'},
+    {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee · large transfers'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in UK'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Post Office & agents'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Post Office & agents'},
   ],
 };
@@ -2184,7 +2635,7 @@ async function fetchRate(c){
 async function updateAll(){
   // baseCur is managed by the custom dropdown (selectCurrency); use global as-is
   document.getElementById('heroFromLabel').textContent=baseCur;
-  document.getElementById('curTag').textContent=baseCur;
+  document.getElementById('curTag').textContent=baseCur;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=baseCur);
   const ld=document.getElementById('rates-loading');
   const rc=document.getElementById('rates-container');
   const rn=document.getElementById('rate-note');
@@ -2712,6 +3163,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
   updateExpTotal();
   // ── Render default (AED) IMMEDIATELY so page isn't blank ──
+  updateHeroBg('AED');
   updateAll();
   // Country → supported currency map
   const COUNTRY_CUR={
@@ -2740,6 +3192,11 @@ window.addEventListener('DOMContentLoaded',()=>{
         document.getElementById('curBtnFlag').innerHTML=meta.flag;
         document.getElementById('curBtnCode').textContent=cur;
         document.getElementById('curBtnRegion').textContent=meta.region;
+        // Sync cflag pills
+        document.querySelectorAll('.cflag').forEach(b=>b.classList.remove('active'));
+        const pill=document.querySelector('.cflag[data-cur="'+cur+'"]');
+        if(pill)pill.classList.add('active');
+        updateHeroBg(cur);
       }
     }
   }
@@ -2916,7 +3373,7 @@ function updateHeroRate() {
     ? '<div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div>&nbsp;Live rate &middot; Updated ' + new Date().toLocaleTimeString()
     : '<span style="color:var(--amber)">&#127313; Approximate rate (offline fallback)</span>';
   const dr = document.getElementById('dash-rate');
-  if(dr && midRate) dr.textContent = '&#8377;' + midRate.toFixed(4);
+  if(dr && midRate) dr.textContent = '₹' + midRate.toFixed(4);
   const dc = document.getElementById('dash-cur');
   if(dc) dc.textContent = baseCur;
   updateHeroReceive();
@@ -3041,9 +3498,36 @@ function calcTaxResidency(){
 
 // ── CURRENCY CONTEXT BARS ─────────────────────────────────────────────────────
 const CCB_TABS=['invest','nrenro','homeloan','return','dtaa','realty','taxres'];
+
+// ── COUNTRY PERSONALIZATION ──────────────────────────────────────────────────
+const COUNTRY_HUB = {
+  AED:{name:'UAE',emoji:'🇦🇪',label:'UAE NRI Hub',guide:'tax-saving.html',guideLbl:'UAE DTAA Guide'},
+  SAR:{name:'Saudi Arabia',emoji:'🇸🇦',label:'Saudi NRI Hub',guide:'tax-saving.html',guideLbl:'KSA DTAA Guide'},
+  QAR:{name:'Qatar',emoji:'🇶🇦',label:'Qatar NRI Hub',guide:'tax-saving.html',guideLbl:'Qatar DTAA Guide'},
+  KWD:{name:'Kuwait',emoji:'🇰🇼',label:'Kuwait NRI Hub',guide:'tax-saving.html',guideLbl:'Kuwait DTAA Guide'},
+  MYR:{name:'Malaysia',emoji:'🇲🇾',label:'Malaysia NRI Hub',guide:'tax-saving.html',guideLbl:'Malaysia DTAA Guide'},
+  SGD:{name:'Singapore',emoji:'🇸🇬',label:'Singapore NRI Hub',guide:'tax-saving.html',guideLbl:'Singapore DTAA Guide'},
+  GBP:{name:'UK',emoji:'🇬🇧',label:'UK NRI Hub',guide:'tax-saving.html',guideLbl:'UK DTAA Guide'},
+  USD:{name:'USA',emoji:'🇺🇸',label:'USA NRI Hub',guide:'tax-saving.html',guideLbl:'US DTAA Guide'},
+  AUD:{name:'Australia',emoji:'🇦🇺',label:'Australia NRI Hub',guide:'tax-saving.html',guideLbl:'Australia DTAA Guide'},
+  CAD:{name:'Canada',emoji:'🇨🇦',label:'Canada NRI Hub',guide:'tax-saving.html',guideLbl:'Canada DTAA Guide'},
+  EUR:{name:'Europe',emoji:'🇪🇺',label:'Europe NRI Hub',guide:'tax-saving.html',guideLbl:'Europe DTAA Guide'},
+};
+function updateCountryPersonalization(){
+  const hub = COUNTRY_HUB[baseCur];
+  const el = document.getElementById('countryWelcome');
+  const flagEl = document.getElementById('countryWelcomeFlag');
+  const txtEl = document.getElementById('countryWelcomeText');
+  if(!el||!hub)return;
+  flagEl.innerHTML = '<img src="https://flagcdn.com/20x15/' + baseCur.toLowerCase().slice(0,2) + '.png" width="20" height="15" style="border-radius:2px;vertical-align:middle;margin-right:4px;" alt=""/> ';
+  txtEl.innerHTML = '<strong>' + hub.label + '</strong> &mdash; rates, tax &amp; guides for ' + hub.name + ' NRIs';
+  el.style.display = 'flex';
+}
+
 function syncCurrencyToCalcs(){
   if(typeof updateRpLocal==='function')updateRpLocal();
   if(typeof calcEdPlan==='function')calcEdPlan();
+  updateCountryPersonalization();
   if(!midRate||!baseCur)return;
   const meta=CUR_META[baseCur]||{flag:'',name:baseCur,region:''};
   CCB_TABS.forEach(tid=>{
@@ -3593,6 +4077,58 @@ function closeArticle(){
   history.replaceState(null,'','#guides');
 }
 </script>
-<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "75c15b30e0ed4215b3aad38198670f57"}'>
+// ── JUMP NAV ──────────────────────────────────────────────────────────────
+function jumpTo(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const offset=57+40; // nav height + jump nav height
+  const top=el.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top,behavior:'smooth'});
+}
+
+// Show/hide jump nav based on scroll position (show after hero)
+(function(){
+  let ticking=false;
+  const sections=['dash-send','dash-bank','dash-prop','dash-tax','dash-plan','dash-guides'];
+  window.addEventListener('scroll',function(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      const jn=document.getElementById('jumpNav');
+      if(!jn){ticking=false;return;}
+      // Show after user scrolls 300px
+      jn.style.display=window.scrollY>300?'block':'none';
+      // Highlight active section
+      const links=jn.querySelectorAll('.jn-link');
+      let active='';
+      sections.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el&&el.getBoundingClientRect().top<120)active=id;
+      });
+      links.forEach(l=>{
+        const target=l.getAttribute('onclick').replace("jumpTo('","").replace("')","");
+        l.classList.toggle('active',target===active);
+      });
+      ticking=false;
+    });
+  },{passive:true});
+})();
+
+// ── ARTICLE SEARCH ────────────────────────────────────────────────────────
+function searchArticles(q){
+  const cards=document.querySelectorAll('#art-list .art-card');
+  const noRes=document.getElementById('artNoResults');
+  const term=q.trim().toLowerCase();
+  let visible=0;
+  cards.forEach(card=>{
+    const text=card.textContent.toLowerCase();
+    const show=!term||text.includes(term);
+    card.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  if(noRes)noRes.style.display=(visible===0&&term)?'block':'none';
+}
+</script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
