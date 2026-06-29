@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// Prevent flash: apply theme before CSS loads
+(function(){var t=localStorage.getItem('nri-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad</title>
@@ -146,9 +150,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .ci-check{color:var(--amber);font-size:12px;font-weight:900;}
 
 /* ── HERO ──────────────────────────────────────── */
-.hero-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px 60px;position:relative;overflow:hidden;text-align:center;}
-.hero-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(240,165,32,.08) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 20% 80%,rgba(0,205,176,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 80% 60%,rgba(129,140,248,.06) 0%,transparent 60%);pointer-events:none;}
-.hero-section::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%);}
+.hero-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px 60px;position:relative;overflow:hidden;text-align:center;background-image:url('https://images.unsplash.com/photo-1566454657862-2f74c0f7e9e8?q=80&w=1920&auto=format&fit=crop');background-size:cover;background-position:center;background-attachment:fixed;}
+.hero-section::before{content:'';position:absolute;inset:0;background:linear-gradient(160deg,rgba(5,8,15,0.82) 0%,rgba(5,8,15,0.72) 40%,rgba(5,8,15,0.88) 100%);pointer-events:none;z-index:1;}
+.hero-section::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 100%,rgba(240,165,32,.1) 0%,transparent 70%);pointer-events:none;z-index:1;}
 /* hero section inner (new) */
 .hero-content{position:relative;z-index:2;max-width:800px;width:100%;margin:0 auto;text-align:center;}
 
@@ -671,6 +675,101 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .journey-inner{padding:0 20px;}
 }
 @media print{nav,footer,.tab-nav-shell,.active-tool-bar,.drawer,.drawer-overlay,.btn-row,.hero,.feat-section,.tool-banner{display:none!important;}}
+
+/* ── LIGHT THEME ─────────────────────────────────────────────────────── */
+[data-theme="light"]{
+  --bg:#f4f6fb;
+  --surface:#ffffff;
+  --card:#ffffff;
+  --elevated:#eaeff7;
+  --border:rgba(15,23,42,0.08);
+  --border2:rgba(15,23,42,0.14);
+  --text:#0f172a;
+  --text2:#2d3a52;
+  --muted:rgba(15,23,42,0.5);
+  --amber-dim:rgba(240,165,32,0.12);
+  --amber-glow:rgba(240,165,32,0.4);
+  --teal-dim:rgba(0,205,176,0.1);
+  --green-dim:rgba(34,211,154,0.12);
+  --red-dim:rgba(245,101,112,0.12);
+  --indigo-dim:rgba(129,140,248,0.12);
+}
+[data-theme="light"] body{background:var(--bg);}
+[data-theme="light"] nav.site-nav{background:rgba(244,246,251,0.92)!important;border-bottom-color:rgba(15,23,42,0.1)!important;}
+[data-theme="light"] .hero-section::before{background:linear-gradient(160deg,rgba(15,23,42,0.72) 0%,rgba(15,23,42,0.6) 40%,rgba(15,23,42,0.78) 100%);}
+[data-theme="light"] .cur-btn{background:var(--elevated);border-color:var(--border2);}
+[data-theme="light"] .cur-panel{background:var(--surface);}
+[data-theme="light"] .cur-item:hover,[data-theme="light"] .cur-item.active{background:var(--elevated);}
+[data-theme="light"] .nav-cta{box-shadow:0 4px 14px rgba(240,165,32,.4);}
+[data-theme="light"] .stat-item{color:var(--text);}
+[data-theme="light"] .stat-num{color:var(--text);}
+[data-theme="light"] .card{background:var(--card);border-color:var(--border);}
+[data-theme="light"] .card::before{background:linear-gradient(90deg,transparent,rgba(240,165,32,.15),transparent);}
+[data-theme="light"] .f input,[data-theme="light"] .f select{background:var(--elevated);border-color:var(--border2);color:var(--text);}
+[data-theme="light"] .f select option{background:var(--surface);color:var(--text);}
+[data-theme="light"] .ri{background:var(--elevated);}
+[data-theme="light"] .rate-row{background:var(--card);}
+[data-theme="light"] .mkt-rate-card{background:var(--elevated);}
+[data-theme="light"] .bank-row{background:var(--elevated);}
+[data-theme="light"] .tab-nav-shell{background:var(--surface);}
+[data-theme="light"] .tab-btn.active{background:var(--elevated);}
+[data-theme="light"] .tool-banner{background:var(--card);}
+[data-theme="light"] .art-card{background:var(--card);}
+[data-theme="light"] .feat-card{background:var(--card);}
+[data-theme="light"] .guide-card{background:var(--card);}
+[data-theme="light"] .tool-card{background:var(--card);}
+[data-theme="light"] .step-card{background:transparent;}
+[data-theme="light"] .drawer{background:var(--surface);border-right-color:var(--border2);}
+[data-theme="light"] .drawer-item:hover,[data-theme="light"] .drawer-item.active{background:var(--elevated);}
+[data-theme="light"] .tl-card{background:var(--elevated);}
+[data-theme="light"] .amount-strip{background:var(--elevated);}
+[data-theme="light"] .info{background:rgba(129,140,248,.07);}
+[data-theme="light"] .rpc-row{background:var(--elevated);}
+[data-theme="light"] .rate-preview-card{background:var(--card);}
+[data-theme="light"] .hero-rate-widget{background:rgba(255,255,255,0.15);backdrop-filter:blur(16px);border-color:rgba(255,255,255,0.3);}
+[data-theme="light"] .hrw-inp,[data-theme="light"] .hrw-inr{color:#fff;}
+[data-theme="light"] .hrw-label,[data-theme="light"] .hrw-status,[data-theme="light"] .hrw-cur{color:rgba(255,255,255,0.7);}
+[data-theme="light"] .hrw-flag-strip,[data-theme="light"] .hrw-input-area,[data-theme="light"] .hrw-arrow{border-color:rgba(255,255,255,0.2);}
+[data-theme="light"] ::-webkit-scrollbar-track{background:var(--surface);}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:rgba(15,23,42,0.15);}
+
+[data-theme="light"] .stats-section{background:var(--surface);border-color:var(--border);}
+[data-theme="light"] .steps-section{background:var(--elevated);border-color:var(--border);}
+[data-theme="light"] .guides-section{background:var(--elevated);border-color:var(--border);}
+[data-theme="light"] .cta-banner::before{background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(240,165,32,.05) 0%,transparent 70%);}
+[data-theme="light"] .site-footer{background:var(--surface);border-color:var(--border);}
+[data-theme="light"] .footer-brand-logo{color:var(--text);}
+[data-theme="light"] .section-h2{color:var(--text);}
+[data-theme="light"] .step-num{color:rgba(15,23,42,0.06);}
+[data-theme="light"] .step-card h3{color:var(--text);}
+[data-theme="light"] .feat-card h3{color:var(--text);}
+[data-theme="light"] .tc-name{color:var(--text);}
+[data-theme="light"] .gc-title{color:var(--text);}
+[data-theme="light"] .nav-logo-text strong{color:var(--text);}
+[data-theme="light"] .hero-eyebrow{border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.8);}
+[data-theme="light"] .hero-h1 .plain{color:#fff;}
+[data-theme="light"] .hero-sub{color:rgba(255,255,255,0.8);}
+[data-theme="light"] .cta-banner h2{color:var(--text);}
+[data-theme="light"] .tool-card:hover{border-color:rgba(240,165,32,.25);}
+[data-theme="light"] .amount-strip input{color:var(--text);}
+[data-theme="light"] .card-hd{color:var(--text);}
+[data-theme="light"] .pname{color:var(--text);}
+[data-theme="light"] .bname{color:var(--text);}
+[data-theme="light"] .drawer-name{color:var(--text2);}
+[data-theme="light"] .tab-btn{color:var(--muted);}
+[data-theme="light"] .tab-btn.active{color:var(--text);}
+[data-theme="light"] .art-title{color:var(--text);}
+[data-theme="light"] .art-reader h1,[data-theme="light"] .art-reader h2{color:var(--text);}
+
+/* Theme toggle button */
+.theme-toggle{width:36px;height:36px;border-radius:9px;background:var(--elevated);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.theme-toggle:hover{border-color:var(--amber);color:var(--amber);}
+.theme-toggle svg{width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;}
+.theme-toggle:hover svg{stroke:var(--amber);}
+.icon-sun{display:none;}
+.icon-moon{display:block;}
+[data-theme="light"] .icon-sun{display:block;}
+[data-theme="light"] .icon-moon{display:none;}
 </style>
 </head>
 <body>
@@ -732,6 +831,10 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="cur-item" data-val="HKD" data-flag="&#127469;&#127472;" data-name="Hong Kong Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-hk" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">HKD</span><span class="ci-name">Hong Kong &mdash; Dollar</span></div><span class="ci-check" id="ck-HKD"></span></div>
       </div>
     </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme">
+      <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
     <button class="nav-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Compare Rates</button>
   </div>
 </nav>
@@ -3906,6 +4009,24 @@ setTimeout(updateHeroWidget,1000);
     }
   },{passive:true});
 })();
+
+// ── THEME TOGGLE ───────────────────────────────
+(function(){
+  // Apply saved theme immediately to avoid flash
+  var saved = localStorage.getItem('nri-theme') || 'dark';
+  if(saved === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+
+function toggleTheme(){
+  var current = document.documentElement.getAttribute('data-theme');
+  var next = (current === 'light') ? 'dark' : 'light';
+  if(next === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+  localStorage.setItem('nri-theme', next);
+}
 </script>
 </body>
 </html>
