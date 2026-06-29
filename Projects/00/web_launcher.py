@@ -578,11 +578,13 @@ function refreshAll() {
 }
 
 // ── Scripts ────────────────────────────────────────────────────────────────
+let _scripts = [];
+
 async function loadScripts() {
-  const scripts = await get('/api/scripts');
+  _scripts = await get('/api/scripts');
   const grid = document.getElementById('pinned-grid');
   grid.innerHTML = '';
-  for (const s of scripts) {
+  _scripts.forEach((s, idx) => {
     const card = document.createElement('div');
     card.className = 'pin-card';
     card.style.setProperty('--card-color', s.color);
@@ -595,15 +597,16 @@ async function loadScripts() {
         ${!s.exists ? '<div class="pin-notfound">⚠ Script not found</div>' : ''}
         <div class="pin-footer">
           <div class="pin-status" id="status-${s.id}"></div>
-          <button class="btn-run" id="btn-${s.id}" onclick="runScript('${s.id}','${escHtml(s.bat)}','${escHtml(s.label)}')"
+          <button class="btn-run" id="btn-${s.id}" onclick="runScript(${idx})"
             ${!s.exists?'disabled':''}>▶ Run</button>
         </div>
       </div>`;
     grid.appendChild(card);
-  }
+  });
 }
 
-async function runScript(id, bat, label) {
+async function runScript(idx) {
+  const {id, bat, label} = _scripts[idx];
   const btn    = document.getElementById('btn-' + id);
   const status = document.getElementById('status-' + id);
 
