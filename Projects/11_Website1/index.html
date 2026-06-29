@@ -581,7 +581,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .tl-card:active{transform:scale(0.97);}
 .tl-card-wide{grid-column:1/-1;display:flex;align-items:center;gap:14px;}
 .tl-card-wide .tl-ds{margin-top:0;}
-.tl-ico{font-size:18px;margin-bottom:4px;display:block;position:relative;z-index:1;}
+.tl-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;position:relative;z-index:1;flex-shrink:0;}
 .tl-c-teal{filter:drop-shadow(0 0 6px rgba(0,205,176,0.6));}
 .tl-c-amber{filter:drop-shadow(0 0 6px rgba(240,165,32,0.6));}
 .tl-c-blue{filter:drop-shadow(0 0 6px rgba(99,130,246,0.6));}
@@ -590,7 +590,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .tl-c-red{filter:drop-shadow(0 0 6px rgba(245,101,112,0.6));}
 .tl-c-sky{filter:drop-shadow(0 0 6px rgba(14,165,233,0.6));}
 .tl-c-indigo{filter:drop-shadow(0 0 6px rgba(129,140,248,0.6));}
-.tl-card-wide .tl-ico{margin-bottom:0;font-size:22px;}
+.tl-card-wide .tl-ico{margin-bottom:0;}
 .tl-nm{font-size:12px;font-weight:800;color:var(--text);position:relative;z-index:1;line-height:1.2;}
 .tl-ds{font-size:11px;color:var(--muted);margin-top:3px;position:relative;z-index:1;line-height:1.4;}
 .tl-card-wide .tl-body{flex:1;}
@@ -829,6 +829,114 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 .art-search-input:focus{border-color:var(--teal);}
 .art-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5;}
 .art-no-results{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;display:none;}
+
+<style>
+/* ══ PROFESSIONAL OVERRIDES ══════════════════════════════ */
+
+/* ── NAV desktop links ── */
+.nav-links{display:flex;align-items:center;gap:4px;position:absolute;left:50%;transform:translateX(-50%);}
+.nav-link{font-size:13px;font-weight:600;color:var(--text2);padding:7px 14px;border-radius:8px;transition:color .2s,background .2s;white-space:nowrap;cursor:pointer;}
+.nav-link:hover{color:#fff;background:var(--elevated);}
+.nav-link.active{color:var(--amber);}
+nav{position:relative;}
+
+/* ── BRAND HERO ── */
+.brand-hero{padding:88px 32px 0;background:var(--bg);}
+.brand-hero-inner{max-width:1100px;margin:0 auto;text-align:center;}
+.bh-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--amber-dim);border:1px solid var(--amber-glow);border-radius:100px;padding:5px 16px;font-size:11.5px;font-weight:700;color:var(--amber);margin-bottom:20px;letter-spacing:.3px;}
+.bh-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber);animation:blink 2s infinite;}
+.brand-hero h1{font-size:clamp(36px,5vw,64px);font-weight:900;letter-spacing:-2px;line-height:1.07;color:#fff;margin-bottom:16px;}
+.brand-hero h1 em{font-style:normal;background:linear-gradient(135deg,#f0a520,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.bh-sub{font-size:17px;color:var(--text2);line-height:1.7;max-width:580px;margin:0 auto 36px;}
+.bh-stats{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:0;}
+.bh-stat{padding:16px 28px;border-right:1px solid var(--border);text-align:center;}
+.bh-stat:last-child{border-right:none;}
+.bh-stat-v{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px;}
+.bh-stat-l{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px;}
+
+/* ── TRUST BAR ── */
+.trust-bar{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:0;}
+.trust-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:stretch;}
+.tb-item{flex:1;display:flex;align-items:center;gap:14px;padding:22px 28px;border-right:1px solid var(--border);}
+.tb-item:last-child{border-right:none;}
+.tb-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tb-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb-text strong{font-size:14px;font-weight:700;color:var(--text);display:block;margin-bottom:2px;}
+.tb-text span{font-size:12px;color:var(--muted);}
+
+/* ── HERO refinements ── */
+.hero{padding-top:0;}
+.hero-inner{padding-top:36px;padding-bottom:36px;}
+.hrd-eyebrow{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.hrd-main{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
+.hrd-sym{font-size:32px;font-weight:900;color:var(--amber);}
+.hrd-val{font-size:56px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;}
+.hrd-status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+
+/* ── TRUST STRIP in hero: text only, no emoji ── */
+.trust-strip{gap:0;background:transparent;border:none;padding:0;margin-bottom:16px;flex-wrap:wrap;display:flex;align-items:center;}
+.trust-item{font-size:11.5px;font-weight:600;color:var(--text2);padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;margin:2px 4px 2px 0;}
+.trust-icon{display:none;}
+.trust-sep{display:none;}
+
+/* ── TOOL LAUNCHER: remove emoji category labels ── */
+.tl-cat-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:10px 2px 6px;border-top:1px solid var(--border);margin-top:6px;}
+.tl-cat-lbl:first-of-type{border-top:none;margin-top:0;padding-top:4px;}
+
+/* ── SVG JOURNEY ICONS ── */
+.js-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;background:var(--elevated);flex-shrink:0;}
+.js-icon svg{width:22px;height:22px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── FEAT TAGS: text only ── */
+.feat-tag{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:20px;width:fit-content;display:inline-block;margin-bottom:10px;}
+
+/* ── TOOL BANNERS: icon area hidden, just text ── */
+.tool-banner{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden;}
+.tool-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);}
+.tool-banner-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--amber-dim);}
+.tool-banner-icon svg{width:22px;height:22px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tool-banner-body h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
+.tool-banner-body p{font-size:13px;color:var(--muted);}
+
+/* ── DRAWER ICONS: clean SVG ── */
+.drawer-icon{width:34px;height:34px;border-radius:8px;background:var(--elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-icon svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── ACTIVE TOOL BAR ── */
+.atb-icon{width:34px;height:34px;border-radius:8px;background:var(--amber-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.atb-icon svg{width:16px;height:16px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── DASHBOARD STRIP: clean icons ── */
+.dm-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dm-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ── FOOTER refinements ── */
+.footer-brand .fb-logo{font-size:18px;font-weight:900;color:#fff;margin-bottom:12px;letter-spacing:-.3px;}
+
+/* ── SECTION EYEBROWS: no emoji ── */
+.feat-eyebrow{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber);margin-bottom:8px;}
+
+/* ── MID-MARKET RATE: no emoji ── */
+.mkt-rate-label span:first-child::before{content:'';}
+
+/* ── HERO READS: remove from hero to declutter ── */
+.hero-reads{display:none;}
+
+/* ── NAV ACTIONS refinement ── */
+.tools-trigger{display:flex;align-items:center;gap:7px;background:var(--elevated);border:1px solid var(--border2);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;color:var(--text2);transition:all .2s;cursor:pointer;}
+.tools-trigger:hover{border-color:var(--amber);color:var(--amber);}
+.tools-trigger svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;}
+
+@media(max-width:768px){
+  .nav-links{display:none;}
+  .brand-hero h1{letter-spacing:-1px;}
+  .trust-bar-inner{flex-direction:column;}
+  .tb-item{border-right:none;border-bottom:1px solid var(--border);padding:16px 20px;}
+  .tb-item:last-child{border-bottom:none;}
+  .bh-stats{flex-direction:column;width:100%;}
+  .bh-stat{border-right:none;border-bottom:1px solid var(--border);}
+  .bh-stat:last-child{border-bottom:none;}
+}
 </style>
 </head>
 <body>
@@ -844,6 +952,13 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <span>For Indians working abroad</span>
     </div>
   </a>
+  <nav class="nav-links">
+    <span class="nav-link" onclick="document.querySelector('.hero').scrollIntoView({behavior:'smooth'})">Live Rates</span>
+    <span class="nav-link" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Tools</span>
+    <span class="nav-link" onclick="document.querySelector('.feat-section').scrollIntoView({behavior:'smooth'})">Guides</span>
+    <span class="nav-link" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Banking</span>
+    <span class="nav-link" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Tax</span>
+  </nav>
   <div class="nav-right">
     <button class="tools-trigger" onclick="openDrawer()">
       <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -889,36 +1004,60 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 <!-- Jump navigation -->
 <nav id="jumpNav" style="display:none;position:sticky;top:57px;z-index:90;background:rgba(6,11,28,0.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(100,130,220,0.1);padding:0 20px;">
   <div style="display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;max-width:1400px;margin:0 auto;">
-    <span class="jn-link" onclick="jumpTo('dash-send')">💸 Remittance</span>
-    <span class="jn-link" onclick="jumpTo('dash-bank')">🏦 Banking</span>
-    <span class="jn-link" onclick="jumpTo('dash-prop')">🏠 Property</span>
-    <span class="jn-link" onclick="jumpTo('dash-tax')">🛡 Tax</span>
-    <span class="jn-link" onclick="jumpTo('dash-plan')">🗓 Planning</span>
-    <span class="jn-link" onclick="jumpTo('dash-guides')">📚 Guides</span>
-    <span class="jn-link" onclick="jumpTo('art-list')">📖 Articles</span>
+    <span class="jn-link" onclick="jumpTo('dash-send')">Remittance</span>
+    <span class="jn-link" onclick="jumpTo('dash-bank')">Banking</span>
+    <span class="jn-link" onclick="jumpTo('dash-prop')">Property</span>
+    <span class="jn-link" onclick="jumpTo('dash-tax')">Tax</span>
+    <span class="jn-link" onclick="jumpTo('dash-plan')">Planning</span>
+    <span class="jn-link" onclick="jumpTo('dash-guides')">Guides</span>
+    <span class="jn-link" onclick="jumpTo('art-list')">Articles</span>
   </div>
 </nav>
 
-<!-- INTENT CTA -->
-<div class="intent-bar">
-  <div class="intent-inner">
-    <span class="intent-lbl">What do you want to do today?</span>
-    <div class="intent-btns">
-      <button class="intent-btn" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <span>💸</span> Send Money
-      </button>
-      <button class="intent-btn" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <span>📈</span> Grow Wealth
-      </button>
-      <button class="intent-btn" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <span>🛡</span> Save Tax
-      </button>
-      <button class="intent-btn" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <span>🏠</span> Buy Property
-      </button>
-      <button class="intent-btn" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <span>✈️</span> Return to India
-      </button>
+
+</div>
+
+<!-- BRAND HERO -->
+<div class="brand-hero">
+  <div class="brand-hero-inner">
+    <div class="bh-eyebrow">Free · No Sign-up · Live Data</div>
+    <h1>India's Complete<br><em>NRI Finance Hub</em></h1>
+    <p class="bh-sub">Live remittance rates, NRE/NRO FD comparisons, SIP/SWP calculators, home loan planners, DTAA tax tools and India return planning — all in one place.</p>
+    <div class="bh-stats">
+      <div class="bh-stat"><div class="bh-stat-v">50+</div><div class="bh-stat-l">Providers Compared</div></div>
+      <div class="bh-stat"><div class="bh-stat-v">14</div><div class="bh-stat-l">Currencies Live</div></div>
+      <div class="bh-stat"><div class="bh-stat-v">9</div><div class="bh-stat-l">Free Tools</div></div>
+      <div class="bh-stat"><div class="bh-stat-v">18</div><div class="bh-stat-l">Expert Guides</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="tb-item">
+      <div class="tb-icon" style="background:var(--amber-dim);color:var(--amber)">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="tb-text"><strong>Live Exchange Rates</strong><span>Updated every few minutes via currency API</span></div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-icon" style="background:var(--green-dim);color:var(--green)">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="tb-text"><strong>No Sign-up Required</strong><span>All tools work instantly, completely free</span></div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-icon" style="background:var(--indigo-dim);color:var(--indigo)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="tb-text"><strong>Expert Guides</strong><span>18 in-depth NRI finance guides</span></div>
+    </div>
+    <div class="tb-item">
+      <div class="tb-icon" style="background:var(--teal-dim);color:var(--teal)">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="tb-text"><strong>Works Worldwide</strong><span>Gulf, SE Asia, UK, US, Australia &amp; more</span></div>
     </div>
   </div>
 </div>
@@ -930,16 +1069,16 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
     <!-- LEFT: Live Rate Ticker + Country Quick-Select -->
     <div class="hero-left">
-      <div class="hero-badge">&#127327; Live rates &middot; 14 currencies &middot; Always free</div>
-      <div class="hero-loc-label" id="heroLocLabel">Dubai, UAE</div>
+      <div class="hero-badge">Live rates &middot; 14 currencies &middot; Always free</div>
+      <div class="hero-loc-label" style="display:none" id="heroLocLabel">Dubai, UAE</div>
       <div class="trust-strip">
-        <div class="trust-item"><span class="trust-icon">✅</span>50+ providers compared</div>
+        <div class="trust-item">50+ providers compared</div>
         <div class="trust-sep"></div>
-        <div class="trust-item"><span class="trust-icon">🔄</span>Rates updated live</div>
+        <div class="trust-item">Rates updated live</div>
         <div class="trust-sep"></div>
-        <div class="trust-item"><span class="trust-icon">🔒</span>No signup needed</div>
+        <div class="trust-item">No signup needed</div>
         <div class="trust-sep"></div>
-        <div class="trust-item"><span class="trust-icon">🆓</span>Free forever</div>
+        <div class="trust-item">Free forever</div>
       </div>
       <div class="country-welcome" id="countryWelcome" style="display:none">
         <span id="countryWelcomeFlag"></span>
@@ -983,7 +1122,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
     <div class="hero-reads">
       <div class="hr-header">
-        <span class="hr-label">📚 Must-Read Guides</span>
+        <span class="hr-label">Must-Read Guides</span>
         <span class="hr-count">18 articles</span>
       </div>
       <a href="nre-nro.html" class="hr-card">
@@ -1043,60 +1182,60 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       <div class="tool-launcher">
         <div class="tl-hd">Your NRI Dashboard</div>
 
-        <div id="dash-send" class="tl-cat-lbl">💸 Send Money</div>
+        <div id="dash-send" class="tl-cat-lbl">Send Money</div>
         <div class="tl-grid tl-grid-1">
           <div class="tl-card tl-card-wide" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))">
-            <span class="tl-ico tl-c-teal">&#128202;</span><div><div class="tl-nm">Live Remittance Rates</div><div class="tl-ds">Compare 50+ providers · Best rate to India today</div></div>
+            <span class="tl-ico tl-c-teal"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span><div><div class="tl-nm">Live Remittance Rates</div><div class="tl-ds">Compare 50+ providers · Best rate to India today</div></div>
           </div>
         </div>
 
-        <div id="dash-bank" class="tl-cat-lbl">🏦 Banking &amp; Savings</div>
+        <div id="dash-bank" class="tl-cat-lbl">Banking &amp; Savings</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">
-            <span class="tl-ico tl-c-blue">&#127963;</span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank rates</div>
+            <span class="tl-ico tl-c-blue"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></span><div class="tl-nm">NRE / NRO FD</div><div class="tl-ds">Best bank rates</div>
           </div>
           <div class="tl-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'))">
-            <span class="tl-ico tl-c-green">&#128200;</span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
+            <span class="tl-ico tl-c-green"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></span><div class="tl-nm">SIP &amp; SWP</div><div class="tl-ds">Wealth calculator</div>
           </div>
         </div>
 
-        <div id="dash-prop" class="tl-cat-lbl">🏠 Property</div>
+        <div id="dash-prop" class="tl-cat-lbl">Property</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">
-            <span class="tl-ico tl-c-amber">&#127968;</span><div class="tl-nm">Home Loan EMI</div><div class="tl-ds">Full amortization</div>
+            <span class="tl-ico tl-c-amber"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><div class="tl-nm">Home Loan EMI</div><div class="tl-ds">Full amortization</div>
           </div>
           <div class="tl-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'))">
-            <span class="tl-ico tl-c-teal">&#127960;</span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Yield vs FD</div>
+            <span class="tl-ico tl-c-teal"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><div class="tl-nm">Real Estate ROI</div><div class="tl-ds">Yield vs FD</div>
           </div>
         </div>
 
-        <div id="dash-tax" class="tl-cat-lbl">🛡 Tax &amp; Compliance</div>
+        <div id="dash-tax" class="tl-cat-lbl">Tax &amp; Compliance</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'))">
-            <span class="tl-ico tl-c-sky">&#128196;</span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
+            <span class="tl-ico tl-c-sky"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><div class="tl-nm">Tax Residency</div><div class="tl-ds">NRI / RNOR / Resident</div>
           </div>
           <div class="tl-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))">
-            <span class="tl-ico tl-c-red">&#128176;</span><div class="tl-nm">DTAA Calculator</div><div class="tl-ds">Reduce TDS</div>
+            <span class="tl-ico tl-c-red"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div class="tl-nm">DTAA Calculator</div><div class="tl-ds">Reduce TDS</div>
           </div>
         </div>
 
-        <div id="dash-plan" class="tl-cat-lbl">🗓 Life Planning</div>
+        <div id="dash-plan" class="tl-cat-lbl">Life Planning</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="showTab('return',document.querySelector('[data-tab=return]'))">
-            <span class="tl-ico">&#9992;&#65039;</span><div class="tl-nm">Return to India</div><div class="tl-ds">Corpus &amp; checklist</div>
+            <span class="tl-ico tl-c-teal"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45a2 2 0 0 1 1.95-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17.09l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><div class="tl-nm">Return to India</div><div class="tl-ds">Corpus &amp; checklist</div>
           </div>
           <div class="tl-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'))">
-            <span class="tl-ico tl-c-purple">🎓</span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child corpus &amp; SIP</div>
+            <span class="tl-ico tl-c-purple"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span><div class="tl-nm">Education Planner</div><div class="tl-ds">Child corpus &amp; SIP</div>
           </div>
         </div>
 
-        <div id="dash-guides" class="tl-cat-lbl">📚 Guides</div>
+        <div id="dash-guides" class="tl-cat-lbl">Guides</div>
         <div class="tl-grid">
           <div class="tl-card" onclick="document.querySelector('.feat-section').scrollIntoView({behavior:'smooth'})">
-            <span class="tl-ico">📖</span><div class="tl-nm">NRI Articles</div><div class="tl-ds">11 guides below</div>
+            <span class="tl-ico tl-c-blue"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><div class="tl-nm">NRI Articles</div><div class="tl-ds">11 guides below</div>
           </div>
           <div class="tl-card" onclick="showTab('articles',document.querySelector('[data-tab=articles]'))">
-            <span class="tl-ico">📚</span><div class="tl-nm">All Tools</div><div class="tl-ds">Open full guides</div>
+            <span class="tl-ico tl-c-amber"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><div class="tl-nm">All Tools</div><div class="tl-ds">Open full guides</div>
           </div>
         </div>
       </div>
@@ -1120,7 +1259,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 <div class="dash-strip">
   <div class="dash-inner">
     <div class="dash-m">
-      <div class="dm-icon" style="background:var(--amber-dim)">&#128177;</div>
+      <div class="dm-icon" style="background:var(--amber-dim);color:var(--amber)"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div>
         <div class="dm-lbl">Mid Rate</div>
         <div class="dm-val" id="dash-rate">Loading&hellip;</div>
@@ -1128,7 +1267,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="dash-m">
-      <div class="dm-icon" style="background:var(--green-dim)">&#127963;</div>
+      <div class="dm-icon" style="background:var(--green-dim);color:var(--green)"><svg viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></div>
       <div>
         <div class="dm-lbl">Best NRE FD</div>
         <div class="dm-val">7.25%</div>
@@ -1136,7 +1275,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="dash-m">
-      <div class="dm-icon" style="background:var(--teal-dim)">&#127968;</div>
+      <div class="dm-icon" style="background:var(--teal-dim);color:var(--teal)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div>
         <div class="dm-lbl">NRI Home Loan</div>
         <div class="dm-val">7.25%</div>
@@ -1144,7 +1283,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
     </div>
     <div class="dash-m">
-      <div class="dm-icon" style="background:var(--indigo-dim)">&#128295;</div>
+      <div class="dm-icon" style="background:var(--indigo-dim);color:var(--indigo)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
       <div>
         <div class="dm-lbl">Free NRI Tools</div>
         <div class="dm-val">9 Tools</div>
@@ -1163,7 +1302,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     </div>
     <div class="journey-steps">
       <div class="journey-step" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <div class="js-icon">💸</div>
+        <div class="js-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
         <div class="js-num">01</div>
         <div class="js-title">Send Money</div>
         <div class="js-desc">Compare 50+ providers. Get the best AED/MYR/SGD → INR rate today.</div>
@@ -1171,7 +1310,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <div class="journey-arrow">→</div>
       <div class="journey-step" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <div class="js-icon">🏦</div>
+        <div class="js-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></div>
         <div class="js-num">02</div>
         <div class="js-title">Build Savings</div>
         <div class="js-desc">Park money in NRE FDs at up to 7.25% — fully tax-free and repatriable.</div>
@@ -1179,7 +1318,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <div class="journey-arrow">→</div>
       <div class="journey-step" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <div class="js-icon">📈</div>
+        <div class="js-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
         <div class="js-num">03</div>
         <div class="js-title">Invest &amp; Grow</div>
         <div class="js-desc">SIP into Indian mutual funds. Model corpus growth over 10–25 years.</div>
@@ -1187,7 +1326,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <div class="journey-arrow">→</div>
       <div class="journey-step" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <div class="js-icon">🏠</div>
+        <div class="js-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div class="js-num">04</div>
         <div class="js-title">Buy Property</div>
         <div class="js-desc">Calculate EMI, compare NRI home loan rates, plan your investment property.</div>
@@ -1195,7 +1334,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <div class="journey-arrow">→</div>
       <div class="journey-step" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
-        <div class="js-icon">✈️</div>
+        <div class="js-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45a2 2 0 0 1 1.95-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17.09l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
         <div class="js-num">05</div>
         <div class="js-title">Return to India</div>
         <div class="js-desc">Know exactly how much corpus you need. Month-by-month projection.</div>
@@ -1210,110 +1349,110 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="feat-inner">
     <div class="feat-header">
       <div>
-        <div class="feat-eyebrow">📚 NRI Knowledge Hub &middot; 18 Guides</div>
+        <div class="feat-eyebrow">NRI Knowledge Hub &middot; 18 Guides</div>
         <h2 class="feat-title">Guides Every NRI Should Read</h2>
       </div>
       <button class="feat-all-btn" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'});setTimeout(()=>showTab('articles',document.querySelector('[data-tab=articles]')),100)">All 18 Guides →</button>
     </div>
     <div class="feat-grid">
       <a href="nre-nro.html" class="feat-card feat-card-hot">
-        <div class="feat-tag banking">🏦 Banking</div>
+        <div class="feat-tag banking">Banking</div>
         <div class="feat-card-title">NRE vs NRO Account: Which One Do You Actually Need?</div>
         <div class="feat-card-desc">Tax treatment, repatriation rules, FD rates and when to use each account.</div>
         <div class="feat-card-meta">6 min read →</div>
       </a>
       <a href="rnor-status.html" class="feat-card feat-card-hot">
-        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-tag tax">Tax</div>
         <div class="feat-card-title">RNOR Status: The Tax-Free Window NRIs Miss</div>
         <div class="feat-card-desc">How returning NRIs can avoid Indian tax on foreign income for up to 3 years.</div>
         <div class="feat-card-meta">7 min read →</div>
       </a>
       <a href="itr-nri.html" class="feat-card">
-        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-tag tax">Tax</div>
         <div class="feat-card-title">NRI ITR Filing Guide 2026: Who Must File & How</div>
         <div class="feat-card-desc">When NRIs must file, which ITR form, TDS refunds and penalties to avoid.</div>
         <div class="feat-card-meta">8 min read →</div>
       </a>
       <a href="tax-saving.html" class="feat-card">
-        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-tag tax">Tax</div>
         <div class="feat-card-title">How NRIs Can Save Tax in 2026 — DTAA, Form 15CA & More</div>
         <div class="feat-card-desc">Use DTAA treaties to avoid double taxation. ELSS, LTCG exemptions explained.</div>
         <div class="feat-card-meta">8 min read →</div>
       </a>
       <a href="nri-mutual-funds.html" class="feat-card">
-        <div class="feat-tag invest">📈 Invest</div>
+        <div class="feat-tag invest">Invest</div>
         <div class="feat-card-title">NRI Mutual Fund Investment Guide 2026</div>
         <div class="feat-card-desc">Which funds NRIs can invest in, KYC process, FATCA rules and tax treatment.</div>
         <div class="feat-card-meta">7 min read →</div>
       </a>
       <a href="home-buying.html" class="feat-card">
-        <div class="feat-tag property">🏠 Property</div>
+        <div class="feat-tag property">Property</div>
         <div class="feat-card-title">The Complete NRI Home Buying Guide (2026)</div>
         <div class="feat-card-desc">FEMA rules, loan eligibility, EMI from NRE account and sale proceeds repatriation.</div>
         <div class="feat-card-meta">10 min read →</div>
       </a>
       <a href="ppf-nps-nri.html" class="feat-card">
-        <div class="feat-tag invest">📈 Invest</div>
+        <div class="feat-tag invest">Invest</div>
         <div class="feat-card-title">PPF &amp; NPS for NRIs — What's Allowed in 2026?</div>
         <div class="feat-card-desc">NRIs can't open PPF but can continue existing ones. NPS rules, benefits and exit.</div>
         <div class="feat-card-meta">6 min read →</div>
       </a>
       <a href="send-money.html" class="feat-card">
-        <div class="feat-tag transfer">💸 Transfer</div>
+        <div class="feat-tag transfer">Transfer</div>
         <div class="feat-card-title">Best Ways to Send Money to India: Full Cost Comparison</div>
         <div class="feat-card-desc">Wise vs InstaReM vs Remitly — who wins on rates, fees and speed in 2026.</div>
         <div class="feat-card-meta">5 min read →</div>
       </a>
       <a href="repatriation.html" class="feat-card">
-        <div class="feat-tag banking">🏦 Banking</div>
+        <div class="feat-tag banking">Banking</div>
         <div class="feat-card-title">NRI Repatriation of Funds: FEMA Rules Simplified</div>
         <div class="feat-card-desc">How much you can transfer abroad, which accounts qualify and the CA certificate process.</div>
         <div class="feat-card-meta">6 min read →</div>
       </a>
       <a href="return-planner.html" class="feat-card">
-        <div class="feat-tag planning">🗓 Planning</div>
+        <div class="feat-tag planning">Planning</div>
         <div class="feat-card-title">How to Use the Return Planner — Simulate Your Corpus</div>
         <div class="feat-card-desc">Enter your savings, years abroad, expenses — see exactly how long corpus lasts.</div>
         <div class="feat-card-meta">5 min read →</div>
       </a>
       <a href="retirement.html" class="feat-card">
-        <div class="feat-tag planning">🗓 Planning</div>
+        <div class="feat-tag planning">Planning</div>
         <div class="feat-card-title">NRI Retirement Planning with SIP &amp; SWP — India Guide</div>
         <div class="feat-card-desc">Build corpus abroad with SIP, withdraw sustainably in India with SWP. Real numbers.</div>
         <div class="feat-card-meta">7 min read →</div>
       </a>
       <a href="capital-gains-nri.html" class="feat-card feat-card-hot">
-        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-tag tax">Tax</div>
         <div class="feat-card-title">Capital Gains Tax for NRIs: Stocks, MFs & Property</div>
         <div class="feat-card-desc">LTCG/STCG rates, TDS on property sales, Lower TDS certificate and Section 54 exemptions.</div>
         <div class="feat-card-meta">8 min read →</div>
       </a>
       <a href="tds-refund-nri.html" class="feat-card">
-        <div class="feat-tag tax">🛡 Tax</div>
+        <div class="feat-tag tax">Tax</div>
         <div class="feat-card-title">TDS Refund for NRIs: Claim Back Excess Tax</div>
         <div class="feat-card-desc">Why NRIs overpay TDS on property and interest — and the exact steps to get it back via ITR.</div>
         <div class="feat-card-meta">7 min read →</div>
       </a>
       <a href="power-of-attorney-nri.html" class="feat-card">
-        <div class="feat-tag property">🏠 Property</div>
+        <div class="feat-tag property">Property</div>
         <div class="feat-card-title">NRI Power of Attorney: Manage Property from Abroad</div>
         <div class="feat-card-desc">General vs Specific POA, how to create and register one, and how to prevent POA fraud.</div>
         <div class="feat-card-meta">7 min read →</div>
       </a>
       <a href="nri-insurance.html" class="feat-card">
-        <div class="feat-tag planning">🗓 Planning</div>
+        <div class="feat-tag planning">Planning</div>
         <div class="feat-card-title">NRI Insurance Guide: Life & Health Coverage in India</div>
         <div class="feat-card-desc">Term plans, health insurance for India visits, tax benefits and LIC for NRIs explained.</div>
         <div class="feat-card-meta">8 min read →</div>
       </a>
       <a href="uae-nri-guide.html" class="feat-card feat-card-hot">
-        <div class="feat-tag transfer">🇦🇪 UAE Guide</div>
+        <div class="feat-tag transfer">UAE Guide</div>
         <div class="feat-card-title">UAE NRI Finance Hub: Complete Guide for Indians in UAE</div>
         <div class="feat-card-desc">Best AED to INR rates, NRE/NRO accounts, DTAA benefits, investments and UAE Golden Visa impact.</div>
         <div class="feat-card-meta">10 min read →</div>
       </a>
       <a href="fcnr-deposits.html" class="feat-card">
-        <div class="feat-tag banking">🏦 Banking</div>
+        <div class="feat-tag banking">Banking</div>
         <div class="feat-card-title">FCNR Deposits: Earn in USD, GBP or AED Without Currency Risk</div>
         <div class="feat-card-desc">How FCNR works, current rates, FCNR vs NRE FD comparison and when to choose each.</div>
         <div class="feat-card-meta">6 min read →</div>
@@ -1334,50 +1473,50 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
-    <div class="drawer-section-lbl">💸 Send Money</div>
+    <div class="drawer-section-lbl">Send Money</div>
     <div class="drawer-item active" data-tab="rates" onclick="showTab('rates',this)">
-      <div class="drawer-icon">📊</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Live Rates</div><div class="drawer-desc">Compare 50+ remittance providers</div></div>
     </div>
-    <div class="drawer-section-lbl">🏦 Banking & Savings</div>
+    <div class="drawer-section-lbl">Banking & Savings</div>
     <div class="drawer-item" data-tab="nrenro" onclick="showTab('nrenro',this)">
-      <div class="drawer-icon">🏛</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">NRE / NRO Accounts</div><div class="drawer-desc">Best FD rates &amp; account guide</div></div>
     </div>
     <div class="drawer-item" data-tab="invest" onclick="showTab('invest',this)">
-      <div class="drawer-icon">📈</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">SIP &amp; SWP</div><div class="drawer-desc">Mutual fund wealth calculator</div></div>
     </div>
-    <div class="drawer-section-lbl">🏠 Property</div>
+    <div class="drawer-section-lbl">Property</div>
     <div class="drawer-item" data-tab="homeloan" onclick="showTab('homeloan',this)">
-      <div class="drawer-icon">🏠</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Home Loan</div><div class="drawer-desc">EMI, amortization &amp; prepayment</div></div>
     </div>
     <div class="drawer-item" data-tab="realty" onclick="showTab('realty',this)">
-      <div class="drawer-icon">🏘️</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Real Estate ROI</div><div class="drawer-desc">Rental yield vs NRE FD benchmark</div></div>
     </div>
-    <div class="drawer-section-lbl">🛡 Tax & Compliance</div>
+    <div class="drawer-section-lbl">Tax & Compliance</div>
     <div class="drawer-item" data-tab="taxres" onclick="showTab('taxres',this)">
-      <div class="drawer-icon">&#128196;</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Tax Residency</div><div class="drawer-desc">Am I NRI, RNOR or Resident?</div></div>
     </div>
     <div class="drawer-item" data-tab="dtaa" onclick="showTab('dtaa',this)">
-      <div class="drawer-icon">💰</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">DTAA Calculator</div><div class="drawer-desc">Reduce TDS with tax treaties</div></div>
     </div>
-    <div class="drawer-section-lbl">🗓 Life Planning</div>
+    <div class="drawer-section-lbl">Life Planning</div>
     <div class="drawer-item" data-tab="return" onclick="showTab('return',this)">
-      <div class="drawer-icon">✈️</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45a2 2 0 0 1 1.95-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17.09l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Return to India</div><div class="drawer-desc">How much corpus do you need?</div></div>
     </div>
     <div class="drawer-item" data-tab="edplan" onclick="showTab('edplan',this)">
-      <div class="drawer-icon">🎓</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
     </div>
-    <div class="drawer-section-lbl">📚 Guides</div>
+    <div class="drawer-section-lbl">Guides</div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
-      <div class="drawer-icon">📚</div>
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">NRI Finance Guides</div><div class="drawer-desc">Tax, banking, property &amp; more</div></div>
     </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
@@ -1385,7 +1524,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
   <!-- ACTIVE TOOL BAR (replaces tab nav) -->
   <div class="active-tool-bar" onclick="openDrawer()">
-    <div class="atb-icon" id="atbIcon">📊</div>
+    <div class="atb-icon" id="atbIcon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
     <div class="atb-info">
       <div class="atb-name" id="atbName">Live Rates</div>
       <div class="atb-hint">Tap to switch tool</div>
@@ -1396,7 +1535,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB 1: LIVE RATES -->
   <div class="tool-section active" id="tab-rates">
     <div class="tool-banner tb-rates">
-      <div class="tool-banner-icon">💱</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
       <div class="tool-banner-body">
         <h2>Today's Best Rates to India</h2>
         <p>Sorted by most rupees received · Local providers for your country · Click "Send Now" to confirm rate on provider's site</p>
@@ -1412,7 +1551,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
     <div class="mkt-rate-card" id="mktRateCard">
       <div>
         <div class="mkt-rate-label">
-          <span>&#127974; Mid-Market Rate</span>
+          <span>Mid-Market Rate</span>
           <span class="mkt-xe-badge">XE.COM</span>
         </div>
         <div class="mkt-rate-val" id="mktRateVal">1 AED = &#8377;&#8212;</div>
@@ -1436,7 +1575,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-invest">
   <div class="calc-cur-bar" id="ccb-invest"><span class="ccb-flag" id="ccb-flag-invest"></span><span class="ccb-rate" id="ccb-rate-invest">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-invest" type="number" placeholder="Amount" oninput="ccbConvert('invest')"/><span id="ccb-cur-invest" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-invest">₹—</span></div></div>
     <div class="tool-banner tb-invest">
-      <div class="tool-banner-icon">📈</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
       <div class="tool-banner-body">
         <h2>SIP &amp; SWP Calculator</h2>
         <p>SIP — grow your India corpus with monthly investments · SWP — plan monthly withdrawals without depleting your corpus</p>
@@ -1494,7 +1633,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-nrenro">
   <div class="calc-cur-bar" id="ccb-nrenro"><span class="ccb-flag" id="ccb-flag-nrenro"></span><span class="ccb-rate" id="ccb-rate-nrenro">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-nrenro" type="number" placeholder="Amount" oninput="ccbConvert('nrenro')"/><span id="ccb-cur-nrenro" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-nrenro">₹—</span></div></div>
     <div class="tool-banner tb-nrenro">
-      <div class="tool-banner-icon">🏛</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></div>
       <div class="tool-banner-body">
         <h2>NRE vs NRO Account</h2>
         <p>Current NRE FD rates from leading banks &middot; Account comparison &middot; Personalised recommendation</p>
@@ -1606,7 +1745,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-homeloan">
   <div class="calc-cur-bar" id="ccb-homeloan"><span class="ccb-flag" id="ccb-flag-homeloan"></span><span class="ccb-rate" id="ccb-rate-homeloan">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-homeloan" type="number" placeholder="Amount" oninput="ccbConvert('homeloan')"/><span id="ccb-cur-homeloan" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-homeloan">₹—</span></div></div>
     <div class="tool-banner tb-homeloan">
-      <div class="tool-banner-icon">🏠</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="tool-banner-body">
         <h2>NRI Home Loan EMI Calculator</h2>
         <p>Monthly EMI &middot; Yearly amortization schedule &middot; Download as CSV or PDF</p>
@@ -1691,7 +1830,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-return">
   <div class="calc-cur-bar" id="ccb-return"><span class="ccb-flag" id="ccb-flag-return"></span><span class="ccb-rate" id="ccb-rate-return">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-return" type="number" placeholder="Amount" oninput="ccbConvert('return')"/><span id="ccb-cur-return" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-return">₹—</span></div></div>
     <div class="tool-banner tb-return">
-      <div class="tool-banner-icon">✈️</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45a2 2 0 0 1 1.95-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17.09l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
       <div class="tool-banner-body">
         <h2>Return to India Planner</h2>
         <p>Build your expense profile &middot; Apply real India inflation &middot; See year-by-year projections &middot; Know exactly how much corpus you need</p>
@@ -1956,7 +2095,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-dtaa">
   <div class="calc-cur-bar" id="ccb-dtaa"><span class="ccb-flag" id="ccb-flag-dtaa"></span><span class="ccb-rate" id="ccb-rate-dtaa">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-dtaa" type="number" placeholder="Amount" oninput="ccbConvert('dtaa')"/><span id="ccb-cur-dtaa" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-dtaa">₹—</span></div></div>
     <div class="tool-banner tb-dtaa">
-      <div class="tool-banner-icon">📋</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
       <div class="tool-banner-body">
         <h2>DTAA Tax Calculator</h2>
       <p>India has Double Tax Avoidance Agreements (DTAA) with 90+ countries. NRIs can claim reduced TDS rates — often saving 15–20% on their India income.</p>
@@ -2011,7 +2150,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
     <div class="tool-banner tb-realty">
-      <div class="tool-banner-icon">🏘️</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div class="tool-banner-body">
         <h2>Real Estate ROI Calculator</h2>
         <p>NRIs own 25%+ of Indian real estate purchases. Calculate rental yield, total ROI, EMI, cash flow — and compare against NRE FD returns.</p>
@@ -2049,7 +2188,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB: EDUCATION CORPUS PLANNER -->
   <div class="tool-section" id="tab-edplan">
     <div class="tool-banner tb-edplan">
-      <div class="tool-banner-icon">🎓</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="tool-banner-body">
         <h2>Education Corpus Planner</h2>
         <p>Calculate how much you need to save for your child's education in India or abroad</p>
@@ -2058,7 +2197,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
 
     <!-- Quick reference costs -->
     <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:24px;">
-      <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">📚 Typical Education Costs (Today's ₹)</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Typical Education Costs (Today's ₹)</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">
         <div class="ed-ref-card" onclick="setEdCost(3.5)"><div class="ed-ref-name">IIT / IIM</div><div class="ed-ref-cost">₹3–4L/yr</div></div>
         <div class="ed-ref-card" onclick="setEdCost(2)"><div class="ed-ref-name">Private Engg / BBA</div><div class="ed-ref-cost">₹1.5–2.5L/yr</div></div>
@@ -2111,7 +2250,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <!-- TAB: NRI GUIDES / ARTICLES -->
   <div class="tool-section" id="tab-articles">
     <div class="tool-banner tb-articles">
-      <div class="tool-banner-icon">📚</div>
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="tool-banner-body">
         <h2>NRI Financial Guides</h2>
       <p>Practical, jargon-free guides written for Indians living abroad</p>
@@ -2205,7 +2344,7 @@ footer{max-width:1100px;margin:0 auto;padding:52px 32px 32px;}
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
-        <div class="fb-logo">&#127988;&#8205;&#9894;&#65039; NRI Finance Hub</div>
+        <div class="fb-logo">NRI Finance Hub</div>
         <p>The only finance tool built specifically for Indians working in Gulf, Southeast Asia, Australia, Americas, and Europe. Free, live, no signup required.</p>
       </div>
       <div class="footer-col">
@@ -3142,7 +3281,7 @@ function showTab(id,btn){setActiveBottomTab(id);
   const meta=TOOL_META[id]||{icon:'📊',name:'Tools'};
   const icon=document.getElementById('atbIcon');
   const name=document.getElementById('atbName');
-  if(icon)icon.textContent=meta.icon;
+  if(icon)icon.innerHTML=meta.icon;
   if(name)name.textContent=meta.name;
   // Close drawer & scroll to the active tab section (skip hero/rates header)
   closeDrawer();
