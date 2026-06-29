@@ -848,7 +848,32 @@ nav{position:relative;}
 .brand-hero h1{font-size:clamp(36px,5vw,64px);font-weight:900;letter-spacing:-2px;line-height:1.07;color:#fff;margin-bottom:16px;}
 .brand-hero h1 em{font-style:normal;background:linear-gradient(135deg,#f0a520,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .bh-sub{font-size:17px;color:var(--text2);line-height:1.7;max-width:580px;margin:0 auto 36px;}
-.bh-stats{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:0;}
+.bh-stats{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:48px;}
+/* ── FEATURED TOOL CARDS ── */
+.bh-features{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;margin:0 auto;padding:0 0 48px;}
+.bh-feat{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:28px 30px;text-align:left;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:pointer;}
+.bh-feat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.bh-feat-rates::before{background:linear-gradient(90deg,#f0a520,#fbbf24);}
+.bh-feat-return::before{background:linear-gradient(90deg,#00cdb0,#6366f1);}
+.bh-feat:hover{border-color:rgba(240,165,32,.4);transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.35);}
+.bh-feat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.bh-feat-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.bh-feat-rates .bh-feat-icon{background:var(--amber-dim);color:var(--amber);}
+.bh-feat-return .bh-feat-icon{background:var(--teal-dim);color:var(--teal);}
+.bh-feat-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.bh-feat-rates .bh-feat-label{color:var(--amber);}
+.bh-feat-return .bh-feat-label{color:var(--teal);}
+.bh-feat h3{font-size:19px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.3px;line-height:1.25;}
+.bh-feat p{font-size:13.5px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
+.bh-feat-cta{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;border-radius:9px;padding:10px 20px;transition:transform .15s,box-shadow .15s;}
+.bh-feat-rates .bh-feat-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;box-shadow:0 4px 16px rgba(240,165,32,.3);}
+.bh-feat-rates .bh-feat-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(240,165,32,.45);}
+.bh-feat-return .bh-feat-cta{background:linear-gradient(135deg,#00cdb0,#0097a7);color:#000;box-shadow:0 4px 16px rgba(0,205,176,.25);}
+.bh-feat-return .bh-feat-cta:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,205,176,.4);}
+.bh-feat-cta svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.bh-feat-live{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-dim);border:1px solid rgba(34,211,154,.2);border-radius:20px;padding:3px 9px;position:absolute;top:20px;right:20px;}
+.bh-feat-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@media(max-width:640px){.bh-features{grid-template-columns:1fr;}}
 .bh-stat{padding:16px 28px;border-right:1px solid var(--border);text-align:center;}
 .bh-stat:last-child{border-right:none;}
 .bh-stat-v{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px;}
@@ -1029,6 +1054,40 @@ nav{position:relative;}
       <div class="bh-stat"><div class="bh-stat-v">9</div><div class="bh-stat-l">Free Tools</div></div>
       <div class="bh-stat"><div class="bh-stat-v">18</div><div class="bh-stat-l">Expert Guides</div></div>
     </div>
+  </div>
+
+  <!-- FEATURED TOOL CARDS -->
+  <div class="bh-features">
+
+    <!-- Live Currency Rates -->
+    <div class="bh-feat bh-feat-rates" onclick="document.querySelector('.hero').scrollIntoView({behavior:'smooth'})">
+      <div class="bh-feat-live">Live</div>
+      <div class="bh-feat-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="bh-feat-label">Live Currency Rates</div>
+      <h3>Best Rate to India<br>Today</h3>
+      <p>Compare 50+ remittance providers — Wise, InstaReM, Remitly and more — sorted by most rupees received. AED, USD, GBP, SGD and 10 more currencies.</p>
+      <span class="bh-feat-cta">
+        Compare Rates
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </div>
+
+    <!-- Return to India Planner -->
+    <div class="bh-feat bh-feat-return" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="bh-feat-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45a2 2 0 0 1 1.95-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17.09l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <div class="bh-feat-label">Return to India Planner</div>
+      <h3>Know Your Exact<br>Corpus Number</h3>
+      <p>Enter your expenses, city tier, years abroad and savings. Get a month-by-month projection of how long your corpus will last — with a full return checklist.</p>
+      <span class="bh-feat-cta">
+        Plan My Return
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </div>
+
   </div>
 </div>
 
