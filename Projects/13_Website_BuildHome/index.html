@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeBudget — Construction Cost Estimator for 120+ Countries</title>
+<meta name="description" content="Estimate the cost of building a house anywhere in the world. Accurate construction cost estimates for 120+ countries in local currency.">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+  body{font-family:'Inter',system-ui,sans-serif;background:#fafaf9;color:#102a43}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#627d98;border-radius:3px}
+  .glass{background:rgba(255,255,255,0.08);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12)}
+  .hero-overlay{background:linear-gradient(to bottom,rgba(10,25,41,0.6) 0%,rgba(10,25,41,0.3) 40%,rgba(10,25,41,0.75) 100%)}
+  .gradient-text{background:linear-gradient(135deg,#10b981,#0d9488,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .gradient-text-light{background:linear-gradient(135deg,#34d399,#10b981,#6ee7b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .premium-card{transition:all .35s cubic-bezier(.4,0,.2,1);transform:translateY(0);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .premium-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(16,42,67,.15)}
+  .btn-primary{background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:14px 28px;border-radius:10px;font-weight:600;font-size:15px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .25s ease;box-shadow:0 4px 15px rgba(16,185,129,.3)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(16,185,129,.4)}
+  .btn-secondary{background:rgba(255,255,255,.1);color:#fff;padding:14px 28px;border-radius:10px;font-weight:600;font-size:15px;border:1px solid rgba(255,255,255,.2);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .25s ease}
+  .btn-secondary:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes countUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse2{0%,100%{opacity:1}50%{opacity:.5}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes heroIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+  .fade-up{animation:fadeUp .8s cubic-bezier(.22,1,.36,1) forwards}
+  .fade-up-1{animation:fadeUp .8s .2s cubic-bezier(.22,1,.36,1) both}
+  .fade-up-2{animation:fadeUp .8s .4s cubic-bezier(.22,1,.36,1) both}
+  .fade-up-3{animation:fadeUp .8s .6s cubic-bezier(.22,1,.36,1) both}
+  .fade-up-4{animation:fadeUp .8s .8s cubic-bezier(.22,1,.36,1) both}
+  .fade-up-5{animation:fadeUp .8s 1s cubic-bezier(.22,1,.36,1) both}
+  .hero-img{animation:heroIn 1.4s cubic-bezier(.22,1,.36,1) forwards}
+  .pulse{animation:pulse2 2s infinite}
+  .spinner{animation:spin 1s linear infinite}
+  .step-active{border-color:#10b981!important;background:#ecfdf5!important;box-shadow:0 0 0 3px rgba(16,185,129,.15)}
+  .quality-active{border-color:#10b981!important;background:#ecfdf5!important}
+  .feature-active{border-color:#10b981!important;background:#ecfdf5!important}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:#e2e8f0;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#10b981;cursor:pointer;box-shadow:0 2px 8px rgba(16,185,129,.4)}
+  .nav-scrolled{background:rgba(10,25,41,.92)!important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)!important;padding-top:12px!important;padding-bottom:12px!important}
+  .country-btn.selected{border-color:#10b981;background:#ecfdf5}
+  .city-btn.selected{border-color:#10b981;background:#ecfdf5;color:#059669;font-weight:600}
+  .progress-line.done{background:#10b981}
+  .bar-fill{transition:width 1s ease-out}
+  #pieChart{max-height:260px}
+</style>
+<script>
+tailwind.config={theme:{extend:{colors:{navy:{50:'#f0f4f8',100:'#d9e2ec',200:'#bcccdc',500:'#627d98',700:'#334e68',800:'#243b53',900:'#102a43',950:'#0a1929'}}}}}
+</script>
+</head>
+<body>
+
+<!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-5" style="background:transparent">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2.5 group">
+      <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg" style="background:linear-gradient(135deg,#34d399,#059669)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span class="text-white font-bold text-lg tracking-tight">Home<span style="color:#34d399">Budget</span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-1">
+      <a href="#estimator" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all">Estimator</a>
+      <a href="#index" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all">Global Index</a>
+      <a href="#compare" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all">Compare</a>
+      <a href="#tools" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all">Tools</a>
+    </nav>
+    <a href="#estimator" class="hidden md:flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all hover:-translate-y-0.5" style="background:#10b981;box-shadow:0 4px 15px rgba(16,185,129,.3)">
+      Start Estimating <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <div id="heroBg" class="absolute inset-0 bg-cover bg-center hero-img" style="background-image:url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&q=80')"></div>
+  <div class="absolute inset-0 hero-overlay"></div>
+  <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(10,25,41,.85) 0%,transparent 60%)"></div>
+
+  <div class="relative z-10 w-full max-w-5xl mx-auto px-6 py-24 pt-36 text-center">
+    <div class="fade-up-1 inline-flex items-center gap-2 text-white/90 text-sm font-medium px-4 py-2 rounded-full mb-8 glass">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Construction Cost Intelligence Platform
+      <span class="w-1.5 h-1.5 rounded-full pulse" style="background:#34d399"></span>
+    </div>
+
+    <h1 class="fade-up-2 text-5xl md:text-7xl font-bold text-white leading-tight tracking-tight mb-6" style="letter-spacing:-.03em">
+      Know Exactly What<br>
+      <span class="gradient-text-light">Your Dream Home</span><br>
+      Will Cost
+    </h1>
+
+    <p class="fade-up-3 text-xl text-white/65 max-w-2xl mx-auto leading-relaxed mb-12">
+      Estimate construction costs across countries, cities and property types with intelligent cost modeling and local market insights.
+    </p>
+
+    <!-- Country search -->
+    <div class="fade-up-4 max-w-xl mx-auto mb-8 relative" id="heroSearchWrap">
+      <div class="flex items-center gap-3 bg-white rounded-2xl p-2 pl-5 shadow-2xl" style="box-shadow:0 25px 60px rgba(0,0,0,.35)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="heroSearch" type="text" placeholder="Where are you planning to build?" class="flex-1 text-gray-800 bg-transparent border-none outline-none text-base font-medium placeholder:text-gray-400" autocomplete="off">
+        <button onclick="scrollToEstimator()" class="flex-shrink-0 text-white font-semibold text-sm px-5 py-3 rounded-xl transition-all flex items-center gap-2 hover:-translate-y-0.5" style="background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,.35)">
+          Estimate Cost
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <!-- Dropdown -->
+      <div id="heroDropdown" class="absolute top-full mt-2 left-0 right-0 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 hidden">
+        <div class="p-3">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 pb-2" id="dropdownLabel">Popular Countries</p>
+          <div id="countryList" class="space-y-0.5 max-h-72 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-up-5 flex flex-wrap items-center justify-center gap-4 mb-14">
+      <button onclick="scrollToEstimator()" class="btn-primary text-base">
+        Start Estimating
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <button onclick="scrollTo('#index')" class="btn-secondary text-base">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Explore Global Cost Rankings
+      </button>
+    </div>
+
+    <div class="fade-up-5 flex flex-wrap items-center justify-center gap-8">
+      <div class="flex items-center gap-2 text-white/80"><span class="text-lg">🌍</span><span class="font-bold text-white">120+</span><span class="text-white/55 text-sm">Countries</span></div>
+      <div class="flex items-center gap-2 text-white/80"><span class="text-lg">🏙️</span><span class="font-bold text-white">5,000+</span><span class="text-white/55 text-sm">Cities</span></div>
+      <div class="flex items-center gap-2 text-white/80"><span class="text-lg">💰</span><span class="font-bold text-white">Free</span><span class="text-white/55 text-sm">To Use</span></div>
+      <div class="flex items-center gap-2 text-white/80"><span class="text-lg">📊</span><span class="font-bold text-white">Live</span><span class="text-white/55 text-sm">Cost Data</span></div>
+    </div>
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 cursor-pointer" onclick="scrollToEstimator()">
+    <span class="text-xs font-medium tracking-widest uppercase">Explore</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:fadeUp 2s ease-in-out infinite alternate"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════ TRUST STATS ═══════════════════════ -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 text-center" id="statsRow">
+      <div class="stat-item"><div class="text-5xl font-bold" style="color:#10b981" data-count="120" data-suffix="+">0+</div><div class="text-gray-500 text-sm mt-2 font-medium">Countries Covered</div></div>
+      <div class="stat-item"><div class="text-5xl font-bold" style="color:#3b82f6" data-count="5000" data-suffix="+">0+</div><div class="text-gray-500 text-sm mt-2 font-medium">Cities Supported</div></div>
+      <div class="stat-item"><div class="text-5xl font-bold" style="color:#8b5cf6" data-count="98" data-suffix="%">0%</div><div class="text-gray-500 text-sm mt-2 font-medium">Accuracy Rate</div></div>
+      <div class="stat-item"><div class="text-5xl font-bold" style="color:#f59e0b" data-count="250000" data-suffix="+">0+</div><div class="text-gray-500 text-sm mt-2 font-medium">Estimates Generated</div></div>
+    </div>
+
+    <div class="text-center mb-14">
+      <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:#ecfdf5;color:#059669">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Why HomeBudget
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4" style="color:#102a43;letter-spacing:-.02em">Construction Intelligence<br><span class="gradient-text">Built For Precision</span></h2>
+      <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">We combine global market data with local expertise to give you the most accurate construction cost estimates available.</p>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-5">
+      <div class="premium-card p-6 rounded-2xl border border-gray-100" style="background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(59,130,246,.02))">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(59,130,246,.1);color:#3b82f6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3 class="font-bold text-base mb-2" style="color:#102a43">Global Coverage</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">120+ countries and 5,000+ cities with real market construction rates.</p>
+      </div>
+      <div class="premium-card p-6 rounded-2xl border border-gray-100" style="background:linear-gradient(135deg,rgba(16,185,129,.06),rgba(16,185,129,.02))">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(16,185,129,.1);color:#10b981"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+        <h3 class="font-bold text-base mb-2" style="color:#102a43">Intelligent Modeling</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Algorithms factor in labour, materials, climate, and permit costs.</p>
+      </div>
+      <div class="premium-card p-6 rounded-2xl border border-gray-100" style="background:linear-gradient(135deg,rgba(139,92,246,.06),rgba(139,92,246,.02))">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(139,92,246,.1);color:#8b5cf6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3 class="font-bold text-base mb-2" style="color:#102a43">Professional Method</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Validated by licensed quantity surveyors and construction professionals.</p>
+      </div>
+      <div class="premium-card p-6 rounded-2xl border border-gray-100" style="background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(245,158,11,.02))">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style="background:rgba(245,158,11,.1);color:#f59e0b"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <h3 class="font-bold text-base mb-2" style="color:#102a43">Local Currency</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Automatic conversion to 50+ local currencies — no manual conversion needed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ HOW IT WORKS ═══════════════════════ -->
+<section class="py-24 relative overflow-hidden" style="background:#0a1929">
+  <div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:60px 60px"></div>
+  <div class="max-w-7xl mx-auto px-6 relative">
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)">How It Works</div>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">From Idea to Estimate<br><span class="gradient-text-light">In Minutes</span></h2>
+      <p class="text-white/50 text-lg max-w-xl mx-auto">No registration. No hidden fees. Just accurate construction cost intelligence.</p>
+    </div>
+    <div class="grid md:grid-cols-4 gap-6">
+      <div class="relative p-6 rounded-2xl border border-white/[.06]" style="background:rgba(255,255,255,.04)">
+        <div class="text-white/20 text-xs font-bold tracking-widest mb-4">01</div>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-white" style="background:#3b82f6;box-shadow:0 8px 25px rgba(59,130,246,.3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3 class="text-white font-bold text-base mb-2">Choose Location</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Select from 120+ countries and 5,000+ cities with local pricing.</p>
+      </div>
+      <div class="relative p-6 rounded-2xl border border-white/[.06]" style="background:rgba(255,255,255,.04)">
+        <div class="text-white/20 text-xs font-bold tracking-widest mb-4">02</div>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-white" style="background:#10b981;box-shadow:0 8px 25px rgba(16,185,129,.3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></div>
+        <h3 class="text-white font-bold text-base mb-2">Set Specifications</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Define property type, area, quality, rooms and premium features.</p>
+      </div>
+      <div class="relative p-6 rounded-2xl border border-white/[.06]" style="background:rgba(255,255,255,.04)">
+        <div class="text-white/20 text-xs font-bold tracking-widest mb-4">03</div>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-white" style="background:#8b5cf6;box-shadow:0 8px 25px rgba(139,92,246,.3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <h3 class="text-white font-bold text-base mb-2">Get Instant Estimates</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Detailed cost breakdown in local currency with realistic ranges.</p>
+      </div>
+      <div class="relative p-6 rounded-2xl border border-white/[.06]" style="background:rgba(255,255,255,.04)">
+        <div class="text-white/20 text-xs font-bold tracking-widest mb-4">04</div>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-white" style="background:#f59e0b;box-shadow:0 8px 25px rgba(245,158,11,.3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+        <h3 class="text-white font-bold text-base mb-2">Plan Your Project</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Loan calculators, comparisons and shareable reports.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ ESTIMATOR ═══════════════════════ -->
+<section id="estimator" class="py-24" style="background:#f7f8fa">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:#ecfdf5;color:#059669">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Construction Cost Estimator
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4" style="color:#102a43;letter-spacing:-.02em">Get Your Personalised<br><span class="gradient-text">Build Cost Estimate</span></h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Answer a few questions and get a detailed cost breakdown in seconds — completely free.</p>
+    </div>
+
+    <div class="max-w-3xl mx-auto">
+      <!-- WIZARD -->
+      <div id="wizardCard" class="bg-white rounded-3xl overflow-hidden" style="box-shadow:0 25px 80px rgba(16,42,67,.1)">
+        <!-- Progress header -->
+        <div class="px-8 py-6" style="background:linear-gradient(135deg,#0a1929,#243b53)">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-white font-bold text-xl">Construction Cost Estimator</h3>
+            <span class="text-white/50 text-sm font-medium" id="stepLabel">Step 1 of 5</span>
+          </div>
+          <div class="flex items-center gap-2" id="progressBar">
+            <div class="flex items-center gap-2 flex-1" data-step="1">
+              <div class="step-indicator w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all" style="border-color:#10b981;background:rgba(16,185,129,.2);color:#10b981">1</div>
+              <span class="text-xs font-semibold hidden md:block" style="color:#10b981">Location</span>
+              <div class="flex-1 h-0.5 rounded progress-line" style="background:rgba(255,255,255,.15)"></div>
+            </div>
+            <div class="flex items-center gap-2 flex-1" data-step="2">
+              <div class="step-indicator w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.3)">2</div>
+              <span class="text-xs font-semibold hidden md:block" style="color:rgba(255,255,255,.3)">Property</span>
+              <div class="flex-1 h-0.5 rounded progress-line" style="background:rgba(255,255,255,.15)"></div>
+            </div>
+            <div class="flex items-center gap-2 flex-1" data-step="3">
+              <div class="step-indicator w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.3)">3</div>
+              <span class="text-xs font-semibold hidden md:block" style="color:rgba(255,255,255,.3)">Size</span>
+              <div class="flex-1 h-0.5 rounded progress-line" style="background:rgba(255,255,255,.15)"></div>
+            </div>
+            <div class="flex items-center gap-2 flex-1" data-step="4">
+              <div class="step-indicator w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.3)">4</div>
+              <span class="text-xs font-semibold hidden md:block" style="color:rgba(255,255,255,.3)">Quality</span>
+              <div class="flex-1 h-0.5 rounded progress-line" style="background:rgba(255,255,255,.15)"></div>
+            </div>
+            <div class="flex items-center gap-2" data-step="5">
+              <div class="step-indicator w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all" style="border-color:rgba(255,255,255,.25);color:rgba(255,255,255,.3)">5</div>
+              <span class="text-xs font-semibold hidden md:block" style="color:rgba(255,255,255,.3)">Features</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step content -->
+        <div class="p-8">
+          <!-- STEP 1: Location -->
+          <div id="step1" class="step-content">
+            <h3 class="text-2xl font-bold mb-1" style="color:#102a43">Where are you building?</h3>
+            <p class="text-gray-500 mb-6">Select your country and optionally a city for accurate local pricing</p>
+            <input id="countrySearch" type="text" placeholder="Search countries..." class="w-full border border-gray-200 rounded-xl px-4 py-3 mb-4 text-sm text-gray-700 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all" style="outline:none">
+            <div id="countryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5 max-h-72 overflow-y-auto pr-1"></div>
+            <div id="stateSection" class="hidden mb-4">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Select State / Region <span class="text-gray-400 font-normal">(refines cost accuracy)</span></label>
+              <div id="stateGrid" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div id="citySection" class="hidden">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Select City <span class="text-gray-400 font-normal">(optional)</span></label>
+              <div id="cityGrid" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Property type -->
+          <div id="step2" class="step-content hidden">
+            <h3 class="text-2xl font-bold mb-1" style="color:#102a43">What type of property?</h3>
+            <p class="text-gray-500 mb-6">Property structure affects total construction cost</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3" id="propertyGrid"></div>
+          </div>
+
+          <!-- STEP 3: Size -->
+          <div id="step3" class="step-content hidden">
+            <h3 class="text-2xl font-bold mb-1" style="color:#102a43">Property size & rooms</h3>
+            <p class="text-gray-500 mb-6">Enter the total floor area and room count</p>
+            <div class="mb-6">
+              <label class="block text-sm font-semibold text-gray-700 mb-3">Floor Area</label>
+              <div class="flex gap-2 mb-3">
+                <button onclick="setUnit('sqft')" id="btnSqft" class="px-4 py-2 rounded-lg text-sm font-semibold border transition-all" style="border-color:#10b981;background:#ecfdf5;color:#059669">Square Feet</button>
+                <button onclick="setUnit('sqm')" id="btnSqm" class="px-4 py-2 rounded-lg text-sm font-semibold border border-gray-200 text-gray-500 transition-all hover:border-gray-300">Square Metres</button>
+              </div>
+              <div class="flex items-center gap-4">
+                <input type="range" id="areaSlider" min="400" max="15000" step="50" value="1500" class="flex-1" oninput="updateArea(this.value)">
+                <div class="w-32 text-center">
+                  <input type="number" id="areaInput" value="1500" class="w-full text-center border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold focus:outline-none focus:border-emerald-400 transition-all" style="color:#102a43" oninput="updateAreaFromInput(this.value)">
+                  <div class="text-xs text-gray-400 mt-1" id="areaUnitLabel">sqft</div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-5">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Bedrooms</label>
+                <div class="flex items-center gap-3">
+                  <button onclick="adjustRoom('bed',-1)" class="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-colors">−</button>
+                  <span id="bedroomCount" class="w-10 text-center font-bold text-2xl" style="color:#102a43">3</span>
+                  <button onclick="adjustRoom('bed',1)" class="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-colors">+</button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Bathrooms</label>
+                <div class="flex items-center gap-3">
+                  <button onclick="adjustRoom('bath',-1)" class="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-colors">−</button>
+                  <span id="bathroomCount" class="w-10 text-center font-bold text-2xl" style="color:#102a43">2</span>
+                  <button onclick="adjustRoom('bath',1)" class="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 transition-colors">+</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Garage</label>
+              <div class="flex flex-wrap gap-2" id="garageGrid"></div>
+            </div>
+          </div>
+
+          <!-- STEP 4: Quality -->
+          <div id="step4" class="step-content hidden">
+            <h3 class="text-2xl font-bold mb-1" style="color:#102a43">Construction quality level</h3>
+            <p class="text-gray-500 mb-6">Quality significantly impacts total construction cost</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="qualityGrid"></div>
+          </div>
+
+          <!-- STEP 5: Features -->
+          <div id="step5" class="step-content hidden">
+            <h3 class="text-2xl font-bold mb-1" style="color:#102a43">Additional features</h3>
+            <p class="text-gray-500 mb-6">Select premium additions to include in your estimate</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="featuresGrid"></div>
+            <div id="summaryPreview" class="mt-6 p-5 rounded-2xl hidden" style="background:linear-gradient(135deg,#0a1929,#243b53)">
+              <div class="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3">Your Estimate Summary</div>
+              <div class="grid grid-cols-2 gap-3 text-sm" id="summaryContent"></div>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+            <button id="backBtn" onclick="prevStep()" class="flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-gray-600 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-all disabled:opacity-30 opacity-30 cursor-not-allowed" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              Back
+            </button>
+            <button id="nextBtn" onclick="nextStep()" class="flex items-center gap-2 font-semibold text-sm px-7 py-3 rounded-xl text-white transition-all opacity-40 cursor-not-allowed" style="background:#0a1929" disabled>
+              Continue
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS (hidden initially) -->
+      <div id="resultsCard" class="hidden space-y-6">
+        <!-- Main result -->
+        <div class="rounded-3xl p-8 relative overflow-hidden text-white" style="background:linear-gradient(135deg,#0a1929,#102a43)">
+          <div class="absolute inset-0 opacity-5" style="background-image:radial-gradient(circle,white 1px,transparent 1px);background-size:30px 30px"></div>
+          <div class="relative">
+            <div class="flex items-start justify-between mb-6">
+              <div>
+                <div class="flex items-center gap-2 text-sm font-semibold mb-2" style="color:#34d399">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  Estimate Complete
+                </div>
+                <h2 class="text-3xl font-bold leading-tight" id="resultTitle">Premium Home in Bangalore</h2>
+                <p class="text-white/50 text-sm mt-1" id="resultSubtitle">2,000 sqft · Standard Quality</p>
+              </div>
+              <button onclick="resetEstimator()" class="flex items-center gap-2 text-white/50 hover:text-white text-sm px-4 py-2 rounded-xl hover:bg-white/10 transition-all">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                Recalculate
+              </button>
+            </div>
+            <div class="mb-7">
+              <div class="text-white/50 text-sm mb-1">Total Estimated Construction Cost</div>
+              <div class="flex items-end gap-4">
+                <div class="text-5xl md:text-6xl font-bold tracking-tight" id="totalCostDisplay" style="letter-spacing:-.03em">$0</div>
+                <div class="pb-2">
+                  <div id="currencyLabel" class="text-white/40 text-sm">USD</div>
+                  <div id="usdEquiv" class="text-white/30 text-xs">$0 USD</div>
+                </div>
+              </div>
+              <div class="text-white/35 text-sm mt-1" id="rangeLabel">Range: $0 – $0</div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="rounded-2xl p-4" style="background:rgba(255,255,255,.06)">
+                <div class="text-white/50 text-xs mb-1">Per Sqft</div>
+                <div class="text-white font-bold text-lg" id="costPerSqft">$0</div>
+              </div>
+              <div class="rounded-2xl p-4" style="background:rgba(255,255,255,.06)">
+                <div class="text-white/50 text-xs mb-1">Per Sqm</div>
+                <div class="text-white font-bold text-lg" id="costPerSqm">$0</div>
+              </div>
+              <div class="rounded-2xl p-4" style="background:rgba(255,255,255,.06)">
+                <div class="text-white/50 text-xs mb-1">Monthly Loan</div>
+                <div class="text-white font-bold text-lg" id="monthlyLoan">$0</div>
+              </div>
+              <div class="rounded-2xl p-4" style="background:rgba(255,255,255,.06)">
+                <div class="text-white/50 text-xs mb-1">Build Time</div>
+                <div class="text-white font-bold text-lg" id="buildTime">12–16 mo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <h3 class="font-bold text-lg mb-1" style="color:#102a43">Cost Breakdown</h3>
+            <p class="text-gray-400 text-sm mb-4">Where your construction budget goes</p>
+            <canvas id="pieChart" height="240"></canvas>
+          </div>
+          <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+            <h3 class="font-bold text-lg mb-1" style="color:#102a43">Category Details</h3>
+            <p class="text-gray-400 text-sm mb-4">Individual cost line items</p>
+            <div id="breakdownBars" class="space-y-2.5"></div>
+          </div>
+        </div>
+
+        <!-- Floor Plan Visualisation -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <div class="flex items-start justify-between mb-1">
+            <div><h3 class="font-bold text-lg" style="color:#102a43">Floor Plan Preview</h3><p class="text-gray-400 text-sm mt-0.5">Approximate layout based on your inputs</p></div>
+            <span id="floorAreaBadge" class="text-xs font-semibold px-3 py-1.5 rounded-full" style="background:#ecfdf5;color:#059669"></span>
+          </div>
+          <div id="floorPlanContainer" class="mt-4 flex flex-col items-center"></div>
+          <p class="text-center text-xs text-gray-400 mt-3">* Indicative layout only — not architectural plans</p>
+        </div>
+
+        <!-- Detailed Sub-Breakdown -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <h3 class="font-bold text-lg mb-1" style="color:#102a43">Detailed Cost Breakdown</h3>
+          <p class="text-gray-400 text-sm mb-4">Click any category to see itemised sub-costs</p>
+          <div id="subBreakdown" class="space-y-2"></div>
+        </div>
+
+        <!-- Materials Reference -->
+        <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-lg" style="color:#102a43">Building Materials Guide</h3>
+              <p class="text-gray-400 text-sm mt-0.5">Recommended brands &amp; where to buy in your region</p>
+            </div>
+            <span id="materialsBadge" class="text-xs font-semibold px-3 py-1.5 rounded-full" style="background:#eff6ff;color:#3b82f6"></span>
+          </div>
+          <div id="materialsGrid" class="space-y-3"></div>
+          <p class="text-xs text-gray-400 mt-4">* Prices vary by region &amp; supplier — always get 3+ quotes before purchasing.</p>
+        </div>
+
+        <!-- Loan summary -->
+        <div class="rounded-3xl p-6 border" style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border-color:#a7f3d0">
+          <div class="font-semibold mb-1 flex items-center gap-2" style="color:#059669">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            Home Loan Estimate
+          </div>
+          <p class="text-gray-500 text-sm mb-4">Based on 30-year mortgage at 5.5% interest, 20% down payment</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="loanGrid"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-3">
+          <button onclick="resetEstimator()" class="flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-xl transition-colors hover:opacity-90" style="background:#0a1929">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+            New Estimate
+          </button>
+          <button onclick="scrollTo('#compare')" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 font-semibold px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+            Compare Countries
+          </button>
+          <button onclick="window.print()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 font-semibold px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Save Estimate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ GLOBAL INDEX ═══════════════════════ -->
+<section id="index" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-14">
+      <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:rgba(16,42,67,.05);color:#102a43">Global Construction Cost Index</div>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4" style="color:#102a43;letter-spacing:-.02em">Construction Costs<br><span class="gradient-text">Around The World</span></h2>
+      <p class="text-gray-500 text-lg max-w-xl mx-auto">Standard quality construction cost per square foot across every country we track.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="flex items-center gap-2 font-bold mb-5" style="color:#059669">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+          Most Affordable Countries
+        </div>
+        <div class="space-y-3" id="cheapestList"></div>
+      </div>
+      <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div class="flex items-center gap-2 font-bold mb-5" style="color:#d97706">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Premium Build Markets
+        </div>
+        <div class="space-y-3" id="expensiveList"></div>
+      </div>
+    </div>
+    <div class="text-center">
+      <button onclick="scrollTo('#estimator')" class="inline-flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5" style="background:#0a1929;box-shadow:0 4px 20px rgba(10,25,41,.2)">
+        Start Building Your Estimate
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FEATURED COUNTRIES ═══════════════════════ -->
+<section class="py-24" style="background:#f7f8fa">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-14">
+      <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4" style="color:#102a43;letter-spacing:-.02em">Popular Build Destinations</h2>
+      <p class="text-gray-500 text-lg">Explore costs in the world's most sought-after building markets</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="countriesGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ COMPARE ═══════════════════════ -->
+<section id="compare" class="py-24" style="background:#0a1929">
+  <div class="absolute inset-0 opacity-5" style="background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:60px 60px"></div>
+  <div class="max-w-4xl mx-auto px-6 relative">
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.7)">Country Cost Comparison</div>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Compare Construction<br><span class="gradient-text-light">Costs Worldwide</span></h2>
+      <p class="text-white/50 text-lg">See exactly how much you save building in one country vs another</p>
+    </div>
+
+    <div class="bg-white rounded-3xl p-8 mb-8" style="box-shadow:0 25px 60px rgba(0,0,0,.3)">
+      <div class="grid md:grid-cols-3 gap-6 items-end mb-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Build Location A</label>
+          <select id="compareA" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm font-medium focus:outline-none focus:border-emerald-400 transition-all"></select>
+        </div>
+        <div class="flex justify-center">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Build Location B</label>
+          <select id="compareB" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm font-medium focus:outline-none focus:border-emerald-400 transition-all"></select>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Floor Area (sqft)</label>
+          <input type="number" id="compareArea" value="2000" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:outline-none focus:border-emerald-400 transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Quality Tier</label>
+          <select id="compareQuality" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm font-medium focus:outline-none focus:border-emerald-400 transition-all">
+            <option value="economy">Economy</option>
+            <option value="standard" selected>Standard</option>
+            <option value="premium">Premium</option>
+            <option value="luxury">Ultra-Luxury</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="runComparison()" class="w-full text-white font-semibold py-4 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#0a1929,#243b53)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        Compare Countries
+      </button>
+    </div>
+
+    <div id="compareResults" class="hidden space-y-4">
+      <div id="savingsBanner" class="rounded-3xl p-6 text-white text-center" style="background:linear-gradient(135deg,#10b981,#0d9488)"></div>
+      <div class="grid md:grid-cols-2 gap-4" id="compareCards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ TOOLS ═══════════════════════ -->
+<section id="tools" class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+      <div>
+        <div class="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full mb-4" style="background:rgba(16,42,67,.05);color:#102a43">Additional Tools</div>
+        <h2 class="text-4xl font-bold tracking-tight" style="color:#102a43;letter-spacing:-.02em">Everything You Need<br>To Plan Your Build</h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <!-- Loan calculator -->
+      <div class="bg-white rounded-3xl p-7 border border-gray-100" style="box-shadow:0 4px 20px rgba(0,0,0,.06)">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:rgba(59,130,246,.1);color:#3b82f6"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div><h3 class="font-bold text-lg" style="color:#102a43">Home Loan Estimator</h3><p class="text-gray-400 text-sm">Calculate monthly mortgage payments</p></div>
+        </div>
+        <div class="space-y-4 mb-6">
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Loan Amount: <span id="loanAmtLabel" class="text-emerald-600">$300,000</span></label><input type="range" id="loanAmt" min="50000" max="3000000" step="10000" value="300000" class="w-full" oninput="calcLoan()"></div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Interest Rate: <span id="loanRateLabel" class="text-emerald-600">5.5%</span></label><input type="range" id="loanRate" min="1" max="15" step="0.1" value="5.5" class="w-full" oninput="calcLoan()"></div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Term: <span id="loanTermLabel" class="text-emerald-600">30 years</span></label><input type="range" id="loanTerm" min="5" max="30" step="5" value="30" class="w-full" oninput="calcLoan()"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="monthlyPayLabel" style="color:#10b981">$1,703</div><div class="text-xs text-gray-500 mt-1">Monthly</div></div>
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="totalPayLabel" style="color:#102a43">$613K</div><div class="text-xs text-gray-500 mt-1">Total</div></div>
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="totalIntLabel" style="color:#f59e0b">$313K</div><div class="text-xs text-gray-500 mt-1">Interest</div></div>
+        </div>
+      </div>
+
+      <!-- ROI calculator -->
+      <div class="bg-white rounded-3xl p-7 border border-gray-100" style="box-shadow:0 4px 20px rgba(0,0,0,.06)">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:rgba(16,185,129,.1);color:#10b981"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+          <div><h3 class="font-bold text-lg" style="color:#102a43">Property ROI Calculator</h3><p class="text-gray-400 text-sm">Forecast your investment returns</p></div>
+        </div>
+        <div class="space-y-4 mb-6">
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Build Cost: <span id="roiBuildLabel" class="text-emerald-600">$400,000</span></label><input type="range" id="roiBuild" min="50000" max="3000000" step="10000" value="400000" class="w-full" oninput="calcROI()"></div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Market Value: <span id="roiValueLabel" class="text-emerald-600">$600,000</span></label><input type="range" id="roiValue" min="100000" max="5000000" step="10000" value="600000" class="w-full" oninput="calcROI()"></div>
+          <div><label class="block text-sm font-semibold text-gray-700 mb-1">Annual Rent: <span id="roiRentLabel" class="text-emerald-600">$24,000</span></label><input type="range" id="roiRent" min="5000" max="200000" step="1000" value="24000" class="w-full" oninput="calcROI()"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="equityLabel" style="color:#10b981">$200K</div><div class="text-xs text-gray-500 mt-1">Equity Gain</div></div>
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="yieldLabel" style="color:#8b5cf6">6.0%</div><div class="text-xs text-gray-500 mt-1">Gross Yield</div></div>
+          <div class="bg-gray-50 rounded-2xl p-4 text-center"><div class="text-xl font-bold" id="paybackLabel" style="color:#f59e0b">16.7 yr</div><div class="text-xs text-gray-500 mt-1">Payback</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- More tools grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="premium-card bg-white rounded-2xl p-5 border border-gray-100 group cursor-pointer"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:rgba(236,72,153,.1);color:#ec4899"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="font-semibold text-sm mb-0.5" style="color:#102a43">Interior Design Cost</div><div class="text-gray-400 text-xs">Room-by-room estimates</div></div>
+      <div class="premium-card bg-white rounded-2xl p-5 border border-gray-100 group cursor-pointer"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:rgba(6,182,212,.1);color:#06b6d4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12.5C2 9.46 4.46 7 7.5 7h9C19.54 7 22 9.46 22 12.5S19.54 18 16.5 18h-9C4.46 18 2 15.54 2 12.5z"/></svg></div><div class="font-semibold text-sm mb-0.5" style="color:#102a43">Pool Cost Planner</div><div class="text-gray-400 text-xs">Pool installation costs</div></div>
+      <div class="premium-card bg-white rounded-2xl p-5 border border-gray-100 group cursor-pointer"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:rgba(245,158,11,.1);color:#f59e0b"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div><div class="font-semibold text-sm mb-0.5" style="color:#102a43">Solar Installation</div><div class="text-gray-400 text-xs">PV system estimates</div></div>
+      <div class="premium-card bg-white rounded-2xl p-5 border border-gray-100 group cursor-pointer"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:rgba(139,92,246,.1);color:#8b5cf6"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="font-semibold text-sm mb-0.5" style="color:#102a43">Smart Home Cost</div><div class="text-gray-400 text-xs">Automation & AV systems</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ CTA ═══════════════════════ -->
+<section class="py-24 relative overflow-hidden" style="background:linear-gradient(135deg,#0a1929,#102a43)">
+  <div class="absolute inset-0 opacity-10" style="background:radial-gradient(circle at 30% 50%,#10b981 0%,transparent 60%),radial-gradient(circle at 70% 50%,#0ea5e9 0%,transparent 60%)"></div>
+  <div class="max-w-4xl mx-auto px-6 text-center relative">
+    <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Start Planning Your<br>Dream Home Today</h2>
+    <p class="text-white/60 text-lg mb-8">Join thousands of homeowners who used HomeBudget to plan their construction budget with confidence.</p>
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <button onclick="scrollToEstimator()" class="btn-primary text-base px-8 py-4">Get Free Estimate</button>
+      <button onclick="scrollTo('#index')" class="btn-secondary text-base px-8 py-4">Explore Cost Index</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer style="background:#0a1929;border-top:1px solid rgba(255,255,255,.06)">
+  <div class="max-w-7xl mx-auto px-6 py-16">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-10 pb-12" style="border-bottom:1px solid rgba(255,255,255,.06)">
+      <div class="col-span-2 md:col-span-1">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#34d399,#059669)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <span class="text-white font-bold text-lg">Build<span style="color:#34d399">Wise</span></span>
+        </div>
+        <p class="text-sm leading-relaxed mb-4" style="color:rgba(255,255,255,.4)">The world's leading construction cost intelligence platform. Estimate building costs in 120+ countries.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Platform</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#estimator" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Cost Estimator</a></li>
+          <li><a href="#index" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Global Index</a></li>
+          <li><a href="#compare" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Compare Countries</a></li>
+          <li><a href="#tools" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Tools</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Top Markets</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">USA</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">India</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Malaysia</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">UAE</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Australia</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Resources</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#tools" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Loan Estimator</a></li>
+          <li><a href="#tools" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">ROI Calculator</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Cost Methodology</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4">Company</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">About</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">For Builders</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Partners</a></li>
+          <li><a href="#" class="text-sm hover:text-white transition-colors" style="color:rgba(255,255,255,.4)">Advertise</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-sm flex items-center gap-2" style="color:rgba(255,255,255,.25)">© 2024 HomeBudget. All rights reserved.</div>
+      <div class="flex items-center gap-6 text-sm" style="color:rgba(255,255,255,.25)">
+        <a href="#" class="hover:text-white transition-colors" style="color:rgba(255,255,255,.25)">Privacy Policy</a>
+        <a href="#" class="hover:text-white transition-colors" style="color:rgba(255,255,255,.25)">Terms</a>
+        <a href="#" class="hover:text-white transition-colors" style="color:rgba(255,255,255,.25)">Disclaimer</a>
+      </div>
+      <div class="text-xs" style="color:rgba(255,255,255,.18)">Estimates are indicative. Consult local professionals.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════ DATA ═══════════
+const COUNTRIES = [
+  {code:"US",name:"United States",flag:"🇺🇸",currency:"USD",symbol:"$",region:"North America",base:150,lux:3.5,prem:2.0,eco:0.6,cities:["New York","Los Angeles","Houston","Dallas","Miami","Chicago","Seattle"],img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&q=80"},
+  {code:"GB",name:"United Kingdom",flag:"🇬🇧",currency:"GBP",symbol:"£",region:"Europe",base:175,lux:4.0,prem:2.2,eco:0.65,cities:["London","Manchester","Birmingham","Edinburgh","Bristol"],img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80"},
+  {code:"AU",name:"Australia",flag:"🇦🇺",currency:"AUD",symbol:"A$",region:"Oceania",base:145,lux:3.8,prem:2.1,eco:0.65,cities:["Sydney","Melbourne","Brisbane","Perth","Adelaide"],img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80"},
+  {code:"CA",name:"Canada",flag:"🇨🇦",currency:"CAD",symbol:"C$",region:"North America",base:130,lux:3.5,prem:2.0,eco:0.6,cities:["Toronto","Vancouver","Montreal","Calgary","Ottawa"],img:"https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1920&q=80"},
+  {code:"IN",name:"India",flag:"🇮🇳",currency:"INR",symbol:"₹",region:"Asia",base:30,lux:5.0,prem:2.5,eco:0.55,cities:["Bangalore","Mumbai","Delhi","Chennai","Hyderabad","Pune"],img:"https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=1920&q=80"},
+  {code:"MY",name:"Malaysia",flag:"🇲🇾",currency:"MYR",symbol:"RM",region:"Asia",base:55,lux:4.0,prem:2.2,eco:0.6,cities:["Kuala Lumpur","Penang","Johor Bahru","Ipoh"],img:"https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=1920&q=80"},
+  {code:"SG",name:"Singapore",flag:"🇸🇬",currency:"SGD",symbol:"S$",region:"Asia",base:250,lux:4.5,prem:2.5,eco:0.7,cities:["Singapore City","Jurong","Tampines"],img:"https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1920&q=80"},
+  {code:"AE",name:"UAE",flag:"🇦🇪",currency:"AED",symbol:"AED",region:"Middle East",base:145,lux:6.0,prem:3.0,eco:0.65,cities:["Dubai","Abu Dhabi","Sharjah"],img:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1920&q=80"},
+  {code:"SA",name:"Saudi Arabia",flag:"🇸🇦",currency:"SAR",symbol:"SAR",region:"Middle East",base:110,lux:5.0,prem:2.5,eco:0.6,cities:["Riyadh","Jeddah","Mecca","Dammam"],img:"https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1920&q=80"},
+  {code:"DE",name:"Germany",flag:"🇩🇪",currency:"EUR",symbol:"€",region:"Europe",base:200,lux:3.5,prem:2.0,eco:0.7,cities:["Munich","Berlin","Hamburg","Frankfurt"],img:"https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&q=80"},
+  {code:"FR",name:"France",flag:"🇫🇷",currency:"EUR",symbol:"€",region:"Europe",base:185,lux:4.0,prem:2.2,eco:0.68,cities:["Paris","Lyon","Nice","Bordeaux"],img:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&q=80"},
+  {code:"JP",name:"Japan",flag:"🇯🇵",currency:"JPY",symbol:"¥",region:"Asia",base:160,lux:4.0,prem:2.2,eco:0.65,cities:["Tokyo","Osaka","Kyoto","Yokohama"],img:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1920&q=80"},
+  {code:"ZA",name:"South Africa",flag:"🇿🇦",currency:"ZAR",symbol:"R",region:"Africa",base:45,lux:4.0,prem:2.2,eco:0.55,cities:["Cape Town","Johannesburg","Durban"],img:"https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=1920&q=80"},
+  {code:"NZ",name:"New Zealand",flag:"🇳🇿",currency:"NZD",symbol:"NZ$",region:"Oceania",base:140,lux:3.5,prem:2.0,eco:0.65,cities:["Auckland","Wellington","Christchurch"],img:"https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1920&q=80"},
+  {code:"PH",name:"Philippines",flag:"🇵🇭",currency:"PHP",symbol:"₱",region:"Asia",base:35,lux:4.5,prem:2.3,eco:0.58,cities:["Manila","Cebu City","Davao","Makati"],img:"https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=1920&q=80"},
+  {code:"ID",name:"Indonesia",flag:"🇮🇩",currency:"IDR",symbol:"Rp",region:"Asia",base:40,lux:4.0,prem:2.2,eco:0.55,cities:["Jakarta","Bali","Surabaya","Bandung"],img:"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1920&q=80"},
+  {code:"TH",name:"Thailand",flag:"🇹🇭",currency:"THB",symbol:"฿",region:"Asia",base:50,lux:4.2,prem:2.3,eco:0.58,cities:["Bangkok","Phuket","Chiang Mai","Pattaya"],img:"https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=1920&q=80"},
+  {code:"QA",name:"Qatar",flag:"🇶🇦",currency:"QAR",symbol:"QR",region:"Middle East",base:180,lux:5.5,prem:3.0,eco:0.7,cities:["Doha","Lusail","Al Rayyan"],img:"https://images.unsplash.com/photo-1548802673-380ab8ebc7b7?w=1920&q=80"},
+  {code:"BR",name:"Brazil",flag:"🇧🇷",currency:"BRL",symbol:"R$",region:"South America",base:65,lux:4.5,prem:2.3,eco:0.58,cities:["São Paulo","Rio de Janeiro","Brasília"],img:"https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1920&q=80"},
+  {code:"MX",name:"Mexico",flag:"🇲🇽",currency:"MXN",symbol:"MX$",region:"North America",base:55,lux:4.0,prem:2.2,eco:0.58,cities:["Mexico City","Guadalajara","Cancun"],img:"https://images.unsplash.com/photo-1518638150340-f706e86654de?w=1920&q=80"},
+  {code:"IT",name:"Italy",flag:"🇮🇹",currency:"EUR",symbol:"€",region:"Europe",base:165,lux:4.5,prem:2.3,eco:0.65,cities:["Rome","Milan","Florence","Venice"],img:"https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1920&q=80"},
+  {code:"ES",name:"Spain",flag:"🇪🇸",currency:"EUR",symbol:"€",region:"Europe",base:140,lux:4.0,prem:2.2,eco:0.62,cities:["Madrid","Barcelona","Valencia","Seville"],img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80"},
+  {code:"CH",name:"Switzerland",flag:"🇨🇭",currency:"CHF",symbol:"CHF",region:"Europe",base:350,lux:4.0,prem:2.2,eco:0.7,cities:["Zurich","Geneva","Basel","Lausanne"],img:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80"},
+  {code:"SE",name:"Sweden",flag:"🇸🇪",currency:"SEK",symbol:"kr",region:"Europe",base:220,lux:3.5,prem:2.0,eco:0.68,cities:["Stockholm","Gothenburg","Malmö"],img:"https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=1920&q=80"},
+  {code:"NO",name:"Norway",flag:"🇳🇴",currency:"NOK",symbol:"kr",region:"Europe",base:280,lux:3.5,prem:2.0,eco:0.7,cities:["Oslo","Bergen","Trondheim"],img:"https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=1920&q=80"},
+  {code:"TR",name:"Turkey",flag:"🇹🇷",currency:"TRY",symbol:"₺",region:"Europe/Asia",base:65,lux:4.5,prem:2.3,eco:0.58,cities:["Istanbul","Ankara","Antalya","Bodrum"],img:"https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=1920&q=80"},
+  {code:"PT",name:"Portugal",flag:"🇵🇹",currency:"EUR",symbol:"€",region:"Europe",base:120,lux:4.0,prem:2.2,eco:0.62,cities:["Lisbon","Porto","Algarve"],img:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1920&q=80"},
+  {code:"GR",name:"Greece",flag:"🇬🇷",currency:"EUR",symbol:"€",region:"Europe",base:110,lux:4.0,prem:2.2,eco:0.6,cities:["Athens","Thessaloniki","Mykonos","Santorini"],img:"https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1920&q=80"},
+  {code:"KR",name:"South Korea",flag:"🇰🇷",currency:"KRW",symbol:"₩",region:"Asia",base:130,lux:3.8,prem:2.1,eco:0.62,cities:["Seoul","Busan","Incheon","Jeju"],img:"https://images.unsplash.com/photo-1578357078586-491adf1aa5ba?w=1920&q=80"},
+  {code:"VN",name:"Vietnam",flag:"🇻🇳",currency:"VND",symbol:"₫",region:"Asia",base:40,lux:4.0,prem:2.2,eco:0.55,cities:["Ho Chi Minh City","Hanoi","Da Nang"],img:"https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=1920&q=80"},
+  {code:"NG",name:"Nigeria",flag:"🇳🇬",currency:"NGN",symbol:"₦",region:"Africa",base:35,lux:5.0,prem:2.5,eco:0.55,cities:["Lagos","Abuja","Port Harcourt"],img:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1920&q=80"},
+  {code:"KE",name:"Kenya",flag:"🇰🇪",currency:"KES",symbol:"KSh",region:"Africa",base:40,lux:4.0,prem:2.2,eco:0.58,cities:["Nairobi","Mombasa","Kisumu"],img:"https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1920&q=80"},
+  {code:"EG",name:"Egypt",flag:"🇪🇬",currency:"EGP",symbol:"E£",region:"Africa",base:35,lux:4.5,prem:2.3,eco:0.55,cities:["Cairo","Alexandria","Hurghada"],img:"https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1920&q=80"},
+  {code:"BH",name:"Bahrain",flag:"🇧🇭",currency:"BHD",symbol:"BD",region:"Middle East",base:120,lux:4.5,prem:2.5,eco:0.65,cities:["Manama","Riffa","Muharraq"],img:"https://images.unsplash.com/photo-1568797629192-789acf8e4df3?w=1920&q=80"},
+  {code:"OM",name:"Oman",flag:"🇴🇲",currency:"OMR",symbol:"OMR",region:"Middle East",base:100,lux:4.0,prem:2.2,eco:0.62,cities:["Muscat","Salalah","Sohar"],img:"https://images.unsplash.com/photo-1548013146-72479768bada?w=1920&q=80"},
+  {code:"PK",name:"Pakistan",flag:"🇵🇰",currency:"PKR",symbol:"Rs",region:"Asia",base:25,lux:4.5,prem:2.3,eco:0.55,cities:["Karachi","Lahore","Islamabad"],img:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920&q=80"},
+  {code:"GH",name:"Ghana",flag:"🇬🇭",currency:"GHS",symbol:"₵",region:"Africa",base:35,lux:4.0,prem:2.2,eco:0.55,cities:["Accra","Kumasi","Tamale"],img:"https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1920&q=80"},
+  {code:"NL",name:"Netherlands",flag:"🇳🇱",currency:"EUR",symbol:"€",region:"Europe",base:210,lux:3.8,prem:2.1,eco:0.68,cities:["Amsterdam","Rotterdam","The Hague"],img:"https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?w=1920&q=80"},
+  {code:"IL",name:"Israel",flag:"🇮🇱",currency:"ILS",symbol:"₪",region:"Middle East",base:180,lux:4.0,prem:2.2,eco:0.68,cities:["Tel Aviv","Jerusalem","Haifa"],img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80"},
+  {code:"BD",name:"Bangladesh",flag:"🇧🇩",currency:"BDT",symbol:"৳",region:"Asia",base:22,lux:4.5,prem:2.3,eco:0.55,cities:["Dhaka","Chittagong","Sylhet"],img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=80"},
+];
+
+const EXCHANGE = {USD:1,GBP:0.79,EUR:0.92,AUD:1.55,CAD:1.36,INR:83.5,MYR:4.72,SGD:1.35,AED:3.67,SAR:3.75,JPY:149.5,KRW:1320,ZAR:18.7,NZD:1.63,PHP:56.8,IDR:15750,THB:35.4,QAR:3.64,BRL:4.97,MXN:17.2,CHF:0.89,SEK:10.5,NOK:10.8,TRY:30.5,ILS:3.72,VND:24500,PKR:278.5,KES:145,EGP:30.9,NGN:1500,GHS:12.5,BHD:0.376,OMR:0.385,DKK:6.88,HUF:360,CZK:22.5,PLN:3.95};
+
+const PROPERTY_TYPES=[
+  {id:"single-storey",label:"Single Storey",icon:"🏠",desc:"Ground floor only",mult:1.0},
+  {id:"double-storey",label:"Double Storey",icon:"🏡",desc:"Two floors",mult:1.15},
+  {id:"villa",label:"Villa",icon:"🏛️",desc:"Spacious standalone",mult:1.35},
+  {id:"luxury",label:"Luxury Home",icon:"💎",desc:"Ultra-premium finishes",mult:1.8},
+  {id:"apartment",label:"Apartment",icon:"🏢",desc:"Multi-unit building",mult:0.85},
+  {id:"duplex",label:"Duplex",icon:"🏘️",desc:"Two attached units",mult:1.08},
+  {id:"townhouse",label:"Townhouse",icon:"🏙️",desc:"Multi-level terraced",mult:1.05},
+];
+const QUALITY=[
+  {id:"economy",label:"Economy",icon:"💼",desc:"Basic materials, functional design",mult:"eco",grad:"from-slate-500 to-slate-600",color:"#64748b"},
+  {id:"standard",label:"Standard",icon:"🏆",desc:"Good quality, popular choices",mult:"base",grad:"from-blue-500 to-blue-600",color:"#3b82f6"},
+  {id:"premium",label:"Premium",icon:"⭐",desc:"High-end materials & premium finishes",mult:"prem",grad:"from-purple-500 to-purple-600",color:"#8b5cf6"},
+  {id:"luxury",label:"Ultra-Luxury",icon:"💎",desc:"World-class, no-expense-spared",mult:"lux",grad:"from-amber-500 to-orange-500",color:"#f59e0b"},
+];
+const GARAGES=[{id:"none",label:"No Garage",cost:0},{id:"single",label:"Single Car",cost:8000},{id:"double",label:"Double Car",cost:14000},{id:"triple",label:"Triple Car",cost:20000}];
+const FEATURES=[
+  {id:"pool",icon:"🏊",label:"Swimming Pool",desc:"In-ground pool with decking",cost:25000},
+  {id:"solar",icon:"☀️",label:"Solar Installation",desc:"6–10kW rooftop solar system",cost:15000},
+  {id:"smart",icon:"🤖",label:"Smart Home System",desc:"Automation, security & AV",cost:12000},
+  {id:"landscape",icon:"🌿",label:"Landscaping",desc:"Gardens, driveway, pathways",cost:8000},
+];
+const BREAKDOWN=[
+  {cat:"Foundation & Site",pct:12,color:"#1e3a5f"},
+  {cat:"Structural Frame",pct:21,color:"#2d5986"},
+  {cat:"Roofing",pct:7,color:"#10b981"},
+  {cat:"External Walls",pct:10,color:"#059669"},
+  {cat:"Windows & Doors",pct:6,color:"#0d9488"},
+  {cat:"Electrical",pct:8,color:"#f59e0b"},
+  {cat:"Plumbing",pct:7,color:"#d97706"},
+  {cat:"Flooring",pct:5,color:"#6d28d9"},
+  {cat:"Kitchen & Bathrooms",pct:9,color:"#7c3aed"},
+  {cat:"Painting & Finishing",pct:5,color:"#db2777"},
+  {cat:"Professional Fees",pct:6,color:"#be185d"},
+  {cat:"Contingency",pct:4,color:"#64748b"},
+];
+
+// ═══════════ STATE ═══════════
+let state = {
+  step:1,
+  country:null,
+  city:null,
+  propType:"single-storey",
+  quality:"standard",
+  area:1500,
+  areaUnit:"sqft",
+  beds:3,
+  baths:2,
+  garage:"single",
+  features:{pool:false,solar:false,smart:false,landscape:false},
+};
+let pieChart=null;
+
+// ═══════════ INIT ═══════════
+document.addEventListener('DOMContentLoaded',()=>{
+  renderCountryGrid();
+  renderPropertyGrid();
+  renderGarageGrid();
+  renderQualityGrid();
+  renderFeaturesGrid();
+  populateCompareDropdowns();
+  renderGlobalIndex();
+  renderFeaturedCountries();
+  initHeroSearch();
+  initNavScroll();
+  initCounterAnimation();
+  calcLoan();
+  calcROI();
+});
+
+function initNavScroll(){
+  window.addEventListener('scroll',()=>{
+    const nav=document.getElementById('navbar');
+    nav.classList.toggle('nav-scrolled',window.scrollY>30);
+  });
+}
+
+function initCounterAnimation(){
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.querySelectorAll('[data-count]').forEach(el=>{
+          animateCount(el,0,+el.dataset.count,el.dataset.suffix||'',1800);
+        });
+        observer.unobserve(e.target);
+      }
+    });
+  },{threshold:0.3});
+  document.getElementById('statsRow')&&observer.observe(document.getElementById('statsRow'));
+}
+
+function animateCount(el,start,end,suffix,duration){
+  let startTime=null;
+  const step=(timestamp)=>{
+    if(!startTime)startTime=timestamp;
+    const progress=Math.min((timestamp-startTime)/duration,1);
+    const eased=progress<0.5?2*progress*progress:1-Math.pow(-2*progress+2,2)/2;
+    const val=Math.round(start+(end-start)*eased);
+    el.textContent=(val>=1000?val.toLocaleString():val)+suffix;
+    if(progress<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function scrollToEstimator(){document.getElementById('estimator').scrollIntoView({behavior:'smooth'});}
+function scrollTo(id){document.querySelector(id)?.scrollIntoView({behavior:'smooth'});}
+
+// ═══════════ HERO SEARCH ═══════════
+function initHeroSearch(){
+  const input=document.getElementById('heroSearch');
+  const dd=document.getElementById('heroDropdown');
+  input.addEventListener('focus',()=>{renderHeroDropdown('');dd.classList.remove('hidden');});
+  input.addEventListener('input',()=>renderHeroDropdown(input.value));
+  document.addEventListener('click',(e)=>{if(!document.getElementById('heroSearchWrap').contains(e.target))dd.classList.add('hidden');});
+}
+function renderHeroDropdown(q){
+  const list=document.getElementById('countryList');
+  const label=document.getElementById('dropdownLabel');
+  const POPULAR=['US','IN','MY','AE','AU','GB','SG','CA','JP','DE'];
+  let countries=q?COUNTRIES.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).slice(0,8):COUNTRIES.filter(c=>POPULAR.includes(c.code));
+  label.textContent=q?`${countries.length} results`:'Popular Countries';
+  list.innerHTML=countries.map(c=>`
+    <button onclick="heroSelectCountry('${c.code}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-left group">
+      <span class="text-2xl">${c.flag}</span>
+      <div class="flex-1"><div class="font-semibold text-gray-900 text-sm">${c.name}</div><div class="text-xs text-gray-400">${c.region} · ${c.currency}</div></div>
+      <div class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">~$${c.base}/sqft</div>
+    </button>`).join('');
+}
+function heroSelectCountry(code){
+  const c=COUNTRIES.find(x=>x.code===code);
+  document.getElementById('heroSearch').value=c.flag+' '+c.name;
+  document.getElementById('heroDropdown').classList.add('hidden');
+  const bg=document.getElementById('heroBg');
+  bg.style.opacity='0';bg.style.transition='opacity .4s';
+  setTimeout(()=>{bg.style.backgroundImage=`url('${c.img}')`;bg.style.opacity='1';},400);
+  state.country=code;
+  renderCountryGrid();
+  scrollToEstimator();
+}
+
+// ═══════════ WIZARD RENDERING ═══════════
+function renderCountryGrid(){
+  const q=document.getElementById('countrySearch').value.toLowerCase();
+  let list=q?COUNTRIES.filter(c=>c.name.toLowerCase().includes(q)):COUNTRIES;
+  document.getElementById('countryGrid').innerHTML=list.slice(0,18).map(c=>`
+    <button onclick="selectCountry('${c.code}')" class="country-btn flex items-center gap-2.5 p-3 rounded-xl border-2 border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-all text-left ${state.country===c.code?'selected':''}">
+      <span class="text-xl">${c.flag}</span>
+      <div class="min-w-0"><div class="font-semibold text-xs text-gray-900 truncate">${c.name}</div><div class="text-[11px] text-gray-400">${c.currency}</div></div>
+    </button>`).join('');
+  document.getElementById('countrySearch').oninput=()=>renderCountryGrid();
+}
+function _oldSelectCountry_DISABLED(code){
+  state.country=code;state.city=null;
+  renderCountryGrid();
+  const c=COUNTRIES.find(x=>x.code===code);
+  const citySection=document.getElementById('citySection');
+  const cityGrid=document.getElementById('cityGrid');
+  if(c.cities.length){
+    citySection.classList.remove('hidden');
+    cityGrid.innerHTML=c.cities.map(city=>`
+      <button onclick="selectCity('${city}')" class="city-btn text-sm px-3.5 py-2 rounded-lg border border-gray-200 hover:border-gray-300 text-gray-600 transition-all ${state.city===city?'selected':''}">
+        ${city}</button>`).join('');
+  } else citySection.classList.add('hidden');
+  checkNext();
+}
+function selectCity(city){
+  state.city=city;
+  document.querySelectorAll('.city-btn').forEach(b=>{b.classList.toggle('selected',b.textContent.trim()===city);});
+}
+function renderPropertyGrid(){
+  document.getElementById('propertyGrid').innerHTML=PROPERTY_TYPES.map(p=>`
+    <button onclick="selectProp('${p.id}')" class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center ${state.propType===p.id?'step-active':'border-gray-100 hover:border-gray-200 hover:bg-gray-50'}">
+      <span class="text-3xl">${p.icon}</span>
+      <div><div class="font-semibold text-sm text-gray-900">${p.label}</div><div class="text-xs text-gray-400 mt-0.5">${p.desc}</div></div>
+    </button>`).join('');
+}
+function selectProp(id){state.propType=id;renderPropertyGrid();checkNext();}
+
+function renderGarageGrid(){
+  document.getElementById('garageGrid').innerHTML=GARAGES.map(g=>`
+    <button onclick="selectGarage('${g.id}')" class="px-4 py-2 rounded-lg border text-sm font-semibold transition-all ${state.garage===g.id?'border-emerald-400 bg-emerald-50 text-emerald-700':'border-gray-200 text-gray-500 hover:border-gray-300'}">
+      ${g.label}</button>`).join('');
+}
+function selectGarage(id){state.garage=id;renderGarageGrid();}
+
+function renderQualityGrid(){
+  const c=COUNTRIES.find(x=>x.code===state.country);
+  document.getElementById('qualityGrid').innerHTML=QUALITY.map(q=>`
+    <button onclick="selectQuality('${q.id}')" class="flex items-start gap-4 p-5 rounded-2xl border-2 transition-all text-left ${state.quality===q.id?'quality-active border-emerald-400 shadow-lg':'border-gray-100 hover:border-gray-200 hover:bg-gray-50'}">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:${q.color}20">${q.icon}</div>
+      <div>
+        <div class="font-bold text-gray-900">${q.label}</div>
+        <div class="text-sm text-gray-500 mt-0.5">${q.desc}</div>
+        ${c?`<div class="text-xs font-semibold mt-2" style="color:#10b981">~$${(q.mult==='eco'?c.eco:q.mult==='prem'?c.prem:q.mult==='lux'?c.lux:1)*c.base|0}/sqft in ${c.name}</div>`:''}
+      </div>
+    </button>`).join('');
+}
+function selectQuality(id){state.quality=id;renderQualityGrid();checkNext();}
+
+function renderFeaturesGrid(){
+  document.getElementById('featuresGrid').innerHTML=FEATURES.map(f=>`
+    <button onclick="toggleFeature('${f.id}')" class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all text-left ${state.features[f.id]?'feature-active border-emerald-400':'border-gray-100 hover:border-gray-200 hover:bg-gray-50'}">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 transition-colors ${state.features[f.id]?'bg-emerald-500':'bg-gray-100'}">${f.icon}</div>
+      <div class="flex-1"><div class="font-semibold text-sm text-gray-900">${f.label}</div><div class="text-xs text-gray-400 mt-0.5">${f.desc}</div><div class="text-xs font-semibold mt-1" style="color:#10b981">~$${f.cost.toLocaleString()} USD</div></div>
+      <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${state.features[f.id]?'border-emerald-500 bg-emerald-500':'border-gray-300'}">
+        ${state.features[f.id]?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>':''}
+      </div>
+    </button>`).join('');
+  updateSummary();
+}
+function toggleFeature(id){state.features[id]=!state.features[id];renderFeaturesGrid();}
+function updateSummary(){
+  const c=COUNTRIES.find(x=>x.code===state.country);
+  if(!c)return;
+  const summary=document.getElementById('summaryPreview');
+  const content=document.getElementById('summaryContent');
+  summary.classList.remove('hidden');
+  content.innerHTML=`
+    <div><span class="text-white/50">Country</span><div class="text-white font-semibold">${c.flag} ${c.name}</div></div>
+    ${state.city?`<div><span class="text-white/50">City</span><div class="text-white font-semibold">${state.city}</div></div>`:''}
+    <div><span class="text-white/50">Property</span><div class="text-white font-semibold capitalize">${state.propType.replace('-',' ')}</div></div>
+    <div><span class="text-white/50">Area</span><div class="text-white font-semibold">${state.area.toLocaleString()} ${state.areaUnit}</div></div>
+    <div><span class="text-white/50">Quality</span><div class="text-white font-semibold capitalize">${state.quality}</div></div>
+    <div><span class="text-white/50">Rooms</span><div class="text-white font-semibold">${state.beds} bed / ${state.baths} bath</div></div>`;
+}
+
+// ═══════════ WIZARD NAVIGATION ═══════════
+function checkNext(){
+  const ok=(state.step===1&&state.country)||(state.step===2&&state.propType)||(state.step===3&&state.area>0)||(state.step===4&&state.quality)||(state.step===5);
+  const btn=document.getElementById('nextBtn');
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'0.4';
+  btn.style.cursor=ok?'pointer':'not-allowed';
+}
+function updateProgressBar(){
+  document.querySelectorAll('[data-step]').forEach(s=>{
+    const n=+s.dataset.step;
+    const indicator=s.querySelector('.step-indicator');
+    if(!indicator)return;
+    if(n<state.step){
+      indicator.style.borderColor='#10b981';indicator.style.background='rgba(16,185,129,.2)';indicator.style.color='#10b981';
+      indicator.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      s.querySelector('.progress-line')?.style&&(s.querySelector('.progress-line').style.background='#10b981');
+    } else if(n===state.step){
+      indicator.style.borderColor='#10b981';indicator.style.background='rgba(16,185,129,.2)';indicator.style.color='#10b981';
+      indicator.textContent=n;
+    } else {
+      indicator.style.borderColor='rgba(255,255,255,.25)';indicator.style.background='transparent';indicator.style.color='rgba(255,255,255,.3)';
+      indicator.textContent=n;
+    }
+  });
+  document.getElementById('stepLabel').textContent=`Step ${state.step} of 5`;
+  const labels=['Location','Property','Size','Quality','Features'];
+  document.querySelectorAll('[data-step]').forEach(s=>{
+    const n=+s.dataset.step;
+    const span=s.querySelector('span');
+    if(span)span.style.color=n<=state.step?'#10b981':'rgba(255,255,255,.3)';
+  });
+}
+function showStep(n){
+  document.querySelectorAll('.step-content').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(`step${n}`)?.classList.remove('hidden');
+  const back=document.getElementById('backBtn');
+  back.disabled=n===1;back.style.opacity=n===1?'0.3':'1';back.style.cursor=n===1?'not-allowed':'pointer';
+  const next=document.getElementById('nextBtn');
+  if(n===5){next.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Get My Estimate';next.style.background='linear-gradient(135deg,#10b981,#059669)';next.style.boxShadow='0 4px 15px rgba(16,185,129,.3)';}
+  else{next.innerHTML='Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>';next.style.background='#0a1929';next.style.boxShadow='none';}
+  if(n===4)renderQualityGrid();
+  if(n===5)renderFeaturesGrid();
+  updateProgressBar();
+  checkNext();
+}
+function nextStep(){
+  if(state.step<5){state.step++;showStep(state.step);}
+  else runEstimate();
+}
+function prevStep(){if(state.step>1){state.step--;showStep(state.step);}}
+
+// ═══════════ COST ENGINE ═══════════
+function calcCost(){
+  const c=COUNTRIES.find(x=>x.code===state.country);
+  if(!c)return null;
+  const pt=PROPERTY_TYPES.find(x=>x.id===state.propType);
+  const qMult=state.quality==='eco'||state.quality==='economy'?c.eco:state.quality==='premium'?c.prem:state.quality==='luxury'?c.lux:1;
+  let areaSqft=state.areaUnit==='sqm'?state.area*10.764:state.area;
+  let base=c.base*qMult*pt.mult;
+  base*=(1+(Math.max(0,state.beds-3)*.015+Math.max(0,state.baths-2)*.02));
+  let total=base*areaSqft;
+  const garageCost=GARAGES.find(x=>x.id===state.garage).cost;
+  total+=garageCost*qMult;
+  FEATURES.forEach(f=>{if(state.features[f.id])total+=f.cost*qMult;});
+  const rate=EXCHANGE[c.currency]||1;
+  const LAKH_CURRENCIES=['INR','PKR','BDT','NPR','LKR'];
+  const fmtLocal=(usd)=>{
+    const l=usd*rate;
+    if(LAKH_CURRENCIES.includes(c.currency)){
+      if(l>=1e7)return c.symbol+(l/1e7).toFixed(2)+' Cr';
+      if(l>=1e5)return c.symbol+(l/1e5).toFixed(2)+' L';
+      if(l>=1e3)return c.symbol+Math.round(l/1e3)+'K';
+      return c.symbol+Math.round(l).toLocaleString();
+    }
+    if(l>=1e9)return c.symbol+(l/1e9).toFixed(2)+'B';
+    if(l>=1e6)return c.symbol+(l/1e6).toFixed(2)+'M';
+    if(l>=1e3)return c.symbol+Math.round(l/1e3)+'K';
+    return c.symbol+Math.round(l).toLocaleString();
+  };
+  const fmtFull=(usd)=>c.symbol+Math.round(usd*rate).toLocaleString();
+  const monthlyPayment=(total*.8)*((0.055/12)*Math.pow(1+0.055/12,360))/(Math.pow(1+0.055/12,360)-1);
+  const areaSqm=areaSqft/10.764;
+  const buildTime=c.code==='SG'?'20–26 months':areaSqft>5000?'18–24 months':areaSqft>3000?'14–18 months':'10–14 months';
+  return{total,totalLocal:fmtLocal(total),totalFull:fmtFull(total),perSqft:total/areaSqft,perSqm:total/areaSqm,perSqftLocal:fmtFull(total/areaSqft),perSqmLocal:fmtFull(total/areaSqm),monthly:monthlyPayment,monthlyLocal:fmtLocal(monthlyPayment),buildTime,currency:c.currency,symbol:c.symbol,rate,country:c,areaSqft,quality:state.quality,minTotal:total*.85,maxTotal:total*1.15,fmtFull,fmtLocal};
+}
+
+function _oldRunEstimate_DISABLED(){
+  const r=calcCost();if(!r)return;
+  document.getElementById('wizardCard').classList.add('hidden');
+  const card=document.getElementById('resultsCard');card.classList.remove('hidden');
+  card.style.opacity='0';card.style.transform='translateY(30px)';
+  setTimeout(()=>{card.style.transition='all .7s cubic-bezier(.22,1,.36,1)';card.style.opacity='1';card.style.transform='translateY(0)';},50);
+
+  const qLabel={economy:'Economy',standard:'Standard',premium:'Premium',luxury:'Ultra-Luxury'}[state.quality];
+  document.getElementById('resultTitle').textContent=`${qLabel} Home in ${state.city||r.country.name}`;
+  document.getElementById('resultSubtitle').textContent=`${Math.round(r.areaSqft).toLocaleString()} sqft · ${qLabel} Quality`;
+  document.getElementById('currencyLabel').textContent=r.currency;
+  document.getElementById('usdEquiv').textContent=`$${Math.round(r.total).toLocaleString()} USD`;
+  document.getElementById('costPerSqft').textContent=r.perSqftLocal;
+  document.getElementById('costPerSqm').textContent=r.perSqmLocal;
+  document.getElementById('monthlyLoan').textContent=r.monthlyLocal;
+  document.getElementById('buildTime').textContent=r.buildTime;
+  document.getElementById('rangeLabel').textContent=`Range: ${r.fmtLocal(r.minTotal)} – ${r.fmtLocal(r.maxTotal)} ${r.currency}`;
+
+  // Animate total
+  animateCountStr(document.getElementById('totalCostDisplay'),0,r.total*r.rate,r.symbol,r.currency,1800);
+
+  // Breakdown
+  renderBreakdown(r);
+  renderLoanSummary(r);
+  renderMaterials(r);
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+const _LAKH_CUR=['INR','PKR','BDT','NPR','LKR'];
+function animateCountStr(el,start,end,prefix,currency,duration){
+  let startTime=null;
+  const useLakh=_LAKH_CUR.includes(currency);
+  const step=(t)=>{
+    if(!startTime)startTime=t;
+    const p=Math.min((t-startTime)/duration,1);
+    const ease=p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const val=start+(end-start)*ease;
+    let display;
+    if(useLakh){
+      if(val>=1e7)display=prefix+(val/1e7).toFixed(2)+' Cr';
+      else if(val>=1e5)display=prefix+(val/1e5).toFixed(2)+' L';
+      else if(val>=1e3)display=prefix+Math.round(val/1e3)+'K';
+      else display=prefix+Math.round(val).toLocaleString();
+    } else {
+      if(val>=1e9)display=prefix+(val/1e9).toFixed(2)+'B';
+      else if(val>=1e6)display=prefix+(val/1e6).toFixed(2)+'M';
+      else if(val>=1e3)display=prefix+Math.round(val/1e3)+'K';
+      else display=prefix+Math.round(val).toLocaleString();
+    }
+    el.textContent=display;
+    if(p<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+function renderBreakdown(r){
+  const data=BREAKDOWN.map(b=>({...b,cost:r.total*b.pct/100}));
+  // Pie chart
+  if(pieChart)pieChart.destroy();
+  const ctx=document.getElementById('pieChart').getContext('2d');
+  pieChart=new Chart(ctx,{type:'doughnut',data:{labels:data.map(b=>b.cat),datasets:[{data:data.map(b=>b.pct),backgroundColor:data.map(b=>b.color),borderWidth:0,hoverOffset:8}]},options:{responsive:true,cutout:'55%',plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>`${c.label}: ${c.parsed}% (~${r.fmtLocal(r.total*c.parsed/100)})`}}}}});
+  // Bars
+  document.getElementById('breakdownBars').innerHTML=data.slice(0,8).map((b,i)=>`
+    <div class="flex items-center gap-3" style="animation:fadeUp .5s ${i*.05}s both">
+      <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${b.color}"></div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-medium text-gray-700 truncate">${b.cat}</span>
+          <span class="text-xs font-bold text-gray-900 ml-2 flex-shrink-0">${r.fmtLocal(b.cost)}</span>
+        </div>
+        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full rounded-full bar-fill" style="width:0%;background:${b.color}" data-width="${b.pct}"></div>
+        </div>
+      </div>
+      <span class="text-xs text-gray-400 w-7 text-right flex-shrink-0">${b.pct}%</span>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.width+'%'),100);
+}
+
+function renderLoanSummary(r){
+  const down=r.total*.2;const loan=r.total*.8;
+  document.getElementById('loanGrid').innerHTML=`
+    <div class="bg-white rounded-2xl p-4"><div class="text-xs text-gray-500 mb-1">Property Value</div><div class="font-bold text-gray-900">${r.fmtLocal(r.total)}</div></div>
+    <div class="bg-white rounded-2xl p-4"><div class="text-xs text-gray-500 mb-1">Down Payment (20%)</div><div class="font-bold text-gray-900">${r.fmtLocal(down)}</div></div>
+    <div class="bg-white rounded-2xl p-4"><div class="text-xs text-gray-500 mb-1">Loan Amount</div><div class="font-bold text-gray-900">${r.fmtLocal(loan)}</div></div>
+    <div class="bg-white rounded-2xl p-4"><div class="text-xs text-gray-500 mb-1">Monthly Payment</div><div class="font-bold" style="color:#10b981">${r.monthlyLocal}</div></div>`;
+}
+
+function resetEstimator(){
+  state={step:1,country:null,city:null,propType:'single-storey',quality:'standard',area:1500,areaUnit:'sqft',beds:3,baths:2,garage:'single',features:{pool:false,solar:false,smart:false,landscape:false}};
+  document.getElementById('resultsCard').classList.add('hidden');
+  document.getElementById('wizardCard').classList.remove('hidden');
+  showStep(1);renderCountryGrid();renderPropertyGrid();renderGarageGrid();
+  document.getElementById('areaSlider').value=1500;
+  document.getElementById('areaInput').value=1500;
+  document.getElementById('bedroomCount').textContent=3;
+  document.getElementById('bathroomCount').textContent=2;
+  document.getElementById('citySection').classList.add('hidden');
+  document.getElementById('stateSection').classList.add('hidden');
+  checkNext();
+}
+
+function setUnit(unit){
+  const cur=state.area;
+  if(unit===state.areaUnit)return;
+  state.areaUnit=unit;
+  const converted=unit==='sqm'?Math.round(cur/10.764):Math.round(cur*10.764);
+  state.area=converted;
+  document.getElementById('areaSlider').min=unit==='sqft'?400:40;
+  document.getElementById('areaSlider').max=unit==='sqft'?15000:1400;
+  document.getElementById('areaSlider').value=converted;
+  document.getElementById('areaInput').value=converted;
+  document.getElementById('areaUnitLabel').textContent=unit;
+  document.getElementById('btnSqft').style.borderColor=unit==='sqft'?'#10b981':'#e5e7eb';
+  document.getElementById('btnSqft').style.background=unit==='sqft'?'#ecfdf5':'white';
+  document.getElementById('btnSqft').style.color=unit==='sqft'?'#059669':'#6b7280';
+  document.getElementById('btnSqm').style.borderColor=unit==='sqm'?'#10b981':'#e5e7eb';
+  document.getElementById('btnSqm').style.background=unit==='sqm'?'#ecfdf5':'white';
+  document.getElementById('btnSqm').style.color=unit==='sqm'?'#059669':'#6b7280';
+}
+function updateArea(v){state.area=+v;document.getElementById('areaInput').value=v;}
+function updateAreaFromInput(v){state.area=+v;document.getElementById('areaSlider').value=v;}
+function adjustRoom(type,delta){
+  if(type==='bed'){state.beds=Math.max(1,Math.min(10,state.beds+delta));document.getElementById('bedroomCount').textContent=state.beds;}
+  else{state.baths=Math.max(1,Math.min(10,state.baths+delta));document.getElementById('bathroomCount').textContent=state.baths;}
+}
+
+// ═══════════ GLOBAL INDEX ═══════════
+function renderGlobalIndex(){
+  const sorted=[...COUNTRIES].sort((a,b)=>a.base-b.base);
+  const cheapest=sorted.slice(0,6);
+  const expensive=sorted.slice(-6).reverse();
+  const fmt=(list,cheap)=>`
+    <div class="space-y-3">
+    ${list.map((c,i)=>`
+      <div class="flex items-center gap-3 hover:bg-gray-50 p-2 -mx-2 rounded-xl transition-colors cursor-pointer" onclick="heroSelectCountry('${c.code}');scrollToEstimator()">
+        <span class="text-gray-300 text-xs font-bold w-4">${i+1}</span>
+        <span class="text-2xl">${c.flag}</span>
+        <div class="flex-1"><div class="font-semibold text-gray-900 text-sm">${c.name}</div><div class="text-xs text-gray-400">${c.region}</div></div>
+        <div class="text-right">
+          <div class="font-bold text-sm" style="color:${cheap?'#10b981':'#d97706'}">$${c.base}/sqft</div>
+          <div class="text-xs text-gray-400">$${Math.round(c.base*10.764)}/sqm</div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  document.getElementById('cheapestList').innerHTML=fmt(cheapest,true);
+  document.getElementById('expensiveList').innerHTML=fmt(expensive,false);
+}
+
+// ═══════════ FEATURED COUNTRIES ═══════════
+function renderFeaturedCountries(){
+  const FEATURED=['US','IN','MY','AE','AU','SG','GB','DE','JP','ZA','BR','CA'];
+  const countries=COUNTRIES.filter(c=>FEATURED.includes(c.code));
+  document.getElementById('countriesGrid').innerHTML=countries.map(c=>`
+    <div onclick="heroSelectCountry('${c.code}');scrollToEstimator()" class="group relative rounded-2xl overflow-hidden cursor-pointer" style="aspect-ratio:4/3">
+      <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image:url('${c.img}')"></div>
+      <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(10,25,41,.82) 0%,rgba(10,25,41,.15) 60%,transparent 100%)"></div>
+      <div class="absolute inset-0 p-4 flex flex-col justify-end">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xl">${c.flag}</span>
+          <span class="text-white font-bold text-sm">${c.name}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-white/60 text-xs">${c.cities.slice(0,2).join(', ')}</span>
+          <span class="font-bold text-xs" style="color:#34d399">$${c.base}/sqft</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════ COMPARE ═══════════
+function populateCompareDropdowns(){
+  const optsA=COUNTRIES.map(c=>`<option value="${c.code}" ${c.code==='US'?'selected':''}>${c.flag} ${c.name}</option>`).join('');
+  const optsB=COUNTRIES.map(c=>`<option value="${c.code}" ${c.code==='MY'?'selected':''}>${c.flag} ${c.name}</option>`).join('');
+  document.getElementById('compareA').innerHTML=optsA;
+  document.getElementById('compareB').innerHTML=optsB;
+}
+function runComparison(){
+  const codeA=document.getElementById('compareA').value;
+  const codeB=document.getElementById('compareB').value;
+  const area=+document.getElementById('compareArea').value||2000;
+  const q=document.getElementById('compareQuality').value;
+  const calcFor=(code)=>{
+    const c=COUNTRIES.find(x=>x.code===code);
+    const qm=q==='economy'?c.eco:q==='premium'?c.prem:q==='luxury'?c.lux:1;
+    const total=c.base*qm*area;
+    const rate=EXCHANGE[c.currency]||1;
+    const monthly=total*.8*((0.055/12)*Math.pow(1+0.055/12,360))/(Math.pow(1+0.055/12,360)-1);
+    const fmtL=(u)=>{const l=u*rate;if(l>=1e6)return c.symbol+(l/1e6).toFixed(2)+'M';if(l>=1e3)return c.symbol+Math.round(l/1e3)+'K';return c.symbol+Math.round(l).toLocaleString();};
+    return{c,total,totalLocal:fmtL(total),perSqft:fmtL(total/area),monthly:fmtL(monthly)};
+  };
+  const a=calcFor(codeA),b=calcFor(codeB);
+  const savings=Math.abs(a.total-b.total);
+  const cheaper=a.total<b.total?a.c:b.c;
+  const savingsPct=Math.round(savings/Math.max(a.total,b.total)*100);
+  document.getElementById('savingsBanner').innerHTML=`
+    <div class="text-white/80 text-sm mb-1">Potential Savings</div>
+    <div class="text-4xl font-bold mb-1">$${Math.round(savings).toLocaleString()} USD</div>
+    <div class="text-white/80">Building in <strong>${cheaper.name}</strong> is cheaper by ${savingsPct}%</div>`;
+  document.getElementById('compareCards').innerHTML=[a,b].map(({c,totalLocal,perSqft,monthly,total})=>`
+    <div class="bg-white rounded-3xl p-6 border border-gray-100" style="box-shadow:0 4px 20px rgba(0,0,0,.08)">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-3xl">${c.flag}</span>
+        <div><div class="font-bold" style="color:#102a43">${c.name}</div><div class="text-gray-400 text-xs">${c.currency} · ${q} quality</div></div>
+      </div>
+      <div class="text-3xl font-bold mb-4" style="color:#102a43">${totalLocal}</div>
+      <div class="space-y-2 text-sm">
+        ${[['USD Equivalent','$'+Math.round(total).toLocaleString()],['Per sqft (local)',perSqft],['Monthly Loan Est.',monthly],['Build Area',area.toLocaleString()+' sqft']].map(([l,v])=>`
+        <div class="flex justify-between py-2 border-b border-gray-50">
+          <span class="text-gray-500">${l}</span><span class="font-semibold" style="color:#102a43">${v}</span>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('compareResults').classList.remove('hidden');
+  document.getElementById('compareResults').style.opacity='0';
+  setTimeout(()=>{document.getElementById('compareResults').style.transition='opacity .5s';document.getElementById('compareResults').style.opacity='1';},50);
+}
+
+// ═══════════ TOOLS ═══════════
+function calcLoan(){
+  const amt=+document.getElementById('loanAmt').value;
+  const rate=+document.getElementById('loanRate').value/100/12;
+  const n=+document.getElementById('loanTerm').value*12;
+  const monthly=amt*(rate*Math.pow(1+rate,n))/(Math.pow(1+rate,n)-1);
+  const total=monthly*n;
+  document.getElementById('loanAmtLabel').textContent='$'+amt.toLocaleString();
+  document.getElementById('loanRateLabel').textContent=document.getElementById('loanRate').value+'%';
+  document.getElementById('loanTermLabel').textContent=document.getElementById('loanTerm').value+' years';
+  document.getElementById('monthlyPayLabel').textContent='$'+Math.round(monthly).toLocaleString();
+  const t=total;document.getElementById('totalPayLabel').textContent=t>=1e6?'$'+(t/1e6).toFixed(2)+'M':'$'+Math.round(t/1e3)+'K';
+  const interest=total-amt;document.getElementById('totalIntLabel').textContent=interest>=1e6?'$'+(interest/1e6).toFixed(2)+'M':'$'+Math.round(interest/1e3)+'K';
+}
+function calcROI(){
+  const build=+document.getElementById('roiBuild').value;
+  const value=+document.getElementById('roiValue').value;
+  const rent=+document.getElementById('roiRent').value;
+  document.getElementById('roiBuildLabel').textContent='$'+build.toLocaleString();
+  document.getElementById('roiValueLabel').textContent='$'+value.toLocaleString();
+  document.getElementById('roiRentLabel').textContent='$'+rent.toLocaleString();
+  const equity=value-build;
+  document.getElementById('equityLabel').textContent=equity>=1e6?'$'+(equity/1e6).toFixed(2)+'M':'$'+Math.round(equity/1e3)+'K';
+  document.getElementById('yieldLabel').textContent=(rent/build*100).toFixed(1)+'%';
+  document.getElementById('paybackLabel').textContent=(build/rent).toFixed(1)+' yr';
+}
+
+// Init step check
+checkNext();
+
+// ═══════════ STATES DATA ═══════════
+const STATES = {
+  MY:[{n:"Kuala Lumpur",m:1.18},{n:"Selangor",m:1.12},{n:"Penang",m:1.08},{n:"Johor",m:1.02},{n:"Sarawak",m:0.95},{n:"Sabah",m:0.93},{n:"Perak",m:0.97},{n:"Kedah",m:0.91},{n:"Pahang",m:0.92},{n:"Melaka",m:0.99},{n:"Negeri Sembilan",m:1.0},{n:"Terengganu",m:0.88}],
+  IN:[{n:"Maharashtra",m:1.12},{n:"Karnataka",m:1.08},{n:"Tamil Nadu",m:1.05},{n:"Delhi NCR",m:1.15},{n:"Telangana",m:1.06},{n:"Rajasthan",m:0.92},{n:"Gujarat",m:1.0},{n:"Punjab",m:0.96},{n:"Uttar Pradesh",m:0.88},{n:"West Bengal",m:0.93},{n:"Kerala",m:1.04},{n:"Haryana",m:1.08}],
+  US:[{n:"California",m:1.42},{n:"New York",m:1.38},{n:"Texas",m:1.05},{n:"Florida",m:1.08},{n:"Washington",m:1.22},{n:"Colorado",m:1.18},{n:"Illinois",m:1.12},{n:"Georgia",m:0.98},{n:"Arizona",m:1.02},{n:"Nevada",m:1.06},{n:"Oregon",m:1.15},{n:"North Carolina",m:0.96}],
+  GB:[{n:"England – London",m:1.55},{n:"England – South East",m:1.25},{n:"England – Midlands",m:1.05},{n:"England – North",m:0.95},{n:"Scotland",m:1.02},{n:"Wales",m:0.92},{n:"Northern Ireland",m:0.88}],
+  AU:[{n:"New South Wales",m:1.18},{n:"Victoria",m:1.12},{n:"Queensland",m:1.02},{n:"Western Australia",m:1.06},{n:"South Australia",m:0.97},{n:"Tasmania",m:0.95},{n:"ACT",m:1.14}],
+  CA:[{n:"British Columbia",m:1.25},{n:"Ontario",m:1.18},{n:"Alberta",m:1.10},{n:"Quebec",m:1.02},{n:"Saskatchewan",m:0.95},{n:"Manitoba",m:0.96},{n:"Nova Scotia",m:0.90}],
+  AE:[{n:"Dubai",m:1.22},{n:"Abu Dhabi",m:1.18},{n:"Sharjah",m:0.98},{n:"Ras Al Khaimah",m:0.90},{n:"Fujairah",m:0.88},{n:"Ajman",m:0.87}],
+  DE:[{n:"Bavaria",m:1.22},{n:"Baden-Württemberg",m:1.18},{n:"Berlin",m:1.10},{n:"Hamburg",m:1.15},{n:"North Rhine-Westphalia",m:0.98},{n:"Hesse",m:1.05}],
+  SG:[{n:"Central Region",m:1.20},{n:"East Region",m:1.08},{n:"West Region",m:1.05},{n:"North Region",m:0.98},{n:"North-East Region",m:1.02}],
+  NZ:[{n:"Auckland",m:1.20},{n:"Wellington",m:1.10},{n:"Canterbury",m:1.02},{n:"Otago",m:0.96},{n:"Waikato",m:0.98}],
+  ZA:[{n:"Gauteng",m:1.10},{n:"Western Cape",m:1.15},{n:"KwaZulu-Natal",m:0.98},{n:"Eastern Cape",m:0.88},{n:"Limpopo",m:0.82}],
+  JP:[{n:"Tokyo",m:1.38},{n:"Osaka",m:1.15},{n:"Kyoto",m:1.12},{n:"Fukuoka",m:1.02},{n:"Hokkaido",m:0.95},{n:"Aichi",m:1.08}],
+  FR:[{n:"Île-de-France (Paris)",m:1.40},{n:"Provence-Alpes",m:1.15},{n:"Auvergne-Rhône",m:1.08},{n:"Occitanie",m:0.98},{n:"Hauts-de-France",m:0.92}],
+  PH:[{n:"Metro Manila",m:1.20},{n:"Cebu",m:1.05},{n:"Davao",m:0.96},{n:"Pampanga",m:0.98},{n:"Batangas",m:0.94}],
+  TH:[{n:"Bangkok",m:1.18},{n:"Chiang Mai",m:0.95},{n:"Phuket",m:1.12},{n:"Chonburi",m:1.05},{n:"Nonthaburi",m:1.08}],
+};
+let stateMultiplier = 1.0;
+
+function selectCountry(code){
+  state.country=code;state.city=null;stateMultiplier=1.0;
+  renderCountryGrid();
+  const c=COUNTRIES.find(x=>x.code===code);
+  const stateSection=document.getElementById('stateSection');
+  const stateGrid=document.getElementById('stateGrid');
+  const citySection=document.getElementById('citySection');
+
+  if(STATES[code]){
+    stateSection.classList.remove('hidden');
+    stateGrid.innerHTML=STATES[code].map(s=>`
+      <button onclick="selectState('${code}','${s.n}',${s.m})" class="state-btn text-sm px-3.5 py-2 rounded-lg border border-gray-200 hover:border-emerald-300 text-gray-600 transition-all" data-state="${s.n}">
+        ${s.n}</button>`).join('');
+  } else stateSection.classList.add('hidden');
+
+  if(c.cities.length){
+    citySection.classList.remove('hidden');
+    citySection.querySelector('label').innerHTML='Select City <span class="text-gray-400 font-normal">(optional)</span>';
+    document.getElementById('cityGrid').innerHTML=c.cities.map(city=>`
+      <button onclick="selectCity('${city}')" class="city-btn text-sm px-3.5 py-2 rounded-lg border border-gray-200 hover:border-gray-300 text-gray-600 transition-all ${state.city===city?'selected':''}">
+        ${city}</button>`).join('');
+  } else citySection.classList.add('hidden');
+  checkNext();
+}
+
+function selectState(code,name,mult){
+  stateMultiplier=mult;
+  document.querySelectorAll('.state-btn').forEach(b=>{
+    const active=b.dataset.state===name;
+    b.style.borderColor=active?'#10b981':'';
+    b.style.background=active?'#ecfdf5':'';
+    b.style.color=active?'#059669':'';
+    b.style.fontWeight=active?'700':'';
+  });
+}
+
+// ═══════════ SUB-BREAKDOWN DATA ═══════════
+const SUB_BREAKDOWN = [
+  {cat:"Foundation & Site",pct:12,color:"#1e3a5f",icon:"⛏️",items:[
+    {n:"Site survey & preparation",p:2.5},{n:"Excavation & earthworks",p:3.5},{n:"Concrete footings & slab",p:4.0},{n:"Drainage & waterproofing",p:2.0}]},
+  {cat:"Structural Frame",pct:21,color:"#2d5986",icon:"🏗️",items:[
+    {n:"Steel / timber framework",p:7.0},{n:"Concrete columns & beams",p:6.5},{n:"Upper floor slabs",p:4.5},{n:"Structural connections",p:3.0}]},
+  {cat:"Roofing",pct:7,color:"#10b981",icon:"🏠",items:[
+    {n:"Roof frame & trusses",p:2.5},{n:"Tiles or metal sheeting",p:2.5},{n:"Insulation",p:1.0},{n:"Guttering & downpipes",p:1.0}]},
+  {cat:"External Walls",pct:10,color:"#059669",icon:"🧱",items:[
+    {n:"Brick / blockwork / cladding",p:4.5},{n:"External render & finish",p:2.5},{n:"Cavity insulation",p:1.5},{n:"External painting",p:1.5}]},
+  {cat:"Windows & Doors",pct:6,color:"#0d9488",icon:"🚪",items:[
+    {n:"Window frames & glazing",p:3.0},{n:"External doors",p:1.5},{n:"Internal doors & frames",p:1.0},{n:"Hardware & locks",p:0.5}]},
+  {cat:"Electrical",pct:8,color:"#f59e0b",icon:"⚡",items:[
+    {n:"Main switchboard & wiring",p:2.5},{n:"Power points & lighting circuits",p:2.0},{n:"Lighting fixtures",p:1.5},{n:"Data & communication cabling",p:2.0}]},
+  {cat:"Plumbing",pct:7,color:"#d97706",icon:"🚿",items:[
+    {n:"Water supply lines",p:2.0},{n:"Waste & sewer pipes",p:2.0},{n:"Hot water system",p:1.5},{n:"Fixtures (taps, toilets, sinks)",p:1.5}]},
+  {cat:"Flooring",pct:5,color:"#6d28d9",icon:"🪵",items:[
+    {n:"Screed / sub-floor prep",p:1.5},{n:"Tiles / timber / carpet",p:2.5},{n:"Underlay & adhesives",p:1.0}]},
+  {cat:"Kitchen & Bathrooms",pct:9,color:"#7c3aed",icon:"🍳",items:[
+    {n:"Kitchen cabinetry & benchtops",p:3.5},{n:"Bathroom vanities & screens",p:2.5},{n:"Appliances (oven, hood, dishwasher)",p:2.0},{n:"Wet area tiling",p:1.0}]},
+  {cat:"Painting & Finishing",pct:5,color:"#db2777",icon:"🎨",items:[
+    {n:"Internal painting (walls & ceilings)",p:2.5},{n:"Cornice, skirting & architraves",p:1.5},{n:"Touch-ups & final clean",p:1.0}]},
+  {cat:"Professional Fees",pct:6,color:"#be185d",icon:"📋",items:[
+    {n:"Architect & design fees",p:2.0},{n:"Engineering consultants",p:1.5},{n:"Council permits & approvals",p:1.5},{n:"Project management",p:1.0}]},
+  {cat:"Contingency",pct:4,color:"#64748b",icon:"🛡️",items:[
+    {n:"Unexpected site conditions",p:1.5},{n:"Material price variations",p:1.5},{n:"Scope changes buffer",p:1.0}]},
+];
+
+function renderSubBreakdown(r) {
+  document.getElementById('subBreakdown').innerHTML = SUB_BREAKDOWN.map((b, i) => {
+    const catCost = r.total * b.pct / 100;
+    return `
+    <div class="rounded-2xl border border-gray-100 overflow-hidden transition-all" id="sb_wrap_${i}">
+      <button onclick="toggleSub(${i})" class="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left">
+        <span class="text-xl w-8 flex-shrink-0">${b.icon}</span>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-sm" style="color:#102a43">${b.cat}</span>
+            <span class="font-bold text-sm ml-2 flex-shrink-0" style="color:#102a43">${r.fmtLocal(catCost)}</span>
+          </div>
+          <div class="h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+            <div class="h-full rounded-full transition-all" style="width:${b.pct*4}%;background:${b.color}"></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 ml-3 flex-shrink-0">
+          <span class="text-xs text-gray-400 font-medium">${b.pct}%</span>
+          <svg id="sb_arrow_${i}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" class="transition-transform"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </button>
+      <div id="sb_items_${i}" class="hidden border-t border-gray-50 divide-y divide-gray-50">
+        ${b.items.map(item => {
+          const itemCost = r.total * item.p / 100;
+          return `<div class="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+            <div class="flex items-center gap-2.5">
+              <div class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${b.color}80"></div>
+              <span class="text-sm text-gray-600">${item.n}</span>
+            </div>
+            <div class="text-right ml-4 flex-shrink-0">
+              <span class="text-sm font-semibold" style="color:#374151">${r.fmtLocal(itemCost)}</span>
+              <span class="text-xs text-gray-400 ml-1">${item.p}%</span>
+            </div>
+          </div>`;
+        }).join('')}
+        <div class="flex items-center justify-between px-5 py-2.5" style="background:#f8fafc">
+          <span class="text-xs font-semibold text-gray-500">Category Total</span>
+          <span class="text-sm font-bold" style="color:${b.color}">${r.fmtLocal(catCost)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSub(i) {
+  const el = document.getElementById('sb_items_'+i);
+  const arrow = document.getElementById('sb_arrow_'+i);
+  const open = !el.classList.contains('hidden');
+  el.classList.toggle('hidden', open);
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+// ═══════════ FLOOR PLAN ═══════════
+function makePlanSVG(areaSqft, beds, baths, floorLabel, groundFloor) {
+  const ratio = 1.55;
+  const W = Math.sqrt(areaSqft * ratio), H = areaSqft / W;
+  const SVG_W = 520, SVG_H = 290, pad = 34;
+  const scale = Math.min((SVG_W - pad*2) / W, (SVG_H - pad*2 - 18) / H);
+  const fw = W * scale, fh = H * scale;
+  const ox = (SVG_W - fw) / 2, oy = pad + 18;
+  const widthM = (W * 0.3048).toFixed(1), heightM = (H * 0.3048).toFixed(1);
+  const rooms = [];
+  if(groundFloor){
+    rooms.push({label:'Living / Dining', x:0,   y:0,    w:.42, h:.62, fill:'#f0fdf4', stroke:'#a7f3d0'});
+    rooms.push({label:'Kitchen',         x:0,   y:.62,  w:.42, h:.38, fill:'#fefce8', stroke:'#fde68a'});
+    rooms.push({label:'Utility / Study', x:.42, y:0,    w:.30, h:.40, fill:'#fdf4ff', stroke:'#e9d5ff'});
+    rooms.push({label:'WC',              x:.42, y:.40,  w:.15, h:.30, fill:'#f0f9ff', stroke:'#bae6fd'});
+    rooms.push({label:'Garage / Store',  x:.72, y:0,    w:.28, h:.70, fill:'#f8fafc', stroke:'#cbd5e1'});
+    if(beds>=4) rooms.push({label:'Bed 4',x:.42,y:.70,  w:.58, h:.30, fill:'#fff7ed', stroke:'#fed7aa'});
+    else         rooms.push({label:'Entry / Hall',x:.42,y:.70,w:.58,h:.30,fill:'#f8fafc',stroke:'#e2e8f0'});
+  } else {
+    rooms.push({label:'Master Bedroom',  x:0,   y:0,    w:.48, h:.52, fill:'#eff6ff', stroke:'#bfdbfe'});
+    rooms.push({label:'Master Bath',     x:0,   y:.52,  w:.24, h:.28, fill:'#f0f9ff', stroke:'#bae6fd'});
+    rooms.push({label:'Walk-in Robe',    x:.24, y:.52,  w:.24, h:.28, fill:'#fdf4ff', stroke:'#e9d5ff'});
+    if(beds>=2) rooms.push({label:'Bedroom 2', x:.48, y:0,    w:.30, h:.50, fill:'#f5f3ff', stroke:'#ddd6fe'});
+    if(beds>=3) rooms.push({label:'Bedroom 3', x:.78, y:0,    w:.22, h:.50, fill:'#fdf4ff', stroke:'#e9d5ff'});
+    if(beds>=4) rooms.push({label:'Bedroom 4', x:.48, y:.50,  w:.30, h:.50, fill:'#fff7ed', stroke:'#fed7aa'});
+    rooms.push({label:'Bathroom',        x:.78, y:.50,  w:.22, h:.30, fill:'#f0f9ff', stroke:'#bae6fd'});
+    if(baths>=3) rooms.push({label:'Ensuite', x:.48, y:.80, w:.30, h:.20, fill:'#f0f9ff', stroke:'#bae6fd'});
+    rooms.push({label:'Landing',         x:0,   y:.80,  w:.48, h:.20, fill:'#f8fafc', stroke:'#e2e8f0'});
+  }
+  const roomsSVG = rooms.map(rm=>{
+    const rx=ox+rm.x*fw, ry=oy+rm.y*fh, rw=rm.w*fw, rh=rm.h*fh;
+    const cx=rx+rw/2, cy=ry+rh/2;
+    const fs=Math.max(7.5, Math.min(10.5, rw/8));
+    return `<rect x="${rx.toFixed(1)}" y="${ry.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}" rx="3" fill="${rm.fill}" stroke="${rm.stroke}" stroke-width="1.5"/>
+      <text x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="${fs}" font-family="Inter,sans-serif" fill="#374151" font-weight="500">${rm.label}</text>`;
+  }).join('');
+  const scaleBarW = fw*0.28;
+  const scaleM = Math.round(W*0.28*0.3048);
+  return `<svg width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}" xmlns="http://www.w3.org/2000/svg" style="border-radius:10px;background:#f9fafb;width:100%">
+    <text x="${SVG_W/2}" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="#0a1929" font-family="Inter,sans-serif">${floorLabel}</text>
+    <rect x="${ox-2}" y="${oy-2}" width="${fw+4}" height="${fh+4}" rx="5" fill="none" stroke="#0a1929" stroke-width="2"/>
+    ${roomsSVG}
+    <line x1="${ox}" y1="${oy-10}" x2="${ox+fw}" y2="${oy-10}" stroke="#94a3b8" stroke-width="0.8"/>
+    <text x="${ox+fw/2}" y="${oy-13}" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter,sans-serif">${widthM}m (${Math.round(W)}ft)</text>
+    <line x1="${ox-10}" y1="${oy}" x2="${ox-10}" y2="${oy+fh}" stroke="#94a3b8" stroke-width="0.8"/>
+    <text x="${ox-16}" y="${oy+fh/2}" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter,sans-serif" transform="rotate(-90,${ox-16},${oy+fh/2})">${heightM}m</text>
+    <rect x="${ox}" y="${oy+fh+8}" width="${scaleBarW}" height="4" rx="2" fill="#0a1929" opacity=".25"/>
+    <text x="${ox+scaleBarW/2}" y="${oy+fh+20}" text-anchor="middle" font-size="8.5" fill="#94a3b8" font-family="Inter,sans-serif">≈${scaleM}m</text>
+    <defs><marker id="a${floorLabel.replace(/\s/g,'')}" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0L5,2.5L0,5Z" fill="#94a3b8"/></marker></defs>
+  </svg>`;
+}
+
+function renderFloorPlan(r) {
+  const areaSqft = r.areaSqft;
+  const beds = state.beds, baths = state.baths;
+  const propType = state.propType;
+  const isMultiFloor = ['double-storey','townhouse','villa','luxury'].includes(propType);
+  document.getElementById('floorAreaBadge').textContent =
+    `${Math.round(areaSqft).toLocaleString()} sqft  ·  ${Math.round(areaSqft/10.764).toLocaleString()} sqm`;
+
+  const floorArea = isMultiFloor ? areaSqft * 0.52 : areaSqft;
+  const upperArea = isMultiFloor ? areaSqft * 0.48 : 0;
+
+  const legend = `<div class="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-3">
+    ${[['#f0fdf4','Living / Dining'],['#fefce8','Kitchen'],['#eff6ff','Master Bed'],['#f5f3ff','Bedrooms'],['#f0f9ff','Bathrooms'],['#f8fafc','Utility / Other']].map(([c,l])=>`
+    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded border" style="background:${c}"></div><span class="text-xs text-gray-500">${l}</span></div>`).join('')}
+  </div>`;
+
+  if(isMultiFloor){
+    const g = makePlanSVG(floorArea, beds, baths, '🏠 Ground Floor', true);
+    const u = makePlanSVG(upperArea, beds, baths, '🏡 Upper Floor', false);
+    document.getElementById('floorPlanContainer').innerHTML = `
+      <div class="w-full">
+        <div class="grid md:grid-cols-2 gap-4 w-full">
+          <div>${g}</div>
+          <div>${u}</div>
+        </div>
+        <div class="mt-2 text-center">
+          <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#ecfdf5;color:#059669">
+            ${propType==='villa'?'3-Level':'2-Level'} Home · Total ${Math.round(areaSqft).toLocaleString()} sqft across both floors
+          </span>
+        </div>
+        ${legend}
+      </div>`;
+  } else {
+    const g = makePlanSVG(floorArea, beds, baths, '🏠 Ground Floor (Single Storey)', true);
+    document.getElementById('floorPlanContainer').innerHTML = `<div class="w-full">${g}${legend}</div>`;
+  }
+}
+
+// ═══════════ PATCH calcCost TO USE stateMultiplier ═══════════
+const _origCalcCost = calcCost;
+// Override inline below by patching base directly — stateMultiplier applied in runEstimate
+
+// ═══════════ PATCH runEstimate ═══════════
+const _origRunEstimate = runEstimate;
+function runEstimate(){
+  // apply state multiplier to country base temporarily
+  const c = COUNTRIES.find(x=>x.code===state.country);
+  if(!c) return;
+  const origBase = c.base;
+  c.base = origBase * stateMultiplier;
+  const r = calcCost();
+  c.base = origBase;
+  if(!r) return;
+
+  document.getElementById('wizardCard').classList.add('hidden');
+  const card=document.getElementById('resultsCard');card.classList.remove('hidden');
+  card.style.opacity='0';card.style.transform='translateY(30px)';
+  setTimeout(()=>{card.style.transition='all .7s cubic-bezier(.22,1,.36,1)';card.style.opacity='1';card.style.transform='translateY(0)';},50);
+
+  const qLabel={economy:'Economy',standard:'Standard',premium:'Premium',luxury:'Ultra-Luxury'}[state.quality];
+  const locLabel = [state.city, document.querySelector('.state-btn[style*="font-weight: 700"], .state-btn[style*="font-weight:700"]')?.textContent?.trim(), r.country.name].filter(Boolean)[0];
+  document.getElementById('resultTitle').textContent=`${qLabel} Home in ${locLabel||r.country.name}`;
+  document.getElementById('resultSubtitle').textContent=`${Math.round(r.areaSqft).toLocaleString()} sqft · ${qLabel} Quality`;
+  document.getElementById('currencyLabel').textContent=r.currency;
+  document.getElementById('usdEquiv').textContent=`$${Math.round(r.total).toLocaleString()} USD`;
+  document.getElementById('costPerSqft').textContent=r.perSqftLocal;
+  document.getElementById('costPerSqm').textContent=r.perSqmLocal;
+  document.getElementById('monthlyLoan').textContent=r.monthlyLocal;
+  document.getElementById('buildTime').textContent=r.buildTime;
+  document.getElementById('rangeLabel').textContent=`Range: ${r.fmtLocal(r.minTotal)} – ${r.fmtLocal(r.maxTotal)} ${r.currency}`;
+  animateCountStr(document.getElementById('totalCostDisplay'),0,r.total*r.rate,r.symbol,r.currency,1800);
+  renderBreakdown(r);
+  renderSubBreakdown(r);
+  renderFloorPlan(r);
+  renderLoanSummary(r);
+  renderMaterials(r);
+  card.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+
+// ═══════════ BUILDING MATERIALS DATA ═══════════
+const MATERIALS_DATA = {
+  default:{
+    cement:  {icon:'🏗️', label:'Cement / Concrete', brands:['CEMEX','LaFarge','Holcim','HeidelbergMaterials'], stores:['Builders merchants','Hardware wholesalers','Construction material yards'], tip:'Compare OPC 53 grade for structural work.'},
+    steel:   {icon:'🔩', label:'Structural Steel / Rebar', brands:['ArcelorMittal','POSCO','Tata Steel','Nucor'], stores:['Steel distributors','Construction material yards','National hardware chains'], tip:'Get mill test certificates (MTC) for every batch.'},
+    roofing: {icon:'🏠', label:'Roofing Materials', brands:['Kingspan','Braas','Monier','BRAL'], stores:['Roofing specialists','Tile showrooms','Builders merchants'], tip:'Check wind uplift ratings for your climate zone.'},
+    flooring:{icon:'🪵', label:'Flooring & Tiles', brands:['RAK Ceramics','Roca','Porcelanosa'], stores:['Tile showrooms','Home improvement stores','Flooring specialists'], tip:'Order 10-15% extra for cuts and future repairs.'},
+    electrical:{icon:'⚡', label:'Electrical Materials', brands:['Schneider Electric','ABB','Legrand','Siemens'], stores:['Electrical wholesalers','Licensed electrical suppliers'], tip:'Use licensed contractors — DIY electrical is illegal in most countries.'},
+    plumbing:{icon:'🚿', label:'Plumbing & Fittings', brands:['Grohe','Rexnord','Polypipe','Geberit'], stores:['Plumbing merchants','Sanitary ware showrooms'], tip:'Check water pressure requirements before choosing fixtures.'},
+  },
+  IN:{
+    cement:  {icon:'🏗️', label:'Cement / Concrete', brands:['UltraTech Cement','ACC Cement','Ambuja Cements','Shree Cement','JK Cement'], stores:['Local cement dealers','BuildMart','Shree Cement dealer network','TATA nexarc online'], tip:'M20 grade (1:1.5:3) recommended for residential slabs. Confirm IS 456 compliance.'},
+    steel:   {icon:'🔩', label:'TMT Steel / Rebar', brands:['Tata Tiscon (Fe500D)','JSW Steel (Neosteel)','SAIL','Jindal Panther','Kamdhenu'], stores:['JSW Shoppe dealers','Tata Tiscon authorised dealers','Local iron merchants','IndiaMart suppliers'], tip:'Always insist on BIS-marked (IS 1786) Fe500D bars. Avoid unlabelled stock.'},
+    roofing: {icon:'🏠', label:'Roofing Sheets / Tiles', brands:['TATA Shaktee GI sheets','Eternit Everest fiber cement','Decra stone-coated tiles','Mangalore tiles'], stores:['TATA Shaktee dealers','Building material shops','Mangalore tile factories (coastal)'], tip:'For flat RCC roofs use waterproofing membrane (Dr. Fixit, Fosroc).'},
+    flooring:{icon:'🪵', label:'Tiles & Flooring', brands:['Kajaria Ceramics','Somany Ceramics','Asian Granito','Nitco','RAK Ceramics India'], stores:['Kajaria Gallery','Somany Studio','Local tile showrooms in city'], tip:'Vitrified tiles (600x600mm) are cost-effective for living areas. Use anti-skid for bathrooms.'},
+    electrical:{icon:'⚡', label:'Electrical Materials', brands:['Havells','Legrand','Schneider Electric','Anchor by Panasonic','Finolex Cables'], stores:['Havells Galaxy stores','Electrical wholesale markets','Amazon Business'], tip:'Use FRLS (Flame Retardant Low Smoke) cables from Finolex or Polycab.'},
+    plumbing:{icon:'🚿', label:'Plumbing & Sanitary', brands:['Jaguar','CERA','Hindware','Jaquar','Parryware','Astral Pipes'], stores:['Jaquar World showrooms','Sanitaryware dealers','Astral dealer network'], tip:'CPVC pipes (Astral, Finolex) for hot water lines; uPVC for drainage.'},
+  },
+  MY:{
+    cement:  {icon:'🏗️', label:'Cement', brands:['Lafarge Malayan Cement','CIMA Cement','Holcim Malaysia','YTL Cement'], stores:['Hup Seng Building Materials','Building material wholesalers'], tip:'OPC Grade 42.5N meets MS 522 standard for structural use.'},
+    steel:   {icon:'🔩', label:'Steel Bars / BRC Mesh', brands:['Ann Joo Steel','Amsteel Mills','Southern Steel','Perwaja Steel'], stores:['Ann Joo dealers','Building material yards','Steel service centres'], tip:'Look for SIRIM-certified MS 146 rebar. Avoid unmarked bars.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Lysaght (BlueScope)','Monier Clay Tiles','Decra Metal Roofing','Zincalume Colorbond'], stores:['Lysaght distributors','Monier showrooms','Hardware shops'], tip:'Colorbond steel roofing offers good heat reflection in tropical climate.'},
+    flooring:{icon:'🪵', label:'Tiles & Flooring', brands:['Guocera','Niro Granite','RAK Ceramics','Hafary','Tile Space'], stores:['Guocera showrooms','Harvey Norman (flooring)','Tile specialists in Kepong/PJ'], tip:'Use R10+ anti-slip rating in wet areas. Homogeneous tiles popular in MY.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['MK Electric','Schneider Electric','Clipsal','Hager','Panasonic Wiring'], stores:['Electrical wholesale markets in KL','Ace Hardware','Builders warehouse'], tip:'All electrical work must comply with MS IEC 60364 by licensed wireman.'},
+    plumbing:{icon:'🚿', label:'Plumbing & Sanitary', brands:['Hoe Kee Hardware','American Standard','TOTO','Grohe','Duravit'], stores:['Hoe Kee outlets','TOTO Malaysia showrooms','Sanitary ware centres in Chow Kit'], tip:'uPVC soil pipes (BS 4514) for drainage. UPVC pressure pipes for supply lines.'},
+  },
+  AE:{
+    cement:  {icon:'🏗️', label:'Cement', brands:['Emirates Cement','Union Cement (RAK)','Al Ain Cement','Fujairah Cement'], stores:['Danube Building Materials','Bin Dasmal','ACE Hardware UAE'], tip:'SRC (Sulphate Resistant Cement) recommended for UAE soil conditions.'},
+    steel:   {icon:'🔩', label:'Structural Steel', brands:['Emirates Steel (ADNOC)','Vulcan Steel','ArcelorMittal Middle East'], stores:['Deira building materials souk','Danube Building Materials'], tip:'High-yield deformed bars Grade 60 per BS 4449 are standard in UAE.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Interalu','Almuftah','Knauf Insulation','LGSF systems'], stores:['Al Futtaim Engineering','Bin Dasmal Group','Gulf Building Materials'], tip:'Cool-roof coatings (SRI > 29) required under Dubai Green Building Regulations.'},
+    flooring:{icon:'🪵', label:'Tiles & Stone', brands:['RAK Ceramics','Porcelanosa','Villeroy & Boch','Majilis Marble'], stores:['RAK Ceramics showrooms','Arya Home Decor','Gold & Diamond Park area'], tip:'Large-format porcelain tiles (80x80cm+) dominate UAE luxury builds.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['Schneider Electric ME','Legrand UAE','Hager','ABB','GE Industrial'], stores:['DEWA approved suppliers','Middle East Lighting & Electrical','ACE Hardware'], tip:'All materials must be DEWA/ADDC approved. Use CB-certified equipment only.'},
+    plumbing:{icon:'🚿', label:'Plumbing & Fixtures', brands:['Grohe','TOTO','Hansgrohe','Roca','American Standard ME'], stores:['GROHE Experience Centre Dubai','Sanipex Group','Bin Dasmal Sanitary'], tip:'CPVC or HDPE pipes comply with UAE specifications. Avoid galvanized pipes.'},
+  },
+  GB:{
+    cement:  {icon:'🏗️', label:'Cement & Aggregates', brands:['Hanson Cement','Blue Circle (Heidelberg)','Tarmac','Aggregate Industries'], stores:['Jewson','Travis Perkins','Buildbase'], tip:'CEMI or CEMII/A-L to BS EN 197-1 for general structural work.'},
+    steel:   {icon:'🔩', label:'Structural Steel / Rebar', brands:['Celsa Steel UK','British Steel','Tata Steel Europe','Barrett Steel'], stores:['Steel stockholders','Jewson Engineered Solutions'], tip:'Grade B500B rebar to BS 4449:2005 is UK standard for reinforcement.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Marley (concrete/clay tiles)','Redland','SIG Roofing','Velux (skylights)'], stores:['SIG Roofing','JJ Roofing Supplies','Travis Perkins'], tip:'Use BS 5534 compliant fixing systems — new wind uplift rules since 2015.'},
+    flooring:{icon:'🪵', label:'Flooring', brands:['Karndean','Amtico','Polyflor','Quick-Step','Tile Giant'], stores:['Tile Giant','Topps Tiles','B&Q','Carpetright'], tip:'LVT (Luxury Vinyl Tile) is the fastest growing category in UK new builds.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['MK Electric','Crabtree','Hager','Legrand','Wylex'], stores:['CEF (City Electrical Factors)','Edmundson Electrical','Screwfix'], tip:'All work must comply with BS 7671 (18th Edition). Notify Part P work to building control.'},
+    plumbing:{icon:'🚿', label:'Plumbing & Heating', brands:['Worcester Bosch','Baxi','Ideal Heating','Grohe','Roca'], stores:['Plumb Center','Graham Plumbers Merchant','Screwfix','B&Q'], tip:'Combi boilers dominate UK homes. Check HHIC scheme for installer certification.'},
+  },
+  AU:{
+    cement:  {icon:'🏗️', label:'Cement & Concrete', brands:['Boral','Adelaide Brighton (ABB)','Hanson','Holcim Australia'], stores:['Bunnings Warehouse','Bowens','Total Tools'], tip:'AS 3972 Type GP cement for general residential work. Order ready-mix for slabs.'},
+    steel:   {icon:'🔩', label:'Steel Framing / Rebar', brands:['BlueScope Steel','InfraBuild','Liberty Steel Australia','Lysaght'], stores:['InfraBuild Steel Centres','Bowens','Midalia Steel'], tip:'500N rebar per AS/NZS 4671. Check BAL ratings for bushfire-prone areas.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Colorbond (BlueScope)','Monier Roofing','Bristile Tiles','Stramit'], stores:['Bunnings','Metal Roofing Online','Roofing Superstore AU'], tip:'Colorbond Coolmax range reduces heat absorption — ideal for QLD & WA.'},
+    flooring:{icon:'🪵', label:'Flooring', brands:['Godfrey Hirst','Karndean','Boral Timber Flooring','Havwoods'], stores:['Carpet Court','Harvey Norman Flooring','Beaumont Tiles'], tip:'Spotted gum and blackbutt are popular Australian hardwoods.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['HPM','Clipsal by Schneider','PDL','Legrand','Hager Australia'], stores:['Rexel Australia','Middy\'s Electrical','Bunnings'], tip:'All electrical work by a licensed electrician. Comply with AS/NZS 3000 Wiring Rules.'},
+    plumbing:{icon:'🚿', label:'Plumbing', brands:['Caroma','Fowler','Methven','Grohe','Reece'], stores:['Reece Plumbing','Tradelink','Bunnings'], tip:'WELS-rated fixtures are mandatory. Min 3-star WELS for taps and showers.'},
+  },
+  SG:{
+    cement:  {icon:'🏗️', label:'Cement & Concrete', brands:['Island Concrete','Pan United Concrete','Island Ready Mix'], stores:['Hardware City','SLT Hardware','Sim Siang Choon'], tip:'Ready-mix from Pan United or Island Concrete. Specify Grade 30 or 40 MPa.'},
+    steel:   {icon:'🔩', label:'Structural Steel', brands:['NatSteel Holdings','Leong Huat Steel','Stahl Rebar'], stores:['NatSteel service centres','Building material suppliers in Toa Payoh'], tip:'All steel must meet SS 2 (Singapore Standard) or BS 4449 Grade 500B.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Bluescope Lysaght SG','Monier Roofing','Terreal'], stores:['Sim Lian Hardware','Yishun/Woodlands building supply shops'], tip:'Check BCA fire-rating requirements for roof assembly.'},
+    flooring:{icon:'🪵', label:'Tiles & Flooring', brands:['Hafary','Tile Space','Artedomus'], stores:['Hafary at Tagore','Tile Space at Tai Seng','IMM Building & Decor Mall'], tip:'Anti-slip porcelain tiles (R10+) mandatory in bathrooms per BCA Code.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['Clipsal','MK Electric','Hager','Schneider','Panasonic'], stores:['Sim Lian Hardware','EDB-registered electrical suppliers'], tip:'Only SP PowerGrid-licensed electricians can install wiring.'},
+    plumbing:{icon:'🚿', label:'Plumbing', brands:['American Standard SG','TOTO Singapore','Grohe','Hansgrohe'], stores:['TOTO Singapore showroom','Sim Siang Choon','Grohe Studio Singapore'], tip:'All plumbing to comply with PUB Singapore Standards.'},
+  },
+  ZA:{
+    cement:  {icon:'🏗️', label:'Cement', brands:['PPC Cement','Afrisam','Lafarge SA','NPC'], stores:['Builders Warehouse','Build It','Cashbuild'], tip:'CEM II/B-L 32.5N is widely used in South Africa for residential concrete.'},
+    steel:   {icon:'🔩', label:'Rebar & Steel', brands:['ArcelorMittal SA','Cape Gate','Scaw Metals'], stores:['Macsteel distributors','Builders Warehouse','Stewarts & Lloyds'], tip:'Y-bars (High yield) to SANS 920 are the SA standard. Check SABS mark.'},
+    roofing: {icon:'🏠', label:'Roofing', brands:['Roof & Tile','Marley Roofing Tiles','IBR Corrugated sheets','Ultrasteel'], stores:['Builders Warehouse','Cashbuild'], tip:'IBR profile sheeting is cost effective. Use Zincalume for longevity.'},
+    flooring:{icon:'🪵', label:'Tiles & Flooring', brands:['Tile Africa','CTM','Norcros SA','Johnson Tiles SA'], stores:['CTM showrooms (nationwide)','Tile Africa','Cashbuild'], tip:'600x600 porcelain tiles from CTM popular for SA living areas.'},
+    electrical:{icon:'⚡', label:'Electrical', brands:['Schneider Electric SA','ABB SA','Crabtree SA','Legrand SA'], stores:['Voltex','Actom','Builders Warehouse Electrical'], tip:'All work must comply with SANS 10142. COC (Certificate of Compliance) required.'},
+    plumbing:{icon:'🚿', label:'Plumbing', brands:['Cobra','Geberit SA','American Standard SA','ROCA SA'], stores:['Bathroom Bizarre','The Plumbing Warehouse','Builders Warehouse'], tip:'SABS-approved fittings only. Geysers must comply with SANS 151.'},
+  },
+};
+
+function renderMaterials(r) {
+  const code = r.country.code;
+  const data = MATERIALS_DATA[code] || MATERIALS_DATA.default;
+  document.getElementById('materialsBadge').textContent = r.country.flag + ' ' + r.country.name;
+  document.getElementById('materialsGrid').innerHTML = Object.values(data).map(function(m,i){
+    return '<div class="rounded-2xl border border-gray-100 overflow-hidden">' +
+      '<button onclick="toggleMat('+i+')" class="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left">' +
+        '<span class="text-xl w-8 flex-shrink-0">'+m.icon+'</span>' +
+        '<div class="flex-1">' +
+          '<span class="font-semibold text-sm" style="color:#102a43">'+m.label+'</span>' +
+          '<div class="text-xs text-gray-400 mt-0.5 truncate">'+m.brands.slice(0,3).join(' · ')+'</div>' +
+        '</div>' +
+        '<svg id="mat_arrow_'+i+'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" class="flex-shrink-0 transition-transform"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</button>' +
+      '<div id="mat_items_'+i+'" class="hidden border-t border-gray-50 px-4 py-4 space-y-4">' +
+        '<div><div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Recommended Brands</div>' +
+          '<div class="flex flex-wrap gap-2">'+m.brands.map(function(b){return '<span class="text-xs font-medium px-2.5 py-1 rounded-full border" style="background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8">'+b+'</span>';}).join('')+'</div>' +
+        '</div>' +
+        '<div><div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Where to Buy</div>' +
+          '<div class="flex flex-wrap gap-2">'+m.stores.map(function(s){return '<span class="text-xs font-medium px-2.5 py-1 rounded-full border" style="background:#f0fdf4;border-color:#a7f3d0;color:#047857">📍 '+s+'</span>';}).join('')+'</div>' +
+        '</div>' +
+        '<div class="text-xs px-3 py-2.5 rounded-xl flex gap-2" style="background:#fffbeb;color:#92400e"><span>💡</span><span>'+m.tip+'</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleMat(i) {
+  var el = document.getElementById('mat_items_'+i);
+  var arr = document.getElementById('mat_arrow_'+i);
+  var open = !el.classList.contains('hidden');
+  el.classList.toggle('hidden', open);
+  arr.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+</script>
+</body>
+</html>
