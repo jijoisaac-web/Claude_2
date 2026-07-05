@@ -939,6 +939,21 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 </nav>
 
 <!-- ═══════════════════════════════════════════
+     JUMP NAV (sticky section links)
+══════════════════════════════════════════════ -->
+<nav id="jumpNav">
+  <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;">
+    <span class="jn-link" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">💸 Remittance</span>
+    <span class="jn-link" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🏦 Banking</span>
+    <span class="jn-link" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🏠 Property</span>
+    <span class="jn-link" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🛡 Tax</span>
+    <span class="jn-link" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🗓 Return Plan</span>
+    <span class="jn-link" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">📈 Invest</span>
+    <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">📖 Guides</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
      HERO
 ══════════════════════════════════════════════ -->
 <section class="hero-section" id="heroSection">
@@ -3991,7 +4006,8 @@ function jumpTo(id){
 }
 (function(){
   let ticking=false;
-  const sections=['dash-send','dash-bank','dash-prop','dash-tax','dash-plan','dash-guides'];
+  // tab name → jn-link index mapping
+  const tabOrder=['rates','nrenro','realty','dtaa','return','invest','articles'];
   window.addEventListener('scroll',function(){
     if(ticking)return;
     ticking=true;
@@ -3999,15 +4015,12 @@ function jumpTo(id){
       const jn=document.getElementById('jumpNav');
       if(!jn){ticking=false;return;}
       jn.style.display=window.scrollY>300?'block':'none';
+      // highlight jn-link matching the active tab
+      const activeTab=document.querySelector('.drawer-item.active');
+      const activeTabName=activeTab?activeTab.getAttribute('data-tab'):'';
       const links=jn.querySelectorAll('.jn-link');
-      let active='';
-      sections.forEach(id=>{
-        const el=document.getElementById(id);
-        if(el&&el.getBoundingClientRect().top<120)active=id;
-      });
-      links.forEach(l=>{
-        const target=l.getAttribute('onclick').replace("jumpTo('","").replace("')","");
-        l.classList.toggle('active',target===active);
+      links.forEach((l,i)=>{
+        l.classList.toggle('active',tabOrder[i]===activeTabName);
       });
       ticking=false;
     });
