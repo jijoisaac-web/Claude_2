@@ -683,16 +683,22 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   --card:#ffffff;
   --elevated:#eaeff7;
   --border:rgba(15,23,42,0.08);
-  --border2:rgba(15,23,42,0.14);
+  --border2:rgba(15,23,42,0.18);
   --text:#0f172a;
-  --text2:#2d3a52;
-  --muted:rgba(15,23,42,0.5);
-  --amber-dim:rgba(240,165,32,0.12);
-  --amber-glow:rgba(240,165,32,0.4);
-  --teal-dim:rgba(0,205,176,0.1);
-  --green-dim:rgba(34,211,154,0.12);
-  --red-dim:rgba(245,101,112,0.12);
-  --indigo-dim:rgba(129,140,248,0.12);
+  --text2:#1e293b;
+  --muted:#4b5675;
+  /* Darker accent colours for contrast on white */
+  --amber:#b45309;--amber-light:#d97706;
+  --amber-dim:rgba(180,83,9,0.1);
+  --amber-glow:rgba(180,83,9,0.25);
+  --teal:#0d7a6e;
+  --teal-dim:rgba(13,122,110,0.1);
+  --green:#15803d;
+  --green-dim:rgba(21,128,61,0.1);
+  --red:#dc2626;
+  --red-dim:rgba(220,38,38,0.1);
+  --indigo:#4338ca;
+  --indigo-dim:rgba(67,56,202,0.1);
 }
 [data-theme="light"] body{background:var(--bg);}
 [data-theme="light"] nav.site-nav{background:rgba(244,246,251,0.92)!important;border-bottom-color:rgba(15,23,42,0.1)!important;}
@@ -922,6 +928,31 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tpl-label{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;flex-shrink:0;}
 .tpl-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#000;}
+
+/* ── LIGHT THEME TEXT FIXES ─────────────────────────────────────────────── */
+[data-theme="light"] .card-sub,[data-theme="light"] .drawer-desc,
+[data-theme="light"] .ci-name,[data-theme="light"] .ei-label,
+[data-theme="light"] .cl-tip,[data-theme="light"] .f label,
+[data-theme="light"] .ccb-rate,[data-theme="light"] .nav-live-text{color:#374151;}
+[data-theme="light"] .card-hd,[data-theme="light"] .drawer-name,
+[data-theme="light"] .cl-title,[data-theme="light"] .exp-total-lbl{color:#111827;}
+[data-theme="light"] .tpl-btn{background:#f1f5f9;border-color:#cbd5e1;color:#1e293b;}
+[data-theme="light"] .tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#fff;}
+[data-theme="light"] .city-btn{background:#f1f5f9;border-color:#cbd5e1;color:#374151;}
+[data-theme="light"] .city-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+[data-theme="light"] .expense-item{background:#f8fafc;border-color:#e2e8f0;}
+[data-theme="light"] .expense-item input{background:#fff;border-color:#cbd5e1;color:#0f172a;}
+[data-theme="light"] .cl-phase{background:#f8fafc;border-color:#e2e8f0;}
+[data-theme="light"] .cl-item:hover{background:#f1f5f9;}
+[data-theme="light"] .cl-item.done{background:rgba(13,122,110,0.06);border-color:rgba(13,122,110,0.25);}
+[data-theme="light"] .calc-cur-bar{background:#f1f5f9;border-color:#e2e8f0;}
+[data-theme="light"] .ccb-inp{background:#fff;border-color:#cbd5e1;color:#0f172a;}
+[data-theme="light"] .jn-link{color:#374151;}
+[data-theme="light"] #jumpNav{background:rgba(244,246,251,0.96);}
+[data-theme="light"] .rg-card{background:#f8fafc;border-color:#e2e8f0;}
+[data-theme="light"] .year-table th{background:#f1f5f9;color:#374151;}
+[data-theme="light"] .year-table td{color:#1e293b;}
+[data-theme="light"] .year-table tr:hover td{background:#f8fafc;}
 </style>
 </head>
 <body>
@@ -939,7 +970,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.0</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.1</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
@@ -2221,7 +2252,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.0 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.1 · Jul 2026</p>
     </div>
   </div>
 </footer>
