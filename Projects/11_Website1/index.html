@@ -396,7 +396,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .highest-tag{background:var(--green-dim);border:1px solid rgba(34,211,154,.2);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;margin-left:6px;}
 
 /* ── TOOL BANNER ──────────────────────────────── */
-.tool-banner{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;padding:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden;}
+.tool-banner{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:28px 24px;min-height:120px;background:var(--card);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden;}
 .tool-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);}
 .tool-banner-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--amber-dim);}
 .tool-banner-icon svg{width:22px;height:22px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -1184,13 +1184,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.3</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.4</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
-    <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
+    <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
     <a onclick="document.querySelector('.guides-section') && document.querySelector('.guides-section').scrollIntoView({behavior:'smooth'})">Guides</a>
-    <a onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Banking</a>
-    <a onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Tax</a>
+    <a onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Banking</a>
+    <a onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Tax</a>
   </div>
   <div class="nav-right">
     <div class="nav-live-badge"><span class="nav-live-dot"></span>Live Rates</div>
@@ -1234,7 +1234,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <button class="nav-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Compare Rates</button>
+    <button class="nav-cta" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Compare Rates</button>
   </div>
 </nav>
 
@@ -1243,13 +1243,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 ══════════════════════════════════════════════ -->
 <nav id="jumpNav">
   <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;">
-    <span class="jn-link" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">💸 Remittance</span>
-    <span class="jn-link" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🏦 Banking</span>
-    <span class="jn-link" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🏠 Property</span>
-    <span class="jn-link" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🛡 Tax</span>
-    <span class="jn-link" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">🗓 Return Plan</span>
-    <span class="jn-link" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">📈 Invest</span>
-    <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">📖 Guides</span>
+    <span class="jn-link" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">💸 Remittance</span>
+    <span class="jn-link" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏦 Banking</span>
+    <span class="jn-link" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏠 Property</span>
+    <span class="jn-link" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🛡 Tax</span>
+    <span class="jn-link" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🗓 Return Plan</span>
+    <span class="jn-link" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📈 Invest</span>
+    <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📖 Guides</span>
   </div>
 </nav>
 
@@ -1272,11 +1272,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       and access 9 free financial tools — all in one place.
     </p>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Compare Rates Now
       </button>
-      <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Return to India Planner
       </button>
@@ -1427,37 +1427,37 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <h2 class="section-h2">Every tool you need,<br><em>no login required</em></h2>
     </div>
     <div class="tools-grid">
-      <div class="tool-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--amber-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--amber);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="tc-name">Live Currency Rates</div>
         <div class="tc-desc">Real-time rates from 50+ providers, ranked by best INR received.</div>
         <span class="tc-tag" style="background:var(--green-dim);color:var(--green);">Live</span>
       </div>
-      <div class="tool-card" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--teal-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--teal);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div class="tc-name">India Mortgage Calculator</div>
         <div class="tc-desc">EMI, total interest, amortisation schedule for Indian home loans.</div>
         <span class="tc-tag" style="background:var(--teal-dim);color:var(--teal);">Calculator</span>
       </div>
-      <div class="tool-card" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--green-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--green);"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
         <div class="tc-name">NPS Corpus Estimator</div>
         <div class="tc-desc">Project your National Pension Scheme corpus and monthly pension.</div>
         <span class="tc-tag" style="background:var(--green-dim);color:var(--green);">Calculator</span>
       </div>
-      <div class="tool-card" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:rgba(168,85,247,.1);"><svg viewBox="0 0 24 24" style="stroke:#c084fc;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
         <div class="tc-name">Capital Gains Tax</div>
         <div class="tc-desc">Compute LTCG/STCG on Indian mutual funds, shares and property.</div>
         <span class="tc-tag" style="background:rgba(168,85,247,.1);color:#c084fc;">Tax</span>
       </div>
-      <div class="tool-card" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--indigo-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--indigo);"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
         <div class="tc-name">Return to India Planner</div>
         <div class="tc-desc">Step-by-step checklist to navigate your move home without missing a thing.</div>
         <span class="tc-tag" style="background:var(--indigo-dim);color:var(--indigo);">Planning</span>
       </div>
-      <div class="tool-card" onclick="showTab('gratuity',document.querySelector('[data-tab=gratuity]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <div class="tool-card" onclick="showTab('gratuity',document.querySelector('[data-tab=gratuity]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:rgba(251,146,60,.1);"><svg viewBox="0 0 24 24" style="stroke:#fb923c;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
         <div class="tc-name">Gratuity & End of Service</div>
         <div class="tc-desc">Calculate UAE, Saudi, and Indian gratuity entitlements accurately.</div>
@@ -1465,7 +1465,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       </div>
     </div>
     <div style="text-align:center;margin-top:32px;">
-      <button class="btn-ghost" style="font-size:14px;" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-ghost" style="font-size:14px;" onclick="(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         View All 9 Tools
       </button>
@@ -1483,7 +1483,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="section-eyebrow">Expert Guides</div>
         <h2 class="section-h2" style="margin-bottom:0;">Read what matters<br><em>to NRIs</em></h2>
       </div>
-      <button class="guides-all-btn" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">All 18 Guides →</button>
+      <button class="guides-all-btn" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">All 18 Guides →</button>
     </div>
     <div class="guides-grid">
       <a href="nre-nro.html" class="guide-card banking">
@@ -1516,11 +1516,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <h2>Start with the <em>best rate</em><br>to India today</h2>
     <p>Free, real-time comparison across 50+ remittance providers. See exactly how much your family receives — before you send a single rupee.</p>
     <div class="cta-btn-row">
-      <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">
+      <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Compare Rates Free
       </button>
-      <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Return to India Planner</button>
+      <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Return to India Planner</button>
     </div>
   </div>
 </div>
@@ -2184,6 +2184,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <div class="tool-banner-body">
         <h2>DTAA Tax Calculator</h2>
       <p>India has Double Tax Avoidance Agreements (DTAA) with 90+ countries. NRIs can claim reduced TDS rates — often saving 15–20% on their India income.</p>
+      </div>
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Your Details</div>
@@ -2434,12 +2435,12 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       </div>
       <div class="footer-col">
         <h4>Tools</h4>
-        <a href="#" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">Live Remittance Rates</a>
-        <a href="#" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">SIP &amp; SWP Calculator</a>
-        <a href="#" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">India Mortgage Calculator</a>
-        <a href="#" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">NPS Projector</a>
-        <a href="#" onclick="showTab('return',document.querySelector('[data-tab=return]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">Return to India Planner</a>
-        <a href="#" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'});return false;">Capital Gains Calculator</a>
+        <a href="#" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Live Remittance Rates</a>
+        <a href="#" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">SIP &amp; SWP Calculator</a>
+        <a href="#" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">India Mortgage Calculator</a>
+        <a href="#" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">NPS Projector</a>
+        <a href="#" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Return to India Planner</a>
+        <a href="#" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Capital Gains Calculator</a>
       </div>
       <div class="footer-col">
         <h4>Guides</h4>
@@ -2469,7 +2470,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.3 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.4 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -3393,7 +3394,7 @@ function showTab(id,btn){setActiveBottomTab(id);
   closeDrawer();
   setTimeout(()=>{
     const el=document.getElementById('tab-'+id);
-    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+    if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-82,behavior:'smooth'});
   },50);
 }
 
