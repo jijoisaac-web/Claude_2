@@ -933,7 +933,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v2.7</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v2.8</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
@@ -2196,7 +2196,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v2.7 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v2.8 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -2248,7 +2248,7 @@ function selectCurrency(el){
   document.getElementById('curBtn').classList.remove('open');
   // Update baseCur and reload rates
   baseCur=val;
-  document.getElementById('heroFromLabel').textContent=val;
+  const _hfl=document.getElementById('heroFromLabel');if(_hfl)_hfl.textContent=val;
   document.getElementById('curTag').textContent=val;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=val);
   updateHeroBg(val);
   // Sync quick-select pills to match chosen currency
@@ -2604,7 +2604,7 @@ async function fetchRate(c){
 
 async function updateAll(){
   // baseCur is managed by the custom dropdown (selectCurrency); use global as-is
-  document.getElementById('heroFromLabel').textContent=baseCur;
+  const _hfl2=document.getElementById('heroFromLabel');if(_hfl2)_hfl2.textContent=baseCur;
   document.getElementById('curTag').textContent=baseCur;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=baseCur);
   const ld=document.getElementById('rates-loading');
   const rc=document.getElementById('rates-container');
