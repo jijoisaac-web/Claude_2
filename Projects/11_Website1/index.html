@@ -916,6 +916,12 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .cl-reset{text-align:right;margin-top:12px;}
 .cl-reset-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s;}
 .cl-reset-btn:hover{border-color:var(--text);color:var(--text);}
+
+/* ── SIP/SWP TEMPLATES ──────────────────────────────────────────────────── */
+.tpl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.tpl-label{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;flex-shrink:0;}
+.tpl-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#000;}
 </style>
 </head>
 <body>
@@ -933,7 +939,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v2.9</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.0</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
@@ -1397,6 +1403,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
       <div class="card-sub">How much will your monthly mutual fund investment grow to? Models compounding with annual step-up option.</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="applySIPTpl(15000,12,10,10)">🌱 Starter NRI</button>
+        <button class="tpl-btn" onclick="applySIPTpl(50000,12,20,10)">📈 Wealth Builder</button>
+        <button class="tpl-btn" onclick="applySIPTpl(20000,11,15,8)">🎓 Child Education</button>
+        <button class="tpl-btn" onclick="applySIPTpl(100000,10,8,0)">🏠 Property Corpus</button>
+        <button class="tpl-btn" onclick="applySIPTpl(75000,12,25,5)">🛡 Retirement Fund</button>
+      </div>
       <div class="fg">
         <div class="f"><label>Monthly SIP Amount (&#8377;)</label><input type="number" id="sip-amount" value="25000" placeholder="e.g. 25000"/></div>
         <div class="f"><label>Expected Annual Return (%)</label><input type="number" id="sip-return" value="12" step="0.5"/></div>
@@ -1419,6 +1433,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>SWP &mdash; Systematic Withdrawal Plan</div>
       <div class="card-sub">You&apos;ve built a corpus. How long will it last with monthly withdrawals? Accounts for portfolio returns and inflation.</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="applySWPTpl(100,30000,9,6,6)">🏡 Modest Retirement</button>
+        <button class="tpl-btn" onclick="applySWPTpl(300,100000,9,6,6)">🏙 Metro Lifestyle</button>
+        <button class="tpl-btn" onclick="applySWPTpl(500,150000,10,6,6)">💰 Gulf Return</button>
+        <button class="tpl-btn" onclick="applySWPTpl(200,50000,8,5,5)">🔒 Conservative</button>
+        <button class="tpl-btn" onclick="applySWPTpl(1000,300000,10,6,6)">👑 Affluent</button>
+      </div>
       <div class="fg">
         <div class="f"><label>Starting Corpus (&#8377; Lakhs)</label><input type="number" id="swp-corpus" value="200" step="10"/></div>
         <div class="f"><label>Monthly Withdrawal (&#8377;)</label><input type="number" id="swp-monthly" value="75000"/></div>
@@ -2199,7 +2221,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v2.9 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.0 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -4192,6 +4214,23 @@ function toggleTheme(){
     document.documentElement.setAttribute('data-theme', 'light');
   }
   localStorage.setItem('nri-theme', next);
+}
+
+// ── SIP / SWP TEMPLATES ──────────────────────────────────────────────────────
+function applySIPTpl(amount, ret, years, stepup) {
+  document.getElementById('sip-amount').value = amount;
+  document.getElementById('sip-return').value = ret;
+  document.getElementById('sip-years').value = years;
+  document.getElementById('sip-stepup').value = stepup;
+  calcSIP();
+}
+function applySWPTpl(corpusLakhs, monthly, ret, inflation, stepup) {
+  document.getElementById('swp-corpus').value = corpusLakhs;
+  document.getElementById('swp-monthly').value = monthly;
+  document.getElementById('swp-return').value = ret;
+  document.getElementById('swp-inflation').value = inflation;
+  document.getElementById('swp-stepup').value = stepup;
+  calcSWP();
 }
 </script>
 </body>
