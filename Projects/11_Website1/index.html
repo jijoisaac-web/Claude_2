@@ -933,7 +933,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v2.8</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v2.9</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
@@ -969,6 +969,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="cur-item" data-val="CAD" data-flag="&#127464;&#127462;" data-name="Canadian Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ca" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CAD</span><span class="ci-name">Canada &mdash; Dollar</span></div><span class="ci-check" id="ck-CAD"></span></div>
         <div class="cur-item" data-val="AUD" data-flag="&#127462;&#127482;" data-name="Australian Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-au" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">AUD</span><span class="ci-name">Australia &mdash; Dollar</span></div><span class="ci-check" id="ck-AUD"></span></div>
         <div class="cur-item" data-val="SGD" data-flag="&#127480;&#127468;" data-name="Singapore Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sg" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SGD</span><span class="ci-name">Singapore &mdash; Dollar</span></div><span class="ci-check" id="ck-SGD"></span></div>
+        <div class="cur-item" data-val="MYR" data-flag="&#127474;&#127486;" data-name="Malaysian Ringgit" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-my" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">MYR</span><span class="ci-name">Malaysia &mdash; Ringgit</span></div><span class="ci-check" id="ck-MYR"></span></div>
         <div class="cur-item" data-val="NZD" data-flag="&#127475;&#127487;" data-name="New Zealand Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-nz" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">NZD</span><span class="ci-name">New Zealand &mdash; Dollar</span></div><span class="ci-check" id="ck-NZD"></span></div>
         <div class="cur-item" data-val="CHF" data-flag="&#127464;&#127469;" data-name="Swiss Franc" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ch" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CHF</span><span class="ci-name">Switzerland &mdash; Franc</span></div><span class="ci-check" id="ck-CHF"></span></div>
         <div class="cur-item" data-val="JPY" data-flag="&#127471;&#127477;" data-name="Japanese Yen" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-jp" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">JPY</span><span class="ci-name">Japan &mdash; Yen</span></div><span class="ci-check" id="ck-JPY"></span></div>
@@ -1652,9 +1653,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <div class="card-hd"><div class="card-hd-bar"></div>Step 1 &mdash; Choose Your City Tier</div>
       <div class="card-sub">Pre-fills typical monthly expenses. You can edit every figure below.</div>
       <div class="city-btn-row">
-        <button class="city-btn active" onclick="setCity('metro',this)">&#127963; Metro (Mumbai/Delhi/Bangalore)</button>
-        <button class="city-btn" onclick="setCity('tier2',this)">&#127968; Tier 2 (Kochi/Pune/Hyderabad)</button>
-        <button class="city-btn" onclick="setCity('tier3',this)">&#127795; Tier 3 / Small Town</button>
+        <button class="city-btn active" onclick="setCity('metro',this)">🏙 Metro (Mumbai/Delhi/Bangalore)</button>
+        <button class="city-btn" onclick="setCity('tier2',this)">🏘 Tier 2 (Kochi/Pune/Hyderabad)</button>
+        <button class="city-btn" onclick="setCity('tier3',this)">🏡 Tier 3 (Jaipur/Indore/Nagpur)</button>
+        <button class="city-btn" onclick="setCity('tier4',this)">🌆 Tier 4 (Thrissur/Mysore/Udaipur)</button>
+        <button class="city-btn" onclick="setCity('tier5',this)">🌾 Tier 5 / Village / Rural</button>
       </div>
       <div class="card-hd" style="margin-bottom:6px"><div class="card-hd-bar"></div>Step 2 &mdash; Your Monthly Expense Breakdown</div>
       <div class="card-sub">All amounts in Indian Rupees (&#8377;) per month</div>
@@ -2196,7 +2199,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v2.8 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v2.9 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -2963,6 +2966,8 @@ const CITY_PRESETS={
   metro:{food:20000,rent:30000,transport:8000,util:6000,lifeins:5000,healthins:5000,medical:5000,edu:20000,ent:10000,travel:6000,clothing:5000,misc:5000},
   tier2:{food:15000,rent:18000,transport:5000,util:4000,lifeins:4000,healthins:3500,medical:4000,edu:12000,ent:6000,travel:4000,clothing:3000,misc:3500},
   tier3:{food:10000,rent:8000,transport:3000,util:2500,lifeins:3000,healthins:2500,medical:3000,edu:7000,ent:3000,travel:2500,clothing:2000,misc:2000},
+  tier4:{food:8000,rent:5000,transport:2000,util:2000,lifeins:2500,healthins:2000,medical:2500,edu:5000,ent:2000,travel:2000,clothing:1500,misc:1500},
+  tier5:{food:6000,rent:3000,transport:1500,util:1500,lifeins:2000,healthins:1500,medical:2000,edu:3000,ent:1500,travel:1500,clothing:1000,misc:1000},
 };
 function setCity(tier,btn){
   document.querySelectorAll('.city-btn').forEach(b=>b.classList.remove('active'));
