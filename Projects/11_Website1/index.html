@@ -1163,6 +1163,32 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
   background-size:cover;background-position:center;border:none;
 }
+
+/* ── Unified Hero Rates Panel ───────────────────────────── */
+.hero-rates-panel{width:100%;max-width:540px;margin:28px auto 0;background:rgba(4,12,28,0.72);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(240,165,32,0.22);border-radius:22px;overflow:hidden;animation:fadeUp .7s .45s ease both;}
+.hrp-top{display:flex;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.hrp-flag-block{display:flex;align-items:center;gap:7px;flex-shrink:0;background:rgba(255,255,255,0.06);border-radius:10px;padding:8px 10px;}
+.hrp-flag-block span{font-size:11px;font-weight:800;color:var(--text2);}
+.hrp-send-block{flex:1;min-width:0;}
+.hrp-send-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:4px;}
+.hrp-inp-row{display:flex;align-items:baseline;gap:6px;}
+.hrp-inp{background:none;border:none;outline:none;font-size:26px;font-weight:900;color:var(--text);width:100px;font-family:inherit;line-height:1;}
+.hrp-inp::-webkit-inner-spin-button,.hrp-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.hrp-send-cur{font-size:13px;font-weight:700;color:var(--muted);}
+.hrp-arrow-col{color:var(--muted);opacity:.6;flex-shrink:0;}
+.hrp-arrow-col svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.hrp-result-block{text-align:right;flex-shrink:0;}
+.hrp-result-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:4px;}
+.hrp-result-amt{font-size:26px;font-weight:900;color:var(--amber);display:block;font-variant-numeric:tabular-nums;line-height:1;}
+.hrp-result-sub{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:5px;font-size:10px;color:var(--green);font-weight:700;}
+.hrp-providers-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 22px 8px;}
+.hrp-providers-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.hrp-live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green);}
+.hrp-rows-wrap{padding:0 14px;}
+.hrp-footer-wrap{padding:10px 22px 14px;font-size:11px;color:var(--muted);border-top:1px solid rgba(255,255,255,0.06);margin-top:10px;line-height:1.6;}
+[data-theme="light"] .hero-rates-panel{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.12);}
+[data-theme="light"] .hrp-flag-block{background:rgba(0,0,0,0.05);}
+[data-theme="light"] .hrp-inp{color:var(--text);}
 </style>
 </head>
 <body>
@@ -1180,7 +1206,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.6</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.7</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -1277,33 +1303,45 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         Return to India Planner
       </button>
     </div>
-  <!-- Live rate mini-widget -->
-    <div class="hero-rate-widget">
-      <div class="hrw-flag-strip">
-        <span id="heroWidgetFlag"><span class="fi fi-ae" style="font-size:28px;border-radius:4px;line-height:1;"></span></span>
-        <span style="font-size:13px;font-weight:800;color:var(--text2);" id="heroWidgetCur">AED</span>
+  <!-- Unified Hero Rates Panel -->
+    <div class="hero-rates-panel">
+      <!-- Top: amount input + result -->
+      <div class="hrp-top">
+        <div class="hrp-flag-block">
+          <span id="heroWidgetFlag"><span class="fi fi-ae" style="font-size:22px;border-radius:3px;line-height:1;"></span></span>
+          <span id="heroWidgetCur">AED</span>
+        </div>
+        <div class="hrp-send-block">
+          <span class="hrp-send-lbl">You send</span>
+          <div class="hrp-inp-row">
+            <input class="hrp-inp" id="heroWidgetAmt" type="number" value="1000" min="1" oninput="updateHeroWidget()"/>
+            <span class="hrp-send-cur" id="heroWidgetCurLabel">AED</span>
+          </div>
+        </div>
+        <div class="hrp-arrow-col">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="hrp-result-block">
+          <span class="hrp-result-lbl">Best rate you get</span>
+          <span class="hrp-result-amt" id="heroWidgetResult">&#8377;—</span>
+          <div class="hrp-result-sub">
+            <span class="nav-live-dot" style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;display:inline-block;"></span>
+            Live · updated now
+          </div>
+        </div>
       </div>
-      <div class="hrw-input-area">
-        <span class="hrw-label">You send</span>
-        <input class="hrw-inp" id="heroWidgetAmt" type="number" value="1000" min="1" oninput="updateHeroWidget()"/>
-        <span class="hrw-cur" id="heroWidgetCurLabel">AED</span>
+      <!-- Provider list header -->
+      <div class="hrp-providers-hdr">
+        <span class="hrp-providers-title">&#127942; Top providers &nbsp;&middot;&nbsp; <span id="rpc-cur">AED</span> &rarr; &#8377; INR</span>
+        <span class="hrp-live-pill"><span class="nav-live-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;display:inline-block;flex-shrink:0;"></span>Live rates</span>
       </div>
-      <div class="hrw-arrow">
-        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <!-- Provider rows (populated by renderRatePreview()) -->
+      <div class="hrp-rows-wrap">
+        <div class="rpc-rows" id="rpc-rows">
+          <div style="padding:14px;text-align:center;color:var(--muted);font-size:13px;">&#8987; Loading live rates&hellip;</div>
+        </div>
       </div>
-      <div class="hrw-result">
-        <span class="hrw-inr" id="heroWidgetResult">&#8377;—</span>
-        <span class="hrw-status"><span class="nav-live-dot" style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;display:inline-block;"></span> Best rate · updated now</span>
-      </div>
-    </div>
-
-    <!-- Best Rates Preview Card (populated by renderRatePreview()) -->
-    <div class="rate-preview-card" style="margin-top:28px;max-width:460px;width:100%;text-align:left;animation:fadeUp .7s .5s ease both;">
-      <div class="rpc-label">Today&rsquo;s Best Rates &rarr; &#8377; INR &nbsp;|&nbsp; Sending <span id="rpc-cur">AED</span></div>
-      <div class="rpc-rows" id="rpc-rows">
-        <div style="padding:14px;text-align:center;color:var(--muted);font-size:13px;">⏳ Loading live rates…</div>
-      </div>
-      <div class="rpc-footer" id="rpc-footer">Estimates only &middot; Verify on provider site before transferring</div>
+      <div class="hrp-footer-wrap" id="rpc-footer">Estimates only &middot; Verify on provider site before transferring</div>
     </div>
   </div>
 </section>
@@ -2499,7 +2537,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.6 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.7 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -2955,6 +2993,7 @@ function syncAmountFromMain(v){const _el=document.getElementById('heroWidgetAmt'
 
 // ── RATE PREVIEW CARD (Hero right panel) ──────
 function renderRatePreview(){
+  updateHeroWidget(); // keep hero widget in sync whenever preview refreshes
   if(!midRate)return;
   const rpcCur=document.getElementById('rpc-cur');
   if(rpcCur)rpcCur.textContent=baseCur;
@@ -4414,20 +4453,19 @@ function searchArticles(q){
 // ── HERO WIDGET ────────────────────────────────
 function updateHeroWidget(){
   var amt=parseFloat(document.getElementById('heroWidgetAmt').value)||1000;
-  var cur=document.getElementById('curBtnCode')&&document.getElementById('curBtnCode').textContent||'AED';
-  // Get best rate from providers data if available
-  var best=null;
-  if(typeof PROVIDERS!=='undefined'&&PROVIDERS[cur]){
-    var list=PROVIDERS[cur];
-    list.forEach(function(p){if(p.rate&&(!best||p.rate>best))best=p.rate;});
-  }
   var el=document.getElementById('heroWidgetResult');
-  if(el){
-    if(best){
-      el.textContent='₹'+Math.round(amt*best).toLocaleString('en-IN');
-    } else {
-      el.textContent='₹—';
-    }
+  if(!el)return;
+  // Use P[baseCur] (the live providers object) + midRate (fetched live FX rate)
+  if(typeof midRate!=='undefined'&&midRate&&typeof P!=='undefined'&&P[baseCur]){
+    var bestInr=0;
+    P[baseCur].forEach(function(p){
+      var rate=midRate*(1-p.spread);
+      var inr=Math.max(0,amt-(p.fee||0))*rate;
+      if(inr>bestInr)bestInr=inr;
+    });
+    el.textContent=bestInr>0?'₹'+Math.round(bestInr).toLocaleString('en-IN'):'₹—';
+  } else {
+    el.textContent='₹—';
   }
 }
 // Update hero widget when currency changes
