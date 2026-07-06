@@ -1007,6 +1007,166 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .f label{color:#1e293b;font-weight:600;}
 /* Checklist progress */
 [data-theme="light"] .cl-progress-label{color:#374151;}
+
+/* ── LIGHT THEME: GUIDE CARD TAG COLORS ─────────────────────────────────── */
+/* Neon colors are designed for dark backgrounds; use richer, darker hues in light mode */
+[data-theme="light"] .gc-tag.banking{background:rgba(37,99,235,0.1);color:#1d4ed8;}
+[data-theme="light"] .gc-tag.tax{background:rgba(109,40,217,0.1);color:#6d28d9;}
+[data-theme="light"] .gc-tag.invest{background:rgba(21,128,61,0.1);color:#15803d;}
+[data-theme="light"] .gc-tag.transfer{background:rgba(180,83,9,0.1);color:#b45309;}
+[data-theme="light"] .gc-tag.planning{background:rgba(67,56,202,0.1);color:#4338ca;}
+[data-theme="light"] .gc-tag.property{background:rgba(13,122,110,0.1);color:#0d7a6e;}
+/* Guide card body text */
+[data-theme="light"] .gc-desc{color:#374151;}
+[data-theme="light"] .gc-meta{color:#4b5675;}
+[data-theme="light"] .gc-read{color:var(--teal);}
+/* Step numbers — slightly more visible watermark in light mode */
+[data-theme="light"] .step-num{color:rgba(15,23,42,0.09);}
+/* Section label eyebrow pills */
+[data-theme="light"] .section-label,.section-label-light{color:var(--teal);}
+.compare-btn{margin-left:auto;padding:9px 18px;background:var(--amber);color:#000;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.02em;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.compare-btn:hover{background:var(--amber-light,#d97706);transform:translateY(-1px);}
+[data-theme="light"] .compare-btn{color:#fff;}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TOOL BANNER BACKGROUND IMAGES  (each tab gets a thematic photo)
+   ══════════════════════════════════════════════════════════════════════════ */
+.tool-banner[class*=" tb-"]{position:relative;overflow:hidden;}
+
+/* shared: force white text over dark photo overlay */
+.tb-rates .tool-banner-body h2,.tb-invest .tool-banner-body h2,
+.tb-nrenro .tool-banner-body h2,.tb-homeloan .tool-banner-body h2,
+.tb-return .tool-banner-body h2,.tb-dtaa .tool-banner-body h2,
+.tb-realty .tool-banner-body h2,.tb-edplan .tool-banner-body h2,
+.tb-articles .tool-banner-body h2{color:#fff;}
+.tb-rates .tool-banner-body p,.tb-invest .tool-banner-body p,
+.tb-nrenro .tool-banner-body p,.tb-homeloan .tool-banner-body p,
+.tb-return .tool-banner-body p,.tb-dtaa .tool-banner-body p,
+.tb-realty .tool-banner-body p,.tb-edplan .tool-banner-body p,
+.tb-articles .tool-banner-body p{color:rgba(255,255,255,0.75);}
+
+/* 💸 Remittance / Currency exchange */
+.tb-rates{background:linear-gradient(135deg,rgba(4,12,28,0.91) 0%,rgba(8,25,50,0.86) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 📈 SIP & SWP — stock market */
+.tb-invest{background:linear-gradient(135deg,rgba(4,20,10,0.91) 0%,rgba(5,30,18,0.86) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🏦 NRE/NRO Banking — financial district */
+.tb-nrenro{background:linear-gradient(135deg,rgba(5,10,30,0.91) 0%,rgba(10,18,45,0.86) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🏠 Home Loan — house exterior */
+.tb-homeloan{background:linear-gradient(135deg,rgba(8,15,5,0.91) 0%,rgba(12,25,8,0.86) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🗓 Return to India — India Gate */
+.tb-return{background:linear-gradient(135deg,rgba(15,8,4,0.91) 0%,rgba(30,15,5,0.86) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🛡 DTAA / Tax — documents & law */
+.tb-dtaa{background:linear-gradient(135deg,rgba(10,5,25,0.91) 0%,rgba(20,10,40,0.86) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🏢 Real Estate ROI — modern buildings */
+.tb-realty{background:linear-gradient(135deg,rgba(4,12,20,0.91) 0%,rgba(8,20,35,0.86) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 🎓 Education Planning — student/campus */
+.tb-edplan{background:linear-gradient(135deg,rgba(5,12,25,0.91) 0%,rgba(10,20,40,0.86) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* 📖 Guides / Articles — books & knowledge */
+.tb-articles{background:linear-gradient(135deg,rgba(15,10,4,0.91) 0%,rgba(28,18,5,0.86) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* Light mode: use a light-tinted overlay so background card look is preserved */
+[data-theme="light"] .tb-rates,[data-theme="light"] .tb-invest,
+[data-theme="light"] .tb-nrenro,[data-theme="light"] .tb-homeloan,
+[data-theme="light"] .tb-return,[data-theme="light"] .tb-dtaa,
+[data-theme="light"] .tb-realty,[data-theme="light"] .tb-edplan,
+[data-theme="light"] .tb-articles{background-blend-mode:normal;}
+[data-theme="light"] .tb-rates{background:linear-gradient(135deg,rgba(4,12,40,0.88) 0%,rgba(5,20,60,0.84) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-invest{background:linear-gradient(135deg,rgba(4,30,15,0.88) 0%,rgba(5,40,20,0.84) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-nrenro{background:linear-gradient(135deg,rgba(5,15,50,0.88) 0%,rgba(10,22,65,0.84) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-homeloan{background:linear-gradient(135deg,rgba(8,20,8,0.88) 0%,rgba(12,30,10,0.84) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-return{background:linear-gradient(135deg,rgba(40,15,5,0.88) 0%,rgba(55,20,5,0.84) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-dtaa{background:linear-gradient(135deg,rgba(20,8,45,0.88) 0%,rgba(30,12,60,0.84) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-realty{background:linear-gradient(135deg,rgba(4,18,35,0.88) 0%,rgba(8,25,50,0.84) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-edplan{background:linear-gradient(135deg,rgba(5,15,40,0.88) 0%,rgba(10,22,55,0.84) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+[data-theme="light"] .tb-articles{background:linear-gradient(135deg,rgba(40,20,5,0.88) 0%,rgba(55,28,5,0.84) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HOMEPAGE SECTION BACKGROUND IMAGES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* "Why NRI Finance Hub" — global city / NRI abroad */
+.section{
+  background-image:linear-gradient(160deg,rgba(5,8,18,0.94) 0%,rgba(8,14,32,0.90) 50%,rgba(5,8,18,0.95) 100%),
+    url('https://images.pexels.com/photos/1486785/pexels-photo-1486785.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;
+}
+.section .section-h2{color:#fff;}
+.section .section-sub{color:rgba(255,255,255,0.78);}
+.section .section-eyebrow{color:var(--amber);}
+
+/* "How It Works" steps — journey / process */
+.steps-section{
+  background:none;border:none;
+  background-image:linear-gradient(160deg,rgba(4,10,22,0.94) 0%,rgba(6,16,34,0.90) 50%,rgba(4,10,22,0.95) 100%),
+    url('https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;border-top:none;border-bottom:none;
+}
+.steps-section .section-h2{color:#fff;}
+.steps-section .section-sub{color:rgba(255,255,255,0.78);}
+.steps-section .section-eyebrow{color:var(--amber);}
+
+/* "Free Tools" grid — financial planning */
+.tools-section{
+  background-image:linear-gradient(160deg,rgba(5,10,20,0.94) 0%,rgba(8,15,30,0.90) 50%,rgba(5,10,20,0.95) 100%),
+    url('https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;
+}
+.tools-section .section-h2{color:#fff;}
+.tools-section .section-sub{color:rgba(255,255,255,0.78);}
+.tools-section .section-eyebrow{color:var(--amber);}
+
+/* "Expert Guides" — books & knowledge */
+.guides-section{
+  background:none;border:none;
+  background-image:linear-gradient(160deg,rgba(15,8,4,0.94) 0%,rgba(25,12,5,0.90) 50%,rgba(15,8,4,0.95) 100%),
+    url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;border-top:none;
+}
+.guides-section .section-h2{color:#fff;}
+.guides-section .section-sub{color:rgba(255,255,255,0.78);}
+.guides-section .section-eyebrow{color:var(--amber);}
+
+/* Light mode homepage sections — keep dark overlay (text stays white on photo) */
+[data-theme="light"] .section{
+  background-image:linear-gradient(160deg,rgba(5,8,18,0.90) 0%,rgba(8,14,32,0.86) 50%,rgba(5,8,18,0.92) 100%),
+    url('https://images.pexels.com/photos/1486785/pexels-photo-1486785.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;
+}
+[data-theme="light"] .section .section-h2,
+[data-theme="light"] .steps-section .section-h2,
+[data-theme="light"] .tools-section .section-h2,
+[data-theme="light"] .guides-section .section-h2{color:#fff !important;}
+[data-theme="light"] .section .section-sub,
+[data-theme="light"] .steps-section .section-sub,
+[data-theme="light"] .tools-section .section-sub,
+[data-theme="light"] .guides-section .section-sub{color:rgba(255,255,255,0.78) !important;}
+[data-theme="light"] .section .section-eyebrow,
+[data-theme="light"] .steps-section .section-eyebrow,
+[data-theme="light"] .tools-section .section-eyebrow,
+[data-theme="light"] .guides-section .section-eyebrow{color:var(--amber);}
+[data-theme="light"] .steps-section{
+  background-image:linear-gradient(160deg,rgba(4,10,22,0.90) 0%,rgba(6,16,34,0.86) 50%,rgba(4,10,22,0.92) 100%),
+    url('https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;border:none;
+}
+[data-theme="light"] .tools-section{
+  background-image:linear-gradient(160deg,rgba(5,10,20,0.90) 0%,rgba(8,15,30,0.86) 50%,rgba(5,10,20,0.92) 100%),
+    url('https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;
+}
+[data-theme="light"] .guides-section{
+  background-image:linear-gradient(160deg,rgba(15,8,4,0.90) 0%,rgba(25,12,5,0.86) 50%,rgba(15,8,4,0.92) 100%),
+    url('https://images.pexels.com/photos/256541/pexels-photo-256541.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');
+  background-size:cover;background-position:center;border:none;
+}
 </style>
 </head>
 <body>
@@ -1024,7 +1184,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.2</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.3</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Calculators</a>
@@ -1447,10 +1607,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     </div>
     <div class="amount-strip">
       <label>You send</label>
-      <input type="number" id="sendAmount" value="1000" oninput="syncAmountFromMain(this.value);renderRates();renderMarketRate()"/>
+      <input type="number" id="sendAmount" value="1000" 
+        oninput="syncAmountFromMain(this.value);renderRates();renderMarketRate()"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();renderRates();renderMarketRate();}"/>
       <span class="cur-tag" id="curTag">AED</span>
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
-      <span style="font-size:13px;font-weight:600;color:var(--text2)">→ Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
+      <span style="font-size:13px;font-weight:600;color:var(--text2)">Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
+      <button class="compare-btn" onclick="renderRates();renderMarketRate()">Compare Rates ↗</button>
     </div>
     <div class="mkt-rate-card" id="mktRateCard">
       <div>
@@ -2306,7 +2469,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.2 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.3 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -2758,7 +2921,7 @@ async function updateAll(){
 }
 
 function syncAmount(v){document.getElementById('sendAmount').value=v;}
-function syncAmountFromMain(v){document.getElementById('heroAmount').value=v;}
+function syncAmountFromMain(v){const _el=document.getElementById('heroWidgetAmt');if(_el)_el.value=v;}
 
 // ── RATE PREVIEW CARD (Hero right panel) ──────
 function renderRatePreview(){
