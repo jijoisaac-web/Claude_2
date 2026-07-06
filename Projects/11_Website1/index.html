@@ -396,12 +396,12 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .highest-tag{background:var(--green-dim);border:1px solid rgba(34,211,154,.2);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;margin-left:6px;}
 
 /* ── TOOL BANNER ──────────────────────────────── */
-.tool-banner{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:28px 24px;min-height:120px;background:var(--card);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden;}
+.tool-banner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;padding:40px 32px;min-height:240px;background:var(--card);border:1px solid var(--border);border-radius:18px;position:relative;overflow:hidden;text-align:center;}
 .tool-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);}
-.tool-banner-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--amber-dim);}
-.tool-banner-icon svg{width:22px;height:22px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-.tool-banner-body h2{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px;}
-.tool-banner-body p{font-size:13px;color:var(--muted);}
+.tool-banner-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(240,165,32,0.2);border:1px solid rgba(240,165,32,0.3);}
+.tool-banner-icon svg{width:28px;height:28px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tool-banner-body h2{font-size:clamp(22px,3vw,32px);font-weight:900;letter-spacing:-.6px;margin-bottom:10px;line-height:1.15;}
+.tool-banner-body p{font-size:15px;color:var(--muted);line-height:1.6;max-width:680px;}
 
 /* ── DRAWER ──────────────────────────────────── */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;backdrop-filter:blur(4px);}
@@ -1046,47 +1046,43 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tb-articles .tool-banner-body p{color:rgba(255,255,255,0.75);}
 
 /* 💸 Remittance / Currency exchange */
-.tb-rates{background:linear-gradient(135deg,rgba(4,12,28,0.91) 0%,rgba(8,25,50,0.86) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-rates{background:linear-gradient(160deg,rgba(4,12,28,0.65) 0%,rgba(8,25,50,0.58) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 📈 SIP & SWP — stock market */
-.tb-invest{background:linear-gradient(135deg,rgba(4,20,10,0.91) 0%,rgba(5,30,18,0.86) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-invest{background:linear-gradient(160deg,rgba(4,20,10,0.65) 0%,rgba(5,30,18,0.58) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🏦 NRE/NRO Banking — financial district */
-.tb-nrenro{background:linear-gradient(135deg,rgba(5,10,30,0.91) 0%,rgba(10,18,45,0.86) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-nrenro{background:linear-gradient(160deg,rgba(5,10,30,0.65) 0%,rgba(10,18,45,0.58) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🏠 Home Loan — house exterior */
-.tb-homeloan{background:linear-gradient(135deg,rgba(8,15,5,0.91) 0%,rgba(12,25,8,0.86) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-homeloan{background:linear-gradient(160deg,rgba(8,15,5,0.65) 0%,rgba(12,25,8,0.58) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🗓 Return to India — India Gate */
-.tb-return{background:linear-gradient(135deg,rgba(15,8,4,0.91) 0%,rgba(30,15,5,0.86) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-return{background:linear-gradient(160deg,rgba(15,8,4,0.65) 0%,rgba(30,15,5,0.58) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🛡 DTAA / Tax — documents & law */
-.tb-dtaa{background:linear-gradient(135deg,rgba(10,5,25,0.91) 0%,rgba(20,10,40,0.86) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-dtaa{background:linear-gradient(160deg,rgba(10,5,25,0.65) 0%,rgba(20,10,40,0.58) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🏢 Real Estate ROI — modern buildings */
-.tb-realty{background:linear-gradient(135deg,rgba(4,12,20,0.91) 0%,rgba(8,20,35,0.86) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-realty{background:linear-gradient(160deg,rgba(4,12,20,0.65) 0%,rgba(8,20,35,0.58) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 🎓 Education Planning — student/campus */
-.tb-edplan{background:linear-gradient(135deg,rgba(5,12,25,0.91) 0%,rgba(10,20,40,0.86) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-edplan{background:linear-gradient(160deg,rgba(5,12,25,0.65) 0%,rgba(10,20,40,0.58) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* 📖 Guides / Articles — books & knowledge */
-.tb-articles{background:linear-gradient(135deg,rgba(15,10,4,0.91) 0%,rgba(28,18,5,0.86) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+.tb-articles{background:linear-gradient(160deg,rgba(15,10,4,0.65) 0%,rgba(28,18,5,0.58) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* Light mode: use a light-tinted overlay so background card look is preserved */
-[data-theme="light"] .tb-rates,[data-theme="light"] .tb-invest,
-[data-theme="light"] .tb-nrenro,[data-theme="light"] .tb-homeloan,
-[data-theme="light"] .tb-return,[data-theme="light"] .tb-dtaa,
-[data-theme="light"] .tb-realty,[data-theme="light"] .tb-edplan,
-[data-theme="light"] .tb-articles{background-blend-mode:normal;}
-[data-theme="light"] .tb-rates{background:linear-gradient(135deg,rgba(4,12,40,0.88) 0%,rgba(5,20,60,0.84) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-invest{background:linear-gradient(135deg,rgba(4,30,15,0.88) 0%,rgba(5,40,20,0.84) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-nrenro{background:linear-gradient(135deg,rgba(5,15,50,0.88) 0%,rgba(10,22,65,0.84) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-homeloan{background:linear-gradient(135deg,rgba(8,20,8,0.88) 0%,rgba(12,30,10,0.84) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-return{background:linear-gradient(135deg,rgba(40,15,5,0.88) 0%,rgba(55,20,5,0.84) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-dtaa{background:linear-gradient(135deg,rgba(20,8,45,0.88) 0%,rgba(30,12,60,0.84) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-realty{background:linear-gradient(135deg,rgba(4,18,35,0.88) 0%,rgba(8,25,50,0.84) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-edplan{background:linear-gradient(135deg,rgba(5,15,40,0.88) 0%,rgba(10,22,55,0.84) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
-[data-theme="light"] .tb-articles{background:linear-gradient(135deg,rgba(40,20,5,0.88) 0%,rgba(55,28,5,0.84) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1200&h=250&fit=crop') center/cover;}
+/* light tb-* use same dark overlay as dark mode */
+[data-theme="light"] .tb-rates{background:linear-gradient(160deg,rgba(4,12,40,0.65) 0%,rgba(5,20,60,0.58) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-invest{background:linear-gradient(160deg,rgba(4,30,15,0.65) 0%,rgba(5,40,20,0.58) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-nrenro{background:linear-gradient(160deg,rgba(5,15,50,0.65) 0%,rgba(10,22,65,0.58) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-homeloan{background:linear-gradient(160deg,rgba(8,20,8,0.65) 0%,rgba(12,30,10,0.58) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-return{background:linear-gradient(160deg,rgba(40,15,5,0.65) 0%,rgba(55,20,5,0.58) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-dtaa{background:linear-gradient(160deg,rgba(20,8,45,0.65) 0%,rgba(30,12,60,0.58) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-realty{background:linear-gradient(160deg,rgba(4,18,35,0.65) 0%,rgba(8,25,50,0.58) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-edplan{background:linear-gradient(160deg,rgba(5,15,40,0.65) 0%,rgba(10,22,55,0.58) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-articles{background:linear-gradient(160deg,rgba(40,20,5,0.65) 0%,rgba(55,28,5,0.58) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
 
 /* ══════════════════════════════════════════════════════════════════════════
    HOMEPAGE SECTION BACKGROUND IMAGES
@@ -1184,7 +1180,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.4</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.6</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -1299,6 +1295,15 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <span class="hrw-inr" id="heroWidgetResult">&#8377;—</span>
         <span class="hrw-status"><span class="nav-live-dot" style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;display:inline-block;"></span> Best rate · updated now</span>
       </div>
+    </div>
+
+    <!-- Best Rates Preview Card (populated by renderRatePreview()) -->
+    <div class="rate-preview-card" style="margin-top:28px;max-width:460px;width:100%;text-align:left;animation:fadeUp .7s .5s ease both;">
+      <div class="rpc-label">Today&rsquo;s Best Rates &rarr; &#8377; INR &nbsp;|&nbsp; Sending <span id="rpc-cur">AED</span></div>
+      <div class="rpc-rows" id="rpc-rows">
+        <div style="padding:14px;text-align:center;color:var(--muted);font-size:13px;">⏳ Loading live rates…</div>
+      </div>
+      <div class="rpc-footer" id="rpc-footer">Estimates only &middot; Verify on provider site before transferring</div>
     </div>
   </div>
 </section>
@@ -1429,39 +1434,57 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="tools-grid">
       <div class="tool-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--amber-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--amber);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="tc-name">Live Currency Rates</div>
-        <div class="tc-desc">Real-time rates from 50+ providers, ranked by best INR received.</div>
+        <div class="tc-name">Live Remittance Rates</div>
+        <div class="tc-desc">Real-time rates from providers, ranked by best INR received.</div>
         <span class="tc-tag" style="background:var(--green-dim);color:var(--green);">Live</span>
       </div>
-      <div class="tool-card" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        <div class="tc-icon" style="background:var(--teal-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--teal);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-        <div class="tc-name">India Mortgage Calculator</div>
-        <div class="tc-desc">EMI, total interest, amortisation schedule for Indian home loans.</div>
-        <span class="tc-tag" style="background:var(--teal-dim);color:var(--teal);">Calculator</span>
-      </div>
-      <div class="tool-card" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        <div class="tc-icon" style="background:var(--green-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--green);"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-        <div class="tc-name">NPS Corpus Estimator</div>
-        <div class="tc-desc">Project your National Pension Scheme corpus and monthly pension.</div>
+      <div class="tool-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:var(--green-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--green);"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+        <div class="tc-name">SIP &amp; SWP Calculator</div>
+        <div class="tc-desc">Grow your India corpus with SIP or plan monthly SWP withdrawals.</div>
         <span class="tc-tag" style="background:var(--green-dim);color:var(--green);">Calculator</span>
       </div>
-      <div class="tool-card" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        <div class="tc-icon" style="background:rgba(168,85,247,.1);"><svg viewBox="0 0 24 24" style="stroke:#c084fc;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-        <div class="tc-name">Capital Gains Tax</div>
-        <div class="tc-desc">Compute LTCG/STCG on Indian mutual funds, shares and property.</div>
-        <span class="tc-tag" style="background:rgba(168,85,247,.1);color:#c084fc;">Tax</span>
+      <div class="tool-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:var(--teal-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--teal);"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/></svg></div>
+        <div class="tc-name">NRE / NRO Banking</div>
+        <div class="tc-desc">Compare NRE vs NRO vs FCNR FD rates across top Indian banks.</div>
+        <span class="tc-tag" style="background:var(--teal-dim);color:var(--teal);">Banking</span>
+      </div>
+      <div class="tool-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:rgba(16,185,129,.1);"><svg viewBox="0 0 24 24" style="stroke:#10b981;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="tc-name">NRI Home Loan EMI</div>
+        <div class="tc-desc">EMI, total interest &amp; amortisation for NRI home loans in India.</div>
+        <span class="tc-tag" style="background:rgba(16,185,129,.1);color:#10b981;">Calculator</span>
       </div>
       <div class="tool-card" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <div class="tc-icon" style="background:var(--indigo-dim);"><svg viewBox="0 0 24 24" style="stroke:var(--indigo);"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
         <div class="tc-name">Return to India Planner</div>
-        <div class="tc-desc">Step-by-step checklist to navigate your move home without missing a thing.</div>
+        <div class="tc-desc">Build your India expense profile &amp; calculate the corpus you need.</div>
         <span class="tc-tag" style="background:var(--indigo-dim);color:var(--indigo);">Planning</span>
       </div>
-      <div class="tool-card" onclick="showTab('gratuity',document.querySelector('[data-tab=gratuity]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        <div class="tc-icon" style="background:rgba(251,146,60,.1);"><svg viewBox="0 0 24 24" style="stroke:#fb923c;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-        <div class="tc-name">Gratuity & End of Service</div>
-        <div class="tc-desc">Calculate UAE, Saudi, and Indian gratuity entitlements accurately.</div>
+      <div class="tool-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:rgba(168,85,247,.1);"><svg viewBox="0 0 24 24" style="stroke:#a855f7;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="tc-name">DTAA Tax Calculator</div>
+        <div class="tc-desc">Calculate TDS savings under India&rsquo;s double tax treaty with your country.</div>
+        <span class="tc-tag" style="background:rgba(168,85,247,.1);color:#a855f7;">Tax</span>
+      </div>
+      <div class="tool-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:rgba(251,146,60,.1);"><svg viewBox="0 0 24 24" style="stroke:#fb923c;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="tc-name">Real Estate ROI</div>
+        <div class="tc-desc">Analyse rental yield, capital appreciation &amp; total ROI on India property.</div>
         <span class="tc-tag" style="background:rgba(251,146,60,.1);color:#fb923c;">Calculator</span>
+      </div>
+      <div class="tool-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:rgba(99,102,241,.1);"><svg viewBox="0 0 24 24" style="stroke:#6366f1;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="tc-name">Education Corpus</div>
+        <div class="tc-desc">Project the corpus needed for your child&rsquo;s education in India or abroad.</div>
+        <span class="tc-tag" style="background:rgba(99,102,241,.1);color:#6366f1;">Planning</span>
+      </div>
+      <div class="tool-card" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <div class="tc-icon" style="background:rgba(245,158,11,.1);"><svg viewBox="0 0 24 24" style="stroke:#f59e0b;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="tc-name">NRI Financial Guides</div>
+        <div class="tc-desc">18 expert articles on tax, banking, property &amp; returning to India.</div>
+        <span class="tc-tag" style="background:rgba(245,158,11,.1);color:#f59e0b;">Guides</span>
       </div>
     </div>
     <div style="text-align:center;margin-top:32px;">
@@ -2470,7 +2493,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.4 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v3.6 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -3400,8 +3423,18 @@ function showTab(id,btn){setActiveBottomTab(id);
 
 // ── INIT ─────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  // Deep-link: handle #article/key in URL
+  // Deep-link: open specific tool tab when arriving from a guide page
   const hash=location.hash;
+  const TAB_IDS=['rates','invest','nrenro','homeloan','return','dtaa','realty','edplan','taxres','articles'];
+  if(hash && TAB_IDS.includes(hash.slice(1))){
+    const tabId=hash.slice(1);
+    const btn=document.querySelector('[data-tab="'+tabId+'"]');
+    if(btn){
+      showTab(tabId,btn);
+      setTimeout(()=>{const m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});},120);
+    }
+  }
+  // Deep-link: handle #article/key in URL
   if(hash.startsWith('#article/')){
     const key=hash.replace('#article/','');
     showTab('articles',document.querySelector('[data-tab=articles]'));
