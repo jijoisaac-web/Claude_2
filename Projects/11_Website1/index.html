@@ -1189,6 +1189,57 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .hero-rates-panel{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.12);}
 [data-theme="light"] .hrp-flag-block{background:rgba(0,0,0,0.05);}
 [data-theme="light"] .hrp-inp{color:var(--text);}
+
+/* ── Rates Disclaimer ───────────────────────────────── */
+.rates-disclaimer{display:flex;gap:14px;align-items:flex-start;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2);border-radius:14px;padding:18px 20px;margin-top:20px;}
+.rd-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.rd-title{font-size:13px;font-weight:800;color:var(--amber);margin-bottom:8px;letter-spacing:.01em;}
+.rd-text{font-size:12.5px;color:var(--muted);line-height:1.7;}
+.rd-text strong{color:var(--text2);}
+[data-theme="light"] .rates-disclaimer{background:rgba(251,191,36,0.08);border-color:rgba(180,120,0,0.2);}
+[data-theme="light"] .rd-text{color:#4b5563;}
+[data-theme="light"] .rd-text strong{color:#1f2937;}
+
+/* ── Return to India Preview Section ──────────────── */
+.rtp-section{padding:96px 40px;position:relative;overflow:hidden;}
+.rtp-section::before{content:'';position:absolute;inset:0;background-image:linear-gradient(160deg,rgba(4,10,24,0.93) 0%,rgba(8,20,45,0.90) 100%),url('https://images.pexels.com/photos/1586298/pexels-photo-1586298.jpeg?auto=compress&cs=tinysrgb&w=1920&h=700&fit=crop');background-size:cover;background-position:center;background-attachment:fixed;z-index:0;}
+.rtp-section>*{position:relative;z-index:1;}
+.rtp-section .section-eyebrow{color:var(--amber);}
+.rtp-section .section-h2,.rtp-section .section-sub{color:#fff;}
+.rtp-section .section-sub{color:rgba(255,255,255,.78);}
+.rtp-widget{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:44px;max-width:960px;margin-left:auto;margin-right:auto;}
+.rtp-card{background:rgba(255,255,255,0.05);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;}
+.rtp-card-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--amber);margin-bottom:18px;}
+.rtp-city-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.rtp-city-btn{padding:7px 13px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.rtp-city-btn:hover{background:rgba(240,165,32,0.15);border-color:var(--amber);color:#fff;}
+.rtp-city-btn.active{background:rgba(240,165,32,0.2);border-color:var(--amber);color:var(--amber);font-weight:800;}
+.rtp-field{margin-bottom:16px;}
+.rtp-field label{display:block;font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.6);margin-bottom:6px;}
+.rtp-field input{width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:10px 14px;color:#fff;font-size:15px;font-weight:700;outline:none;font-family:inherit;box-sizing:border-box;transition:border-color .2s;}
+.rtp-field input:focus{border-color:var(--amber);}
+.rtp-field input::-webkit-inner-spin-button{-webkit-appearance:none;}
+.rtp-results-card{display:flex;flex-direction:column;gap:16px;}
+.rtp-stat{background:rgba(255,255,255,0.06);border-radius:14px;padding:16px 18px;border:1px solid rgba(255,255,255,0.08);transition:all .3s;}
+.rtp-stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,0.5);margin-bottom:6px;}
+.rtp-stat-val{font-size:26px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1;}
+.rtp-stat-sub{font-size:11.5px;color:rgba(255,255,255,0.45);margin-top:5px;}
+.rtp-stat.primary{background:rgba(240,165,32,0.12);border-color:rgba(240,165,32,0.3);}
+.rtp-stat.primary .rtp-stat-val{color:var(--amber);}
+.rtp-stat.good .rtp-stat-val{color:var(--green);}
+.rtp-stat.warn .rtp-stat-val{color:#f97316;}
+.rtp-timeline{margin-top:4px;height:6px;border-radius:3px;background:rgba(255,255,255,0.1);overflow:hidden;}
+.rtp-timeline-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--amber));transition:width .5s ease;}
+.rtp-cta-row{margin-top:4px;}
+.rtp-full-btn{width:100%;padding:14px;background:var(--amber);color:#000;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.02em;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.rtp-full-btn:hover{background:#f59e0b;transform:translateY(-1px);}
+@media(max-width:768px){
+  .rtp-section{padding:64px 20px;}
+  .rtp-widget{grid-template-columns:1fr;}
+}
+[data-theme="light"] .rtp-field input{color:#111;background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.15);}
+[data-theme="light"] .rtp-city-btn{color:rgba(0,0,0,0.7);border-color:rgba(0,0,0,0.2);background:rgba(0,0,0,0.05);}
+[data-theme="light"] .rtp-city-btn.active{color:var(--amber);}
 </style>
 </head>
 <body>
@@ -1534,6 +1585,70 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   </div>
 </section>
 
+
+<!-- ═══════════════════════════════════════════
+     RETURN TO INDIA PREVIEW
+══════════════════════════════════════════════ -->
+<section class="rtp-section">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-eyebrow">Return to India Planner</div>
+    <h2 class="section-h2" style="font-size:clamp(28px,4vw,42px);font-weight:900;margin-bottom:12px;letter-spacing:-.6px;">How Much Corpus Do You Need?</h2>
+    <p class="section-sub" style="font-size:16px;max-width:560px;margin:0 auto 0;">Pick your city, set your lifestyle, and see your number instantly.</p>
+  </div>
+
+  <div class="rtp-widget">
+    <!-- LEFT: Inputs -->
+    <div class="rtp-card">
+      <div class="rtp-card-title">&#9998; Your Plan</div>
+      <div class="rtp-city-row">
+        <button class="rtp-city-btn active" data-monthly="120000" onclick="rtpSetCity(this)">&#127963; Metro</button>
+        <button class="rtp-city-btn" data-monthly="75000" onclick="rtpSetCity(this)">&#127978; Tier 2</button>
+        <button class="rtp-city-btn" data-monthly="50000" onclick="rtpSetCity(this)">&#127969; Tier 3</button>
+        <button class="rtp-city-btn" data-monthly="35000" onclick="rtpSetCity(this)">&#127750; Tier 4</button>
+        <button class="rtp-city-btn" data-monthly="20000" onclick="rtpSetCity(this)">&#127807; Rural</button>
+      </div>
+      <div class="rtp-field">
+        <label>Monthly Expenses in India (&#8377;/mo)</label>
+        <input id="rtp-p-monthly" type="number" value="120000" oninput="calcRtpPreview()"/>
+      </div>
+      <div class="rtp-field">
+        <label>Years Until You Return</label>
+        <input id="rtp-p-years" type="number" value="5" min="1" max="30" oninput="calcRtpPreview()"/>
+      </div>
+      <div class="rtp-field">
+        <label>Expected India Income After Return (&#8377;/mo)</label>
+        <input id="rtp-p-income" type="number" value="0" oninput="calcRtpPreview()"/>
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div class="rtp-card rtp-results-card">
+      <div class="rtp-card-title">&#128200; Your Numbers</div>
+      <div class="rtp-stat">
+        <div class="rtp-stat-label">Monthly Expenses at Return</div>
+        <div class="rtp-stat-val" id="rtp-r-monthly">&#8377;1,60,733</div>
+        <div class="rtp-stat-sub" id="rtp-r-monthly-sub">After 6% inflation over 5 yrs</div>
+      </div>
+      <div class="rtp-stat primary">
+        <div class="rtp-stat-label">&#127942; Corpus You Need</div>
+        <div class="rtp-stat-val" id="rtp-r-corpus">&#8377;2.4 Cr</div>
+        <div class="rtp-stat-sub">To sustain lifestyle · 8% return, 6% inflation</div>
+      </div>
+      <div class="rtp-stat" id="rtp-r-sustain-card">
+        <div class="rtp-stat-label">Corpus Sustains For</div>
+        <div class="rtp-stat-val" id="rtp-r-sustain">30+ yrs</div>
+        <div class="rtp-stat-sub">Assuming no other income</div>
+        <div class="rtp-timeline"><div class="rtp-timeline-fill" id="rtp-r-bar" style="width:100%"></div></div>
+      </div>
+      <div class="rtp-cta-row">
+        <button class="rtp-full-btn" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">
+          &#127968; Build My Full Return Plan &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════
      GUIDES SECTION
 ══════════════════════════════════════════════ -->
@@ -1697,6 +1812,21 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
 
     <div class="info" style="margin-top:16px;border-left:3px solid rgba(99,102,241,0.5)"><strong>How to read this:</strong> INR shown = today&apos;s mid-market rate minus each provider&apos;s <em>typical</em> margin &amp; fee. Visual bars show relative value — longer bar = more rupees received. <strong>Providers run promotions and change rates in real time</strong> — always click a provider to confirm the live rate before transferring. Promos (like zero-fee first transfers) will make the actual rate better than shown here.</div>
+
+    <!-- Rates Disclaimer -->
+    <div class="rates-disclaimer">
+      <div class="rd-icon">&#9888;&#65039;</div>
+      <div class="rd-body">
+        <div class="rd-title">Disclaimer &amp; Important Notice</div>
+        <div class="rd-text">
+          Rates shown on this page are <strong>indicative estimates only</strong>, calculated using live mid-market exchange rates adjusted by each provider&apos;s <em>typical</em> margin and fee. They are <strong>not guaranteed</strong> and may differ from the actual rate offered at the time of your transfer.
+          <br><br>
+          Exchange rates fluctuate continuously. Provider margins, fees, and promotions change without notice. NRI Finance Hub is an <strong>independent comparison tool</strong> and has no commercial affiliation with any remittance provider listed. We do not process, facilitate, or guarantee any money transfers.
+          <br><br>
+          <strong>Always visit the provider&apos;s official website or app to confirm the live rate and total cost before initiating any transfer.</strong> NRI Finance Hub accepts no liability for losses arising from reliance on rates displayed here.
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- TAB 2: SIP & SWP -->
@@ -2743,10 +2873,9 @@ const P={
     {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Strong South Asian corridor'},
     {name:'Remitly',spread:0.012,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
     {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
-    {name:'SingX',spread:0.011,fee:0,link:'https://singx.co/',note:'Good for larger transfers'},
     {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates'},
     {name:'Ria Money Transfer',spread:0.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
-    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu outlets'},
+    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'Lulu Exchange outlets · Malaysia'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   AED:[
@@ -4566,6 +4695,60 @@ function applySWPTpl(corpusLakhs, monthly, ret, inflation, stepup) {
   document.getElementById('swp-stepup').value = stepup;
   calcSWP();
 }
+
+// ── Return to India Preview Calculator ──────────────────
+function rtpSetCity(btn){
+  document.querySelectorAll('.rtp-city-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rtp-p-monthly').value=btn.dataset.monthly;
+  calcRtpPreview();
+}
+function fmtCr(v){
+  if(v>=10000000)return'\u20b9'+(v/10000000).toFixed(1)+' Cr';
+  if(v>=100000)return'\u20b9'+(v/100000).toFixed(1)+' L';
+  return'\u20b9'+Math.round(v).toLocaleString('en-IN');
+}
+function calcRtpPreview(){
+  const monthly=parseFloat(document.getElementById('rtp-p-monthly').value)||120000;
+  const years=parseInt(document.getElementById('rtp-p-years').value)||5;
+  const income=parseFloat(document.getElementById('rtp-p-income').value)||0;
+  const inflation=0.06,roi=0.08;
+  // Expenses at return date
+  const returnMonthly=monthly*Math.pow(1+inflation,years);
+  // Corpus needed
+  const shortfall=Math.max(0,returnMonthly-income);
+  const netRate=roi-inflation;
+  const corpusNeeded=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // Simulate survival years
+  let c=corpusNeeded,em=returnMonthly,survive=0;
+  for(let y=1;y<=50;y++){
+    const net=Math.max(0,em*12-income*12);
+    c=c+c*roi-net;
+    em*=(1+inflation);
+    if(c>0)survive=y; else break;
+  }
+  // Update DOM
+  document.getElementById('rtp-r-monthly').textContent='\u20b9'+Math.round(returnMonthly).toLocaleString('en-IN');
+  document.getElementById('rtp-r-monthly-sub').textContent='After 6% inflation over '+years+' yr'+(years>1?'s':'');
+  document.getElementById('rtp-r-corpus').textContent=fmtCr(corpusNeeded);
+  const card=document.getElementById('rtp-r-sustain-card');
+  if(survive>=40){
+    document.getElementById('rtp-r-sustain').textContent='40+ yrs';
+    card.className='rtp-stat good';
+    document.getElementById('rtp-r-bar').style.width='100%';
+  } else if(survive>=20){
+    document.getElementById('rtp-r-sustain').textContent=survive+' yrs';
+    card.className='rtp-stat good';
+    document.getElementById('rtp-r-bar').style.width=Math.round(survive/40*100)+'%';
+  } else {
+    document.getElementById('rtp-r-sustain').textContent=survive+' yrs';
+    card.className='rtp-stat warn';
+    document.getElementById('rtp-r-bar').style.width=Math.round(survive/40*100)+'%';
+  }
+}
+// Init on page load
+window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();});
+
 </script>
 </body>
 </html>
