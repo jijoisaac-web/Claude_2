@@ -1337,6 +1337,40 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .hero-actions{margin-bottom:12px;}
   .hero-widgets-row{margin-top:10px;}
 }
+
+/* ── Hero split layout (text left, widgets right) ── */
+.hero-section{align-items:center!important;justify-content:center!important;padding:90px 40px 40px!important;text-align:left!important;}
+.hero-split{display:flex;align-items:center;gap:48px;max-width:1280px;width:100%;margin:0 auto;}
+.hero-text-col{flex:0 0 42%;max-width:500px;}
+.hero-text-col .hero-eyebrow{justify-content:flex-start;}
+.hero-text-col .hero-h1{text-align:left!important;font-size:clamp(32px,3.6vw,56px)!important;}
+.hero-text-col .hero-sub{text-align:left!important;margin-left:0!important;max-width:420px;}
+.hero-text-col .hero-actions{justify-content:flex-start!important;}
+.hero-widgets-row{flex:1;margin-top:0!important;flex-wrap:nowrap;justify-content:flex-start!important;}
+.hero-widgets-row .hero-rates-panel{flex:1 1 0;min-width:0;}
+.hero-corpus-panel{flex:0 0 270px;min-width:240px;}
+
+/* Laptop 14" compact tweaks in split layout */
+@media(max-width:1280px){
+  .hero-split{gap:28px;}
+  .hero-text-col{flex:0 0 38%;}
+  .hero-text-col .hero-h1{font-size:clamp(28px,3.2vw,46px)!important;}
+  .hero-corpus-panel{flex:0 0 250px;min-width:230px;}
+  .hero-section{padding:80px 28px 32px!important;}
+}
+
+/* Mobile: stack back to column */
+@media(max-width:800px){
+  .hero-split{flex-direction:column;align-items:center;}
+  .hero-text-col{flex:none;width:100%;max-width:100%;text-align:center;}
+  .hero-text-col .hero-eyebrow{justify-content:center;}
+  .hero-text-col .hero-h1{text-align:center!important;}
+  .hero-text-col .hero-sub{text-align:center!important;margin:0 auto 32px!important;}
+  .hero-text-col .hero-actions{justify-content:center!important;}
+  .hero-widgets-row{flex-wrap:wrap!important;margin-top:16px!important;}
+  .hero-corpus-panel{flex:1 1 100%!important;}
+  .hero-section{text-align:center!important;}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -1490,7 +1524,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.1</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.2</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -1566,7 +1600,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
      HERO
 ══════════════════════════════════════════════ -->
 <section class="hero-section" id="heroSection">
-  <div class="hero-content">
+  <div class="hero-split">
+    <div class="hero-text-col">
     <div class="hero-eyebrow">
       <span class="hero-eyebrow-dot"></span>
       Live data &nbsp;·&nbsp; Free &nbsp;·&nbsp; No sign-up required
@@ -1590,6 +1625,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         Return to India Planner
       </button>
     </div>
+    </div><!-- /hero-text-col -->
   <!-- Hero dual-widget row -->
   <div class="hero-widgets-row">
     <!-- Left: Live Rates widget -->
@@ -3154,7 +3190,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.1 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.2 · Jul 2026</p>
     </div>
   </div>
 </footer>
