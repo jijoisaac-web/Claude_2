@@ -1306,6 +1306,37 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .aff-btn-secondary{background:rgba(240,165,32,0.1);border:1px solid var(--amber);color:var(--amber);}
 .aff-btn-secondary:hover{background:rgba(240,165,32,0.22);}
 .aff-disclaimer{font-size:9.5px;color:var(--muted);margin-top:6px;opacity:0.7;}
+
+/* ── Compact hero for 14-inch laptops (viewport ~768-900px height) ── */
+@media (max-width:1440px) and (min-width:769px){
+  .hero-section{padding:68px 32px 20px;}
+  .hero-eyebrow{margin-bottom:12px;padding:5px 13px;font-size:11px;}
+  .hero-h1{font-size:40px!important;line-height:1.06;margin-bottom:10px;letter-spacing:-1.5px;}
+  .hero-sub{font-size:13.5px;margin-bottom:14px;line-height:1.55;}
+  .hero-actions{margin-bottom:14px;gap:10px;}
+  .hero-actions .btn-primary,.hero-actions .btn-ghost{padding:11px 22px;font-size:13px;}
+  .hero-widgets-row{margin-top:12px;gap:12px;}
+  .hero-corpus-panel{padding:14px;}
+  .hcp-tabs{margin-bottom:9px;}
+  .hcp-tab-btn{padding:5px 3px;font-size:9.5px;}
+  .hcp-city-btn{padding:4px 6px;font-size:10px;}
+  .hcp-yr-btn{padding:4px 2px;font-size:9.5px;}
+  .hcp-divider{margin:6px 0 8px;}
+  .hcp-corpus-lbl{font-size:10px;}
+  .hcp-corpus-val{font-size:26px!important;}
+  .hcp-corpus-sub{font-size:10px;}
+  .hcp-stats{margin-top:8px;}
+  .hcp-stat-l{font-size:10px;}
+  .hcp-stat-v{font-size:15px;}
+  .hcp-cta{padding:9px 14px;font-size:11px;margin-top:10px;}
+}
+@media (max-height:800px) and (min-width:769px){
+  .hero-section{padding:62px 32px 16px;}
+  .hero-h1{font-size:36px!important;margin-bottom:8px;}
+  .hero-sub{font-size:13px;margin-bottom:12px;}
+  .hero-actions{margin-bottom:12px;}
+  .hero-widgets-row{margin-top:10px;}
+}
 </style>
 <script type="application/ld+json">
 {
@@ -1459,7 +1490,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.0</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.1</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -3123,7 +3154,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.0 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.1 · Jul 2026</p>
     </div>
   </div>
 </footer>
