@@ -1322,7 +1322,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.8</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v3.9</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -1714,7 +1714,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="rtp-sip-tile">
           <div>
             <div class="rtp-sip-lbl">Monthly SIP needed</div>
-            <div class="rtp-sip-sub">Equity mutual funds · 12% p.a.</div>
+            <div class="rtp-sip-sub" id="rtp-r-sip-sub">Over 5 yrs · 12% p.a.</div>
           </div>
           <div class="rtp-sip-val" id="rtp-r-sip">&#8377;—</div>
         </div>
@@ -4939,6 +4939,8 @@ function calcRtpPreview(){
   const sipNeeded=sipN>0&&sipRate>0?corpusNeeded*sipRate/(Math.pow(1+sipRate,sipN)-1):0;
   const sipEl=document.getElementById('rtp-r-sip');
   if(sipEl)sipEl.textContent=sipNeeded>0?'\u20b9'+Math.round(sipNeeded).toLocaleString('en-IN')+'/mo':'\u20b9—';
+  const sipSubEl=document.getElementById('rtp-r-sip-sub');
+  if(sipSubEl)sipSubEl.textContent='Over '+years+' yr'+(years>1?'s':'')+' · 12% p.a.';
   const card=document.getElementById('rtp-r-sustain-card');
   if(survive>=40){
     document.getElementById('rtp-r-sustain').textContent='40+ yrs';
