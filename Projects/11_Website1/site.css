@@ -1390,7 +1390,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .ed-chip{background:var(--elevated);border:1px solid var(--border2);color:var(--text2);border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .ed-chip:hover{background:rgba(20,184,166,0.12);border-color:var(--teal);color:var(--teal);}
 
-body{font-family:Arial,sans-serif;padding:24px;color:#111;}h2{font-size:18px;margin-bottom:4px;}p{font-size:12px;color:#555;margin-bottom:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f3f4f6;padding:8px 12px;text-align:right;border:1px solid #ddd;font-size:11px;}th:first-child{text-align:center;}td{padding:7px 12px;border:1px solid #e5e7eb;text-align:right;}td:first-child{text-align:center;}tr:last-child{background:#f9fafb;font-weight:700;}tr:nth-child(even){background:#fafafa;}.principal{color:#059669;}.interest{color:#dc2626;}
+
 /* ── Inline scroll containers (bank tables, checklist) ── */
 [style*="overflow-y:auto"]{scrollbar-width:thin;scrollbar-color:rgba(240,165,32,0.3) transparent;}
 [style*="overflow-y:auto"]::-webkit-scrollbar{width:4px;}
