@@ -351,7 +351,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .highest-tag{background:var(--green-dim);border:1px solid rgba(34,211,154,.2);color:var(--green);font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;margin-left:6px;}
 
 /* ── TOOL BANNER ──────────────────────────────── */
-.tool-banner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;margin-bottom:24px;padding:40px 32px;min-height:240px;background:var(--card);border:1px solid var(--border);border-radius:18px;position:relative;overflow:hidden;text-align:center;}
+.tool-banner{display:flex;flex-direction:row;align-items:center;gap:16px;margin-bottom:20px;padding:16px 20px;min-height:auto;background:var(--card);border:1px solid var(--border);border-radius:14px;position:relative;overflow:hidden;text-align:left;}
 .tool-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),transparent);}
 .tool-banner-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(240,165,32,0.2);border:1px solid rgba(240,165,32,0.3);}
 .tool-banner-icon svg{width:28px;height:28px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -986,7 +986,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 /* ══════════════════════════════════════════════════════════════════════════
    TOOL BANNER BACKGROUND IMAGES  (each tab gets a thematic photo)
    ══════════════════════════════════════════════════════════════════════════ */
-.tool-banner[class*=" tb-"]{position:relative;overflow:hidden;}
+
+.tool-banner[class*=" tb-"]{position:relative;overflow:hidden;background-size:cover;background-position:center;}
+.tool-banner-icon{flex-shrink:0;width:38px;height:38px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--teal);}
+.tool-banner-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tool-banner-body{flex:1;}
+.tool-banner-body h2{font-size:17px;font-weight:700;margin:0 0 3px;color:var(--text1);}
+.tool-banner-body p{font-size:12px;color:rgba(255,255,255,0.65);margin:0;line-height:1.5;}
 
 /* shared: force white text over dark photo overlay */
 .tb-rates .tool-banner-body h2,.tb-invest .tool-banner-body h2,
@@ -1001,43 +1007,43 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tb-articles .tool-banner-body p{color:rgba(255,255,255,0.75);}
 
 /* 💸 Remittance / Currency exchange */
-.tb-rates{background:linear-gradient(160deg,rgba(4,12,28,0.65) 0%,rgba(8,25,50,0.58) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-rates{background:linear-gradient(160deg,rgba(4,12,28, 0.92) 0%,rgba(8,25,50, 0.92) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 📈 SIP & SWP — stock market */
-.tb-invest{background:linear-gradient(160deg,rgba(4,20,10,0.65) 0%,rgba(5,30,18,0.58) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-invest{background:linear-gradient(160deg,rgba(4,20,10, 0.92) 0%,rgba(5,30,18, 0.92) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🏦 NRE/NRO Banking — financial district */
-.tb-nrenro{background:linear-gradient(160deg,rgba(5,10,30,0.65) 0%,rgba(10,18,45,0.58) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-nrenro{background:linear-gradient(160deg,rgba(5,10,30, 0.92) 0%,rgba(10,18,45, 0.92) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🏠 Home Loan — house exterior */
-.tb-homeloan{background:linear-gradient(160deg,rgba(8,15,5,0.65) 0%,rgba(12,25,8,0.58) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-homeloan{background:linear-gradient(160deg,rgba(8,15,5, 0.92) 0%,rgba(12,25,8, 0.92) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🗓 Return to India — India Gate */
-.tb-return{background:linear-gradient(160deg,rgba(15,8,4,0.65) 0%,rgba(30,15,5,0.58) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-return{background:linear-gradient(160deg,rgba(15,8,4, 0.92) 0%,rgba(30,15,5, 0.92) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🛡 DTAA / Tax — documents & law */
-.tb-dtaa{background:linear-gradient(160deg,rgba(10,5,25,0.65) 0%,rgba(20,10,40,0.58) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-dtaa{background:linear-gradient(160deg,rgba(10,5,25, 0.92) 0%,rgba(20,10,40, 0.92) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🏢 Real Estate ROI — modern buildings */
-.tb-realty{background:linear-gradient(160deg,rgba(4,12,20,0.65) 0%,rgba(8,20,35,0.58) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-realty{background:linear-gradient(160deg,rgba(4,12,20, 0.92) 0%,rgba(8,20,35, 0.92) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 🎓 Education Planning — student/campus */
-.tb-edplan{background:linear-gradient(160deg,rgba(5,12,25,0.65) 0%,rgba(10,20,40,0.58) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-edplan{background:linear-gradient(160deg,rgba(5,12,25, 0.92) 0%,rgba(10,20,40, 0.92) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 📖 Guides / Articles — books & knowledge */
-.tb-articles{background:linear-gradient(160deg,rgba(15,10,4,0.65) 0%,rgba(28,18,5,0.58) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+.tb-articles{background:linear-gradient(160deg,rgba(15,10,4, 0.92) 0%,rgba(28,18,5, 0.92) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* Light mode: use a light-tinted overlay so background card look is preserved */
 /* light tb-* use same dark overlay as dark mode */
-[data-theme="light"] .tb-rates{background:linear-gradient(160deg,rgba(4,12,40,0.65) 0%,rgba(5,20,60,0.58) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-invest{background:linear-gradient(160deg,rgba(4,30,15,0.65) 0%,rgba(5,40,20,0.58) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-nrenro{background:linear-gradient(160deg,rgba(5,15,50,0.65) 0%,rgba(10,22,65,0.58) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-homeloan{background:linear-gradient(160deg,rgba(8,20,8,0.65) 0%,rgba(12,30,10,0.58) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-return{background:linear-gradient(160deg,rgba(40,15,5,0.65) 0%,rgba(55,20,5,0.58) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-dtaa{background:linear-gradient(160deg,rgba(20,8,45,0.65) 0%,rgba(30,12,60,0.58) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-realty{background:linear-gradient(160deg,rgba(4,18,35,0.65) 0%,rgba(8,25,50,0.58) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-edplan{background:linear-gradient(160deg,rgba(5,15,40,0.65) 0%,rgba(10,22,55,0.58) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
-[data-theme="light"] .tb-articles{background:linear-gradient(160deg,rgba(40,20,5,0.65) 0%,rgba(55,28,5,0.58) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=500&fit=crop') center/cover fixed;}
+[data-theme="light"] .tb-rates{background:linear-gradient(160deg,rgba(4,12,40, 0.92) 0%,rgba(5,20,60, 0.92) 100%),url('https://images.pexels.com/photos/259200/pexels-photo-259200.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-invest{background:linear-gradient(160deg,rgba(4,30,15, 0.92) 0%,rgba(5,40,20, 0.92) 100%),url('https://images.pexels.com/photos/159888/pexels-photo-159888.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-nrenro{background:linear-gradient(160deg,rgba(5,15,50, 0.92) 0%,rgba(10,22,65, 0.92) 100%),url('https://images.pexels.com/photos/1602726/pexels-photo-1602726.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-homeloan{background:linear-gradient(160deg,rgba(8,20,8, 0.92) 0%,rgba(12,30,10, 0.92) 100%),url('https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-return{background:linear-gradient(160deg,rgba(40,15,5, 0.92) 0%,rgba(55,20,5, 0.92) 100%),url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-dtaa{background:linear-gradient(160deg,rgba(20,8,45, 0.92) 0%,rgba(30,12,60, 0.92) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-realty{background:linear-gradient(160deg,rgba(4,18,35, 0.92) 0%,rgba(8,25,50, 0.92) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-edplan{background:linear-gradient(160deg,rgba(5,15,40, 0.92) 0%,rgba(10,22,55, 0.92) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-articles{background:linear-gradient(160deg,rgba(40,20,5, 0.92) 0%,rgba(55,28,5, 0.92) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* ══════════════════════════════════════════════════════════════════════════
    HOMEPAGE SECTION BACKGROUND IMAGES
@@ -1572,7 +1578,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.9</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v5.0</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -3615,7 +3621,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.9 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v5.0 · Jul 2026</p>
     </div>
   </div>
 </footer>
