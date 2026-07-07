@@ -1325,6 +1325,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hcp-cta{width:100%;padding:11px;border-radius:12px;background:var(--teal);color:#fff;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:opacity .2s;}
 .hcp-cta:hover{opacity:.88;}
 @media(max-width:860px){.hero-widgets-row{flex-wrap:wrap;}.hero-widgets-row .hero-rates-panel{flex:1 1 100%;}.hero-corpus-panel{flex:1 1 100%;}}
+
+.hcp-yr-row{display:flex;gap:5px;margin-bottom:14px;}
+.hcp-yr-btn{flex:1;padding:5px 2px;border-radius:16px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10.5px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.hcp-yr-btn.active{background:rgba(240,165,32,0.15);border-color:var(--amber);color:var(--amber);}
+.hcp-divider{height:1px;background:var(--border);margin:8px 0 12px;}
 </style>
 </head>
 <body>
@@ -1494,10 +1499,18 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <button class="hcp-city-btn" data-monthly="50000" onclick="hcpSetCity(this)">Tier 3</button>
         <button class="hcp-city-btn" data-monthly="35000" onclick="hcpSetCity(this)">Tier 4</button>
       </div>
+      <div class="hcp-yr-row">
+        <button class="hcp-yr-btn active" data-years="5" onclick="hcpSetYears(this)">5 yrs</button>
+        <button class="hcp-yr-btn" data-years="10" onclick="hcpSetYears(this)">10 yrs</button>
+        <button class="hcp-yr-btn" data-years="15" onclick="hcpSetYears(this)">15 yrs</button>
+        <button class="hcp-yr-btn" data-years="20" onclick="hcpSetYears(this)">20 yrs</button>
+        <button class="hcp-yr-btn" data-years="25" onclick="hcpSetYears(this)">25 yrs</button>
+      </div>
+      <div class="hcp-divider"></div>
       <div class="hcp-corpus-big">
         <div class="hcp-corpus-lbl">&#127942; Corpus You Need</div>
         <div class="hcp-corpus-val" id="hcp-corpus">&#8377;—</div>
-        <div class="hcp-corpus-sub">At 8% return · 6% inflation · 5 yrs</div>
+        <div class="hcp-corpus-sub" id="hcp-corpus-sub">At 8% return · 6% inflation · 5 yrs</div>
         <div class="hcp-corpus-fx" id="hcp-corpus-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
       </div>
       <div class="hcp-stats">
@@ -4964,9 +4977,12 @@ function fmtCr(v){
   if(v>=100000)return'\u20b9'+(v/100000).toFixed(1)+' L';
   return'\u20b9'+Math.round(v).toLocaleString('en-IN');
 }
-function calcHeroCorpus(monthly){
-  monthly=monthly||120000;
-  var years=5,inflation=0.06,roi=0.08;
+var _hcpMonthly=120000,_hcpYears=5;
+function calcHeroCorpus(monthly,years){
+  if(monthly!==undefined)_hcpMonthly=monthly;
+  if(years!==undefined)_hcpYears=years;
+  monthly=_hcpMonthly; years=_hcpYears;
+  var inflation=0.06,roi=0.08;
   var returnMonthly=monthly*Math.pow(1+inflation,years);
   var shortfall=Math.max(0,returnMonthly);
   var netRate=roi-inflation;
@@ -4983,6 +4999,8 @@ function calcHeroCorpus(monthly){
   var fxEl=document.getElementById('hcp-corpus-fx');
   var sipFxEl=document.getElementById('hcp-sip-fx');
   if(el)el.textContent=fmtCr(corpus);
+  var subEl=document.getElementById('hcp-corpus-sub');
+  if(subEl)subEl.textContent='At 8% return · 6% inflation · '+years+' yr'+(years>1?'s':'');
   if(sipEl)sipEl.textContent=sip>0?'₹'+Math.round(sip/1000).toFixed(0)+'K/mo':'₹—';
   if(susEl)susEl.textContent=survive>=40?'40+ yrs':survive+' yrs';
   // FX equivalents
@@ -4997,7 +5015,12 @@ function calcHeroCorpus(monthly){
 function hcpSetCity(btn){
   document.querySelectorAll('.hcp-city-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
-  calcHeroCorpus(parseFloat(btn.dataset.monthly)||120000);
+  calcHeroCorpus(parseFloat(btn.dataset.monthly)||120000,undefined);
+}
+function hcpSetYears(btn){
+  document.querySelectorAll('.hcp-yr-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroCorpus(undefined,parseInt(btn.dataset.years)||5);
 }
 
 function calcRtpPreview(){
