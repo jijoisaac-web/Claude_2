@@ -2594,16 +2594,16 @@ function closeNavDD(){
   };
 
   const DEST={
-    BOM:{name:'Mumbai',    icon:'🏙️',tip:'Best: Nov–Jan · Cool &amp; festive'},
-    DEL:{name:'Delhi',     icon:'🕌',tip:'Best: Oct–Mar · Pleasant weather'},
-    BLR:{name:'Bangalore', icon:'💻',tip:'Best: Sep–Nov · Mild &amp; green'},
-    MAA:{name:'Chennai',   icon:'🌊',tip:'Best: Nov–Feb · Cool, post-monsoon'},
-    HYD:{name:'Hyderabad', icon:'🏯',tip:'Best: Oct–Feb · Comfortable'},
-    COK:{name:'Kochi',     icon:'⛵',tip:'Best: Oct–Feb · Backwater season'},
-    CCU:{name:'Kolkata',   icon:'🎭',tip:'Best: Oct–Feb · Durga Puja &amp; winter'},
-    TRV:{name:'Trivandrum',icon:'🏝️',tip:'Best: Oct–Feb · Coast &amp; beach'},
-    AMD:{name:'Ahmedabad', icon:'🏺',tip:'Best: Nov–Jan · Cool &amp; events'},
-    GOI:{name:'Goa',       icon:'🌴',tip:'Best: Oct–Mar · Peak beach season'}
+    BOM:{name:'Mumbai',    icon:'🏙️',tip:'Best: Nov–Jan · Cool &amp; festive',   deal:'Feb–Mar, Jun–Aug',dealNote:'Monsoon &amp; shoulder'},
+    DEL:{name:'Delhi',     icon:'🕌',tip:'Best: Oct–Mar · Pleasant weather',      deal:'Jan–Mar, Jun–Aug',dealNote:'Post-peak &amp; monsoon'},
+    BLR:{name:'Bangalore', icon:'💻',tip:'Best: Sep–Nov · Mild &amp; green',      deal:'Jan–Feb, Jun–Aug',dealNote:'Off-peak deals'},
+    MAA:{name:'Chennai',   icon:'🌊',tip:'Best: Nov–Feb · Cool, post-monsoon',    deal:'Feb–Apr, Jun–Jul',dealNote:'Shoulder season'},
+    HYD:{name:'Hyderabad', icon:'🏯',tip:'Best: Oct–Feb · Comfortable',           deal:'Feb–Mar, Jun–Aug',dealNote:'Low season fares'},
+    COK:{name:'Kochi',     icon:'⛵',tip:'Best: Oct–Feb · Backwater season',      deal:'Mar–May, Jul–Aug',dealNote:'Shoulder &amp; off-peak'},
+    CCU:{name:'Kolkata',   icon:'🎭',tip:'Best: Oct–Feb · Durga Puja &amp; winter',deal:'Feb–Apr, Jul–Aug',dealNote:'Off-peak deals'},
+    TRV:{name:'Trivandrum',icon:'🏝️',tip:'Best: Oct–Feb · Coast &amp; beach',    deal:'Mar–May, Jul–Aug',dealNote:'Low season fares'},
+    AMD:{name:'Ahmedabad', icon:'🏺',tip:'Best: Nov–Jan · Cool &amp; events',     deal:'Jun–Sep',        dealNote:'Up to 40% off in monsoon'},
+    GOI:{name:'Goa',       icon:'🌴',tip:'Best: Oct–Mar · Peak beach season',     deal:'Jun–Sep',        dealNote:'Up to 60% off in monsoon'}
   };
 
   let _flOrigin=null;
@@ -2654,6 +2654,7 @@ function closeNavDD(){
         +'<div class="fl-price">'+price+' <span class="fl-price-note">RT · Economy</span></div>'
         +'<div class="fl-dur">'+r.dur+' · '+r.airlines+'</div>'
         +'<div class="fl-tip">'+d.tip+'</div>'
+        +(d.deal?'<div class="fl-deal"><span class="fl-deal-tag">🏷️ Best deals</span><span class="fl-deal-months">'+d.deal+'</span><span class="fl-deal-note">'+d.dealNote+'</span></div>':'')
         +'<div class="fl-btn-row">'
         +'<a class="fl-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">✈ Skyscanner</a>'
         +'<a class="fl-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'

@@ -1424,3 +1424,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-btn-gf{background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2);}
 [data-theme="light"] .fl-btn-gf{background:rgba(0,0,0,0.05);color:#374151;border-color:#d1d5db;}
 [data-theme="light"] .fl-dest-card{background:#f8fafc;}
+
+/* Flight deal dates */
+.fl-deal{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:8px 0 10px;padding:7px 10px;background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.2);border-radius:8px;}
+.fl-deal-tag{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.fl-deal-months{font-size:13px;font-weight:700;color:var(--teal);}
+.fl-deal-note{font-size:10px;color:var(--muted);margin-left:2px;}
