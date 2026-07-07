@@ -1415,6 +1415,10 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .bgt-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
 @media(max-width:700px){.bgt-panels{grid-template-columns:1fr;}}
 .bgt-inr-note{font-size:10px;color:var(--text3);}
+
+/* Education planner chips */
+.ed-chip{background:var(--elevated);border:1px solid var(--border2);color:var(--text2);border-radius:20px;padding:4px 10px;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ed-chip:hover{background:rgba(20,184,166,0.12);border-color:var(--teal);color:var(--teal);}
 </style>
 <script type="application/ld+json">
 {
@@ -1568,7 +1572,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.7</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.9</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -2861,12 +2865,16 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   <!-- ══ TAX RESIDENCY CALCULATOR ══════════════════════════════════════════ -->
   <div class="tool-section" id="tab-taxres">
   <div class="calc-cur-bar" id="ccb-taxres"><span class="ccb-flag" id="ccb-flag-taxres"></span><span class="ccb-rate" id="ccb-rate-taxres">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-taxres" type="number" placeholder="Amount" oninput="ccbConvert('taxres')"/><span id="ccb-cur-taxres" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-taxres">₹—</span></div></div>
-    <div class="tool-inner">
-      <h2>Tax Residency Status Calculator</h2>
-      <p>Your residency status — <strong>NRI</strong>, <strong>RNOR</strong>, or <strong>Resident</strong> — controls which income is taxable in India and at what rate. Enter days spent inside India for each year.</p>
-      <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 14px;display:flex;align-items:center;gap:6px;">
-        <span>📅</span> Enter days spent <strong>inside India</strong> for each fiscal year (Apr–Mar).
-      </p>
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(240,165,32,0.12),rgba(251,191,36,0.06));border-color:rgba(240,165,32,0.3);">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>Tax Residency Status Calculator</h2>
+        <p>NRI, RNOR, or Resident? Your status controls which income is taxable in India. Enter days spent inside India per fiscal year.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Days Spent in India — Last 10 Financial Years</div>
+      <div class="card-sub">Enter days inside India for each fiscal year (Apr–Mar). Threshold: NRI = under 182 days in current year.</div>
       <div class="tr-timeline">
         <div class="tr-yr-row current-yr">
           <div class="tr-yr-dot cur"></div>
@@ -2962,6 +2970,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Your Details</div>
+      <div class="card-sub">Select your country and income type — DTAA rates vary by treaty. UAE NRIs pay 0% TDS on interest; US NRIs pay 15%.</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('dtaa-country').value='AED';document.getElementById('dtaa-type').value='interest';document.getElementById('dtaa-income').value=200000;calcDTAA();})()">🇦🇪 UAE FD interest</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('dtaa-country').value='USD';document.getElementById('dtaa-type').value='interest';document.getElementById('dtaa-income').value=500000;calcDTAA();})()">🇺🇸 US NRO interest</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('dtaa-country').value='GBP';document.getElementById('dtaa-type').value='rental';document.getElementById('dtaa-income').value=300000;calcDTAA();})()">🇬🇧 UK rental income</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('dtaa-country').value='SGD';document.getElementById('dtaa-type').value='dividend';document.getElementById('dtaa-income').value=150000;calcDTAA();})()">🇸🇬 SG dividend</button>
+      </div>
       <div class="fg">
         <div class="f">
           <label>Country of Residence</label>
@@ -3018,6 +3034,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     </div>
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Property Details</div>
+      <div class="card-sub">Model rental yield, ROI, and monthly cash flow vs NRE FD benchmark. Results update automatically.</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('re-value').value=50;document.getElementById('re-dp').value=30;document.getElementById('re-rent').value=15000;document.getElementById('re-apprec').value=5;calcRealty();})()">🏠 ₹50L apartment</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('re-value').value=100;document.getElementById('re-dp').value=25;document.getElementById('re-rent').value=30000;document.getElementById('re-apprec').value=6;calcRealty();})()">🏢 ₹1Cr flat</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('re-value').value=200;document.getElementById('re-dp').value=40;document.getElementById('re-rent').value=60000;document.getElementById('re-apprec').value=7;calcRealty();})()">🏗️ ₹2Cr premium</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('re-value').value=80;document.getElementById('re-dp').value=100;document.getElementById('re-rent').value=20000;document.getElementById('re-apprec').value=8;calcRealty();})()">🏘️ Full cash buy</button>
+      </div>
       <div class="fg">
         <div class="f"><label>Property Value (₹ Lakhs)</label><input type="number" id="re-value" value="80" oninput="calcRealty()"/></div>
         <div class="f"><label>Down Payment (%)</label><input type="number" id="re-dp" value="20" min="10" max="100" oninput="calcRealty()"/></div>
@@ -3055,91 +3079,76 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       </div>
     </div>
 
-    <!-- Quick reference costs -->
-    <div style="background:var(--elevated);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:24px;">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Typical Education Costs (Today's ₹)</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;">
-        <div class="ed-ref-card" onclick="setEdCost(3.5)"><div class="ed-ref-name">IIT / IIM</div><div class="ed-ref-cost">₹3–4L/yr</div></div>
-        <div class="ed-ref-card" onclick="setEdCost(2)"><div class="ed-ref-name">Private Engg / BBA</div><div class="ed-ref-cost">₹1.5–2.5L/yr</div></div>
-        <div class="ed-ref-card" onclick="setEdCost(8)"><div class="ed-ref-name">MBBS (Private)</div><div class="ed-ref-cost">₹6–10L/yr</div></div>
-        <div class="ed-ref-card" onclick="setEdCost(30)"><div class="ed-ref-name">UK / Australia</div><div class="ed-ref-cost">₹25–35L/yr</div></div>
-        <div class="ed-ref-card" onclick="setEdCost(40)"><div class="ed-ref-name">USA / Canada</div><div class="ed-ref-cost">₹35–45L/yr</div></div>
-        <div class="ed-ref-card" onclick="setEdCost(15)"><div class="ed-ref-name">Singapore / NUS</div><div class="ed-ref-cost">₹12–18L/yr</div></div>
-      </div>
+    <!-- Quick reference costs — compact chips -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;align-items:center;">
+      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-right:4px;">Quick fill:</span>
+      <button class="ed-chip" onclick="setEdCost(3.5)">IIT/IIM · ₹3.5L/yr</button>
+      <button class="ed-chip" onclick="setEdCost(2)">Private Engg · ₹2L/yr</button>
+      <button class="ed-chip" onclick="setEdCost(8)">MBBS · ₹8L/yr</button>
+      <button class="ed-chip" onclick="setEdCost(30)">UK/AU · ₹30L/yr</button>
+      <button class="ed-chip" onclick="setEdCost(40)">USA/CA · ₹40L/yr</button>
+      <button class="ed-chip" onclick="setEdCost(15)">Singapore · ₹15L/yr</button>
     </div>
 
-    <div class="calc-grid">
-      <div class="calc-inputs">
-        <div class="cinput-group">
-          <div class="cinput-label">Child Profile</div>
-          <div class="f"><label>Child's Current Age (years)</label><input type="number" id="ed-age" value="5" min="0" max="17" oninput="calcEdPlan()"/></div>
-          <div class="f"><label>Age When Education Starts</label><input type="number" id="ed-start-age" value="18" min="5" max="25" oninput="calcEdPlan()"/></div>
-          <div class="f"><label>Course Duration (years)</label><input type="number" id="ed-duration" value="4" min="1" max="6" oninput="calcEdPlan()"/></div>
-        </div>
-        <div class="cinput-group">
-          <div class="cinput-label">Education Cost</div>
-          <div class="f"><label>Annual Cost Today (₹ Lakhs)</label><input type="number" id="ed-cost" value="3.5" step="0.5" oninput="calcEdPlan()"/><div id="ed-cost-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
-          <div class="f"><label>Education Inflation Rate (% p.a.)</label><input type="number" id="ed-inflation" value="8" step="0.5" oninput="calcEdPlan()"/></div>
-        </div>
-        <div class="cinput-group">
-          <div class="cinput-label">Your Savings</div>
-          <div class="f"><label>Current Education Savings (₹ Lakhs)</label><input type="number" id="ed-savings" value="0" step="0.5" oninput="calcEdPlan()"/></div>
-          <div class="f"><label>Monthly SIP for Education (₹)</label><input type="number" id="ed-sip" value="10000" step="1000" oninput="calcEdPlan()"/><div id="ed-sip-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
-          <div class="f"><label>Expected Investment Return (% p.a.)</label><input type="number" id="ed-roi" value="12" step="0.5" oninput="calcEdPlan()"/></div>
-        </div>
-        <button class="btn" onclick="calcEdPlan()">Calculate Education Corpus</button>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Child Profile &amp; Costs</div>
+      <div class="fg">
+        <div class="f"><label>Child's Current Age (yrs)</label><input type="number" id="ed-age" value="5" min="0" max="17" oninput="calcEdPlan()"/></div>
+        <div class="f"><label>Age When Education Starts</label><input type="number" id="ed-start-age" value="18" min="5" max="25" oninput="calcEdPlan()"/></div>
+        <div class="f"><label>Course Duration (yrs)</label><input type="number" id="ed-duration" value="4" min="1" max="6" oninput="calcEdPlan()"/></div>
+        <div class="f"><label>Annual Cost Today (₹ Lakhs)</label><input type="number" id="ed-cost" value="3.5" step="0.5" oninput="calcEdPlan()"/><div id="ed-cost-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
+        <div class="f"><label>Education Inflation (% p.a.)</label><input type="number" id="ed-inflation" value="8" step="0.5" oninput="calcEdPlan()"/></div>
+        <div class="f"><label>Current Savings (₹ Lakhs)</label><input type="number" id="ed-savings" value="0" step="0.5" oninput="calcEdPlan()"/></div>
+        <div class="f"><label>Monthly SIP (₹)</label><input type="number" id="ed-sip" value="10000" step="1000" oninput="calcEdPlan()"/><div id="ed-sip-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
+        <div class="f"><label>Investment Return (% p.a.)</label><input type="number" id="ed-roi" value="12" step="0.5" oninput="calcEdPlan()"/></div>
       </div>
+      <button class="btn btn-amber" onclick="calcEdPlan()">Calculate Education Corpus &rarr;</button>
+    </div>
+    <div>
 
       <div class="calc-results" id="ed-results" style="display:none">
-        <div class="ed-results-wrap">
-          <div class="ed-progress-card">
-            <div class="ed-ring-wrap">
-              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="9"/>
-                <circle id="ed-ring-arc" cx="60" cy="60" r="50" fill="none" stroke="var(--teal)" stroke-width="9"
-                  stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
-                  transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .7s ease,stroke .4s"/>
-              </svg>
-              <div class="ed-ring-center">
-                <span class="ed-ring-pct" id="ed-ring-pct">0%</span>
-                <span class="ed-ring-lbl">funded</span>
-              </div>
-            </div>
-            <div class="ed-stat-row">
-              <div class="ed-stat-box">
-                <div class="ed-stat-box-lbl">Target Corpus</div>
-                <div class="ed-stat-box-val" id="ed-s-needed">₹—</div>
-                <div class="ed-stat-box-sub" id="ed-s-needed-sub"></div>
-              </div>
-              <div class="ed-stat-box">
-                <div class="ed-stat-box-lbl">Projected Corpus</div>
-                <div class="ed-stat-box-val" id="ed-s-proj">₹—</div>
-                <div class="ed-stat-box-sub" id="ed-s-proj-sub"></div>
-              </div>
-              <div class="ed-stat-box">
-                <div class="ed-stat-box-lbl">Years to Save</div>
-                <div class="ed-stat-box-val" id="ed-s-years">—</div>
-                <div class="ed-stat-box-sub" id="ed-s-years-sub"></div>
-              </div>
-              <div class="ed-stat-box">
-                <div class="ed-stat-box-lbl" id="ed-s-gap-lbl">Gap</div>
-                <div class="ed-stat-box-val" id="ed-s-gap">₹—</div>
-                <div class="ed-stat-box-sub" id="ed-s-gap-sub"></div>
-              </div>
-            </div>
+        <!-- Compact 4-stat result row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="result-card">
+            <div class="result-label">Target Corpus</div>
+            <div class="result-value" id="ed-s-needed">₹—</div>
+            <div class="result-sub" id="ed-s-needed-sub"></div>
           </div>
-          <div class="ed-status-strip" id="ed-status-box"></div>
-          <div>
-            <button class="btn btn-outline" id="ed-table-toggle" onclick="toggleEdTable()" style="display:flex;align-items:center;gap:6px">▶ Year-by-Year Growth</button>
-            <div id="ed-table-wrap" style="display:none;margin-top:12px;overflow-x:auto;">
-              <table class="year-table">
-                <thead><tr><th>Year</th><th>Child Age</th><th>Corpus (₹L)</th><th>Ed. Cost That Year (₹L)</th></tr></thead>
-                <tbody id="ed-table-body"></tbody>
-              </table>
-            </div>
+          <div class="result-card">
+            <div class="result-label">Projected Corpus</div>
+            <div class="result-value" id="ed-s-proj">₹—</div>
+            <div class="result-sub" id="ed-s-proj-sub"></div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Years to Save</div>
+            <div class="result-value" id="ed-s-years">—</div>
+            <div class="result-sub" id="ed-s-years-sub"></div>
+          </div>
+          <div class="result-card">
+            <div class="result-label" id="ed-s-gap-lbl">Gap / Surplus</div>
+            <div class="result-value" id="ed-s-gap">₹—</div>
+            <div class="result-sub" id="ed-s-gap-sub"></div>
           </div>
         </div>
-      </div>
+        <!-- Funded % bar -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+            <span>Funding progress</span><span id="ed-ring-pct" style="font-weight:700;color:var(--teal);">0%</span>
+          </div>
+          <div style="background:var(--border2);border-radius:99px;height:6px;overflow:hidden;">
+            <div id="ed-progress-bar" style="height:100%;border-radius:99px;background:var(--teal);width:0%;transition:width .6s ease;"></div>
+          </div>
+        </div>
+        <div class="ed-status-strip" id="ed-status-box"></div>
+        <div style="margin-top:10px;">
+          <button class="btn btn-outline" id="ed-table-toggle" onclick="toggleEdTable()" style="font-size:12px;padding:7px 14px;">▶ Year-by-Year Growth</button>
+          <div id="ed-table-wrap" style="display:none;margin-top:10px;overflow-x:auto;">
+            <table class="year-table">
+              <thead><tr><th>Year</th><th>Child Age</th><th>Corpus (₹L)</th><th>Ed. Cost That Year (₹L)</th></tr></thead>
+              <tbody id="ed-table-body"></tbody>
+            </table>
+          </div>
+        </div>
     </div>
   </div>
 
@@ -3249,6 +3258,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Property Sale Details</div>
       <div class="card-sub">Enter sale price and purchase cost — TDS is deducted by the buyer before payment to NRI</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('pt-sale').value=5000000;document.getElementById('pt-cost').value=2500000;document.getElementById('pt-hold').value='gt';calcPropTDS();})()">🏠 ₹50L flat (LTCG)</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('pt-sale').value=10000000;document.getElementById('pt-cost').value=4000000;document.getElementById('pt-hold').value='gt';calcPropTDS();})()">🏢 ₹1Cr flat (LTCG)</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('pt-sale').value=3000000;document.getElementById('pt-cost').value=2500000;document.getElementById('pt-hold').value='lt';calcPropTDS();})()">⚡ ₹30L short-term</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('pt-sale').value=20000000;document.getElementById('pt-cost').value=8000000;document.getElementById('pt-hold').value='gt';calcPropTDS();})()">🏗️ ₹2Cr plot sale</button>
+      </div>
       <div class="fg">
         <div class="f"><label>Sale Price (&#8377;)</label><input type="number" id="pt-sale" value="5000000" min="0" oninput="calcPropTDS()"/></div>
         <div class="f"><label>Purchase / Cost Price (&#8377;)</label><input type="number" id="pt-cost" value="2500000" min="0" oninput="calcPropTDS()"/></div>
@@ -3310,6 +3326,12 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>Your EPF Details</div>
       <div class="card-sub">Check your EPF balance on the EPFO UAN portal before entering — balance includes both employee and employer contributions</div>
+      <div class="tpl-row">
+        <span class="tpl-label">Quick fill:</span>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('epf-bal').value=300000;document.getElementById('epf-yrs').value=4;document.getElementById('epf-sal').value=35000;document.getElementById('epf-reason').value='nri';calcEPF();})()">💼 3yr NRI (taxable)</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('epf-bal').value=800000;document.getElementById('epf-yrs').value=7;document.getElementById('epf-sal').value=60000;document.getElementById('epf-reason').value='nri';calcEPF();})()">🌏 7yr NRI (tax-free)</button>
+        <button class="tpl-btn" onclick="(function(){document.getElementById('epf-bal').value=2000000;document.getElementById('epf-yrs').value=25;document.getElementById('epf-sal').value=80000;document.getElementById('epf-reason').value='retire';calcEPF();})()">🎯 Retirement corpus</button>
+      </div>
       <div class="fg">
         <div class="f"><label>EPF Balance (&#8377;)</label><input type="number" id="epf-bal" value="500000" min="0" oninput="calcEPF()"/></div>
         <div class="f"><label>Years of Service</label><input type="number" id="epf-yrs" value="6" min="0" max="40" step="0.5" oninput="calcEPF()"/></div>
@@ -3444,128 +3466,107 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 
 
   <div class="tool-section" id="tab-budget">
-    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(20,184,166,0.12),rgba(52,211,153,0.06));border-color:rgba(20,184,166,0.3);">
-      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M16 21H8M12 17v4"/><path d="M6 8h4M6 11h2"/></svg></div>
-      <div class="tool-banner-body">
-        <h2>NRI Budget Tracker</h2>
-        <p>Track overseas living expenses and India commitments side by side. Data saved in your browser — no signup needed.</p>
-      </div>
-    </div>
-
-    <!-- Controls -->
-    <div class="bgt-controls">
+    <!-- Top bar: month nav + currency + rate -->
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;padding:10px 14px;background:var(--fg);border:1px solid var(--border2);border-radius:12px;">
       <div class="bgt-month-nav">
-        <button onclick="bgtPrevMonth()" title="Previous month">&#8249;</button>
-        <span id="bgt-month-label">—</span>
-        <button onclick="bgtNextMonth()" title="Next month">&#8250;</button>
+        <button onclick="bgtPrevMonth()">&#8249;</button>
+        <span id="bgt-month-label" style="font-weight:700;font-size:14px;min-width:100px;text-align:center;">—</span>
+        <button onclick="bgtNextMonth()">&#8250;</button>
       </div>
-      <div class="bgt-cur-row">
-        <label>Currency:</label>
-        <select id="bgt-cur" onchange="bgtOnCurChange()">
-          <option value="USD">USD – US Dollar</option>
-          <option value="AED">AED – UAE Dirham</option>
-          <option value="GBP">GBP – British Pound</option>
-          <option value="SGD">SGD – Singapore Dollar</option>
-          <option value="EUR">EUR – Euro</option>
-          <option value="CAD">CAD – Canadian Dollar</option>
-          <option value="AUD">AUD – Australian Dollar</option>
-          <option value="MYR">MYR – Malaysian Ringgit</option>
-          <option value="QAR">QAR – Qatari Riyal</option>
-          <option value="SAR">SAR – Saudi Riyal</option>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:auto;">
+        <select id="bgt-cur" onchange="bgtOnCurChange()" style="background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:4px 8px;font-size:12px;">
+          <option value="USD">USD</option><option value="AED">AED</option><option value="GBP">GBP</option>
+          <option value="SGD">SGD</option><option value="EUR">EUR</option><option value="CAD">CAD</option>
+          <option value="AUD">AUD</option><option value="MYR">MYR</option><option value="QAR">QAR</option><option value="SAR">SAR</option>
         </select>
-        <label>1 <span class="bgt-cur-sym">USD</span> =</label>
-        <input type="number" id="bgt-rate" value="83.5" min="0.01" step="0.01" onchange="bgtSaveRate();bgtRender()">
-        <label>INR</label>
+        <span style="font-size:12px;color:var(--text3);">1 <span class="bgt-cur-sym">USD</span> =</span>
+        <input type="number" id="bgt-rate" value="83.5" min="0.01" step="0.01" onchange="bgtSaveRate();bgtRender()" style="width:72px;background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:4px 6px;font-size:12px;">
+        <span style="font-size:12px;color:var(--text3);">INR</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:6px;">💾 auto-saved</span>
       </div>
     </div>
 
-    <!-- Summary strip -->
-    <div class="bgt-summary">
-      <div class="bgt-sum-item">
-        <div class="bgt-sum-label">Total Income</div>
-        <div class="bgt-sum-val income" id="bgt-sum-income">—</div>
-        <div class="bgt-inr-note" id="bgt-sum-income-inr"></div>
+    <!-- Compact summary row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+      <div style="background:var(--fg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Income</div>
+        <div style="font-size:13px;font-weight:700;color:#34d399;margin-top:2px;" id="bgt-sum-income">—</div>
+        <div style="font-size:10px;color:var(--text3);" id="bgt-sum-income-inr"></div>
       </div>
-      <div class="bgt-sum-item">
-        <div class="bgt-sum-label">Overseas Spend</div>
-        <div class="bgt-sum-val red" id="bgt-sum-overseas">—</div>
-        <div class="bgt-inr-note" id="bgt-sum-overseas-inr"></div>
+      <div style="background:var(--fg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Overseas</div>
+        <div style="font-size:13px;font-weight:700;color:#f87171;margin-top:2px;" id="bgt-sum-overseas">—</div>
+        <div style="font-size:10px;color:var(--text3);" id="bgt-sum-overseas-inr"></div>
       </div>
-      <div class="bgt-sum-item">
-        <div class="bgt-sum-label">India Commitments</div>
-        <div class="bgt-sum-val amber" id="bgt-sum-india">—</div>
+      <div style="background:var(--fg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">India</div>
+        <div style="font-size:13px;font-weight:700;color:var(--amber);margin-top:2px;" id="bgt-sum-india">—</div>
       </div>
-      <div class="bgt-sum-item">
-        <div class="bgt-sum-label">Net Savings (INR)</div>
-        <div class="bgt-sum-val teal" id="bgt-sum-savings">—</div>
-      </div>
-      <div class="bgt-sum-item">
-        <div class="bgt-sum-label">Savings Rate</div>
-        <div class="bgt-sum-val" id="bgt-sum-rate">—</div>
+      <div style="background:var(--fg);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">Savings</div>
+        <div style="font-size:13px;font-weight:700;color:var(--teal);margin-top:2px;" id="bgt-sum-savings">—</div>
+        <div style="font-size:10px;color:var(--text3);" id="bgt-sum-rate"></div>
       </div>
     </div>
 
-    <!-- Add entry form -->
-    <div class="card">
-      <div class="card-hd"><div class="card-hd-bar"></div>Add Entry</div>
-      <div class="fg">
-        <div class="f">
-          <label>Section</label>
-          <select id="bgt-add-sec" onchange="bgtUpdateAddForm()">
-            <option value="income">💰 Income</option>
-            <option value="overseas">🌏 Overseas Expense</option>
-            <option value="india">🇮🇳 India Commitment</option>
-          </select>
-        </div>
-        <div class="f">
-          <label>Category</label>
-          <select id="bgt-add-cat"></select>
-        </div>
-        <div class="f">
-          <label>Description</label>
-          <input type="text" id="bgt-add-desc" placeholder="e.g. Monthly rent">
-        </div>
-        <div class="f">
-          <label>Amount (<span id="bgt-add-cur-lbl">USD</span>)</label>
-          <input type="number" id="bgt-add-amt" placeholder="0.00" min="0" step="0.01">
-        </div>
+    <!-- Inline add form -->
+    <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--fg);border:1px solid var(--border2);border-radius:12px;margin-bottom:12px;">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--text3);">Section</label>
+        <select id="bgt-add-sec" onchange="bgtUpdateAddForm()" style="background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:6px 8px;font-size:12px;">
+          <option value="income">💰 Income</option>
+          <option value="overseas">🌏 Overseas</option>
+          <option value="india">🇮🇳 India</option>
+        </select>
       </div>
-      <button class="calc-btn" onclick="bgtAddEntry()" style="margin-top:10px;width:100%;padding:11px;">+ Add Entry</button>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--text3);">Category</label>
+        <select id="bgt-add-cat" style="background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:6px 8px;font-size:12px;"></select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:110px;">
+        <label style="font-size:10px;color:var(--text3);">Description</label>
+        <input type="text" id="bgt-add-desc" placeholder="e.g. Monthly rent" style="background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:6px 8px;font-size:12px;width:100%;">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--text3);">Amount (<span id="bgt-add-cur-lbl">USD</span>)</label>
+        <input type="number" id="bgt-add-amt" placeholder="0.00" min="0" step="0.01" style="width:90px;background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:6px 8px;font-size:12px;">
+      </div>
+      <button onclick="bgtAddEntry()" style="background:var(--teal);border:none;color:#000;font-weight:700;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;white-space:nowrap;">+ Add</button>
     </div>
 
-    <!-- Income table -->
-    <div class="card" style="margin-top:16px;">
-      <div class="card-hd"><div class="card-hd-bar" style="background:var(--teal)"></div>💰 Income</div>
-      <table class="bgt-table">
-        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>≈ INR</th><th></th></tr></thead>
-        <tbody id="bgt-body-income"><tr><td colspan="5" class="bgt-empty">No income entries yet</td></tr></tbody>
-        <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-income-cur">—</td><td id="bgt-tot-income-inr">—</td><td></td></tr></tfoot>
-      </table>
+    <!-- Income entries (collapsible) -->
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <span style="font-size:12px;font-weight:600;color:#34d399;">💰 Income entries</span>
+        <span style="font-size:11px;color:var(--text3);">tap to expand ▾</span>
+      </div>
+      <div style="display:none;margin-top:4px;">
+        <table class="bgt-table">
+          <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>≈ INR</th><th></th></tr></thead>
+          <tbody id="bgt-body-income"><tr><td colspan="5" class="bgt-empty">No income entries yet</td></tr></tbody>
+          <tfoot><tr><td colspan="2" style="font-size:11px;font-weight:700;">Total</td><td id="bgt-tot-income-cur" style="font-size:11px;font-weight:700;">—</td><td id="bgt-tot-income-inr" style="font-size:11px;font-weight:700;">—</td><td></td></tr></tfoot>
+        </table>
+      </div>
     </div>
 
     <!-- Overseas + India side by side -->
     <div class="bgt-panels">
-      <div class="card">
-        <div class="card-hd"><div class="card-hd-bar" style="background:#f87171"></div>🌏 Overseas Expenses</div>
+      <div class="card" style="padding:12px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#f87171;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">🌏 Overseas Expenses</div>
         <table class="bgt-table">
-          <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>≈ INR</th><th></th></tr></thead>
-          <tbody id="bgt-body-overseas"><tr><td colspan="5" class="bgt-empty">No overseas entries yet</td></tr></tbody>
-          <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-overseas-cur">—</td><td id="bgt-tot-overseas-inr">—</td><td></td></tr></tfoot>
+          <thead><tr><th>Category</th><th>Desc</th><th>Amt</th><th>≈₹</th><th></th></tr></thead>
+          <tbody id="bgt-body-overseas"><tr><td colspan="5" class="bgt-empty">No entries yet</td></tr></tbody>
+          <tfoot><tr><td colspan="2" style="font-size:11px;font-weight:700;">Total</td><td id="bgt-tot-overseas-cur" style="font-size:11px;font-weight:700;">—</td><td id="bgt-tot-overseas-inr" style="font-size:11px;font-weight:700;">—</td><td></td></tr></tfoot>
         </table>
       </div>
-      <div class="card">
-        <div class="card-hd"><div class="card-hd-bar" style="background:var(--amber)"></div>🇮🇳 India Commitments</div>
+      <div class="card" style="padding:12px 14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">🇮🇳 India Commitments</div>
         <table class="bgt-table">
-          <thead><tr><th>Category</th><th>Description</th><th>₹ Amount</th><th></th></tr></thead>
-          <tbody id="bgt-body-india"><tr><td colspan="4" class="bgt-empty">No India entries yet</td></tr></tbody>
-          <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-india">—</td><td></td></tr></tfoot>
+          <thead><tr><th>Category</th><th>Desc</th><th>₹ Amt</th><th></th></tr></thead>
+          <tbody id="bgt-body-india"><tr><td colspan="4" class="bgt-empty">No entries yet</td></tr></tbody>
+          <tfoot><tr><td colspan="2" style="font-size:11px;font-weight:700;">Total</td><td id="bgt-tot-india" style="font-size:11px;font-weight:700;">—</td><td></td></tr></tfoot>
         </table>
       </div>
-    </div>
-
-    <!-- Note -->
-    <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid var(--border2);">
-      <span style="font-size:11.5px;color:var(--text3);">💾 Data is saved automatically in your browser (localStorage). It stays across sessions on this device. Use a different currency per month by switching the currency selector — each month's rate is saved independently.</span>
     </div>
   </div>
 
@@ -3614,7 +3615,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.7 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.9 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -5128,7 +5129,7 @@ function calcEdPlan(){
 
   // Render progress ring
   const pct=Math.min(100,Math.round(projCorpus/totalNeeded*100));
-  const arc=document.getElementById('ed-ring-arc');
+  const arc=(document.getElementById('ed-ring-arc')||{style:{},setAttribute:function(){}});
   if(arc){
     arc.style.strokeDashoffset=String(Math.round(314*(1-pct/100)));
     arc.style.stroke=onTrack?'var(--green)':pct>=70?'var(--amber)':'#f43f5e';
