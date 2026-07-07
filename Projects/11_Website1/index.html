@@ -1307,9 +1307,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rtp-checkitem .rci{color:var(--teal);font-weight:700;font-size:11px;}
 
 /* ── Hero dual-widget row ──────────────────────────── */
-.hero-widgets-row{display:flex;gap:18px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-top:28px;animation:fadeUp .7s .45s ease both;}
-.hero-rates-panel{margin:0!important;width:100%;max-width:480px;flex:0 1 480px;}
-.hero-corpus-panel{width:100%;max-width:320px;flex:0 1 320px;background:rgba(4,12,28,0.72);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(20,184,166,0.28);border-radius:22px;overflow:hidden;padding:20px;}
+.hero-widgets-row{display:flex;gap:16px;justify-content:center;align-items:flex-start;flex-wrap:nowrap;margin-top:28px;animation:fadeUp .7s .45s ease both;width:100%;max-width:860px;}
+.hero-widgets-row .hero-rates-panel{margin:0!important;width:auto!important;flex:1 1 460px;min-width:0;}
+.hero-corpus-panel{flex:0 0 300px;min-width:280px;background:rgba(4,12,28,0.72);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(20,184,166,0.28);border-radius:22px;overflow:hidden;padding:20px;}
 .hcp-label{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
 .hcp-city-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
 .hcp-city-btn{flex:1;min-width:0;padding:6px 4px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;}
@@ -1324,7 +1324,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hcp-stat-v{font-size:15px;font-weight:900;color:var(--text);}
 .hcp-cta{width:100%;padding:11px;border-radius:12px;background:var(--teal);color:#fff;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:opacity .2s;}
 .hcp-cta:hover{opacity:.88;}
-@media(max-width:700px){.hero-rates-panel{max-width:100%;}.hero-corpus-panel{max-width:100%;}}
+@media(max-width:860px){.hero-widgets-row{flex-wrap:wrap;}.hero-widgets-row .hero-rates-panel{flex:1 1 100%;}.hero-corpus-panel{flex:1 1 100%;}}
 </style>
 </head>
 <body>
@@ -1498,11 +1498,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="hcp-corpus-lbl">&#127942; Corpus You Need</div>
         <div class="hcp-corpus-val" id="hcp-corpus">&#8377;—</div>
         <div class="hcp-corpus-sub">At 8% return · 6% inflation · 5 yrs</div>
+        <div class="hcp-corpus-fx" id="hcp-corpus-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
       </div>
       <div class="hcp-stats">
         <div class="hcp-stat">
           <div class="hcp-stat-l">Monthly SIP</div>
           <div class="hcp-stat-v" id="hcp-sip">&#8377;—</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px;" id="hcp-sip-fx"></div>
         </div>
         <div class="hcp-stat">
           <div class="hcp-stat-l">Sustains for</div>
@@ -3329,7 +3331,7 @@ function syncAmountFromMain(v){const _el=document.getElementById('heroWidgetAmt'
 
 // ── RATE PREVIEW CARD (Hero right panel) ──────
 function renderRatePreview(){
-  updateHeroWidget(); // keep hero widget in sync whenever preview refreshes
+  updateHeroWidget(); calcHeroCorpus(); // keep hero widget in sync whenever preview refreshes
   if(!midRate)return;
   const rpcCur=document.getElementById('rpc-cur');
   if(rpcCur)rpcCur.textContent=baseCur;
@@ -4978,9 +4980,19 @@ function calcHeroCorpus(monthly){
   var el=document.getElementById('hcp-corpus');
   var sipEl=document.getElementById('hcp-sip');
   var susEl=document.getElementById('hcp-sustain');
+  var fxEl=document.getElementById('hcp-corpus-fx');
+  var sipFxEl=document.getElementById('hcp-sip-fx');
   if(el)el.textContent=fmtCr(corpus);
   if(sipEl)sipEl.textContent=sip>0?'₹'+Math.round(sip/1000).toFixed(0)+'K/mo':'₹—';
   if(susEl)susEl.textContent=survive>=40?'40+ yrs':survive+' yrs';
+  // FX equivalents
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    if(fxEl)fxEl.textContent='≈ '+baseCur+' '+Math.round(corpus/midRate/100000).toFixed(1)+'L';
+    if(sipFxEl)sipFxEl.textContent='≈ '+baseCur+' '+Math.round(sip/midRate).toLocaleString('en-IN');
+  } else {
+    if(fxEl)fxEl.textContent='';
+    if(sipFxEl)sipFxEl.textContent='';
+  }
 }
 function hcpSetCity(btn){
   document.querySelectorAll('.hcp-city-btn').forEach(function(b){b.classList.remove('active');});
