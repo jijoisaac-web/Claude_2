@@ -1381,6 +1381,40 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .nav-dd-heading{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:4px 8px 8px;}
 .nav-dropdown a{display:block;padding:7px 10px;border-radius:8px;font-size:12.5px;color:var(--text2);text-decoration:none;transition:all .15s;cursor:pointer;white-space:nowrap;}
 .nav-dropdown a:hover{background:var(--elevated);color:var(--text);}
+
+/* ── NRI Budget Tracker ───────────────────────────────── */
+.bgt-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:16px;padding:14px 18px;background:var(--fg);border:1px solid var(--border2);border-radius:14px;}
+.bgt-month-nav{display:flex;align-items:center;gap:10px;}
+.bgt-month-nav button{background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text1);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;}
+.bgt-month-nav button:hover{background:rgba(20,184,166,0.15);border-color:var(--teal);}
+#bgt-month-label{font-weight:700;font-size:15px;color:var(--text1);min-width:110px;text-align:center;}
+.bgt-cur-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.bgt-cur-row label{font-size:12px;color:var(--text2);}
+.bgt-cur-row select,.bgt-cur-row input{background:var(--card);border:1px solid var(--border2);color:var(--text1);border-radius:8px;padding:5px 8px;font-size:13px;}
+.bgt-cur-row input{width:80px;}
+.bgt-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:700px){.bgt-summary{grid-template-columns:1fr 1fr;}}
+.bgt-sum-item{background:var(--fg);border:1px solid var(--border2);border-radius:12px;padding:12px 14px;}
+.bgt-sum-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.bgt-sum-val{font-size:15px;font-weight:700;color:var(--text1);}
+.bgt-sum-val.red{color:#f87171;}
+.bgt-sum-val.amber{color:var(--amber);}
+.bgt-sum-val.teal{color:var(--teal);}
+.bgt-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+.bgt-table thead th{color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;text-align:left;border-bottom:1px solid var(--border2);}
+.bgt-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.04);}
+.bgt-table tbody tr:hover{background:rgba(255,255,255,0.03);}
+.bgt-table tbody td{padding:7px 8px;color:var(--text2);vertical-align:middle;}
+.bgt-table tfoot td{padding:8px 8px;font-weight:700;color:var(--text1);border-top:1px solid var(--border2);}
+.bgt-table .bgt-del{background:none;border:none;color:rgba(255,255,255,0.2);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;}
+.bgt-table .bgt-del:hover{color:#f87171;background:rgba(248,113,113,0.1);}
+.bgt-cat-pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(20,184,166,0.12);color:var(--teal);white-space:nowrap;}
+.bgt-cat-pill.india{background:rgba(240,165,32,0.12);color:var(--amber);}
+.bgt-cat-pill.income{background:rgba(52,211,153,0.12);color:#34d399;}
+.bgt-empty{text-align:center;color:var(--text3);font-size:12px;padding:18px 0;font-style:italic;}
+.bgt-panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+@media(max-width:700px){.bgt-panels{grid-template-columns:1fr;}}
+.bgt-inr-note{font-size:10px;color:var(--text3);}
 </style>
 <script type="application/ld+json">
 {
@@ -1534,7 +1568,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.6</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.8</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -1563,6 +1597,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
           <a onclick="closeNavDD();showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🏡 Return to India</a>
           <a onclick="closeNavDD();showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🎓 Education Corpus</a>
           <a onclick="closeNavDD();showTab('panaadhaar',document.querySelector('[data-tab=panaadhaar]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🪪 PAN &amp; Aadhaar</a>
+          <a onclick="closeNavDD();showTab('budget',document.querySelector('[data-tab=budget]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">💰 Budget Tracker</a>
         </div>
       </div>
     </div>
@@ -2209,6 +2244,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="drawer-item" data-tab="edplan" onclick="showTab('edplan',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
+    </div>
+    <div class="drawer-section-lbl">Budgeting</div>
+    <div class="drawer-item" data-tab="budget" onclick="showTab('budget',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M16 21H8M12 17v4"/><path d="M6 8h4M6 11h2"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Budget Tracker</div><div class="drawer-desc">Overseas &amp; India expenses monthly</div></div>
     </div>
     <div class="drawer-section-lbl">Guides</div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
@@ -3402,6 +3442,136 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     </div>
   </div>
 
+
+  <div class="tool-section" id="tab-budget">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(20,184,166,0.12),rgba(52,211,153,0.06));border-color:rgba(20,184,166,0.3);">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M16 21H8M12 17v4"/><path d="M6 8h4M6 11h2"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>NRI Budget Tracker</h2>
+        <p>Track overseas living expenses and India commitments side by side. Data saved in your browser — no signup needed.</p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="bgt-controls">
+      <div class="bgt-month-nav">
+        <button onclick="bgtPrevMonth()" title="Previous month">&#8249;</button>
+        <span id="bgt-month-label">—</span>
+        <button onclick="bgtNextMonth()" title="Next month">&#8250;</button>
+      </div>
+      <div class="bgt-cur-row">
+        <label>Currency:</label>
+        <select id="bgt-cur" onchange="bgtOnCurChange()">
+          <option value="USD">USD – US Dollar</option>
+          <option value="AED">AED – UAE Dirham</option>
+          <option value="GBP">GBP – British Pound</option>
+          <option value="SGD">SGD – Singapore Dollar</option>
+          <option value="EUR">EUR – Euro</option>
+          <option value="CAD">CAD – Canadian Dollar</option>
+          <option value="AUD">AUD – Australian Dollar</option>
+          <option value="MYR">MYR – Malaysian Ringgit</option>
+          <option value="QAR">QAR – Qatari Riyal</option>
+          <option value="SAR">SAR – Saudi Riyal</option>
+        </select>
+        <label>1 <span class="bgt-cur-sym">USD</span> =</label>
+        <input type="number" id="bgt-rate" value="83.5" min="0.01" step="0.01" onchange="bgtSaveRate();bgtRender()">
+        <label>INR</label>
+      </div>
+    </div>
+
+    <!-- Summary strip -->
+    <div class="bgt-summary">
+      <div class="bgt-sum-item">
+        <div class="bgt-sum-label">Total Income</div>
+        <div class="bgt-sum-val income" id="bgt-sum-income">—</div>
+        <div class="bgt-inr-note" id="bgt-sum-income-inr"></div>
+      </div>
+      <div class="bgt-sum-item">
+        <div class="bgt-sum-label">Overseas Spend</div>
+        <div class="bgt-sum-val red" id="bgt-sum-overseas">—</div>
+        <div class="bgt-inr-note" id="bgt-sum-overseas-inr"></div>
+      </div>
+      <div class="bgt-sum-item">
+        <div class="bgt-sum-label">India Commitments</div>
+        <div class="bgt-sum-val amber" id="bgt-sum-india">—</div>
+      </div>
+      <div class="bgt-sum-item">
+        <div class="bgt-sum-label">Net Savings (INR)</div>
+        <div class="bgt-sum-val teal" id="bgt-sum-savings">—</div>
+      </div>
+      <div class="bgt-sum-item">
+        <div class="bgt-sum-label">Savings Rate</div>
+        <div class="bgt-sum-val" id="bgt-sum-rate">—</div>
+      </div>
+    </div>
+
+    <!-- Add entry form -->
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Add Entry</div>
+      <div class="fg">
+        <div class="f">
+          <label>Section</label>
+          <select id="bgt-add-sec" onchange="bgtUpdateAddForm()">
+            <option value="income">💰 Income</option>
+            <option value="overseas">🌏 Overseas Expense</option>
+            <option value="india">🇮🇳 India Commitment</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Category</label>
+          <select id="bgt-add-cat"></select>
+        </div>
+        <div class="f">
+          <label>Description</label>
+          <input type="text" id="bgt-add-desc" placeholder="e.g. Monthly rent">
+        </div>
+        <div class="f">
+          <label>Amount (<span id="bgt-add-cur-lbl">USD</span>)</label>
+          <input type="number" id="bgt-add-amt" placeholder="0.00" min="0" step="0.01">
+        </div>
+      </div>
+      <button class="calc-btn" onclick="bgtAddEntry()" style="margin-top:10px;width:100%;padding:11px;">+ Add Entry</button>
+    </div>
+
+    <!-- Income table -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-hd"><div class="card-hd-bar" style="background:var(--teal)"></div>💰 Income</div>
+      <table class="bgt-table">
+        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>≈ INR</th><th></th></tr></thead>
+        <tbody id="bgt-body-income"><tr><td colspan="5" class="bgt-empty">No income entries yet</td></tr></tbody>
+        <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-income-cur">—</td><td id="bgt-tot-income-inr">—</td><td></td></tr></tfoot>
+      </table>
+    </div>
+
+    <!-- Overseas + India side by side -->
+    <div class="bgt-panels">
+      <div class="card">
+        <div class="card-hd"><div class="card-hd-bar" style="background:#f87171"></div>🌏 Overseas Expenses</div>
+        <table class="bgt-table">
+          <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>≈ INR</th><th></th></tr></thead>
+          <tbody id="bgt-body-overseas"><tr><td colspan="5" class="bgt-empty">No overseas entries yet</td></tr></tbody>
+          <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-overseas-cur">—</td><td id="bgt-tot-overseas-inr">—</td><td></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-hd-bar" style="background:var(--amber)"></div>🇮🇳 India Commitments</div>
+        <table class="bgt-table">
+          <thead><tr><th>Category</th><th>Description</th><th>₹ Amount</th><th></th></tr></thead>
+          <tbody id="bgt-body-india"><tr><td colspan="4" class="bgt-empty">No India entries yet</td></tr></tbody>
+          <tfoot><tr><td colspan="2">Total</td><td id="bgt-tot-india">—</td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Export / Import toolbar -->
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid var(--border2);">
+      <span style="font-size:11.5px;color:var(--text3);flex:1;min-width:180px;">💾 Data saved in this browser. Use Export to back up or move data to another device.</span>
+      <button class="aff-btn aff-btn-primary" style="font-size:12px;padding:7px 14px;" onclick="bgtExport()">⬇ Export JSON</button>
+      <label class="aff-btn aff-btn-secondary" style="font-size:12px;padding:7px 14px;cursor:pointer;">⬆ Import JSON<input type="file" accept=".json" style="display:none;" onchange="bgtImport(this)"></label>
+      <button class="aff-btn" style="font-size:12px;padding:7px 14px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);color:#f87171;" onclick="bgtClearAll()">🗑 Clear All</button>
+    </div>
+  </div>
+
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-inner">
@@ -3447,7 +3617,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.6 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.8 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -5795,6 +5965,280 @@ function closeNavDD(){
   document.querySelectorAll('.nav-dropdown').forEach(function(d){d.classList.remove('open');});
 }
 
+
+
+// ── NRI BUDGET TRACKER ─────────────────────────────────────────────────────
+(function(){
+  var BGT_KEY = 'nriBudget_v1';
+  var bgtData = {};
+  var bgtYear, bgtMonth; // current view
+
+  var BGT_CATS = {
+    income: ['Salary / Wages','Freelance / Consulting','Rental Income (India)','Dividends / Interest','Business Income','Other Income'],
+    overseas: ['Housing / Rent','Groceries & Food','Transport / Fuel','Utilities','Insurance','Children's Education','Entertainment','Healthcare','Dining Out','Clothing','Personal Care','Subscriptions','Misc Overseas'],
+    india: ['Family Support','Home Loan EMI','Car / Other EMI','LIC / Insurance','Property Maintenance','SIP / Investments','PPF / NPS','School / College Fees','Medical (India)','Misc India']
+  };
+
+  function bgtKey(y,m){return y+'-'+(m<10?'0'+m:m);}
+
+  function bgtLoad(){
+    try{ bgtData = JSON.parse(localStorage.getItem(BGT_KEY)||'{}'); }
+    catch(e){ bgtData={}; }
+  }
+  function bgtSave(){
+    try{ localStorage.setItem(BGT_KEY, JSON.stringify(bgtData)); }
+    catch(e){}
+  }
+
+  function bgtGetMonth(y,m){
+    var k=bgtKey(y,m);
+    if(!bgtData[k]) bgtData[k]={entries:[],rate:83.5,cur:'USD'};
+    return bgtData[k];
+  }
+
+  var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function bgtInit(){
+    bgtLoad();
+    var now=new Date();
+    bgtYear=now.getFullYear();
+    bgtMonth=now.getMonth()+1;
+    bgtUpdateMonthLabel();
+    bgtUpdateAddForm();
+    bgtRender();
+  }
+
+  function bgtUpdateMonthLabel(){
+    var el=document.getElementById('bgt-month-label');
+    if(el) el.textContent=MONTH_NAMES[bgtMonth-1]+' '+bgtYear;
+  }
+
+  window.bgtPrevMonth=function(){
+    bgtMonth--;
+    if(bgtMonth<1){bgtMonth=12;bgtYear--;}
+    bgtUpdateMonthLabel();
+    bgtSyncControls();
+    bgtRender();
+  };
+  window.bgtNextMonth=function(){
+    bgtMonth++;
+    if(bgtMonth>12){bgtMonth=1;bgtYear++;}
+    bgtUpdateMonthLabel();
+    bgtSyncControls();
+    bgtRender();
+  };
+
+  function bgtSyncControls(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    if(curEl) curEl.value=d.cur||'USD';
+    if(rateEl) rateEl.value=d.rate||83.5;
+    bgtUpdateCurLabels();
+  }
+
+  function bgtUpdateCurLabels(){
+    var cur=(document.getElementById('bgt-cur')||{}).value||'USD';
+    document.querySelectorAll('.bgt-cur-sym').forEach(function(el){el.textContent=cur;});
+    var lbl=document.getElementById('bgt-add-cur-lbl');
+    var sec=(document.getElementById('bgt-add-sec')||{}).value||'income';
+    if(lbl) lbl.textContent = sec==='india' ? 'INR' : cur;
+  }
+
+  window.bgtOnCurChange=function(){
+    bgtSaveRate();
+    bgtUpdateCurLabels();
+    bgtRender();
+  };
+
+  window.bgtSaveRate=function(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    if(curEl) d.cur=curEl.value;
+    if(rateEl) d.rate=parseFloat(rateEl.value)||83.5;
+    bgtSave();
+  };
+
+  window.bgtUpdateAddForm=function(){
+    var sec=(document.getElementById('bgt-add-sec')||{}).value||'income';
+    var catEl=document.getElementById('bgt-add-cat');
+    if(!catEl) return;
+    var cats=BGT_CATS[sec]||[];
+    catEl.innerHTML=cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');
+    bgtUpdateCurLabels();
+  };
+
+  window.bgtAddEntry=function(){
+    var sec=(document.getElementById('bgt-add-sec')||{}).value;
+    var cat=(document.getElementById('bgt-add-cat')||{}).value;
+    var desc=((document.getElementById('bgt-add-desc')||{}).value||'').trim();
+    var amt=parseFloat((document.getElementById('bgt-add-amt')||{}).value)||0;
+    if(!amt){alert('Please enter an amount.');return;}
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    d.cur=(curEl||{}).value||'USD';
+    d.rate=parseFloat((rateEl||{}).value)||83.5;
+    d.entries.push({id:Date.now(),section:sec,category:cat,desc:desc,amount:amt});
+    bgtSave();
+    var descEl=document.getElementById('bgt-add-desc');
+    var amtEl=document.getElementById('bgt-add-amt');
+    if(descEl) descEl.value='';
+    if(amtEl) amtEl.value='';
+    bgtRender();
+  };
+
+  window.bgtDeleteEntry=function(id){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    d.entries=d.entries.filter(function(e){return e.id!==id;});
+    bgtSave();
+    bgtRender();
+  };
+
+  function fmtCur(n,cur){
+    return cur+' '+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  }
+  function fmtINR(n){
+    return '₹'+Math.round(n).toLocaleString('en-IN');
+  }
+
+  window.bgtRender=function(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var cur=d.cur||'USD';
+    var rate=d.rate||83.5;
+    bgtSyncControls();
+
+    var income=d.entries.filter(function(e){return e.section==='income';});
+    var overseas=d.entries.filter(function(e){return e.section==='overseas';});
+    var india=d.entries.filter(function(e){return e.section==='india';});
+
+    var totIncCur=income.reduce(function(s,e){return s+e.amount;},0);
+    var totOvCur=overseas.reduce(function(s,e){return s+e.amount;},0);
+    var totIndINR=india.reduce(function(s,e){return s+e.amount;},0);
+    var totIncINR=totIncCur*rate;
+    var totOvINR=totOvCur*rate;
+    var savings=totIncINR-totOvINR-totIndINR;
+    var rate_pct=totIncINR>0?Math.round(savings/totIncINR*100):0;
+
+    function setEl(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+    setEl('bgt-sum-income',fmtCur(totIncCur,cur));
+    setEl('bgt-sum-income-inr',fmtINR(totIncINR));
+    setEl('bgt-sum-overseas',fmtCur(totOvCur,cur));
+    setEl('bgt-sum-overseas-inr',fmtINR(totOvINR));
+    setEl('bgt-sum-india',fmtINR(totIndINR));
+    setEl('bgt-sum-savings',fmtINR(savings));
+    setEl('bgt-sum-rate', rate_pct+'%');
+    setEl('bgt-tot-income-cur',fmtCur(totIncCur,cur));
+    setEl('bgt-tot-income-inr',fmtINR(totIncINR));
+    setEl('bgt-tot-overseas-cur',fmtCur(totOvCur,cur));
+    setEl('bgt-tot-overseas-inr',fmtINR(totOvINR));
+    setEl('bgt-tot-india',fmtINR(totIndINR));
+
+    function buildRows(entries,isIndia){
+      if(!entries.length) return '<tr><td colspan="'+(isIndia?4:5)+'" class="bgt-empty">No entries yet</td></tr>';
+      return entries.map(function(e){
+        var amtStr = isIndia ? fmtINR(e.amount) : fmtCur(e.amount,cur);
+        var inrStr = isIndia ? '' : '<td class="bgt-inr-note">'+fmtINR(e.amount*rate)+'</td>';
+        var pillCls = isIndia ? 'india' : (e.section==='income'?'income':'');
+        return '<tr><td><span class="bgt-cat-pill '+pillCls+'">'+e.category+'</span></td><td>'+
+          (e.desc||'—')+'</td><td>'+amtStr+'</td>'+inrStr+
+          '<td><button class="bgt-del" onclick="bgtDeleteEntry('+e.id+')" title="Delete">✕</button></td></tr>';
+      }).join('');
+    }
+
+    var bodyInc=document.getElementById('bgt-body-income');
+    var bodyOv=document.getElementById('bgt-body-overseas');
+    var bodyInd=document.getElementById('bgt-body-india');
+    if(bodyInc) bodyInc.innerHTML=buildRows(income,false);
+    if(bodyOv) bodyOv.innerHTML=buildRows(overseas,false);
+    if(bodyInd) bodyInd.innerHTML=buildRows(india,true);
+
+    // Colour savings rate
+    var rateEl=document.getElementById('bgt-sum-rate');
+    if(rateEl){
+      rateEl.className='bgt-sum-val'+(rate_pct>=30?' teal':rate_pct>=10?' amber':' red');
+    }
+  };
+
+  // Init when tab is opened
+  var _bgtInited=false;
+  var _bgtOrig=window.showTab;
+  window.showTab=function(tabId,el){
+    if(typeof _bgtOrig==='function') _bgtOrig(tabId,el);
+    if(tabId==='budget' && !_bgtInited){
+      _bgtInited=true;
+      setTimeout(bgtInit,50);
+    }
+  };
+  // Also init if already on tab
+  document.addEventListener('DOMContentLoaded',function(){
+    if(document.getElementById('tab-budget') &&
+       document.getElementById('tab-budget').style.display!=='none'){
+      bgtInit();
+    }
+  });
+})();
+
+  window.bgtExport=function(){
+    bgtLoad();
+    var json=JSON.stringify(bgtData,null,2);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    var today=new Date();
+    a.download='nri-budget-'+today.getFullYear()+'-'+(today.getMonth()+1<10?'0':'')+(today.getMonth()+1)+'.json';
+    a.href=url;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  window.bgtImport=function(input){
+    var file=input.files[0];
+    if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var imported=JSON.parse(e.target.result);
+        if(typeof imported!=='object'||Array.isArray(imported)){
+          alert('Invalid file — expected NRI Budget Tracker export.');
+          return;
+        }
+        var keys=Object.keys(imported);
+        var valid=keys.every(function(k){return /^\d{4}-\d{2}$/.test(k)&&Array.isArray(imported[k].entries);});
+        if(!valid){alert('File format not recognised. Please use an exported NRI Budget file.');return;}
+        var merged=0,added=0;
+        keys.forEach(function(k){
+          if(bgtData[k]){
+            // Merge: add entries not already present by id
+            var existIds=bgtData[k].entries.map(function(e){return e.id;});
+            imported[k].entries.forEach(function(e){
+              if(existIds.indexOf(e.id)===-1){bgtData[k].entries.push(e);merged++;}
+            });
+          } else {
+            bgtData[k]=imported[k];
+            added+=imported[k].entries.length;
+          }
+        });
+        bgtSave();
+        bgtRender();
+        alert('Import complete. '+keys.length+' month(s) loaded, '+merged+' new entries merged.');
+      } catch(err){
+        alert('Could not read file: '+err.message);
+      }
+      input.value='';
+    };
+    reader.readAsText(file);
+  };
+
+  window.bgtClearAll=function(){
+    if(!confirm('Delete ALL budget data for all months? This cannot be undone.')) return;
+    bgtData={};
+    bgtSave();
+    bgtRender();
+  };
+
+// ── END BUDGET TRACKER ─────────────────────────────────────────────────────
 
 </script>
 </body>
