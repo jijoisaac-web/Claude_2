@@ -2609,7 +2609,7 @@ function closeNavDD(){
   let _flOrigin=null;
 
   function initFlights(){
-    var cur=window.baseCur||'AED';
+    var cur=baseCur||'AED';
     var data=FL[cur]||FL['AED'];
     _flOrigin=data.origins[0].code;
     var lbl=document.getElementById('fl-cur-label');
@@ -2631,7 +2631,7 @@ function closeNavDD(){
     _flOrigin=code;
     document.querySelectorAll('.fl-pill').forEach(function(p){p.classList.remove('active');});
     el.classList.add('active');
-    var cur=window.baseCur||'AED';
+    var cur=baseCur||'AED';
     renderDests(cur,FL[cur]||FL['AED']);
   };
 
@@ -2671,7 +2671,8 @@ function closeNavDD(){
   var _flCurOrig=window.selectCurrency;
   window.selectCurrency=function(el){
     if(typeof _flCurOrig==='function') _flCurOrig(el);
-    if(document.getElementById('tab-flights')&&document.getElementById('tab-flights').classList.contains('active')){
+    var flEl=document.getElementById('tab-flights');
+    if(flEl&&flEl.style.display!=='none'){
       setTimeout(initFlights,80);
     }
   };
