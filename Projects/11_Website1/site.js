@@ -1,0 +1,2559 @@
+
+
+// ── CURRENCY DATA MAP ──────────────────────────────
+const CUR_META={
+  AED:{flag:'<span class="fi fi-ae fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ae',name:'UAE Dirham',region:'Gulf'},
+  SAR:{flag:'<span class="fi fi-sa fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'sa',name:'Saudi Riyal',region:'Gulf'},
+  QAR:{flag:'<span class="fi fi-qa fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'qa',name:'Qatari Riyal',region:'Gulf'},
+  KWD:{flag:'<span class="fi fi-kw fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'kw',name:'Kuwaiti Dinar',region:'Gulf'},
+  BHD:{flag:'<span class="fi fi-bh fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'bh',name:'Bahraini Dinar',region:'Gulf'},
+  OMR:{flag:'<span class="fi fi-om fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'om',name:'Omani Rial',region:'Gulf'},
+  MYR:{flag:'<span class="fi fi-my fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'my',name:'Malaysian Ringgit',region:'SE Asia'},
+  SGD:{flag:'<span class="fi fi-sg fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'sg',name:'Singapore Dollar',region:'SE Asia'},
+  AUD:{flag:'<span class="fi fi-au fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'au',name:'Australian Dollar',region:'Oceania'},
+  NZD:{flag:'<span class="fi fi-nz fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'nz',name:'NZ Dollar',region:'Oceania'},
+  USD:{flag:'<span class="fi fi-us fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'us',name:'US Dollar',region:'Americas'},
+  CAD:{flag:'<span class="fi fi-ca fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ca',name:'Canadian Dollar',region:'Americas'},
+  EUR:{flag:'<span class="fi fi-eu fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'eu',name:'Euro',region:'Europe'},
+  GBP:{flag:'<span class="fi fi-gb fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'gb',name:'British Pound',region:'Europe'},
+};
+
+// ── CUSTOM DROPDOWN ────────────────────────────────
+function toggleCurDropdown(e){
+  e.stopPropagation();
+  const panel=document.getElementById('curPanel');
+  const btn=document.getElementById('curBtn');
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+}
+function selectCurrency(el){
+  const val=el.dataset.val;
+  // Update checkmarks
+  document.querySelectorAll('.ci-check').forEach(c=>c.style.display='none');
+  document.querySelectorAll('.cur-item').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const ck=document.getElementById('ck-'+val);
+  if(ck)ck.style.display='';
+  // Update button display
+  const meta=CUR_META[val]||{flag:'🌐',name:val,region:''};
+  document.getElementById('curBtnFlag').innerHTML=meta.flag;
+  document.getElementById('curBtnCode').textContent=val;
+  document.getElementById('curBtnRegion').textContent=meta.region;
+  // Close panel
+  document.getElementById('curPanel').classList.remove('open');
+  document.getElementById('curBtn').classList.remove('open');
+  // Update baseCur and reload rates
+  baseCur=val;
+  const _hfl=document.getElementById('heroFromLabel');if(_hfl)_hfl.textContent=val;
+  document.getElementById('curTag').textContent=val;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=val);
+  updateHeroBg(val);
+  // Sync quick-select pills to match chosen currency
+  document.querySelectorAll('.cflag').forEach(b=>b.classList.remove('active'));
+  const activePill=document.querySelector('.cflag[data-cur="'+val+'"]');
+  if(activePill)activePill.classList.add('active');
+  updateAll();
+}
+// Close dropdown on outside click
+document.addEventListener('click',function(e){
+  const dd=document.getElementById('curDropdown');
+  if(dd&&!dd.contains(e.target)){
+    document.getElementById('curPanel').classList.remove('open');
+    document.getElementById('curBtn').classList.remove('open');
+  }
+});
+
+// ── MARKET RATE BANNER ──────────────────────────────
+function renderMarketRate(){
+  if(!midRate)return;
+  const amt=parseFloat(document.getElementById('sendAmount').value)||1000;
+  const card=document.getElementById('mktRateCard');
+  if(!card)return;
+  card.classList.add('visible');
+  // Mid-market values
+  const midReceive=amt*midRate;
+  document.getElementById('mktRateVal').innerHTML=`1 ${baseCur} = <strong style="color:var(--teal)">&#8377;${midRate.toFixed(4)}</strong>`;
+  document.getElementById('mktSendAmt').textContent=amt.toLocaleString('en-IN');
+  document.getElementById('mktSendCur').textContent=baseCur;
+  document.getElementById('mktReceiveVal').textContent='₹'+Math.round(midReceive).toLocaleString('en-IN');
+  document.getElementById('mktRateTime').textContent=new Date().toLocaleTimeString();
+  // Best provider comparison
+  const providers=P[baseCur]||P['USD'];
+  const sorted=providers.map(p=>{
+    const rate=midRate*(1-p.spread);
+    const inr=Math.max(0,amt-p.fee)*rate;
+    return{...p,rate,inr};
+  }).sort((a,b)=>b.inr-a.inr);
+  const best=sorted[0];const worst=sorted[sorted.length-1];
+  const bestPct=((midReceive-best.inr)/midReceive*100).toFixed(1);
+  const worstPct=((midReceive-worst.inr)/midReceive*100).toFixed(1);
+  document.getElementById('mktMarginNote').textContent=`${bestPct}%–${worstPct}%`;
+  document.getElementById('mktVsBar').innerHTML=`
+    <div class="mkt-vs-item"><div class="mkt-vs-dot" style="background:var(--green)"></div><span class="mkt-vs-label">Best (${best.name}):</span> <span class="mkt-vs-val">&#8377;${Math.round(best.inr).toLocaleString('en-IN')}</span> <span class="mkt-vs-pct" style="color:var(--green)">-${bestPct}% vs mid-market</span></div>
+    <div class="mkt-vs-item" style="margin-left:10px"><div class="mkt-vs-dot" style="background:var(--red)"></div><span class="mkt-vs-label">Bank wire:</span> <span class="mkt-vs-val">&#8377;${Math.round(worst.inr).toLocaleString('en-IN')}</span> <span class="mkt-vs-pct" style="color:var(--red)">-${worstPct}% vs mid-market</span></div>
+  `;
+}
+
+// ── STATE ──────────────────────────────────────
+let midRate=null,baseCur='AED',loanAmortData=[],returnProjData=[];
+
+// ── PROVIDER BADGE STYLES ──────────────────────
+const BADGE={
+  'Wise':          {bg:'#1a3d2b',color:'#4ade80',text:'W'},
+  'LuluMoney':     {bg:'#2d1f47',color:'#a78bfa',text:'LM'},
+  'eRemit':        {bg:'#7a1c1c',color:'#fca5a5',text:'eR'},
+  'Lotus Remit':   {bg:'#1a2a1a',color:'#86efac',text:'LR'},
+  'Merchantrade':  {bg:'#3b2a10',color:'#fbbf24',text:'MT'},
+  'BigPay':        {bg:'#3b1a1a',color:'#f87171',text:'BP'},
+  'SkyRemit':      {bg:'#1a2e3b',color:'#7dd3fc',text:'SR'},
+  'Western Union': {bg:'#3b2e00',color:'#fde68a',text:'WU'},
+  'MoneyGram':     {bg:'#3b1a20',color:'#fca5a5',text:'MG'},
+  'Al Ansari Exchange':{bg:'#1a2a3b',color:'#93c5fd',text:'AA'},
+  'UAE Exchange':  {bg:'#1a2e3b',color:'#67e8f9',text:'UE'},
+  'Al Fardan Exchange':{bg:'#2a1f10',color:'#fdba74',text:'AF'},
+  'Sharaf Exchange':{bg:'#1f2a1a',color:'#86efac',text:'SX'},
+  'Remitly':       {bg:'#1a2040',color:'#818cf8',text:'RM'},
+  'STC Pay':       {bg:'#2a1040',color:'#c084fc',text:'ST'},
+  'Al Rajhi Bank': {bg:'#0d2a1a',color:'#34d399',text:'AR'},
+  'Alinma Pay':    {bg:'#1a2040',color:'#60a5fa',text:'AP'},
+  'Al Zaman Exchange':{bg:'#3b2010',color:'#fb923c',text:'AZ'},
+  'BFC Exchange':  {bg:'#1a1f3b',color:'#a5b4fc',text:'BF'},
+  'InstaReM':      {bg:'#1a2f4a',color:'#38bdf8',text:'IR'},
+  'SingX':         {bg:'#2a1020',color:'#e879f9',text:'SX'},
+  'OFX':           {bg:'#2a1f10',color:'#f97316',text:'OX'},
+  'TorFX':         {bg:'#102a2a',color:'#2dd4bf',text:'TX'},
+  'Xoom (PayPal)': {bg:'#101f3b',color:'#6366f1',text:'XM'},
+  'Xe.com':        {bg:'#1a2a10',color:'#a3e635',text:'XE'},
+  'default':       {bg:'#1a2a3b',color:'#94a3b8',text:'?'},
+};
+function badgeFail(img,bg,color,txt){
+  const p=img.closest('.pbadge');
+  if(!p)return;
+  p.style.background=bg;p.style.padding='0';
+  p.innerHTML=`<span style="color:${color};font-weight:900;font-size:11px">${txt}</span>`;
+}
+function badge(name,link){
+  const s=BADGE[name]||BADGE['default'];
+  if(link&&link!=='#'){
+    try{
+      const dom=new URL(link).hostname.replace('www.','');
+      return `<div class="pbadge" style="background:#fff;padding:3px;overflow:hidden;border:1px solid rgba(200,200,200,0.15)"><img src="https://www.google.com/s2/favicons?domain=${dom}&sz=64" width="38" height="38" style="object-fit:contain;border-radius:4px;display:block" onerror="badgeFail(this,'${s.bg}','${s.color}','${s.text}')" loading="lazy"></div>`;
+    }catch(e){}
+  }
+  return `<div class="pbadge" style="background:${s.bg};color:${s.color}">${s.text}</div>`;
+}
+
+// ── COUNTRY HERO THEMES (flag-color gradients) ───────────────────────────
+const COUNTRY_HERO={
+  // Gulf
+  AED:{grad:'linear-gradient(135deg,#0a1a0a 0%,#0d2218 30%,#1a3a1a 60%,#c9960020 100%)',glow:'rgba(201,150,0,0.15)',label:'Dubai, UAE 🇦🇪',dot:'#c9a227'},
+  SAR:{grad:'linear-gradient(135deg,#041a04 0%,#073d07 35%,#0a5a0a 70%,#ffffff08 100%)',glow:'rgba(21,126,21,0.18)',label:'Riyadh, Saudi Arabia 🇸🇦',dot:'#22c55e'},
+  QAR:{grad:'linear-gradient(135deg,#1a0410 0%,#3d0a22 35%,#5a1035 70%,#ffffff08 100%)',glow:'rgba(139,26,74,0.2)',label:'Doha, Qatar 🇶🇦',dot:'#c084fc'},
+  KWD:{grad:'linear-gradient(135deg,#041a04 0%,#0a3012 35%,#8b0000 0%,#8b000015 70%,#0a3012 100%)',glow:'rgba(10,107,46,0.18)',label:'Kuwait City 🇰🇼',dot:'#4ade80'},
+  BHD:{grad:'linear-gradient(135deg,#1a0404 0%,#3d0a0a 35%,#c1272d25 70%,#0a0f1e 100%)',glow:'rgba(193,39,45,0.18)',label:'Manama, Bahrain 🇧🇭',dot:'#f87171'},
+  OMR:{grad:'linear-gradient(135deg,#1a0404 0%,#2d0808 30%,#c1272d20 55%,#0a2010 100%)',glow:'rgba(193,39,45,0.15)',label:'Muscat, Oman 🇴🇲',dot:'#f87171'},
+  // SE Asia
+  MYR:{grad:'linear-gradient(135deg,#0a0420 0%,#14083a 30%,#cc000120 60%,#ffd70015 100%)',glow:'rgba(204,0,1,0.15)',label:'Kuala Lumpur, Malaysia 🇲🇾',dot:'#f43f5e'},
+  SGD:{grad:'linear-gradient(135deg,#1a0408 0%,#ef334018 30%,#0a1020 70%,#ef334010 100%)',glow:'rgba(239,51,64,0.15)',label:'Singapore 🇸🇬',dot:'#f87171'},
+  // Europe / Americas
+  GBP:{grad:'linear-gradient(135deg,#010d2a 0%,#012169 35%,#c8102e18 70%,#010d2a 100%)',glow:'rgba(1,33,105,0.3)',label:'London, UK 🇬🇧',dot:'#60a5fa'},
+  EUR:{grad:'linear-gradient(135deg,#00062a 0%,#003399 25%,#00339928 60%,#00062a 100%)',glow:'rgba(0,51,153,0.25)',label:'Europe 🇪🇺',dot:'#818cf8'},
+  USD:{grad:'linear-gradient(135deg,#00051a 0%,#002868 30%,#bf0a3018 65%,#00051a 100%)',glow:'rgba(0,40,104,0.3)',label:'United States 🇺🇸',dot:'#60a5fa'},
+  CAD:{grad:'linear-gradient(135deg,#1a0202 0%,#ff000020 30%,#0a0f20 60%,#ff000015 100%)',glow:'rgba(255,0,0,0.12)',label:'Canada 🇨🇦',dot:'#f87171'},
+  AUD:{grad:'linear-gradient(135deg,#00041a 0%,#00008b 30%,#00008b28 60%,#c9960018 100%)',glow:'rgba(0,0,139,0.25)',label:'Sydney, Australia 🇦🇺',dot:'#60a5fa'},
+  NZD:{grad:'linear-gradient(135deg,#00041a 0%,#00205b 30%,#cc142418 65%,#00041a 100%)',glow:'rgba(0,32,91,0.25)',label:'New Zealand 🇳🇿',dot:'#818cf8'},
+};
+
+function updateHeroBg(cur){
+  const theme=COUNTRY_HERO[cur]||COUNTRY_HERO['AED'];
+  const bg=document.querySelector('.hero-bg');
+  const hero=document.querySelector('.hero');
+  if(!bg)return;
+  // Fade out
+  bg.style.transition='opacity 0.3s ease';
+  bg.style.opacity='0';
+  setTimeout(()=>{
+    // Apply gradient as background (no external image needed)
+    bg.style.background=theme.grad;
+    bg.style.opacity='1';
+    // Shift hero glow color
+    if(hero)hero.style.setProperty('--hero-glow',theme.glow||'transparent');
+  },320);
+  // Update location label
+  const lbl=document.getElementById('heroLocLabel');
+  if(lbl){
+    lbl.textContent=theme.label;
+    lbl.style.borderColor=theme.dot+'55';
+    lbl.style.color=theme.dot;
+  }
+}
+
+// ── PROVIDERS ──────────────────────────────────
+const P={
+  MYR:[
+    {name:'Wise',spread:0.001,fee:12,link:'https://wise.com',note:'Mid-market rate · ~12 MYR fee'},
+    {name:'InstaReM',spread:0.003,fee:6,link:'https://instarem.com/en-my/',note:'FPX transfer · 2hr delivery'},
+    {name:'eRemit',spread:0.002,fee:13,link:'https://eremit.com.my/home',note:'eRemit Malaysia · MYR 13 fee'},
+    {name:'Merchantrade Money',spread:0.008,fee:3,link:'https://merchantrademoney.com',note:'Malaysia\'s largest remittance player'},
+    {name:'EzyRemit',spread:0.009,fee:5,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY'},
+    {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Strong South Asian corridor'},
+    {name:'Remitly',spread:0.012,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates'},
+    {name:'Ria Money Transfer',spread:0.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'Lulu Exchange outlets · Malaysia'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  ],
+  AED:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Emirates NBD DirectRemit',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
+    {name:'ADCB Money Transfer',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank transfer · fast'},
+    {name:'FAB India Transfers',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
+    {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
+    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
+    {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
+    {name:'GCC Exchange',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
+    {name:'Wall Street Exchange',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
+    {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
+    {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium exchange service'},
+    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  ],
+  SAR:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'STC Pay',spread:.010,fee:0,link:'https://stcpay.com.sa',note:'Very popular Saudi fintech app'},
+    {name:'UrPay',spread:.010,fee:0,link:'https://urpay.com.sa',note:'STC digital wallet · growing fast'},
+    {name:'Tahweel Al Rajhi',spread:.011,fee:0,link:'https://alrajhiexchange.com',note:'Al Rajhi exchange counters'},
+    {name:'Tahweel Al Bilad',spread:.012,fee:0,link:'https://albilad.com',note:'Bank Al Bilad exchange'},
+    {name:'Enjaz',spread:.012,fee:0,link:'https://enjazit.com.sa',note:'Al Rajhi Bank remittance service'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu KSA outlets'},
+    {name:'Alinma Pay',spread:.013,fee:0,link:'https://alinma.com',note:'Alinma Bank digital wallet'},
+    {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across KSA'},
+    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-sa/',note:'Digital · fast transfers'},
+    {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most widely used bank KSA'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Large agent network'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via KSA agents'},
+  ],
+  QAR:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Qatar'},
+    {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across Qatar'},
+    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-qa/',note:'Digital · fast transfers'},
+    {name:'Al Zaman Exchange',spread:.012,fee:0,link:'https://alzamanexchange.com',note:'Popular in Doha'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+  ],
+  KWD:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Kuwait branches'},
+    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-kw/',note:'Digital · fast transfers'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+  ],
+  BHD:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'BFC Exchange',spread:.013,fee:0,link:'https://bfcgroup.com',note:"Bahrain's top exchange"},
+    {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Bahrain branches'},
+    {name:'InstaReM',spread:.014,fee:0,link:'https://instarem.com/en-bh/',note:'Digital · fast transfers'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Available at agents'},
+  ],
+  OMR:[
+    {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Oman branches'},
+    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-om/',note:'Digital · fast transfers'},
+    {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+  ],
+  SGD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore-founded fintech · MAS licensed'},
+    {name:'DBS Remit',spread:.009,fee:0,link:'https://dbs.com.sg',note:'Zero fee for DBS/POSB customers'},
+    {name:'OCBC Global Transfer',spread:.010,fee:0,link:'https://ocbc.com',note:'Low fee for OCBC account holders'},
+    {name:'Standard Chartered Online',spread:.010,fee:0,link:'https://sc.com/sg',note:'SC Bank transfer · fast'},
+    {name:'SingX',spread:.011,fee:0,link:'https://singx.co/',note:'SG–India specialist · good large-transfer rates'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'WorldRemit',spread:.014,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India coverage'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+  ],
+  AUD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate · ASIC licensed'},
+    {name:'InstaReM',spread:.008,fee:0,link:'https://instarem.com/en-au/',note:'SG fintech · ASIC licensed'},
+    {name:'OFX',spread:.010,fee:0,link:'https://www.ofx.com/',note:'Australia-founded FX specialist · very popular'},
+    {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
+    {name:'Remitly',spread:.012,fee:0,link:'https://www.remitly.com/',note:'Popular AU–India'},
+    {name:'TorFX',spread:.013,fee:0,link:'https://www.torfx.com/',note:'No transfer fees · personal dealer'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in AU'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'AU agent network'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+  ],
+  NZD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'NZ registered'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+  ],
+  USD:[
+    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · FinCEN licensed'},
+    {name:'Revolut',spread:.006,fee:0,link:'https://www.revolut.com/',note:'US app users · free on standard (limits apply)'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular US–India · Express & Economy options'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · very popular with Indian Americans'},
+    {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-us/',note:'Digital · fast'},
+    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'No fee · good for large amounts'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Large US agent network'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  ],
+  CAD:[
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Popular Canada–India corridor'},
+    {name:'Simplii Global Money Transfer',spread:.012,fee:0,link:'https://simplii.com',note:'CIBC-owned · popular with Indian Canadians'},
+    {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-ca/',note:'Digital · fast'},
+    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · popular app'},
+    {name:'TD Global Transfer',spread:.018,fee:5,link:'https://td.com',note:'TD Bank customers · convenient'},
+    {name:'RBC International Transfer',spread:.019,fee:6,link:'https://rbc.com',note:'RBC account holders'},
+    {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No fee transfers'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Canada-wide agent network'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  ],
+  EUR:[
+    {name:'Wise',spread:.005,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Fast digital'},
+    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-eu/',note:'EU licensed · digital'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'EU-wide agents'},
+  ],
+  GBP:[
+    {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate · FCA regulated'},
+    {name:'Revolut',spread:.005,fee:0,link:'https://www.revolut.com/',note:'App-based · free on standard plan (limits apply)'},
+    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular UK–India corridor'},
+    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-gb/',note:'FCA regulated · digital'},
+    {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
+    {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee · large transfers'},
+    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in UK'},
+    {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+    {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Post Office & agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Post Office & agents'},
+  ],
+};
+
+const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.34,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
+let rateIsLive=false;
+const CACHE_TTL=10*60*1000; // 10 minutes
+
+function getCachedRate(c){
+  try{
+    const raw=sessionStorage.getItem('rate_'+c);
+    if(!raw)return null;
+    const {rate,ts}=JSON.parse(raw);
+    if(Date.now()-ts<CACHE_TTL)return rate;
+  }catch(e){}
+  return null;
+}
+function setCachedRate(c,rate){
+  try{sessionStorage.setItem('rate_'+c,JSON.stringify({rate,ts:Date.now()}));}catch(e){}
+}
+function getLastUpdatedStr(){
+  try{
+    const raw=sessionStorage.getItem('rate_'+baseCur);
+    if(!raw)return null;
+    const {ts}=JSON.parse(raw);
+    const diff=Math.round((Date.now()-ts)/1000);
+    if(diff<60)return 'Updated just now';
+    if(diff<3600)return `Updated ${Math.floor(diff/60)}m ago`;
+    return `Updated ${Math.floor(diff/3600)}h ago`;
+  }catch(e){return null;}
+}
+
+async function fetchRate(c){
+  // Return cache if fresh
+  const cached=getCachedRate(c);
+  if(cached){rateIsLive=true;return cached;}
+  const cu=c.toLowerCase();
+  // Race all 3 sources in parallel — fastest wins
+  const tout=(ms)=>new Promise((_,rej)=>setTimeout(()=>rej('timeout'),ms));
+  const safe=(p)=>Promise.race([p,tout(6000)]);
+  const s1=safe(fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${cu}.json`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
+  const s2=safe(fetch(`https://latest.currency-api.pages.dev/v1/currencies/${cu}.json`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
+  const s3=safe(fetch(`https://api.frankfurter.app/latest?from=${c}&to=INR`).then(r=>r.ok?r.json():Promise.reject()).then(d=>{const v=d.rates&&d.rates.INR;if(v)return v;throw 0;}));
+  try{
+    const v=await Promise.any([s1,s2,s3]);
+    rateIsLive=true;
+    setCachedRate(c,v);
+    return v;
+  }
+  catch(e){rateIsLive=false;return FB[c]||null;}
+}
+
+async function updateAll(){
+  // baseCur is managed by the custom dropdown (selectCurrency); use global as-is
+  const _hfl2=document.getElementById('heroFromLabel');if(_hfl2)_hfl2.textContent=baseCur;
+  document.getElementById('curTag').textContent=baseCur;document.getElementById('sendCurTag')&&(document.getElementById('sendCurTag').textContent=baseCur);
+  const ld=document.getElementById('rates-loading');
+  const rc=document.getElementById('rates-container');
+  const rn=document.getElementById('rate-note');
+
+  // Show fallback rates INSTANTLY so UI is never blank
+  if(FB[baseCur]){
+    midRate=FB[baseCur];rateIsLive=false;updateHeroRate();
+    rc.style.display='flex';ld.style.display='none';rn.style.display='flex';
+    renderRates();renderRatePreview();renderMarketRate();
+    // Show subtle "updating" badge in note
+    const nt=document.getElementById('rate-note-text');
+    if(nt)nt.innerHTML+=' &nbsp;<span style="background:var(--amber-dim);color:var(--amber);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">⟳ Updating to live…</span>';
+  } else {
+    ld.style.display='flex';ld.innerHTML='<div class="spin"></div><span>Fetching rates for '+baseCur+'…</span>';
+    rc.style.display='none';rn.style.display='none';
+  }
+
+  // Fetch live rate in parallel (all 3 sources race)
+  const live=await fetchRate(baseCur);
+  ld.style.display='none';
+  if(live){
+    midRate=live;rateIsLive=true;updateHeroRate();
+    rc.style.display='flex';rn.style.display='flex';
+    renderRates();renderRatePreview();renderMarketRate();
+    // Show last-updated timestamp
+    const ts=getLastUpdatedStr();
+    const hrdStatus=document.getElementById('hrd-status');
+    if(hrdStatus&&ts)hrdStatus.innerHTML=`<div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div> Live rate · ${ts}`;
+  } else if(FB[baseCur]){
+    // Graceful fallback — show FB rate with clear label
+    midRate=FB[baseCur];rateIsLive=false;
+    rc.style.display='flex';rn.style.display='flex';
+    renderRates();renderRatePreview();renderMarketRate();
+    const hrdStatus=document.getElementById('hrd-status');
+    if(hrdStatus)hrdStatus.innerHTML=`<span style="color:var(--amber)">⚠ Using reference rate — live fetch failed. Verify on provider site.</span>`;
+  } else {
+    ld.innerHTML='<span style="color:var(--red)">⚠ Could not load rates. Check your internet connection.</span>';
+    ld.style.display='flex';
+  }
+}
+
+function syncAmount(v){document.getElementById('sendAmount').value=v;}
+function syncAmountFromMain(v){const _el=document.getElementById('heroWidgetAmt');if(_el)_el.value=v;}
+
+// ── RATE PREVIEW CARD (Hero right panel) ──────
+function renderRatePreview(){
+  updateHeroWidget(); calcHeroCorpus(); calcHeroHomeLoan(); calcHeroRealty(); // keep hero widget in sync whenever preview refreshes
+  if(!midRate)return;
+  const rpcCur=document.getElementById('rpc-cur');
+  if(rpcCur)rpcCur.textContent=baseCur;
+  const amt=parseFloat(document.getElementById('sendAmount').value)||1000;
+  const providers=P[baseCur]||P['USD'];
+  const rows=providers.map(p=>{
+    const rate=midRate*(1-p.spread);
+    const inr=Math.max(0,amt-p.fee)*rate;
+    return{...p,rate,inr};
+  }).sort((a,b)=>b.inr-a.inr).slice(0,3);
+  const rpcRows=document.getElementById('rpc-rows');
+  if(!rpcRows)return;
+  rpcRows.innerHTML=rows.map((p,i)=>{
+    const s=BADGE[p.name]||BADGE['default'];
+    const dom2=p.link&&p.link!=='#'?new URL(p.link).hostname.replace('www.',''):null;
+    const rpcBadge=dom2
+      ?`<div class="rpc-badge" style="background:#fff;padding:2px;overflow:hidden;border:1px solid rgba(200,200,200,0.15)"><img src="https://www.google.com/s2/favicons?domain=${dom2}&sz=64" width="32" height="32" style="object-fit:contain;border-radius:4px;display:block" onerror="badgeFail(this,'${s.bg}','${s.color}','${s.text}')" loading="lazy"></div>`
+      :`<div class="rpc-badge" style="background:${s.bg};color:${s.color}">${s.text}</div>`;
+    return`<div class="rpc-row">
+      ${rpcBadge}
+      <div class="rpc-info">
+        <div class="rpc-name">${p.name}${i===0?'<span class="best-tag" style="font-size:9px;padding:1px 7px">BEST</span>':''}</div>
+        <div class="rpc-note">${p.note}</div>
+      </div>
+      <div class="rpc-amount">
+        <div class="rpc-inr">₹${Math.round(p.inr).toLocaleString('en-IN')}</div>
+        <div class="rpc-rate">@ ₹${p.rate.toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const rpcFooter=document.getElementById('rpc-footer');
+  if(rpcFooter)rpcFooter.innerHTML=`<span class="rpc-live-tag"><div class="live-dot" style="display:inline-block"></div> ${rateIsLive?'Live':'Approx'} · 1 ${baseCur} = ₹${midRate.toFixed(4)}</span> · Estimates only — promotions may apply · <strong>Verify live rate on provider site before sending</strong>`;
+}
+
+function renderRates(){
+  if(!midRate)return;
+  const amt=parseFloat(document.getElementById('sendAmount').value)||1000;
+  const providers=P[baseCur]||P['USD'];
+  const rows=providers.map(p=>{
+    const rate=midRate*(1-p.spread);
+    const inr=Math.max(0,amt-p.fee)*rate;
+    return{...p,rate,inr};
+  }).sort((a,b)=>b.inr-a.inr);
+  const best=rows[0].inr,worst=rows[rows.length-1].inr;
+  document.getElementById('rates-container').innerHTML=rows.map((p,i)=>{
+    const isBest=i===0;
+    const pct=worst===best?100:Math.round(70+(p.inr-worst)/(best-worst)*30);
+    const barColor=isBest?'var(--green)':i===rows.length-1?'var(--red)':'var(--amber)';
+    const diff=isBest?'':`<span style="font-size:12px;color:var(--red);font-weight:700"> -₹${Math.round(best-p.inr).toLocaleString('en-IN')}</span>`;
+    return`<div class="rate-row${isBest?' best':''}">
+      ${badge(p.name,p.link)}
+      <div class="pinfo"><div class="pname">${p.name}${isBest?'<span class="best-tag">BEST TODAY</span>':''}</div>
+      <div class="pmeta">${p.note} · ${p.fee>0?`Fee: ${baseCur} ${p.fee}`:'No fee'} · ${(p.spread*100).toFixed(1)}% margin</div></div>
+      <div class="pbar-col">
+        <div class="pamount" style="color:${isBest?'var(--green)':'var(--text)'}">₹${Math.round(p.inr).toLocaleString('en-IN')}${diff}</div>
+        <div class="pamount-sub">₹${p.rate.toFixed(2)} per ${baseCur}</div>
+        <div class="pbar-track"><div class="pbar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </div>
+      <a class="rate-cta${p.link==='#'?' disabled':''}" href="${p.link}" target="_blank" rel="noopener">Send Now →</a>
+      <div class="rate-row-mobile-cta">
+        <span style="font-size:11px;color:var(--muted)">${p.note}</span>
+        <a class="rate-cta-sm${p.link==='#'?' disabled':''}" href="${p.link}" target="_blank" rel="noopener">Send Now →</a>
+      </div>
+    </div>`;
+  }).join('');
+
+  const now=new Date();
+  const lbl=rateIsLive?`<span style="color:var(--green);font-weight:700">🟢 Live</span> · Updated ${now.toLocaleTimeString()}`:`<span style="color:var(--amber);font-weight:700">🟡 Offline</span> · Approximate rates (mid-2025)`;
+  document.getElementById('rate-note-text').innerHTML=`<strong>ℹ️ These are estimates only.</strong> Rates shown = today's mid-market rate (1 ${baseCur} = ₹${midRate.toFixed(4)}) minus each provider's typical margin & fee. <strong>Actual rates change every few minutes</strong> and providers may run promotions (zero-fee offers, bonus rates) not reflected here. <span style="color:var(--amber);font-weight:700">Always click through to the provider and confirm the live rate before sending money.</span>`;
+  renderRatePreview();
+  renderMarketRate();
+}
+
+// ── SIP ─────────────────────────────────────────
+let sipData=[],swpData=[];
+function calcSIP(){
+  const sip0=parseFloat(document.getElementById('sip-amount').value)||25000;
+  const rate=parseFloat(document.getElementById('sip-return').value)/100;
+  const yrs=parseInt(document.getElementById('sip-years').value);
+  const stepup=parseFloat(document.getElementById('sip-stepup').value)/100;
+  const mr=rate/12;
+  let corpus=0,totalInvested=0,sipM=sip0;
+  sipData=[];
+  let tbody='';
+  for(let y=1;y<=yrs;y++){
+    const annInvested=sipM*12;
+    for(let m=0;m<12;m++){corpus=(corpus+sipM)*(1+mr);}
+    totalInvested+=annInvested;
+    const wealthGain=corpus-totalInvested;
+    sipData.push({year:y,sipM:Math.round(sipM),annInvested:Math.round(annInvested),totalInvested:Math.round(totalInvested),corpus:Math.round(corpus),gain:Math.round(wealthGain)});
+    const gainPct=Math.round(wealthGain/corpus*100);
+    tbody+=`<tr><td>${y}</td><td>₹${Math.round(sipM).toLocaleString('en-IN')}</td><td>₹${Math.round(annInvested).toLocaleString('en-IN')}</td><td>₹${(totalInvested/100000).toFixed(1)}L</td><td style="color:var(--amber);font-weight:700">₹${(corpus/100000).toFixed(1)}L</td><td style="color:var(--green)">₹${(wealthGain/100000).toFixed(1)}L (${gainPct}%)</td></tr>`;
+    sipM*=(1+stepup);
+  }
+  document.getElementById('sip-year-body').innerHTML=tbody;
+  const finalCorpus=sipData[sipData.length-1].corpus;
+  const finalInvested=sipData[sipData.length-1].totalInvested;
+  const finalGain=finalCorpus-finalInvested;
+  const sipLcL=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
+  const sipLc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(inr/midRate).toLocaleString('en-IN')}</div>`:'';
+  document.getElementById('sip-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Total Invested</div><div class="ri-val" style="font-size:20px">₹${(finalInvested/100000).toFixed(1)}L</div>${sipLcL(finalInvested)}<div class="ri-sub">over ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Wealth Created</div><div class="ri-val">₹${(finalGain/100000).toFixed(1)}L</div>${sipLcL(finalGain)}<div class="ri-sub">returns earned</div></div>
+    <div class="ri"><div class="ri-lbl">Final Corpus</div><div class="ri-val" style="color:var(--green)">₹${(finalCorpus/100000).toFixed(1)}L</div>${sipLcL(finalCorpus)}<div class="ri-sub">at ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Wealth Multiplier</div><div class="ri-val">×${(finalCorpus/finalInvested).toFixed(1)}</div><div class="ri-sub">your money grew</div></div>`;
+  document.getElementById('sip-tip').innerHTML=`🎯 Starting at ₹${sip0.toLocaleString('en-IN')}/mo and stepping up ${(stepup*100).toFixed(0)}% annually at <strong>${rate*100}% returns</strong> turns ₹${(finalInvested/100000).toFixed(0)}L invested into <strong>₹${(finalCorpus/100000).toFixed(1)}L</strong> — ${((finalCorpus/finalInvested)).toFixed(1)}× your money.`;
+  document.getElementById('sip-result').style.display='block';var _sw=document.getElementById('sip-table-wrap');var _sb=document.getElementById('sip-toggle-btn');if(_sw)_sw.style.display='';if(_sb)_sb.innerHTML='&#9650; Collapse Table';
+}
+function toggleYearTable(id){
+  const wrap=document.getElementById(id+'-table-wrap');
+  const btn=document.getElementById(id+'-toggle-btn');
+  if(!wrap||!btn)return;
+  const isCollapsed=wrap.style.display==='none';
+  wrap.style.display=isCollapsed?'':'none';
+  btn.innerHTML=isCollapsed?'&#9650; Collapse Table':'&#9660; Show Table';
+}
+function downloadSIPCSV(){
+  const rows=[['Year','Monthly SIP (₹)','Invested in Year (₹)','Total Invested (₹)','Corpus Value (₹)','Wealth Gained (₹)']];
+  sipData.forEach(r=>rows.push([r.year,r.sipM,r.annInvested,r.totalInvested,r.corpus,r.gain]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','sip-projection.csv');
+}
+
+// ── SWP ─────────────────────────────────────────
+function calcSWP(){
+  let corpus=parseFloat(document.getElementById('swp-corpus').value)*100000;
+  const wd0=parseFloat(document.getElementById('swp-monthly').value)||75000;
+  const ret=parseFloat(document.getElementById('swp-return').value)/100;
+  const stepup=parseFloat(document.getElementById('swp-stepup').value)/100;
+  const mr=ret/12;
+  let wdM=wd0,exhaustYear=null;
+  swpData=[];
+  let tbody='';
+  for(let y=1;y<=40;y++){
+    let annWd=0,annRet=0;
+    for(let m=0;m<12;m++){
+      const retM=corpus*mr;corpus=corpus+retM-wdM;annWd+=wdM;annRet+=retM;
+      if(corpus<=0){corpus=0;}
+    }
+    const close=Math.max(0,corpus);
+    swpData.push({year:y,wdM:Math.round(wdM),annWd:Math.round(annWd),annRet:Math.round(annRet),close});
+    const depleted=close<=0;
+    if(depleted&&!exhaustYear)exhaustYear=y;
+    tbody+=`<tr${depleted?' style="opacity:0.5"':''}><td>${y}</td><td>₹${Math.round(wdM).toLocaleString('en-IN')}</td><td>₹${Math.round(annWd).toLocaleString('en-IN')}</td><td style="color:var(--green)">₹${Math.round(annRet).toLocaleString('en-IN')}</td><td style="color:${close>0?'var(--amber)':'var(--red)'};font-weight:700">₹${(close/100000).toFixed(1)}L</td><td style="color:${close>0?'var(--green)':'var(--red)'}">${close>0?'✔ Active':'✘ Depleted'}</td></tr>`;
+    wdM*=(1+stepup);
+    if(depleted)break;
+  }
+  document.getElementById('swp-year-body').innerHTML=tbody;
+  const initCorpus=parseFloat(document.getElementById('swp-corpus').value)*100000;
+  const finalClose=swpData[swpData.length-1].close;
+  const totalWd=swpData.reduce((s,r)=>s+r.annWd,0);
+  const swpLcL=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
+  const swpLc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(inr/midRate).toLocaleString('en-IN')}</div>`:'';
+  const swpRemL=exhaustYear?'':swpLcL(finalClose);
+  document.getElementById('swp-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Starting Corpus</div><div class="ri-val" style="font-size:20px">₹${(initCorpus/100000).toFixed(0)}L</div>${swpLcL(initCorpus)}</div>
+    <div class="ri"><div class="ri-lbl">Monthly Withdrawal</div><div class="ri-val">₹${wd0.toLocaleString('en-IN')}</div>${swpLc(wd0)}<div class="ri-sub">starting amount</div></div>
+    <div class="ri"><div class="ri-lbl">Total Withdrawn</div><div class="ri-val">₹${(totalWd/100000).toFixed(1)}L</div>${swpLcL(totalWd)}<div class="ri-sub">over plan period</div></div>
+    <div class="ri"><div class="ri-lbl">${exhaustYear?'Corpus Lasts':'Corpus After 40yr'}</div><div class="ri-val" style="color:${exhaustYear?'var(--red)':'var(--green)'};">${exhaustYear?exhaustYear+' years':'₹'+(finalClose/100000).toFixed(1)+'L'}</div>${swpRemL}<div class="ri-sub">${exhaustYear?'then corpus depleted':'still remaining'}</div></div>`;
+  document.getElementById('swp-verdict').innerHTML=exhaustYear
+    ?`<div class="box-red">⚠️ <strong>Corpus runs out in Year ${exhaustYear}.</strong> Options: reduce monthly withdrawal · increase portfolio return · add an income source · consider a larger starting corpus.</div>`
+    :`<div class="box-green">✅ <strong>Corpus is sustainable.</strong> At ${ret*100}% returns with ${(stepup*100).toFixed(0)}% annual withdrawal increase, your corpus outlasts the 40-year projection. Remaining: ₹${(finalClose/100000).toFixed(1)}L.</div>`;
+  document.getElementById('swp-result').style.display='block';var _ww=document.getElementById('swp-table-wrap');var _wb=document.getElementById('swp-toggle-btn');if(_ww)_ww.style.display='';if(_wb)_wb.innerHTML='&#9650; Collapse Table';
+}
+function downloadSWPCSV(){
+  const rows=[['Year','Monthly Withdrawal (₹)','Annual Withdrawal (₹)','Portfolio Return (₹)','Closing Corpus (₹)']];
+  swpData.forEach(r=>rows.push([r.year,r.wdM,r.annWd,r.annRet,r.close]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','swp-projection.csv');
+}
+
+// ── NRE vs NRO ──────────────────────────────────
+function nreNroRecommend(){
+  const q1=document.getElementById('nro-q1').value;
+  const q2=document.getElementById('nro-q2').value;
+  const q3=document.getElementById('nro-q3').value;
+  let rec='';
+  if(q1==='no'&&q2==='yes'&&q3==='yes')rec=`<strong>Open an NRE Account.</strong> You earn only abroad, want full repatriation, and prefer tax-free interest. NRE is perfect. Consider FCNR for large amounts to eliminate FX risk.`;
+  else if(q1==='yes'&&q2==='no')rec=`<strong>Open an NRO Account.</strong> Your India-based income (rent, dividends) can only be deposited into NRO. You can still repatriate up to $1M/year after tax.`;
+  else if(q1==='yes'&&q2==='yes')rec=`<strong>Open Both NRE + NRO.</strong> Route foreign income into NRE (tax-free, full repatriation) and India income into NRO. Most NRIs with mixed income use both.`;
+  else rec=`<strong>Start with an NRE Account.</strong> Tax-free interest, full repatriation, ideal for foreign earnings. Add NRO later if you develop India income.`;
+  document.getElementById('nrenro-rec').innerHTML=`✅ <strong>Recommendation:</strong> ${rec}<br/><br/><a href="https://www.hdfcbank.com/personal/save/accounts/nre-savings-account" target="_blank">Open NRE at HDFC →</a> &nbsp;·&nbsp; <a href="https://www.icicibank.com/nri-banking/bank-accounts/nre-savings-account" target="_blank">Open NRE at ICICI →</a>`;
+  document.getElementById('nrenro-rec').style.display='block';
+}
+
+// ── HOME LOAN ────────────────────────────────────
+let prepayRowCount=1;
+const MAX_PREPAY=5;
+function togglePrepay(){
+  const sec=document.getElementById('prepay-section');
+  sec.style.display=sec.style.display==='none'?'block':'none';
+}
+function addPrepayRow(){
+  if(prepayRowCount>=MAX_PREPAY)return;
+  prepayRowCount++;
+  const n=prepayRowCount;
+  const row=document.createElement('div');
+  row.className='prepay-row';row.id='pr-'+n;
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:10px';
+  row.innerHTML=`<div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">#${n} Amount (₹ Lakhs)</label><input type="number" id="pp-amt-${n}" placeholder="e.g. 5" min="0" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div><div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">After Year</label><input type="number" id="pp-yr-${n}" placeholder="e.g. 10" min="1" max="30" class="hl-lead-inp" oninput="updatePrepayBadge()"/></div><div style="padding-bottom:1px"><button onclick="removePrepayRow(${n})" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:var(--red);width:34px;height:36px;border-radius:7px;cursor:pointer;font-size:15px;line-height:1">✕</button></div>`;
+  document.getElementById('prepay-rows').appendChild(row);
+  document.getElementById('prepay-add-btn').style.opacity=prepayRowCount>=MAX_PREPAY?'0.4':'1';
+  document.getElementById('prepay-add-btn').disabled=prepayRowCount>=MAX_PREPAY;
+  updatePrepayBadge();
+}
+function removePrepayRow(n){
+  const row=document.getElementById('pr-'+n);
+  if(row)row.remove();
+  if(n===prepayRowCount)prepayRowCount--;
+  document.getElementById('prepay-add-btn').style.opacity='1';
+  document.getElementById('prepay-add-btn').disabled=false;
+  updatePrepayBadge();
+}
+function getPrepayments(){
+  const list=[];
+  for(let i=1;i<=MAX_PREPAY;i++){
+    const aEl=document.getElementById('pp-amt-'+i);
+    const yEl=document.getElementById('pp-yr-'+i);
+    if(!aEl||!yEl)continue;
+    const amt=(parseFloat(aEl.value)||0)*100000;
+    const yr=parseInt(yEl.value)||0;
+    if(amt>0&&yr>=1)list.push({amt,yr});
+  }
+  list.sort((a,b)=>a.yr-b.yr);
+  return list;
+}
+function updatePrepayBadge(){
+  const list=getPrepayments();
+  const badge=document.getElementById('prepay-badge');
+  if(list.length===0){badge.style.display='none';return;}
+  badge.style.display='inline';
+  const total=list.reduce((s,p)=>s+p.amt,0);
+  badge.textContent=`${list.length} prepayment${list.length>1?'s':''} · ₹${(total/100000).toFixed(0)}L total`;
+}
+function calcHomeLoan(){
+  const pv=parseFloat(document.getElementById('hl-propval').value)*100000;
+  const dp=parseFloat(document.getElementById('hl-down').value)/100;
+  const ar=parseFloat(document.getElementById('hl-rate').value)/100;
+  const yrs=parseInt(document.getElementById('hl-tenure').value);
+  const prepays=getPrepayments().filter(p=>p.yr<=yrs);
+  const hasPrepay=prepays.length>0;
+  // Group by year (sum if same year)
+  const prepayMap={};
+  prepays.forEach(p=>{prepayMap[p.yr]=(prepayMap[p.yr]||0)+p.amt;});
+  const loan=pv*(1-dp),mr=ar/12,n=yrs*12;
+  const emi=loan*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1);
+  const baseTotal=emi*n,baseTotalInt=baseTotal-loan;
+  loanAmortData=[];
+  let bal=loan,tbody='',totalPrinc=0,totalInterest=0,totalEMIPaid=0,totalPrepaid=0;
+  let effectiveTenure=yrs,loanPaidOff=false;
+  const prepayTh=hasPrepay?'<th style="color:var(--amber)">Prepayment</th>':'';
+  document.querySelector('#hl-amort-table thead tr').innerHTML=`<th>Year</th><th>Opening Balance</th><th>Annual EMI</th>${prepayTh}<th>Principal Paid</th><th>Interest Paid</th><th>Closing Balance</th>`;
+  for(let y=1;y<=yrs;y++){
+    if(loanPaidOff)break;
+    const open=bal;let annPrinc=0,annInt=0;
+    for(let m=0;m<12&&bal>0;m++){
+      const intM=bal*mr;const princM=Math.min(emi-intM,bal);
+      annInt+=intM;annPrinc+=princM;bal-=princM;
+    }
+    let prepayThisYear=0;
+    if(hasPrepay&&prepayMap[y]&&bal>0){
+      prepayThisYear=Math.min(prepayMap[y],bal);
+      bal=Math.max(0,bal-prepayThisYear);
+      totalPrepaid+=prepayThisYear;
+    }
+    const annEMI=annPrinc+annInt;
+    totalPrinc+=annPrinc+prepayThisYear;totalInterest+=annInt;totalEMIPaid+=annEMI;
+    if(bal<=0&&!loanPaidOff){effectiveTenure=y;loanPaidOff=true;}
+    loanAmortData.push({year:y,open,annEMI,prepay:prepayThisYear,annPrinc,annInt,close:Math.max(0,bal)});
+    const prepayCell=hasPrepay?(prepayThisYear>0?`<td style="color:var(--amber);font-weight:800">₹${(prepayThisYear/100000).toFixed(1)}L ✓</td>`:`<td style="color:var(--muted)">—</td>`):'';
+    const rowStyle=prepayThisYear>0?' style="background:rgba(240,165,32,0.1)"':'';
+    tbody+=`<tr${rowStyle}><td>${y}</td><td>₹${(open/100000).toFixed(2)}L</td><td>₹${Math.round(annEMI).toLocaleString('en-IN')}</td>${prepayCell}<td class="principal">₹${Math.round(annPrinc).toLocaleString('en-IN')}</td><td class="interest">₹${Math.round(annInt).toLocaleString('en-IN')}</td><td>₹${(Math.max(0,bal)/100000).toFixed(2)}L</td></tr>`;
+  }
+  const prepayTotalCell=hasPrepay?`<td style="color:var(--amber);font-weight:800">₹${(totalPrepaid/100000).toFixed(1)}L</td>`:'';
+  tbody+=`<tr><td>Total</td><td>—</td><td>₹${Math.round(totalEMIPaid).toLocaleString('en-IN')}</td>${prepayTotalCell}<td class="principal">₹${(totalPrinc/100000).toFixed(2)}L</td><td class="interest">₹${(totalInterest/100000).toFixed(2)}L</td><td>₹0</td></tr>`;
+  document.getElementById('hl-amort-body').innerHTML=tbody;
+  const interestSaved=hasPrepay?Math.max(0,baseTotalInt-totalInterest):0;
+  const yrsSaved=hasPrepay?yrs-effectiveTenure:0;
+  const prepayDesc=prepays.length>1?`${prepays.length} prepayments`:`₹${(prepays[0]?.amt/100000||0).toFixed(0)}L in yr ${prepays[0]?.yr||''}`;
+  const fxEMI=midRate?`<div class="ri"><div class="ri-lbl">EMI in ${baseCur}</div><div class="ri-val" style="font-size:20px">${baseCur} ${Math.round(emi/midRate).toLocaleString()}</div><div class="ri-sub">at today's rate</div></div>`:'';
+  const prepayResult=hasPrepay?`
+    <div class="ri" style="border:1px solid rgba(74,222,128,0.3);background:rgba(74,222,128,0.06)"><div class="ri-lbl">&#127881; Interest Saved</div><div class="ri-val" style="color:var(--green)">₹${(interestSaved/100000).toFixed(1)}L</div><div class="ri-sub">${prepayDesc}</div></div>
+    <div class="ri" style="border:1px solid rgba(240,165,32,0.3);background:rgba(240,165,32,0.06)"><div class="ri-lbl">&#9200; New Tenure</div><div class="ri-val" style="color:var(--amber)">${effectiveTenure} yrs</div><div class="ri-sub">${yrsSaved} year${yrsSaved!==1?'s':''} saved!</div></div>`:'';
+  document.getElementById('hl-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Loan Amount</div><div class="ri-val" style="font-size:20px">₹${(loan/100000).toFixed(1)}L</div><div class="ri-sub">${(dp*100).toFixed(0)}% down paid</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly EMI</div><div class="ri-val">₹${Math.round(emi).toLocaleString('en-IN')}</div><div class="ri-sub">for ${yrs} years</div></div>
+    <div class="ri"><div class="ri-lbl">Total Interest</div><div class="ri-val" style="color:var(--red)">₹${(baseTotalInt/100000).toFixed(1)}L</div><div class="ri-sub">${hasPrepay?'without prepayment':'cost of borrowing'}</div></div>
+    <div class="ri"><div class="ri-lbl">Total Paid</div><div class="ri-val" style="font-size:20px">₹${((totalEMIPaid+totalPrepaid)/100000).toFixed(1)}L</div><div class="ri-sub">EMI${hasPrepay?' + ₹'+(totalPrepaid/100000).toFixed(1)+'L prepaid':''}</div></div>
+    ${fxEMI}${prepayResult}`;
+  document.getElementById('hl-tip').innerHTML=`<div style="font-size:13px;color:var(--amber);font-weight:800;margin-bottom:8px">💡 NRI Home Loan Checklist</div><div style="font-size:13px;color:var(--muted);line-height:1.75">• EMI debited from NRE/NRO account via ECS/NACH mandate<br/>• Power of Attorney required for local India representative<br/>• Sec 24b deduction: up to ₹2L/yr interest if filing India returns<br/>• Pre-payment: most banks allow 2 free pre-payments/yr — reduces interest significantly</div>`;
+  document.getElementById('hl-result').style.display='block';
+}
+function downloadLoanCSV(){
+  const rows=[['Year','Opening Balance (₹)','Annual EMI (₹)','Principal Paid (₹)','Interest Paid (₹)','Closing Balance (₹)']];
+  loanAmortData.forEach(r=>rows.push([r.year,Math.round(r.open),Math.round(r.annEMI),Math.round(r.annPrinc),Math.round(r.annInt),Math.round(r.close)]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','home-loan-schedule.csv');
+}
+function downloadLoanPDF(){
+  const tbl=document.getElementById('hl-amort-table');
+  const rate=document.getElementById('hl-rate').value;
+  const tenure=document.getElementById('hl-tenure').value;
+  const propval=document.getElementById('hl-propval').value;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Home Loan Schedule</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111;}h2{font-size:18px;margin-bottom:4px;}p{font-size:12px;color:#555;margin-bottom:20px;}table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f3f4f6;padding:8px 12px;text-align:right;border:1px solid #ddd;font-size:11px;}th:first-child{text-align:center;}td{padding:7px 12px;border:1px solid #e5e7eb;text-align:right;}td:first-child{text-align:center;}tr:last-child{background:#f9fafb;font-weight:700;}tr:nth-child(even){background:#fafafa;}.principal{color:#059669;}.interest{color:#dc2626;}</style></head><body><h2>Home Loan Amortization Schedule</h2><p>Property: ₹${propval}L · Rate: ${rate}% p.a. · Tenure: ${tenure} years · Generated: ${new Date().toLocaleDateString()}</p>${tbl.outerHTML}
+<!-- BOTTOM TAB BAR (mobile) -->
+<nav class="bottom-tabs" id="bottomTabs">
+  <button class="btab active" id="btab-rates" onclick="showTab('rates',document.querySelector('[data-tab=rates]'))"><span class="btab-ico">&#128202;</span><span class="btab-lbl">Rates</span></button>
+  <button class="btab" id="btab-nrenro" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'))"><span class="btab-ico">&#127963;</span><span class="btab-lbl">FD</span></button>
+  <button class="btab" id="btab-homeloan" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'))"><span class="btab-ico">&#127968;</span><span class="btab-lbl">Loan</span></button>
+  <button class="btab" id="btab-dtaa" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'))"><span class="btab-ico">&#128176;</span><span class="btab-lbl">Tax</span></button>
+  <button class="btab" id="btab-more" onclick="openDrawer()"><span class="btab-ico">&#9776;</span><span class="btab-lbl">More</span></button>
+</nav>
+</body></html>`);
+  win.document.close();setTimeout(()=>{win.print();},400);
+}
+
+// ── CITY PRESETS ────────────────────────────────
+const CITY_PRESETS={
+  metro:{food:20000,rent:30000,transport:8000,util:6000,lifeins:5000,healthins:5000,medical:5000,edu:20000,ent:10000,travel:6000,clothing:5000,misc:5000},
+  tier2:{food:15000,rent:18000,transport:5000,util:4000,lifeins:4000,healthins:3500,medical:4000,edu:12000,ent:6000,travel:4000,clothing:3000,misc:3500},
+  tier3:{food:10000,rent:8000,transport:3000,util:2500,lifeins:3000,healthins:2500,medical:3000,edu:7000,ent:3000,travel:2500,clothing:2000,misc:2000},
+  tier4:{food:8000,rent:5000,transport:2000,util:2000,lifeins:2500,healthins:2000,medical:2500,edu:5000,ent:2000,travel:2000,clothing:1500,misc:1500},
+  tier5:{food:6000,rent:3000,transport:1500,util:1500,lifeins:2000,healthins:1500,medical:2000,edu:3000,ent:1500,travel:1500,clothing:1000,misc:1000},
+};
+function setCity(tier,btn){
+  document.querySelectorAll('.city-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const p=CITY_PRESETS[tier];
+  ['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'].forEach(k=>document.getElementById('exp-'+k).value=p[k]);
+  updateExpTotal();
+}
+function updateExpTotal(){
+  const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
+  const total=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
+  document.getElementById('exp-total-display').textContent='₹'+Math.round(total).toLocaleString('en-IN');
+  return total;
+}
+document.addEventListener('input',e=>{if(e.target.id&&e.target.id.startsWith('exp-'))updateExpTotal();});
+
+// ── RETURN PLANNER ──────────────────────────────
+function calcReturn(){
+  const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
+  const baseMonthly=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
+  const inflation=parseFloat(document.getElementById('rp-inflation').value)/100;
+  const roi=parseFloat(document.getElementById('rp-roi').value)/100;
+  const indiaIncome=parseFloat(document.getElementById('rp-income').value)||0;
+  const years=parseInt(document.getElementById('rp-years').value);
+  const savingsNow=parseFloat(document.getElementById('rp-savings').value)*100000;
+  const monthlySavings=parseFloat(document.getElementById('rp-monthly').value)*100000;
+  document.getElementById('exp-total-display').textContent='₹'+Math.round(baseMonthly).toLocaleString('en-IN');
+  const mr=roi/12,n=years*12;
+  const fvSavings=savingsNow*Math.pow(1+mr,n);
+  const fvContrib=monthlySavings*(Math.pow(1+mr,n)-1)/mr;
+  const projCorpus=fvSavings+fvContrib;
+  const returnMonthly=baseMonthly*Math.pow(1+inflation,years);
+  const shortfall=Math.max(0,returnMonthly-indiaIncome);
+  const netRate=roi-inflation;
+  const corpusNeeded=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // Drawdown simulation — starts at return date with projCorpus
+  returnProjData=[];
+  let corpus=projCorpus,expM=returnMonthly,tbody='',surviveYears=0,depleted=false;
+  const maxSimYears=40;
+  for(let y=1;y<=maxSimYears;y++){
+    const open=corpus;
+    const annExp=expM*12;
+    const annIncome=indiaIncome*12;
+    const netWithdraw=Math.max(0,annExp-annIncome);
+    const returns=corpus*roi;
+    corpus=Math.max(0,corpus+returns-netWithdraw);
+    const close=corpus;
+    returnProjData.push({year:y,open:Math.round(open),annExp:Math.round(annExp),annIncome:Math.round(annIncome),returns:Math.round(returns),close:Math.round(close)});
+    if(close>0)surviveYears=y; else if(!depleted){depleted=true;surviveYears=y;}
+    const pct=projCorpus>0?close/projCorpus:0;
+    const colr=close<=0?'var(--red)':pct>0.5?'var(--green)':pct>0.15?'var(--amber)':'var(--red)';
+    const status=close<=0?'✘ Depleted':pct>0.5?'✔ Healthy':pct>0.15?'⚠ Low':'⚠ Critical';
+    const rowStyle=close<=0?' style="opacity:0.5"':'';
+    const lcClose=midRate>0&&close>0?`<div class="rp-local">${baseCur} ${(close/midRate/100000).toFixed(1)}L</div>`:'';
+    tbody+=`<tr${rowStyle}><td>${y}</td>`;
+    tbody+=`<td>₹${(open/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--red)">₹${(annExp/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--muted)">₹${(annIncome/100000).toFixed(1)}L</td>`;
+    tbody+=`<td style="color:var(--green)">₹${(returns/100000).toFixed(1)}L</td>`;
+    tbody+=`<td><strong style="color:${colr}">₹${(close/100000).toFixed(1)}L</strong>${lcClose}</td>`;
+    tbody+=`<td style="color:${colr};font-weight:700">${status}</td></tr>`;
+    expM*=(1+inflation);
+    if(depleted)break;
+  }
+  document.getElementById('rp-year-body').innerHTML=tbody;
+  const lc=(inr)=>midRate>0?baseCur+' '+Math.round(inr/midRate).toLocaleString('en-IN'):null;
+  const lcL=(inr)=>midRate>0?baseCur+' '+(inr/midRate/100000).toFixed(1)+'L':null;
+  const lcSub=(inr)=>lc(inr)?`<div class="ri-local">≈ ${lc(inr)}</div>`:'';
+  const lcLSub=(inr)=>lcL(inr)?`<div class="ri-local">≈ ${lcL(inr)}</div>`:'';
+  const survivalLabel=depleted?`${surviveYears} years`:'40+ years';
+  const survivalColor=depleted?(surviveYears<15?'var(--red)':'var(--amber)'):'var(--green)';
+  const survivalSub=depleted?`corpus runs out in year ${surviveYears}`:'sustainable through 40 years';
+  // Break-even monthly: max withdrawal so corpus hits ₹0 exactly at year 40
+  // PV of inflation-growing annuity: PV = PMT × [1 - ((1+g)/(1+r))^n] / (r-g)
+  const beNetRate=roi-inflation;
+  const beN=40;
+  const beFactor=beNetRate>0.0001?(1-Math.pow((1+inflation)/(1+roi),beN))/beNetRate:beN/(1+inflation);
+  const beAnnual=projCorpus>0&&beFactor>0?projCorpus/beFactor:0;
+  const beMonthly=Math.round(beAnnual/12);
+  // Sustainable forever (real perpetuity): corpus × (roi-inflation) / 12
+  const beSustainMonthly=beNetRate>0?Math.round(projCorpus*beNetRate/12):0;
+  const beLcSub=midRate>0&&beMonthly>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(beMonthly/midRate).toLocaleString('en-IN')}/mo</div>`:'';
+  document.getElementById('rp-result-grid').innerHTML=`
+    <div class="ri"><div class="ri-lbl">Monthly Expenses Today</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${Math.round(baseMonthly).toLocaleString('en-IN')}</div>${lcSub(baseMonthly)}</div><div class="ri-sub">before inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Monthly at Return</div><div class="rp-dual"><div class="ri-val">₹${Math.round(returnMonthly).toLocaleString('en-IN')}</div>${lcSub(returnMonthly)}</div><div class="ri-sub">after ${years}yr × ${(inflation*100).toFixed(0)}% inflation</div></div>
+    <div class="ri"><div class="ri-lbl">Projected Corpus</div><div class="rp-dual"><div class="ri-val" style="color:${projCorpus>=corpusNeeded?'var(--green)':'var(--red)'}">₹${(projCorpus/100000).toFixed(1)}L</div>${lcLSub(projCorpus)}</div><div class="ri-sub">at return date</div></div>
+    <div class="ri"><div class="ri-lbl">Corpus Required</div><div class="rp-dual"><div class="ri-val" style="font-size:20px">₹${(corpusNeeded/100000).toFixed(1)}L</div>${lcLSub(corpusNeeded)}</div><div class="ri-sub">for inflation-adjusted income</div></div>
+    <div class="ri" style="border-color:${survivalColor};background:${depleted&&surviveYears<15?'rgba(239,68,68,0.06)':'rgba(74,222,128,0.05)'}"><div class="ri-lbl">&#9200; Corpus Survives</div><div class="ri-val" style="color:${survivalColor}">${survivalLabel}</div><div class="ri-sub">${survivalSub}</div></div>
+    <div class="ri" style="border-color:var(--teal);background:rgba(20,184,166,0.05);grid-column:1/-1"><div class="ri-lbl">&#128181; Max Monthly Take-Home from Corpus</div><div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end;margin-top:6px"><div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">40-year drawdown (corpus → ₹0)</div><div class="ri-val" style="color:var(--teal);font-size:22px">₹${beMonthly.toLocaleString('en-IN')}<span style="font-size:13px;font-weight:500">/mo</span></div>${beLcSub}</div><div style="width:1px;background:var(--border);align-self:stretch"></div><div><div style="font-size:11px;color:var(--muted);margin-bottom:3px">Sustainable forever (corpus stays intact)</div><div class="ri-val" style="color:var(--green);font-size:22px">₹${beSustainMonthly.toLocaleString('en-IN')}<span style="font-size:13px;font-weight:500">/mo</span></div>${midRate>0?`<div class="ri-local">≈ ${baseCur} ${Math.round(beSustainMonthly/midRate).toLocaleString('en-IN')}/mo</div>`:''}</div></div><div style="font-size:11px;color:var(--muted);margin-top:8px">&#128161; Starting monthly — grows with ${(inflation*100).toFixed(0)}% inflation each year · add India income of ₹${indiaIncome.toLocaleString('en-IN')}/mo on top</div></div>`;
+  const onTrack=projCorpus>=corpusNeeded*0.9;
+  const gapInr=(corpusNeeded-projCorpus);
+  const gapLocal=midRate>0?` (${baseCur} ${(gapInr/midRate/100000).toFixed(1)}L)`:'';
+  const projLocal=midRate>0?` · ${baseCur} ${(projCorpus/midRate/100000).toFixed(1)}L`:'';
+  document.getElementById('rp-verdict').innerHTML=onTrack
+    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L${projLocal} covers your inflation-adjusted lifestyle. Ensure you're invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
+    :`<div class="box-red">⚠️ <strong>Gap of ~₹${(gapInr/100000).toFixed(1)}L${gapLocal}.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
+  document.getElementById('rp-result').style.display='block';
+}
+function toggleRpTable(){
+  const wrap=document.getElementById('rp-table-wrap');
+  const btn=document.getElementById('rp-table-toggle');
+  const hidden=wrap.style.display==='none';
+  wrap.style.display=hidden?'block':'none';
+  btn.innerHTML=hidden?'&#9660; Year-by-Year Table':'&#9658; Year-by-Year Table';
+}
+function downloadReturnCSV(){
+  const rows=[['Year','Opening Corpus (₹)','Annual Expenses (₹)','India Income (₹)','Returns Earned (₹)','Closing Corpus (₹)']];
+  returnProjData.forEach(r=>rows.push([r.year,r.open,r.annExp,r.annIncome,r.returns,r.close]));
+  triggerDownload(rows.map(r=>r.join(',')).join('\n'),'text/csv','return-india-projection.csv');
+}
+
+// ── HELPERS ──────────────────────────────────────
+function triggerDownload(content,type,filename){
+  const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
+}
+// ── DRAWER ──────────────────────────────────────
+const TOOL_META={
+  rates:{icon:'📊',name:'Live Rates'},
+  invest:{icon:'📈',name:'SIP & SWP'},
+  nrenro:{icon:'🏛',name:'NRE vs NRO'},
+  homeloan:{icon:'🏠',name:'Home Loan'},
+  realty:{icon:'🏘️',name:'Real Estate ROI'},
+  dtaa:{icon:'💰',name:'Tax & DTAA'},
+  return:{icon:'✈️',name:'Return Planner'},
+  edplan:{icon:'🎓',name:'Education Planner'},
+};
+function openDrawer(){
+  document.getElementById('navDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function showTab(id,btn){setActiveBottomTab(id);
+  document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.drawer-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  // Mark active in drawer
+  const drawerItem=document.querySelector(`.drawer-item[data-tab="${id}"]`);
+  if(drawerItem)drawerItem.classList.add('active');
+  // Update active tool bar
+  const meta=TOOL_META[id]||{icon:'📊',name:'Tools'};
+  const icon=document.getElementById('atbIcon');
+  const name=document.getElementById('atbName');
+  if(icon)icon.innerHTML=meta.icon;
+  if(name)name.textContent=meta.name;
+  // Close drawer & scroll to the active tab section (skip hero/rates header)
+  closeDrawer();
+  setTimeout(()=>{
+    const el=document.getElementById('tab-'+id);
+    if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-82,behavior:'smooth'});
+  },50);
+}
+
+// ── INIT ─────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  // Deep-link: open specific tool tab when arriving from a guide page
+  const hash=location.hash;
+  const TAB_IDS=['rates','invest','nrenro','homeloan','return','dtaa','realty','edplan','taxres','articles'];
+  if(hash && TAB_IDS.includes(hash.slice(1))){
+    const tabId=hash.slice(1);
+    const btn=document.querySelector('[data-tab="'+tabId+'"]');
+    if(btn){
+      showTab(tabId,btn);
+      setTimeout(()=>{const m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});},120);
+    }
+  }
+  // Deep-link: handle #article/key in URL
+  if(hash.startsWith('#article/')){
+    const key=hash.replace('#article/','');
+    showTab('articles',document.querySelector('[data-tab=articles]'));
+    setTimeout(()=>openArticle(key),100);
+  }
+  updateExpTotal();
+  // ── Render default (AED) IMMEDIATELY so page isn't blank ──
+  updateHeroBg('AED');
+  updateAll();
+  // Country → supported currency map
+  const COUNTRY_CUR={
+    AE:'AED',SA:'SAR',QA:'QAR',KW:'KWD',BH:'BHD',OM:'OMR', // Gulf
+    MY:'MYR',SG:'SGD',                                         // SE Asia
+    AU:'AUD',NZ:'NZD',                                         // Oceania
+    US:'USD',CA:'CAD',                                         // Americas
+    GB:'GBP',IE:'EUR',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR',     // Europe
+    NL:'EUR',BE:'EUR',AT:'EUR',PT:'EUR',FI:'EUR',GR:'EUR',
+    IN:'AED' // Indians likely in Gulf — default AED
+  };
+  const SUPPORTED=Object.keys(FB);
+  // Try IP detection with 3s timeout
+  // Race 3 IP-geo APIs — whichever responds first wins
+  function applyDetectedCur(cc){
+    const cur=COUNTRY_CUR[cc]||null;
+    if(cur&&SUPPORTED.includes(cur)){
+      baseCur=cur;
+      const el=document.querySelector(`.cur-item[data-val="${cur}"]`);
+      if(el){
+        document.querySelectorAll('.ci-check').forEach(c=>c.style.display='none');
+        document.querySelectorAll('.cur-item').forEach(c=>c.classList.remove('active'));
+        el.classList.add('active');
+        const ck=document.getElementById('ck-'+cur);if(ck)ck.style.display='';
+        const meta=CUR_META[cur]||{flag:'🌐',region:''};
+        document.getElementById('curBtnFlag').innerHTML=meta.flag;
+        document.getElementById('curBtnCode').textContent=cur;
+        document.getElementById('curBtnRegion').textContent=meta.region;
+        // Sync cflag pills
+        document.querySelectorAll('.cflag').forEach(b=>b.classList.remove('active'));
+        const pill=document.querySelector('.cflag[data-cur="'+cur+'"]');
+        if(pill)pill.classList.add('active');
+        updateHeroBg(cur);
+      }
+    }
+  }
+  const t=(ms)=>new Promise((_,r)=>setTimeout(()=>r('timeout'),ms));
+  Promise.any([
+    Promise.race([fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>d.country_code),t(4000)]),
+    Promise.race([fetch('https://ip-api.com/json/').then(r=>r.json()).then(d=>d.countryCode),t(4000)]),
+    Promise.race([fetch('https://ipinfo.io/json').then(r=>r.json()).then(d=>d.country),t(4000)]),
+  ]).then(cc=>{if(cc&&cc!=='timeout')applyDetectedCur(cc);})
+    .catch(()=>{})
+    .finally(()=>{
+      // Re-render with detected currency (or keep AED if detection failed)
+      updateAll();
+    });
+});
+// ══ DTAA TAX CALCULATOR ═════════════════════════════════════════════════════
+const DTAA_RATES={
+  AED:{country:'UAE',         interest:12.5, dividend:10, stcg:15, ltcg:10, rental:30, note:'UAE has no personal income tax. DTAA signed 1992. Submit TRC + Form 10F to bank.'},
+  SAR:{country:'Saudi Arabia',interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-KSA DTAA 2006. Reduced 10% on interest/dividends. Submit TRC to claim.'},
+  QAR:{country:'Qatar',       interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Qatar DTAA 1999. Claim by submitting Tax Residency Certificate to your bank.'},
+  KWD:{country:'Kuwait',      interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Kuwait DTAA 2006. Submit TRC + Form 10F before year end for TDS relief.'},
+  BHD:{country:'Bahrain',     interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Bahrain DTAA. Bahrain has no income tax, so interest TDS reduced to 10%.'},
+  OMR:{country:'Oman',        interest:12.5, dividend:12.5,stcg:15,ltcg:10, rental:30, note:'India-Oman DTAA 1997. Interest rate capped at 12.5%.'},
+  MYR:{country:'Malaysia',    interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Malaysia DTAA 1976 (revised). 10% on interest income.'},
+  SGD:{country:'Singapore',   interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-Singapore DTAA 1994. Interest/dividends capped at 15%.'},
+  AUD:{country:'Australia',   interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-Australia DTAA 1991. 15% withholding on interest/dividends.'},
+  NZD:{country:'New Zealand', interest:10,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-NZ DTAA 1986. Interest reduced to 10%, dividends 15%.'},
+  USD:{country:'USA',         interest:15,   dividend:25, stcg:15, ltcg:10, rental:30, note:'India-USA DTAA 1990. Note: Dividends TDS 25% (US treaty). FATCA compliance required for MF investments.'},
+  CAD:{country:'Canada',      interest:15,   dividend:25, stcg:15, ltcg:10, rental:30, note:'India-Canada DTAA 1996. Dividends 25%, interest 15%. File ITR in India for refund.'},
+  EUR:{country:'Germany/EU',  interest:10,   dividend:10, stcg:15, ltcg:10, rental:30, note:'India-Germany DTAA (representative). Most EU countries: 10–15% on interest. Check specific country treaty.'},
+  GBP:{country:'UK',          interest:15,   dividend:15, stcg:15, ltcg:10, rental:30, note:'India-UK DTAA 1993. 15% on interest and dividends. Must file ITR in India to claim DTAA.'},
+};
+const STD_TDS={interest:31.2,dividend:20.8,stcg:15.6,ltcg:10.4,rental:31.2};
+const TYPE_LABEL={interest:'NRO FD/Savings Interest',dividend:'Dividend Income',stcg:'Short-Term Capital Gains',ltcg:'Long-Term Capital Gains',rental:'Rental Income'};
+
+function calcDTAA(){
+  const cur=document.getElementById('dtaa-country').value;
+  const type=document.getElementById('dtaa-type').value;
+  const income=parseFloat(document.getElementById('dtaa-income').value)||0;
+  const d=DTAA_RATES[cur];
+  const stdRate=STD_TDS[type];
+  const dtaaRate=d[type];
+  const stdTax=income*stdRate/100;
+  const dtaaTax=income*dtaaRate/100;
+  const saving=stdTax-dtaaTax;
+  const savingPct=((saving/stdTax)*100).toFixed(1);
+
+  const fmt=v=>'₹'+Math.round(v).toLocaleString('en-IN');
+  document.getElementById('dtaa-result').style.display='block';
+  document.getElementById('dtaa-grid').innerHTML=`
+    <div class="rg-card"><div class="rg-lbl">Standard TDS Rate</div><div class="rg-val" style="color:var(--red)">${stdRate}%</div><div class="rg-sub">Without DTAA benefit</div></div>
+    <div class="rg-card"><div class="rg-lbl">DTAA Rate (${d.country})</div><div class="rg-val" style="color:var(--green)">${dtaaRate}%</div><div class="rg-sub">With treaty benefit</div></div>
+    <div class="rg-card"><div class="rg-lbl">Standard TDS Amount</div><div class="rg-val" style="color:var(--red)">${fmt(stdTax)}</div><div class="rg-sub">Per year on ${fmt(income)}</div></div>
+    <div class="rg-card"><div class="rg-lbl">DTAA TDS Amount</div><div class="rg-val" style="color:var(--teal)">${fmt(dtaaTax)}</div><div class="rg-sub">Reduced under treaty</div></div>
+    <div class="rg-card" style="border:1px solid var(--amber-glow);background:var(--amber-dim)"><div class="rg-lbl">💰 Annual Tax Saving</div><div class="rg-val" style="color:var(--amber)">${fmt(saving)}</div><div class="rg-sub">That's ${savingPct}% less tax</div></div>
+    <div class="rg-card"><div class="rg-lbl">Effective Rate After DTAA</div><div class="rg-val">${dtaaRate}%</div><div class="rg-sub">vs ${stdRate}% standard</div></div>`;
+
+  document.getElementById('dtaa-info').innerHTML=`<strong>📋 How to Claim:</strong> ${d.note}<br><br>
+    <strong>Steps:</strong> (1) Obtain Tax Residency Certificate (TRC) from your country's tax authority &nbsp;·&nbsp;
+    (2) Fill <strong>Form 10F</strong> on the Indian Income Tax portal &nbsp;·&nbsp;
+    (3) Submit TRC + Form 10F + self-declaration to your Indian bank/broker before receiving income &nbsp;·&nbsp;
+    (4) File ITR in India to claim refund if excess TDS was deducted.`;
+
+  // DTAA rates comparison table
+  const rows=Object.entries(DTAA_RATES).map(([k,v])=>{
+    const rate=v[type];
+    const saving=((STD_TDS[type]-rate)/STD_TDS[type]*100).toFixed(0);
+    const isCur=k===cur;
+    return`<tr style="${isCur?'background:var(--amber-dim);':''}">
+      <td>${v.country}</td>
+      <td style="color:var(--red)">${STD_TDS[type]}%</td>
+      <td style="color:var(--green);font-weight:${isCur?700:400}">${rate}%</td>
+      <td style="color:var(--amber)">${saving}% saved</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('dtaa-rates-table').innerHTML=`
+    <div class="card-hd" style="margin-bottom:12px"><div class="card-hd-bar"></div>DTAA Rates Comparison — ${TYPE_LABEL[type]}</div>
+    <div class="year-table-wrap"><table class="year-table">
+      <thead><tr><th>Country</th><th>Standard TDS</th><th>DTAA Rate</th><th>Saving</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+// ══ REAL ESTATE ROI CALCULATOR ═══════════════════════════════════════════════
+function calcRealty(){
+  const val=parseFloat(document.getElementById('re-value').value)||0;   // lakhs
+  const dp=parseFloat(document.getElementById('re-dp').value)||20;
+  const rate=parseFloat(document.getElementById('re-rate').value)||8.5;
+  const tenure=parseFloat(document.getElementById('re-tenure').value)||20;
+  const rent=parseFloat(document.getElementById('re-rent').value)||0;   // monthly
+  const maint=parseFloat(document.getElementById('re-maint').value)||0; // annual
+  const ptax=parseFloat(document.getElementById('re-ptax').value)||0;   // annual
+  const apprec=parseFloat(document.getElementById('re-apprec').value)||6;
+  const fdRate=parseFloat(document.getElementById('re-fd').value)||7;
+
+  const propVal=val*100000; // in ₹
+  const loanAmt=propVal*(1-dp/100);
+  const downPay=propVal*(dp/100);
+  const mr=rate/12/100;
+  const n=tenure*12;
+  const emi=loanAmt>0?Math.round(loanAmt*mr*Math.pow(1+mr,n)/(Math.pow(1+mr,n)-1)):0;
+
+  const annualRent=rent*12;
+  const netAnnualRent=annualRent-maint-ptax;
+  const grossYield=(annualRent/propVal*100).toFixed(2);
+  const netYield=(netAnnualRent/propVal*100).toFixed(2);
+  const annualEMI=emi*12;
+  const annualCashFlow=netAnnualRent-annualEMI;
+  const totalROI=(parseFloat(netYield)+apprec).toFixed(2);
+  const fdReturn=(downPay*fdRate/100);
+  const appreciationGain=propVal*apprec/100;
+  const totalAnnualGain=netAnnualRent+appreciationGain;
+  const effROI=(totalAnnualGain/propVal*100).toFixed(2);
+
+  const fmt=v=>'₹'+Math.round(v).toLocaleString('en-IN');
+  const fmtL=v=>'₹'+(v/100000).toFixed(1)+'L';
+  document.getElementById('realty-result').style.display='block';
+  document.getElementById('realty-grid').innerHTML=`
+    <div class="rg-card"><div class="rg-lbl">Monthly EMI</div><div class="rg-val" style="color:var(--red)">${fmt(emi)}</div><div class="rg-sub">On ${fmtL(loanAmt)} loan @ ${rate}%</div></div>
+    <div class="rg-card"><div class="rg-lbl">Gross Rental Yield</div><div class="rg-val">${grossYield}%</div><div class="rg-sub">Annual rent ÷ property value</div></div>
+    <div class="rg-card"><div class="rg-lbl">Net Rental Yield</div><div class="rg-val" style="color:var(--teal)">${netYield}%</div><div class="rg-sub">After maintenance &amp; tax</div></div>
+    <div class="rg-card"><div class="rg-lbl">Annual Cash Flow</div><div class="rg-val" style="color:${annualCashFlow>=0?'var(--green)':'var(--red)'}">${fmt(Math.abs(annualCashFlow))}</div><div class="rg-sub">${annualCashFlow>=0?'Surplus (rent > EMI)':'Shortfall (EMI > rent)'}</div></div>
+    <div class="rg-card"><div class="rg-lbl">Total ROI (yield + appreciation)</div><div class="rg-val" style="color:var(--amber)">${effROI}%</div><div class="rg-sub">vs NRE FD ${fdRate}%</div></div>
+    <div class="rg-card" style="${parseFloat(effROI)>fdRate?'border:1px solid var(--green);background:var(--green-dim)':'border:1px solid var(--red);background:var(--red-dim)'}">
+      <div class="rg-lbl">${parseFloat(effROI)>fdRate?'✅ Beats NRE FD':'⚠️ Below NRE FD'}</div>
+      <div class="rg-val">${(parseFloat(effROI)-fdRate).toFixed(1)}% ${parseFloat(effROI)>fdRate?'extra':'less'}</div>
+      <div class="rg-sub">Property ROI vs FD benchmark</div></div>`;
+
+  // Year-by-year projection (10 years)
+  let pv=propVal, tbody='', cumRent=0, cumEMI=0;
+  for(let y=1;y<=10;y++){
+    pv*=(1+apprec/100);
+    const yr=annualRent*Math.pow(1+0.04,y-1); // rent grows 4% p.a.
+    cumRent+=yr; cumEMI+=annualEMI;
+    const netRent=yr-maint-ptax;
+    const cf=netRent-annualEMI;
+    const totalReturn=cumRent+(pv-propVal)-cumEMI;
+    tbody+=`<tr>
+      <td>${y}</td>
+      <td>${fmtL(pv)}</td>
+      <td>${fmt(yr)}</td>
+      <td style="color:var(--red)">${fmt(annualEMI)}</td>
+      <td style="color:${cf>=0?'var(--green)':'var(--red)'}">${fmt(Math.abs(cf))} ${cf>=0?'▲':'▼'}</td>
+      <td style="color:var(--amber)">${fmtL(totalReturn)}</td>
+    </tr>`;
+  }
+  document.getElementById('realty-year-body').innerHTML=tbody;
+
+  const verdict=parseFloat(effROI)>fdRate
+    ?`<div class="info" style="border-color:var(--green)">✅ <strong>Good investment:</strong> Your total ROI of ${effROI}% beats the NRE FD benchmark of ${fdRate}%. The property generates both rental income and capital appreciation. Ensure you factor in stamp duty (5–7%), registration fees, and FEMA repatriation rules.</div>`
+    :`<div class="info" style="border-color:var(--amber)">⚠️ <strong>Consider carefully:</strong> Total ROI ${effROI}% is below NRE FD at ${fdRate}%. The rental yield is low relative to the property price. Either negotiate a lower price, target higher rent, or consider NRE FD as a safer alternative. Real estate has illiquidity risk.</div>`;
+  document.getElementById('realty-verdict').innerHTML=verdict;
+}
+
+// ── DASHBOARD REDESIGN JS ──────────────────────────────────────────────────
+function quickSelectCur(cur, btn) {
+  document.querySelectorAll('.cflag').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const item = document.querySelector('.cur-item[data-val="' + cur + '"]');
+  if(item) selectCurrency(item);
+}
+
+function setActiveBottomTab(id) {
+  document.querySelectorAll('.btab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('btab-' + id);
+  if(el) el.classList.add('active');
+}
+
+function updateHeroRate() {
+  const v = document.getElementById('hero-rate-val');
+  if(v && midRate) v.textContent = midRate.toFixed(2);
+  const st = document.getElementById('hrd-status');
+  if(st) st.innerHTML = rateIsLive
+    ? '<div class="live-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0"></div>&nbsp;Live rate &middot; Updated ' + new Date().toLocaleTimeString()
+    : '<span style="color:var(--amber)">&#127313; Approximate rate (offline fallback)</span>';
+  const dr = document.getElementById('dash-rate');
+  if(dr && midRate) dr.textContent = '₹' + midRate.toFixed(4);
+  const dc = document.getElementById('dash-cur');
+  if(dc) dc.textContent = baseCur;
+  updateHeroReceive();
+  syncCurrencyToCalcs();
+}
+
+function updateHeroReceive() {
+  const amt = parseFloat(document.getElementById('heroAmount') && document.getElementById('heroAmount').value) || 1000;
+  const el = document.getElementById('har-rcv');
+  if(el && midRate) el.textContent = '\u20B9' + (amt * midRate).toLocaleString('en-IN', {maximumFractionDigits:0});
+}
+
+// ── TAX RESIDENCY CALCULATOR ─────────────────────────────────────────────────
+function updateTrBar(i,v){
+  const bar=document.getElementById('tr-bar-'+i);
+  if(!bar)return;
+  const pct=Math.min(100,Math.round(Math.max(0,parseInt(v)||0)/366*100));
+  bar.style.width=pct+'%';
+  bar.className='tr-bar-fill'+(pct>=50?' amber':'')+(pct>=100?' red':'');
+}
+
+function calcTaxResidency(){
+  const days=[];
+  for(let i=0;i<=9;i++){
+    const el=document.getElementById('tr-y'+i);
+    days.push(el?Math.min(366,Math.max(0,parseInt(el.value)||0)):0);
+  }
+  const y0=days[0]; // current year
+  const prev4=days[1]+days[2]+days[3]+days[4]; // FY last 4 years
+  const prev7nri=days.slice(1,8); // 7 preceding years for RNOR check
+
+  // ── STEP 1: Is person Resident in current year? ──────────────────────────
+  // Primary rule: >=182 days
+  const basicResident = y0>=182;
+  // Secondary rule: >=60 days AND >=365 in preceding 4 years
+  // (Citizens leaving for employment abroad: secondary rule does NOT apply — treated as NRI if <182 days)
+  // We assume general case (not crew/employment exception) for simplicity
+  const secondaryResident = y0>=60 && prev4>=365;
+  const isResident = basicResident || secondaryResident;
+
+  // ── STEP 2: If Resident, check RNOR conditions ──────────────────────────
+  // RNOR if: (a) NRI in 9 of preceding 10 years, OR (b) India stay <=729 days in preceding 7 years
+  let status='NRI', statusColor='var(--teal)', bgColor='var(--teal-dim)', subtitle='';
+  let rnorCondA=false, rnorCondB=false;
+
+  if(isResident){
+    // Count NRI years in preceding 10 years (days[1]..days[9] + one more but we only have 9 slots after y0)
+    const nriYears=days.slice(1).filter(d=>d<182).length; // out of 9 collected years
+    rnorCondA = nriYears>=9; // effectively: 9 of 9 collected, or close enough
+
+    const prev7total=days.slice(1,8).reduce((a,b)=>a+b,0);
+    rnorCondB = prev7total<=729;
+
+    if(rnorCondA||rnorCondB){
+      status='RNOR';
+      statusColor='var(--amber)';
+      bgColor='var(--amber-dim)';
+      subtitle='Resident but Not Ordinarily Resident';
+    } else {
+      status='Resident';
+      statusColor='var(--red)';
+      bgColor='var(--red-dim)';
+      subtitle='Resident & Ordinarily Resident';
+    }
+  } else {
+    subtitle='Non-Resident Indian';
+  }
+
+  // ── STEP 3: Days remaining this year ────────────────────────────────────
+  const daysLeft=366-y0; // approximate
+  const daysTo182=Math.max(0,182-y0);
+  const daysTo60=Math.max(0,60-y0);
+
+  // ── RENDER ───────────────────────────────────────────────────────────────
+  // Colours
+  const statusConf={
+    NRI:  {bg:'rgba(20,184,166,0.08)',border:'rgba(20,184,166,0.35)',color:'var(--teal)',emoji:'🌍',label:'Non-Resident Indian'},
+    RNOR: {bg:'rgba(240,165,32,0.08)',border:'rgba(240,165,32,0.35)',color:'var(--amber)',emoji:'🔄',label:'Resident but Not Ordinarily Resident'},
+    Resident:{bg:'rgba(239,68,68,0.07)',border:'rgba(239,68,68,0.30)',color:'#f43f5e',emoji:'🏠',label:'Resident & Ordinarily Resident'}
+  };
+  const sc=statusConf[status];
+
+  // Status hero card
+  document.getElementById('tr-status-hero').innerHTML=
+    '<div style="background:'+sc.bg+';border:2px solid '+sc.border+';border-radius:18px;padding:26px 24px;text-align:center;margin-bottom:18px">'+
+    '<div style="font-size:38px;margin-bottom:10px">'+sc.emoji+'</div>'+
+    '<div style="font-size:32px;font-weight:900;color:'+sc.color+';letter-spacing:-.5px;margin-bottom:6px">'+status+'</div>'+
+    '<div style="font-size:14px;font-weight:600;color:var(--muted)">'+sc.label+'</div>'+
+    '</div>';
+
+  // Threshold cards
+  const prev7total=days.slice(1,8).reduce((a,b)=>a+b,0);
+  document.getElementById('tr-thresholds').innerHTML=
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+((y0>=182)?'var(--green)':'var(--text)')+'">'+y0+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 182</span></div><div class="tr-thresh-lbl">Days this year<br>(primary rule)</div></div>'+
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+(prev4>=365?'var(--green)':'var(--text)')+'">'+prev4+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 365</span></div><div class="tr-thresh-lbl">Prior 4-yr total<br>(secondary rule)</div></div>'+
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+(prev7total<=729?'var(--green)':'#f43f5e')+'">'+prev7total+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 729</span></div><div class="tr-thresh-lbl">Prior 7-yr total<br>(RNOR threshold)</div></div>';
+
+  // Rules explanation
+  const rules={
+    NRI:'<strong>Why NRI?</strong> You spent '+y0+' days in India this year — below the 182-day primary threshold. The secondary rule (≥60 days + ≥365 in prior 4 years) also does not apply. You are a <strong>Non-Resident Indian</strong> for FY 2025-26.',
+    RNOR:'<strong>Why RNOR?</strong> You crossed the resident threshold ('+y0+' days), but qualify for RNOR because '+(rnorCondA?'you were NRI for 9+ of the preceding 10 years':'')+(rnorCondA&&rnorCondB?' and ':'')+(rnorCondB?'your total India stay in the prior 7 years is ≤729 days':'')+'. RNOR status can last up to <strong>2 fiscal years</strong> after returning to India.',
+    Resident:'<strong>Why Resident (ROR)?</strong> You spent <strong>'+y0+' days</strong> in India this year and do not qualify for RNOR. All your worldwide income is taxable in India from this fiscal year.'
+  };
+  document.getElementById('tr-rules').innerHTML=rules[status];
+
+  // Implications cards
+  const imp={
+    NRI:[
+      {icon:'💸',title:'Only India-sourced income is taxable',text:'Foreign salary, overseas business income, and capital gains abroad are not taxable in India.'},
+      {icon:'🏦',title:'NRE interest is tax-free; NRO is taxable',text:'Interest earned on NRE accounts is exempt from tax. NRO account interest is taxable and subject to TDS.'},
+      {icon:'📄',title:'DTAA benefits available',text:'Claim relief under the India-'+' Double Tax Avoidance Agreement to avoid being taxed twice on the same income.'}
+    ],
+    RNOR:[
+      {icon:'🌐',title:'Foreign income still exempt — for now',text:'Only India-sourced income and income from a business controlled in India is taxable. Your overseas income stays exempt.'},
+      {icon:'⏳',title:'Act now — window is limited',text:'RNOR lasts at most 2 fiscal years. This is the ideal window to repatriate NRE FD proceeds and sell overseas assets before they become taxable.'},
+      {icon:'🏦',title:'NRE interest remains tax-free during RNOR',text:'Keep NRE accounts active during this period — interest is still exempt under the Income Tax Act.'}
+    ],
+    Resident:[
+      {icon:'🌍',title:'Global income is taxable in India',text:'Foreign salary, overseas investment gains, and all worldwide income must be reported and may be taxable in India.'},
+      {icon:'🔄',title:'Convert NRE account to Resident/RFC',text:'Your NRE account must be redesignated to a Resident or RFC (Resident Foreign Currency) account immediately.'},
+      {icon:'📋',title:'Disclose foreign assets in ITR',text:'Foreign bank accounts, investments, and assets must be reported in Schedule FA of your Income Tax Return each year.'}
+    ]
+  };
+  document.getElementById('tr-implications').innerHTML=imp[status].map(function(c){
+    return '<div class="tr-impl-card"><div class="tr-impl-icon2">'+c.icon+'</div><div class="tr-impl-body"><div class="tr-impl-title2">'+c.title+'</div><div class="tr-impl-text2">'+c.text+'</div></div></div>';
+  }).join('');
+
+  // Next-year outlook
+  let outlook='';
+  if(status==='NRI'&&y0<182){
+    const canStay=181-y0;
+    outlook='<div class="tr-rules-card" style="border-color:rgba(20,184,166,0.25);background:rgba(20,184,166,0.06)"><strong>📊 Outlook:</strong> You can spend up to <strong>'+canStay+' more days</strong> in India this year and retain NRI status. Crossing 182 days triggers the basic Resident rule.</div>';
+  } else if(status==='RNOR'){
+    outlook='<div class="tr-rules-card" style="border-color:rgba(240,165,32,0.25);background:rgba(240,165,32,0.06)"><strong>⏳ Action window:</strong> RNOR status is temporary. Use this period to repatriate NRE FD proceeds, sell overseas assets, and plan your tax residency transition carefully.</div>';
+  } else {
+    outlook='<div class="tr-rules-card" style="border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05)"><strong>📁 Filing requirement:</strong> As a Resident (ROR), you must file an ITR disclosing your global income and foreign assets (Schedule FA). Consult a CA if you have overseas investments.</div>';
+  }
+  document.getElementById('tr-nextyear').innerHTML=outlook;
+
+  document.getElementById('tr-result').style.display='block';
+}
+
+
+// ── CURRENCY CONTEXT BARS ─────────────────────────────────────────────────────
+const CCB_TABS=['invest','nrenro','homeloan','return','dtaa','realty','taxres'];
+
+// ── COUNTRY PERSONALIZATION ──────────────────────────────────────────────────
+const COUNTRY_HUB = {
+  AED:{name:'UAE',emoji:'🇦🇪',label:'UAE NRI Hub',guide:'tax-saving.html',guideLbl:'UAE DTAA Guide'},
+  SAR:{name:'Saudi Arabia',emoji:'🇸🇦',label:'Saudi NRI Hub',guide:'tax-saving.html',guideLbl:'KSA DTAA Guide'},
+  QAR:{name:'Qatar',emoji:'🇶🇦',label:'Qatar NRI Hub',guide:'tax-saving.html',guideLbl:'Qatar DTAA Guide'},
+  KWD:{name:'Kuwait',emoji:'🇰🇼',label:'Kuwait NRI Hub',guide:'tax-saving.html',guideLbl:'Kuwait DTAA Guide'},
+  MYR:{name:'Malaysia',emoji:'🇲🇾',label:'Malaysia NRI Hub',guide:'tax-saving.html',guideLbl:'Malaysia DTAA Guide'},
+  SGD:{name:'Singapore',emoji:'🇸🇬',label:'Singapore NRI Hub',guide:'tax-saving.html',guideLbl:'Singapore DTAA Guide'},
+  GBP:{name:'UK',emoji:'🇬🇧',label:'UK NRI Hub',guide:'tax-saving.html',guideLbl:'UK DTAA Guide'},
+  USD:{name:'USA',emoji:'🇺🇸',label:'USA NRI Hub',guide:'tax-saving.html',guideLbl:'US DTAA Guide'},
+  AUD:{name:'Australia',emoji:'🇦🇺',label:'Australia NRI Hub',guide:'tax-saving.html',guideLbl:'Australia DTAA Guide'},
+  CAD:{name:'Canada',emoji:'🇨🇦',label:'Canada NRI Hub',guide:'tax-saving.html',guideLbl:'Canada DTAA Guide'},
+  EUR:{name:'Europe',emoji:'🇪🇺',label:'Europe NRI Hub',guide:'tax-saving.html',guideLbl:'Europe DTAA Guide'},
+};
+function updateCountryPersonalization(){
+  const hub = COUNTRY_HUB[baseCur];
+  const el = document.getElementById('countryWelcome');
+  const flagEl = document.getElementById('countryWelcomeFlag');
+  const txtEl = document.getElementById('countryWelcomeText');
+  if(!el||!hub)return;
+  flagEl.innerHTML = '<img src="https://flagcdn.com/20x15/' + baseCur.toLowerCase().slice(0,2) + '.png" width="20" height="15" style="border-radius:2px;vertical-align:middle;margin-right:4px;" alt=""/> ';
+  txtEl.innerHTML = '<strong>' + hub.label + '</strong> &mdash; rates, tax &amp; guides for ' + hub.name + ' NRIs';
+  el.style.display = 'flex';
+}
+
+function syncCurrencyToCalcs(){
+  if(typeof updateRpLocal==='function')updateRpLocal();
+  if(typeof calcEdPlan==='function')calcEdPlan();
+  updateCountryPersonalization();
+  if(!midRate||!baseCur)return;
+  const meta=CUR_META[baseCur]||{flag:'',name:baseCur,region:''};
+  CCB_TABS.forEach(tid=>{
+    const flagEl=document.getElementById('ccb-flag-'+tid);
+    const rateEl=document.getElementById('ccb-rate-'+tid);
+    const curEl=document.getElementById('ccb-cur-'+tid);
+    if(flagEl)flagEl.innerHTML=meta.flag;
+    if(rateEl)rateEl.innerHTML='1 <strong>'+baseCur+'</strong> = <span>₹'+midRate.toFixed(4)+'</span>';
+    if(curEl)curEl.textContent=baseCur;
+    ccbConvert(tid);
+  });
+}
+function ccbConvert(tid){
+  if(!midRate)return;
+  const inp=document.getElementById('ccb-inp-'+tid);
+  const out=document.getElementById('ccb-out-'+tid);
+  if(!inp||!out)return;
+  const amt=parseFloat(inp.value);
+  if(!isNaN(amt)&&amt>0){
+    out.textContent='₹'+(amt*midRate).toLocaleString('en-IN',{maximumFractionDigits:0});
+  } else {
+    out.textContent='₹—';
+  }
+}
+
+function updateRpLocal(){
+  const sav=parseFloat(document.getElementById('rp-savings').value)||0;
+  const mon=parseFloat(document.getElementById('rp-monthly').value)||0;
+  const roi=(parseFloat(document.getElementById('rp-roi').value)||8)/100;
+  const yrs=parseInt(document.getElementById('rp-years').value)||0;
+  // Projected corpus at return date
+  const mr=roi/12,n=yrs*12;
+  const fvSav=(sav*100000)*Math.pow(1+mr,n);
+  const fvCon=mr>0?(mon*100000)*(Math.pow(1+mr,n)-1)/mr:(mon*100000)*n;
+  const proj=fvSav+fvCon;
+  const yc=document.getElementById('rp-years-corpus');
+  if(yc&&yrs>0){
+    const inrStr='₹'+(proj/100000).toFixed(1)+'L projected corpus';
+    const lcStr=midRate>0?' (≈ '+baseCur+' '+(proj/midRate/100000).toFixed(1)+'L)':'';
+    yc.textContent=inrStr+lcStr;
+  }
+  if(!midRate)return;
+  const sl=document.getElementById('rp-savings-local');
+  const ml=document.getElementById('rp-monthly-local');
+  if(sl)sl.textContent=sav>0?'≈ '+baseCur+' '+(sav*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'';
+  if(ml)ml.textContent=mon>0?'≈ '+baseCur+' '+(mon*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0})+'/mo':'';
+}
+
+// ── RETURN CHECKLIST ──────────────────────────────────────────────────────────
+const CL_KEY='nri_return_checklist';
+const CL_PHASES={1:[1,2,3,4,5],2:[6,7,8,9],3:[10,11,12]};
+const CL_TOTAL=12;
+
+function clLoad(){
+  try{return JSON.parse(localStorage.getItem(CL_KEY)||'{}');}catch(e){return {};}
+}
+function clSave(state){
+  try{localStorage.setItem(CL_KEY,JSON.stringify(state));}catch(e){}
+}
+function toggleCheck(id){
+  const state=clLoad();
+  state[id]=!state[id];
+  clSave(state);
+  renderChecklist();
+}
+function resetChecklist(){
+  if(!confirm('Reset all checklist items?'))return;
+  clSave({});
+  renderChecklist();
+}
+function renderChecklist(){
+  const state=clLoad();
+  let done=0;
+  for(let i=1;i<=CL_TOTAL;i++){
+    const el=document.getElementById('cl-'+i);
+    if(!el)continue;
+    if(state['cl-'+i]){el.classList.add('done');done++;}
+    else el.classList.remove('done');
+  }
+  // Progress bar
+  const pct=Math.round((done/CL_TOTAL)*100);
+  const fill=document.getElementById('cl-fill');
+  const pctEl=document.getElementById('cl-pct');
+  if(fill)fill.style.width=pct+'%';
+  if(pctEl){
+    pctEl.textContent=pct+'%';
+    pctEl.style.color=pct===100?'var(--green)':pct>=50?'var(--teal)':'var(--amber)';
+  }
+  // Phase subtitles
+  Object.entries(CL_PHASES).forEach(([phase,ids])=>{
+    const phaseDone=ids.filter(i=>state['cl-'+i]).length;
+    const sub=document.getElementById('cl-phase'+phase+'-sub');
+    if(sub)sub.textContent=phaseDone+' / '+ids.length+' done';
+  });
+}
+// Init checklist on page load
+document.addEventListener('DOMContentLoaded',()=>{renderChecklist();});
+
+// ── RATE ALERT SIGNUP ─────────────────────────────────────────────────────────
+
+// ── EDUCATION CORPUS PLANNER ─────────────────────────────────────────────
+function setEdCost(val){
+  document.getElementById('ed-cost').value=val;
+  calcEdPlan();
+}
+
+function calcEdPlan(){
+  const age=parseInt(document.getElementById('ed-age').value)||0;
+  const startAge=parseInt(document.getElementById('ed-start-age').value)||18;
+  const duration=parseInt(document.getElementById('ed-duration').value)||4;
+  const costToday=(parseFloat(document.getElementById('ed-cost').value)||0)*100000;
+  const edInf=(parseFloat(document.getElementById('ed-inflation').value)||8)/100;
+  const savings=(parseFloat(document.getElementById('ed-savings').value)||0)*100000;
+  const sipM=parseFloat(document.getElementById('ed-sip').value)||0;
+  const roi=(parseFloat(document.getElementById('ed-roi').value)||12)/100;
+
+  const yrsToStart=Math.max(0,startAge-age);
+  const mr=roi/12;
+  const n=yrsToStart*12;
+
+  // Local currency sub-labels
+  const cl=document.getElementById('ed-cost-local');
+  const sl=document.getElementById('ed-sip-local');
+  if(cl)cl.textContent=midRate>0&&costToday>0?'≈ '+baseCur+' '+Math.round(costToday/midRate).toLocaleString('en-IN')+'/yr':'';
+  if(sl)sl.textContent=midRate>0&&sipM>0?'≈ '+baseCur+' '+Math.round(sipM/midRate).toLocaleString('en-IN')+'/mo':'';
+
+  if(yrsToStart<0||costToday===0)return;
+
+  // Total corpus needed: sum of inflated annual costs over duration
+  let totalNeeded=0;
+  const annualCosts=[];
+  for(let d=0;d<duration;d++){
+    const inflatedCost=costToday*Math.pow(1+edInf,yrsToStart+d);
+    annualCosts.push(inflatedCost);
+    totalNeeded+=inflatedCost;
+  }
+
+  // Projected corpus at start age
+  const fvSavings=savings*Math.pow(1+mr,n);
+  const fvSip=mr>0?sipM*(Math.pow(1+mr,n)-1)/mr:sipM*n;
+  const projCorpus=fvSavings+fvSip;
+
+  const gap=totalNeeded-projCorpus;
+  const onTrack=projCorpus>=totalNeeded;
+
+  // Required SIP to meet target
+  let reqSip=0;
+  if(gap>0&&n>0){
+    const fvNeeded=totalNeeded-fvSavings;
+    reqSip=mr>0?fvNeeded*mr/(Math.pow(1+mr,n)-1):fvNeeded/n;
+  }
+
+  // Year-by-year table
+  let tbody='',edDataRows=[];
+  const tableYears=yrsToStart+duration;
+  let corpus=savings;
+  for(let y=1;y<=tableYears;y++){
+    // Monthly compounding
+    corpus=corpus*(1+mr)+sipM;
+    const childAge=age+y;
+    const isEdYear=childAge>=startAge&&childAge<startAge+duration;
+    const edCostThisYear=isEdYear?costToday*Math.pow(1+edInf,y):0;
+    const corpusL=(corpus/100000).toFixed(1);
+    const edCostL=isEdYear?(edCostThisYear/100000).toFixed(1):'—';
+    const rowClass=isEdYear?'style="background:rgba(240,165,32,0.06)"':'';
+    tbody+=`<tr ${rowClass}><td>${y}</td><td>${childAge}</td><td>₹${corpusL}L</td><td>${isEdYear?'₹'+edCostL+'L':'—'}</td></tr>`;
+  }
+  document.getElementById('ed-table-body').innerHTML=tbody;
+
+  // Render progress ring
+  const pct=Math.min(100,Math.round(projCorpus/totalNeeded*100));
+  const arc=(document.getElementById('ed-ring-arc')||{style:{},setAttribute:function(){}});
+  if(arc){
+    arc.style.strokeDashoffset=String(Math.round(314*(1-pct/100)));
+    arc.style.stroke=onTrack?'var(--green)':pct>=70?'var(--amber)':'#f43f5e';
+  }
+  const ringPct=document.getElementById('ed-ring-pct');
+  if(ringPct)ringPct.textContent=pct+'%';
+
+  // Stat cards
+  const lc=(inr)=>midRate>0?'≈ '+baseCur+' '+(inr/midRate/100000).toFixed(1)+'L':'';
+  const qs=id=>document.getElementById(id);
+  qs('ed-s-needed').textContent='₹'+(totalNeeded/100000).toFixed(1)+'L';
+  qs('ed-s-needed').style.color='var(--text)';
+  qs('ed-s-needed-sub').textContent=lc(totalNeeded);
+  qs('ed-s-proj').textContent='₹'+(projCorpus/100000).toFixed(1)+'L';
+  qs('ed-s-proj').style.color=onTrack?'var(--green)':'var(--amber)';
+  qs('ed-s-proj-sub').textContent=lc(projCorpus);
+  qs('ed-s-years').textContent=yrsToStart+' yrs';
+  qs('ed-s-years-sub').textContent='Child '+age+' → starts at '+startAge;
+  const gapLbl=qs('ed-s-gap-lbl');
+  const gapVal=qs('ed-s-gap');
+  if(onTrack){
+    gapLbl.textContent='Surplus';
+    gapVal.textContent='₹'+(Math.abs(gap)/100000).toFixed(1)+'L';
+    gapVal.style.color='var(--green)';
+  } else {
+    gapLbl.textContent='Shortfall';
+    gapVal.textContent='₹'+(gap/100000).toFixed(1)+'L';
+    gapVal.style.color='#f43f5e';
+  }
+  qs('ed-s-gap-sub').textContent=lc(Math.abs(gap));
+
+  // Status strip
+  const statusBox=document.getElementById('ed-status-box');
+  if(onTrack){
+    statusBox.style.background='rgba(34,197,94,0.07)';
+    statusBox.style.border='1px solid rgba(34,197,94,0.22)';
+    statusBox.innerHTML='<div class="ed-status-strip-icon">✅</div><div><div class="ed-status-strip-title" style="color:var(--green)">You are on track!</div><div class="ed-status-strip-text" style="color:var(--muted)">Projected corpus of <strong style="color:var(--text)">₹'+(projCorpus/100000).toFixed(1)+'L</strong> covers the full education cost of <strong style="color:var(--text)">₹'+(totalNeeded/100000).toFixed(1)+'L</strong> with a surplus of <strong style="color:var(--green)">₹'+(Math.abs(gap)/100000).toFixed(1)+'L</strong>.</div></div>';
+  } else {
+    statusBox.style.background='rgba(240,165,32,0.07)';
+    statusBox.style.border='1px solid rgba(240,165,32,0.22)';
+    const sipStr='₹'+Math.round(reqSip).toLocaleString('en-IN')+'/mo'+(midRate>0?' (≈ '+baseCur+' '+Math.round(reqSip/midRate).toLocaleString('en-IN')+'/mo)':'');
+    statusBox.innerHTML='<div class="ed-status-strip-icon">⚠️</div><div><div class="ed-status-strip-title" style="color:var(--amber)">Shortfall of ₹'+(gap/100000).toFixed(1)+'L</div><div class="ed-status-strip-text" style="color:var(--muted)">Your current SIP and savings will leave a gap. Increase your monthly SIP to close it.</div><div class="ed-sip-pill">💡 Recommended SIP: '+sipStr+'</div></div>';
+  }
+
+  document.getElementById('ed-results').style.display='block';
+}
+
+function toggleEdTable(){
+  const wrap=document.getElementById('ed-table-wrap');
+  const btn=document.getElementById('ed-table-toggle');
+  const hidden=wrap.style.display==='none';
+  wrap.style.display=hidden?'block':'none';
+  btn.innerHTML=hidden?'▼ Year-by-Year Growth':'▶ Year-by-Year Growth';
+}
+
+// ── ARTICLES ──────────────────────────────────────
+const ARTICLES={
+  'nre-nro':{
+    tag:'banking',tagLabel:'Banking',readTime:'6 min read',
+    metaTitle:'NRE vs NRO Account: Which Is Better for NRIs? (2026 Guide)',
+    metaDesc:'Understand the key differences between NRE and NRO accounts — tax treatment, repatriation rules, FD interest rates, and when to use each account type.',
+    metaKw:'NRE account, NRO account, NRE vs NRO difference, NRI bank account India 2026',
+    title:'NRE vs NRO Account: Which One Do You Actually Need?',
+    content:`
+      <div class="art-callout indigo"><strong>Quick answer:</strong> If you earn abroad and want tax-free returns — open an NRE account. If you have income in India (rent, dividends, pension) — you need an NRO account. Most NRIs with both income types should have both.</div>
+      <h2>What Is an NRE Account?</h2>
+      <p>A <strong>Non-Resident External (NRE)</strong> account lets you park your foreign earnings in India in Indian Rupees. The key benefits are hard to beat:</p>
+      <ul>
+        <li><strong>Tax-free interest</strong> — interest earned is completely exempt from Indian income tax</li>
+        <li><strong>Fully repatriable</strong> — you can move both principal and interest back abroad at any time</li>
+        <li><strong>Rupee account</strong> — you convert your foreign currency to INR at the time of deposit, so you take the exchange rate risk</li>
+        <li>Available as savings accounts and fixed deposits (FDs)</li>
+      </ul>
+      <div class="art-callout green"><strong>Best for:</strong> Parking overseas salary savings you might want to bring back one day, or investing in Indian markets via SIP/mutual funds from a clean, tax-free account.</div>
+      <h2>What Is an NRO Account?</h2>
+      <p>A <strong>Non-Resident Ordinary (NRO)</strong> account is designed for income that originates in India — rent from a property, dividends from Indian stocks, pension payments, or money gifted by Indian residents.</p>
+      <ul>
+        <li><strong>Interest is taxable</strong> — TDS of 30% is deducted at source (can be reduced via DTAA)</li>
+        <li><strong>Repatriation limit</strong> — you can repatriate up to USD 1 million per financial year after paying tax</li>
+        <li>You cannot freely move money from NRO to an overseas account without satisfying FEMA conditions</li>
+      </ul>
+      <h2>Side-by-Side Comparison</h2>
+      <table class="art-table">
+        <thead><tr><th>Feature</th><th>NRE Account</th><th>NRO Account</th></tr></thead>
+        <tbody>
+          <tr><td>Purpose</td><td>Foreign earnings in India</td><td>India-sourced income</td></tr>
+          <tr><td>Tax on Interest</td><td>Nil (fully exempt)</td><td>30% TDS</td></tr>
+          <tr><td>Repatriation</td><td>Freely repatriable</td><td>Up to $1M/yr after tax</td></tr>
+          <tr><td>Joint account</td><td>With another NRI only</td><td>With NRI or resident Indian</td></tr>
+          <tr><td>Currency</td><td>INR (converted from forex)</td><td>INR</td></tr>
+          <tr><td>Deposits from India</td><td>Not allowed</td><td>Allowed</td></tr>
+        </tbody>
+      </table>
+      <h2>What About FCNR Accounts?</h2>
+      <p>There's a third option: <strong>Foreign Currency Non-Resident (FCNR)</strong> deposits. These are fixed deposits held in your home currency (USD, AED, GBP, EUR, etc.) — so you eliminate exchange rate risk entirely. Interest is tax-free. Great for large sums you don't want to convert to INR yet.</p>
+      <h2>Common Mistakes NRIs Make</h2>
+      <ul>
+        <li><strong>Keeping a regular savings account after becoming NRI</strong> — illegal under FEMA. Must convert to NRO within 6 months of becoming NRI.</li>
+        <li><strong>Mixing foreign and India income in one account</strong> — defeats the purpose and creates tax complexity.</li>
+        <li><strong>Not claiming DTAA benefit on NRO interest</strong> — you can reduce TDS from 30% to 10–15% in many countries.</li>
+      </ul>
+      <div class="art-callout"><strong>Action checklist:</strong> 1) Open NRE account for your overseas salary · 2) Convert your old Indian savings account to NRO · 3) Check DTAA with your country of residence to reduce NRO TDS · 4) Consider FCNR FD for amounts above ₹20L you won't touch for 1–5 years</div>
+      <div class="art-cta"><div><div class="art-cta-text">Compare NRE FD Rates Across Banks</div><div class="art-cta-sub">See which bank offers the best NRE fixed deposit rate right now</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">Open FD Calculator &#8594;</button></div>
+    `},
+  'tax-saving':{
+    tag:'tax',
+    metaTitle:'NRI Tax Saving Guide India 2026 — DTAA, ELSS, NRE FD & More',
+    metaDesc:'Complete tax-saving guide for NRIs: how to use DTAA to avoid double taxation, best tax-saving investments, Section 80C options, and LTCG exemptions.',
+    metaKw:'NRI tax saving India, DTAA double tax, Section 80C NRI, NRI capital gains tax 2026',tagLabel:'Tax',readTime:'8 min read',
+    title:'How NRIs Can Save Tax in 2026 (DTAA, Form 15CA & More)',
+    content:`
+      <div class="art-callout indigo"><strong>Key principle:</strong> India taxes you on income that arises or is received in India. Foreign income is generally not taxable in India if you are an NRI. The real savings come from structuring your India-based income correctly.</div>
+      <h2>Your Residential Status Determines Everything</h2>
+      <p>India's tax system is residence-based, not citizenship-based. Your tax liability depends entirely on whether you are classified as:</p>
+      <ul>
+        <li><strong>NRI (Non-Resident Indian)</strong> — present in India fewer than 182 days in the financial year</li>
+        <li><strong>RNOR (Resident but Not Ordinarily Resident)</strong> — transitional status, taxed like NRI for most foreign income</li>
+        <li><strong>Resident</strong> — taxed on global income</li>
+      </ul>
+      <div class="art-callout"><strong>Watch your days:</strong> If you plan to visit India for extended periods, track your days carefully. Crossing 182 days in a year — or 120 days under certain conditions — can flip your status and expose your entire global income to Indian tax.</div>
+      <h2>Tax-Free Income as an NRI</h2>
+      <p>Several income sources are completely exempt from Indian tax for NRIs:</p>
+      <ul>
+        <li><strong>NRE account interest</strong> — fully exempt, no TDS, no declaration needed</li>
+        <li><strong>FCNR deposit interest</strong> — fully exempt</li>
+        <li><strong>Long-term capital gains on equity mutual funds</strong> — up to ₹1.25L per year tax-free (FY 2024–25 onwards)</li>
+        <li><strong>Overseas income</strong> — your foreign salary, business income, or rental income abroad is not taxable in India</li>
+      </ul>
+      <h2>DTAA: Your Most Powerful Tax Tool</h2>
+      <p>India has <strong>Double Tax Avoidance Agreements (DTAA)</strong> with 90+ countries. These treaties prevent you from paying tax twice on the same income. Key benefits:</p>
+      <table class="art-table">
+        <thead><tr><th>Country</th><th>NRO Interest TDS (Normal)</th><th>With DTAA</th></tr></thead>
+        <tbody>
+          <tr><td>UAE</td><td>30%</td><td>0% (UAE has no income tax)</td></tr>
+          <tr><td>UK</td><td>30%</td><td>15%</td></tr>
+          <tr><td>USA</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Malaysia</td><td>30%</td><td>10%</td></tr>
+          <tr><td>Singapore</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Australia</td><td>30%</td><td>15%</td></tr>
+          <tr><td>Canada</td><td>30%</td><td>25%</td></tr>
+        </tbody>
+      </table>
+      <p>To claim DTAA benefit, submit a <strong>Tax Residency Certificate (TRC)</strong> from your country of residence to your Indian bank, along with <strong>Form 10F</strong>. The bank will then deduct TDS at the lower DTAA rate.</p>
+      <h2>Form 15CA and 15CB</h2>
+      <p>When you repatriate money from India (especially large amounts from NRO accounts), you need these forms:</p>
+      <ul>
+        <li><strong>Form 15CA</strong> — a declaration you file online on the Income Tax portal confirming tax has been paid</li>
+        <li><strong>Form 15CB</strong> — a CA certificate verifying the remittance is legal and taxes are settled. Required for amounts above ₹5 lakh</li>
+      </ul>
+      <h2>Filing Indian Tax Returns as an NRI</h2>
+      <p>You must file an Indian tax return (ITR-2) if your India-sourced income exceeds the basic exemption limit (₹2.5L under old regime, ₹3L under new regime). Even if you have no tax liability, filing is good practice and required for loan applications.</p>
+      <div class="art-callout green"><strong>Big opportunity:</strong> NRIs can claim a deduction under Section 80C (up to ₹1.5L) on ELSS mutual fund investments, home loan principal, and life insurance premiums paid in India. Section 24b allows ₹2L deduction on home loan interest. These can significantly reduce your taxable India income.</div>
+      <div class="art-cta"><div><div class="art-cta-text">Check Your Tax Residency Status</div><div class="art-cta-sub">Use our calculator to determine NRI / RNOR / Resident status</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('taxres',document.querySelector('[data-tab=taxres]'))">Open Tax Residency Tool &#8594;</button></div>
+    `},
+  'home-buying':{
+    tag:'property',
+    metaTitle:'NRI Home Buying Guide India 2026 — Eligibility, Loan & Repatriation',
+    metaDesc:'Can NRIs buy property in India? Yes. Here is everything: FEMA rules, NRI home loan eligibility, EMI from NRE account, and how to repatriate sale proceeds.',
+    metaKw:'NRI home buying India, NRI property purchase, NRI home loan 2026, FEMA property NRI',tagLabel:'Property',readTime:'10 min read',
+    title:'The Complete NRI Home Buying Guide (2026)',
+    content:`
+      <div class="art-callout indigo"><strong>Can NRIs buy property in India?</strong> Yes. NRIs and PIOs can buy residential and commercial property in India without RBI approval. Agricultural land, plantation property, and farmhouses are not permitted.</div>
+      <h2>Step 1: Decide Your Structure</h2>
+      <p>Before searching for property, decide:</p>
+      <ul>
+        <li><strong>Self-use or investment?</strong> — Tax treatment and loan eligibility differ</li>
+        <li><strong>Jointly or solo?</strong> — Many NRIs add a local family member as co-owner for practical reasons (signing, possession)</li>
+        <li><strong>Loan or self-funded?</strong> — NRI home loans are available from most major banks at 7.25–9% p.a.</li>
+      </ul>
+      <h2>Step 2: Power of Attorney (POA)</h2>
+      <p>Since you're abroad, you'll need a <strong>Power of Attorney</strong> — a legal document authorising a trusted person in India (parent, sibling, spouse) to act on your behalf for signing agreements, registering the property, and taking possession.</p>
+      <ul>
+        <li>POA must be executed before an Indian consulate or notarised and apostilled in the country where you reside</li>
+        <li>The original POA must be sent to India; your representative will get it stamped and registered</li>
+        <li>Use a specific POA (limited to this transaction) rather than a general POA for security</li>
+      </ul>
+      <h2>Step 3: NRI Home Loan Eligibility</h2>
+      <p>Most major banks (SBI, ICICI, HDFC, Axis) offer NRI home loans. Key requirements:</p>
+      <table class="art-table">
+        <thead><tr><th>Requirement</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>NRE/NRO Account</td><td>Mandatory — EMI must be debited from your Indian account</td></tr>
+          <tr><td>Min Employment</td><td>Usually 1–2 years in current job abroad</td></tr>
+          <tr><td>Income proof</td><td>3–6 months payslips, employment contract, overseas bank statements</td></tr>
+          <tr><td>Credit score</td><td>CIBIL score 700+ preferred; some banks accept overseas credit reports</td></tr>
+          <tr><td>Max LTV</td><td>Up to 90% of property value</td></tr>
+          <tr><td>Max tenure</td><td>Up to 30 years</td></tr>
+        </tbody>
+      </table>
+      <h2>Step 4: Payment Rules (FEMA)</h2>
+      <p>All payments for property must come from:</p>
+      <ul>
+        <li>Inward remittance from abroad via normal banking channels</li>
+        <li>Funds in your NRE or NRO account</li>
+        <li>Home loan proceeds</li>
+      </ul>
+      <p>Cash transactions are <strong>not permitted</strong>. Keep all payment records — you'll need them to prove source of funds when you sell.</p>
+      <h2>Step 5: Registration and Stamp Duty</h2>
+      <p>Property must be registered in India. Your POA holder can execute this in your absence. Stamp duty varies by state (typically 3–7% of property value). Registration fee is typically 1%. Budget 6–8% of property value for total acquisition costs including stamp duty, registration, and legal fees.</p>
+      <h2>Tax on Rental Income</h2>
+      <p>If you rent out the property, rental income is taxable in India under "Income from House Property." TDS of 30% is deducted by the tenant if the tenant is an Indian resident paying rent above ₹50,000/month. You can claim deductions for municipal taxes paid and 30% standard deduction on net rent.</p>
+      <h2>Selling the Property</h2>
+      <ul>
+        <li><strong>Short-term capital gains</strong> (held &lt;2 years): Taxed at your slab rate</li>
+        <li><strong>Long-term capital gains</strong> (held &gt;2 years): 12.5% (from FY25) with no indexation benefit</li>
+        <li>Buyer must deduct TDS of 20% on sale amount if seller is NRI</li>
+        <li>You can repatriate sale proceeds up to the original investment amount from NRO account</li>
+      </ul>
+      <div class="art-callout"><strong>Pro tip:</strong> Invest in under-construction property from a RERA-registered developer. This gives legal protection, allows you to verify project status online, and ensures the builder cannot deviate from approved plans.</div>
+      <div class="art-cta"><div><div class="art-cta-text">Calculate Your NRI Home Loan EMI</div><div class="art-cta-sub">See EMI, amortization schedule, and interest saved with prepayments</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('homeloan',document.querySelector('[data-tab=homeloan]'))">Open Home Loan Calculator &#8594;</button></div>
+    `},
+  'send-money':{
+    tag:'transfer',
+    metaTitle:'Best Way to Send Money to India as NRI in 2026 — Wise vs InstaReM vs Remitly',
+    metaDesc:'Compare the top remittance services for sending money to India: exchange rates, fees, transfer speed, and which service wins for your country.',
+    metaKw:'best way to send money to India NRI, Wise vs InstaReM, remittance India 2026, lowest fee money transfer India',tagLabel:'Transfer',readTime:'5 min read',
+    title:'Best Ways to Send Money to India: Full Cost Comparison',
+    content:`
+      <div class="art-callout green"><strong>The hidden cost:</strong> The exchange rate margin — not the fee — is where you lose the most money. A provider charging "zero fee" but offering a rate 2% below mid-market costs far more than one charging a small fee at a near-perfect rate.</div>
+      <h2>How Transfer Costs Work</h2>
+      <p>Every international money transfer has two components:</p>
+      <ul>
+        <li><strong>Exchange rate margin (spread)</strong> — the gap between the mid-market rate (what banks trade between themselves) and what you actually receive. This is the invisible cost.</li>
+        <li><strong>Transfer fee</strong> — the flat or percentage fee charged per transaction. Easier to see, but often not the biggest cost.</li>
+      </ul>
+      <p>Example: You're sending AED 5,000 to India. Mid-market rate = ₹22.80 per AED. If a provider gives you ₹22.35 instead, that's a 2% margin — you lose ₹2,250 on that one transfer.</p>
+      <h2>The Main Transfer Methods Compared</h2>
+      <table class="art-table">
+        <thead><tr><th>Method</th><th>Typical Margin</th><th>Fee</th><th>Speed</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Wise</td><td>0.4–0.6%</td><td>Small flat fee</td><td>Seconds–hours</td><td>Best overall rate</td></tr>
+          <tr><td>InstaReM</td><td>0.2–0.5%</td><td>Low/nil</td><td>2–4 hours</td><td>Best for Gulf & SE Asia</td></tr>
+          <tr><td>LuluMoney</td><td>0.8–1.2%</td><td>None</td><td>Same day</td><td>Gulf NRIs, cash pickup</td></tr>
+          <tr><td>Bank wire (SWIFT)</td><td>2–4%</td><td>₹500–2,000</td><td>1–3 days</td><td>Large regulated transfers</td></tr>
+          <tr><td>Exchange house</td><td>1–2.5%</td><td>Varies</td><td>Same day</td><td>Cash, large amounts</td></tr>
+          <tr><td>Western Union / MoneyGram</td><td>2–3%</td><td>0–small</td><td>Minutes</td><td>Urgency only</td></tr>
+        </tbody>
+      </table>
+      <h2>How to Get the Best Rate Every Time</h2>
+      <ul>
+        <li><strong>Always compare on our rates tab</strong> — we show estimated INR received side by side for your currency</li>
+        <li><strong>Send larger amounts less frequently</strong> — many providers have flat fees, so the effective cost drops on bigger amounts</li>
+        <li><strong>Time your transfers</strong> — rates fluctuate. Sending on weekdays (Tuesday–Thursday) typically gives better rates than weekends</li>
+        <li><strong>Lock in a rate</strong> — Wise and some others let you lock the rate for a few hours or days. Use this if you see a good rate</li>
+        <li><strong>Check for promos</strong> — InstaReM, Remitly, and others frequently run zero-fee first-transfer promotions</li>
+      </ul>
+      <h2>What's the Real Annual Cost?</h2>
+      <p>If you send ₹5L to India per year via bank wire at a 3% margin, you lose roughly ₹15,000/year. Switching to Wise or InstaReM (0.5% margin) cuts that to ₹2,500/year — a saving of ₹12,500 every year for the same transfers.</p>
+      <div class="art-callout"><strong>Tax note:</strong> Remittances to India from NRE funds are not taxable. Money in NRO accounts being repatriated may require Form 15CA/15CB above ₹5L. Gifts to parents up to ₹50,000/year from relatives are tax-free for the recipient.</div>
+      <div class="art-cta"><div><div class="art-cta-text">See Live Rates for Your Currency</div><div class="art-cta-sub">Compare all providers side-by-side right now</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('rates',document.querySelector('[data-tab=rates]'))">Compare Rates Now &#8594;</button></div>
+    `},
+  'return-planner':{
+    tag:'planning',
+    metaTitle:'How to Use the NRI Return Planner — Simulate Corpus & Retirement (2026)',
+    metaDesc:'Step-by-step guide to using the Return Planner tool: enter savings, years abroad, monthly expenses, and see exactly how long your corpus will last in India.',
+    metaKw:'NRI return to India planner, NRI retirement corpus calculator, return to India financial planning, NRI corpus simulation',tagLabel:'Planning',readTime:'5 min read',
+    title:'How to Use the Return Planner: Simulate Your Corpus & Retirement',
+    content:`
+      <div class="art-callout indigo"><strong>What this tool does:</strong> The Return Planner projects your corpus at the time you return to India, then simulates year-by-year how long that corpus survives based on your expenses, income, inflation, and investment returns.</div>
+
+      <h2>Step 1 — Enter Your Savings Profile</h2>
+      <p><strong>Current Savings Abroad (₹ Lakhs):</strong> The total amount you have invested or saved today — NRE FDs, mutual funds, PPF, overseas savings converted to ₹. If you hold foreign currency, use today's exchange rate to estimate the ₹ equivalent.</p>
+      <p><strong>Monthly Savings Rate (₹ Lakhs/mo):</strong> How much you add to this corpus every month. Include SIP, FD instalments, or any disciplined savings. Even ₹50,000/month (₹0.5L) makes a dramatic difference over 10 years.</p>
+      <p>As you type, the tool shows you the <strong>local currency equivalent</strong> (e.g., MYR, USD, AED) so you can quickly cross-check against your payslip.</p>
+
+      <h2>Step 2 — Set Your Return Timeline</h2>
+      <p><strong>Years Until You Return:</strong> How many more years you plan to stay abroad and keep saving. The tool instantly shows you the <strong>projected corpus at return date</strong>, compounding your current savings and monthly contributions at your chosen ROI.</p>
+      <p>Try changing this number and watch the projected corpus update — this is the most powerful input. An extra 2–3 years abroad can add crores to your corpus.</p>
+      <table class="art-table">
+        <thead><tr><th>Current Savings</th><th>Monthly SIP</th><th>ROI</th><th>5 Years</th><th>10 Years</th><th>15 Years</th></tr></thead>
+        <tbody>
+          <tr><td>₹50L</td><td>₹1.5L/mo</td><td>8%</td><td>~₹1.9 Cr</td><td>~₹4.0 Cr</td><td>~₹7.0 Cr</td></tr>
+          <tr><td>₹1 Cr</td><td>₹2L/mo</td><td>8%</td><td>~₹3.1 Cr</td><td>~₹5.7 Cr</td><td>~₹9.2 Cr</td></tr>
+          <tr><td>₹50L</td><td>₹1.5L/mo</td><td>10%</td><td>~₹2.1 Cr</td><td>~₹4.9 Cr</td><td>~₹9.5 Cr</td></tr>
+        </tbody>
+      </table>
+
+      <h2>Step 3 — Set Your Post-Return Expenses</h2>
+      <p><strong>Monthly Expenses in India (₹/mo):</strong> Your expected spending after returning — rent/EMI, groceries, utilities, education, healthcare, travel, lifestyle. Be realistic. Most NRIs underestimate this because they forget how expensive children's education and healthcare become.</p>
+      <p>A practical benchmark: if you currently spend MYR 8,000/month abroad, a comfortable India equivalent is around ₹1.5–2L/month in a metro.</p>
+      <p><strong>India Inflation Rate (% p.a.):</strong> Default is 6%, which is the historical average for India. Healthcare and education inflate faster (8–10%), so if those are major buckets for you, nudge this to 7%.</p>
+
+      <h2>Step 4 — Set Corpus Return & Income</h2>
+      <p><strong>Investment Return on Corpus (% p.a.):</strong> The return your corpus earns after you return. Assume 8–9% for a balanced equity+debt portfolio, or 6–7% for a conservative FD-heavy approach. Do not use aggressive equity-only assumptions for money you'll actually be spending.</p>
+      <p><strong>Expected India Income After Return (₹/mo):</strong> Any income you'll earn in India — consultancy, rental income, part-time work, pension, interest from FDs. This reduces how much you withdraw from the corpus each month. Even ₹30,000/month in rental income can add 5–7 years to corpus life.</p>
+
+      <h2>Reading the Results</h2>
+      <p>After clicking Calculate, you'll see four key outputs:</p>
+      <ul>
+        <li><strong>Projected Corpus at Return:</strong> What you'll have when you land in India, based on your savings + contributions + ROI over the years until return.</li>
+        <li><strong>Corpus Survives X Years:</strong> How many years your money lasts given your expenses, income, inflation, and investment returns.</li>
+        <li><strong>Break-Even Monthly (Zero in 40 yrs):</strong> The maximum monthly spend that allows your corpus to last exactly 40 years — useful for setting a budget ceiling.</li>
+        <li><strong>Sustainable Monthly (Forever):</strong> Monthly spend at which your corpus never depletes — the interest earned covers all withdrawals indefinitely.</li>
+      </ul>
+
+      <h2>The Year-by-Year Table</h2>
+      <p>Click <strong>▼ Year-by-Year Table</strong> to expand the full simulation. Each row shows:</p>
+      <ul>
+        <li><strong>Opening / Closing Corpus:</strong> Balance at start and end of each year. Watch for the year the closing balance turns red — that is when you run out of money.</li>
+        <li><strong>Investment Returns:</strong> What your corpus earned that year (grows as the corpus grows).</li>
+        <li><strong>Net Annual Expenses:</strong> Your total spend minus any income — this is what actually gets withdrawn from the corpus.</li>
+      </ul>
+      <div class="art-callout"><strong>Pro tip — stress test your plan:</strong> Run the calculation twice. First with your "base case" numbers. Then increase expenses by 20% and reduce ROI by 1%. If the corpus still survives 30+ years in the stress case, your plan is solid. If it collapses to 15 years, you need a larger corpus or lower expenses.</div>
+
+      <h2>Common Mistakes to Avoid</h2>
+      <p><strong>Ignoring inflation:</strong> Many people enter today's expenses and use a 0% inflation assumption. At 6% inflation, ₹1L/month today becomes ₹1.8L/month in 10 years. The planner auto-escalates expenses by your entered inflation rate each year.</p>
+      <p><strong>Over-estimating ROI:</strong> Using 12–15% equity returns for your post-retirement corpus is dangerous. You can't afford a 3-year market downturn when you're actually spending the money. Use 7–9% max.</p>
+      <p><strong>Forgetting one-time costs:</strong> Children's higher education, medical emergencies, home purchase. Add ₹30–50L to your required corpus as a one-time buffer for these.</p>
+
+      <div class="art-cta"><div><div class="art-cta-text">Open the Return Planner</div><div class="art-cta-sub">Run your numbers with the interactive simulation</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('return',document.querySelector('[data-tab=return]'))">Open Return Planner &#8594;</button></div>
+    `},
+  'retirement':{
+    tag:'planning',
+    metaTitle:'NRI Retirement Planning with SIP and SWP — Complete India Guide 2026',
+    metaDesc:'How to build a retirement corpus using SIP while abroad and sustainably withdraw using SWP after returning to India. With real corpus numbers and tax tips.',
+    metaKw:'NRI retirement planning India, SIP SWP NRI, retire in India corpus, NRI retirement calculator 2026',tagLabel:'Planning',readTime:'7 min read',
+    title:'How to Plan Your India Retirement Using SIP & SWP',
+    content:`
+      <div class="art-callout indigo"><strong>The two-phase framework:</strong> Phase 1 — Accumulate a corpus using SIP (Systematic Investment Plan) while you're earning abroad. Phase 2 — Withdraw sustainably using SWP (Systematic Withdrawal Plan) after you return to India.</div>
+      <h2>What Corpus Do You Actually Need?</h2>
+      <p>The most common question — and the most personal. But here's a framework:</p>
+      <ul>
+        <li>Estimate your monthly expenses in India in today's money (include rent/EMI, food, healthcare, lifestyle, travel)</li>
+        <li>Apply the <strong>25× rule</strong>: corpus needed = annual expenses × 25. This assumes a 4% annual withdrawal rate, which is considered sustainable for 30 years</li>
+        <li>Add a buffer of 20% for healthcare costs that rise faster than inflation</li>
+      </ul>
+      <p>Example: If you need ₹1.5L/month (₹18L/year), your target corpus is ₹18L × 25 = <strong>₹4.5 crore</strong>. With 20% healthcare buffer, aim for ₹5.4 crore.</p>
+      <h2>Building the Corpus with SIP</h2>
+      <p>SIP in Indian equity mutual funds is the most efficient accumulation tool for NRIs. Key facts:</p>
+      <ul>
+        <li>NRIs can invest in Indian mutual funds from their NRE account (tax-free returns on equity gains up to ₹1.25L/year)</li>
+        <li>Historical equity mutual fund returns: 12–15% CAGR over 10+ year periods</li>
+        <li>Use <strong>step-up SIP</strong> — increase your SIP by 10% each year to match salary growth. This dramatically accelerates corpus building</li>
+      </ul>
+      <table class="art-table">
+        <thead><tr><th>Monthly SIP</th><th>Step-Up</th><th>Years</th><th>Corpus (at 12%)</th></tr></thead>
+        <tbody>
+          <tr><td>₹25,000</td><td>10%/yr</td><td>15</td><td>~₹1.8 Cr</td></tr>
+          <tr><td>₹50,000</td><td>10%/yr</td><td>15</td><td>~₹3.7 Cr</td></tr>
+          <tr><td>₹1,00,000</td><td>10%/yr</td><td>15</td><td>~₹7.4 Cr</td></tr>
+          <tr><td>₹50,000</td><td>10%/yr</td><td>20</td><td>~₹8.5 Cr</td></tr>
+        </tbody>
+      </table>
+      <h2>Withdrawing Sustainably with SWP</h2>
+      <p>Once you return to India and stop earning, switch to SWP from your corpus. Instead of selling mutual fund units in a lump sum, SWP sells just enough units each month to fund your withdrawal — while the remaining corpus keeps compounding.</p>
+      <ul>
+        <li>Keep withdrawal rate at or below 4–5% of corpus per year for long-term sustainability</li>
+        <li>Step up your withdrawal by 5–6% per year to offset inflation</li>
+        <li>Keep 1–2 years of expenses in liquid funds / FD as a buffer — don't touch equity in a market downturn</li>
+      </ul>
+      <div class=
+      <div class="art-callout"><strong>The bucket strategy:</strong> Bucket 1 — 2 years expenses in FD/liquid fund. Bucket 2 — next 5 years in balanced/hybrid funds. Bucket 3 — remaining in equity funds. Refill Bucket 1 from Bucket 2 annually, and Bucket 2 from Bucket 3 every 3–4 years.</div>
+      <h2>Tax on SWP After Return to India</h2>
+      <p>When you return and become a resident, your SWP withdrawals from equity funds are taxed as capital gains:</p>
+      <ul>
+        <li><strong>LTCG</strong> (units held &gt;1 year): 12.5% on gains above &#8377;1.25L/year</li>
+        <li><strong>STCG</strong> (units held &lt;1 year): 20%</li>
+        <li>Debt fund gains: Taxed at slab rate regardless of holding period (post-2023)</li>
+      </ul>
+      <p>Structure your SWP to stay within the &#8377;1.25L LTCG exemption where possible, especially in early retirement years.</</p>
+    `}
+};
+function openArticle(key){
+  const art=ARTICLES[key];
+  if(!art)return;
+  const seoTitle=art.metaTitle||art.title+' | NRI Finance Hub';
+  const seoDesc=art.metaDesc||art.title;
+  document.title=seoTitle;
+  let dm=document.querySelector('meta[name="description"]');
+  if(dm)dm.setAttribute('content',seoDesc);
+  let ogT=document.querySelector('meta[property="og:title"]');
+  if(ogT)ogT.setAttribute('content',seoTitle);
+  let ogD=document.querySelector('meta[property="og:description"]');
+  if(ogD)ogD.setAttribute('content',seoDesc);
+  let ogU=document.querySelector('meta[property="og:url"]');
+  if(ogU)ogU.setAttribute('content','https://nrifinancehub.com/#article/'+key);
+  history.replaceState(null,'','#article/'+key);
+  const tagClass=art.tag;
+  document.getElementById('art-content').innerHTML=`
+    <span class="art-reader-tag art-tag ${tagClass}">${art.tagLabel}</span>
+    <h1>${art.title}</h1>
+    <div class="art-reader-meta">${art.readTime} &nbsp;&middot;&nbsp; Last updated June 2026 &nbsp;&middot;&nbsp; For informational purposes only</div>
+    ${art.content}`;
+  document.getElementById('art-list').style.display='none';
+  document.getElementById('art-reader').style.display='block';
+  setTimeout(()=>{
+    const el=document.getElementById('tab-articles');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  },30);
+}
+function closeArticle(){
+  document.getElementById('art-reader').style.display='none';
+  document.getElementById('art-list').style.display='block';
+  document.title='NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad';
+  let dm=document.querySelector('meta[name="description"]');
+  if(dm)dm.setAttribute('content','Free tools for NRIs: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner, DTAA tax guide and India return planner.');
+  history.replaceState(null,'','#guides');
+}
+
+
+// ── JUMP NAV ────────────────────────────────────────────────────────────────────────
+function jumpTo(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const offset=64;
+  const top=el.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top,behavior:'smooth'});
+}
+(function(){
+  let ticking=false;
+  // tab name → jn-link index mapping
+  const tabOrder=['rates','nrenro','realty','dtaa','return','invest','articles'];
+  window.addEventListener('scroll',function(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      const jn=document.getElementById('jumpNav');
+      if(!jn){ticking=false;return;}
+      jn.style.display=window.scrollY>300?'block':'none';
+      // highlight jn-link matching the active tab
+      const activeTab=document.querySelector('.drawer-item.active');
+      const activeTabName=activeTab?activeTab.getAttribute('data-tab'):'';
+      const links=jn.querySelectorAll('.jn-link');
+      links.forEach((l,i)=>{
+        l.classList.toggle('active',tabOrder[i]===activeTabName);
+      });
+      ticking=false;
+    });
+  },{passive:true});
+})();
+function searchArticles(q){
+  const cards=document.querySelectorAll('#art-list .art-card');
+  const noRes=document.getElementById('artNoResults');
+  const term=q.trim().toLowerCase();
+  let visible=0;
+  cards.forEach(card=>{
+    const text=card.textContent.toLowerCase();
+    const show=!term||text.includes(term);
+    card.style.display=show?'':'none';
+    if(show)visible++;
+  });
+  if(noRes)noRes.style.display=(visible===0&&term)?'block':'none';
+}
+
+// ── HERO WIDGET ────────────────────────────────
+function updateHeroWidget(){
+  var amt=parseFloat(document.getElementById('heroWidgetAmt').value)||1000;
+  var el=document.getElementById('heroWidgetResult');
+  if(!el)return;
+  // Use P[baseCur] (the live providers object) + midRate (fetched live FX rate)
+  if(typeof midRate!=='undefined'&&midRate&&typeof P!=='undefined'&&P[baseCur]){
+    var bestInr=0;
+    P[baseCur].forEach(function(p){
+      var rate=midRate*(1-p.spread);
+      var inr=Math.max(0,amt-(p.fee||0))*rate;
+      if(inr>bestInr)bestInr=inr;
+    });
+    el.textContent=bestInr>0?'₹'+Math.round(bestInr).toLocaleString('en-IN'):'₹—';
+  } else {
+    el.textContent='₹—';
+  }
+}
+// Update hero widget when currency changes
+var _origSelectCurrency=typeof selectCurrency==='function'?selectCurrency:null;
+if(_origSelectCurrency){
+  selectCurrency=function(el){
+    _origSelectCurrency(el);
+    var cur=el.getAttribute('data-val');
+    var flagEl=document.getElementById('heroWidgetFlag');
+    var curEl=document.getElementById('heroWidgetCur');
+    var curLbl=document.getElementById('heroWidgetCurLabel');
+    if(flagEl)flagEl.innerHTML=el.querySelector('.ci-flag').innerHTML;
+    if(curEl)curEl.textContent=cur;
+    if(curLbl)curLbl.textContent=cur;
+    updateHeroWidget();
+  };
+}
+setTimeout(updateHeroWidget,1000);
+
+// ── STAT COUNTERS ──────────────────────────────
+(function(){
+  var observed=false;
+  var els=document.querySelectorAll('.stat-accent[data-target]');
+  if(!els.length)return;
+  function animateCounters(){
+    if(observed)return;observed=true;
+    els.forEach(function(el){
+      var target=parseInt(el.getAttribute('data-target'))||0;
+      var suffix=el.getAttribute('data-suffix')||'';
+      var start=0;var dur=1200;var startTime=null;
+      function step(ts){
+        if(!startTime)startTime=ts;
+        var prog=Math.min((ts-startTime)/dur,1);
+        var ease=1-Math.pow(1-prog,3);
+        el.textContent=Math.round(start+(target-start)*ease)+suffix;
+        if(prog<1)requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){if(e.isIntersecting)animateCounters();});
+    },{threshold:0.3});
+    var statsSection=document.querySelector('.stats-section');
+    if(statsSection)io.observe(statsSection);
+  } else {
+    setTimeout(animateCounters,500);
+  }
+})();
+
+// ── NAV SCROLL EFFECT ──────────────────────────
+(function(){
+  var nav=document.getElementById('siteNav');
+  if(!nav)return;
+  window.addEventListener('scroll',function(){
+    if(window.scrollY>40){
+      nav.style.background='rgba(5,8,15,0.97)';
+      nav.style.borderBottomColor='rgba(255,255,255,0.1)';
+    } else {
+      nav.style.background='rgba(5,8,15,0.85)';
+      nav.style.borderBottomColor='rgba(255,255,255,0.07)';
+    }
+  },{passive:true});
+})();
+
+// ── THEME TOGGLE ───────────────────────────────
+(function(){
+  // Apply saved theme immediately to avoid flash
+  var saved = localStorage.getItem('nri-theme') || 'dark';
+  if(saved === 'light') document.documentElement.setAttribute('data-theme','light');
+})();
+
+function toggleTheme(){
+  var current = document.documentElement.getAttribute('data-theme');
+  var next = (current === 'light') ? 'dark' : 'light';
+  if(next === 'dark'){
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+  localStorage.setItem('nri-theme', next);
+}
+
+// ── SIP / SWP TEMPLATES ──────────────────────────────────────────────────────
+function applySIPTpl(amount, ret, years, stepup) {
+  document.getElementById('sip-amount').value = amount;
+  document.getElementById('sip-return').value = ret;
+  document.getElementById('sip-years').value = years;
+  document.getElementById('sip-stepup').value = stepup;
+  calcSIP();
+}
+function applySWPTpl(corpusLakhs, monthly, ret, inflation, stepup) {
+  document.getElementById('swp-corpus').value = corpusLakhs;
+  document.getElementById('swp-monthly').value = monthly;
+  document.getElementById('swp-return').value = ret;
+  document.getElementById('swp-inflation').value = inflation;
+  document.getElementById('swp-stepup').value = stepup;
+  calcSWP();
+}
+
+// ── Return to India Preview Calculator ──────────────────
+function rtpSetCity(btn){
+  document.querySelectorAll('.rtp-city-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rtp-p-monthly').value=btn.dataset.monthly;
+  calcRtpPreview();
+}
+function fmtCr(v){
+  if(v>=10000000)return'\u20b9'+(v/10000000).toFixed(1)+' Cr';
+  if(v>=100000)return'\u20b9'+(v/100000).toFixed(1)+' L';
+  return'\u20b9'+Math.round(v).toLocaleString('en-IN');
+}
+var _hcpMonthly=120000,_hcpYears=5;
+function calcHeroCorpus(monthly,years){
+  if(monthly!==undefined)_hcpMonthly=monthly;
+  if(years!==undefined)_hcpYears=years;
+  monthly=_hcpMonthly; years=_hcpYears;
+  var inflation=0.06,roi=0.08;
+  var returnMonthly=monthly*Math.pow(1+inflation,years);
+  var shortfall=Math.max(0,returnMonthly);
+  var netRate=roi-inflation;
+  var corpus=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // SIP at 12%
+  var mr=0.01,n=years*12;
+  var sip=corpus*mr/(Math.pow(1+mr,n)-1);
+  // Sustain years
+  var c=corpus,em=returnMonthly,survive=0;
+  for(var y=1;y<=50;y++){c=c+c*roi-em*12;em*=(1+inflation);if(c>0)survive=y;else break;}
+  var el=document.getElementById('hcp-corpus');
+  var sipEl=document.getElementById('hcp-sip');
+  var susEl=document.getElementById('hcp-sustain');
+  var fxEl=document.getElementById('hcp-corpus-fx');
+  var sipFxEl=document.getElementById('hcp-sip-fx');
+  if(el)el.textContent=fmtCr(corpus);
+  var subEl=document.getElementById('hcp-corpus-sub');
+  if(subEl)subEl.textContent='At 8% return · 6% inflation · '+years+' yr'+(years>1?'s':'');
+  if(sipEl)sipEl.textContent=sip>0?'₹'+Math.round(sip/1000).toFixed(0)+'K/mo':'₹—';
+  if(susEl)susEl.textContent=survive>=40?'40+ yrs':survive+' yrs';
+  // FX equivalents
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    if(fxEl)fxEl.textContent='≈ '+baseCur+' '+Math.round(corpus/midRate/100000).toFixed(1)+'L';
+    if(sipFxEl)sipFxEl.textContent='≈ '+baseCur+' '+Math.round(sip/midRate).toLocaleString('en-IN');
+  } else {
+    if(fxEl)fxEl.textContent='';
+    if(sipFxEl)sipFxEl.textContent='';
+  }
+}
+function hcpSetCity(btn){
+  document.querySelectorAll('.hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroCorpus(parseFloat(btn.dataset.monthly)||120000,undefined);
+}
+function hcpSetYears(btn){
+  document.querySelectorAll('.hcp-yr-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroCorpus(undefined,parseInt(btn.dataset.years)||5);
+}
+
+
+function hcpSetTab(tabId,btn){
+  document.querySelectorAll('.hcp-tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.hcp-tab-pane').forEach(function(p){p.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  var pane=document.getElementById('hcp-pane-'+tabId);
+  if(pane)pane.classList.add('active');
+}
+
+var _hlAmount=3000000;
+function calcHeroHomeLoan(amount){
+  if(amount!==undefined)_hlAmount=amount;
+  var rate=8.5/100/12,n=20*12;
+  var emi=_hlAmount*rate*Math.pow(1+rate,n)/(Math.pow(1+rate,n)-1);
+  var totalInterest=emi*n-_hlAmount;
+  var intPct=Math.round(totalInterest/_hlAmount*100);
+  var emiStr=emi>=100000?('\u20b9'+(emi/100000).toFixed(1)+'L/mo'):('\u20b9'+(emi/1000).toFixed(1)+'K/mo');
+  var el=document.getElementById('hcp-hl-emi');
+  var subEl=document.getElementById('hcp-hl-sub');
+  var intEl=document.getElementById('hcp-hl-interest');
+  var pctEl=document.getElementById('hcp-hl-pct');
+  var fxEl=document.getElementById('hcp-hl-fx');
+  if(el)el.textContent=emiStr;
+  if(subEl)subEl.textContent='For '+fmtCr(_hlAmount)+' loan \u00b7 8.5% \u00b7 20yr';
+  if(intEl)intEl.textContent=fmtCr(totalInterest);
+  if(pctEl)pctEl.textContent=intPct+'% of loan';
+  if(fxEl&&typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxEl.textContent='\u2248 '+baseCur+' '+Math.round(emi/midRate).toLocaleString('en-IN')+'/mo';
+  }
+}
+function hlSetAmount(btn){
+  document.querySelectorAll('#hcp-pane-homeloan .hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroHomeLoan(parseFloat(btn.dataset.loan)||3000000);
+}
+
+var _reValue=3000000;
+function calcHeroRealty(val){
+  if(val!==undefined)_reValue=val;
+  var monthlyRent=_reValue*0.03/12;
+  var val10yr=_reValue*Math.pow(1.07,10);
+  var gain=val10yr-_reValue;
+  var el=document.getElementById('hcp-re-val10');
+  var subEl=document.getElementById('hcp-re-sub');
+  var rentEl=document.getElementById('hcp-re-rent');
+  var gainEl=document.getElementById('hcp-re-gain');
+  var fxEl=document.getElementById('hcp-re-fx');
+  if(el)el.textContent=fmtCr(val10yr);
+  if(subEl)subEl.textContent='From '+fmtCr(_reValue)+' \u00b7 7% p.a. growth';
+  var rentStr=monthlyRent>=100000?('\u20b9'+(monthlyRent/100000).toFixed(1)+'L/mo'):('\u20b9'+(monthlyRent/1000).toFixed(1)+'K/mo');
+  if(rentEl)rentEl.textContent=rentStr;
+  if(gainEl)gainEl.textContent=fmtCr(gain);
+  if(fxEl&&typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxEl.textContent='\u2248 '+baseCur+' '+Math.round(val10yr/midRate/100000).toFixed(1)+'L';
+  }
+}
+function reSetValue(btn){
+  document.querySelectorAll('#hcp-pane-realty .hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroRealty(parseFloat(btn.dataset.prop)||3000000);
+}
+
+function calcRtpPreview(){
+  const monthly=parseFloat(document.getElementById('rtp-p-monthly').value)||120000;
+  const years=parseInt(document.getElementById('rtp-p-years').value)||5;
+  const income=parseFloat(document.getElementById('rtp-p-income').value)||0;
+  const inflation=0.06,roi=0.08;
+  // Expenses at return date
+  const returnMonthly=monthly*Math.pow(1+inflation,years);
+  // Corpus needed
+  const shortfall=Math.max(0,returnMonthly-income);
+  const netRate=roi-inflation;
+  const corpusNeeded=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // Simulate survival years
+  let c=corpusNeeded,em=returnMonthly,survive=0;
+  for(let y=1;y<=50;y++){
+    const net=Math.max(0,em*12-income*12);
+    c=c+c*roi-net;
+    em*=(1+inflation);
+    if(c>0)survive=y; else break;
+  }
+  // Update DOM
+  document.getElementById('rtp-r-monthly').textContent='\u20b9'+Math.round(returnMonthly).toLocaleString('en-IN');
+  document.getElementById('rtp-r-monthly-sub').textContent='After 6% inflation over '+years+' yr'+(years>1?'s':'');
+  document.getElementById('rtp-r-corpus').textContent=fmtCr(corpusNeeded);
+  // SIP needed to build corpus in N years at 12% p.a.
+  const sipRate=0.01; // 12%/12
+  const sipN=years*12;
+  const sipNeeded=sipN>0&&sipRate>0?corpusNeeded*sipRate/(Math.pow(1+sipRate,sipN)-1):0;
+  const sipEl=document.getElementById('rtp-r-sip');
+  if(sipEl)sipEl.textContent=sipNeeded>0?'\u20b9'+Math.round(sipNeeded).toLocaleString('en-IN')+'/mo':'\u20b9—';
+  const sipSubEl=document.getElementById('rtp-r-sip-sub');
+  if(sipSubEl)sipSubEl.textContent='Over '+years+' yr'+(years>1?'s':'')+' · 12% p.a.';
+  const card=document.getElementById('rtp-r-sustain-card');
+  if(survive>=40){
+    document.getElementById('rtp-r-sustain').textContent='40+ yrs';
+    card.className='rtp-stat good';
+    document.getElementById('rtp-r-bar').style.width='100%';
+  } else if(survive>=20){
+    document.getElementById('rtp-r-sustain').textContent=survive+' yrs';
+    card.className='rtp-stat good';
+    document.getElementById('rtp-r-bar').style.width=Math.round(survive/40*100)+'%';
+  } else {
+    document.getElementById('rtp-r-sustain').textContent=survive+' yrs';
+    card.className='rtp-stat warn';
+    document.getElementById('rtp-r-bar').style.width=Math.round(survive/40*100)+'%';
+  }
+}
+// Init on page load
+window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);calcHeroHomeLoan(3000000);calcHeroRealty(3000000);});
+/* ── Property TDS Calculator ── */
+function calcPropTDS(){
+  var sale=parseFloat(document.getElementById('pt-sale').value)||0;
+  var cost=parseFloat(document.getElementById('pt-cost').value)||0;
+  var hold=document.getElementById('pt-hold').value;
+  var gain=Math.max(0, sale-cost);
+  var tdsRate, tdsLabel, gainLabel;
+  if(hold==='lt'){
+    // STCG: 30% + surcharge + cess on sale price
+    var sur = sale>10000000?0.15:sale>5000000?0.10:0;
+    tdsRate = (0.30*(1+sur)*1.04);
+    tdsLabel='STCG: 30%'+(sur>0?' + '+(sur*100)+'% sur':'')+' + 4% cess';
+    gainLabel='Short-term gain';
+  } else {
+    // LTCG: 20% + surcharge + cess
+    var sur2 = sale>20000000?0.25:sale>10000000?0.15:sale>5000000?0.10:0;
+    tdsRate = (0.20*(1+sur2)*1.04);
+    tdsLabel='LTCG: 20%'+(sur2>0?' + '+(sur2*100)+'% sur':'')+' + 4% cess';
+    gainLabel='Long-term gain (indexed)';
+  }
+  var tdsAmt = sale * tdsRate;
+  var net = sale - tdsAmt;
+  document.getElementById('pt-rate').textContent = (tdsRate*100).toFixed(2)+'%';
+  document.getElementById('pt-tds').textContent = fmtCr(tdsAmt);
+  document.getElementById('pt-tds-sub').textContent = tdsLabel;
+  document.getElementById('pt-gain').textContent = fmtCr(gain);
+  document.getElementById('pt-gain-sub').textContent = gainLabel;
+  document.getElementById('pt-net').textContent = fmtCr(net);
+  var fxStr='';
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxStr = '≈ '+baseCur+' '+Math.round(net/midRate).toLocaleString('en-IN');
+  }
+  document.getElementById('pt-net-sub').textContent = fxStr||'After TDS deduction';
+  var advice = document.getElementById('pt-advice');
+  if(advice){
+    var tips = hold==='gt'
+      ? '<strong>💡 Section 54 Exemption:</strong> Reinvest capital gains in another residential property within 2 years (or under construction within 3 years) to claim full LTCG exemption. Or invest in Capital Gains Bonds (Section 54EC) within 6 months — up to ₹50L exempt.<br><br><strong>📋 Lower TDS:</strong> Apply to your Assessing Officer for a Lower Deduction Certificate under Section 197 before the sale to reduce TDS to actual tax liability.'
+      : '<strong>⚠️ Short-term Capital Gain:</strong> TDS applies at 30% on the full sale price since holding period is under 2 years. Very limited exemptions available. Consider deferring sale beyond 2 years if possible to benefit from LTCG rates.';
+    advice.innerHTML = tips;
+  }
+}
+
+/* ── EPF Withdrawal Calculator ── */
+function calcEPF(){
+  var bal=parseFloat(document.getElementById('epf-bal').value)||0;
+  var yrs=parseFloat(document.getElementById('epf-yrs').value)||0;
+  var sal=parseFloat(document.getElementById('epf-sal').value)||0;
+  var reason=document.getElementById('epf-reason').value;
+  // EPS: ₹1250/month capped, up to 10 years
+  var epsMonths = Math.min(yrs*12, 120);
+  var epsPerMonth = Math.min(sal*0.0833, 1250);
+  var epsAmt = epsMonths * epsPerMonth;
+  // EPF = balance (includes both employee + employer contributions)
+  var epfAmt = bal;
+  // Taxability
+  var taxFree = yrs>=5 || reason==='retire';
+  var tds=0, taxNote='';
+  if(!taxFree){
+    if(bal>50000){ tds=bal*0.10; taxNote='10% TDS deducted (service < 5 yrs, balance > ₹50K)'; }
+    else { taxNote='No TDS but taxable as salary income in ITR'; }
+  } else {
+    taxNote = yrs>=5 ? 'Tax-free (5+ years service)' : 'Tax-free (retirement)';
+  }
+  var net = epfAmt - tds;
+  document.getElementById('epf-out-epf').textContent = fmtCr(epfAmt);
+  document.getElementById('epf-out-eps').textContent = fmtCr(epsAmt);
+  document.getElementById('epf-eps-sub').textContent = yrs>=10?'Eligible for monthly pension':'Lump sum (< 10 yrs)';
+  document.getElementById('epf-out-tax').textContent = taxFree?'Tax-Free':'Taxable';
+  document.getElementById('epf-out-tax').style.color = taxFree?'var(--teal)':'var(--amber)';
+  document.getElementById('epf-tax-sub').textContent = taxNote;
+  document.getElementById('epf-out-net').textContent = fmtCr(net);
+  var fxStr='';
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxStr='≈ '+baseCur+' '+Math.round(net/midRate).toLocaleString('en-IN');
+  }
+  document.getElementById('epf-net-sub').textContent = fxStr||(tds>0?'After '+fmtCr(tds)+' TDS':'Full amount');
+  var advice=document.getElementById('epf-advice');
+  if(advice){
+    var msg = reason==='nri'
+      ? '<strong>🌍 NRI EPF Withdrawal Steps:</strong> (1) Activate UAN on EPFO portal. (2) Link Aadhaar + bank account to UAN. (3) Submit Form 19 (EPF) + Form 10C (EPS) online. (4) Amount credited to NRO account within 15–30 days. <br><br><strong>💡 Tip:</strong> If you plan to return to India, consider keeping EPF invested — it earns 8.25% p.a. interest and accumulates tax-free.'
+      : taxFree
+        ? '<strong>✅ Good news:</strong> Your withdrawal is fully tax-free. Submit Form 19 + 10C on the EPFO UAN portal. Ensure Aadhaar and bank account are linked and KYC is approved.'
+        : '<strong>⚠️ Tax Alert:</strong> Since your service is under 5 years, the withdrawal is taxable. Consider whether you can defer withdrawal or transfer to new employer to avoid tax. Submit Form 15G (if income below taxable limit) to avoid TDS.';
+    advice.innerHTML = msg;
+  }
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  calcPropTDS();
+  calcEPF();
+});
+
+function toggleNavDD(id){
+  var dd=document.getElementById(id);
+  if(!dd)return;
+  dd.classList.toggle('open');
+  document.addEventListener('click',function h(e){
+    if(!e.target.closest('.nav-dropdown-wrap')){dd.classList.remove('open');document.removeEventListener('click',h);}
+  });
+}
+function closeNavDD(){
+  document.querySelectorAll('.nav-dropdown').forEach(function(d){d.classList.remove('open');});
+}
+
+
+
+// ── NRI BUDGET TRACKER ─────────────────────────────────────────────────────
+(function(){
+  var BGT_KEY = 'nriBudget_v1';
+  var bgtData = {};
+  var bgtYear, bgtMonth; // current view
+
+  var BGT_CATS = {
+    income: ['Salary / Wages','Freelance / Consulting','Rental Income (India)','Dividends / Interest','Business Income','Other Income'],
+    overseas: ['Housing / Rent','Groceries & Food','Transport / Fuel','Utilities','Insurance','Children Education','Entertainment','Healthcare','Dining Out','Clothing','Personal Care','Subscriptions','Misc Overseas'],
+    india: ['Family Support','Home Loan EMI','Car / Other EMI','LIC / Insurance','Property Maintenance','SIP / Investments','PPF / NPS','School / College Fees','Medical (India)','Misc India']
+  };
+
+  function bgtKey(y,m){return y+'-'+(m<10?'0'+m:m);}
+
+  function bgtLoad(){
+    try{ bgtData = JSON.parse(localStorage.getItem(BGT_KEY)||'{}'); }
+    catch(e){ bgtData={}; }
+  }
+  function bgtSave(){
+    try{ localStorage.setItem(BGT_KEY, JSON.stringify(bgtData)); }
+    catch(e){}
+  }
+
+  function bgtGetMonth(y,m){
+    var k=bgtKey(y,m);
+    if(!bgtData[k]) bgtData[k]={entries:[],rate:83.5,cur:'USD'};
+    return bgtData[k];
+  }
+
+  var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function bgtInit(){
+    bgtLoad();
+    var now=new Date();
+    bgtYear=now.getFullYear();
+    bgtMonth=now.getMonth()+1;
+    bgtUpdateMonthLabel();
+    bgtUpdateAddForm();
+    bgtRender();
+  }
+
+  function bgtUpdateMonthLabel(){
+    var el=document.getElementById('bgt-month-label');
+    if(el) el.textContent=MONTH_NAMES[bgtMonth-1]+' '+bgtYear;
+  }
+
+  window.bgtPrevMonth=function(){
+    bgtMonth--;
+    if(bgtMonth<1){bgtMonth=12;bgtYear--;}
+    bgtUpdateMonthLabel();
+    bgtSyncControls();
+    bgtRender();
+  };
+  window.bgtNextMonth=function(){
+    bgtMonth++;
+    if(bgtMonth>12){bgtMonth=1;bgtYear++;}
+    bgtUpdateMonthLabel();
+    bgtSyncControls();
+    bgtRender();
+  };
+
+  function bgtSyncControls(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    if(curEl) curEl.value=d.cur||'USD';
+    if(rateEl) rateEl.value=d.rate||83.5;
+    bgtUpdateCurLabels();
+  }
+
+  function bgtUpdateCurLabels(){
+    var cur=(document.getElementById('bgt-cur')||{}).value||'USD';
+    document.querySelectorAll('.bgt-cur-sym').forEach(function(el){el.textContent=cur;});
+    var lbl=document.getElementById('bgt-add-cur-lbl');
+    var sec=(document.getElementById('bgt-add-sec')||{}).value||'income';
+    if(lbl) lbl.textContent = sec==='india' ? 'INR' : cur;
+  }
+
+  window.bgtOnCurChange=function(){
+    bgtSaveRate();
+    bgtUpdateCurLabels();
+    bgtRender();
+  };
+
+  window.bgtSaveRate=function(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    if(curEl) d.cur=curEl.value;
+    if(rateEl) d.rate=parseFloat(rateEl.value)||83.5;
+    bgtSave();
+  };
+
+  window.bgtUpdateAddForm=function(){
+    var sec=(document.getElementById('bgt-add-sec')||{}).value||'income';
+    var catEl=document.getElementById('bgt-add-cat');
+    if(!catEl) return;
+    var cats=BGT_CATS[sec]||[];
+    catEl.innerHTML=cats.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');
+    bgtUpdateCurLabels();
+  };
+
+  window.bgtAddEntry=function(){
+    var sec=(document.getElementById('bgt-add-sec')||{}).value;
+    var cat=(document.getElementById('bgt-add-cat')||{}).value;
+    var desc=((document.getElementById('bgt-add-desc')||{}).value||'').trim();
+    var amt=parseFloat((document.getElementById('bgt-add-amt')||{}).value)||0;
+    if(!amt){alert('Please enter an amount.');return;}
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var curEl=document.getElementById('bgt-cur');
+    var rateEl=document.getElementById('bgt-rate');
+    d.cur=(curEl||{}).value||'USD';
+    d.rate=parseFloat((rateEl||{}).value)||83.5;
+    d.entries.push({id:Date.now(),section:sec,category:cat,desc:desc,amount:amt});
+    bgtSave();
+    var descEl=document.getElementById('bgt-add-desc');
+    var amtEl=document.getElementById('bgt-add-amt');
+    if(descEl) descEl.value='';
+    if(amtEl) amtEl.value='';
+    bgtRender();
+  };
+
+  window.bgtDeleteEntry=function(id){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    d.entries=d.entries.filter(function(e){return e.id!==id;});
+    bgtSave();
+    bgtRender();
+  };
+
+  function fmtCur(n,cur){
+    return cur+' '+n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  }
+  function fmtINR(n){
+    return '₹'+Math.round(n).toLocaleString('en-IN');
+  }
+
+  window.bgtRender=function(){
+    var d=bgtGetMonth(bgtYear,bgtMonth);
+    var cur=d.cur||'USD';
+    var rate=d.rate||83.5;
+    bgtSyncControls();
+
+    var income=d.entries.filter(function(e){return e.section==='income';});
+    var overseas=d.entries.filter(function(e){return e.section==='overseas';});
+    var india=d.entries.filter(function(e){return e.section==='india';});
+
+    var totIncCur=income.reduce(function(s,e){return s+e.amount;},0);
+    var totOvCur=overseas.reduce(function(s,e){return s+e.amount;},0);
+    var totIndINR=india.reduce(function(s,e){return s+e.amount;},0);
+    var totIncINR=totIncCur*rate;
+    var totOvINR=totOvCur*rate;
+    var savings=totIncINR-totOvINR-totIndINR;
+    var rate_pct=totIncINR>0?Math.round(savings/totIncINR*100):0;
+
+    function setEl(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+    setEl('bgt-sum-income',fmtCur(totIncCur,cur));
+    setEl('bgt-sum-income-inr',fmtINR(totIncINR));
+    setEl('bgt-sum-overseas',fmtCur(totOvCur,cur));
+    setEl('bgt-sum-overseas-inr',fmtINR(totOvINR));
+    setEl('bgt-sum-india',fmtINR(totIndINR));
+    setEl('bgt-sum-savings',fmtINR(savings));
+    setEl('bgt-sum-rate', rate_pct+'%');
+    setEl('bgt-tot-income-cur',fmtCur(totIncCur,cur));
+    setEl('bgt-tot-income-inr',fmtINR(totIncINR));
+    setEl('bgt-tot-overseas-cur',fmtCur(totOvCur,cur));
+    setEl('bgt-tot-overseas-inr',fmtINR(totOvINR));
+    setEl('bgt-tot-india',fmtINR(totIndINR));
+
+    function buildRows(entries,isIndia){
+      if(!entries.length) return '<tr><td colspan="'+(isIndia?4:5)+'" class="bgt-empty">No entries yet</td></tr>';
+      return entries.map(function(e){
+        var amtStr = isIndia ? fmtINR(e.amount) : fmtCur(e.amount,cur);
+        var inrStr = isIndia ? '' : '<td class="bgt-inr-note">'+fmtINR(e.amount*rate)+'</td>';
+        var pillCls = isIndia ? 'india' : (e.section==='income'?'income':'');
+        return '<tr><td><span class="bgt-cat-pill '+pillCls+'">'+e.category+'</span></td><td>'+
+          (e.desc||'—')+'</td><td>'+amtStr+'</td>'+inrStr+
+          '<td><button class="bgt-del" onclick="bgtDeleteEntry('+e.id+')" title="Delete">✕</button></td></tr>';
+      }).join('');
+    }
+
+    var bodyInc=document.getElementById('bgt-body-income');
+    var bodyOv=document.getElementById('bgt-body-overseas');
+    var bodyInd=document.getElementById('bgt-body-india');
+    if(bodyInc) bodyInc.innerHTML=buildRows(income,false);
+    if(bodyOv) bodyOv.innerHTML=buildRows(overseas,false);
+    if(bodyInd) bodyInd.innerHTML=buildRows(india,true);
+
+    // Colour savings rate
+    var rateEl=document.getElementById('bgt-sum-rate');
+    if(rateEl){
+      rateEl.className='bgt-sum-val'+(rate_pct>=30?' teal':rate_pct>=10?' amber':' red');
+    }
+  };
+
+  // Init when tab is opened
+  var _bgtInited=false;
+  var _bgtOrig=window.showTab;
+  window.showTab=function(tabId,el){
+    if(typeof _bgtOrig==='function') _bgtOrig(tabId,el);
+    if(tabId==='budget' && !_bgtInited){
+      _bgtInited=true;
+      setTimeout(bgtInit,50);
+    }
+  };
+  // Also init if already on tab
+  document.addEventListener('DOMContentLoaded',function(){
+    if(document.getElementById('tab-budget') &&
+       document.getElementById('tab-budget').style.display!=='none'){
+      bgtInit();
+    }
+  });
+})();
+// ── END BUDGET TRACKER ─────────────────────────────────────────────────────
+
