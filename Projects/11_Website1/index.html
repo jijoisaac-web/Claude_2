@@ -1330,6 +1330,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hcp-yr-btn{flex:1;padding:5px 2px;border-radius:16px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10.5px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .hcp-yr-btn.active{background:rgba(240,165,32,0.15);border-color:var(--amber);color:var(--amber);}
 .hcp-divider{height:1px;background:var(--border);margin:8px 0 12px;}
+
+/* ── Hero panel tabs ── */
+.hcp-tabs{display:flex;gap:4px;margin-bottom:12px;}
+.hcp-tab-btn{flex:1;padding:7px 3px;border-radius:14px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1.2;}
+.hcp-tab-btn.active{background:rgba(20,184,166,0.15);border-color:var(--teal);color:var(--teal);}
+.hcp-tab-pane{display:none;}
+.hcp-tab-pane.active{display:block;}
+.hcp-hl-info{font-size:10px;color:var(--muted);text-align:center;background:rgba(255,255,255,0.04);border-radius:8px;padding:5px 8px;margin-bottom:10px;border:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -1492,41 +1500,112 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 
     <!-- Right: Corpus Calculator widget -->
     <div class="hero-corpus-panel">
-      <div class="hcp-label">&#127968; Return to India</div>
-      <div class="hcp-city-row">
-        <button class="hcp-city-btn active" data-monthly="120000" onclick="hcpSetCity(this)">Metro</button>
-        <button class="hcp-city-btn" data-monthly="75000" onclick="hcpSetCity(this)">Tier 2</button>
-        <button class="hcp-city-btn" data-monthly="50000" onclick="hcpSetCity(this)">Tier 3</button>
-        <button class="hcp-city-btn" data-monthly="35000" onclick="hcpSetCity(this)">Tier 4</button>
+      <!-- Tab bar -->
+      <div class="hcp-tabs">
+        <button class="hcp-tab-btn active" onclick="hcpSetTab('corpus',this)">&#127968; Corpus</button>
+        <button class="hcp-tab-btn" onclick="hcpSetTab('homeloan',this)">&#127963;&#65039; Loan</button>
+        <button class="hcp-tab-btn" onclick="hcpSetTab('realty',this)">&#127970; Realty</button>
       </div>
-      <div class="hcp-yr-row">
-        <button class="hcp-yr-btn active" data-years="5" onclick="hcpSetYears(this)">5 yrs</button>
-        <button class="hcp-yr-btn" data-years="10" onclick="hcpSetYears(this)">10 yrs</button>
-        <button class="hcp-yr-btn" data-years="15" onclick="hcpSetYears(this)">15 yrs</button>
-        <button class="hcp-yr-btn" data-years="20" onclick="hcpSetYears(this)">20 yrs</button>
-        <button class="hcp-yr-btn" data-years="25" onclick="hcpSetYears(this)">25 yrs</button>
-      </div>
-      <div class="hcp-divider"></div>
-      <div class="hcp-corpus-big">
-        <div class="hcp-corpus-lbl">&#127942; Corpus You Need</div>
-        <div class="hcp-corpus-val" id="hcp-corpus">&#8377;—</div>
-        <div class="hcp-corpus-sub" id="hcp-corpus-sub">At 8% return · 6% inflation · 5 yrs</div>
-        <div class="hcp-corpus-fx" id="hcp-corpus-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
-      </div>
-      <div class="hcp-stats">
-        <div class="hcp-stat">
-          <div class="hcp-stat-l">Monthly SIP</div>
-          <div class="hcp-stat-v" id="hcp-sip">&#8377;—</div>
-          <div style="font-size:10px;color:var(--teal);margin-top:2px;" id="hcp-sip-fx"></div>
+
+      <!-- ── CORPUS TAB ── -->
+      <div class="hcp-tab-pane active" id="hcp-pane-corpus">
+        <div class="hcp-city-row">
+          <button class="hcp-city-btn active" data-monthly="120000" onclick="hcpSetCity(this)">Metro</button>
+          <button class="hcp-city-btn" data-monthly="75000" onclick="hcpSetCity(this)">Tier 2</button>
+          <button class="hcp-city-btn" data-monthly="50000" onclick="hcpSetCity(this)">Tier 3</button>
+          <button class="hcp-city-btn" data-monthly="35000" onclick="hcpSetCity(this)">Tier 4</button>
         </div>
-        <div class="hcp-stat">
-          <div class="hcp-stat-l">Sustains for</div>
-          <div class="hcp-stat-v" id="hcp-sustain">—</div>
+        <div class="hcp-yr-row">
+          <button class="hcp-yr-btn active" data-years="5" onclick="hcpSetYears(this)">5 yrs</button>
+          <button class="hcp-yr-btn" data-years="10" onclick="hcpSetYears(this)">10 yrs</button>
+          <button class="hcp-yr-btn" data-years="15" onclick="hcpSetYears(this)">15 yrs</button>
+          <button class="hcp-yr-btn" data-years="20" onclick="hcpSetYears(this)">20 yrs</button>
+          <button class="hcp-yr-btn" data-years="25" onclick="hcpSetYears(this)">25 yrs</button>
         </div>
+        <div class="hcp-divider"></div>
+        <div class="hcp-corpus-big">
+          <div class="hcp-corpus-lbl">&#127942; Corpus You Need</div>
+          <div class="hcp-corpus-val" id="hcp-corpus">&#8377;&#8212;</div>
+          <div class="hcp-corpus-sub" id="hcp-corpus-sub">At 8% return &middot; 6% inflation &middot; 5 yrs</div>
+          <div class="hcp-corpus-fx" id="hcp-corpus-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
+        </div>
+        <div class="hcp-stats">
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Monthly SIP</div>
+            <div class="hcp-stat-v" id="hcp-sip">&#8377;&#8212;</div>
+            <div style="font-size:10px;color:var(--teal);margin-top:2px;" id="hcp-sip-fx"></div>
+          </div>
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Sustains for</div>
+            <div class="hcp-stat-v" id="hcp-sustain">&#8212;</div>
+          </div>
+        </div>
+        <button class="hcp-cta" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">
+          &#127968; Build Full Return Plan &rarr;
+        </button>
       </div>
-      <button class="hcp-cta" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        &#127968; Build Full Return Plan &rarr;
-      </button>
+
+      <!-- ── HOME LOAN TAB ── -->
+      <div class="hcp-tab-pane" id="hcp-pane-homeloan">
+        <div class="hcp-hl-info">NRI Home Loan &middot; 8.5% p.a. &middot; 20 yr tenure</div>
+        <div class="hcp-city-row">
+          <button class="hcp-city-btn active" data-loan="3000000" onclick="hlSetAmount(this)">&#8377;30L</button>
+          <button class="hcp-city-btn" data-loan="5000000" onclick="hlSetAmount(this)">&#8377;50L</button>
+          <button class="hcp-city-btn" data-loan="10000000" onclick="hlSetAmount(this)">&#8377;1 Cr</button>
+          <button class="hcp-city-btn" data-loan="20000000" onclick="hlSetAmount(this)">&#8377;2 Cr</button>
+        </div>
+        <div class="hcp-divider"></div>
+        <div class="hcp-corpus-big">
+          <div class="hcp-corpus-lbl">&#128197; Monthly EMI</div>
+          <div class="hcp-corpus-val" id="hcp-hl-emi">&#8377;&#8212;</div>
+          <div class="hcp-corpus-sub" id="hcp-hl-sub">For &#8377;30L loan &middot; 8.5% &middot; 20yr</div>
+          <div class="hcp-corpus-fx" id="hcp-hl-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
+        </div>
+        <div class="hcp-stats">
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Total Interest</div>
+            <div class="hcp-stat-v" id="hcp-hl-interest">&#8377;&#8212;</div>
+          </div>
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Interest Ratio</div>
+            <div class="hcp-stat-v" id="hcp-hl-pct">&#8212;</div>
+          </div>
+        </div>
+        <button class="hcp-cta" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">
+          &#127963;&#65039; Full EMI Calculator &rarr;
+        </button>
+      </div>
+
+      <!-- ── REAL ESTATE TAB ── -->
+      <div class="hcp-tab-pane" id="hcp-pane-realty">
+        <div class="hcp-hl-info">Rental yield 3% &middot; Capital growth 7% p.a.</div>
+        <div class="hcp-city-row">
+          <button class="hcp-city-btn active" data-prop="3000000" onclick="reSetValue(this)">&#8377;30L</button>
+          <button class="hcp-city-btn" data-prop="5000000" onclick="reSetValue(this)">&#8377;50L</button>
+          <button class="hcp-city-btn" data-prop="10000000" onclick="reSetValue(this)">&#8377;1 Cr</button>
+          <button class="hcp-city-btn" data-prop="20000000" onclick="reSetValue(this)">&#8377;2 Cr</button>
+        </div>
+        <div class="hcp-divider"></div>
+        <div class="hcp-corpus-big">
+          <div class="hcp-corpus-lbl">&#127961; 10yr Property Value</div>
+          <div class="hcp-corpus-val" id="hcp-re-val10">&#8377;&#8212;</div>
+          <div class="hcp-corpus-sub" id="hcp-re-sub">From &#8377;30L &middot; 7% p.a. growth</div>
+          <div class="hcp-corpus-fx" id="hcp-re-fx" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:5px;min-height:16px;"></div>
+        </div>
+        <div class="hcp-stats">
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Monthly Rent</div>
+            <div class="hcp-stat-v" id="hcp-re-rent">&#8377;&#8212;</div>
+          </div>
+          <div class="hcp-stat">
+            <div class="hcp-stat-l">Capital Gain</div>
+            <div class="hcp-stat-v" id="hcp-re-gain">&#8377;&#8212;</div>
+          </div>
+        </div>
+        <button class="hcp-cta" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">
+          &#127970; Full ROI Analysis &rarr;
+        </button>
+      </div>
     </div>
   </div><!-- end hero-widgets-row -->
   </div>
@@ -3344,7 +3423,7 @@ function syncAmountFromMain(v){const _el=document.getElementById('heroWidgetAmt'
 
 // ── RATE PREVIEW CARD (Hero right panel) ──────
 function renderRatePreview(){
-  updateHeroWidget(); calcHeroCorpus(); // keep hero widget in sync whenever preview refreshes
+  updateHeroWidget(); calcHeroCorpus(); calcHeroHomeLoan(); calcHeroRealty(); // keep hero widget in sync whenever preview refreshes
   if(!midRate)return;
   const rpcCur=document.getElementById('rpc-cur');
   if(rpcCur)rpcCur.textContent=baseCur;
@@ -5023,6 +5102,68 @@ function hcpSetYears(btn){
   calcHeroCorpus(undefined,parseInt(btn.dataset.years)||5);
 }
 
+
+function hcpSetTab(tabId,btn){
+  document.querySelectorAll('.hcp-tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.hcp-tab-pane').forEach(function(p){p.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  var pane=document.getElementById('hcp-pane-'+tabId);
+  if(pane)pane.classList.add('active');
+}
+
+var _hlAmount=3000000;
+function calcHeroHomeLoan(amount){
+  if(amount!==undefined)_hlAmount=amount;
+  var rate=8.5/100/12,n=20*12;
+  var emi=_hlAmount*rate*Math.pow(1+rate,n)/(Math.pow(1+rate,n)-1);
+  var totalInterest=emi*n-_hlAmount;
+  var intPct=Math.round(totalInterest/_hlAmount*100);
+  var emiStr=emi>=100000?('\u20b9'+(emi/100000).toFixed(1)+'L/mo'):('\u20b9'+(emi/1000).toFixed(1)+'K/mo');
+  var el=document.getElementById('hcp-hl-emi');
+  var subEl=document.getElementById('hcp-hl-sub');
+  var intEl=document.getElementById('hcp-hl-interest');
+  var pctEl=document.getElementById('hcp-hl-pct');
+  var fxEl=document.getElementById('hcp-hl-fx');
+  if(el)el.textContent=emiStr;
+  if(subEl)subEl.textContent='For '+fmtCr(_hlAmount)+' loan \u00b7 8.5% \u00b7 20yr';
+  if(intEl)intEl.textContent=fmtCr(totalInterest);
+  if(pctEl)pctEl.textContent=intPct+'% of loan';
+  if(fxEl&&typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxEl.textContent='\u2248 '+baseCur+' '+Math.round(emi/midRate).toLocaleString('en-IN')+'/mo';
+  }
+}
+function hlSetAmount(btn){
+  document.querySelectorAll('#hcp-pane-homeloan .hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroHomeLoan(parseFloat(btn.dataset.loan)||3000000);
+}
+
+var _reValue=3000000;
+function calcHeroRealty(val){
+  if(val!==undefined)_reValue=val;
+  var monthlyRent=_reValue*0.03/12;
+  var val10yr=_reValue*Math.pow(1.07,10);
+  var gain=val10yr-_reValue;
+  var el=document.getElementById('hcp-re-val10');
+  var subEl=document.getElementById('hcp-re-sub');
+  var rentEl=document.getElementById('hcp-re-rent');
+  var gainEl=document.getElementById('hcp-re-gain');
+  var fxEl=document.getElementById('hcp-re-fx');
+  if(el)el.textContent=fmtCr(val10yr);
+  if(subEl)subEl.textContent='From '+fmtCr(_reValue)+' \u00b7 7% p.a. growth';
+  var rentStr=monthlyRent>=100000?('\u20b9'+(monthlyRent/100000).toFixed(1)+'L/mo'):('\u20b9'+(monthlyRent/1000).toFixed(1)+'K/mo');
+  if(rentEl)rentEl.textContent=rentStr;
+  if(gainEl)gainEl.textContent=fmtCr(gain);
+  if(fxEl&&typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxEl.textContent='\u2248 '+baseCur+' '+Math.round(val10yr/midRate/100000).toFixed(1)+'L';
+  }
+}
+function reSetValue(btn){
+  document.querySelectorAll('#hcp-pane-realty .hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroRealty(parseFloat(btn.dataset.prop)||3000000);
+}
+
 function calcRtpPreview(){
   const monthly=parseFloat(document.getElementById('rtp-p-monthly').value)||120000;
   const years=parseInt(document.getElementById('rtp-p-years').value)||5;
@@ -5070,7 +5211,7 @@ function calcRtpPreview(){
   }
 }
 // Init on page load
-window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);});
+window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);calcHeroHomeLoan(3000000);calcHeroRealty(3000000);});
 
 </script>
 </body>
