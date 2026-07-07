@@ -1240,6 +1240,59 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .rtp-field input{color:#111;background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.15);}
 [data-theme="light"] .rtp-city-btn{color:rgba(0,0,0,0.7);border-color:rgba(0,0,0,0.2);background:rgba(0,0,0,0.05);}
 [data-theme="light"] .rtp-city-btn.active{color:var(--amber);}
+
+/* ── Education Planner Redesign ──────────────────────── */
+.ed-results-wrap{display:flex;flex-direction:column;gap:18px;margin-top:4px;}
+.ed-progress-card{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+.ed-ring-wrap{position:relative;width:116px;height:116px;flex-shrink:0;}
+.ed-ring-wrap svg{width:116px;height:116px;}
+.ed-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.ed-ring-pct{font-size:24px;font-weight:900;color:var(--text);line-height:1;}
+.ed-ring-lbl{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;}
+.ed-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:1;min-width:240px;}
+.ed-stat-box{background:var(--elevated);border-radius:12px;padding:13px 15px;}
+.ed-stat-box-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.ed-stat-box-val{font-size:20px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
+.ed-stat-box-sub{font-size:10.5px;color:var(--muted);margin-top:3px;}
+.ed-status-strip{border-radius:14px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;}
+.ed-status-strip-icon{font-size:24px;flex-shrink:0;margin-top:1px;}
+.ed-status-strip-title{font-size:14px;font-weight:800;margin-bottom:5px;}
+.ed-status-strip-text{font-size:13px;line-height:1.6;}
+.ed-sip-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.3);border-radius:20px;padding:5px 14px;margin-top:10px;font-size:13px;font-weight:700;color:var(--teal);}
+
+/* ── Tax Residency Redesign ──────────────────────────── */
+.tr-timeline{display:flex;flex-direction:column;gap:0;background:var(--card);border:1px solid var(--border2);border-radius:16px;overflow:hidden;margin-bottom:20px;}
+.tr-yr-row{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--border);transition:background .15s;}
+.tr-yr-row:last-child{border-bottom:none;}
+.tr-yr-row.current-yr{background:rgba(240,165,32,0.06);}
+.tr-yr-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;}
+.tr-yr-dot.cur{background:var(--amber);box-shadow:0 0 0 3px rgba(240,165,32,0.25);}
+.tr-yr-label{font-size:12px;font-weight:700;color:var(--muted);width:96px;flex-shrink:0;}
+.tr-yr-label.cur{color:var(--amber);}
+.tr-days-inp{width:66px;background:var(--elevated);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;color:var(--text);font-size:14px;font-weight:800;text-align:center;outline:none;font-family:inherit;transition:border-color .2s;}
+.tr-days-inp:focus{border-color:var(--amber);}
+.tr-days-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
+.tr-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.tr-bar-fill{height:100%;border-radius:3px;transition:width .3s ease;background:var(--teal);}
+.tr-bar-fill.amber{background:var(--amber);}
+.tr-bar-fill.red{background:#f43f5e;}
+.tr-days-tag{font-size:10.5px;color:var(--muted);width:48px;text-align:right;flex-shrink:0;}
+.tr-status-hero{border-radius:18px;padding:26px 24px;text-align:center;margin-bottom:18px;border:2px solid;}
+.tr-status-big{font-size:34px;font-weight:900;letter-spacing:-.5px;display:block;margin-bottom:6px;}
+.tr-status-sub2{font-size:15px;font-weight:600;opacity:.85;}
+.tr-thresholds{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.tr-thresh{background:var(--elevated);border-radius:12px;padding:13px 10px;text-align:center;border:1px solid var(--border);}
+.tr-thresh-val{font-size:17px;font-weight:900;margin-bottom:4px;}
+.tr-thresh-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;line-height:1.3;}
+.tr-impl-list{display:flex;flex-direction:column;gap:10px;}
+.tr-impl-card{background:var(--elevated);border-radius:13px;padding:14px 16px;display:flex;gap:11px;align-items:flex-start;border:1px solid var(--border);}
+.tr-impl-icon2{font-size:20px;flex-shrink:0;}
+.tr-impl-body{}
+.tr-impl-title2{font-size:13px;font-weight:800;margin-bottom:3px;}
+.tr-impl-text2{font-size:12.5px;color:var(--muted);line-height:1.65;}
+.tr-rules-card{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:13px;padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+[data-theme="light"] .tr-days-inp{color:#111;}
+[data-theme="light"] .tr-yr-dot{background:rgba(0,0,0,0.15);}
 </style>
 </head>
 <body>
@@ -2320,58 +2373,88 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     <div class="tool-inner">
       <h2>Tax Residency Status Calculator</h2>
       <p>Your residency status — <strong>NRI</strong>, <strong>RNOR</strong>, or <strong>Resident</strong> — controls which income is taxable in India and at what rate. Enter days spent inside India for each year.</p>
-      <div class="calc-grid">
-        <div class="form-group">
-          <label>Current year (FY 2025-26) — days in India</label>
-          <input type="number" id="tr-y0" value="60" min="0" max="366" oninput="calcTaxResidency()"/>
+      <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 14px;display:flex;align-items:center;gap:6px;">
+        <span>📅</span> Enter days spent <strong>inside India</strong> for each fiscal year (Apr–Mar).
+      </p>
+      <div class="tr-timeline">
+        <div class="tr-yr-row current-yr">
+          <div class="tr-yr-dot cur"></div>
+          <div class="tr-yr-label cur">FY 2025-26</div>
+          <input class="tr-days-inp" type="number" id="tr-y0" value="60" min="0" max="366" oninput="calcTaxResidency();updateTrBar(0,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-0" style="width:16%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2024-25 — days in India</label>
-          <input type="number" id="tr-y1" value="45" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2024-25</div>
+          <input class="tr-days-inp" type="number" id="tr-y1" value="45" min="0" max="366" oninput="calcTaxResidency();updateTrBar(1,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-1" style="width:12%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2023-24 — days in India</label>
-          <input type="number" id="tr-y2" value="30" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2023-24</div>
+          <input class="tr-days-inp" type="number" id="tr-y2" value="30" min="0" max="366" oninput="calcTaxResidency();updateTrBar(2,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-2" style="width:8%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2022-23 — days in India</label>
-          <input type="number" id="tr-y3" value="20" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2022-23</div>
+          <input class="tr-days-inp" type="number" id="tr-y3" value="20" min="0" max="366" oninput="calcTaxResidency();updateTrBar(3,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-3" style="width:5%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2021-22 — days in India</label>
-          <input type="number" id="tr-y4" value="15" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2021-22</div>
+          <input class="tr-days-inp" type="number" id="tr-y4" value="15" min="0" max="366" oninput="calcTaxResidency();updateTrBar(4,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-4" style="width:4%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2020-21 — days in India</label>
-          <input type="number" id="tr-y5" value="10" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2020-21</div>
+          <input class="tr-days-inp" type="number" id="tr-y5" value="10" min="0" max="366" oninput="calcTaxResidency();updateTrBar(5,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-5" style="width:3%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2019-20 — days in India</label>
-          <input type="number" id="tr-y6" value="5" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2019-20</div>
+          <input class="tr-days-inp" type="number" id="tr-y6" value="5" min="0" max="366" oninput="calcTaxResidency();updateTrBar(6,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-6" style="width:1%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2018-19 — days in India</label>
-          <input type="number" id="tr-y7" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2018-19</div>
+          <input class="tr-days-inp" type="number" id="tr-y7" value="0" min="0" max="366" oninput="calcTaxResidency();updateTrBar(7,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-7" style="width:0%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2017-18 — days in India</label>
-          <input type="number" id="tr-y8" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2017-18</div>
+          <input class="tr-days-inp" type="number" id="tr-y8" value="0" min="0" max="366" oninput="calcTaxResidency();updateTrBar(8,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-8" style="width:0%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
-        <div class="form-group">
-          <label>FY 2016-17 — days in India</label>
-          <input type="number" id="tr-y9" value="0" min="0" max="366" oninput="calcTaxResidency()"/>
+        <div class="tr-yr-row">
+          <div class="tr-yr-dot"></div>
+          <div class="tr-yr-label">FY 2016-17</div>
+          <input class="tr-days-inp" type="number" id="tr-y9" value="0" min="0" max="366" oninput="calcTaxResidency();updateTrBar(9,this.value)"/>
+          <div class="tr-bar-track"><div class="tr-bar-fill" id="tr-bar-9" style="width:0%"></div></div>
+          <div class="tr-days-tag">/ 366</div>
         </div>
       </div>
       <button class="btn btn-amber" onclick="calcTaxResidency()">Determine My Status &rarr;</button>
-      <div id="tr-result" style="display:none;margin-top:28px">
-        <div id="tr-badge-wrap" style="text-align:center;margin-bottom:24px">
-          <div id="tr-badge" style="display:inline-block;padding:16px 40px;border-radius:16px;font-size:32px;font-weight:900;letter-spacing:1px;"></div>
-          <div id="tr-subtitle" style="margin-top:10px;font-size:15px;color:var(--text2)"></div>
-        </div>
-        <div class="rg" id="tr-grid"></div>
-        <div id="tr-rules" class="info" style="margin-top:20px"></div>
-        <div id="tr-implications" style="margin-top:20px"></div>
-        <div id="tr-nextyear" style="margin-top:20px"></div>
+      <div id="tr-result" style="display:none;margin-top:24px">
+        <div id="tr-status-hero" class="tr-status-hero"></div>
+        <div class="tr-thresholds" id="tr-thresholds"></div>
+        <div id="tr-rules" class="tr-rules-card" style="margin-bottom:16px"></div>
+        <div class="tr-impl-list" id="tr-implications"></div>
+        <div id="tr-nextyear" style="margin-top:14px"></div>
       </div>
     </div>
   </div>
@@ -2517,15 +2600,52 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       </div>
 
       <div class="calc-results" id="ed-results" style="display:none">
-        <div class="res-grid" id="ed-res-tiles"></div>
-        <div id="ed-status-box" style="margin-top:16px;border-radius:12px;padding:16px 20px;"></div>
-        <div style="margin-top:16px;">
-          <button class="btn btn-outline" id="ed-table-toggle" onclick="toggleEdTable()" style="display:flex;align-items:center;gap:6px">▶ Year-by-Year Growth</button>
-          <div id="ed-table-wrap" style="display:none;margin-top:12px;overflow-x:auto;">
-            <table class="year-table">
-              <thead><tr><th>Year</th><th>Child Age</th><th>Corpus (₹L)</th><th>Ed. Cost That Year (₹L)</th></tr></thead>
-              <tbody id="ed-table-body"></tbody>
-            </table>
+        <div class="ed-results-wrap">
+          <div class="ed-progress-card">
+            <div class="ed-ring-wrap">
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="9"/>
+                <circle id="ed-ring-arc" cx="60" cy="60" r="50" fill="none" stroke="var(--teal)" stroke-width="9"
+                  stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"
+                  transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .7s ease,stroke .4s"/>
+              </svg>
+              <div class="ed-ring-center">
+                <span class="ed-ring-pct" id="ed-ring-pct">0%</span>
+                <span class="ed-ring-lbl">funded</span>
+              </div>
+            </div>
+            <div class="ed-stat-row">
+              <div class="ed-stat-box">
+                <div class="ed-stat-box-lbl">Target Corpus</div>
+                <div class="ed-stat-box-val" id="ed-s-needed">₹—</div>
+                <div class="ed-stat-box-sub" id="ed-s-needed-sub"></div>
+              </div>
+              <div class="ed-stat-box">
+                <div class="ed-stat-box-lbl">Projected Corpus</div>
+                <div class="ed-stat-box-val" id="ed-s-proj">₹—</div>
+                <div class="ed-stat-box-sub" id="ed-s-proj-sub"></div>
+              </div>
+              <div class="ed-stat-box">
+                <div class="ed-stat-box-lbl">Years to Save</div>
+                <div class="ed-stat-box-val" id="ed-s-years">—</div>
+                <div class="ed-stat-box-sub" id="ed-s-years-sub"></div>
+              </div>
+              <div class="ed-stat-box">
+                <div class="ed-stat-box-lbl" id="ed-s-gap-lbl">Gap</div>
+                <div class="ed-stat-box-val" id="ed-s-gap">₹—</div>
+                <div class="ed-stat-box-sub" id="ed-s-gap-sub"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ed-status-strip" id="ed-status-box"></div>
+          <div>
+            <button class="btn btn-outline" id="ed-table-toggle" onclick="toggleEdTable()" style="display:flex;align-items:center;gap:6px">▶ Year-by-Year Growth</button>
+            <div id="ed-table-wrap" style="display:none;margin-top:12px;overflow-x:auto;">
+              <table class="year-table">
+                <thead><tr><th>Year</th><th>Child Age</th><th>Corpus (₹L)</th><th>Ed. Cost That Year (₹L)</th></tr></thead>
+                <tbody id="ed-table-body"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -3851,6 +3971,14 @@ function updateHeroReceive() {
 }
 
 // ── TAX RESIDENCY CALCULATOR ─────────────────────────────────────────────────
+function updateTrBar(i,v){
+  const bar=document.getElementById('tr-bar-'+i);
+  if(!bar)return;
+  const pct=Math.min(100,Math.round(Math.max(0,parseInt(v)||0)/366*100));
+  bar.style.width=pct+'%';
+  bar.className='tr-bar-fill'+(pct>=50?' amber':'')+(pct>=100?' red':'');
+}
+
 function calcTaxResidency(){
   const days=[];
   for(let i=0;i<=9;i++){
@@ -3904,58 +4032,71 @@ function calcTaxResidency(){
   const daysTo60=Math.max(0,60-y0);
 
   // ── RENDER ───────────────────────────────────────────────────────────────
-  const badge=document.getElementById('tr-badge');
-  badge.textContent=status;
-  badge.style.background=bgColor;
-  badge.style.color=statusColor;
-  badge.style.border='2px solid '+statusColor;
+  // Colours
+  const statusConf={
+    NRI:  {bg:'rgba(20,184,166,0.08)',border:'rgba(20,184,166,0.35)',color:'var(--teal)',emoji:'🌍',label:'Non-Resident Indian'},
+    RNOR: {bg:'rgba(240,165,32,0.08)',border:'rgba(240,165,32,0.35)',color:'var(--amber)',emoji:'🔄',label:'Resident but Not Ordinarily Resident'},
+    Resident:{bg:'rgba(239,68,68,0.07)',border:'rgba(239,68,68,0.30)',color:'#f43f5e',emoji:'🏠',label:'Resident & Ordinarily Resident'}
+  };
+  const sc=statusConf[status];
 
-  document.getElementById('tr-subtitle').textContent=subtitle;
+  // Status hero card
+  document.getElementById('tr-status-hero').innerHTML=
+    '<div style="background:'+sc.bg+';border:2px solid '+sc.border+';border-radius:18px;padding:26px 24px;text-align:center;margin-bottom:18px">'+
+    '<div style="font-size:38px;margin-bottom:10px">'+sc.emoji+'</div>'+
+    '<div style="font-size:32px;font-weight:900;color:'+sc.color+';letter-spacing:-.5px;margin-bottom:6px">'+status+'</div>'+
+    '<div style="font-size:14px;font-weight:600;color:var(--muted)">'+sc.label+'</div>'+
+    '</div>';
 
-  // Summary grid
-  const gridData=[
-    {l:'Current Year Days in India',v:y0+' / 366'},
-    {l:'Prior 4-Year Total',v:prev4+' days'},
-    {l:'Prior 7-Year Total',v:days.slice(1,8).reduce((a,b)=>a+b,0)+' days'},
-    {l:'Basic Resident Rule (≥182 days)?',v:basicResident?'Yes ✓':'No'},
-    {l:'Secondary Resident Rule (≥60 + ≥365 prev-4)?',v:secondaryResident?'Yes ✓':'No'},
-  ];
-  if(isResident){
-    gridData.push({l:'RNOR: NRI in ≥9 of prior 10 years?',v:rnorCondA?'Yes ✓':'No'});
-    gridData.push({l:'RNOR: Prior 7-year stay ≤729 days?',v:rnorCondB?'Yes ✓':'No'});
-  }
-  document.getElementById('tr-grid').innerHTML=gridData.map(d=>
-    '<div class="rg-row"><span class="rg-label">'+d.l+'</span><span class="rg-value">'+d.v+'</span></div>'
-  ).join('');
+  // Threshold cards
+  const prev7total=days.slice(1,8).reduce((a,b)=>a+b,0);
+  document.getElementById('tr-thresholds').innerHTML=
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+((y0>=182)?'var(--green)':'var(--text)')+'">'+y0+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 182</span></div><div class="tr-thresh-lbl">Days this year<br>(primary rule)</div></div>'+
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+(prev4>=365?'var(--green)':'var(--text)')+'">'+prev4+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 365</span></div><div class="tr-thresh-lbl">Prior 4-yr total<br>(secondary rule)</div></div>'+
+    '<div class="tr-thresh"><div class="tr-thresh-val" style="color:'+(prev7total<=729?'var(--green)':'#f43f5e')+'">'+prev7total+' <span style="font-size:11px;font-weight:500;color:var(--muted)">/ 729</span></div><div class="tr-thresh-lbl">Prior 7-yr total<br>(RNOR threshold)</div></div>';
 
   // Rules explanation
   const rules={
-    'NRI':'<b>NRI rule:</b> You spent <b>'+y0+' days</b> in India this year — under the 182-day threshold. Neither the secondary condition (60+ days + 365 days in prior 4 years) applies. You are a <b>Non-Resident Indian</b> for FY 2025-26.',
-    'RNOR':'<b>RNOR rule:</b> You are a Resident ('+y0+' days this year), but qualify as RNOR because: '+(rnorCondA?'you were NRI for 9+ of the preceding 10 years. ':'')+(rnorCondB?'your total India stay in the prior 7 years is ≤729 days.':'')+'  RNOR status protects you for up to <b>2 fiscal years</b> after returning to India.',
-    'Resident':'<b>Resident (ROR) rule:</b> You spent <b>'+y0+' days</b> in India this year and do not qualify for RNOR. All your global income is taxable in India.'
+    NRI:'<strong>Why NRI?</strong> You spent '+y0+' days in India this year — below the 182-day primary threshold. The secondary rule (≥60 days + ≥365 in prior 4 years) also does not apply. You are a <strong>Non-Resident Indian</strong> for FY 2025-26.',
+    RNOR:'<strong>Why RNOR?</strong> You crossed the resident threshold ('+y0+' days), but qualify for RNOR because '+(rnorCondA?'you were NRI for 9+ of the preceding 10 years':'')+(rnorCondA&&rnorCondB?' and ':'')+(rnorCondB?'your total India stay in the prior 7 years is ≤729 days':'')+'. RNOR status can last up to <strong>2 fiscal years</strong> after returning to India.',
+    Resident:'<strong>Why Resident (ROR)?</strong> You spent <strong>'+y0+' days</strong> in India this year and do not qualify for RNOR. All your worldwide income is taxable in India from this fiscal year.'
   };
   document.getElementById('tr-rules').innerHTML=rules[status];
 
-  // Implications
+  // Implications cards
   const imp={
-    'NRI':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li>Only income <em>earned or received in India</em> is taxable here</li><li>Foreign salary, business income, capital gains abroad — <em>not taxable in India</em></li><li>NRE account interest is tax-free; NRO interest is taxable (TDS applies)</li><li>You can claim DTAA benefits to avoid double taxation</li><li>No wealth tax; FEMA rules apply for remittances</li></ul></div>',
-    'RNOR':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li>Only India-sourced income and income from a business controlled in India is taxable</li><li>Foreign income is <em>still exempt</em> — same as NRI, for now</li><li>NRE account interest remains tax-free during RNOR period</li><li><b>Ideal window to repatriate overseas assets</b> before becoming fully Resident</li><li>RNOR lasts at most 2 financial years — plan conversions now</li></ul></div>',
-    'Resident':'<div style="margin-top:4px"><b>What this means for you:</b><ul style="margin:8px 0 0 18px;line-height:1.9;color:var(--text2)"><li><b>Global income</b> — including foreign salary and overseas investment gains — is taxable in India</li><li>NRE account must be converted to Resident/RFC account</li><li>Foreign assets must be disclosed in Schedule FA of your ITR</li><li>FBAR/FATCA reporting obligations may apply</li><li>Use DTAA to avoid double taxation on India-sourced income</li></ul></div>'
+    NRI:[
+      {icon:'💸',title:'Only India-sourced income is taxable',text:'Foreign salary, overseas business income, and capital gains abroad are not taxable in India.'},
+      {icon:'🏦',title:'NRE interest is tax-free; NRO is taxable',text:'Interest earned on NRE accounts is exempt from tax. NRO account interest is taxable and subject to TDS.'},
+      {icon:'📄',title:'DTAA benefits available',text:'Claim relief under the India-'+' Double Tax Avoidance Agreement to avoid being taxed twice on the same income.'}
+    ],
+    RNOR:[
+      {icon:'🌐',title:'Foreign income still exempt — for now',text:'Only India-sourced income and income from a business controlled in India is taxable. Your overseas income stays exempt.'},
+      {icon:'⏳',title:'Act now — window is limited',text:'RNOR lasts at most 2 fiscal years. This is the ideal window to repatriate NRE FD proceeds and sell overseas assets before they become taxable.'},
+      {icon:'🏦',title:'NRE interest remains tax-free during RNOR',text:'Keep NRE accounts active during this period — interest is still exempt under the Income Tax Act.'}
+    ],
+    Resident:[
+      {icon:'🌍',title:'Global income is taxable in India',text:'Foreign salary, overseas investment gains, and all worldwide income must be reported and may be taxable in India.'},
+      {icon:'🔄',title:'Convert NRE account to Resident/RFC',text:'Your NRE account must be redesignated to a Resident or RFC (Resident Foreign Currency) account immediately.'},
+      {icon:'📋',title:'Disclose foreign assets in ITR',text:'Foreign bank accounts, investments, and assets must be reported in Schedule FA of your Income Tax Return each year.'}
+    ]
   };
-  document.getElementById('tr-implications').innerHTML=imp[status];
+  document.getElementById('tr-implications').innerHTML=imp[status].map(function(c){
+    return '<div class="tr-impl-card"><div class="tr-impl-icon2">'+c.icon+'</div><div class="tr-impl-body"><div class="tr-impl-title2">'+c.title+'</div><div class="tr-impl-text2">'+c.text+'</div></div></div>';
+  }).join('');
 
   // Next-year outlook
   let outlook='';
-  if(status==='NRI'){
-    if(daysTo182>0){
-      outlook='<div class="info" style="margin-top:0"><b>Next year outlook:</b> You can stay up to <b>'+(181-y0)+' more days</b> this year and remain NRI. Stay '+(182-y0)+' more days or more and you trigger the basic Resident rule.</div>';
-    }
+  if(status==='NRI'&&y0<182){
+    const canStay=181-y0;
+    outlook='<div class="tr-rules-card" style="border-color:rgba(20,184,166,0.25);background:rgba(20,184,166,0.06)"><strong>📊 Outlook:</strong> You can spend up to <strong>'+canStay+' more days</strong> in India this year and retain NRI status. Crossing 182 days triggers the basic Resident rule.</div>';
   } else if(status==='RNOR'){
-    outlook='<div class="info" style="margin-top:0"><b>Action window:</b> RNOR status is temporary. Use this period to:<br>• Repatriate NRE FD maturity proceeds<br>• Sell overseas assets (gains not taxable in India yet)<br>• Convert NRE/NRO accounts before the window closes</div>';
+    outlook='<div class="tr-rules-card" style="border-color:rgba(240,165,32,0.25);background:rgba(240,165,32,0.06)"><strong>⏳ Action window:</strong> RNOR status is temporary. Use this period to repatriate NRE FD proceeds, sell overseas assets, and plan your tax residency transition carefully.</div>';
   } else {
-    outlook='<div class="info" style="margin-top:0"><b>Filing requirement:</b> As a Resident (ROR), you must file an ITR disclosing global income and foreign assets (Schedule FA). Consult a CA if you have overseas income or investments.</div>';
+    outlook='<div class="tr-rules-card" style="border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05)"><strong>📁 Filing requirement:</strong> As a Resident (ROR), you must file an ITR disclosing your global income and foreign assets (Schedule FA). Consult a CA if you have overseas investments.</div>';
   }
   document.getElementById('tr-nextyear').innerHTML=outlook;
+
   document.getElementById('tr-result').style.display='block';
 }
 
@@ -4161,25 +4302,51 @@ function calcEdPlan(){
   }
   document.getElementById('ed-table-body').innerHTML=tbody;
 
-  // Render tiles
-  const lc=(inr)=>midRate>0?`<div class="ri-local">≈ ${baseCur} ${(inr/midRate/100000).toFixed(1)}L</div>`:'';
-  document.getElementById('ed-res-tiles').innerHTML=`
-    <div class="res-tile"><div class="res-label">Total Corpus Needed</div><div class="res-value">₹${(totalNeeded/100000).toFixed(1)}L</div>${lc(totalNeeded)}</div>
-    <div class="res-tile"><div class="res-label">Projected Corpus</div><div class="res-value" style="color:${onTrack?'var(--green)':'var(--amber)'}">₹${(projCorpus/100000).toFixed(1)}L</div>${lc(projCorpus)}</div>
-    <div class="res-tile"><div class="res-label">Years to Save</div><div class="res-value">${yrsToStart} yrs</div><div class="ri-local">Child is ${age}, starts at ${startAge}</div></div>
-    <div class="res-tile"><div class="res-label">${onTrack?'Surplus':'Gap'}</div><div class="res-value" style="color:${onTrack?'var(--green)':'var(--red)'}">₹${(Math.abs(gap)/100000).toFixed(1)}L</div>${lc(Math.abs(gap))}</div>
-  `;
+  // Render progress ring
+  const pct=Math.min(100,Math.round(projCorpus/totalNeeded*100));
+  const arc=document.getElementById('ed-ring-arc');
+  if(arc){
+    arc.style.strokeDashoffset=String(Math.round(314*(1-pct/100)));
+    arc.style.stroke=onTrack?'var(--green)':pct>=70?'var(--amber)':'#f43f5e';
+  }
+  const ringPct=document.getElementById('ed-ring-pct');
+  if(ringPct)ringPct.textContent=pct+'%';
 
-  // Status box
+  // Stat cards
+  const lc=(inr)=>midRate>0?'≈ '+baseCur+' '+(inr/midRate/100000).toFixed(1)+'L':'';
+  const qs=id=>document.getElementById(id);
+  qs('ed-s-needed').textContent='₹'+(totalNeeded/100000).toFixed(1)+'L';
+  qs('ed-s-needed').style.color='var(--text)';
+  qs('ed-s-needed-sub').textContent=lc(totalNeeded);
+  qs('ed-s-proj').textContent='₹'+(projCorpus/100000).toFixed(1)+'L';
+  qs('ed-s-proj').style.color=onTrack?'var(--green)':'var(--amber)';
+  qs('ed-s-proj-sub').textContent=lc(projCorpus);
+  qs('ed-s-years').textContent=yrsToStart+' yrs';
+  qs('ed-s-years-sub').textContent='Child '+age+' → starts at '+startAge;
+  const gapLbl=qs('ed-s-gap-lbl');
+  const gapVal=qs('ed-s-gap');
+  if(onTrack){
+    gapLbl.textContent='Surplus';
+    gapVal.textContent='₹'+(Math.abs(gap)/100000).toFixed(1)+'L';
+    gapVal.style.color='var(--green)';
+  } else {
+    gapLbl.textContent='Shortfall';
+    gapVal.textContent='₹'+(gap/100000).toFixed(1)+'L';
+    gapVal.style.color='#f43f5e';
+  }
+  qs('ed-s-gap-sub').textContent=lc(Math.abs(gap));
+
+  // Status strip
   const statusBox=document.getElementById('ed-status-box');
   if(onTrack){
-    statusBox.style.background='rgba(34,197,94,0.08)';
-    statusBox.style.border='1px solid rgba(34,197,94,0.25)';
-    statusBox.innerHTML=`<strong style="color:var(--green)">✓ You are on track!</strong> Your projected corpus of <strong>₹${(projCorpus/100000).toFixed(1)}L</strong> covers the full education cost of <strong>₹${(totalNeeded/100000).toFixed(1)}L</strong> with a surplus of ₹${(gap*-1/100000).toFixed(1)}L.`;
+    statusBox.style.background='rgba(34,197,94,0.07)';
+    statusBox.style.border='1px solid rgba(34,197,94,0.22)';
+    statusBox.innerHTML='<div class="ed-status-strip-icon">✅</div><div><div class="ed-status-strip-title" style="color:var(--green)">You are on track!</div><div class="ed-status-strip-text" style="color:var(--muted)">Projected corpus of <strong style="color:var(--text)">₹'+(projCorpus/100000).toFixed(1)+'L</strong> covers the full education cost of <strong style="color:var(--text)">₹'+(totalNeeded/100000).toFixed(1)+'L</strong> with a surplus of <strong style="color:var(--green)">₹'+(Math.abs(gap)/100000).toFixed(1)+'L</strong>.</div></div>';
   } else {
-    statusBox.style.background='rgba(244,63,94,0.07)';
-    statusBox.style.border='1px solid rgba(244,63,94,0.2)';
-    statusBox.innerHTML=`<strong style="color:var(--amber)">⚠ Shortfall of ₹${(gap/100000).toFixed(1)}L.</strong> Increase your monthly SIP to <strong style="color:var(--teal)">₹${Math.round(reqSip).toLocaleString('en-IN')}/mo</strong>${midRate>0?' (≈ '+baseCur+' '+Math.round(reqSip/midRate).toLocaleString('en-IN')+'/mo)':''} to fully fund your child's education.`;
+    statusBox.style.background='rgba(240,165,32,0.07)';
+    statusBox.style.border='1px solid rgba(240,165,32,0.22)';
+    const sipStr='₹'+Math.round(reqSip).toLocaleString('en-IN')+'/mo'+(midRate>0?' (≈ '+baseCur+' '+Math.round(reqSip/midRate).toLocaleString('en-IN')+'/mo)':'');
+    statusBox.innerHTML='<div class="ed-status-strip-icon">⚠️</div><div><div class="ed-status-strip-title" style="color:var(--amber)">Shortfall of ₹'+(gap/100000).toFixed(1)+'L</div><div class="ed-status-strip-text" style="color:var(--muted)">Your current SIP and savings will leave a gap. Increase your monthly SIP to close it.</div><div class="ed-sip-pill">💡 Recommended SIP: '+sipStr+'</div></div>';
   }
 
   document.getElementById('ed-results').style.display='block';
