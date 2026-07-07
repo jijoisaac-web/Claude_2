@@ -1524,7 +1524,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.3</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.4</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <a onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Calculators</a>
@@ -1613,7 +1613,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
     </h1>
     <p class="hero-sub">
       Compare live remittance rates from 50+ providers, calculate taxes, plan your return to India, 
-      and access 9 free financial tools — all in one place.
+      and access 12 free financial tools — all in one place.
     </p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
@@ -2142,6 +2142,19 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <div class="drawer-info"><div class="drawer-name">Real Estate ROI</div><div class="drawer-desc">Rental yield vs NRE FD benchmark</div></div>
     </div>
     <div class="drawer-section-lbl">Tax & Compliance</div>
+    
+    <div class="drawer-item" data-tab="proptds" onclick="showTab('proptds',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Property TDS</div><div class="drawer-desc">NRI property sale tax calculator</div></div>
+    </div>
+    <div class="drawer-item" data-tab="epf" onclick="showTab('epf',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">EPF Withdrawal</div><div class="drawer-desc">PF balance & taxability check</div></div>
+    </div>
+    <div class="drawer-item" data-tab="panaadhaar" onclick="showTab('panaadhaar',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">PAN &amp; Aadhaar</div><div class="drawer-desc">NRI guide &amp; document checklist</div></div>
+    </div>
     <div class="drawer-item" data-tab="taxres" onclick="showTab('taxres',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Tax Residency</div><div class="drawer-desc">Am I NRI, RNOR or Resident?</div></div>
@@ -3145,6 +3158,238 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   </div>
 </div>
 
+  <!-- TAB: PROPERTY TDS CALCULATOR -->
+  <div class="tool-section" id="tab-proptds">
+    <div class="calc-cur-bar" id="ccb-proptds"><span class="ccb-flag" id="ccb-flag-proptds"></span><span class="ccb-rate" id="ccb-rate-proptds">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-proptds" type="number" placeholder="Amount" oninput="ccbConvert('proptds')"/><span id="ccb-cur-proptds" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-proptds">₹—</span></div></div>
+    <div class="tool-banner tb-homeloan">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>NRI Property Sale — TDS Calculator</h2>
+        <p>Calculate TDS under Section 195 when selling Indian property as an NRI · Based on Finance Act 2024</p>
+      </div>
+    </div>
+    <div class="calc-grid" style="grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+      <div class="calc-field">
+        <label>Sale Price (₹)</label>
+        <input type="number" id="pt-sale" value="5000000" min="0" oninput="calcPropTDS()"/>
+      </div>
+      <div class="calc-field">
+        <label>Purchase Price / Cost (₹)</label>
+        <input type="number" id="pt-cost" value="2500000" min="0" oninput="calcPropTDS()"/>
+      </div>
+      <div class="calc-field">
+        <label>Holding Period</label>
+        <select id="pt-hold" onchange="calcPropTDS()">
+          <option value="lt">Short-term (&lt; 2 years)</option>
+          <option value="gt" selected>Long-term (2+ years)</option>
+        </select>
+      </div>
+      <div class="calc-field">
+        <label>Property Type</label>
+        <select id="pt-type" onchange="calcPropTDS()">
+          <option value="res" selected>Residential</option>
+          <option value="com">Commercial</option>
+        </select>
+      </div>
+    </div>
+    <div class="calc-results" id="pt-results">
+      <div class="ed-stat-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">TDS Rate</div>
+          <div class="ed-stat-box-val" id="pt-rate">—</div>
+          <div class="ed-stat-box-sub">Incl. surcharge &amp; cess</div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">TDS Amount</div>
+          <div class="ed-stat-box-val" id="pt-tds">₹—</div>
+          <div class="ed-stat-box-sub" id="pt-tds-sub"></div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">Capital Gain</div>
+          <div class="ed-stat-box-val" id="pt-gain">₹—</div>
+          <div class="ed-stat-box-sub" id="pt-gain-sub"></div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">Net Proceeds</div>
+          <div class="ed-stat-box-val" id="pt-net">₹—</div>
+          <div class="ed-stat-box-sub" id="pt-net-sub"></div>
+        </div>
+      </div>
+      <div class="tr-rules-card" id="pt-advice" style="margin-top:16px;"></div>
+    </div>
+    <div class="info-cards-grid" style="margin-top:20px;">
+      <div class="info-card">
+        <div class="info-card-title">📋 What is Section 195 TDS?</div>
+        <p>When an NRI sells property in India, the <strong>buyer must deduct TDS</strong> on the entire sale consideration before paying. The buyer deposits this with the Indian government via Form 26QB. The NRI can claim refund if actual tax liability is lower.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">💡 How to Reduce TDS?</div>
+        <p><strong>Apply for Lower Deduction Certificate</strong> under Section 197 from your Assessing Officer before the sale. With capital gain exemptions (Section 54 — reinvest in another house within 2 years), your actual tax can be nil.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">📄 Key Documents</div>
+        <p><strong>Buyer needs:</strong> Form 15CA &amp; 15CB (CA-certified). <strong>NRI needs:</strong> PAN card, TAN of buyer, sale agreement, cost basis proof. TDS certificate (Form 16B) issued to NRI within 15 days.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: EPF WITHDRAWAL CALCULATOR -->
+  <div class="tool-section" id="tab-epf">
+    <div class="calc-cur-bar" id="ccb-epf"><span class="ccb-flag" id="ccb-flag-epf"></span><span class="ccb-rate" id="ccb-rate-epf">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-epf" type="number" placeholder="Amount" oninput="ccbConvert('epf')"/><span id="ccb-cur-epf" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-epf">₹—</span></div></div>
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(20,184,166,0.08));border-color:rgba(16,185,129,0.3);">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>EPF / PF Withdrawal Calculator</h2>
+        <p>Check your PF withdrawal amount, taxability &amp; EPS pension — for NRIs leaving India</p>
+      </div>
+    </div>
+    <div class="calc-grid" style="grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+      <div class="calc-field">
+        <label>EPF Balance (₹)</label>
+        <input type="number" id="epf-bal" value="500000" min="0" oninput="calcEPF()"/>
+      </div>
+      <div class="calc-field">
+        <label>Years of Service</label>
+        <input type="number" id="epf-yrs" value="6" min="0" max="40" step="0.5" oninput="calcEPF()"/>
+      </div>
+      <div class="calc-field">
+        <label>Last Basic + DA Salary (₹/mo)</label>
+        <input type="number" id="epf-sal" value="50000" min="0" oninput="calcEPF()"/>
+      </div>
+      <div class="calc-field">
+        <label>Reason for Withdrawal</label>
+        <select id="epf-reason" onchange="calcEPF()">
+          <option value="nri" selected>Left India / Becoming NRI</option>
+          <option value="retire">Retirement (58+)</option>
+          <option value="resign">Resigned / Unemployed 2+ months</option>
+        </select>
+      </div>
+    </div>
+    <div class="calc-results" id="epf-results">
+      <div class="ed-stat-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">EPF Withdrawal</div>
+          <div class="ed-stat-box-val" id="epf-out-epf">₹—</div>
+          <div class="ed-stat-box-sub">Employee + employer</div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">EPS Amount</div>
+          <div class="ed-stat-box-val" id="epf-out-eps">₹—</div>
+          <div class="ed-stat-box-sub" id="epf-eps-sub">Pension scheme</div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">Tax Status</div>
+          <div class="ed-stat-box-val" id="epf-out-tax">—</div>
+          <div class="ed-stat-box-sub" id="epf-tax-sub"></div>
+        </div>
+        <div class="ed-stat-box">
+          <div class="ed-stat-box-lbl">Net in Hand</div>
+          <div class="ed-stat-box-val" id="epf-out-net">₹—</div>
+          <div class="ed-stat-box-sub" id="epf-net-sub"></div>
+        </div>
+      </div>
+      <div class="tr-rules-card" id="epf-advice" style="margin-top:16px;"></div>
+    </div>
+    <div class="info-cards-grid" style="margin-top:20px;">
+      <div class="info-card">
+        <div class="info-card-title">🌍 NRI &amp; EPF Rules</div>
+        <p>NRIs can withdraw their full EPF after <strong>2 months of leaving India</strong> (or becoming NRI). Submit <strong>Form 19</strong> (EPF) and <strong>Form 10C</strong> (EPS) online via UAN portal. Processing takes 15–30 days.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">💰 Taxability Rules</div>
+        <p>EPF withdrawal is <strong>fully tax-free</strong> if service ≥ 5 years. If &lt; 5 years: taxable as salary income + 10% TDS if &gt; ₹50,000. Exception: medical reasons, employer shutdown, or job transfer.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">📊 EPS Pension Options</div>
+        <p>If service &lt; 10 years: get lump sum (scheme certificate). If 10+ years: entitled to monthly pension at age 58. Maximum EPS contribution is ₹1,250/month (capped at ₹15,000 salary).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PAN & AADHAAR GUIDE -->
+  <div class="tool-section" id="tab-panaadhaar">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(240,165,32,0.12),rgba(251,191,36,0.06));border-color:rgba(240,165,32,0.3);">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>PAN &amp; Aadhaar Guide for NRIs</h2>
+        <p>Complete guide to getting, updating &amp; using PAN and Aadhaar as an NRI — what's mandatory, what's optional</p>
+      </div>
+    </div>
+
+    <div class="info-cards-grid" style="margin-top:4px;">
+      <div class="info-card" style="border-color:rgba(240,165,32,0.3);">
+        <div class="info-card-title">🪪 PAN Card — Is it Mandatory?</div>
+        <p><strong>Yes for NRIs if you:</strong> own property in India, earn India income (rent, dividends, capital gains), invest in mutual funds or stocks, have NRE/NRO accounts, or file Indian income tax returns. Apply via <strong>Form 49AA</strong> (for foreign nationals / OCIs) or <strong>Form 49A</strong> (Indian citizens abroad). Processing takes 15–20 days. Cost: ₹107 (India address) or ₹1,017 (foreign address).</p>
+      </div>
+      <div class="info-card" style="border-color:rgba(20,184,166,0.3);">
+        <div class="info-card-title">🔵 Aadhaar — NRI Rules</div>
+        <p>NRIs can apply for Aadhaar after residing in India for <strong>182+ days</strong> in the preceding 12 months. It is <strong>NOT mandatory</strong> for NRIs to have Aadhaar. NRIs are <strong>exempt from compulsory PAN-Aadhaar linking</strong>. However, if you have both, linking avoids future TDS issues when you return.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="rtp-bd-title" style="margin-bottom:12px;">📋 Document Checklist — PAN Application (NRI)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="tr-rules-card">
+          <div style="font-weight:700;color:var(--teal);margin-bottom:10px;">Identity Proof (any one)</div>
+          <div class="rtp-checklist">
+            <div class="rtp-checkitem"><span class="rci">✓</span>Passport (copy of relevant pages)</div>
+            <div class="rtp-checkitem"><span class="rci">✓</span>OCI / PIO card</div>
+            <div class="rtp-checkitem"><span class="rci">✓</span>Driving licence (with photo)</div>
+          </div>
+        </div>
+        <div class="tr-rules-card">
+          <div style="font-weight:700;color:var(--amber);margin-bottom:10px;">Address Proof (any one)</div>
+          <div class="rtp-checklist">
+            <div class="rtp-checkitem"><span class="rci">✓</span>Passport (address page)</div>
+            <div class="rtp-checkitem"><span class="rci">✓</span>Bank statement (last 3 months)</div>
+            <div class="rtp-checkitem"><span class="rci">✓</span>Utility bill / NRE account letter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+      <div class="info-card">
+        <div class="info-card-title">🔗 Where PAN is Used</div>
+        <ul style="margin:8px 0 0 0;padding-left:18px;font-size:12.5px;color:var(--text2);line-height:1.8;">
+          <li>NRE / NRO account opening</li>
+          <li>Mutual fund investments</li>
+          <li>Property purchase / sale</li>
+          <li>TDS refund claims (ITR)</li>
+          <li>DTAA benefit applications</li>
+          <li>Demat &amp; trading accounts</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">⚠️ Common NRI Mistakes</div>
+        <ul style="margin:8px 0 0 0;padding-left:18px;font-size:12.5px;color:var(--text2);line-height:1.8;">
+          <li>Using residential PAN after becoming NRI</li>
+          <li>Not updating PAN address to overseas</li>
+          <li>Linking Aadhaar without India address</li>
+          <li>Quoting wrong PAN in ITR (wrong status)</li>
+          <li>Not submitting Form 15CA/15CB on remittances</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">🔄 Updating Existing PAN</div>
+        <p style="font-size:12.5px;color:var(--text2);line-height:1.7;margin-top:8px;">Update your address on PAN via NSDL / UTI portals online. Select 'Change in existing PAN data'. Submit proof of overseas address. Important: notify your bank &amp; mutual fund about NRI status — different TDS rates apply.</p>
+      </div>
+    </div>
+
+    <div class="aff-banner" style="margin-top:20px;">
+      <div class="aff-banner-text">
+        <div class="aff-banner-title">📝 Apply for PAN Online — NSDL &amp; UTI portals</div>
+        <div class="aff-banner-sub">Takes 15–20 days · ₹1,017 for foreign dispatch · Accepted worldwide</div>
+      </div>
+      <div class="aff-banner-links">
+        <a class="aff-btn aff-btn-primary" href="https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html" target="_blank" rel="noopener">Apply via NSDL</a>
+        <a class="aff-btn aff-btn-secondary" href="https://www.pan.utiitsl.com/PAN/mainform.html" target="_blank" rel="noopener">Apply via UTI</a>
+        <a class="aff-btn" style="background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2);" href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener">Aadhaar Portal</a>
+      </div>
+    </div>
+  </div>
+
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-inner">
@@ -3190,7 +3435,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.3 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.4 · Jul 2026</p>
     </div>
   </div>
 </footer>
@@ -5434,6 +5679,98 @@ function calcRtpPreview(){
 }
 // Init on page load
 window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);calcHeroHomeLoan(3000000);calcHeroRealty(3000000);});
+/* ── Property TDS Calculator ── */
+function calcPropTDS(){
+  var sale=parseFloat(document.getElementById('pt-sale').value)||0;
+  var cost=parseFloat(document.getElementById('pt-cost').value)||0;
+  var hold=document.getElementById('pt-hold').value;
+  var gain=Math.max(0, sale-cost);
+  var tdsRate, tdsLabel, gainLabel;
+  if(hold==='lt'){
+    // STCG: 30% + surcharge + cess on sale price
+    var sur = sale>10000000?0.15:sale>5000000?0.10:0;
+    tdsRate = (0.30*(1+sur)*1.04);
+    tdsLabel='STCG: 30%'+(sur>0?' + '+(sur*100)+'% sur':'')+' + 4% cess';
+    gainLabel='Short-term gain';
+  } else {
+    // LTCG: 20% + surcharge + cess
+    var sur2 = sale>20000000?0.25:sale>10000000?0.15:sale>5000000?0.10:0;
+    tdsRate = (0.20*(1+sur2)*1.04);
+    tdsLabel='LTCG: 20%'+(sur2>0?' + '+(sur2*100)+'% sur':'')+' + 4% cess';
+    gainLabel='Long-term gain (indexed)';
+  }
+  var tdsAmt = sale * tdsRate;
+  var net = sale - tdsAmt;
+  document.getElementById('pt-rate').textContent = (tdsRate*100).toFixed(2)+'%';
+  document.getElementById('pt-tds').textContent = fmtCr(tdsAmt);
+  document.getElementById('pt-tds-sub').textContent = tdsLabel;
+  document.getElementById('pt-gain').textContent = fmtCr(gain);
+  document.getElementById('pt-gain-sub').textContent = gainLabel;
+  document.getElementById('pt-net').textContent = fmtCr(net);
+  var fxStr='';
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxStr = '≈ '+baseCur+' '+Math.round(net/midRate).toLocaleString('en-IN');
+  }
+  document.getElementById('pt-net-sub').textContent = fxStr||'After TDS deduction';
+  var advice = document.getElementById('pt-advice');
+  if(advice){
+    var tips = hold==='gt'
+      ? '<strong>💡 Section 54 Exemption:</strong> Reinvest capital gains in another residential property within 2 years (or under construction within 3 years) to claim full LTCG exemption. Or invest in Capital Gains Bonds (Section 54EC) within 6 months — up to ₹50L exempt.<br><br><strong>📋 Lower TDS:</strong> Apply to your Assessing Officer for a Lower Deduction Certificate under Section 197 before the sale to reduce TDS to actual tax liability.'
+      : '<strong>⚠️ Short-term Capital Gain:</strong> TDS applies at 30% on the full sale price since holding period is under 2 years. Very limited exemptions available. Consider deferring sale beyond 2 years if possible to benefit from LTCG rates.';
+    advice.innerHTML = tips;
+  }
+}
+
+/* ── EPF Withdrawal Calculator ── */
+function calcEPF(){
+  var bal=parseFloat(document.getElementById('epf-bal').value)||0;
+  var yrs=parseFloat(document.getElementById('epf-yrs').value)||0;
+  var sal=parseFloat(document.getElementById('epf-sal').value)||0;
+  var reason=document.getElementById('epf-reason').value;
+  // EPS: ₹1250/month capped, up to 10 years
+  var epsMonths = Math.min(yrs*12, 120);
+  var epsPerMonth = Math.min(sal*0.0833, 1250);
+  var epsAmt = epsMonths * epsPerMonth;
+  // EPF = balance (includes both employee + employer contributions)
+  var epfAmt = bal;
+  // Taxability
+  var taxFree = yrs>=5 || reason==='retire';
+  var tds=0, taxNote='';
+  if(!taxFree){
+    if(bal>50000){ tds=bal*0.10; taxNote='10% TDS deducted (service < 5 yrs, balance > ₹50K)'; }
+    else { taxNote='No TDS but taxable as salary income in ITR'; }
+  } else {
+    taxNote = yrs>=5 ? 'Tax-free (5+ years service)' : 'Tax-free (retirement)';
+  }
+  var net = epfAmt - tds;
+  document.getElementById('epf-out-epf').textContent = fmtCr(epfAmt);
+  document.getElementById('epf-out-eps').textContent = fmtCr(epsAmt);
+  document.getElementById('epf-eps-sub').textContent = yrs>=10?'Eligible for monthly pension':'Lump sum (< 10 yrs)';
+  document.getElementById('epf-out-tax').textContent = taxFree?'Tax-Free':'Taxable';
+  document.getElementById('epf-out-tax').style.color = taxFree?'var(--teal)':'var(--amber)';
+  document.getElementById('epf-tax-sub').textContent = taxNote;
+  document.getElementById('epf-out-net').textContent = fmtCr(net);
+  var fxStr='';
+  if(typeof midRate!=='undefined'&&midRate>0&&typeof baseCur!=='undefined'){
+    fxStr='≈ '+baseCur+' '+Math.round(net/midRate).toLocaleString('en-IN');
+  }
+  document.getElementById('epf-net-sub').textContent = fxStr||(tds>0?'After '+fmtCr(tds)+' TDS':'Full amount');
+  var advice=document.getElementById('epf-advice');
+  if(advice){
+    var msg = reason==='nri'
+      ? '<strong>🌍 NRI EPF Withdrawal Steps:</strong> (1) Activate UAN on EPFO portal. (2) Link Aadhaar + bank account to UAN. (3) Submit Form 19 (EPF) + Form 10C (EPS) online. (4) Amount credited to NRO account within 15–30 days. <br><br><strong>💡 Tip:</strong> If you plan to return to India, consider keeping EPF invested — it earns 8.25% p.a. interest and accumulates tax-free.'
+      : taxFree
+        ? '<strong>✅ Good news:</strong> Your withdrawal is fully tax-free. Submit Form 19 + 10C on the EPFO UAN portal. Ensure Aadhaar and bank account are linked and KYC is approved.'
+        : '<strong>⚠️ Tax Alert:</strong> Since your service is under 5 years, the withdrawal is taxable. Consider whether you can defer withdrawal or transfer to new employer to avoid tax. Submit Form 15G (if income below taxable limit) to avoid TDS.';
+    advice.innerHTML = msg;
+  }
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  calcPropTDS();
+  calcEPF();
+});
+
 
 </script>
 </body>
