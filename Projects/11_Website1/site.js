@@ -911,7 +911,8 @@ function closeDrawer(){
 function showTab(id,btn){setActiveBottomTab(id);
   document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.drawer-item').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
+  const tabEl=document.getElementById('tab-'+id);if(!tabEl)return;
+  tabEl.classList.add('active');
   // Mark active in drawer
   const drawerItem=document.querySelector(`.drawer-item[data-tab="${id}"]`);
   if(drawerItem)drawerItem.classList.add('active');
@@ -933,7 +934,7 @@ function showTab(id,btn){setActiveBottomTab(id);
 window.addEventListener('DOMContentLoaded',()=>{
   // Deep-link: open specific tool tab when arriving from a guide page
   const hash=location.hash;
-  const TAB_IDS=['rates','invest','nrenro','homeloan','return','dtaa','realty','edplan','taxres','articles'];
+  const TAB_IDS=['rates','invest','nrenro','homeloan','return','dtaa','realty','edplan','taxres','articles','proptds','epf','panaadhaar','budget'];
   if(hash && TAB_IDS.includes(hash.slice(1))){
     const tabId=hash.slice(1);
     const btn=document.querySelector('[data-tab="'+tabId+'"]');

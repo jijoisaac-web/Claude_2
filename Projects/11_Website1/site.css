@@ -286,7 +286,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .cmp-table th,.amort-table th{background:var(--elevated);padding:12px 16px;text-align:left;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
 .cmp-table th:first-child,.amort-table th:first-child{border-radius:10px 0 0 0;}
 .cmp-table th:last-child,.amort-table th:last-child{border-radius:0 10px 0 0;}
-.cmp-table td,.amort-table td{padding:13px 16px;border-bottom:1px solid var(--border);}
+.cmp-table td,.amort-table td{padding:13px 16px;border-bottom:1px solid var(--border);color:var(--text);}
 .cmp-table td:not(:first-child){text-align:center;}
 .cmp-table tr:last-child td,.amort-table tr:last-child td{border-bottom:none;}
 .cmp-table tr:hover td,.amort-table tr:hover td{background:rgba(255,255,255,.02);}
@@ -369,7 +369,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .year-table-wrap{overflow-x:auto;margin-top:16px;}
 .year-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .year-table th{background:var(--elevated);padding:11px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
-.year-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;}
+.year-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums;color:var(--text);}
 .year-table tr:last-child td{border-bottom:none;background:var(--elevated);font-weight:700;}
 .year-table tr:hover td{background:rgba(255,255,255,.02);}
 .exp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
@@ -871,6 +871,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .rg-card{background:#f8fafc;border-color:#e2e8f0;}
 [data-theme="light"] .year-table th{background:#f1f5f9;color:#374151;}
 [data-theme="light"] .year-table td{color:#1e293b;}
+[data-theme="light"] .cmp-table td,[data-theme="light"] .amort-table td{color:#1e293b;}
 [data-theme="light"] .year-table tr:hover td{background:#f8fafc;}
 
 /* ── LIGHT THEME EXTRA FIXES ────────────────────────────────────────────── */
