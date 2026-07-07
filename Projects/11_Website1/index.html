@@ -1305,6 +1305,26 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rtp-checklist{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;}
 .rtp-checkitem{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;line-height:1.4;}
 .rtp-checkitem .rci{color:var(--teal);font-weight:700;font-size:11px;}
+
+/* ── Hero dual-widget row ──────────────────────────── */
+.hero-widgets-row{display:flex;gap:18px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-top:28px;animation:fadeUp .7s .45s ease both;}
+.hero-rates-panel{margin:0!important;width:100%;max-width:480px;flex:0 1 480px;}
+.hero-corpus-panel{width:100%;max-width:320px;flex:0 1 320px;background:rgba(4,12,28,0.72);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(20,184,166,0.28);border-radius:22px;overflow:hidden;padding:20px;}
+.hcp-label{font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.hcp-city-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.hcp-city-btn{flex:1;min-width:0;padding:6px 4px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.hcp-city-btn.active{background:rgba(20,184,166,0.15);border-color:var(--teal);color:var(--teal);}
+.hcp-corpus-big{text-align:center;margin:4px 0 16px;}
+.hcp-corpus-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.hcp-corpus-val{font-size:36px;font-weight:900;color:var(--amber);letter-spacing:-1px;line-height:1;}
+.hcp-corpus-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+.hcp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.hcp-stat{background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 11px;border:1px solid rgba(255,255,255,0.06);}
+.hcp-stat-l{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.hcp-stat-v{font-size:15px;font-weight:900;color:var(--text);}
+.hcp-cta{width:100%;padding:11px;border-radius:12px;background:var(--teal);color:#fff;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:opacity .2s;}
+.hcp-cta:hover{opacity:.88;}
+@media(max-width:700px){.hero-rates-panel{max-width:100%;}.hero-corpus-panel{max-width:100%;}}
 </style>
 </head>
 <body>
@@ -1422,7 +1442,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         Return to India Planner
       </button>
     </div>
-  <!-- Unified Hero Rates Panel -->
+  <!-- Hero dual-widget row -->
+  <div class="hero-widgets-row">
+    <!-- Left: Live Rates widget -->
     <div class="hero-rates-panel">
       <!-- Top: amount input + result -->
       <div class="hrp-top">
@@ -1462,6 +1484,36 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       </div>
       <div class="hrp-footer-wrap" id="rpc-footer">Estimates only &middot; Verify on provider site before transferring</div>
     </div>
+
+    <!-- Right: Corpus Calculator widget -->
+    <div class="hero-corpus-panel">
+      <div class="hcp-label">&#127968; Return to India</div>
+      <div class="hcp-city-row">
+        <button class="hcp-city-btn active" data-monthly="120000" onclick="hcpSetCity(this)">Metro</button>
+        <button class="hcp-city-btn" data-monthly="75000" onclick="hcpSetCity(this)">Tier 2</button>
+        <button class="hcp-city-btn" data-monthly="50000" onclick="hcpSetCity(this)">Tier 3</button>
+        <button class="hcp-city-btn" data-monthly="35000" onclick="hcpSetCity(this)">Tier 4</button>
+      </div>
+      <div class="hcp-corpus-big">
+        <div class="hcp-corpus-lbl">&#127942; Corpus You Need</div>
+        <div class="hcp-corpus-val" id="hcp-corpus">&#8377;—</div>
+        <div class="hcp-corpus-sub">At 8% return · 6% inflation · 5 yrs</div>
+      </div>
+      <div class="hcp-stats">
+        <div class="hcp-stat">
+          <div class="hcp-stat-l">Monthly SIP</div>
+          <div class="hcp-stat-v" id="hcp-sip">&#8377;—</div>
+        </div>
+        <div class="hcp-stat">
+          <div class="hcp-stat-l">Sustains for</div>
+          <div class="hcp-stat-v" id="hcp-sustain">—</div>
+        </div>
+      </div>
+      <button class="hcp-cta" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        &#127968; Build Full Return Plan &rarr;
+      </button>
+    </div>
+  </div><!-- end hero-widgets-row -->
   </div>
 </section>
 
@@ -4910,6 +4962,32 @@ function fmtCr(v){
   if(v>=100000)return'\u20b9'+(v/100000).toFixed(1)+' L';
   return'\u20b9'+Math.round(v).toLocaleString('en-IN');
 }
+function calcHeroCorpus(monthly){
+  monthly=monthly||120000;
+  var years=5,inflation=0.06,roi=0.08;
+  var returnMonthly=monthly*Math.pow(1+inflation,years);
+  var shortfall=Math.max(0,returnMonthly);
+  var netRate=roi-inflation;
+  var corpus=netRate>0?shortfall*12/netRate:shortfall*12*30;
+  // SIP at 12%
+  var mr=0.01,n=years*12;
+  var sip=corpus*mr/(Math.pow(1+mr,n)-1);
+  // Sustain years
+  var c=corpus,em=returnMonthly,survive=0;
+  for(var y=1;y<=50;y++){c=c+c*roi-em*12;em*=(1+inflation);if(c>0)survive=y;else break;}
+  var el=document.getElementById('hcp-corpus');
+  var sipEl=document.getElementById('hcp-sip');
+  var susEl=document.getElementById('hcp-sustain');
+  if(el)el.textContent=fmtCr(corpus);
+  if(sipEl)sipEl.textContent=sip>0?'₹'+Math.round(sip/1000).toFixed(0)+'K/mo':'₹—';
+  if(susEl)susEl.textContent=survive>=40?'40+ yrs':survive+' yrs';
+}
+function hcpSetCity(btn){
+  document.querySelectorAll('.hcp-city-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  calcHeroCorpus(parseFloat(btn.dataset.monthly)||120000);
+}
+
 function calcRtpPreview(){
   const monthly=parseFloat(document.getElementById('rtp-p-monthly').value)||120000;
   const years=parseInt(document.getElementById('rtp-p-years').value)||5;
@@ -4957,7 +5035,7 @@ function calcRtpPreview(){
   }
 }
 // Init on page load
-window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();});
+window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);});
 
 </script>
 </body>
