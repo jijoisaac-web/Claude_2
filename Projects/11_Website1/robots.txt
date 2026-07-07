@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
-Sitemap: https://nri-finance-hub.pages.dev/sitemap.xml
+Disallow: /.env
+Disallow: /.env.bak
+Disallow: /.env.backup
+
+Sitemap: https://nrifinancehub.com/sitemap.xml
