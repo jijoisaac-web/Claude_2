@@ -171,6 +171,24 @@
   ]
 }
 </script>
+<script>
+/* Expose baseCur (let variable) via window — reads live from currency button */
+Object.defineProperty(window,'baseCur',{
+  get:function(){var e=document.getElementById('curBtnCode');return e?e.textContent.trim()||'AED':'AED';},
+  configurable:true
+});
+/* Re-render Flights tab whenever currency changes */
+document.addEventListener('DOMContentLoaded',function(){
+  var btn=document.getElementById('curBtnCode');
+  if(!btn)return;
+  new MutationObserver(function(){
+    var fl=document.getElementById('tab-flights');
+    if(fl&&fl.style.display!=='none'&&typeof window.initFlights==='function'){
+      setTimeout(window.initFlights,60);
+    }
+  }).observe(btn,{characterData:true,childList:true,subtree:true});
+});
+</script>
 </head>
 <body>
 
