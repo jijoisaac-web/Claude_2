@@ -1534,7 +1534,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.5</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v4.6</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -3206,31 +3206,17 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <p>Calculate TDS under Section 195 when selling Indian property as an NRI · Based on Finance Act 2024</p>
       </div>
     </div>
-    <div class="calc-grid" style="grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-      <div class="calc-field">
-        <label>Sale Price (₹)</label>
-        <input type="number" id="pt-sale" value="5000000" min="0" oninput="calcPropTDS()"/>
-      </div>
-      <div class="calc-field">
-        <label>Purchase Price / Cost (₹)</label>
-        <input type="number" id="pt-cost" value="2500000" min="0" oninput="calcPropTDS()"/>
-      </div>
-      <div class="calc-field">
-        <label>Holding Period</label>
-        <select id="pt-hold" onchange="calcPropTDS()">
-          <option value="lt">Short-term (&lt; 2 years)</option>
-          <option value="gt" selected>Long-term (2+ years)</option>
-        </select>
-      </div>
-      <div class="calc-field">
-        <label>Property Type</label>
-        <select id="pt-type" onchange="calcPropTDS()">
-          <option value="res" selected>Residential</option>
-          <option value="com">Commercial</option>
-        </select>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Property Sale Details</div>
+      <div class="card-sub">Enter sale price and purchase cost — TDS is deducted by the buyer before payment to NRI</div>
+      <div class="fg">
+        <div class="f"><label>Sale Price (&#8377;)</label><input type="number" id="pt-sale" value="5000000" min="0" oninput="calcPropTDS()"/></div>
+        <div class="f"><label>Purchase / Cost Price (&#8377;)</label><input type="number" id="pt-cost" value="2500000" min="0" oninput="calcPropTDS()"/></div>
+        <div class="f"><label>Holding Period</label><select id="pt-hold" onchange="calcPropTDS()"><option value="lt">Short-term (&lt; 2 years)</option><option value="gt" selected>Long-term (2+ years)</option></select></div>
+        <div class="f"><label>Property Type</label><select id="pt-type" onchange="calcPropTDS()"><option value="res" selected>Residential</option><option value="com">Commercial</option></select></div>
       </div>
     </div>
-    <div class="calc-results" id="pt-results">
+    <div class="card"><div class="calc-results" id="pt-results">
       <div class="ed-stat-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="ed-stat-box">
           <div class="ed-stat-box-lbl">TDS Rate</div>
@@ -3254,7 +3240,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         </div>
       </div>
       <div class="tr-rules-card" id="pt-advice" style="margin-top:16px;"></div>
-    </div>
+    </div></div>
     <div class="info-cards-grid" style="margin-top:20px;">
       <div class="info-card">
         <div class="info-card-title">📋 What is Section 195 TDS?</div>
@@ -3281,29 +3267,17 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <p>Check your PF withdrawal amount, taxability &amp; EPS pension — for NRIs leaving India</p>
       </div>
     </div>
-    <div class="calc-grid" style="grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-      <div class="calc-field">
-        <label>EPF Balance (₹)</label>
-        <input type="number" id="epf-bal" value="500000" min="0" oninput="calcEPF()"/>
-      </div>
-      <div class="calc-field">
-        <label>Years of Service</label>
-        <input type="number" id="epf-yrs" value="6" min="0" max="40" step="0.5" oninput="calcEPF()"/>
-      </div>
-      <div class="calc-field">
-        <label>Last Basic + DA Salary (₹/mo)</label>
-        <input type="number" id="epf-sal" value="50000" min="0" oninput="calcEPF()"/>
-      </div>
-      <div class="calc-field">
-        <label>Reason for Withdrawal</label>
-        <select id="epf-reason" onchange="calcEPF()">
-          <option value="nri" selected>Left India / Becoming NRI</option>
-          <option value="retire">Retirement (58+)</option>
-          <option value="resign">Resigned / Unemployed 2+ months</option>
-        </select>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-bar"></div>Your EPF Details</div>
+      <div class="card-sub">Check your EPF balance on the EPFO UAN portal before entering — balance includes both employee and employer contributions</div>
+      <div class="fg">
+        <div class="f"><label>EPF Balance (&#8377;)</label><input type="number" id="epf-bal" value="500000" min="0" oninput="calcEPF()"/></div>
+        <div class="f"><label>Years of Service</label><input type="number" id="epf-yrs" value="6" min="0" max="40" step="0.5" oninput="calcEPF()"/></div>
+        <div class="f"><label>Last Basic + DA Salary (&#8377;/mo)</label><input type="number" id="epf-sal" value="50000" min="0" oninput="calcEPF()"/></div>
+        <div class="f"><label>Reason for Withdrawal</label><select id="epf-reason" onchange="calcEPF()"><option value="nri" selected>Left India / Becoming NRI</option><option value="retire">Retirement (58+)</option><option value="resign">Resigned / Unemployed 2+ months</option></select></div>
       </div>
     </div>
-    <div class="calc-results" id="epf-results">
+    <div class="card"><div class="calc-results" id="epf-results">
       <div class="ed-stat-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="ed-stat-box">
           <div class="ed-stat-box-lbl">EPF Withdrawal</div>
@@ -3327,7 +3301,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         </div>
       </div>
       <div class="tr-rules-card" id="epf-advice" style="margin-top:16px;"></div>
-    </div>
+    </div></div>
     <div class="info-cards-grid" style="margin-top:20px;">
       <div class="info-card">
         <div class="info-card-title">🌍 NRI &amp; EPF Rules</div>
@@ -3473,7 +3447,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.5 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v4.6 · Jul 2026</p>
     </div>
   </div>
 </footer>
