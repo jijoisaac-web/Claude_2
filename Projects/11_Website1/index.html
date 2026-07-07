@@ -1293,6 +1293,18 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tr-rules-card{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);border-radius:13px;padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px;}
 [data-theme="light"] .tr-days-inp{color:#111;}
 [data-theme="light"] .tr-yr-dot{background:rgba(0,0,0,0.15);}
+
+/* ── RTP Breakdown panel ─────────────────────────── */
+.rtp-breakdown{border-top:1px solid var(--border);margin-top:12px;padding-top:14px;}
+.rtp-bd-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;}
+.rtp-sip-tile{display:flex;justify-content:space-between;align-items:center;background:var(--elevated);border:1px solid var(--border);border-radius:11px;padding:11px 14px;margin-bottom:12px;}
+.rtp-sip-lbl{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:2px;}
+.rtp-sip-sub{font-size:10px;color:var(--muted);}
+.rtp-sip-val{font-size:17px;font-weight:900;color:var(--teal);white-space:nowrap;}
+.rtp-plan-hdr{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+.rtp-checklist{display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;}
+.rtp-checkitem{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;line-height:1.4;}
+.rtp-checkitem .rci{color:var(--teal);font-weight:700;font-size:11px;}
 </style>
 </head>
 <body>
@@ -1695,6 +1707,26 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
         <div class="rtp-stat-val" id="rtp-r-sustain">30+ yrs</div>
         <div class="rtp-stat-sub">Assuming no other income</div>
         <div class="rtp-timeline"><div class="rtp-timeline-fill" id="rtp-r-bar" style="width:100%"></div></div>
+      </div>
+      <!-- Corpus build breakdown -->
+      <div class="rtp-breakdown">
+        <div class="rtp-bd-title">&#128200; To Build This Corpus</div>
+        <div class="rtp-sip-tile">
+          <div>
+            <div class="rtp-sip-lbl">Monthly SIP needed</div>
+            <div class="rtp-sip-sub">Equity mutual funds · 12% p.a.</div>
+          </div>
+          <div class="rtp-sip-val" id="rtp-r-sip">&#8377;—</div>
+        </div>
+        <div class="rtp-plan-hdr">Full plan also covers</div>
+        <div class="rtp-checklist">
+          <div class="rtp-checkitem"><span class="rci">✓</span>Tax on return</div>
+          <div class="rtp-checkitem"><span class="rci">✓</span>NRE account exit</div>
+          <div class="rtp-checkitem"><span class="rci">✓</span>Healthcare corpus</div>
+          <div class="rtp-checkitem"><span class="rci">✓</span>Property checklist</div>
+          <div class="rtp-checkitem"><span class="rci">✓</span>Children education</div>
+          <div class="rtp-checkitem"><span class="rci">✓</span>Emergency buffer</div>
+        </div>
       </div>
       <div class="rtp-cta-row">
         <button class="rtp-full-btn" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">
@@ -4901,6 +4933,12 @@ function calcRtpPreview(){
   document.getElementById('rtp-r-monthly').textContent='\u20b9'+Math.round(returnMonthly).toLocaleString('en-IN');
   document.getElementById('rtp-r-monthly-sub').textContent='After 6% inflation over '+years+' yr'+(years>1?'s':'');
   document.getElementById('rtp-r-corpus').textContent=fmtCr(corpusNeeded);
+  // SIP needed to build corpus in N years at 12% p.a.
+  const sipRate=0.01; // 12%/12
+  const sipN=years*12;
+  const sipNeeded=sipN>0&&sipRate>0?corpusNeeded*sipRate/(Math.pow(1+sipRate,sipN)-1):0;
+  const sipEl=document.getElementById('rtp-r-sip');
+  if(sipEl)sipEl.textContent=sipNeeded>0?'\u20b9'+Math.round(sipNeeded).toLocaleString('en-IN')+'/mo':'\u20b9—';
   const card=document.getElementById('rtp-r-sustain-card');
   if(survive>=40){
     document.getElementById('rtp-r-sustain').textContent='40+ yrs';
