@@ -187,7 +187,7 @@
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v5.4</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v5.5</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -806,7 +806,7 @@
     <div class="drawer-head">
       <div>
         <div class="drawer-brand">NRI <span>Finance Hub</span></div>
-        <div class="drawer-sub">7 tools for Indians abroad</div>
+        <div class="drawer-sub">18+ tools for Indians abroad</div>
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
@@ -863,6 +863,11 @@
     <div class="drawer-item" data-tab="edplan" onclick="showTab('edplan',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
+    </div>
+    <div class="drawer-section-lbl">Travel</div>
+    <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Flights to India</div><div class="drawer-desc">Fare ranges &amp; best booking sites</div></div>
     </div>
     <div class="drawer-section-lbl">Budgeting</div>
     <div class="drawer-item" data-tab="budget" onclick="showTab('budget',this)">
@@ -2193,6 +2198,26 @@
       </div>
     </div>
   </div>
+
+  <!-- TAB: FLIGHTS TO INDIA -->
+  <div class="tool-section" id="tab-flights">
+  <div class="calc-cur-bar" id="ccb-flights"><span class="ccb-flag" id="ccb-flag-flights"></span><span class="ccb-rate" id="ccb-rate-flights">Showing fares in your currency</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-flights" type="number" placeholder="Amount" oninput="ccbConvert('flights')"/><span id="ccb-cur-flights" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">&rarr;</span><span class="ccb-result" id="ccb-out-flights">&#8377;&mdash;</span></div></div>
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(7,112,227,0.12),rgba(56,189,248,0.06));border-color:rgba(7,112,227,0.3);">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
+      <div class="tool-banner-body">
+        <div class="tool-banner-title">Flights to India</div>
+        <div class="tool-banner-sub">Typical round-trip fares from your country to top Indian cities. Select your departure airport below, then click any destination to search live prices.</div>
+      </div>
+    </div>
+    <div class="card">
+      <p id="fl-cur-label" style="font-size:11px;color:var(--muted);margin:0 0 12px;line-height:1.5;">Loading route data&hellip;</p>
+      <div class="fl-origin-lbl">Departure airport</div>
+      <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
+    </div>
+    <div id="fl-dest-grid" class="fl-dest-grid"><!-- JS renders destination cards --></div>
+    <div class="aff-disclaimer" style="text-align:center;font-size:9px;color:var(--muted);padding:8px 0 4px;">&#9992; Prices are typical economy round-trip ranges &mdash; actual fares vary by date &amp; airline. Always verify on Skyscanner or Google Flights before booking.</div>
+  </div>
+
 </div><!-- /.main -->
 
 <!-- FOOTER -->
@@ -2240,7 +2265,7 @@
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v5.4 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v5.5 · Jul 2026</p>
     </div>
   </div>
 </footer>

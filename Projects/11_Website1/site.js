@@ -2558,3 +2558,122 @@ function closeNavDD(){
 })();
 // ── END BUDGET TRACKER ─────────────────────────────────────────────────────
 
+
+
+// ── FLIGHTS TO INDIA ──────────────────────────────────────────────────────
+(function(){
+  const FL={
+    AED:{country:'UAE',origins:[{code:'DXB',name:'Dubai'},{code:'AUH',name:'Abu Dhabi'},{code:'SHJ',name:'Sharjah'}],
+      routes:{BOM:{min:800,max:2400,dur:'~3–4 hrs',airlines:'Air India, IndiGo, Emirates, flydubai'},DEL:{min:900,max:2600,dur:'~3–4 hrs',airlines:'Air India, IndiGo, Emirates, flydubai'},BLR:{min:900,max:2500,dur:'~3–4 hrs',airlines:'IndiGo, Air India, Air Arabia'},MAA:{min:800,max:2300,dur:'~3–4 hrs',airlines:'IndiGo, Air India, Emirates'},HYD:{min:850,max:2400,dur:'~3–4 hrs',airlines:'IndiGo, Air India, flydubai'},COK:{min:650,max:1800,dur:'~3 hrs',airlines:'Air Arabia, IndiGo, Air India Express'},CCU:{min:1000,max:2700,dur:'~4–5 hrs',airlines:'IndiGo, Air India'},TRV:{min:700,max:1900,dur:'~3 hrs',airlines:'Air India Express, Air Arabia'},AMD:{min:850,max:2400,dur:'~3 hrs',airlines:'IndiGo, Air India'},GOI:{min:900,max:2500,dur:'~3–4 hrs',airlines:'IndiGo, Air India Express'}}},
+    SAR:{country:'Saudi Arabia',origins:[{code:'RUH',name:'Riyadh'},{code:'JED',name:'Jeddah'},{code:'DMM',name:'Dammam'}],
+      routes:{BOM:{min:700,max:2000,dur:'~3–4 hrs',airlines:'IndiGo, Air India, Saudia'},DEL:{min:750,max:2100,dur:'~4 hrs',airlines:'Air India, IndiGo, Saudia'},BLR:{min:800,max:2200,dur:'~4 hrs',airlines:'IndiGo, Air India'},MAA:{min:700,max:2000,dur:'~4 hrs',airlines:'IndiGo, Air India'},HYD:{min:750,max:2100,dur:'~4 hrs',airlines:'IndiGo, Air India'},COK:{min:600,max:1700,dur:'~3–4 hrs',airlines:'Air India Express, IndiGo'},CCU:{min:900,max:2400,dur:'~5 hrs',airlines:'IndiGo, Air India'},TRV:{min:650,max:1800,dur:'~3–4 hrs',airlines:'Air India Express'},AMD:{min:750,max:2100,dur:'~4 hrs',airlines:'IndiGo, Air India'},GOI:{min:800,max:2200,dur:'~4 hrs',airlines:'IndiGo, Air India'}}},
+    QAR:{country:'Qatar',origins:[{code:'DOH',name:'Doha'}],
+      routes:{BOM:{min:800,max:2200,dur:'~3 hrs',airlines:'Qatar Airways, IndiGo, Air India'},DEL:{min:850,max:2300,dur:'~3–4 hrs',airlines:'Qatar Airways, Air India, IndiGo'},BLR:{min:850,max:2300,dur:'~3–4 hrs',airlines:'Qatar Airways, IndiGo'},MAA:{min:800,max:2200,dur:'~3–4 hrs',airlines:'Qatar Airways, IndiGo'},HYD:{min:820,max:2200,dur:'~3–4 hrs',airlines:'Qatar Airways, IndiGo'},COK:{min:700,max:1900,dur:'~3 hrs',airlines:'Qatar Airways, Air India Express'},CCU:{min:950,max:2500,dur:'~4 hrs',airlines:'Qatar Airways, IndiGo'},TRV:{min:750,max:2000,dur:'~3 hrs',airlines:'Qatar Airways'},AMD:{min:850,max:2300,dur:'~3–4 hrs',airlines:'Qatar Airways, IndiGo'},GOI:{min:900,max:2400,dur:'~3–4 hrs',airlines:'Qatar Airways, IndiGo'}}},
+    KWD:{country:'Kuwait',origins:[{code:'KWI',name:'Kuwait City'}],
+      routes:{BOM:{min:80,max:220,dur:'~3–4 hrs',airlines:'Jazeera Airways, Air India Express, IndiGo'},DEL:{min:85,max:240,dur:'~4 hrs',airlines:'Air India, IndiGo, Jazeera Airways'},BLR:{min:90,max:235,dur:'~4 hrs',airlines:'IndiGo, Air India'},MAA:{min:80,max:220,dur:'~4 hrs',airlines:'IndiGo, Air India'},HYD:{min:85,max:225,dur:'~4 hrs',airlines:'IndiGo, Air India'},COK:{min:70,max:175,dur:'~3 hrs',airlines:'Air India Express, IndiGo'},CCU:{min:95,max:255,dur:'~5 hrs',airlines:'IndiGo, Air India'},TRV:{min:75,max:185,dur:'~3 hrs',airlines:'Air India Express'},AMD:{min:85,max:225,dur:'~4 hrs',airlines:'IndiGo, Air India'},GOI:{min:90,max:235,dur:'~4 hrs',airlines:'IndiGo, Air India'}}},
+    BHD:{country:'Bahrain',origins:[{code:'BAH',name:'Bahrain'}],
+      routes:{BOM:{min:90,max:240,dur:'~3 hrs',airlines:'Air Arabia, Gulf Air, IndiGo'},DEL:{min:95,max:255,dur:'~3–4 hrs',airlines:'Air Arabia, Gulf Air, Air India'},BLR:{min:95,max:250,dur:'~3–4 hrs',airlines:'IndiGo, Air Arabia'},MAA:{min:90,max:240,dur:'~3–4 hrs',airlines:'IndiGo, Gulf Air'},HYD:{min:90,max:245,dur:'~3–4 hrs',airlines:'IndiGo, Air Arabia'},COK:{min:78,max:195,dur:'~3 hrs',airlines:'Air Arabia, Air India Express'},CCU:{min:105,max:270,dur:'~4–5 hrs',airlines:'IndiGo, Gulf Air'},TRV:{min:82,max:200,dur:'~3 hrs',airlines:'Air Arabia, Air India Express'},AMD:{min:90,max:250,dur:'~3–4 hrs',airlines:'IndiGo, Air Arabia'},GOI:{min:95,max:255,dur:'~3–4 hrs',airlines:'IndiGo, Air Arabia'}}},
+    OMR:{country:'Oman',origins:[{code:'MCT',name:'Muscat'}],
+      routes:{BOM:{min:90,max:250,dur:'~3 hrs',airlines:'Oman Air, Air India, IndiGo'},DEL:{min:95,max:260,dur:'~3–4 hrs',airlines:'Oman Air, Air India, IndiGo'},BLR:{min:95,max:255,dur:'~3–4 hrs',airlines:'IndiGo, Oman Air'},MAA:{min:90,max:250,dur:'~3–4 hrs',airlines:'IndiGo, Oman Air'},HYD:{min:92,max:255,dur:'~3–4 hrs',airlines:'IndiGo, Oman Air'},COK:{min:78,max:200,dur:'~3 hrs',airlines:'Air India Express, Oman Air'},CCU:{min:100,max:270,dur:'~4–5 hrs',airlines:'IndiGo, Oman Air'},TRV:{min:80,max:205,dur:'~3 hrs',airlines:'Oman Air, Air India Express'},AMD:{min:92,max:255,dur:'~3–4 hrs',airlines:'IndiGo, Oman Air'},GOI:{min:95,max:260,dur:'~3–4 hrs',airlines:'IndiGo, Oman Air'}}},
+    SGD:{country:'Singapore',origins:[{code:'SIN',name:'Singapore'}],
+      routes:{BOM:{min:350,max:900,dur:'~5–6 hrs',airlines:'IndiGo, Air India, Singapore Airlines'},DEL:{min:350,max:900,dur:'~6 hrs',airlines:'Air India, Singapore Airlines, IndiGo'},BLR:{min:320,max:850,dur:'~5 hrs',airlines:'IndiGo, Air India, Scoot'},MAA:{min:300,max:800,dur:'~4–5 hrs',airlines:'IndiGo, Scoot, Air India'},HYD:{min:320,max:850,dur:'~5–6 hrs',airlines:'IndiGo, Air India'},COK:{min:350,max:900,dur:'~5 hrs',airlines:'IndiGo, Air India, Scoot'},CCU:{min:380,max:950,dur:'~3–4 hrs',airlines:'IndiGo, Air India, Scoot'},TRV:{min:330,max:850,dur:'~5 hrs',airlines:'Scoot, Air India'},AMD:{min:360,max:900,dur:'~6 hrs',airlines:'IndiGo, Air India'},GOI:{min:370,max:920,dur:'~5 hrs',airlines:'IndiGo, Air India'}}},
+    MYR:{country:'Malaysia',origins:[{code:'KUL',name:'Kuala Lumpur'},{code:'PEN',name:'Penang'}],
+      routes:{BOM:{min:1200,max:3200,dur:'~5–6 hrs',airlines:'AirAsia, Air India, Batik Air'},DEL:{min:1200,max:3200,dur:'~6 hrs',airlines:'AirAsia, Air India, MAS'},BLR:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},MAA:{min:1000,max:2800,dur:'~4 hrs',airlines:'AirAsia, IndiGo'},HYD:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},COK:{min:1150,max:3100,dur:'~5 hrs',airlines:'AirAsia, Air India'},CCU:{min:1300,max:3400,dur:'~3 hrs',airlines:'Batik Air, IndiGo'},TRV:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia'},AMD:{min:1200,max:3200,dur:'~6 hrs',airlines:'AirAsia, IndiGo'},GOI:{min:1250,max:3300,dur:'~5–6 hrs',airlines:'AirAsia, IndiGo'}}},
+    AUD:{country:'Australia',origins:[{code:'SYD',name:'Sydney'},{code:'MEL',name:'Melbourne'},{code:'PER',name:'Perth'},{code:'BNE',name:'Brisbane'}],
+      routes:{BOM:{min:900,max:2400,dur:'~14–18 hrs',airlines:'Qantas, Air India, Singapore Airlines'},DEL:{min:900,max:2400,dur:'~15–18 hrs',airlines:'Air India, Qantas, Emirates'},BLR:{min:950,max:2500,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},MAA:{min:1000,max:2600,dur:'~13–17 hrs',airlines:'Singapore Airlines, Air India'},HYD:{min:950,max:2500,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},COK:{min:1000,max:2600,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},CCU:{min:1050,max:2700,dur:'~12–15 hrs',airlines:'Singapore Airlines, Air India'},TRV:{min:1000,max:2600,dur:'~13–17 hrs',airlines:'Air India, Singapore Airlines'},AMD:{min:950,max:2500,dur:'~15–18 hrs',airlines:'Air India, Singapore Airlines'},GOI:{min:1000,max:2600,dur:'~14–18 hrs',airlines:'Air India, Singapore Airlines'}}},
+    NZD:{country:'New Zealand',origins:[{code:'AKL',name:'Auckland'},{code:'WLG',name:'Wellington'}],
+      routes:{BOM:{min:1800,max:4200,dur:'~20–24 hrs',airlines:'Air India, Singapore Airlines, Emirates'},DEL:{min:1800,max:4200,dur:'~20–24 hrs',airlines:'Air India, Singapore Airlines'},BLR:{min:1900,max:4400,dur:'~20–25 hrs',airlines:'Singapore Airlines, Air India'},MAA:{min:1900,max:4400,dur:'~18–22 hrs',airlines:'Singapore Airlines, Air India'},HYD:{min:1900,max:4400,dur:'~20–24 hrs',airlines:'Singapore Airlines, Air India'},COK:{min:1950,max:4500,dur:'~20–24 hrs',airlines:'Singapore Airlines, Air India'},CCU:{min:2000,max:4600,dur:'~18–22 hrs',airlines:'Singapore Airlines, Air India'},TRV:{min:1950,max:4500,dur:'~18–22 hrs',airlines:'Air India, Singapore Airlines'},AMD:{min:1900,max:4400,dur:'~20–25 hrs',airlines:'Singapore Airlines, Air India'},GOI:{min:1950,max:4500,dur:'~20–25 hrs',airlines:'Singapore Airlines, Air India'}}},
+    USD:{country:'USA',origins:[{code:'JFK',name:'New York (JFK)'},{code:'EWR',name:'New York (EWR)'},{code:'ORD',name:'Chicago'},{code:'LAX',name:'Los Angeles'},{code:'SFO',name:'San Francisco'},{code:'IAD',name:'Washington DC'},{code:'IAH',name:'Houston'},{code:'ATL',name:'Atlanta'}],
+      routes:{BOM:{min:700,max:1800,dur:'~16–20 hrs',airlines:'Air India, United, Emirates'},DEL:{min:650,max:1750,dur:'~16–20 hrs',airlines:'Air India (non-stop), United, Lufthansa'},BLR:{min:750,max:1900,dur:'~18–22 hrs',airlines:'Air India, United, Lufthansa'},MAA:{min:750,max:1900,dur:'~18–22 hrs',airlines:'Air India, Singapore Airlines, Lufthansa'},HYD:{min:750,max:1900,dur:'~18–22 hrs',airlines:'Air India, United, Singapore Airlines'},COK:{min:800,max:2000,dur:'~20–24 hrs',airlines:'Air India, Singapore Airlines'},CCU:{min:800,max:2000,dur:'~18–22 hrs',airlines:'Air India, Singapore Airlines'},TRV:{min:800,max:2000,dur:'~20–24 hrs',airlines:'Air India, Singapore Airlines'},AMD:{min:750,max:1900,dur:'~18–22 hrs',airlines:'Air India, Lufthansa'},GOI:{min:800,max:2000,dur:'~18–22 hrs',airlines:'Air India, Singapore Airlines'}}},
+    CAD:{country:'Canada',origins:[{code:'YYZ',name:'Toronto'},{code:'YVR',name:'Vancouver'},{code:'YUL',name:'Montreal'}],
+      routes:{BOM:{min:950,max:2400,dur:'~16–20 hrs',airlines:'Air India, Air Canada'},DEL:{min:900,max:2300,dur:'~15–19 hrs',airlines:'Air India, Air Canada'},BLR:{min:1000,max:2500,dur:'~18–22 hrs',airlines:'Air India, Air Canada'},MAA:{min:1000,max:2500,dur:'~18–22 hrs',airlines:'Air India, Air Canada'},HYD:{min:1000,max:2500,dur:'~18–22 hrs',airlines:'Air India, Air Canada'},COK:{min:1050,max:2600,dur:'~20–24 hrs',airlines:'Air India, Air Canada'},CCU:{min:1050,max:2600,dur:'~18–22 hrs',airlines:'Air India, Air Canada'},TRV:{min:1050,max:2600,dur:'~20–24 hrs',airlines:'Air India, Singapore Airlines'},AMD:{min:1000,max:2500,dur:'~18–22 hrs',airlines:'Air India, Air Canada'},GOI:{min:1050,max:2600,dur:'~18–22 hrs',airlines:'Air India, Air Canada'}}},
+    EUR:{country:'Europe (EUR)',origins:[{code:'FRA',name:'Frankfurt'},{code:'MUC',name:'Munich'},{code:'AMS',name:'Amsterdam'},{code:'CDG',name:'Paris'},{code:'ZRH',name:'Zurich'}],
+      routes:{BOM:{min:500,max:1400,dur:'~9–11 hrs',airlines:'Lufthansa, Air India, KLM'},DEL:{min:480,max:1350,dur:'~8–10 hrs',airlines:'Lufthansa, Air India (non-stop), KLM'},BLR:{min:530,max:1450,dur:'~9–12 hrs',airlines:'Lufthansa, Air India, KLM'},MAA:{min:530,max:1450,dur:'~10–13 hrs',airlines:'Air India, Lufthansa, KLM'},HYD:{min:530,max:1450,dur:'~10–13 hrs',airlines:'Air India, Lufthansa'},COK:{min:560,max:1500,dur:'~10–13 hrs',airlines:'Air India, Lufthansa'},CCU:{min:560,max:1500,dur:'~10–12 hrs',airlines:'Air India, Lufthansa'},TRV:{min:550,max:1480,dur:'~10–13 hrs',airlines:'Air India, Lufthansa'},AMD:{min:530,max:1450,dur:'~10–12 hrs',airlines:'Air India, Lufthansa'},GOI:{min:550,max:1480,dur:'~10–13 hrs',airlines:'Air India, Lufthansa'}}},
+    GBP:{country:'United Kingdom',origins:[{code:'LHR',name:'London Heathrow'},{code:'LGW',name:'London Gatwick'},{code:'BHX',name:'Birmingham'},{code:'MAN',name:'Manchester'}],
+      routes:{BOM:{min:380,max:950,dur:'~9–10 hrs',airlines:'Air India (non-stop), British Airways, Virgin'},DEL:{min:360,max:920,dur:'~8–9 hrs',airlines:'Air India (non-stop), British Airways'},BLR:{min:400,max:1000,dur:'~10–12 hrs',airlines:'Air India, British Airways'},MAA:{min:400,max:1000,dur:'~10–12 hrs',airlines:'Air India, British Airways'},HYD:{min:400,max:1000,dur:'~10–12 hrs',airlines:'Air India, British Airways'},COK:{min:420,max:1050,dur:'~10–12 hrs',airlines:'Air India, British Airways'},CCU:{min:400,max:1000,dur:'~10–12 hrs',airlines:'Air India, British Airways'},TRV:{min:410,max:1020,dur:'~10–12 hrs',airlines:'Air India, British Airways'},AMD:{min:400,max:1000,dur:'~10–12 hrs',airlines:'Air India, British Airways'},GOI:{min:420,max:1050,dur:'~10–12 hrs',airlines:'Air India, British Airways, IndiGo'}}}
+  };
+
+  const DEST={
+    BOM:{name:'Mumbai',    icon:'🏙️',tip:'Best: Nov–Jan · Cool &amp; festive'},
+    DEL:{name:'Delhi',     icon:'🕌',tip:'Best: Oct–Mar · Pleasant weather'},
+    BLR:{name:'Bangalore', icon:'💻',tip:'Best: Sep–Nov · Mild &amp; green'},
+    MAA:{name:'Chennai',   icon:'🌊',tip:'Best: Nov–Feb · Cool, post-monsoon'},
+    HYD:{name:'Hyderabad', icon:'🏯',tip:'Best: Oct–Feb · Comfortable'},
+    COK:{name:'Kochi',     icon:'⛵',tip:'Best: Oct–Feb · Backwater season'},
+    CCU:{name:'Kolkata',   icon:'🎭',tip:'Best: Oct–Feb · Durga Puja &amp; winter'},
+    TRV:{name:'Trivandrum',icon:'🏝️',tip:'Best: Oct–Feb · Coast &amp; beach'},
+    AMD:{name:'Ahmedabad', icon:'🏺',tip:'Best: Nov–Jan · Cool &amp; events'},
+    GOI:{name:'Goa',       icon:'🌴',tip:'Best: Oct–Mar · Peak beach season'}
+  };
+
+  let _flOrigin=null;
+
+  function initFlights(){
+    var cur=window.baseCur||'AED';
+    var data=FL[cur]||FL['AED'];
+    _flOrigin=data.origins[0].code;
+    var lbl=document.getElementById('fl-cur-label');
+    if(lbl) lbl.innerHTML='Showing routes from <strong>'+data.country+'</strong> ('+cur+') — change country via the currency selector above';
+    renderOrigins(data);
+    renderDests(cur,data);
+  }
+  window.initFlights=initFlights;
+
+  function renderOrigins(data){
+    var wrap=document.getElementById('fl-origins');
+    if(!wrap) return;
+    wrap.innerHTML=data.origins.map(function(o,i){
+      return '<button class="fl-pill'+(i===0?' active':'')+'" onclick="flPick(\''+o.code+'\',this)">'+o.code+' · '+o.name+'</button>';
+    }).join('');
+  }
+
+  window.flPick=function(code,el){
+    _flOrigin=code;
+    document.querySelectorAll('.fl-pill').forEach(function(p){p.classList.remove('active');});
+    el.classList.add('active');
+    var cur=window.baseCur||'AED';
+    renderDests(cur,FL[cur]||FL['AED']);
+  };
+
+  function renderDests(cur,data){
+    var wrap=document.getElementById('fl-dest-grid');
+    if(!wrap) return;
+    var from=_flOrigin||data.origins[0].code;
+    wrap.innerHTML=Object.keys(DEST).map(function(code){
+      var d=DEST[code];
+      var r=data.routes[code]||{min:'?',max:'?',dur:'varies',airlines:'Check Skyscanner'};
+      var price=typeof r.min==='number'
+        ? cur+' '+r.min.toLocaleString()+'–'+r.max.toLocaleString()
+        : '—';
+      var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/';
+      var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /,'+')+'%2C+India';
+      return '<div class="fl-dest-card">'
+        +'<div class="fl-dest-hd"><span class="fl-dest-icon">'+d.icon+'</span>'
+        +'<div><div class="fl-dest-name">'+d.name+'</div>'
+        +'<div class="fl-dest-route">'+from+' → '+code+'</div></div></div>'
+        +'<div class="fl-price">'+price+' <span class="fl-price-note">RT · Economy</span></div>'
+        +'<div class="fl-dur">'+r.dur+' · '+r.airlines+'</div>'
+        +'<div class="fl-tip">'+d.tip+'</div>'
+        +'<div class="fl-btn-row">'
+        +'<a class="fl-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">✈ Skyscanner</a>'
+        +'<a class="fl-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
+        +'</div></div>';
+    }).join('');
+  }
+
+  // Hook showTab
+  var _flShowOrig=window.showTab;
+  window.showTab=function(tabId,el){
+    if(typeof _flShowOrig==='function') _flShowOrig(tabId,el);
+    if(tabId==='flights') setTimeout(initFlights,30);
+  };
+  // Re-render on currency change (hook selectCurrency)
+  var _flCurOrig=window.selectCurrency;
+  window.selectCurrency=function(el){
+    if(typeof _flCurOrig==='function') _flCurOrig(el);
+    if(document.getElementById('tab-flights')&&document.getElementById('tab-flights').classList.contains('active')){
+      setTimeout(initFlights,80);
+    }
+  };
+})();
+// ── END FLIGHTS ────────────────────────────────────────────────────────────

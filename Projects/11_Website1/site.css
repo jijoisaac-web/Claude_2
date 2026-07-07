@@ -1397,3 +1397,30 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [style*="overflow-y:auto"]::-webkit-scrollbar{width:4px;}
 [style*="overflow-y:auto"]::-webkit-scrollbar-track{background:transparent;}
 [style*="overflow-y:auto"]::-webkit-scrollbar-thumb{background:rgba(240,165,32,0.3);border-radius:4px;}
+
+
+/* ── FLIGHTS TO INDIA ─────────────────────────────────────────────────── */
+.fl-cur-label{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
+.fl-origin-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.fl-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.fl-pill{background:var(--surface2);border:1px solid var(--border);color:var(--text2);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit;}
+.fl-pill:hover{border-color:var(--teal);color:var(--teal);}
+.fl-pill.active{background:var(--teal);border-color:var(--teal);color:#000;font-weight:700;}
+.fl-dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:16px;}
+.fl-dest-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:15px;transition:border-color .15s;}
+.fl-dest-card:hover{border-color:var(--border2);}
+.fl-dest-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.fl-dest-icon{font-size:22px;line-height:1;flex-shrink:0;}
+.fl-dest-name{font-size:15px;font-weight:700;color:var(--text);}
+.fl-dest-route{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px;letter-spacing:.03em;}
+.fl-price{font-size:17px;font-weight:800;color:var(--teal);margin-bottom:4px;line-height:1.2;}
+.fl-price-note{font-size:10px;font-weight:400;color:var(--muted);}
+.fl-dur{font-size:10px;color:var(--text2);margin-bottom:5px;line-height:1.5;}
+.fl-tip{font-size:10px;color:#f59e0b;margin-bottom:11px;font-style:italic;}
+.fl-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.fl-btn{display:block;padding:7px 8px;border-radius:7px;font-size:11px;font-weight:600;text-align:center;text-decoration:none;transition:opacity .15s;cursor:pointer;}
+.fl-btn:hover{opacity:.82;}
+.fl-btn-sky{background:#0770e3;color:#fff;}
+.fl-btn-gf{background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2);}
+[data-theme="light"] .fl-btn-gf{background:rgba(0,0,0,0.05);color:#374151;border-color:#d1d5db;}
+[data-theme="light"] .fl-dest-card{background:#f8fafc;}
