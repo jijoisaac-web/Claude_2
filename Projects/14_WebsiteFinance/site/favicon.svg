@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0d1117"/>
+  <!-- trend line -->
+  <polyline points="10,46 24,34 34,40 54,16" fill="none" stroke="#58a6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <!-- green candle -->
+  <line x1="22" y1="18" x2="22" y2="52" stroke="#3fb950" stroke-width="2.5"/>
+  <rect x="16.5" y="26" width="11" height="16" rx="2" fill="#3fb950"/>
+  <!-- red candle -->
+  <line x1="42" y1="12" x2="42" y2="44" stroke="#f85149" stroke-width="2.5"/>
+  <rect x="36.5" y="20" width="11" height="14" rx="2" fill="#f85149"/>
+</svg>

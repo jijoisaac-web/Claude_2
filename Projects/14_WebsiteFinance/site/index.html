@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>India Shares Tracker</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="favicon.svg">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.1/lightweight-charts.standalone.production.min.js"></script>
 <script src="universe.js"></script>
 <style>
@@ -132,7 +135,7 @@ progress{width:180px;accent-color:var(--blue);}
   <div id="fundView"><div class="loading">Select a stock</div></div>
 </section>
 
-<div class="disclaimer">Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
+<div class="disclaimer"><span id="versionTag"></span> · Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
 </main>
 
 <script>
@@ -436,6 +439,8 @@ async function loadFundamentals(){
     `</optgroup>`).join("");
   $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
   $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
+  $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
+  document.querySelector("header h1").title = "v" + APP_VERSION;
   loadDashboard();
 })();
 </script>

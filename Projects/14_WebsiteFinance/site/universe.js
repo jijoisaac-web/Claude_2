@@ -1,6 +1,8 @@
 // Stock universes — generated from official NSE constituent lists (nsearchives.nseindia.com), July 2026.
 // Yahoo Finance symbols: NSE symbol + ".NS"
 
+const APP_VERSION = "1.2.0";
+
 const INDICES = {
   "^NSEI": "NIFTY 50",
   "^NSEBANK": "NIFTY BANK",
