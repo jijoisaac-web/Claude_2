@@ -1,4 +1,4 @@
-/* v6.0 */
+/* v6.1 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2818,6 +2818,27 @@ function closeNavDD(){
   // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
   // ─── DATE WINDOW ENGINE ──────────────────────────────────────────────────
   var _flTripDays=10;
+  var _flCabinClass='economy';
+
+  // Business class fare multipliers by currency (vs economy base)
+  var BUSINESS_MULT={
+    AED:3.5,SAR:3.5,QAR:3.8,KWD:3.5,BHD:3.5,OMR:3.5,
+    SGD:4.0,MYR:3.8,
+    AUD:4.2,NZD:4.5,
+    USD:4.0,CAD:4.2,
+    EUR:3.8,GBP:3.8
+  };
+
+  // Airlines that only operate economy (no business cabin)
+  var ECONOMY_ONLY_AIRLINES=['airasia','indigo','spicejet','goair','akasa','flydubai','air arabia','wizz','scoot','jetstar'];
+
+  function _isEconomyOnly(airlinesStr){
+    var al=(airlinesStr||'').toLowerCase();
+    for(var i=0;i<ECONOMY_ONLY_AIRLINES.length;i++){
+      if(al.indexOf(ECONOMY_ONLY_AIRLINES[i])>=0) return true;
+    }
+    return false;
+  }
 
   function _addDays(d,n){var r=new Date(d.getTime());r.setDate(r.getDate()+n);return r;}
 
@@ -2888,6 +2909,13 @@ function closeNavDD(){
     if(inp&&inp.value.trim())flPlanTrip();
   };
 
+  window.flCabinSet=function(cls,btn){
+    _flCabinClass=cls;
+    document.querySelectorAll('.fl-cabin-btn').forEach(function(b){b.classList.remove('fl-cabin-active');});
+    if(btn)btn.classList.add('fl-cabin-active');
+    flPlanTrip();
+  };
+
   window.flPlanTrip=function(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
@@ -2935,6 +2963,10 @@ function closeNavDD(){
     var flData=FL[cur]||FL['AED'];
     var route=destCode&&flData.routes[destCode]?flData.routes[destCode]:null;
     var tripDays=_flTripDays||10;
+    var cabinClass=_flCabinClass||'economy';
+    var bizMult=BUSINESS_MULT[cur]||3.8;
+    var cabinFareMult=(cabinClass==='business')?bizMult:1.0;
+    var economyOnly=route?_isEconomyOnly(route.airlines):false;
 
     // ── Build result HTML ──
     var html='<div class="fl-plan">';
@@ -2948,11 +2980,18 @@ function closeNavDD(){
       +'<button class="fl-dur-btn'+(tripDays===10?' fl-dur-active':'')+'" onclick="flDurSet(10,this)">10 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===14?' fl-dur-active':'')+'" onclick="flDurSet(14,this)">14 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===30?' fl-dur-active':'')+'" onclick="flDurSet(30,this)">30 nights</button>'
+      +'</div>'
+      // Cabin class picker
+      +'<div class="fl-cabin-row">'
+      +'<span class="fl-dur-label">Cabin:</span>'
+      +'<button class="fl-cabin-btn'+(_flCabinClass==='economy'?' fl-cabin-active':'')+'" onclick="flCabinSet(&quot;economy&quot;,this)">&#9992; Economy</button>'
+      +'<button class="fl-cabin-btn'+(_flCabinClass==='business'?' fl-cabin-active':'')+'" onclick="flCabinSet(&quot;business&quot;,this)">&#128188; Business</button>'
       +'</div>';
 
     // ── Header ──
     var destLabel=d?d.icon+' '+d.name:'India';
-    html+='<div class="fl-plan-hd">✦ Date Decision Tool — '+cur+' → '+destLabel+'</div>';
+    var cabinLabel=(_flCabinClass==='business')?'💼 Business':'✈ Economy';
+    html+='<div class="fl-plan-hd">✦ Date Decision Tool — '+cur+' → '+destLabel+' &nbsp;<span class="fl-cabin-badge">'+cabinLabel+'</span></div>';
 
     if(!d){
       html+='<div class="fl-plan-section"><div class="fl-plan-sub">💡 Mention a city: Mumbai, Goa, Kochi, Delhi, Bangalore, Hyderabad, Chennai, Kolkata, Trivandrum, Ahmedabad</div></div>';
@@ -2986,9 +3025,9 @@ function closeNavDD(){
         var depDate=w.dep;
         var retDate=w.ret;
 
-        // Fare estimates (w.idx is the monthly price multiplier)
-        var rtMin=Math.round(route.min*w.idx);
-        var rtMax=Math.round(route.max*w.idx);
+        // Fare estimates (w.idx is monthly price multiplier × cabin class)
+        var rtMin=Math.round(route.min*w.idx*cabinFareMult);
+        var rtMax=Math.round(route.max*w.idx*cabinFareMult);
         var outMin=Math.round(rtMin*0.55);
         var outMax=Math.round(rtMax*0.60);
         var retMin=Math.round(rtMin*0.42);
@@ -3003,9 +3042,10 @@ function closeNavDD(){
         // Skyscanner URLs
         var depSK=_fmtSK(depDate);
         var retSK=_fmtSK(retDate);
-        var skRT='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/';
-        var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/';
-        var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/';
+        var _skCabin=cabinClass==='business'?'?cabin=business':'?cabin=economy';
+        var skRT='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/'+_skCabin;
+        var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+_skCabin;
+        var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/'+_skCabin;
 
         // Group multiplier
         var gMult=groupN>1?' (×'+groupN+')':'';
@@ -3044,6 +3084,7 @@ function closeNavDD(){
           +'<div class="fl-win-fare-row fl-win-fare-muted"><span class="fl-win-fare-lbl">🔄 vs Round-trip'+gMult+'</span><span class="fl-win-fare-val">'+cur+' '+grpRtMin.toLocaleString()+'–'+grpRtMax.toLocaleString()+' &nbsp;·&nbsp; '+savNote+'</span></div>'
           +'</div>'
           +connTip
+          +(economyOnly&&cabinClass==='business'?'<div class="fl-win-economy-note">⚠️ Most flights on this route ('+route.airlines+') are <strong>economy-only</strong>. Check Air India or Emirates for business class availability.</div>':'')
           +'<div class="fl-win-btns">'
           +'<a class="fl-win-btn fl-win-btn-main" href="'+skRT+'" target="_blank" rel="noopener">Round-trip ↗</a>'
           +'<a class="fl-win-btn" href="'+skOut+'" target="_blank" rel="noopener">Outbound only ↗</a>'
