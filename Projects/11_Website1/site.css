@@ -1,4 +1,4 @@
-/* v5.9 */
+/* v6.0 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1550,4 +1550,29 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 
 /* ── Festival warning in planner ── */
 .fl-plan-festival{background:color-mix(in srgb,#f59e0b 10%,var(--card));border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px;font-size:.82rem;color:var(--fg);margin-bottom:12px;}
+
+/* ── Flights mobile ── */
+@media(max-width:640px){
+  .fl-dest-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .fl-card{padding:12px 10px;}
+  .fl-card-name{font-size:.82rem;}
+  .fl-price{font-size:.88rem;}
+  .fl-planner-input-row{flex-direction:column;gap:8px;}
+  .fl-planner-input{width:100%;box-sizing:border-box;}
+  .fl-planner-btn{width:100%;justify-content:center;}
+  .fl-dur-row{gap:6px;}
+  .fl-dur-btn{padding:5px 10px;font-size:.72rem;}
+  .fl-win-dates{flex-direction:column;gap:6px;}
+  .fl-win-arrow{transform:rotate(90deg);align-self:center;}
+  .fl-win-btns{flex-direction:column;}
+  .fl-win-btn{text-align:center;}
+  .fl-deal-strip{font-size:.75rem;gap:10px;padding:10px 12px;}
+  .fl-hm-row{gap:2px;}
+  .fl-hm-cell{min-width:22px;font-size:.6rem;padding:3px 2px;}
+  .fl-conn{padding:8px 10px;}
+}
+@media(max-width:380px){
+  .fl-dest-grid{grid-template-columns:1fr;}
+  .fl-dur-btn{padding:4px 8px;font-size:.7rem;}
+}
 

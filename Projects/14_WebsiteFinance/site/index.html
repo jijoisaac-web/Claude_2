@@ -77,8 +77,17 @@ button.btn.danger{background:none;border:none;color:var(--red);cursor:pointer;fo
 .signal-detail{color:var(--muted);font-size:12px;display:block;margin-top:2px;text-align:left;}
 .disclaimer{color:var(--muted);font-size:11px;margin-top:24px;padding-top:12px;border-top:1px solid var(--border);}
 progress{width:180px;accent-color:var(--blue);}
+#searchWrap{position:relative;margin-left:auto;}
+#globalSearch{background:#0d1117;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:13px;width:200px;}
+#searchResults{position:absolute;top:36px;right:0;width:280px;background:var(--panel);border:1px solid var(--border);border-radius:8px;z-index:50;display:none;max-height:320px;overflow-y:auto;}
+#searchResults .sr{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;gap:8px;}
+#searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
+#kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
+.allocRow{display:flex;align-items:center;gap:8px;margin:4px 0;}
+.allocRow .aname{width:120px;font-size:12px;color:var(--muted);text-align:right;}
+.allocRow .bar{height:14px;border-radius:3px;background:var(--blue);min-width:2px;max-width:40vw;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#pfTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -120,8 +129,24 @@ progress{width:180px;accent-color:var(--blue);}
     <button data-tab="fscreener">Value Screener</button>
     <button data-tab="charts">Charts</button>
     <button data-tab="fundamentals">Fundamentals</button>
+    <button data-tab="portfolio">Portfolio</button>
   </nav>
+  <div id="searchWrap">
+    <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
+    <div id="searchResults"></div>
+  </div>
 </header>
+<div id="kbdHelp" style="display:none">
+  <div class="card" style="max-width:420px;margin:80px auto;">
+    <h2 style="margin-top:0">Keyboard shortcuts</h2>
+    <table><tbody>
+      <tr><td><b>/</b></td><td>Focus search</td></tr>
+      <tr><td><b>1–7</b></td><td>Switch tabs (Dashboard → Portfolio)</td></tr>
+      <tr><td><b>?</b></td><td>Toggle this help</td></tr>
+      <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
+    </tbody></table>
+  </div>
+</div>
 <main>
 
 <!-- DASHBOARD -->
@@ -237,6 +262,31 @@ progress{width:180px;accent-color:var(--blue);}
     <button class="btn ghost" onclick="exportFScreenCSV()">⬇ CSV</button>
   </div>
   <div id="fsResults"><div class="loading">Add filters (or pick a preset) and hit Run. First run fetches fundamentals for the whole universe — NIFTY 50 takes ~15s, All ~2 min, then it's cached for an hour.</div></div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" class="tab">
+  <div class="controls">
+    <label class="btn ghost" style="cursor:pointer">📁 Upload CSV<input type="file" id="pfFile" accept=".csv,.txt" style="display:none" onchange="importPortfolioCSV(this)"></label>
+    <select id="pfAddSym"></select>
+    <input type="text" id="pfAddQty" size="5" placeholder="qty">
+    <input type="text" id="pfAddPrice" size="7" placeholder="avg ₹">
+    <button class="btn" onclick="pfAddRow()">+ Add</button>
+    <button class="btn ghost" onclick="analyzePortfolio()">↻ Refresh</button>
+    <button class="btn ghost" onclick="pfClear()">Clear all</button>
+    <span class="muted" id="pfMeta"></span>
+  </div>
+  <div class="muted" style="font-size:11px;margin-bottom:10px">CSV columns: <b>symbol, quantity, avg_price</b> (header row optional; symbols with or without .NS — e.g. <code>RELIANCE, 10, 2450</code>). Everything stays in your browser.</div>
+  <div class="cards" id="pfSummary"></div>
+  <h2>Holdings</h2>
+  <div id="pfTable"><div class="loading">Upload a CSV or add holdings above</div></div>
+  <div class="pulse-grid" style="margin-top:14px">
+    <div><h2 style="margin-top:0">Sector allocation</h2><div id="pfSectors"></div></div>
+    <div><h2 style="margin-top:0">Cap allocation</h2><div id="pfCaps"></div></div>
+    <div><h2 style="margin-top:0">Risk (1 year)</h2><div id="pfRisk"></div></div>
+  </div>
+  <h2>Observations</h2>
+  <div id="pfSuggest"><div class="loading">…</div></div>
 </section>
 
 <!-- CHARTS -->
