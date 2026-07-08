@@ -25,7 +25,15 @@ Requires Python 3.10+ and internet access (data comes from Yahoo Finance, ~15 mi
 
 **Charts** — candlestick charts (1M–5Y) with volume, SMA 20/50/200, Bollinger Bands, and synced RSI + MACD panels. Click any stock row anywhere to jump to its chart.
 
-**Fundamentals** — P/E, P/B, EPS, market cap, ROE, debt/equity, margins, growth, dividend yield, beta, 52-week range, analyst consensus and target price.
+**Fundamentals** — P/E, P/B, EPS, market cap, ROE, debt/equity, margins, growth, dividend yield, beta, 52-week range, analyst consensus and target price — plus intrinsic value (DCF, Graham, DDM, EPV with margin of safety and reverse DCF), five composite scores (Value, Quality, Multibagger, Value-Trap, Dividend), and peer comparison vs the industry median.
+
+**Ideas** — rule-based trade candidates by horizon (short/medium/long) with entry/stop/target, inline chart previews, and a position-size calculator.
+
+**Value Screener** — 24 fundamental filters with presets, saved screens, and CSV export.
+
+**Portfolio** — CSV upload, live P&L, sector/cap allocation, 1-year volatility and drawdown, and allocation warnings.
+
+**UX** — global search (`/`), keyboard shortcuts (`?` for help), mobile-friendly layout. The Cloudflare version (`site/`) is the full-featured one; the local Python app is a simpler subset.
 
 ## Structure
 

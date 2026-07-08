@@ -97,6 +97,9 @@ progress{width:180px;accent-color:var(--blue);}
   nav{overflow-x:auto;max-width:100%;flex:1 1 100%;padding-bottom:2px;scrollbar-width:none;}
   nav::-webkit-scrollbar{display:none;}
   nav button{padding:7px 10px;font-size:13px;white-space:nowrap;flex:0 0 auto;}
+  #searchWrap{flex:1 1 100%;margin-left:0;}
+  #globalSearch{width:100%;}
+  #searchResults{left:0;right:auto;width:100%;}
   h2{font-size:13px;}
   .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px;}
   .card{padding:10px 12px;}
@@ -412,6 +415,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="screener" && !screenerData) loadScreener();
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
+  if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -1299,6 +1303,197 @@ async function loadPeerComparison(sym, me){
     <div class="muted" style="font-size:11px;margin-top:6px;">"Better" = beats the peer median by >10% in the favourable direction (lower for P/E, P/B, D/E; higher for the rest). Sector medians hide business-mix differences — read alongside the company's own history.</div>`;
 }
 
+/* ================= portfolio analyzer ================= */
+const PF_KEY = "ist_portfolio";
+function getPF(){ try{ return JSON.parse(localStorage.getItem(PF_KEY))||[]; }catch(e){ return []; } }
+function setPF(h){ localStorage.setItem(PF_KEY, JSON.stringify(h)); }
+
+function normSym(s){
+  s = s.trim().toUpperCase().replace(/\.NS$/,"");
+  return s ? s+".NS" : null;
+}
+function importPortfolioCSV(input){
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const lines = reader.result.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const holdings = getPF(); let added=0, skipped=[];
+    for(const line of lines){
+      const parts = line.split(/[,;\t]/).map(x=>x.trim().replace(/^"|"$/g,""));
+      if(parts.length<2) continue;
+      if(/symbol|qty|quantity|price/i.test(parts[0])) continue;   // header row
+      const sym = normSym(parts[0]);
+      const qty = parseFloat(parts[1]), avg = parseFloat(parts[2] ?? "0");
+      if(!sym || isNaN(qty) || qty<=0){ skipped.push(parts[0]); continue; }
+      const ex = holdings.find(h=>h.sym===sym);
+      if(ex){ ex.avg = (ex.avg*ex.qty + (avg||0)*qty)/(ex.qty+qty); ex.qty += qty; }
+      else holdings.push({sym, qty, avg: isNaN(avg)?0:avg});
+      added++;
+    }
+    setPF(holdings); input.value = "";
+    $("pfMeta").textContent = `${added} row${added===1?"":"s"} imported${skipped.length?`, skipped: ${skipped.slice(0,5).join(", ")}`:""}`;
+    analyzePortfolio();
+  };
+  reader.readAsText(file);
+}
+function pfAddRow(){
+  const sym = $("pfAddSym").value, qty = parseFloat($("pfAddQty").value), avg = parseFloat($("pfAddPrice").value);
+  if(!sym || isNaN(qty) || qty<=0){ alert("Enter a quantity."); return; }
+  const holdings = getPF(); const ex = holdings.find(h=>h.sym===sym);
+  if(ex){ ex.avg = (ex.avg*ex.qty + (avg||0)*qty)/(ex.qty+qty); ex.qty += qty; }
+  else holdings.push({sym, qty, avg: isNaN(avg)?0:avg});
+  setPF(holdings); $("pfAddQty").value=""; $("pfAddPrice").value="";
+  analyzePortfolio();
+}
+function pfRemove(sym){ setPF(getPF().filter(h=>h.sym!==sym)); analyzePortfolio(); }
+function pfClear(){ if(confirm("Remove all holdings?")){ setPF([]); analyzePortfolio(); } }
+
+async function analyzePortfolio(){
+  window._pfLoaded = true;
+  const holdings = getPF();
+  if(!holdings.length){
+    $("pfTable").innerHTML = '<div class="loading">Upload a CSV or add holdings above</div>';
+    $("pfSummary").innerHTML = ""; $("pfSectors").innerHTML=""; $("pfCaps").innerHTML=""; $("pfRisk").innerHTML="";
+    $("pfSuggest").innerHTML = '<div class="loading">…</div>'; return;
+  }
+  $("pfTable").innerHTML = '<div class="loading">Fetching live prices…</div>';
+  const quotes = await pmap(holdings, async h=>getQuote(h.sym).catch(()=>null), 5);
+  const funds  = await pmap(holdings, async h=>fetchFundamentals(h.sym).catch(()=>null), 5);
+  const rows = holdings.map((h,i)=>{
+    const q = quotes[i], f = funds[i];
+    const ltp = q?q.price:null, cur = ltp!=null?ltp*h.qty:null, inv = h.avg*h.qty;
+    return {...h, name:nameOf(h.sym), sector:sectorOf(h.sym), cap:capOf(h.sym),
+      ltp, cur, inv, dayPct:q?q.change_pct:null, dayAbs:q&&ltp!=null?q.change*h.qty:null,
+      pnl: cur!=null&&h.avg>0 ? cur-inv : null,
+      beta: f?f.beta:null, divYield: f?f.dividend_yield:null, pe: f?f.pe:null};
+  });
+  const totCur = rows.reduce((s,r)=>s+(r.cur||0),0);
+  const totInv = rows.filter(r=>r.avg>0).reduce((s,r)=>s+r.inv,0);
+  const totPnl = rows.reduce((s,r)=>s+(r.pnl||0),0);
+  const totDay = rows.reduce((s,r)=>s+(r.dayAbs||0),0);
+  rows.forEach(r=>r.weight = r.cur!=null&&totCur ? r.cur/totCur*100 : null);
+  const divInc = rows.reduce((s,r)=>s+((r.divYield||0)/100*(r.cur||0)),0);
+  const known = rows.filter(r=>r.beta!=null&&r.weight!=null);
+  const pfBeta = known.length ? known.reduce((s,r)=>s+r.beta*r.weight,0)/known.reduce((s,r)=>s+r.weight,0) : null;
+
+  $("pfSummary").innerHTML = [
+    ["Invested","₹"+fmtInt(Math.round(totInv))], ["Current value","₹"+fmtInt(Math.round(totCur))],
+    ["Total P&L",`<span class="${cls(totPnl)}">${sign(totPnl)}₹${fmtInt(Math.round(Math.abs(totPnl)))} (${totInv?fmt(totPnl/totInv*100,1):"—"}%)</span>`],
+    ["Today",`<span class="${cls(totDay)}">${sign(totDay)}₹${fmtInt(Math.round(Math.abs(totDay)))}</span>`],
+    ["Est. annual dividend","₹"+fmtInt(Math.round(divInc))],
+    ["Portfolio beta", pfBeta!=null?fmt(pfBeta,2):"—"],
+  ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
+
+  $("pfTable").innerHTML = `<table><thead><tr><th>Stock</th><th>Qty</th><th>Avg ₹</th><th>LTP ₹</th><th>Value ₹</th><th>P&L</th><th>P&L %</th><th>Day %</th><th>Weight</th><th></th></tr></thead><tbody>` +
+    rows.map(r=>`<tr onclick="openChart('${r.sym}')">
+      <td><span class="sym">${r.sym.replace(".NS","")}</span> ${r.cap?`<span class="badge ${r.cap==="LARGE"?"capL":r.cap==="MID"?"capM":"capS"}">${r.cap}</span>`:""}<br><span class="subname">${r.name} · ${r.sector||"?"}</span></td>
+      <td>${fmt(r.qty,0)}</td><td>${r.avg?fmt(r.avg):"—"}</td><td>${fmt(r.ltp)}</td><td>${fmtInt(Math.round(r.cur||0))}</td>
+      <td class="${cls(r.pnl)}">${r.pnl!=null?sign(r.pnl)+fmtInt(Math.round(Math.abs(r.pnl))):"—"}</td>
+      <td class="${cls(r.pnl)}">${r.pnl!=null&&r.inv?sign(r.pnl)+fmt(r.pnl/r.inv*100,1)+"%":"—"}</td>
+      <td class="${cls(r.dayPct)}">${r.dayPct!=null?sign(r.dayPct)+fmt(r.dayPct,2)+"%":"—"}</td>
+      <td>${r.weight!=null?fmt(r.weight,1)+"%":"—"}</td>
+      <td><button class="btn danger" onclick="event.stopPropagation();pfRemove('${r.sym}')">✕</button></td></tr>`).join("") + "</tbody></table>";
+
+  // allocations
+  const alloc = (keyFn) => {
+    const agg = {};
+    rows.forEach(r=>{ if(r.cur==null) return; const k = keyFn(r)||"Other"; agg[k]=(agg[k]||0)+r.cur; });
+    return Object.entries(agg).map(([k,v])=>({k, pct:v/totCur*100})).sort((a,b)=>b.pct-a.pct);
+  };
+  const bars = list => list.map(x=>`<div class="allocRow"><span class="aname">${x.k}</span>
+    <div class="bar" style="width:${x.pct*2.4}px"></div><span class="sval">${fmt(x.pct,1)}%</span></div>`).join("");
+  const secAlloc = alloc(r=>r.sector), capAlloc = alloc(r=>r.cap);
+  $("pfSectors").innerHTML = bars(secAlloc);
+  $("pfCaps").innerHTML = bars(capAlloc);
+
+  // risk: 1y weighted daily returns → vol, max drawdown, vs NIFTY
+  $("pfRisk").innerHTML = '<div class="loading">Computing…</div>';
+  try{
+    const hists = await pmap(rows, async r=>({sym:r.sym, w:(r.weight||0)/100, c:toCandles(await fetchChart(r.sym,"1y","1d"))}), 5);
+    const nifty = toCandles(await fetchChart("^NSEI","1y","1d"));
+    const byDate = {};
+    hists.forEach(h=>{ if(!h) return; for(let i=1;i<h.c.length;i++){
+      const d=h.c[i].time, ret=h.c[i].close/h.c[i-1].close-1;
+      (byDate[d]=byDate[d]||[]).push(ret*h.w); }});
+    const dates = Object.keys(byDate).sort();
+    const pRets = dates.map(d=>byDate[d].reduce((a,b)=>a+b,0));
+    const mean = pRets.reduce((a,b)=>a+b,0)/pRets.length;
+    const vol = Math.sqrt(pRets.reduce((s,r)=>s+(r-mean)*(r-mean),0)/(pRets.length-1))*Math.sqrt(252)*100;
+    let peak=1, cum=1, maxDD=0;
+    pRets.forEach(r=>{ cum*=(1+r); peak=Math.max(peak,cum); maxDD=Math.min(maxDD,cum/peak-1); });
+    const pfRet = (cum-1)*100;
+    const nRet = nifty.length>1 ? (nifty[nifty.length-1].close/nifty[0].close-1)*100 : null;
+    $("pfRisk").innerHTML = `<table><tbody>
+      <tr><td>1-yr return (weights as today)</td><td class="${cls(pfRet)}">${sign(pfRet)}${fmt(pfRet,1)}%</td></tr>
+      <tr><td>NIFTY 50 same period</td><td class="${cls(nRet)}">${nRet!=null?sign(nRet)+fmt(nRet,1)+"%":"—"}</td></tr>
+      <tr><td>Annualised volatility</td><td>${fmt(vol,1)}%</td></tr>
+      <tr><td>Max drawdown</td><td class="down">${fmt(maxDD*100,1)}%</td></tr>
+      <tr><td>Largest holding</td><td>${rows.length?fmt(Math.max(...rows.map(r=>r.weight||0)),1)+"%":"—"}</td></tr>
+    </tbody></table>`;
+    // observations
+    const notes = [];
+    const topSec = secAlloc[0];
+    if(topSec && topSec.pct>35) notes.push(`⚠️ ${fmt(topSec.pct,0)}% in ${topSec.k} — a sector-specific downturn hits hard. Consider trimming toward 25–30%.`);
+    const topStock = [...rows].sort((a,b)=>(b.weight||0)-(a.weight||0))[0];
+    if(topStock && topStock.weight>20) notes.push(`⚠️ ${topStock.sym.replace(".NS","")} is ${fmt(topStock.weight,0)}% of the portfolio — single-stock risk. Classic guidance is no more than 10–15% in one name.`);
+    if(pfBeta!=null && pfBeta>1.2) notes.push(`⚠️ Portfolio beta ${fmt(pfBeta,2)} — expect swings ~${fmt((pfBeta-1)*100,0)}% larger than the market, both ways.`);
+    if(pfBeta!=null && pfBeta<0.8) notes.push(`ℹ️ Portfolio beta ${fmt(pfBeta,2)} — defensive tilt; will likely lag in strong rallies.`);
+    const smallPct = capAlloc.find(x=>x.k==="SMALL");
+    if(smallPct && smallPct.pct>40) notes.push(`⚠️ ${fmt(smallPct.pct,0)}% in small caps — high growth potential but deeper drawdowns and lower liquidity in corrections.`);
+    if(nRet!=null && pfRet < nRet - 3) notes.push(`ℹ️ Portfolio trailed NIFTY by ${fmt(nRet-pfRet,1)} pts over 1 yr (using today's weights) — worth checking whether the laggards still earn their place.`);
+    const richPE = rows.filter(r=>r.pe!=null && r.pe>50);
+    if(richPE.length) notes.push(`ℹ️ Rich valuations (P/E > 50): ${richPE.map(r=>r.sym.replace(".NS","")).join(", ")} — fine while growth delivers, punishing if it stumbles.`);
+    if(rows.length<5) notes.push(`ℹ️ Only ${rows.length} holding${rows.length===1?"":"s"} — diversification benefits kick in meaningfully around 8–15 uncorrelated names.`);
+    $("pfSuggest").innerHTML = notes.length ? notes.map(n=>`<div class="card" style="margin-bottom:8px;font-size:13px">${n}</div>`).join("")
+      : '<div class="card" style="font-size:13px">✅ No allocation red flags — sensible concentration, beta and sector spread.</div>';
+  }catch(e){
+    $("pfRisk").innerHTML = `<div class="loading">Risk calc failed: ${e.message}</div>`;
+    $("pfSuggest").innerHTML = "";
+  }
+}
+
+/* ================= global search + keyboard shortcuts ================= */
+const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio"];
+let srSel = -1;
+function searchMatches(q){
+  q = q.trim().toLowerCase(); if(!q) return [];
+  return Object.entries(ALL_STOCKS)
+    .filter(([s,n]) => s.toLowerCase().startsWith(q) || n.toLowerCase().includes(q))
+    .sort((a,b) => (b[0].toLowerCase().startsWith(q)) - (a[0].toLowerCase().startsWith(q)))
+    .slice(0,8);
+}
+function renderSearch(){
+  const q = $("globalSearch").value, res = searchMatches(q), box = $("searchResults");
+  if(!res.length){ box.style.display="none"; return; }
+  box.style.display = "block";
+  box.innerHTML = res.map(([s,n],i)=>`<div class="sr ${i===srSel?"sel":""}" onclick="pickSearch('${s}')">
+    <span><b>${s.replace(".NS","")}</b> <span class="muted">${n}</span></span>
+    <span onclick="event.stopPropagation();closeSearch();openFundamentals('${s}')" title="Fundamentals">📊</span></div>`).join("");
+}
+function pickSearch(sym){ closeSearch(); openChart(sym); }
+function closeSearch(){ $("searchResults").style.display="none"; $("globalSearch").value=""; srSel=-1; $("globalSearch").blur(); }
+$("globalSearch").addEventListener("input", ()=>{ srSel=-1; renderSearch(); });
+$("globalSearch").addEventListener("keydown", e=>{
+  const res = searchMatches($("globalSearch").value);
+  if(e.key==="ArrowDown"){ srSel=Math.min(srSel+1,res.length-1); renderSearch(); e.preventDefault(); }
+  else if(e.key==="ArrowUp"){ srSel=Math.max(srSel-1,0); renderSearch(); e.preventDefault(); }
+  else if(e.key==="Enter" && res.length){ pickSearch(res[Math.max(0,srSel)][0]); }
+  else if(e.key==="Escape"){ closeSearch(); }
+});
+document.addEventListener("keydown", e=>{
+  const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  if(e.key==="Escape"){ $("kbdHelp").style.display="none"; closeSearch(); return; }
+  if(typing) return;
+  if(e.key==="/"){ e.preventDefault(); $("globalSearch").focus(); }
+  else if(e.key==="?"){ const h=$("kbdHelp"); h.style.display = h.style.display==="none"?"block":"none"; }
+  else if(/^[1-7]$/.test(e.key)){
+    const btn = document.querySelector(`nav button[data-tab="${TAB_ORDER[+e.key-1]}"]`);
+    if(btn) btn.click();
+  }
+});
+$("kbdHelp").addEventListener("click", ()=>$("kbdHelp").style.display="none");
+document.addEventListener("click", e=>{ if(!e.target.closest("#searchWrap")) $("searchResults").style.display="none"; });
+
 /* ================= init ================= */
 (function(){
   const opts = Object.entries(UNIVERSES).map(([uni, stocks]) =>
@@ -1306,7 +1501,7 @@ async function loadPeerComparison(sym, me){
     Object.entries(stocks).sort((a,b)=>a[1].localeCompare(b[1]))
       .map(([s,n])=>`<option value="${s}">${n} (${s.replace(".NS","")})</option>`).join("") +
     `</optgroup>`).join("");
-  $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
+  $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts; $("pfAddSym").innerHTML = opts;
   $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
   $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
   $("verBadge").textContent = "v" + APP_VERSION;

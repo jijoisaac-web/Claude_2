@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.0.0] — 2026-07-08 · Portfolio Analyzer + UX
+
+- New **Portfolio** tab: upload a CSV (`symbol, quantity, avg_price` — flexible separators, .NS optional) or add holdings manually; everything stays in the browser
+- Live holdings table: LTP, value, P&L (₹ and %), day change, weight; summary cards for invested/current/total P&L/today/estimated annual dividend/portfolio beta
+- Sector and cap-tier allocation bars; 1-year risk panel: portfolio return (today's weights) vs NIFTY, annualised volatility, max drawdown, largest-holding concentration
+- Observations engine: flags sector >35%, single stock >20%, beta >1.2 or <0.8, small-cap >40%, P/E >50 holdings, under-diversification, and index underperformance
+- Global search in the header (press `/`): type symbol or company name, Enter opens the chart, 📊 jumps to fundamentals
+- Keyboard shortcuts: `1–7` switch tabs, `/` search, `?` help overlay, `Esc` closes
+
 ## [1.9.1] — 2026-07-08
 
 - Mobile layout fixes: swipeable tab bar (no more overflow), all wide tables scroll horizontally inside the page instead of breaking it, tighter cards/inputs/badges, sector bars capped to screen width, smaller chart height on phones
