@@ -7,7 +7,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="apple-touch-icon" href="favicon.svg">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.1/lightweight-charts.standalone.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
 <script src="universe.js"></script>
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;
@@ -45,6 +45,11 @@ tbody tr:hover{background:#1c2129;}
 .badge.bullish{background:rgba(63,185,80,.15);color:var(--green);}
 .badge.bearish{background:rgba(248,81,73,.15);color:var(--red);}
 .badge.neutral{background:rgba(210,153,34,.15);color:var(--amber);}
+.badge.capL{background:rgba(88,166,255,.15);color:var(--blue);}
+.badge.capM{background:rgba(210,153,34,.15);color:var(--amber);}
+.badge.capS{background:rgba(188,140,255,.15);color:#bc8cff;}
+tr.chartRow td{padding:6px 8px;background:#0d1117;cursor:default;}
+tr.chartRow:hover{background:#0d1117;}
 .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
 select,input[type=text]{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:14px;}
 button.btn{background:#238636;border:none;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;}
@@ -535,8 +540,9 @@ function ideaTable(rows){
     <th style="text-align:left;width:38%">Why</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th></th></tr></thead><tbody>` +
     rows.map(s=>{
       const rr = s.entry&&s.stop&&s.target ? ((s.target-s.entry)/(s.entry-s.stop)).toFixed(1) : null;
-      return `<tr onclick="openChart('${s.symbol}')">
-      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
+      const cap = capOf(s.symbol), capCls = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+      return `<tr onclick="toggleIdeaChart(this,'${s.symbol}',${s.entry??"null"},${s.stop??"null"},${s.target??"null"})" title="Click to preview chart">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span> ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""}<br><span class="subname">${s.name}</span></td>
       <td style="text-align:left"><span class="badge ${actCls(s.action)}">${s.action}</span></td>
       <td style="text-align:left"><span class="signal-detail" style="font-size:12.5px">${s.why}</span></td>
       <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${s.target?fmt(s.target):"trail SMA50"}</td>
@@ -558,6 +564,35 @@ async function loadIdeas(force){
   $("ideasShort").innerHTML = ideaTable(shortT);
   $("ideasMed").innerHTML = ideaTable(medT);
   $("ideasLong").innerHTML = ideaTable(longT);
+}
+
+/* inline chart preview inside the ideas tables */
+async function toggleIdeaChart(tr, sym, entry, stop, target){
+  const next = tr.nextElementSibling;
+  if(next && next.classList.contains("chartRow")){ next.remove(); return; }
+  document.querySelectorAll("tr.chartRow").forEach(x=>x.remove());   // one preview at a time
+  const row = document.createElement("tr"); row.className = "chartRow";
+  const td = document.createElement("td"); td.colSpan = tr.children.length;
+  td.innerHTML = `<div class="miniChart" style="height:240px"></div>
+    <div class="muted" style="font-size:11px;padding:4px 2px">6 months daily · SMA20 / SMA50 · dashed lines: entry (blue) · stop (red) · target (green) ·
+    <a href="#" style="color:var(--blue)" onclick="event.preventDefault();openChart('${sym}')">open full chart ↗</a></div>`;
+  row.appendChild(td); tr.after(row);
+  try{
+    await ensureChartsLib();
+    const c = enrich(toCandles(await fetchChart(sym,"1y","1d"))).slice(-132);
+    const ch = LightweightCharts.createChart(td.querySelector(".miniChart"), {
+      height:240, layout:{background:{color:"#0d1117"},textColor:"#8b949e"},
+      grid:{vertLines:{color:"#1c2129"},horzLines:{color:"#1c2129"}},
+      timeScale:{borderColor:"#30363d"}, rightPriceScale:{borderColor:"#30363d"}, autoSize:true });
+    const cs = ch.addCandlestickSeries({upColor:"#3fb950",downColor:"#f85149",borderVisible:false,wickUpColor:"#3fb950",wickDownColor:"#f85149"});
+    cs.setData(c.map(d=>({time:d.time,open:d.open,high:d.high,low:d.low,close:d.close})));
+    [["sma20","#58a6ff"],["sma50","#d29922"]].forEach(([k,col])=>
+      ch.addLineSeries({color:col,lineWidth:1,priceLineVisible:false,lastValueVisible:false})
+        .setData(c.filter(d=>d[k]!=null).map(d=>({time:d.time,value:d[k]}))));
+    const pl = (price,color,title)=> price!=null && cs.createPriceLine({price, color, lineWidth:1, lineStyle:2, axisLabelVisible:true, title});
+    pl(entry,"#58a6ff","entry"); pl(stop,"#f85149","stop"); pl(target,"#3fb950","target");
+    ch.timeScale().fitContent();
+  }catch(e){ td.innerHTML = `<div class="loading">Chart failed: ${e.message}</div>`; }
 }
 
 function prefillCalc(entry, stop){
@@ -600,10 +635,20 @@ function openChart(sym){
   document.querySelector('nav button[data-tab="charts"]').click();
   loadChart();
 }
+function loadScript(src){ return new Promise((ok,err)=>{ const s=document.createElement("script"); s.src=src; s.onload=ok; s.onerror=err; document.head.appendChild(s); }); }
+async function ensureChartsLib(){
+  if(typeof LightweightCharts !== "undefined") return;
+  for(const src of ["https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js",
+                    "https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"]){
+    try{ await loadScript(src); if(typeof LightweightCharts !== "undefined") return; }catch(e){}
+  }
+  throw new Error("chart library could not be loaded — check your network");
+}
 async function loadChart(){
   window._chartLoaded = true;
   const sym = $("chartSymbol").value;
   try{
+    await ensureChartsLib();
     const weekly = chartRange==="2y" || chartRange==="5y";
     const res = await fetchChart(sym, weekly?"10y":"3y", weekly?"1wk":"1d");
     const c = enrich(toCandles(res)).slice(-(N_MAP[chartRange]||252));
@@ -676,8 +721,9 @@ async function loadFundamentals(){
       ["Beta",fmt(f.beta)], ["52W High","₹"+fmt(f.high_52w)], ["52W Low","₹"+fmt(f.low_52w)],
       ["Analyst View",(f.recommendation||"—").toUpperCase()], ["Target Price","₹"+fmt(f.target_price)],
     ];
+    const cap = capOf(sym), capCls = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
     $("fundView").innerHTML = `
-      <h2>${f.name || sym} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
+      <h2>${f.name || sym} ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
       <div class="fund-grid">${rows.map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("")}</div>`;
     loadPeerComparison(sym, f);
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }

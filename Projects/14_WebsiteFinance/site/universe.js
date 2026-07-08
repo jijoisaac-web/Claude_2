@@ -1,7 +1,7 @@
 // Stock universes — generated from official NSE constituent lists (nsearchives.nseindia.com), July 2026.
 // Yahoo Finance symbols: NSE symbol + ".NS"
 
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 
 const INDICES = {
   "^NSEI": "NIFTY 50",
@@ -164,6 +164,14 @@ const UNIVERSES = {
 
 const ALL_STOCKS = Object.assign({}, ...Object.values(UNIVERSES));
 const nameOf = s => ALL_STOCKS[s] || INDICES[s] || s.replace(".NS", "");
+
+// market-cap tier from index membership: NIFTY 50 = large, MIDCAP 150 = mid, SMALLCAP 250 = small
+const CAP_OF = {};
+Object.entries(UNIVERSES).forEach(([u, m]) => {
+  const cap = u === "NIFTY 50" ? "LARGE" : u === "MIDCAP 150" ? "MID" : "SMALL";
+  Object.keys(m).forEach(s => { CAP_OF[s] = cap; });
+});
+const capOf = s => CAP_OF[s] || null;
 
 // Industry groups (NSE sector classification, from the same constituent lists).
 // Used for peer comparison — a stock is judged against others in its group.

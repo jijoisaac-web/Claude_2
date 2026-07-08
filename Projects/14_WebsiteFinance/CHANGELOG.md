@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.6.0] — 2026-07-08
+
+- Ideas: click any idea row to expand an inline 6-month chart with SMA20/50 and the idea's entry/stop/target drawn as dashed price lines — no tab switch needed ("open full chart ↗" link included)
+- Market-cap tier badges (LARGE / MID / SMALL, from index membership) on every idea row and the Fundamentals header
+
+## [1.5.1] — 2026-07-08
+
+- Fixed: charts tab failed with "LightweightCharts is not defined" — the CDN script URL pointed to a non-existent `.min.js` file. Now loads the canonical `lightweight-charts.standalone.production.js` from jsDelivr, with automatic fallback to unpkg if the primary CDN is unreachable
+
 ## [1.5.0] — 2026-07-08
 
 - Ideas tab: every idea row now has a 📊 link straight to that stock's Fundamentals
