@@ -2815,6 +2815,78 @@ function closeNavDD(){
   }
 
   // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
+  // ─── DATE WINDOW ENGINE ──────────────────────────────────────────────────
+  var _flTripDays=10;
+
+  function _addDays(d,n){var r=new Date(d.getTime());r.setDate(r.getDate()+n);return r;}
+
+  function _fmtLong(d){
+    var D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return D[d.getDay()]+', '+d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear();
+  }
+
+  function _fmtSK(d){
+    // Skyscanner YYMMDD format
+    return String(d.getFullYear()).slice(2)
+      +String(d.getMonth()+1).padStart(2,'0')
+      +String(d.getDate()).padStart(2,'0');
+  }
+
+  function _fmtGF(d){
+    // Google Flights YYYY-MM-DD
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  function _nthWeekday(year,month,n,wd){
+    // nth (0-based) occurrence of weekday wd (0=Sun…6=Sat) in month
+    var count=-1;
+    for(var day=1;day<=28;day++){
+      var dt=new Date(year,month,day);
+      if(dt.getDay()===wd){count++;if(count===n)return dt;}
+    }
+    return new Date(year,month,8);
+  }
+
+  function _bestHub(cur){
+    var c=CONNECTIONS[cur];
+    return (c&&c.longHaul&&c.hubs&&c.hubs[0])?c.hubs[0]:null;
+  }
+
+  function _dateWindows(monthIdx,tripDays){
+    var now=new Date(), y=now.getFullYear();
+    var test=new Date(y,monthIdx,1);
+    if(test<=now) y++;
+    var baseIdx=MONTHLY_IDX[monthIdx];
+    // Window 1: 2nd Tuesday (cheapest – midweek week 2)
+    var dep1=_nthWeekday(y,monthIdx,1,2); // 2nd Tue
+    // Window 2: 3rd Wednesday
+    var dep2=_nthWeekday(y,monthIdx,2,3); // 3rd Wed
+    // Window 3: Last Friday (peak – weekend end of month)
+    var dep3=_nthWeekday(y,monthIdx,3,5); // 4th Fri
+    if(!dep3||dep3.getMonth()!==monthIdx) dep3=_nthWeekday(y,monthIdx,2,5);
+    function lvl(idx){
+      if(idx<=0.73) return {cls:'win-best',badge:'🟢 Best Price'};
+      if(idx<=0.90) return {cls:'win-good',badge:'🟢 Good Value'};
+      if(idx<=1.05) return {cls:'win-avg', badge:'🟡 Average'};
+      if(idx<=1.20) return {cls:'win-high',badge:'🟡 Above Avg'};
+      return               {cls:'win-peak',badge:'🔴 Peak Price'};
+    }
+    return [
+      {dep:dep1,ret:_addDays(dep1,tripDays),idx:baseIdx*0.93,lv:lvl(baseIdx*0.93),why:'2nd week · Tue departure — typically cheapest'},
+      {dep:dep2,ret:_addDays(dep2,tripDays),idx:baseIdx,     lv:lvl(baseIdx),     why:'3rd week · Wed departure — solid option'},
+      {dep:dep3,ret:_addDays(dep3,tripDays),idx:baseIdx*1.15,lv:lvl(baseIdx*1.15),why:'4th week · Fri departure — weekend premium'},
+    ];
+  }
+
+  window.flDurSet=function(days,btn){
+    _flTripDays=days;
+    document.querySelectorAll('.fl-dur-btn').forEach(function(b){b.classList.remove('active');});
+    if(btn)btn.classList.add('active');
+    var inp=document.getElementById('fl-planner-input');
+    if(inp&&inp.value.trim())flPlanTrip();
+  };
+
   window.flPlanTrip=function(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
@@ -2829,7 +2901,7 @@ function closeNavDD(){
       'delhi':'DEL','new delhi':'DEL','del':'DEL',
       'bangalore':'BLR','bengaluru':'BLR','blr':'BLR',
       'chennai':'MAA','madras':'MAA','maa':'MAA',
-      'hyderabad':'HYD','hyd':'HYD','hyderabad':'HYD',
+      'hyderabad':'HYD','hyd':'HYD',
       'kochi':'COK','cochin':'COK','kerala':'COK','cok':'COK',
       'kolkata':'CCU','calcutta':'CCU','ccu':'CCU',
       'trivandrum':'TRV','thiruvananthapuram':'TRV','trv':'TRV',
@@ -2854,67 +2926,159 @@ function closeNavDD(){
     if(lq.indexOf('couple')>=0) groupN=2;
     if(lq.indexOf('family')>=0&&!gm) groupN=4;
 
-    // ── Parse budget (largest number > 200) ──
+    // ── Parse budget ──
     var nums=(q.match(/[\d,]+/g)||[]).map(function(n){return parseInt(n.replace(/,/g,''));}).filter(function(n){return n>200;});
     var budget=nums.length?Math.max.apply(null,nums):null;
 
     var cur=baseCur||'AED';
     var flData=FL[cur]||FL['AED'];
     var route=destCode&&flData.routes[destCode]?flData.routes[destCode]:null;
+    var tripDays=_flTripDays||10;
 
-    // ── Build response HTML ──
+    // ── Build result HTML ──
     var html='<div class="fl-plan">';
 
-    // Header
-    html+='<div class="fl-plan-hd">✦ Your Trip Plan</div>';
+    // Duration picker
+    html+='<div class="fl-dur-row">'
+      +'<span class="fl-dur-label">Trip length:</span>'
+      +'<button class="fl-dur-btn'+(tripDays===7?' fl-dur-active':'')+'" onclick="flDurSet(7,this)">7 nights</button>'
+      +'<button class="fl-dur-btn'+(tripDays===10?' fl-dur-active':'')+'" onclick="flDurSet(10,this)">10 nights</button>'
+      +'<button class="fl-dur-btn'+(tripDays===14?' fl-dur-active':'')+'" onclick="flDurSet(14,this)">14 nights</button>'
+      +'</div>';
 
-    // ── Destination block ──
-    if(d){
-      html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-dest">'+d.icon+' <strong>'+d.name+'</strong></div>';
-      html+='<div class="fl-plan-sub">'+d.tip+'</div>';
-      if(route&&typeof route.min==='number'){
-        var pp=cur+' '+route.min.toLocaleString()+'–'+route.max.toLocaleString();
-        html+='<div class="fl-plan-row"><span>✈ Per person</span><strong>'+pp+'</strong></div>';
-        if(groupN>1){
-          var tot=cur+' '+Math.round(route.min*groupN).toLocaleString()+'–'+Math.round(route.max*groupN).toLocaleString();
-          html+='<div class="fl-plan-row"><span>✈ '+groupN+' people total</span><strong>'+tot+'</strong></div>';
-        }
-        html+='<div class="fl-plan-row"><span>⏱ Flight time</span><span>'+route.dur+'</span></div>';
-        html+='<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>';
-      }
-      html+='</div>';
-    } else {
+    // ── Header ──
+    var destLabel=d?d.icon+' '+d.name:'India';
+    html+='<div class="fl-plan-hd">✦ Date Decision Tool — '+cur+' → '+destLabel+'</div>';
+
+    if(!d){
       html+='<div class="fl-plan-section"><div class="fl-plan-sub">💡 Mention a city: Mumbai, Goa, Kochi, Delhi, Bangalore, Hyderabad, Chennai, Kolkata, Trivandrum, Ahmedabad</div></div>';
     }
 
-    // ── Travel month analysis ──
-    if(travelM>=0){
-      var mIdx=MONTHLY_IDX[travelM];
-      var mGrade=mIdx<=0.73?'🟢 Best Deals Season':mIdx<=0.90?'🟡 Shoulder — Good Value':mIdx<=1.05?'⚪ Average Fares':'🔴 Peak — Expensive';
-      var now=new Date();
-      var tDate=new Date(now.getFullYear(),travelM,1);
-      if(tDate<now) tDate=new Date(now.getFullYear()+1,travelM,1);
-      var wks=Math.round((tDate-now)/604800000);
-      var bookAdvice=wks<4?'⚡ Less than 4 weeks away — book immediately, fares rising daily'
-        :wks<8?'✓ Book this week for best availability'
-        :wks<14?'Good time to start comparing — book within 3–4 weeks'
-        :'Monitor prices; book 8–10 weeks before travel';
-      html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-row"><span>📅 '+FL_MONTH_NAMES[travelM]+'</span><strong>'+mGrade+'</strong></div>';
-      html+='<div class="fl-plan-row"><span>📆 Weeks away</span><span>~'+wks+' weeks</span></div>';
-      html+='<div class="fl-plan-advice">'+bookAdvice+'</div>';
-      html+='</div>';
+    if(!route&&d){
+      html+='<div class="fl-plan-section"><div class="fl-plan-sub">Route data not available for this origin. Try searching on <a href="https://www.skyscanner.net" target="_blank" rel="noopener" style="color:var(--teal)">Skyscanner</a>.</div></div>';
+    }
 
-      // Festival check for that month
+    // ── 3 Date Windows (only if month + route known) ──
+    if(travelM>=0&&route&&typeof route.min==='number'){
+      var now=new Date();
+      var tYear=now.getFullYear();
+      var tDate=new Date(tYear,travelM,1);
+      if(tDate<=now) tYear++;
+      var windows=_dateWindows(travelM,tripDays,tYear);
+      var fromCode=flData.origins[0]?flData.origins[0].code:'DXB';
+
+      // Festival check
+      var festHtml='';
       for(var fi=0;fi<FESTIVALS.length;fi++){
         if(FESTIVALS[fi].m===travelM){
-          html+='<div class="fl-plan-section fl-plan-festival">';
-          html+='⚠️ <strong>'+FESTIVALS[fi].name+'</strong> falls in '+FL_MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Book immediately or shift travel by 2+ weeks.';
-          html+='</div>';
+          festHtml='<div class="fl-plan-festival">⚠️ <strong>'+FESTIVALS[fi].name+'</strong> in '+FL_MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Check dates overlap below.</div>';
           break;
         }
       }
+      if(festHtml) html+=festHtml;
+
+      var winLabels=['🟢 Best Price','🟡 Good Value','🔴 Peak Price'];
+      var winDescs=[
+        '2nd week · Tue departure — typically cheapest',
+        '3rd week · Wed departure — solid availability',
+        '4th week · Fri departure — higher demand'
+      ];
+
+      for(var wi=0;wi<windows.length;wi++){
+        var w=windows[wi];
+        var depDate=w.dep;
+        var retDate=_addDays(depDate,tripDays);
+
+        // Fare estimates
+        var rtMin=Math.round(route.min*w.mult);
+        var rtMax=Math.round(route.max*w.mult);
+        var outMin=Math.round(rtMin*0.55);
+        var outMax=Math.round(rtMax*0.60);
+        var retMin=Math.round(rtMin*0.42);
+        var retMax=Math.round(rtMax*0.50);
+        var sepMin=outMin+retMin;
+        var sepMax=outMax+retMax;
+        var savMin=sepMin-rtMin;
+        var savMax=sepMax-rtMax;
+        var savNote=savMin<0?'Save '+cur+' '+Math.abs(savMin).toLocaleString()+'–'+Math.abs(savMax).toLocaleString()+' vs RT'
+          :'Similar to round-trip price';
+
+        // Skyscanner URLs
+        var depSK=_fmtSK(depDate);
+        var retSK=_fmtSK(retDate);
+        var skRT='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/';
+        var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/';
+        var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/';
+
+        // Group multiplier
+        var gMult=groupN>1?' (×'+groupN+')':'';
+        var grpRtMin=Math.round(rtMin*groupN);
+        var grpRtMax=Math.round(rtMax*groupN);
+        var grpOutMin=Math.round(outMin*groupN);
+        var grpOutMax=Math.round(outMax*groupN);
+        var grpRetMin=Math.round(retMin*groupN);
+        var grpRetMax=Math.round(retMax*groupN);
+        var grpSepMin=grpOutMin+grpRetMin;
+        var grpSepMax=grpOutMax+grpRetMax;
+
+        // Connection tip
+        var connData=CONNECTIONS[cur];
+        var connTip='';
+        if(connData&&connData.longHaul&&connData.hubs&&connData.hubs.length){
+          var bh=connData.hubs[0];
+          connTip='<div class="fl-win-conn">🥇 Best via '+bh.via+' ('+bh.airline+') — '+bh.saving+'</div>';
+        }
+
+        html+='<div class="fl-window'+(wi===0?' fl-window-best':'')+'">'
+          +'<div class="fl-win-header">'
+          +'<span class="fl-win-label">'+winLabels[wi]+'</span>'
+          +'<span class="fl-win-desc">'+winDescs[wi]+'</span>'
+          +'</div>'
+          +'<div class="fl-win-dates">'
+          +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">DEPART</div><div class="fl-win-dt">'+_fmtLong(depDate)+'</div></div>'
+          +'<div class="fl-win-arrow">✈ '+tripDays+'n →</div>'
+          +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">RETURN</div><div class="fl-win-dt">'+_fmtLong(retDate)+'</div></div>'
+          +'</div>'
+          +'<div class="fl-win-fares">'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">✈ Outbound'+gMult+' ('+fromCode+'→'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'–'+grpOutMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">✈ Return'+gMult+' ('+destCode+'→'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'–'+grpRetMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-sep"></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">📊 Separate total'+gMult+'</span><strong class="fl-win-fare-val">'+cur+' '+grpSepMin.toLocaleString()+'–'+grpSepMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row fl-win-fare-muted"><span class="fl-win-fare-lbl">🔄 vs Round-trip'+gMult+'</span><span class="fl-win-fare-val">'+cur+' '+grpRtMin.toLocaleString()+'–'+grpRtMax.toLocaleString()+' &nbsp;·&nbsp; '+savNote+'</span></div>'
+          +'</div>'
+          +connTip
+          +'<div class="fl-win-btns">'
+          +'<a class="fl-win-btn fl-win-btn-main" href="'+skRT+'" target="_blank" rel="noopener">Round-trip ↗</a>'
+          +'<a class="fl-win-btn" href="'+skOut+'" target="_blank" rel="noopener">Outbound only ↗</a>'
+          +'<a class="fl-win-btn" href="'+skRet+'" target="_blank" rel="noopener">Return only ↗</a>'
+          +'</div>'
+          +'</div>';
+      }
+
+      // Month grade summary
+      var mIdx=MONTHLY_IDX[travelM];
+      var mGrade=mIdx<=0.73?'🟢 Best Deals Season':mIdx<=0.90?'🟡 Shoulder — Good Value':mIdx<=1.05?'⚪ Average Fares':'🔴 Peak — Expensive';
+      var now2=new Date();
+      var tDate2=new Date(tYear,travelM,1);
+      var wks=Math.round((tDate2-now2)/604800000);
+      var bookAdvice=wks<4?'⚡ Under 4 weeks away — book immediately'
+        :wks<8?'✓ Book this week for best fares'
+        :wks<14?'Good time to compare — book within 3–4 weeks'
+        :'Monitor prices; book 8–10 weeks before travel';
+      html+='<div class="fl-plan-section">'
+        +'<div class="fl-plan-row"><span>📅 '+FL_MONTH_NAMES[travelM]+' '+tYear+'</span><strong>'+mGrade+'</strong></div>'
+        +'<div class="fl-plan-row"><span>⏱ Booking window</span><span>~'+wks+' weeks away &nbsp;·&nbsp; '+bookAdvice+'</span></div>'
+        +'<div class="fl-plan-row"><span>⏱ Flight duration</span><span>'+route.dur+'</span></div>'
+        +'<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>'
+        +'</div>';
+    } else if(travelM<0&&route){
+      // No month — show range only
+      html+='<div class="fl-plan-section">'
+        +'<div class="fl-plan-sub">📅 Mention a month to get exact date windows with pre-filled booking links.</div>'
+        +'<div class="fl-plan-row"><span>✈ Price range'+( groupN>1?' (×'+groupN+')':'')+' per person</span><strong>'+cur+' '+route.min.toLocaleString()+'–'+route.max.toLocaleString()+'</strong></div>'
+        +'<div class="fl-plan-row"><span>⏱ Flight time</span><span>'+route.dur+'</span></div>'
+        +'<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>'
+        +'</div>';
     }
 
     // ── Budget breakdown ──
@@ -2923,71 +3087,34 @@ function closeNavDD(){
       var rem=budget-flMin;
       html+='<div class="fl-plan-section">';
       html+='<div class="fl-plan-row"><span>💰 Your budget</span><strong>'+cur+' '+budget.toLocaleString()+'</strong></div>';
-      html+='<div class="fl-plan-row"><span>✈ Flights ('+groupN+'×, min)</span><span>'+cur+' '+Math.round(flMin).toLocaleString()+'</span></div>';
+      html+='<div class="fl-plan-row"><span>✈ Flights ('+groupN+'×, min estimate)</span><span>−'+cur+' '+Math.round(flMin).toLocaleString()+'</span></div>';
       if(rem>0){
         var rate=typeof midRate==='number'&&midRate>0?midRate:85;
         var remINR=Math.round(rem*rate);
-        var days=7;
+        var days=tripDays;
         var pdINR=Math.round(remINR/days);
         var comfort=pdINR>15000?'Luxury — 4★ hotels, fine dining, activities'
           :pdINR>8000?'Comfortable — good hotels, mix of dining'
           :pdINR>4000?'Budget-friendly — guesthouses, local food'
           :'Very tight — plan every expense carefully';
-        html+='<div class="fl-plan-row"><span>🏨 Hotels + local (rem.)</span><strong>'+cur+' '+Math.round(rem).toLocaleString()+'</strong></div>';
-        html+='<div class="fl-plan-row"><span>₹ India spending</span><span>≈ ₹'+remINR.toLocaleString()+' ('+days+' days)</span></div>';
+        html+='<div class="fl-plan-row"><span>🏨 Hotels + local (remaining)</span><strong>'+cur+' '+Math.round(rem).toLocaleString()+'</strong></div>';
+        html+='<div class="fl-plan-row"><span>₹ India spending</span><span>≈ ₹'+remINR.toLocaleString()+' ('+days+' nights)</span></div>';
         html+='<div class="fl-plan-row"><span>📅 Daily India budget</span><span>≈ ₹'+pdINR.toLocaleString()+'/day</span></div>';
         html+='<div class="fl-plan-advice">'+comfort+'</div>';
       } else {
-        html+='<div class="fl-plan-advice">⚠️ Budget may not cover flights for '+groupN+' (min '+cur+' '+Math.round(flMin).toLocaleString()+') — consider increasing budget or travelling solo.</div>';
+        html+='<div class="fl-plan-advice">⚠️ Budget may be tight for '+groupN+' traveller'+(groupN>1?'s':'')+' (min est. '+cur+' '+Math.round(flMin).toLocaleString()+') — increase budget or travel solo.</div>';
       }
       html+='</div>';
     }
 
-    // ── Smart Dates ──
-    if(travelM>=0){
-      var bd=BEST_DATES[travelM];
-      html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-sec-hd">📅 Best dates in '+FL_MONTH_NAMES[travelM]+'</div>';
-      html+='<div class="fl-plan-row"><span>✅ Best weeks</span><span>'+bd.best+'</span></div>';
-      html+='<div class="fl-plan-row"><span>⚠️ Avoid</span><span>'+bd.avoid+'</span></div>';
-      html+='<div class="fl-plan-row"><span>✈ Day tip</span><span>'+bd.dayTip+'</span></div>';
-      html+='<div class="fl-plan-row"><span>📆 Book by</span><span>'+bd.bookBy+'</span></div>';
-      html+='<div class="fl-plan-advice">'+bd.note+'</div>';
-      html+='</div>';
+    // ── Best connections (long-haul only, summary) ──
+    var connData2=CONNECTIONS[cur];
+    if(connData2&&connData2.longHaul&&destCode&&!route){
+      html+='<div class="fl-plan-section">'
+        +'<div class="fl-plan-sec-hd">✈ Long-haul routing to '+destLabel+'</div>'
+        +'<div class="fl-plan-sub">'+connData2.directHrs+'</div>'
+        +'</div>';
     }
-
-    // ── Best connections (long-haul only) ──
-    var connData=CONNECTIONS[cur];
-    if(connData&&connData.longHaul){
-      html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-sec-hd">✈ Best routing from '+connData.country+(d?' to '+d.name:'')+'</div>';
-      html+='<div class="fl-plan-row fl-plan-row-direct"><span>⏱ Going direct</span><span>'+connData.directHrs+'</span></div>';
-      for(var ci=0;ci<connData.hubs.length;ci++){
-        var h=connData.hubs[ci];
-        html+='<div class="fl-conn'+(ci===0?' fl-conn-best':'')+"'>"
-          +'<div class="fl-conn-top"><span class="fl-conn-rank">'+(ci===0?'🥇':ci===1?'🥈':'🥉')+'</span>'
-          +'<span class="fl-conn-via">Via '+h.via+'</span>'
-          +'<span class="fl-conn-airline">'+h.airline+'</span></div>'
-          +'<div class="fl-conn-meta">'+h.addTime+' &nbsp;·&nbsp; '+h.saving+'</div>'
-          +'<div class="fl-conn-tip">🛫 '+h.tip+'</div>'
-          +(h.stopover?'<div class="fl-conn-stopover">💡 '+h.stopover+'</div>':'')
-          +'</div>';
-      }
-      html+='</div>';
-    }
-
-    // ── Best airports from current country ──
-    html+='<div class="fl-plan-section">';
-    html+='<div class="fl-plan-row"><span>🛫 Your departure airports</span><span>'
-      +flData.origins.map(function(o){return o.code+' · '+o.name;}).join(', ')+'</span></div>';
-    if(destCode){
-      html+='<div class="fl-plan-row"><span>🔗 Book now</span>'
-        +'<span><a href="https://www.skyscanner.net/transport/flights/'+(flData.origins[0].code)+'/'+destCode+'/" '
-        +'target="_blank" rel="noopener" style="color:var(--teal)">Skyscanner ↗</a>'
-        +' &nbsp; <a href="https://www.google.com/travel/flights?q=flights+to+'+d.name.replace(/ /,'+')+'%2C+India" '
-        +'target="_blank" rel="noopener" style="color:var(--muted)">Google Flights ↗</a></span></div>';
-    }
-    html+='</div>';
 
     html+='</div>'; // .fl-plan
     res.innerHTML=html;

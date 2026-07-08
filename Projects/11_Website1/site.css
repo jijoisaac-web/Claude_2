@@ -1515,3 +1515,38 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-conn-meta{font-size:12px;color:var(--teal);font-weight:600;margin-bottom:4px;}
 .fl-conn-tip{font-size:11px;color:var(--text2);margin-bottom:3px;}
 .fl-conn-stopover{font-size:11px;color:var(--amber);margin-top:3px;}
+
+/* ── Duration picker ── */
+.fl-dur-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.fl-dur-label{font-size:.78rem;color:var(--muted);font-weight:600;letter-spacing:.04em;}
+.fl-dur-btn{padding:5px 14px;border:1.5px solid var(--border);border-radius:20px;background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .2s;}
+.fl-dur-btn:hover{border-color:var(--teal);color:var(--teal);}
+.fl-dur-btn.fl-dur-active{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700;}
+
+/* ── Date window cards ── */
+.fl-window{border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;background:var(--card);}
+.fl-window-best{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 6%,var(--card));}
+.fl-win-header{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.fl-win-label{font-weight:700;font-size:.88rem;color:var(--fg);}
+.fl-win-desc{font-size:.75rem;color:var(--muted);}
+.fl-win-dates{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.fl-win-date-blk{flex:1;min-width:120px;}
+.fl-win-dt-label{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.fl-win-dt{font-size:.95rem;font-weight:700;color:var(--fg);}
+.fl-win-arrow{font-size:.78rem;color:var(--teal);white-space:nowrap;padding:0 4px;}
+.fl-win-fares{background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.fl-win-fare-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:.82rem;}
+.fl-win-fare-lbl{color:var(--muted);}
+.fl-win-fare-val{color:var(--fg);}
+.fl-win-fare-sep{border-top:1px solid var(--border);margin:6px 0;}
+.fl-win-fare-muted .fl-win-fare-val{color:var(--muted);font-size:.78rem;}
+.fl-win-conn{font-size:.78rem;color:var(--teal);margin-bottom:10px;padding:6px 10px;background:color-mix(in srgb,var(--teal) 8%,transparent);border-radius:8px;}
+.fl-win-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.fl-win-btn{display:inline-block;padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);color:var(--muted);transition:all .2s;cursor:pointer;}
+.fl-win-btn:hover{border-color:var(--teal);color:var(--teal);}
+.fl-win-btn.fl-win-btn-main{background:var(--teal);border-color:var(--teal);color:#fff;}
+.fl-win-btn.fl-win-btn-main:hover{background:var(--teal-dk,#0096a0);border-color:var(--teal-dk,#0096a0);color:#fff;}
+
+/* ── Festival warning in planner ── */
+.fl-plan-festival{background:color-mix(in srgb,#f59e0b 10%,var(--card));border:1.5px solid #f59e0b;border-radius:10px;padding:10px 14px;font-size:.82rem;color:var(--fg);margin-bottom:12px;}
+

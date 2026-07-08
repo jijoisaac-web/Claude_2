@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>India Shares Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.1/lightweight-charts.standalone.production.min.js"></script>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;
+--green:#3fb950;--red:#f85149;--blue:#58a6ff;--amber:#d29922;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;}
+header{display:flex;align-items:center;gap:24px;padding:12px 24px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+header h1{font-size:18px;font-weight:600;}
+header h1 span{color:var(--blue);}
+nav{display:flex;gap:4px;}
+nav button{background:none;border:none;color:var(--muted);padding:8px 16px;cursor:pointer;font-size:14px;border-radius:6px;}
+nav button:hover{color:var(--text);background:#21262d;}
+nav button.active{color:var(--text);background:#21262d;font-weight:600;}
+main{max-width:1200px;margin:0 auto;padding:20px 24px;}
+.tab{display:none;}
+.tab.visible{display:block;}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.card .name{color:var(--muted);font-size:12px;margin-bottom:4px;}
+.card .price{font-size:22px;font-weight:600;}
+.card .chg{font-size:13px;margin-top:2px;}
+.up{color:var(--green);}
+.down{color:var(--red);}
+h2{font-size:15px;font-weight:600;margin:18px 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border);}
+th:first-child,td:first-child{text-align:left;}
+th{background:#21262d;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;}
+tr:last-child td{border-bottom:none;}
+tbody tr{cursor:pointer;}
+tbody tr:hover{background:#1c2129;}
+.sym{font-weight:600;}
+.subname{color:var(--muted);font-size:12px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:1px 2px;}
+.badge.bullish{background:rgba(63,185,80,.15);color:var(--green);}
+.badge.bearish{background:rgba(248,81,73,.15);color:var(--red);}
+.badge.neutral{background:rgba(210,153,34,.15);color:var(--amber);}
+.controls{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+select,input[type=text]{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:14px;}
+button.btn{background:#238636;border:none;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;}
+button.btn.ghost{background:#21262d;color:var(--text);border:1px solid var(--border);}
+button.btn.danger{background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:0 6px;}
+.rangebtns button{background:#21262d;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;}
+.rangebtns button.active{color:var(--text);border-color:var(--blue);}
+#chart,#rsiChart,#macdChart{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;}
+.fund-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.fund-grid .card .price{font-size:18px;}
+.muted{color:var(--muted);}
+.loading{color:var(--muted);padding:30px;text-align:center;}
+.signal-detail{color:var(--muted);font-size:12px;display:block;margin-top:2px;text-align:left;}
+.disclaimer{color:var(--muted);font-size:11px;margin-top:24px;padding-top:12px;border-top:1px solid var(--border);}
+@media(max-width:700px){main{padding:12px;}th,td{padding:8px 6px;font-size:12px;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇮🇳 India <span>Shares Tracker</span></h1>
+  <nav>
+    <button data-tab="dashboard" class="active">Dashboard</button>
+    <button data-tab="screener">Screener</button>
+    <button data-tab="charts">Charts</button>
+    <button data-tab="fundamentals">Fundamentals</button>
+  </nav>
+</header>
+<main>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="tab visible">
+  <h2>Indices</h2>
+  <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
+  <h2>Watchlist</h2>
+  <div class="controls">
+    <select id="addSelect"></select>
+    <button class="btn" onclick="addToWatchlist()">+ Add</button>
+    <button class="btn ghost" onclick="loadDashboard()">↻ Refresh</button>
+  </div>
+  <div id="watchTable"><div class="loading">Loading watchlist…</div></div>
+</section>
+
+<!-- SCREENER -->
+<section id="screener" class="tab">
+  <div class="controls">
+    <select id="signalFilter" onchange="renderScreener()">
+      <option value="all">All stocks</option>
+      <option value="signals">With signals only</option>
+      <option value="bullish">Bullish signals</option>
+      <option value="bearish">Bearish signals</option>
+    </select>
+    <button class="btn ghost" onclick="loadScreener(true)">↻ Rescan</button>
+    <span class="muted" id="screenerMeta"></span>
+  </div>
+  <div id="screenerTable"><div class="loading">Scanning NIFTY 50… first scan takes ~30s</div></div>
+</section>
+
+<!-- CHARTS -->
+<section id="charts" class="tab">
+  <div class="controls">
+    <select id="chartSymbol" onchange="loadChart()"></select>
+    <div class="rangebtns" id="rangeBtns">
+      <button data-r="1mo">1M</button><button data-r="3mo">3M</button>
+      <button data-r="6mo">6M</button><button data-r="1y" class="active">1Y</button>
+      <button data-r="2y">2Y</button><button data-r="5y">5Y</button>
+    </div>
+    <label class="muted"><input type="checkbox" id="showSMA" checked onchange="loadChart()"> SMA 20/50/200</label>
+    <label class="muted"><input type="checkbox" id="showBB" onchange="loadChart()"> Bollinger</label>
+  </div>
+  <div id="chart"></div>
+  <div id="rsiChart"></div>
+  <div id="macdChart"></div>
+</section>
+
+<!-- FUNDAMENTALS -->
+<section id="fundamentals" class="tab">
+  <div class="controls">
+    <select id="fundSymbol" onchange="loadFundamentals()"></select>
+  </div>
+  <div id="fundView"><div class="loading">Select a stock</div></div>
+</section>
+
+<div class="disclaimer">Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (v, d=2) => v==null ? "—" : Number(v).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtInt = v => v==null ? "—" : Number(v).toLocaleString("en-IN");
+const cls = v => v>=0 ? "up" : "down";
+const sign = v => v>=0 ? "+" : "";
+const api = async (path, opts) => { const r = await fetch(path, opts); if(!r.ok) throw new Error((await r.json()).detail || r.status); return r.json(); };
+
+let SYMBOLS = [], screenerData = null, chartRange = "1y";
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("visible"));
+  b.classList.add("active"); $(b.dataset.tab).classList.add("visible");
+  if(b.dataset.tab==="screener" && !screenerData) loadScreener();
+  if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
+  if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
+});
+
+/* ---------- dashboard ---------- */
+async function loadDashboard(){
+  try{
+    const idx = await api("/api/indices");
+    $("indexCards").innerHTML = idx.map(q=>`
+      <div class="card"><div class="name">${q.name}</div>
+      <div class="price">${fmt(q.price)}</div>
+      <div class="chg ${cls(q.change)}">${sign(q.change)}${fmt(q.change)} (${sign(q.change_pct)}${fmt(q.change_pct)}%)</div></div>`).join("") || '<div class="loading">No index data</div>';
+  }catch(e){ $("indexCards").innerHTML = `<div class="loading">Index load failed: ${e.message}</div>`; }
+  try{
+    const wl = await api("/api/watchlist");
+    $("watchTable").innerHTML = wl.length ? `<table><thead><tr>
+      <th>Stock</th><th>Price ₹</th><th>Change</th><th>Change %</th><th>Volume</th><th></th></tr></thead><tbody>` +
+      wl.map(q=>`<tr onclick="openChart('${q.symbol}')">
+        <td><span class="sym">${q.symbol.replace(".NS","")}</span><br><span class="subname">${q.name}</span></td>
+        <td>${fmt(q.price)}</td>
+        <td class="${cls(q.change)}">${sign(q.change)}${fmt(q.change)}</td>
+        <td class="${cls(q.change_pct)}">${sign(q.change_pct)}${fmt(q.change_pct)}%</td>
+        <td>${fmtInt(q.volume)}</td>
+        <td><button class="btn danger" onclick="event.stopPropagation();removeFromWatchlist('${q.symbol}')">✕</button></td>
+      </tr>`).join("") + "</tbody></table>" : '<div class="loading">Watchlist empty — add a stock above</div>';
+  }catch(e){ $("watchTable").innerHTML = `<div class="loading">Watchlist load failed: ${e.message}</div>`; }
+}
+async function addToWatchlist(){ await api("/api/watchlist/"+$("addSelect").value,{method:"POST"}); loadDashboard(); }
+async function removeFromWatchlist(s){ await api("/api/watchlist/"+s,{method:"DELETE"}); loadDashboard(); }
+
+/* ---------- screener ---------- */
+async function loadScreener(force){
+  $("screenerTable").innerHTML = '<div class="loading">Scanning NIFTY 50… this can take ~30s</div>';
+  try{
+    screenerData = await api("/api/screener");
+    $("screenerMeta").textContent = `As of ${screenerData.as_of} · ${screenerData.count} stocks scanned`;
+    renderScreener();
+  }catch(e){ $("screenerTable").innerHTML = `<div class="loading">Screener failed: ${e.message}</div>`; }
+}
+function renderScreener(){
+  if(!screenerData) return;
+  const f = $("signalFilter").value;
+  let rows = screenerData.stocks;
+  if(f==="signals") rows = rows.filter(s=>s.signals.length);
+  if(f==="bullish") rows = rows.filter(s=>s.signals.some(x=>x.side==="bullish"));
+  if(f==="bearish") rows = rows.filter(s=>s.signals.some(x=>x.side==="bearish"));
+  $("screenerTable").innerHTML = `<table><thead><tr>
+    <th>Stock</th><th>Price ₹</th><th>Chg %</th><th>RSI</th><th>vs 52w High</th><th>Trend</th><th style="text-align:left">Signals</th></tr></thead><tbody>` +
+    rows.map(s=>`<tr onclick="openChart('${s.symbol}')">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
+      <td>${fmt(s.price)}</td>
+      <td class="${cls(s.change_pct)}">${sign(s.change_pct)}${fmt(s.change_pct)}%</td>
+      <td>${fmt(s.rsi,1)}</td>
+      <td>${fmt(s.pct_from_52w_high,1)}%</td>
+      <td>${s.above_sma200==null?"—":s.above_sma200?'<span class="up">▲ &gt;SMA200</span>':'<span class="down">▼ &lt;SMA200</span>'}</td>
+      <td style="text-align:left">${s.signals.map(x=>`<span class="badge ${x.side}" title="${x.detail}">${x.type.replaceAll("_"," ")}</span><span class="signal-detail">${x.detail}</span>`).join("") || '<span class="muted">—</span>'}</td>
+    </tr>`).join("") + "</tbody></table>";
+}
+
+/* ---------- charts ---------- */
+let charts = {};
+function mkChart(el, h){
+  el.innerHTML = "";
+  return LightweightCharts.createChart(el, {
+    height:h, layout:{background:{color:"#161b22"},textColor:"#8b949e"},
+    grid:{vertLines:{color:"#21262d"},horzLines:{color:"#21262d"}},
+    timeScale:{borderColor:"#30363d"}, rightPriceScale:{borderColor:"#30363d"},
+    autoSize:true,
+  });
+}
+document.querySelectorAll("#rangeBtns button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#rangeBtns button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); chartRange=b.dataset.r; loadChart();
+});
+function openChart(sym){
+  $("chartSymbol").value = sym;
+  document.querySelector('nav button[data-tab="charts"]').click();
+  loadChart();
+}
+async function loadChart(){
+  window._chartLoaded = true;
+  const sym = $("chartSymbol").value;
+  try{
+    const data = await api(`/api/history/${sym}?range=${chartRange}`);
+    const c = data.candles;
+    Object.values(charts).forEach(ch=>ch.remove()); charts={};
+
+    const main = mkChart($("chart"), 420);
+    main.addCandlestickSeries({upColor:"#3fb950",downColor:"#f85149",borderVisible:false,wickUpColor:"#3fb950",wickDownColor:"#f85149"})
+        .setData(c.map(d=>({time:d.time,open:d.open,high:d.high,low:d.low,close:d.close})));
+    const volSeries = main.addHistogramSeries({priceFormat:{type:"volume"},priceScaleId:"vol"});
+    main.priceScale("vol").applyOptions({scaleMargins:{top:0.85,bottom:0}});
+    volSeries.setData(c.map(d=>({time:d.time,value:d.volume,color:d.close>=d.open?"rgba(63,185,80,.4)":"rgba(248,81,73,.4)"})));
+    const line=(key,color)=>main.addLineSeries({color,lineWidth:1,priceLineVisible:false,lastValueVisible:false})
+        .setData(c.filter(d=>d[key]!=null).map(d=>({time:d.time,value:d[key]})));
+    if($("showSMA").checked){ line("sma20","#58a6ff"); line("sma50","#d29922"); line("sma200","#bc8cff"); }
+    if($("showBB").checked){ line("bb_upper","rgba(139,148,158,.6)"); line("bb_lower","rgba(139,148,158,.6)"); }
+    charts.main = main;
+
+    const rsi = mkChart($("rsiChart"), 120);
+    rsi.addLineSeries({color:"#d29922",lineWidth:1}).setData(c.filter(d=>d.rsi14!=null).map(d=>({time:d.time,value:d.rsi14})));
+    [30,70].forEach(v=>rsi.addLineSeries({color:"rgba(139,148,158,.4)",lineWidth:1,lineStyle:2,priceLineVisible:false,lastValueVisible:false})
+        .setData(c.map(d=>({time:d.time,value:v}))));
+    charts.rsi = rsi;
+
+    const macd = mkChart($("macdChart"), 120);
+    macd.addHistogramSeries().setData(c.filter(d=>d.macd_hist!=null).map(d=>({time:d.time,value:d.macd_hist,color:d.macd_hist>=0?"rgba(63,185,80,.6)":"rgba(248,81,73,.6)"})));
+    macd.addLineSeries({color:"#58a6ff",lineWidth:1,priceLineVisible:false}).setData(c.filter(d=>d.macd!=null).map(d=>({time:d.time,value:d.macd})));
+    macd.addLineSeries({color:"#d29922",lineWidth:1,priceLineVisible:false}).setData(c.filter(d=>d.macd_signal!=null).map(d=>({time:d.time,value:d.macd_signal})));
+    charts.macd = macd;
+
+    [main,rsi,macd].forEach(a=>a.timeScale().subscribeVisibleLogicalRangeChange(r=>{
+      if(r) [main,rsi,macd].filter(x=>x!==a).forEach(x=>x.timeScale().setVisibleLogicalRange(r));
+    }));
+    main.timeScale().fitContent();
+  }catch(e){ $("chart").innerHTML = `<div class="loading">Chart failed: ${e.message}</div>`; }
+}
+
+/* ---------- fundamentals ---------- */
+async function loadFundamentals(){
+  window._fundLoaded = true;
+  const sym = $("fundSymbol").value;
+  $("fundView").innerHTML = '<div class="loading">Loading…</div>';
+  try{
+    const f = await api("/api/fundamentals/"+sym);
+    const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
+    const pc = v => v==null?"—":`${fmt(v*100,1)}%`;
+    const rows = [
+      ["Price","₹"+fmt(f.price)], ["Market Cap",cr(f.market_cap)],
+      ["P/E (TTM)",fmt(f.pe)], ["Forward P/E",fmt(f.forward_pe)],
+      ["P/B",fmt(f.pb)], ["EPS (TTM)","₹"+fmt(f.eps)],
+      ["Book Value","₹"+fmt(f.book_value)], ["Dividend Yield",f.dividend_yield==null?"—":fmt(f.dividend_yield,2)+"%"],
+      ["ROE",pc(f.roe)], ["Debt/Equity",fmt(f.debt_to_equity)],
+      ["Profit Margin",pc(f.profit_margin)], ["Revenue",cr(f.revenue)],
+      ["Revenue Growth",pc(f.revenue_growth)], ["Earnings Growth",pc(f.earnings_growth)],
+      ["Beta",fmt(f.beta)], ["52W High","₹"+fmt(f.high_52w)], ["52W Low","₹"+fmt(f.low_52w)],
+      ["Analyst View",(f.recommendation||"—").toUpperCase()], ["Target Price","₹"+fmt(f.target_price)],
+    ];
+    $("fundView").innerHTML = `
+      <h2>${f.name || sym} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
+      <div class="fund-grid">${rows.map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("")}</div>`;
+  }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---------- init ---------- */
+(async function(){
+  SYMBOLS = await api("/api/symbols");
+  const opts = SYMBOLS.map(s=>`<option value="${s.symbol}">${s.symbol.replace(".NS","")} — ${s.name}</option>`).join("");
+  $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
+  $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

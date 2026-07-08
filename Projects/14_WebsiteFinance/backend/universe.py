@@ -1,0 +1,66 @@
+"""Stock universe: NSE tickers (Yahoo Finance format: SYMBOL.NS)."""
+
+INDICES = {
+    "^NSEI": "NIFTY 50",
+    "^NSEBANK": "NIFTY BANK",
+    "^BSESN": "SENSEX",
+    "^CNXIT": "NIFTY IT",
+}
+
+# NIFTY 50 constituents (Yahoo symbols)
+NIFTY50 = {
+    "ADANIENT.NS": "Adani Enterprises",
+    "ADANIPORTS.NS": "Adani Ports",
+    "APOLLOHOSP.NS": "Apollo Hospitals",
+    "ASIANPAINT.NS": "Asian Paints",
+    "AXISBANK.NS": "Axis Bank",
+    "BAJAJ-AUTO.NS": "Bajaj Auto",
+    "BAJFINANCE.NS": "Bajaj Finance",
+    "BAJAJFINSV.NS": "Bajaj Finserv",
+    "BEL.NS": "Bharat Electronics",
+    "BHARTIARTL.NS": "Bharti Airtel",
+    "CIPLA.NS": "Cipla",
+    "COALINDIA.NS": "Coal India",
+    "DRREDDY.NS": "Dr Reddy's Labs",
+    "EICHERMOT.NS": "Eicher Motors",
+    "ETERNAL.NS": "Eternal (Zomato)",
+    "GRASIM.NS": "Grasim Industries",
+    "HCLTECH.NS": "HCL Technologies",
+    "HDFCBANK.NS": "HDFC Bank",
+    "HDFCLIFE.NS": "HDFC Life",
+    "HEROMOTOCO.NS": "Hero MotoCorp",
+    "HINDALCO.NS": "Hindalco",
+    "HINDUNILVR.NS": "Hindustan Unilever",
+    "ICICIBANK.NS": "ICICI Bank",
+    "INDUSINDBK.NS": "IndusInd Bank",
+    "INFY.NS": "Infosys",
+    "ITC.NS": "ITC",
+    "JIOFIN.NS": "Jio Financial",
+    "JSWSTEEL.NS": "JSW Steel",
+    "KOTAKBANK.NS": "Kotak Mahindra Bank",
+    "LT.NS": "Larsen & Toubro",
+    "M&M.NS": "Mahindra & Mahindra",
+    "MARUTI.NS": "Maruti Suzuki",
+    "NESTLEIND.NS": "Nestle India",
+    "NTPC.NS": "NTPC",
+    "ONGC.NS": "ONGC",
+    "POWERGRID.NS": "Power Grid",
+    "RELIANCE.NS": "Reliance Industries",
+    "SBILIFE.NS": "SBI Life",
+    "SBIN.NS": "State Bank of India",
+    "SHRIRAMFIN.NS": "Shriram Finance",
+    "SUNPHARMA.NS": "Sun Pharma",
+    "TATACONSUM.NS": "Tata Consumer",
+    "TATAMOTORS.NS": "Tata Motors",
+    "TATASTEEL.NS": "Tata Steel",
+    "TCS.NS": "TCS",
+    "TECHM.NS": "Tech Mahindra",
+    "TITAN.NS": "Titan",
+    "TRENT.NS": "Trent",
+    "ULTRACEMCO.NS": "UltraTech Cement",
+    "WIPRO.NS": "Wipro",
+}
+
+
+def display_name(symbol: str) -> str:
+    return NIFTY50.get(symbol) or INDICES.get(symbol) or symbol.replace(".NS", "")
