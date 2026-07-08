@@ -40,6 +40,38 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "Organization",
+      "@id": "https://nrifinancehub.com/#organization",
+      "name": "NRI Finance Hub",
+      "legalName": "NRI Finance Hub",
+      "url": "https://nrifinancehub.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://nrifinancehub.com/favicon.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "NRI Finance Hub is a free financial tools platform for Non-Resident Indians, offering live remittance rate comparison, NRE/NRO FD rates, tax calculators, home loan EMI, SIP planner and India return guides.",
+      "foundingDate": "2024",
+      "knowsAbout": [
+        "NRI taxation", "DTAA", "remittance rates", "NRE NRO accounts",
+        "NRI home loans", "FEMA compliance", "India return planning",
+        "NRI investments", "tax residency status", "RNOR"
+      ],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Non-Resident Indians (NRIs)"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "availableLanguage": ["English", "Hindi"]
+      },
+      "sameAs": [
+        "https://nrifinancehub.com/"
+      ]
+    },
+    {
       "@type": "WebSite",
       "@id": "https://nrifinancehub.com/#website",
       "url": "https://nrifinancehub.com/",
@@ -47,6 +79,7 @@
       "alternateName": ["NRI Finance", "NRI Calculator", "NRI Remittance Calculator"],
       "description": "Free financial tools for NRIs: compare live remittance rates, NRE/NRO FD rates, home loan EMI calculator, SIP planner, DTAA tax calculator and India return planner.",
       "inLanguage": "en-IN",
+      "publisher": { "@id": "https://nrifinancehub.com/#organization" },
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://nrifinancehub.com/?q={search_term_string}",
