@@ -2965,7 +2965,7 @@ function closeNavDD(){
       var tYear=now.getFullYear();
       var tDate=new Date(tYear,travelM,1);
       if(tDate<=now) tYear++;
-      var windows=_dateWindows(travelM,tripDays,tYear);
+      var windows=_dateWindows(travelM,tripDays);
       var fromCode=flData.origins[0]?flData.origins[0].code:'DXB';
 
       // Festival check
@@ -2978,21 +2978,14 @@ function closeNavDD(){
       }
       if(festHtml) html+=festHtml;
 
-      var winLabels=['🟢 Best Price','🟡 Good Value','🔴 Peak Price'];
-      var winDescs=[
-        '2nd week · Tue departure — typically cheapest',
-        '3rd week · Wed departure — solid availability',
-        '4th week · Fri departure — higher demand'
-      ];
-
       for(var wi=0;wi<windows.length;wi++){
         var w=windows[wi];
         var depDate=w.dep;
-        var retDate=_addDays(depDate,tripDays);
+        var retDate=w.ret;
 
-        // Fare estimates
-        var rtMin=Math.round(route.min*w.mult);
-        var rtMax=Math.round(route.max*w.mult);
+        // Fare estimates (w.idx is the monthly price multiplier)
+        var rtMin=Math.round(route.min*w.idx);
+        var rtMax=Math.round(route.max*w.idx);
         var outMin=Math.round(rtMin*0.55);
         var outMax=Math.round(rtMax*0.60);
         var retMin=Math.round(rtMin*0.42);
@@ -3032,8 +3025,8 @@ function closeNavDD(){
 
         html+='<div class="fl-window'+(wi===0?' fl-window-best':'')+'">'
           +'<div class="fl-win-header">'
-          +'<span class="fl-win-label">'+winLabels[wi]+'</span>'
-          +'<span class="fl-win-desc">'+winDescs[wi]+'</span>'
+          +'<span class="fl-win-label">'+w.lv.badge+'</span>'
+          +'<span class="fl-win-desc">'+w.why+'</span>'
           +'</div>'
           +'<div class="fl-win-dates">'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">DEPART</div><div class="fl-win-dt">'+_fmtLong(depDate)+'</div></div>'
