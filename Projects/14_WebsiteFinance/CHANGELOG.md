@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.4.0] — 2026-07-08
+
+- Seven new scan signals: 20-day range breakout/breakdown (with volume confirmation), Bollinger band squeeze (6-month tights), bullish/bearish RSI divergence, gap up/down ≥3%, three-day pullback dip in uptrend, 3-month relative strength vs NIFTY
+- Screener: filter by specific signal type; sort by signals, % change, RSI, distance to 52-week high, or 3-month momentum
+- Ideas engine upgraded: breakout buys with structure-based stops, gap plays, divergence caution/speculative flags, EXIT/AVOID on breakdowns, squeeze WATCH setups with trigger-entry above the range, relative-strength leaders in the long-term bucket
+
 ## [1.3.0] — 2026-07-08
 
 - New **Ideas** tab: rule-based trade candidates from the latest scan, split by horizon:

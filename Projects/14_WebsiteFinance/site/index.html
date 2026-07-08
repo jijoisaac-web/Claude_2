@@ -104,6 +104,17 @@ progress{width:180px;accent-color:var(--blue);}
       <option value="bullish">Bullish signals</option>
       <option value="bearish">Bearish signals</option>
     </select>
+    <select id="signalType" onchange="renderScreener()">
+      <option value="">Any signal type</option>
+    </select>
+    <select id="sortBy" onchange="renderScreener()">
+      <option value="signals">Sort: most signals</option>
+      <option value="chg">Sort: % change</option>
+      <option value="rsi_low">Sort: RSI low→high</option>
+      <option value="rsi_high">Sort: RSI high→low</option>
+      <option value="near_high">Sort: nearest 52w high</option>
+      <option value="rel">Sort: 3-mo momentum</option>
+    </select>
     <button class="btn ghost" onclick="loadScreener(true)">↻ Rescan</button>
     <span class="muted" id="screenerMeta"></span>
     <progress id="scanProgress" max="50" value="0" style="display:none"></progress>
@@ -304,13 +315,14 @@ async function loadDashboard(){
 let screenerData = null;
 const SCAN_KEY = "ist_scan_cache";
 
-function scanStock(sym, candles){
+function scanStock(sym, candles, bench63){
   if(candles.length < 60) return null;
   const e = enrich(candles);
   const yr = e.slice(-252);
   const last = e[e.length-1], prev = e[e.length-2];
   const close = last.close, signals = [];
   const r = last.rsi14;
+  const aboveSMA200 = last.sma200!=null ? close>last.sma200 : null;
   if(r!=null){
     if(r<30) signals.push({type:"RSI_OVERSOLD",side:"bullish",detail:`RSI ${r.toFixed(1)} — oversold, potential bounce`});
     else if(r>70) signals.push({type:"RSI_OVERBOUGHT",side:"bearish",detail:`RSI ${r.toFixed(1)} — overbought, extended`});
@@ -335,14 +347,55 @@ function scanStock(sym, candles){
     signals.push({type:"VOLUME_SPIKE",side:"neutral",detail:`Volume ${(last.volume/last.vol_avg20).toFixed(1)}x the 20-day average`});
   if(last.bb_lower!=null && close <= last.bb_lower) signals.push({type:"BB_LOWER_TOUCH",side:"bullish",detail:"Close at/below lower Bollinger band"});
   else if(last.bb_upper!=null && close >= last.bb_upper) signals.push({type:"BB_UPPER_TOUCH",side:"bearish",detail:"Close at/above upper Bollinger band"});
+
+  // 20-day range breakout / breakdown (vs prior 20 sessions, excluding today)
+  let h20=null, l20=null;
+  const prior20 = e.slice(-21,-1);
+  if(prior20.length===20){
+    h20 = Math.max(...prior20.map(d=>d.high)); l20 = Math.min(...prior20.map(d=>d.low));
+    const volOK = last.vol_avg20 && last.volume > 1.5*last.vol_avg20;
+    if(close > h20) signals.push({type:"BREAKOUT_20D",side:"bullish",detail:`Close above the 20-day high ₹${Math.round(h20).toLocaleString("en-IN")}${volOK?" on strong volume":""}`});
+    else if(close < l20) signals.push({type:"BREAKDOWN_20D",side:"bearish",detail:`Close below the 20-day low ₹${Math.round(l20).toLocaleString("en-IN")}`});
+  }
+  // Bollinger squeeze: band width tightest in ~6 months
+  const widths = e.slice(-120).map(d=> d.bb_upper!=null && d.sma20 ? (d.bb_upper-d.bb_lower)/d.sma20 : null).filter(v=>v!=null);
+  if(widths.length>60 && widths[widths.length-1] <= Math.min(...widths)*1.1)
+    signals.push({type:"BB_SQUEEZE",side:"neutral",detail:"Bollinger bands tightest in ~6 months — a big move often follows the squeeze"});
+  // RSI divergence over last 40 sessions (compare the two 20-bar halves)
+  const win = e.slice(-40);
+  if(win.length===40 && win.every(d=>d.rsi14!=null)){
+    const H1 = win.slice(0,20), H2 = win.slice(20);
+    const lo1 = H1.reduce((m,d)=>d.low<m.low?d:m), lo2 = H2.reduce((m,d)=>d.low<m.low?d:m);
+    if(lo2.low < lo1.low && lo2.rsi14 > lo1.rsi14 + 3 && r < 50)
+      signals.push({type:"RSI_BULL_DIV",side:"bullish",detail:"Price made a lower low but RSI a higher low — selling pressure fading"});
+    const hi1 = H1.reduce((m,d)=>d.high>m.high?d:m), hi2 = H2.reduce((m,d)=>d.high>m.high?d:m);
+    if(hi2.high > hi1.high && hi2.rsi14 < hi1.rsi14 - 3 && r > 55)
+      signals.push({type:"RSI_BEAR_DIV",side:"bearish",detail:"Price made a higher high but RSI a lower high — momentum fading"});
+  }
+  // Gap up/down ≥3% at today's open
+  const gapPct = prev.close ? (last.open - prev.close)/prev.close*100 : 0;
+  if(gapPct >= 3) signals.push({type:"GAP_UP",side:"bullish",detail:`Gapped up ${gapPct.toFixed(1)}% at the open`});
+  else if(gapPct <= -3) signals.push({type:"GAP_DOWN",side:"bearish",detail:`Gapped down ${Math.abs(gapPct).toFixed(1)}% at the open`});
+  // 3 straight red days inside an uptrend = dip-buy zone
+  const last3 = e.slice(-3);
+  if(aboveSMA200 && last3.length===3 && last3.every(d=>d.close<d.open) && r>=35 && r<=55)
+    signals.push({type:"PULLBACK_DIP",side:"bullish",detail:"Three straight red days within an uptrend, RSI neutral — classic dip-buy zone"});
+  // 3-month relative strength vs NIFTY
+  let ret63 = null;
+  if(e.length>63 && e[e.length-64].close){
+    ret63 = close/e[e.length-64].close - 1;
+    if(bench63!=null && ret63 > bench63 + 0.08)
+      signals.push({type:"REL_STRENGTH",side:"bullish",detail:`Beating NIFTY by ${((ret63-bench63)*100).toFixed(0)} pts over 3 months — institutional favourite behaviour`});
+  }
+
   const sma200_20ago = e.length>20 ? e[e.length-21].sma200 : null;
   return {symbol:sym, name:nameOf(sym), price:close,
     change_pct:(close-prev.close)/prev.close*100, rsi:r,
-    above_sma200: last.sma200!=null ? close>last.sma200 : null,
+    above_sma200: aboveSMA200,
     pct_from_52w_high:(close-hi)/hi*100, signals,
     atr:atr14(candles), sma50:last.sma50, sma200:last.sma200,
     sma200_rising: last.sma200!=null && sma200_20ago!=null ? last.sma200>sma200_20ago : null,
-    hi52:hi, lo52:lo};
+    hi52:hi, lo52:lo, h20, l20, ret63};
 }
 
 function universeSymbols(){
@@ -359,7 +412,12 @@ async function loadScreener(force){
   const syms = universeSymbols();
   $("screenerTable").innerHTML = `<div class="loading">Scanning ${uni === "ALL" ? "all universes" : uni} (${syms.length} stocks)…</div>`;
   const prog = $("scanProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
-  const results = await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d"))), 8, ()=>prog.value++);
+  let bench63 = null;   // NIFTY 3-month return, for relative-strength comparison
+  try{
+    const b = toCandles(await fetchChart("^NSEI","1y","1d"));
+    if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1;
+  }catch(e){}
+  const results = await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d")), bench63), 8, ()=>prog.value++);
   prog.style.display="none";
   const stocks = results.filter(Boolean).sort((a,b)=>b.signals.length-a.signals.length);
   screenerData = {as_of:new Date().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}), count:stocks.length, stocks};
@@ -370,11 +428,27 @@ async function loadScreener(force){
 }
 function renderScreener(){
   if(!screenerData) return;
-  const f = $("signalFilter").value;
+  // populate signal-type dropdown from what the scan actually found (keep selection)
+  const stSel = $("signalType"), prevSel = stSel.value;
+  const types = [...new Set(screenerData.stocks.flatMap(s=>s.signals.map(x=>x.type)))].sort();
+  stSel.innerHTML = '<option value="">Any signal type</option>' +
+    types.map(t=>`<option value="${t}">${t.replaceAll("_"," ")}</option>`).join("");
+  if(types.includes(prevSel)) stSel.value = prevSel;
+
+  const f = $("signalFilter").value, st = stSel.value, sort = $("sortBy").value;
   let rows = screenerData.stocks;
   if(f==="signals") rows = rows.filter(s=>s.signals.length);
   if(f==="bullish") rows = rows.filter(s=>s.signals.some(x=>x.side==="bullish"));
   if(f==="bearish") rows = rows.filter(s=>s.signals.some(x=>x.side==="bearish"));
+  if(st) rows = rows.filter(s=>s.signals.some(x=>x.type===st));
+  rows = [...rows];
+  const nz = v => v==null ? -1e9 : v;
+  if(sort==="chg") rows.sort((a,b)=>nz(b.change_pct)-nz(a.change_pct));
+  else if(sort==="rsi_low") rows.sort((a,b)=>nz(a.rsi)-nz(b.rsi));
+  else if(sort==="rsi_high") rows.sort((a,b)=>nz(b.rsi)-nz(a.rsi));
+  else if(sort==="near_high") rows.sort((a,b)=>nz(b.pct_from_52w_high)-nz(a.pct_from_52w_high));
+  else if(sort==="rel") rows.sort((a,b)=>nz(b.ret63)-nz(a.ret63));
+  else rows.sort((a,b)=>b.signals.length-a.signals.length);
   $("screenerTable").innerHTML = `<table><thead><tr>
     <th>Stock</th><th>Price ₹</th><th>Chg %</th><th>RSI</th><th>vs 52w High</th><th>Trend</th><th style="text-align:left">Signals</th></tr></thead><tbody>` +
     rows.map(s=>`<tr onclick="openChart('${s.symbol}')">
@@ -398,15 +472,27 @@ function buildIdeas(stocks){
     const r = s.rsi;
 
     // ---- short term: momentum triggers, filtered by long-term trend ----
-    if(s.above_sma200 && (has("MACD_BULL_CROSS") || has("RSI_OVERSOLD") || has("BB_LOWER_TOUCH"))){
-      const stop = R(s.price - 1.5*s.atr), target = R(s.price + 3*s.atr);
+    const shortWhy =
+      has("BREAKOUT_20D") ? "20-day range breakout — momentum entry; the broken level becomes support" :
+      has("MACD_BULL_CROSS") ? "Fresh MACD bullish crossover" :
+      has("GAP_UP") ? "Gap-up with the trend — strength begets strength, but size smaller (gaps can fill)" :
+      has("PULLBACK_DIP") ? "Three-day dip inside an uptrend, RSI reset" :
+      has("RSI_BULL_DIV") ? "Bullish RSI divergence — a reversal clue, speculative until price confirms" :
+      has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH") ? "Oversold dip (RSI/lower band)" : null;
+    if(s.above_sma200 && shortWhy){
+      const stop = has("BREAKOUT_20D") && s.h20 ? R(Math.max(s.h20*0.99, s.price-1.5*s.atr)) : R(s.price - 1.5*s.atr);
+      const target = R(s.price + 2*(s.price-stop));
       shortT.push({...s, action:"BUY", entry:R(s.price), stop, target,
-        why:(has("MACD_BULL_CROSS") ? "Fresh MACD bullish crossover" : "Oversold dip (RSI/lower band)") +
-            " inside a long-term uptrend (above SMA200)" + (has("VOLUME_SPIKE") ? "; volume confirms" : "") +
-            ". Works as a swing entry while the uptrend holds."});
+        why: shortWhy + " inside a long-term uptrend (above SMA200)" + (has("VOLUME_SPIKE") ? "; volume confirms" : "") + "."});
+    } else if(has("BREAKDOWN_20D") || has("GAP_DOWN")){
+      shortT.push({...s, action:"EXIT / AVOID", entry:null, stop:null, target:null,
+        why:(has("BREAKDOWN_20D") ? "Broke below its 20-day range" : "Gapped down hard") + " — short-term structure damaged. Stand aside until it stabilises."});
     } else if(r!=null && r>75 && has("BB_UPPER_TOUCH")){
       shortT.push({...s, action:"BOOK PROFITS", entry:null, stop:R(s.price - 1.5*s.atr), target:null,
         why:`RSI ${r.toFixed(0)} and stretched above the upper Bollinger band — short-term risk/reward is poor. If holding, consider trailing a stop rather than adding.`});
+    } else if(has("RSI_BEAR_DIV")){
+      shortT.push({...s, action:"CAUTION", entry:null, stop:null, target:null,
+        why:"Bearish RSI divergence — price is rising on fading momentum. Tighten stops if holding; avoid fresh entries."});
     }
 
     // ---- medium term: trend following ----
@@ -421,12 +507,18 @@ function buildIdeas(stocks){
       const stop = R(Math.min(s.sma50*0.95, s.price - 2.5*s.atr)), target = R(Math.max(s.hi52, s.price + 5*s.atr));
       medT.push({...s, action:"BUY", entry:R(s.price), stop, target,
         why:"Healthy pullback to SMA50 inside an uptrend, RSI reset to neutral — classic buy-the-dip zone with defined risk below the moving average."});
+    } else if(has("BB_SQUEEZE") && s.above_sma200 && s.h20 && s.l20){
+      const entry = R(s.h20*1.005), stop = R(s.l20), target = R(entry + 2*(entry-stop));
+      medT.push({...s, action:"WATCH", entry, stop, target,
+        why:"Volatility squeeze in an uptrend — bands at 6-month tights. Don't buy yet: place the entry above the 20-day high so the breakout triggers it, stop below the range."});
     }
 
     // ---- long term: stage-2 accumulation ----
-    if(s.above_sma200 && s.sma200_rising && s.pct_from_52w_high >= -12){
+    if(s.above_sma200 && s.sma200_rising && (s.pct_from_52w_high >= -12 || has("REL_STRENGTH"))){
       longT.push({...s, action:"ACCUMULATE", entry:R(s.price), stop:R(s.sma200), target:null,
-        why:"Rising SMA200 with price holding near 52-week highs — an established stage-2 uptrend. Accumulate in tranches on dips; exit only if price closes decisively below SMA200."});
+        why:(has("REL_STRENGTH") ? "Beating the index over 3 months with a rising SMA200 — relative-strength leaders tend to keep leading. " :
+            "Rising SMA200 with price holding near 52-week highs — an established stage-2 uptrend. ") +
+            "Accumulate in tranches on dips; exit only if price closes decisively below SMA200."});
     }
   }
   shortT.sort((a,b)=>b.signals.length-a.signals.length);
