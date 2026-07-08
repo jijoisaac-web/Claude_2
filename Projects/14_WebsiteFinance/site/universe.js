@@ -1,7 +1,7 @@
 // Stock universes — generated from official NSE constituent lists (nsearchives.nseindia.com), July 2026.
 // Yahoo Finance symbols: NSE symbol + ".NS"
 
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.7.0";
 
 const INDICES = {
   "^NSEI": "NIFTY 50",
@@ -9,6 +9,20 @@ const INDICES = {
   "^BSESN": "SENSEX",
   "^NSEMDCP50": "NIFTY MIDCAP 50",
   "^CNXSC": "NIFTY SMALLCAP 100",
+};
+
+// global markets & macro (Yahoo symbols)
+const GLOBAL = {
+  "^GSPC": "S&P 500",
+  "^IXIC": "NASDAQ",
+  "^N225": "Nikkei 225",
+  "^HSI": "Hang Seng",
+  "^FTSE": "FTSE 100",
+  "GC=F": "Gold",
+  "BZ=F": "Brent Crude",
+  "INR=X": "USD/INR",
+  "^INDIAVIX": "India VIX",
+  "^TNX": "US 10Y Yield",
 };
 
 const UNIVERSES = {
@@ -163,7 +177,7 @@ const UNIVERSES = {
 };
 
 const ALL_STOCKS = Object.assign({}, ...Object.values(UNIVERSES));
-const nameOf = s => ALL_STOCKS[s] || INDICES[s] || s.replace(".NS", "");
+const nameOf = s => ALL_STOCKS[s] || INDICES[s] || GLOBAL[s] || s.replace(".NS", "");
 
 // market-cap tier from index membership: NIFTY 50 = large, MIDCAP 150 = mid, SMALLCAP 250 = small
 const CAP_OF = {};

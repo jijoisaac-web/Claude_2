@@ -25,6 +25,18 @@ main{max-width:1200px;margin:0 auto;padding:20px 24px;}
 .tab{display:none;}
 .tab.visible{display:block;}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
+.cards.small{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+.cards.small .card .price{font-size:16px;}
+.pulse-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:900px){.pulse-grid{grid-template-columns:1fr;}}
+.pulse-grid table{font-size:13px;}
+.pulse-grid th,.pulse-grid td{padding:6px 8px;}
+.sectorRow{display:flex;align-items:center;gap:8px;margin:3px 0;}
+.sectorRow .sname{width:180px;font-size:12px;color:var(--muted);text-align:right;}
+.sectorRow .bar{height:14px;border-radius:3px;min-width:2px;}
+.sectorRow .sval{font-size:12px;}
+.breadthBar{display:flex;height:18px;border-radius:4px;overflow:hidden;margin:6px 0;}
+.breadthBar div{height:100%;}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
 .card .name{color:var(--muted);font-size:12px;margin-bottom:4px;}
 .card .price{font-size:22px;font-weight:600;}
@@ -70,7 +82,7 @@ progress{width:180px;accent-color:var(--blue);}
 </head>
 <body>
 <header>
-  <h1>🇮🇳 India <span>Shares Tracker</span></h1>
+  <h1>🇮🇳 India <span>Shares Tracker</span> <span class="badge capL" id="verBadge" style="vertical-align:middle"></span></h1>
   <nav>
     <button data-tab="dashboard" class="active">Dashboard</button>
     <button data-tab="screener">Screener</button>
@@ -85,6 +97,12 @@ progress{width:180px;accent-color:var(--blue);}
 <section id="dashboard" class="tab visible">
   <h2>Indices</h2>
   <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
+  <h2>Global markets &amp; macro</h2>
+  <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
+  <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div id="pulseView"><div class="loading">Analysing market…</div></div>
+  <h2>Top opportunities today</h2>
+  <div id="oppView"><div class="loading">…</div></div>
   <h2>Watchlist</h2>
   <div class="controls">
     <select id="addSelect"></select>
@@ -289,20 +307,91 @@ const WL_KEY = "ist_watchlist";
 const WL_DEFAULT = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","TMPV.NS"];
 function getWL(){ try{ const v = JSON.parse(localStorage.getItem(WL_KEY)); return Array.isArray(v)&&v.length?v:WL_DEFAULT; }catch(e){ return WL_DEFAULT; } }
 function setWL(v){ localStorage.setItem(WL_KEY, JSON.stringify(v)); }
+/* ---- market pulse: breadth, sectors, movers — from the latest scan ---- */
+async function loadPulse(){
+  if(!screenerData){
+    $("pulseView").innerHTML = '<div class="loading">Scanning market… (first load takes a moment)</div>';
+    try{ await loadScreener(); }catch(e){}
+  }
+  renderPulse();
+}
+function renderPulse(){
+  if(!screenerData){ $("pulseView").innerHTML = '<div class="loading">Scan failed — open the Screener tab to retry.</div>'; return; }
+  const st = screenerData.stocks;
+  $("pulseMeta").textContent = `· ${$("universeSelect").value} · ${screenerData.as_of}`;
+
+  // breadth
+  const adv = st.filter(s=>s.change_pct>0).length, dec = st.filter(s=>s.change_pct<0).length;
+  const above = st.filter(s=>s.above_sma200).length, knownTrend = st.filter(s=>s.above_sma200!=null).length;
+  const advPct = adv/(adv+dec||1)*100, abovePct = above/(knownTrend||1)*100;
+  const mood = advPct>=60 ? ["up","Risk-on: breadth is strong"] : advPct<=40 ? ["down","Risk-off: breadth is weak"] : ["muted","Mixed breadth — be selective"];
+
+  // sector performance (average day change per sector)
+  const secAgg = {};
+  st.forEach(s=>{ const sec = sectorOf(s.symbol); if(!sec || s.change_pct==null) return;
+    (secAgg[sec] = secAgg[sec] || []).push(s.change_pct); });
+  const secPerf = Object.entries(secAgg).map(([sec,a])=>({sec, n:a.length, avg:a.reduce((x,y)=>x+y,0)/a.length}))
+    .filter(x=>x.n>=3).sort((a,b)=>b.avg-a.avg);
+  const maxAbs = Math.max(0.1, ...secPerf.map(x=>Math.abs(x.avg)));
+
+  // movers
+  const gainers = [...st].sort((a,b)=>b.change_pct-a.change_pct).slice(0,5);
+  const losers  = [...st].sort((a,b)=>a.change_pct-b.change_pct).slice(0,5);
+  const mostActive = [...st].filter(s=>s.turnover!=null).sort((a,b)=>b.turnover-a.turnover).slice(0,5);
+
+  const moverTable = (rows, valFn) => `<table><thead><tr><th>Stock</th><th>Price ₹</th><th>Val</th></tr></thead><tbody>` +
+    rows.map(s=>`<tr onclick="openChart('${s.symbol}')"><td><span class="sym">${s.symbol.replace(".NS","")}</span></td>
+      <td>${fmt(s.price)}</td><td class="${cls(s.change_pct)}">${valFn(s)}</td></tr>`).join("") + "</tbody></table>";
+
+  $("pulseView").innerHTML = `
+    <div class="card" style="margin-bottom:12px">
+      <div class="name">Market breadth — <span class="${mood[0]}">${mood[1]}</span></div>
+      <div class="breadthBar"><div style="width:${advPct}%;background:var(--green)"></div><div style="width:${100-advPct}%;background:var(--red)"></div></div>
+      <div class="muted" style="font-size:12px">${adv} advancing · ${dec} declining · ${abovePct.toFixed(0)}% of stocks above their SMA200</div>
+    </div>
+    <div class="pulse-grid">
+      <div><h2 style="margin-top:0">Top gainers</h2>${moverTable(gainers, s=>sign(s.change_pct)+fmt(s.change_pct)+"%")}</div>
+      <div><h2 style="margin-top:0">Top losers</h2>${moverTable(losers, s=>sign(s.change_pct)+fmt(s.change_pct)+"%")}</div>
+      <div><h2 style="margin-top:0">Most active (turnover)</h2>${mostActive.length?moverTable(mostActive, s=>"₹"+fmtInt(Math.round(s.turnover/1e7))+" Cr"):'<div class="muted" style="font-size:12px">Rescan (↻) on the Screener tab to compute turnover</div>'}</div>
+    </div>
+    <div class="card">
+      <div class="name">Sector performance (avg % today)</div>
+      ${secPerf.map(x=>`<div class="sectorRow"><span class="sname">${x.sec} (${x.n})</span>
+        <div class="bar" style="width:${Math.abs(x.avg)/maxAbs*300}px;background:${x.avg>=0?'var(--green)':'var(--red)'}"></div>
+        <span class="sval ${cls(x.avg)}">${sign(x.avg)}${fmt(x.avg,2)}%</span></div>`).join("")}
+    </div>`;
+
+  // top opportunities from the ideas engine
+  const {shortT, medT} = buildIdeas(st);
+  const opps = [...shortT.filter(s=>s.action==="BUY").slice(0,4), ...medT.filter(s=>s.action==="BUY").slice(0,3)];
+  $("oppView").innerHTML = opps.length ? `<table><thead><tr><th>Stock</th><th style="text-align:left">Setup</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th></tr></thead><tbody>` +
+    opps.map(s=>{ const cap=capOf(s.symbol), cc=cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+      return `<tr onclick="document.querySelector('nav button[data-tab=ideas]').click()">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span> <span class="badge ${cc}">${cap}</span><br><span class="subname">${s.name}</span></td>
+      <td style="text-align:left"><span class="signal-detail" style="font-size:12px">${s.why}</span></td>
+      <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${fmt(s.target)}</td></tr>`;}).join("") +
+    `</tbody></table><div class="muted" style="font-size:11px;margin-top:4px">From the Ideas engine — open the Ideas tab for the full list, inline charts and position sizing.</div>`
+    : '<div class="loading">No qualifying buy setups right now — patience is a position too.</div>';
+}
+
 function addToWatchlist(){ const s=$("addSelect").value, wl=getWL(); if(!wl.includes(s)){ wl.push(s); setWL(wl);} loadDashboard(); }
 function removeFromWatchlist(s){ setWL(getWL().filter(x=>x!==s)); loadDashboard(); }
 
 /* ================= dashboard ================= */
+const cardHTML = q => `
+  <div class="card"><div class="name">${q.name}</div>
+  <div class="price">${fmt(q.price)}</div>
+  <div class="chg ${cls(q.change)}">${sign(q.change)}${fmt(q.change)} (${sign(q.change_pct)}${fmt(q.change_pct)}%)</div></div>`;
+
 async function loadDashboard(){
-  const idxSyms = Object.keys(INDICES);
-  pmap(idxSyms, getQuote, 4).then(idx=>{
-    idx = idx.filter(Boolean);
-    $("indexCards").innerHTML = idx.map(q=>`
-      <div class="card"><div class="name">${q.name}</div>
-      <div class="price">${fmt(q.price)}</div>
-      <div class="chg ${cls(q.change)}">${sign(q.change)}${fmt(q.change)} (${sign(q.change_pct)}${fmt(q.change_pct)}%)</div></div>`).join("")
-      || '<div class="loading">No index data</div>';
+  pmap(Object.keys(INDICES), getQuote, 4).then(idx=>{
+    $("indexCards").innerHTML = idx.filter(Boolean).map(cardHTML).join("") || '<div class="loading">No index data</div>';
   });
+  pmap(Object.keys(GLOBAL), getQuote, 5).then(g=>{
+    g = g.filter(Boolean).map(q => q.symbol==="^TNX" ? {...q, price:q.price/10, change:q.change/10} : q);  // ^TNX is 10x the yield
+    $("globalCards").innerHTML = g.map(cardHTML).join("") || '<div class="loading">No data</div>';
+  });
+  loadPulse();
   const wl = await pmap(getWL(), getQuote, 6);
   const rows = wl.filter(Boolean);
   $("watchTable").innerHTML = rows.length ? `<table><thead><tr>
@@ -401,7 +490,8 @@ function scanStock(sym, candles, bench63){
     pct_from_52w_high:(close-hi)/hi*100, signals,
     atr:atr14(candles), sma50:last.sma50, sma200:last.sma200,
     sma200_rising: last.sma200!=null && sma200_20ago!=null ? last.sma200>sma200_20ago : null,
-    hi52:hi, lo52:lo, h20, l20, ret63};
+    hi52:hi, lo52:lo, h20, l20, ret63,
+    turnover: last.volume!=null ? close*last.volume : null};
 }
 
 function universeSymbols(){
@@ -431,6 +521,7 @@ async function loadScreener(force){
   $("screenerMeta").textContent = `As of ${screenerData.as_of} · ${screenerData.count} stocks scanned`;
   renderScreener();
   if(window._ideasLoaded) loadIdeas();
+  renderPulse();
 }
 function renderScreener(){
   if(!screenerData) return;
@@ -791,7 +882,7 @@ async function loadPeerComparison(sym, me){
   $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
   $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
   $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
-  document.querySelector("header h1").title = "v" + APP_VERSION;
+  $("verBadge").textContent = "v" + APP_VERSION;
   loadDashboard();
 })();
 </script>

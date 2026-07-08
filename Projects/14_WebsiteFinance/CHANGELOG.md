@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.7.0] — 2026-07-08 · Dashboard Pro
+
+- Global markets & macro cards: S&P 500, NASDAQ, Nikkei, Hang Seng, FTSE, Gold, Brent Crude, USD/INR, India VIX, US 10-year yield
+- Market pulse (from the latest scan): advance/decline breadth bar with risk-on/risk-off read, % of stocks above SMA200, top gainers/losers, most active by turnover, sector performance bars (average day move per NSE sector)
+- Top opportunities today: the Ideas engine's best current BUY setups surfaced on the dashboard with entry/stop/target
+- Version badge moved into the header
+
 ## [1.6.0] — 2026-07-08
 
 - Ideas: click any idea row to expand an inline 6-month chart with SMA20/50 and the idea's entry/stop/target drawn as dashed price lines — no tab switch needed ("open full chart ↗" link included)
