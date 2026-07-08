@@ -61,6 +61,18 @@ export async function onRequestGet({ request, params }) {
       low_52w: raw(sd.fiftyTwoWeekLow),
       recommendation: fd.recommendationKey || null,
       target_price: raw(fd.targetMeanPrice),
+      // extended fields for the fundamental screener
+      ps: raw(sd.priceToSalesTrailing12Months),
+      peg: raw(ks.trailingPegRatio) ?? raw(ks.pegRatio),
+      ev_ebitda: raw(ks.enterpriseToEbitda),
+      enterprise_value: raw(ks.enterpriseValue),
+      current_ratio: raw(fd.currentRatio),
+      quick_ratio: raw(fd.quickRatio),
+      gross_margin: raw(fd.grossMargins),
+      operating_margin: raw(fd.operatingMargins),
+      roa: raw(fd.returnOnAssets),
+      ocf: raw(fd.operatingCashflow),
+      fcf: raw(fd.freeCashflow),
     };
     const res = new Response(JSON.stringify(out), {
       headers: {

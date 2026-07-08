@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.8.0] — 2026-07-08 · Value Screener
+
+- New **Value Screener** tab: 24 fundamental filters (market cap, EV, P/E, forward P/E, PEG, P/B, P/S, EV/EBITDA, dividend yield, ROE, ROA, gross/operating/net margins, D/E, current/quick ratio, OCF, FCF, sales/profit growth, beta, % from 52-week high) with unlimited AND combinations, plus sector and universe filters
+- Presets: Quality compounders, Deep value, Dividend champs, GARP
+- Saved screens (named, stored in browser) and CSV export of results
+- Sortable result columns; rows link to Fundamentals (click) and Charts (📈)
+- Fundamentals API extended with the new fields; browser cache versioned so old entries refresh
+- Ideas rows: added 📈 full-chart button next to the 📊 fundamentals button
+
 ## [1.7.0] — 2026-07-08 · Dashboard Pro
 
 - Global markets & macro cards: S&P 500, NASDAQ, Nikkei, Hang Seng, FTSE, Gold, Brent Crude, USD/INR, India VIX, US 10-year yield
