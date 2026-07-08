@@ -69,6 +69,7 @@ progress{width:180px;accent-color:var(--blue);}
   <nav>
     <button data-tab="dashboard" class="active">Dashboard</button>
     <button data-tab="screener">Screener</button>
+    <button data-tab="ideas">Ideas</button>
     <button data-tab="charts">Charts</button>
     <button data-tab="fundamentals">Fundamentals</button>
   </nav>
@@ -108,6 +109,39 @@ progress{width:180px;accent-color:var(--blue);}
     <progress id="scanProgress" max="50" value="0" style="display:none"></progress>
   </div>
   <div id="screenerTable"><div class="loading">Open this tab to scan</div></div>
+</section>
+
+<!-- IDEAS -->
+<section id="ideas" class="tab">
+  <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
+    <span class="muted">⚠️ Rule-based technical ideas generated automatically from the latest scan (universe picked on the Screener tab).
+    Educational tool, not investment advice — check fundamentals, news and your own risk tolerance before acting. Levels are indicative, based on ATR volatility.</span>
+  </div>
+  <div class="controls">
+    <button class="btn ghost" onclick="loadIdeas(true)">↻ Refresh from scan</button>
+    <span class="muted" id="ideasMeta"></span>
+  </div>
+  <h2>Short term · 1–4 weeks (momentum / mean-reversion)</h2>
+  <div id="ideasShort"><div class="loading">…</div></div>
+  <h2>Medium term · 1–6 months (trend following)</h2>
+  <div id="ideasMed"><div class="loading">…</div></div>
+  <h2>Long term · 6+ months (stage-2 accumulation)</h2>
+  <div id="ideasLong"><div class="loading">…</div></div>
+
+  <h2>Position size &amp; margin calculator</h2>
+  <div class="card">
+    <div class="controls" style="margin-bottom:8px;">
+      <label class="muted">Capital ₹ <input type="text" id="pcCapital" value="100000" size="8" oninput="calcPosition()"></label>
+      <label class="muted">Risk/trade % <input type="text" id="pcRisk" value="1" size="3" oninput="calcPosition()"></label>
+      <label class="muted">Entry ₹ <input type="text" id="pcEntry" size="8" oninput="calcPosition()"></label>
+      <label class="muted">Stop ₹ <input type="text" id="pcStop" size="8" oninput="calcPosition()"></label>
+      <label class="muted">Leverage <select id="pcLev" onchange="calcPosition()">
+        <option value="1">1x (cash/delivery)</option><option value="2">2x</option><option value="5">5x (intraday MIS)</option>
+      </select></label>
+    </div>
+    <div id="pcOut" class="muted">Click 📐 on any idea to prefill entry/stop.</div>
+    <div class="muted" style="font-size:11px;margin-top:6px;">Leverage amplifies losses as much as gains — a 5x intraday position loses 5% of capital on a 1% adverse move. Delivery (1x) is safest while learning.</div>
+  </div>
 </section>
 
 <!-- CHARTS -->
@@ -199,6 +233,13 @@ function rsiArr(c,p=14){ const out=new Array(c.length).fill(null); let ag=0,al=0
 function stdArr(a,p){ const out=new Array(a.length).fill(null);
   for(let i=p-1;i<a.length;i++){ const w=a.slice(i-p+1,i+1), m=w.reduce((s,v)=>s+v,0)/p;
     out[i]=Math.sqrt(w.reduce((s,v)=>s+(v-m)*(v-m),0)/(p-1)); } return out; }
+function atr14(c,p=14){ let atr=null;
+  for(let i=0;i<c.length;i++){
+    const tr = i===0 ? c[0].high-c[0].low :
+      Math.max(c[i].high-c[i].low, Math.abs(c[i].high-c[i-1].close), Math.abs(c[i].low-c[i-1].close));
+    atr = i===0 ? tr : (i<p ? (atr*i+tr)/(i+1) : (atr*(p-1)+tr)/p);
+  }
+  return atr; }
 
 function enrich(candles){
   const close = candles.map(d=>d.close), vol = candles.map(d=>d.volume);
@@ -221,6 +262,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("visible"));
   b.classList.add("active"); $(b.dataset.tab).classList.add("visible");
   if(b.dataset.tab==="screener" && !screenerData) loadScreener();
+  if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -293,10 +335,14 @@ function scanStock(sym, candles){
     signals.push({type:"VOLUME_SPIKE",side:"neutral",detail:`Volume ${(last.volume/last.vol_avg20).toFixed(1)}x the 20-day average`});
   if(last.bb_lower!=null && close <= last.bb_lower) signals.push({type:"BB_LOWER_TOUCH",side:"bullish",detail:"Close at/below lower Bollinger band"});
   else if(last.bb_upper!=null && close >= last.bb_upper) signals.push({type:"BB_UPPER_TOUCH",side:"bearish",detail:"Close at/above upper Bollinger band"});
+  const sma200_20ago = e.length>20 ? e[e.length-21].sma200 : null;
   return {symbol:sym, name:nameOf(sym), price:close,
     change_pct:(close-prev.close)/prev.close*100, rsi:r,
     above_sma200: last.sma200!=null ? close>last.sma200 : null,
-    pct_from_52w_high:(close-hi)/hi*100, signals};
+    pct_from_52w_high:(close-hi)/hi*100, signals,
+    atr:atr14(candles), sma50:last.sma50, sma200:last.sma200,
+    sma200_rising: last.sma200!=null && sma200_20ago!=null ? last.sma200>sma200_20ago : null,
+    hi52:hi, lo52:lo};
 }
 
 function universeSymbols(){
@@ -320,6 +366,7 @@ async function loadScreener(force){
   try{ localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(),data:screenerData})); }catch(e){}
   $("screenerMeta").textContent = `As of ${screenerData.as_of} · ${screenerData.count} stocks scanned`;
   renderScreener();
+  if(window._ideasLoaded) loadIdeas();
 }
 function renderScreener(){
   if(!screenerData) return;
@@ -339,6 +386,103 @@ function renderScreener(){
       <td>${s.above_sma200==null?"—":s.above_sma200?'<span class="up">▲ &gt;SMA200</span>':'<span class="down">▼ &lt;SMA200</span>'}</td>
       <td style="text-align:left">${s.signals.map(x=>`<span class="badge ${x.side}" title="${x.detail}">${x.type.replaceAll("_"," ")}</span><span class="signal-detail">${x.detail}</span>`).join("") || '<span class="muted">—</span>'}</td>
     </tr>`).join("") + "</tbody></table>";
+}
+
+/* ================= ideas (rule-based trade candidates) ================= */
+function buildIdeas(stocks){
+  const shortT=[], medT=[], longT=[];
+  const R = v => v==null?null:+v.toFixed(2);
+  for(const s of stocks){
+    if(s.atr==null || !s.price) continue;
+    const has = t => s.signals.some(x=>x.type===t);
+    const r = s.rsi;
+
+    // ---- short term: momentum triggers, filtered by long-term trend ----
+    if(s.above_sma200 && (has("MACD_BULL_CROSS") || has("RSI_OVERSOLD") || has("BB_LOWER_TOUCH"))){
+      const stop = R(s.price - 1.5*s.atr), target = R(s.price + 3*s.atr);
+      shortT.push({...s, action:"BUY", entry:R(s.price), stop, target,
+        why:(has("MACD_BULL_CROSS") ? "Fresh MACD bullish crossover" : "Oversold dip (RSI/lower band)") +
+            " inside a long-term uptrend (above SMA200)" + (has("VOLUME_SPIKE") ? "; volume confirms" : "") +
+            ". Works as a swing entry while the uptrend holds."});
+    } else if(r!=null && r>75 && has("BB_UPPER_TOUCH")){
+      shortT.push({...s, action:"BOOK PROFITS", entry:null, stop:R(s.price - 1.5*s.atr), target:null,
+        why:`RSI ${r.toFixed(0)} and stretched above the upper Bollinger band — short-term risk/reward is poor. If holding, consider trailing a stop rather than adding.`});
+    }
+
+    // ---- medium term: trend following ----
+    if(has("DEATH_CROSS")){
+      medT.push({...s, action:"AVOID", entry:null, stop:null, target:null,
+        why:"SMA50 just crossed below SMA200 (death cross) — medium-term trend has turned down. Wait for repair before fresh entries."});
+    } else if(has("GOLDEN_CROSS")){
+      const stop = R(s.price - 2.5*s.atr), target = R(s.price + 5*s.atr);
+      medT.push({...s, action:"BUY", entry:R(s.price), stop, target,
+        why:"Golden cross (SMA50 above SMA200) just formed — the classic start-of-trend signal. Position for a multi-month move."});
+    } else if(s.above_sma200 && s.sma50!=null && Math.abs(s.price-s.sma50)/s.sma50 < 0.03 && r>=40 && r<=60){
+      const stop = R(Math.min(s.sma50*0.95, s.price - 2.5*s.atr)), target = R(Math.max(s.hi52, s.price + 5*s.atr));
+      medT.push({...s, action:"BUY", entry:R(s.price), stop, target,
+        why:"Healthy pullback to SMA50 inside an uptrend, RSI reset to neutral — classic buy-the-dip zone with defined risk below the moving average."});
+    }
+
+    // ---- long term: stage-2 accumulation ----
+    if(s.above_sma200 && s.sma200_rising && s.pct_from_52w_high >= -12){
+      longT.push({...s, action:"ACCUMULATE", entry:R(s.price), stop:R(s.sma200), target:null,
+        why:"Rising SMA200 with price holding near 52-week highs — an established stage-2 uptrend. Accumulate in tranches on dips; exit only if price closes decisively below SMA200."});
+    }
+  }
+  shortT.sort((a,b)=>b.signals.length-a.signals.length);
+  medT.sort((a,b)=>(a.action==="BUY"?-1:1)-(b.action==="BUY"?-1:1) || b.pct_from_52w_high-a.pct_from_52w_high);
+  longT.sort((a,b)=>b.pct_from_52w_high-a.pct_from_52w_high);
+  return {shortT:shortT.slice(0,8), medT:medT.slice(0,8), longT:longT.slice(0,8)};
+}
+
+function ideaTable(rows){
+  if(!rows.length) return '<div class="loading">No qualifying setups in this scan — that itself is information: don\'t force trades.</div>';
+  const actCls = a => a==="BUY"||a==="ACCUMULATE" ? "bullish" : a==="BOOK PROFITS" ? "neutral" : "bearish";
+  return `<table><thead><tr><th>Stock</th><th style="text-align:left">Action</th>
+    <th style="text-align:left;width:38%">Why</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th></th></tr></thead><tbody>` +
+    rows.map(s=>{
+      const rr = s.entry&&s.stop&&s.target ? ((s.target-s.entry)/(s.entry-s.stop)).toFixed(1) : null;
+      return `<tr onclick="openChart('${s.symbol}')">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
+      <td style="text-align:left"><span class="badge ${actCls(s.action)}">${s.action}</span></td>
+      <td style="text-align:left"><span class="signal-detail" style="font-size:12.5px">${s.why}</span></td>
+      <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${s.target?fmt(s.target):"trail SMA50"}</td>
+      <td>${rr ? rr+":1" : "—"}</td>
+      <td>${s.entry&&s.stop?`<button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();prefillCalc(${s.entry},${s.stop})">📐</button>`:""}</td>
+      </tr>`;}).join("") + "</tbody></table>";
+}
+
+async function loadIdeas(force){
+  window._ideasLoaded = true;
+  if(!screenerData || force===true){
+    $("ideasMeta").textContent = "Scanning…";
+    await loadScreener(force);
+  }
+  if(!screenerData){ $("ideasMeta").textContent="Scan failed — try the Screener tab first."; return; }
+  const {shortT, medT, longT} = buildIdeas(screenerData.stocks);
+  $("ideasMeta").textContent = `From scan of ${$("universeSelect").value} · ${screenerData.as_of}`;
+  $("ideasShort").innerHTML = ideaTable(shortT);
+  $("ideasMed").innerHTML = ideaTable(medT);
+  $("ideasLong").innerHTML = ideaTable(longT);
+}
+
+function prefillCalc(entry, stop){
+  $("pcEntry").value = entry; $("pcStop").value = stop; calcPosition();
+  $("pcOut").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function calcPosition(){
+  const cap = parseFloat($("pcCapital").value), riskPct = parseFloat($("pcRisk").value),
+        entry = parseFloat($("pcEntry").value), stop = parseFloat($("pcStop").value),
+        lev = parseFloat($("pcLev").value);
+  if(!(cap>0 && riskPct>0 && entry>0 && stop>0 && entry>stop)){
+    $("pcOut").textContent = "Enter capital, risk %, entry and stop (stop must be below entry)."; return;
+  }
+  const riskAmt = cap*riskPct/100, perShare = entry-stop;
+  const qty = Math.floor(riskAmt/perShare);
+  const exposure = qty*entry, margin = exposure/lev;
+  $("pcOut").innerHTML = qty<1 ? "Risk budget too small for even 1 share at this stop distance." :
+    `<b>${qty} shares</b> · exposure ₹${fmtInt(Math.round(exposure))} · margin needed ₹${fmtInt(Math.round(margin))} (${lev}x)
+     · max loss if stopped: ₹${fmtInt(Math.round(qty*perShare))} (${riskPct}% of capital)`;
 }
 
 /* ================= charts ================= */

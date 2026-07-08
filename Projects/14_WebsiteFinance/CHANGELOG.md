@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.3.0] — 2026-07-08
+
+- New **Ideas** tab: rule-based trade candidates from the latest scan, split by horizon:
+  - Short term (1–4 weeks): MACD bullish crossovers or oversold dips, filtered to stocks above SMA200; "book profits" flags for stretched names (RSI > 75 at upper Bollinger band)
+  - Medium term (1–6 months): fresh golden crosses and pullbacks to SMA50 in uptrends; "avoid" flags on death crosses
+  - Long term (6+ months): stage-2 uptrends (rising SMA200, near 52-week highs) for accumulation
+- Each idea shows the reasoning, ATR-based entry/stop-loss/target and risk:reward ratio
+- Position size & margin calculator: capital + risk % + leverage → quantity, exposure, margin needed, max loss
+
 ## [1.2.0] — 2026-07-08
 
 - Added favicon (candlestick icon, SVG + ICO) to both versions
