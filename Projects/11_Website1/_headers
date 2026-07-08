@@ -14,6 +14,13 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
 
+# JS/CSS — short cache so version bumps propagate immediately
+/site.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/site.css
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 # Static assets — long cache
 /sitemap.xml
   Cache-Control: public, max-age=86400

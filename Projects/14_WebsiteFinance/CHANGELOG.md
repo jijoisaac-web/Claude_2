@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.5.0] — 2026-07-08
+
+- Ideas tab: every idea row now has a 📊 link straight to that stock's Fundamentals
+- Peer comparison on the Fundamentals tab: the stock's P/E, P/B, ROE, profit margin, revenue growth, dividend yield and debt/equity vs the median of its industry group (20 sectors mapped from NSE classification, up to 15 peers), with better/in-line/worse badges per metric and an overall STRONGER / IN LINE / WEAKER verdict
+- Fundamentals responses cached in the browser for 1 hour, so peer scans are fast on repeat visits
+
 ## [1.4.0] — 2026-07-08
 
 - Seven new scan signals: 20-day range breakout/breakdown (with volume confirmation), Bollinger band squeeze (6-month tights), bullish/bearish RSI divergence, gap up/down ≥3%, three-day pullback dip in uptrend, 3-month relative strength vs NIFTY

@@ -178,6 +178,7 @@ progress{width:180px;accent-color:var(--blue);}
     <select id="fundSymbol" onchange="loadFundamentals()"></select>
   </div>
   <div id="fundView"><div class="loading">Select a stock</div></div>
+  <div id="peerView"></div>
 </section>
 
 <div class="disclaimer"><span id="versionTag"></span> · Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
@@ -540,7 +541,8 @@ function ideaTable(rows){
       <td style="text-align:left"><span class="signal-detail" style="font-size:12.5px">${s.why}</span></td>
       <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${s.target?fmt(s.target):"trail SMA50"}</td>
       <td>${rr ? rr+":1" : "—"}</td>
-      <td>${s.entry&&s.stop?`<button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();prefillCalc(${s.entry},${s.stop})">📐</button>`:""}</td>
+      <td style="white-space:nowrap">${s.entry&&s.stop?`<button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();prefillCalc(${s.entry},${s.stop})" title="Position size">📐</button>`:""}
+      <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openFundamentals('${s.symbol}')" title="Fundamentals & peer comparison">📊</button></td>
       </tr>`;}).join("") + "</tbody></table>";
 }
 
@@ -639,14 +641,28 @@ async function loadChart(){
 }
 
 /* ================= fundamentals ================= */
+const FUND_CACHE = "ist_fund:";
+async function fetchFundamentals(sym){
+  try{ const c = JSON.parse(localStorage.getItem(FUND_CACHE+sym));
+    if(c && Date.now()-c.ts < 60*60*1000) return c.f; }catch(e){}
+  const r = await fetch("/api/fundamentals/"+encodeURIComponent(sym));
+  const f = await r.json();
+  if(!r.ok) throw new Error(f.error||r.status);
+  try{ localStorage.setItem(FUND_CACHE+sym, JSON.stringify({ts:Date.now(), f})); }catch(e){}
+  return f;
+}
+function openFundamentals(sym){
+  $("fundSymbol").value = sym;
+  document.querySelector('nav button[data-tab="fundamentals"]').click();
+  loadFundamentals();
+}
 async function loadFundamentals(){
   window._fundLoaded = true;
   const sym = $("fundSymbol").value;
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
+  $("peerView").innerHTML = "";
   try{
-    const r = await fetch("/api/fundamentals/"+encodeURIComponent(sym));
-    const f = await r.json();
-    if(!r.ok) throw new Error(f.error||r.status);
+    const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
     const pc = v => v==null?"—":`${fmt(v*100,1)}%`;
     const rows = [
@@ -663,7 +679,60 @@ async function loadFundamentals(){
     $("fundView").innerHTML = `
       <h2>${f.name || sym} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
       <div class="fund-grid">${rows.map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("")}</div>`;
+    loadPeerComparison(sym, f);
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---- peer comparison: this stock vs its industry group ---- */
+const PEER_METRICS = [
+  // [label, field, better, format]  better: "low" = lower is better
+  ["P/E","pe","low","x"], ["P/B","pb","low","x"], ["ROE","roe","high","pct"],
+  ["Profit Margin","profit_margin","high","pct"], ["Revenue Growth","revenue_growth","high","pct"],
+  ["Dividend Yield","dividend_yield","high","%"], ["Debt/Equity","debt_to_equity","low","x"],
+];
+const median = a => { const v=a.filter(x=>x!=null&&isFinite(x)).sort((x,y)=>x-y);
+  return v.length ? (v.length%2 ? v[(v.length-1)/2] : (v[v.length/2-1]+v[v.length/2])/2) : null; };
+const fmtMetric = (v,how) => v==null ? "—" : how==="pct" ? fmt(v*100,1)+"%" : how==="%" ? fmt(v,2)+"%" : fmt(v,1);
+
+async function loadPeerComparison(sym, me){
+  const el = $("peerView"), sector = sectorOf(sym);
+  if(!sector){ el.innerHTML=""; return; }
+  let peers = peersOf(sym);
+  if(peers.length < 3){ el.innerHTML=""; return; }
+  if(peers.length > 15) peers = peers.slice(0,15);
+  el.innerHTML = `<h2>vs ${sector} peers</h2><div class="loading">Comparing with ${peers.length} peers…</div>`;
+  const peerData = (await pmap(peers, fetchFundamentals, 6)).filter(Boolean);
+  if($("fundSymbol").value !== sym) return;   // user moved on mid-fetch
+  if(peerData.length < 3){ el.innerHTML=""; return; }
+
+  let better=0, worse=0;
+  const rows = PEER_METRICS.map(([label, field, dir, how])=>{
+    const mine = me[field], med = median(peerData.map(p=>p[field]));
+    if(mine==null || med==null) return {label, mine, med, how, verdict:null};
+    const ratio = med===0 ? null : mine/med;
+    let verdict = "inline";
+    if(ratio!=null){
+      const isBetter = dir==="low" ? ratio < 0.9 : ratio > 1.1;
+      const isWorse  = dir==="low" ? ratio > 1.1 : ratio < 0.9;
+      if(isBetter){ verdict="better"; better++; }
+      else if(isWorse){ verdict="worse"; worse++; }
+    }
+    return {label, mine, med, how, verdict};
+  });
+  const overall = better - worse >= 2 ? ["bullish","STRONGER than peers"] :
+                  worse - better >= 2 ? ["bearish","WEAKER than peers"] :
+                  ["neutral","IN LINE with peers"];
+  const vBadge = v => v==null ? "—" :
+    v==="better" ? '<span class="badge bullish">better</span>' :
+    v==="worse"  ? '<span class="badge bearish">worse</span>' :
+                   '<span class="badge neutral">in line</span>';
+  el.innerHTML = `<h2>vs ${sector} peers <span class="badge ${overall[0]}" style="font-size:12px">${overall[1]}</span>
+    <span class="muted" style="text-transform:none;font-weight:400">· median of ${peerData.length} peers: ${peerData.map(p=>(p.symbol||"").replace(".NS","")).join(", ")}</span></h2>
+    <table><thead><tr><th>Metric</th><th>${sym.replace(".NS","")}</th><th>Peer median</th><th style="text-align:left">Standing</th></tr></thead><tbody>` +
+    rows.map(r=>`<tr><td>${r.label}</td><td>${fmtMetric(r.mine,r.how)}</td><td>${fmtMetric(r.med,r.how)}</td>
+      <td style="text-align:left">${vBadge(r.verdict)}</td></tr>`).join("") +
+    `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px;">"Better" = beats the peer median by >10% in the favourable direction (lower for P/E, P/B, D/E; higher for the rest). Sector medians hide business-mix differences — read alongside the company's own history.</div>`;
 }
 
 /* ================= init ================= */
