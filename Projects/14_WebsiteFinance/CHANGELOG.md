@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.9.0] — 2026-07-08 · Valuation Engine + Scores
+
+- Intrinsic value on the Fundamentals tab: 10-year two-stage DCF (FCF-based, EPS fallback), Benjamin Graham formula, dividend discount model, earnings power value — with adjustable growth/discount/terminal assumptions
+- Summary cards: fair value (median of methods) with range, margin of safety %, upside %, and reverse-DCF market-implied growth vs your assumption
+- Five scores (0–100, click for component breakdown): Value Score (spec weighting: valuation/quality/growth/cash flow/balance sheet/management/institutional/moat), Quality Score, Multibagger Probability, Value-Trap Risk (inverted — high is dangerous), Dividend Quality
+- Missing data excluded from scores (normalized over known components) rather than guessed; proxies labelled (ROA for management, gross margin for moat)
+
 ## [1.8.0] — 2026-07-08 · Value Screener
 
 - New **Value Screener** tab: 24 fundamental filters (market cap, EV, P/E, forward P/E, PEG, P/B, P/S, EV/EBITDA, dividend yield, ROE, ROA, gross/operating/net margins, D/E, current/quick ratio, OCF, FCF, sales/profit growth, beta, % from 52-week high) with unlimited AND combinations, plus sector and universe filters

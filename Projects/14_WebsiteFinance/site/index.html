@@ -232,6 +232,8 @@ progress{width:180px;accent-color:var(--blue);}
     <select id="fundSymbol" onchange="loadFundamentals()"></select>
   </div>
   <div id="fundView"><div class="loading">Select a stock</div></div>
+  <div id="valView"></div>
+  <div id="scoreView"></div>
   <div id="peerView"></div>
 </section>
 
@@ -964,7 +966,7 @@ async function loadFundamentals(){
   window._fundLoaded = true;
   const sym = $("fundSymbol").value;
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
-  $("peerView").innerHTML = "";
+  $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -984,8 +986,185 @@ async function loadFundamentals(){
     $("fundView").innerHTML = `
       <h2>${f.name || sym} ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
       <div class="fund-grid">${rows.map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("")}</div>`;
+    renderValuation(sym, f);
+    renderScores(f);
     loadPeerComparison(sym, f);
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---- intrinsic value engine ---- */
+function dcfPerShare(base, g, tg, r, years=10, fade=5){
+  // stage 1: grow at g for `fade` yrs, then fade linearly to tg by year `years`; terminal Gordon
+  let v = 0, cf = base;
+  for(let y=1; y<=years; y++){
+    const gy = y<=fade ? g : g + (tg-g)*(y-fade)/(years-fade);
+    cf *= (1+gy);
+    v += cf/Math.pow(1+r,y);
+  }
+  const tv = cf*(1+tg)/(r-tg);
+  return v + tv/Math.pow(1+r,years);
+}
+function computeIntrinsic(f, a){   // a = {r, g, tg, y} as decimals; y = Graham AAA-style yield in %
+  const shares = f.market_cap && f.price ? f.market_cap/f.price : null;
+  const fcfps = f.fcf!=null && shares ? f.fcf/shares : null;
+  const base = fcfps!=null && fcfps>0 ? fcfps : (f.eps!=null && f.eps>0 ? f.eps : null);
+  const methods = [];
+  if(base!=null)
+    methods.push(["DCF (10-yr, "+(fcfps!=null&&fcfps>0?"FCF":"EPS")+")", dcfPerShare(base, a.g, a.tg, a.r)]);
+  if(f.eps!=null && f.eps>0)
+    methods.push(["Graham formula", f.eps*(8.5+2*(a.g*100))*4.4/a.y]);
+  const dps = f.dividend_yield!=null && f.price ? f.dividend_yield/100*f.price : null;
+  if(dps && dps>0){
+    const gd = Math.min(0.06, a.r-0.03);
+    methods.push(["Dividend discount", dps*(1+gd)/(a.r-gd)]);
+  }
+  if(f.eps!=null && f.eps>0)
+    methods.push(["Earnings power (no growth)", f.eps/a.r]);
+  if(!methods.length) return null;
+  const vals = methods.map(m=>m[1]).sort((x,y)=>x-y);
+  const fair = vals.length%2 ? vals[(vals.length-1)/2] : (vals[vals.length/2-1]+vals[vals.length/2])/2;
+  // reverse DCF: implied growth from current price
+  let implied = null;
+  if(base!=null && f.price){
+    let lo=-0.20, hi=0.40;
+    for(let i=0;i<40;i++){ const mid=(lo+hi)/2;
+      (dcfPerShare(base, mid, a.tg, a.r) < f.price) ? lo=mid : hi=mid; }
+    implied = (lo+hi)/2;
+  }
+  return {methods, fair, lo:vals[0], hi:vals[vals.length-1],
+    mos:(fair-f.price)/fair*100, upside:(fair-f.price)/f.price*100, implied};
+}
+function renderValuation(sym, f){
+  const el = $("valView");
+  const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
+  el.innerHTML = `<h2>Intrinsic value</h2>
+    <div class="controls" style="margin-bottom:8px">
+      <label class="muted">Growth % <input type="text" id="ivG" size="4" value="${(defG*100).toFixed(0)}"></label>
+      <label class="muted">Discount % <input type="text" id="ivR" size="4" value="12"></label>
+      <label class="muted">Terminal % <input type="text" id="ivT" size="4" value="4"></label>
+      <label class="muted">Graham yield % <input type="text" id="ivY" size="4" value="7.5"></label>
+      <button class="btn ghost" onclick="recalcValuation('${sym}')">Recalculate</button>
+    </div>
+    <div id="ivOut"></div>`;
+  window._fundData = f;
+  recalcValuation(sym);
+}
+function recalcValuation(sym){
+  const f = window._fundData;
+  const a = {g:parseFloat($("ivG").value)/100, r:parseFloat($("ivR").value)/100,
+             tg:parseFloat($("ivT").value)/100, y:parseFloat($("ivY").value)};
+  const out = $("ivOut");
+  if(!(a.r>a.tg) || [a.g,a.r,a.tg,a.y].some(isNaN)){ out.innerHTML='<div class="loading">Discount rate must exceed terminal growth.</div>'; return; }
+  const iv = computeIntrinsic(f, a);
+  if(!iv){ out.innerHTML = '<div class="loading">Not enough data (needs positive EPS or FCF).</div>'; return; }
+  const mosCls = iv.mos>=25 ? "up" : iv.mos<=0 ? "down" : "muted";
+  out.innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="name">Current price</div><div class="price">₹${fmt(f.price)}</div></div>
+      <div class="card"><div class="name">Fair value (median of methods)</div><div class="price">₹${fmt(iv.fair)}</div>
+        <div class="chg muted">range ₹${fmt(iv.lo,0)} – ₹${fmt(iv.hi,0)}</div></div>
+      <div class="card"><div class="name">Margin of safety</div><div class="price ${mosCls}">${fmt(iv.mos,1)}%</div>
+        <div class="chg muted">upside ${sign(iv.upside)}${fmt(iv.upside,1)}%</div></div>
+      <div class="card"><div class="name">Market-implied growth (reverse DCF)</div>
+        <div class="price">${iv.implied!=null?fmt(iv.implied*100,1)+"%":"—"}</div>
+        <div class="chg muted">vs your assumption ${$("ivG").value}%</div></div>
+    </div>
+    <table><thead><tr><th>Method</th><th>Fair value ₹</th><th>vs price</th></tr></thead><tbody>
+      ${iv.methods.map(([n,v])=>`<tr><td>${n}</td><td>${fmt(v)}</td>
+        <td class="${cls(v-f.price)}">${sign((v-f.price)/f.price*100)}${fmt((v-f.price)/f.price*100,1)}%</td></tr>`).join("")}
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px">Simplified models on trailing data — garbage in, garbage out. A margin of safety above 25–30% is the classic buy threshold; if the market-implied growth looks unrealistically high, the stock is priced for perfection.</div>`;
+}
+
+/* ---- composite scores ---- */
+const lin = (v, worst, best) => v==null ? null : Math.max(0, Math.min(1, (v-worst)/(best-worst)));
+function bucket(parts){  // parts: [name, weight, 0..1|null, note]
+  let got=0, max=0;
+  const rows = parts.map(([n,w,s,note])=>{
+    if(s!=null){ got += s*w; max += w; }
+    return [n, s!=null? (s*w).toFixed(1) : "n/a", w, note||""];
+  });
+  return {score: max? Math.round(got/max*100) : null, rows};
+}
+const scoreLabel = s => s==null ? ["—","muted"] : s>=75 ? ["Excellent","up"] : s>=60 ? ["Good","up"] : s>=40 ? ["Average","muted"] : ["Poor","down"];
+const de = f => f.debt_to_equity==null ? null : (f.debt_to_equity>10 ? f.debt_to_equity/100 : f.debt_to_equity);
+const fcfYield = f => f.fcf!=null && f.market_cap ? f.fcf/f.market_cap : null;
+
+function scoreValue(f){
+  return bucket([
+    ["Valuation", 20, [lin(f.pe,40,12), lin(f.pb,8,1.5), lin(f.ev_ebitda,25,8)].filter(x=>x!=null).reduce((a,b,_,arr)=>a+b/arr.length,0)||null, `P/E ${fmt(f.pe,1)}, P/B ${fmt(f.pb,1)}`],
+    ["Business quality", 20, [lin(f.roe,0.05,0.20), lin(f.operating_margin,0,0.20)].filter(x=>x!=null).reduce((a,b,_,arr)=>a+b/arr.length,0)||null, `ROE ${f.roe!=null?fmt(f.roe*100,1)+"%":"—"}`],
+    ["Growth", 15, [lin(f.revenue_growth,0,0.15), lin(f.earnings_growth,0,0.20)].filter(x=>x!=null).reduce((a,b,_,arr)=>a+b/arr.length,0)||null, `sales ${f.revenue_growth!=null?fmt(f.revenue_growth*100,0)+"%":"—"}, profit ${f.earnings_growth!=null?fmt(f.earnings_growth*100,0)+"%":"—"}`],
+    ["Cash flow", 15, fcfYield(f)!=null ? lin(fcfYield(f),0,0.06) : (f.ocf!=null ? (f.ocf>0?0.6:0) : null), `FCF yield ${fcfYield(f)!=null?fmt(fcfYield(f)*100,1)+"%":"—"}`],
+    ["Balance sheet", 10, [de(f)!=null?lin(de(f),2,0.3):null, lin(f.current_ratio,0.8,1.5)].filter(x=>x!=null).reduce((a,b,_,arr)=>a+b/arr.length,0)||null, `D/E ${fmt(de(f),2)}`],
+    ["Management (ROA proxy)", 10, lin(f.roa,0.02,0.08), `ROA ${f.roa!=null?fmt(f.roa*100,1)+"%":"—"}`],
+    ["Institutional view", 10, f.recommendation ? ({strong_buy:1,buy:0.8,hold:0.5,underperform:0.2,sell:0.1}[f.recommendation] ?? 0.5) : null, f.recommendation||"—"],
+    ["Moat (gross margin proxy)", 10, lin(f.gross_margin,0.10,0.40), `GM ${f.gross_margin!=null?fmt(f.gross_margin*100,0)+"%":"—"}`],
+  ]);
+}
+function scoreQuality(f){
+  return bucket([
+    ["ROE", 25, lin(f.roe,0.05,0.20)], ["Operating margin", 20, lin(f.operating_margin,0,0.20)],
+    ["Positive free cash flow", 15, f.fcf!=null ? (f.fcf>0?1:0) : null],
+    ["Growth consistency", 15, (f.revenue_growth!=null&&f.earnings_growth!=null) ? ((f.revenue_growth>0)+(f.earnings_growth>0))/2 : null],
+    ["Low debt", 15, de(f)!=null ? lin(de(f),2,0.3) : null],
+    ["Liquidity", 10, lin(f.current_ratio,0.8,1.5)],
+  ]);
+}
+function scoreMultibagger(f){
+  const mcapCr = f.market_cap!=null ? f.market_cap/1e7 : null;
+  return bucket([
+    ["Small size (room to grow)", 20, mcapCr!=null ? lin(-mcapCr,-50000,-5000) : null, mcapCr!=null?`₹${fmtInt(Math.round(mcapCr))} Cr`:""],
+    ["Sales CAGR > 20%", 20, lin(f.revenue_growth,0.05,0.20)],
+    ["Profit CAGR > 20%", 20, lin(f.earnings_growth,0.05,0.20)],
+    ["High ROE (ROCE proxy)", 15, lin(f.roe,0.10,0.20)],
+    ["Debt/Equity < 0.5", 15, de(f)!=null ? lin(de(f),1.5,0.5) : null],
+    ["Positive cash flow", 10, f.fcf!=null ? (f.fcf>0?1:0) : (f.ocf!=null?(f.ocf>0?1:0):null)],
+  ]);
+}
+function scoreValueTrap(f){   // higher = more dangerous
+  return bucket([
+    ["Declining sales", 25, f.revenue_growth!=null ? lin(-f.revenue_growth,-0.05,0.10) : null],
+    ["Declining profits", 25, f.earnings_growth!=null ? lin(-f.earnings_growth,-0.05,0.15) : null],
+    ["Heavy debt", 20, de(f)!=null ? lin(de(f),0.5,2.5) : null],
+    ["Negative free cash flow", 20, f.fcf!=null ? (f.fcf<0?1:0) : null],
+    ["Weak liquidity", 10, f.current_ratio!=null ? lin(-f.current_ratio,-1.5,-0.8) : null],
+  ]);
+}
+function scoreDividend(f){
+  const dps = f.dividend_yield!=null && f.price ? f.dividend_yield/100*f.price : null;
+  const payout = dps!=null && f.eps ? dps/f.eps : null;
+  const shares = f.market_cap && f.price ? f.market_cap/f.price : null;
+  const divTotal = dps!=null && shares ? dps*shares : null;
+  const fcfCover = divTotal && f.fcf!=null && divTotal>0 ? f.fcf/divTotal : null;
+  return bucket([
+    ["Yield", 30, lin(f.dividend_yield,0.5,3), f.dividend_yield!=null?fmt(f.dividend_yield,2)+"%":""],
+    ["Sane payout ratio", 25, payout!=null ? (payout<=0?0:payout<=0.6?1:lin(-payout,-1,-0.6)) : null, payout!=null?fmt(payout*100,0)+"% of EPS":""],
+    ["FCF coverage", 25, fcfCover!=null ? lin(fcfCover,0.8,2) : null, fcfCover!=null?fmt(fcfCover,1)+"x":""],
+    ["Profitability behind it", 20, lin(f.roe,0.08,0.18)],
+  ]);
+}
+function renderScores(f){
+  const defs = [
+    ["Value Score", scoreValue(f), "Composite: valuation 20, quality 20, growth 15, cash flow 15, balance sheet 10, management 10, institutional 10, moat 10"],
+    ["Quality Score", scoreQuality(f), "Business durability: returns, margins, cash generation, debt"],
+    ["Multibagger Probability", scoreMultibagger(f), "Small + fast-growing + high returns + low debt"],
+    ["Value-Trap Risk", scoreValueTrap(f), "Higher is worse — cheapness with deteriorating fundamentals"],
+    ["Dividend Quality", scoreDividend(f), "Yield, payout sanity, FCF coverage"],
+  ];
+  $("scoreView").innerHTML = `<h2>Scores</h2><div class="cards">` +
+    defs.map(([name, sc, desc], i)=>{
+      const inv = name==="Value-Trap Risk";
+      const [label, c] = inv ? (sc.score==null?["—","muted"]:sc.score>=60?["High risk","down"]:sc.score>=40?["Moderate","muted"]:["Low risk","up"]) : scoreLabel(sc.score);
+      return `<div class="card" style="cursor:pointer" onclick="const d=$('scDet${i}');d.style.display=d.style.display==='none'?'block':'none'" title="${desc}">
+        <div class="name">${name}</div>
+        <div class="price ${c}">${sc.score==null?"—":sc.score}<span style="font-size:13px;color:var(--muted)">/100</span></div>
+        <div class="chg ${c}">${label}</div>
+        <div id="scDet${i}" style="display:none;margin-top:8px;font-size:12px;color:var(--muted)">
+          ${sc.rows.map(([n,got,w,note])=>`${n}: <b>${got}</b>/${w}${note?" · "+note:""}`).join("<br>")}
+        </div></div>`;
+    }).join("") + `</div>
+    <div class="muted" style="font-size:11px;margin-bottom:12px">Rule-based scores from available data — promoter holdings, FII/DII flows and ROCE aren't in free data, so proxies are used and labelled. Click a card for the breakdown. n/a components are excluded rather than guessed.</div>`;
 }
 
 /* ---- peer comparison: this stock vs its industry group ---- */
