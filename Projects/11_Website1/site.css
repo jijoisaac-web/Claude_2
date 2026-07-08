@@ -1430,3 +1430,73 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-deal-tag{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
 .fl-deal-months{font-size:13px;font-weight:700;color:var(--teal);}
 .fl-deal-note{font-size:10px;color:var(--muted);margin-left:2px;}
+
+/* ═══════════════════════════════════════════════════════
+   FLIGHTS — AI INTELLIGENCE FEATURES
+═══════════════════════════════════════════════════════ */
+
+/* Festival warning banner */
+.fl-festival-banner{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:12px;line-height:1.6;}
+
+/* Deal intelligence strip */
+.fl-deal-strip{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:12px;display:flex;flex-wrap:wrap;gap:5px 12px;align-items:center;margin-bottom:14px;min-height:36px;}
+.fl-deal-strip.fl-ds-low{border-color:rgba(20,184,166,.35);background:rgba(20,184,166,.06);}
+.fl-deal-strip.fl-ds-shoulder{border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05);}
+.fl-deal-strip.fl-ds-peak{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05);}
+.fl-ds-score{font-weight:700;}
+.fl-ds-sep{color:var(--border2);font-size:10px;}
+.fl-ds-trend{font-weight:700;}
+.fl-ds-nudge{color:var(--text2);}
+
+/* Card — season badge */
+.fl-dest-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.fl-season-badge{font-size:9px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.fl-season-low{background:rgba(20,184,166,.15);color:var(--teal);}
+.fl-season-shoulder{background:rgba(251,191,36,.15);color:var(--amber);}
+.fl-season-peak{background:rgba(239,68,68,.12);color:#ef4444;}
+.fl-season-avg{background:var(--surface3,rgba(255,255,255,.06));color:var(--muted);}
+
+/* Card — price row with trend arrow */
+.fl-price-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:6px 0 3px;}
+.fl-trend{font-size:11px;font-weight:700;white-space:nowrap;}
+
+/* Card — book nudge */
+.fl-book-nudge{font-size:11px;color:var(--muted);margin:8px 0 10px;line-height:1.5;padding:6px 8px;background:rgba(255,255,255,.03);border-radius:6px;}
+
+/* Card — monthly price heatmap */
+.fl-hm-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px;}
+.fl-hm{display:flex;gap:2px;align-items:flex-end;height:40px;margin-bottom:2px;}
+.fl-hm-bar{display:flex;flex-direction:column;align-items:center;flex:1;cursor:default;}
+.fl-hm-fill{width:100%;border-radius:2px 2px 0 0;min-height:4px;transition:opacity .2s;}
+.fl-hm-bar:hover .fl-hm-fill{opacity:.7;}
+.fl-hm-lbl{font-size:7px;color:var(--muted);margin-top:2px;line-height:1;}
+.fl-hm-low .fl-hm-fill{background:var(--teal);}
+.fl-hm-sh  .fl-hm-fill{background:var(--amber);}
+.fl-hm-avg .fl-hm-fill{background:var(--border2,rgba(255,255,255,.2));}
+.fl-hm-peak .fl-hm-fill{background:#ef4444;}
+.fl-hm-cur .fl-hm-fill{outline:2px solid rgba(255,255,255,.6);outline-offset:1px;}
+
+/* ── AI Trip Planner ────────────────────────────────── */
+.fl-planner-card{margin-bottom:16px;}
+.fl-planner-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.fl-planner-icon{font-size:22px;color:var(--teal);}
+.fl-planner-title{font-size:14px;font-weight:700;}
+.fl-planner-sub{font-size:11px;color:var(--muted);}
+.fl-planner-input-row{display:flex;gap:8px;}
+.fl-planner-input{flex:1;background:var(--surface3,var(--surface2));border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);outline:none;min-width:0;}
+.fl-planner-input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(20,184,166,.15);}
+.fl-planner-input::placeholder{color:var(--muted);}
+.fl-planner-btn{background:var(--teal);color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 18px;cursor:pointer;font-size:13px;white-space:nowrap;transition:opacity .15s;}
+.fl-planner-btn:hover{opacity:.85;}
+.fl-planner-result{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+
+/* Trip plan output */
+.fl-plan-hd{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em;}
+.fl-plan-section{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.fl-plan-dest{display:flex;align-items:center;gap:8px;font-size:16px;margin-bottom:4px;}
+.fl-plan-sub{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.fl-plan-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:12px;}
+.fl-plan-row:last-child{border-bottom:none;padding-bottom:0;}
+.fl-plan-row span:first-child{color:var(--muted);flex-shrink:0;}
+.fl-plan-advice{font-size:12px;color:var(--text2);background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.15);border-radius:7px;padding:8px 10px;margin-top:10px;line-height:1.5;}
+.fl-plan-festival{font-size:12px;line-height:1.6;border-color:rgba(251,191,36,.3) !important;background:rgba(251,191,36,.07) !important;color:var(--text2);}

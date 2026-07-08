@@ -2233,6 +2233,25 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="fl-origin-lbl">Departure airport</div>
       <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
     </div>
+    <!-- Festival warning (JS-rendered) -->
+    <div id="fl-festival-banner" class="fl-festival-banner" style="display:none"></div>
+    <!-- Season deal strip (JS-rendered) -->
+    <div id="fl-deal-strip" class="fl-deal-strip"></div>
+    <!-- AI Trip Planner -->
+    <div class="card fl-planner-card">
+      <div class="fl-planner-hd">
+        <span class="fl-planner-icon">✦</span>
+        <div><div class="fl-planner-title">AI Trip Planner</div>
+        <div class="fl-planner-sub">Tell me your plans &mdash; I'll estimate fares, timing &amp; budget</div></div>
+      </div>
+      <div class="fl-planner-input-row">
+        <input type="text" id="fl-planner-input" class="fl-planner-input"
+               placeholder="e.g. Goa in October, 2 people, budget AED 5000"
+               onkeydown="if(event.key==='Enter')flPlanTrip()">
+        <button class="fl-planner-btn" onclick="flPlanTrip()">Plan ✦</button>
+      </div>
+      <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
+    </div>
     <div id="fl-dest-grid" class="fl-dest-grid"><!-- JS renders destination cards --></div>
     <div class="aff-disclaimer" style="text-align:center;font-size:9px;color:var(--muted);padding:8px 0 4px;">&#9992; Prices are typical economy round-trip ranges &mdash; actual fares vary by date &amp; airline. Always verify on Skyscanner or Google Flights before booking.</div>
   </div>

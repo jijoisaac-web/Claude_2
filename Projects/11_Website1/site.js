@@ -2639,6 +2639,7 @@ function closeNavDD(){
     var wrap=document.getElementById('fl-dest-grid');
     if(!wrap) return;
     var from=_flOrigin||data.origins[0].code;
+    var deal=_getDealInfo(), trend=_getTrend(), nudge=_getBookNudge();
     wrap.innerHTML=Object.keys(DEST).map(function(code){
       var d=DEST[code];
       var r=data.routes[code]||{min:'?',max:'?',dur:'varies',airlines:'Check Skyscanner'};
@@ -2649,18 +2650,173 @@ function closeNavDD(){
       var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /,'+')+'%2C+India';
       return '<div class="fl-dest-card">'
         +'<div class="fl-dest-hd"><span class="fl-dest-icon">'+d.icon+'</span>'
-        +'<div><div class="fl-dest-name">'+d.name+'</div>'
-        +'<div class="fl-dest-route">'+from+' → '+code+'</div></div></div>'
+        +'<div style="flex:1"><div class="fl-dest-name">'+d.name+'</div>'
+        +'<div class="fl-dest-route">'+from+' → '+code+'</div></div>'
+        +'<div class="fl-season-badge fl-season-'+deal.cls+'">'+deal.label+'</div>'
+        +'</div>'
+        +'<div class="fl-price-row">'
         +'<div class="fl-price">'+price+' <span class="fl-price-note">RT · Economy</span></div>'
+        +'<div class="fl-trend" style="color:'+trend.color+'">'+trend.arrow+' '+trend.label+'</div>'
+        +'</div>'
         +'<div class="fl-dur">'+r.dur+' · '+r.airlines+'</div>'
         +'<div class="fl-tip">'+d.tip+'</div>'
         +(d.deal?'<div class="fl-deal"><span class="fl-deal-tag">🏷️ Best deals</span><span class="fl-deal-months">'+d.deal+'</span><span class="fl-deal-note">'+d.dealNote+'</span></div>':'')
+        +'<div class="fl-hm-label">Fare level by month</div>'
+        +_getHeatmapHTML()
+        +'<div class="fl-book-nudge">'+nudge+'</div>'
         +'<div class="fl-btn-row">'
         +'<a class="fl-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">✈ Skyscanner</a>'
         +'<a class="fl-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
         +'</div></div>';
     }).join('');
   }
+
+  // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
+  window.flPlanTrip=function(){
+    var inp=document.getElementById('fl-planner-input');
+    var res=document.getElementById('fl-planner-result');
+    if(!inp||!res)return;
+    var q=(inp.value||'').trim();
+    if(!q){res.style.display='none';return;}
+    var lq=q.toLowerCase();
+
+    // ── Parse destination ──
+    var destMap={
+      'mumbai':'BOM','bombay':'BOM','bom':'BOM',
+      'delhi':'DEL','new delhi':'DEL','del':'DEL',
+      'bangalore':'BLR','bengaluru':'BLR','blr':'BLR',
+      'chennai':'MAA','madras':'MAA','maa':'MAA',
+      'hyderabad':'HYD','hyd':'HYD','hyderabad':'HYD',
+      'kochi':'COK','cochin':'COK','kerala':'COK','cok':'COK',
+      'kolkata':'CCU','calcutta':'CCU','ccu':'CCU',
+      'trivandrum':'TRV','thiruvananthapuram':'TRV','trv':'TRV',
+      'ahmedabad':'AMD','amd':'AMD',
+      'goa':'GOI','goi':'GOI'
+    };
+    var destCode=null;
+    for(var k in destMap){if(lq.indexOf(k)>=0){destCode=destMap[k];break;}}
+    var d=destCode?DEST[destCode]:null;
+
+    // ── Parse travel month ──
+    var mFull=['january','february','march','april','may','june','july','august','september','october','november','december'];
+    var mShort=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    var travelM=-1;
+    for(var i=0;i<12;i++){
+      if(lq.indexOf(mFull[i])>=0||lq.indexOf(mShort[i])>=0){travelM=i;break;}
+    }
+
+    // ── Parse group size ──
+    var gm=lq.match(/(\d+)\s*(person|people|pax|adults?|passenger|travell?er)/);
+    var groupN=gm?parseInt(gm[1]):1;
+    if(lq.indexOf('couple')>=0) groupN=2;
+    if(lq.indexOf('family')>=0&&!gm) groupN=4;
+
+    // ── Parse budget (largest number > 200) ──
+    var nums=(q.match(/[\d,]+/g)||[]).map(function(n){return parseInt(n.replace(/,/g,''));}).filter(function(n){return n>200;});
+    var budget=nums.length?Math.max.apply(null,nums):null;
+
+    var cur=baseCur||'AED';
+    var flData=FL[cur]||FL['AED'];
+    var route=destCode&&flData.routes[destCode]?flData.routes[destCode]:null;
+
+    // ── Build response HTML ──
+    var html='<div class="fl-plan">';
+
+    // Header
+    html+='<div class="fl-plan-hd">✦ Your Trip Plan</div>';
+
+    // ── Destination block ──
+    if(d){
+      html+='<div class="fl-plan-section">';
+      html+='<div class="fl-plan-dest">'+d.icon+' <strong>'+d.name+'</strong></div>';
+      html+='<div class="fl-plan-sub">'+d.tip+'</div>';
+      if(route&&typeof route.min==='number'){
+        var pp=cur+' '+route.min.toLocaleString()+'–'+route.max.toLocaleString();
+        html+='<div class="fl-plan-row"><span>✈ Per person</span><strong>'+pp+'</strong></div>';
+        if(groupN>1){
+          var tot=cur+' '+Math.round(route.min*groupN).toLocaleString()+'–'+Math.round(route.max*groupN).toLocaleString();
+          html+='<div class="fl-plan-row"><span>✈ '+groupN+' people total</span><strong>'+tot+'</strong></div>';
+        }
+        html+='<div class="fl-plan-row"><span>⏱ Flight time</span><span>'+route.dur+'</span></div>';
+        html+='<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>';
+      }
+      html+='</div>';
+    } else {
+      html+='<div class="fl-plan-section"><div class="fl-plan-sub">💡 Mention a city: Mumbai, Goa, Kochi, Delhi, Bangalore, Hyderabad, Chennai, Kolkata, Trivandrum, Ahmedabad</div></div>';
+    }
+
+    // ── Travel month analysis ──
+    if(travelM>=0){
+      var mIdx=MONTHLY_IDX[travelM];
+      var mGrade=mIdx<=0.73?'🟢 Best Deals Season':mIdx<=0.90?'🟡 Shoulder — Good Value':mIdx<=1.05?'⚪ Average Fares':'🔴 Peak — Expensive';
+      var now=new Date();
+      var tDate=new Date(now.getFullYear(),travelM,1);
+      if(tDate<now) tDate=new Date(now.getFullYear()+1,travelM,1);
+      var wks=Math.round((tDate-now)/604800000);
+      var bookAdvice=wks<4?'⚡ Less than 4 weeks away — book immediately, fares rising daily'
+        :wks<8?'✓ Book this week for best availability'
+        :wks<14?'Good time to start comparing — book within 3–4 weeks'
+        :'Monitor prices; book 8–10 weeks before travel';
+      html+='<div class="fl-plan-section">';
+      html+='<div class="fl-plan-row"><span>📅 '+MONTH_NAMES[travelM]+'</span><strong>'+mGrade+'</strong></div>';
+      html+='<div class="fl-plan-row"><span>📆 Weeks away</span><span>~'+wks+' weeks</span></div>';
+      html+='<div class="fl-plan-advice">'+bookAdvice+'</div>';
+      html+='</div>';
+
+      // Festival check for that month
+      for(var fi=0;fi<FESTIVALS.length;fi++){
+        if(FESTIVALS[fi].m===travelM){
+          html+='<div class="fl-plan-section fl-plan-festival">';
+          html+='⚠️ <strong>'+FESTIVALS[fi].name+'</strong> falls in '+MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Book immediately or shift travel by 2+ weeks.';
+          html+='</div>';
+          break;
+        }
+      }
+    }
+
+    // ── Budget breakdown ──
+    if(budget&&route&&typeof route.min==='number'){
+      var flMin=route.min*groupN, flMax=route.max*groupN;
+      var rem=budget-flMin;
+      html+='<div class="fl-plan-section">';
+      html+='<div class="fl-plan-row"><span>💰 Your budget</span><strong>'+cur+' '+budget.toLocaleString()+'</strong></div>';
+      html+='<div class="fl-plan-row"><span>✈ Flights ('+groupN+'×, min)</span><span>'+cur+' '+Math.round(flMin).toLocaleString()+'</span></div>';
+      if(rem>0){
+        var rate=typeof midRate==='number'&&midRate>0?midRate:85;
+        var remINR=Math.round(rem*rate);
+        var days=7;
+        var pdINR=Math.round(remINR/days);
+        var comfort=pdINR>15000?'Luxury — 4★ hotels, fine dining, activities'
+          :pdINR>8000?'Comfortable — good hotels, mix of dining'
+          :pdINR>4000?'Budget-friendly — guesthouses, local food'
+          :'Very tight — plan every expense carefully';
+        html+='<div class="fl-plan-row"><span>🏨 Hotels + local (rem.)</span><strong>'+cur+' '+Math.round(rem).toLocaleString()+'</strong></div>';
+        html+='<div class="fl-plan-row"><span>₹ India spending</span><span>≈ ₹'+remINR.toLocaleString()+' ('+days+' days)</span></div>';
+        html+='<div class="fl-plan-row"><span>📅 Daily India budget</span><span>≈ ₹'+pdINR.toLocaleString()+'/day</span></div>';
+        html+='<div class="fl-plan-advice">'+comfort+'</div>';
+      } else {
+        html+='<div class="fl-plan-advice">⚠️ Budget may not cover flights for '+groupN+' (min '+cur+' '+Math.round(flMin).toLocaleString()+') — consider increasing budget or travelling solo.</div>';
+      }
+      html+='</div>';
+    }
+
+    // ── Best airports from current country ──
+    html+='<div class="fl-plan-section">';
+    html+='<div class="fl-plan-row"><span>🛫 Your departure airports</span><span>'
+      +flData.origins.map(function(o){return o.code+' · '+o.name;}).join(', ')+'</span></div>';
+    if(destCode){
+      html+='<div class="fl-plan-row"><span>🔗 Book now</span>'
+        +'<span><a href="https://www.skyscanner.net/transport/flights/'+(flData.origins[0].code)+'/'+destCode+'/" '
+        +'target="_blank" rel="noopener" style="color:var(--teal)">Skyscanner ↗</a>'
+        +' &nbsp; <a href="https://www.google.com/travel/flights?q=flights+to+'+d.name.replace(/ /,'+')+'%2C+India" '
+        +'target="_blank" rel="noopener" style="color:var(--muted)">Google Flights ↗</a></span></div>';
+    }
+    html+='</div>';
+
+    html+='</div>'; // .fl-plan
+    res.innerHTML=html;
+    res.style.display='block';
+  };
 
   // Hook showTab
   var _flShowOrig=window.showTab;
