@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [1.9.1] — 2026-07-08
+
+- Mobile layout fixes: swipeable tab bar (no more overflow), all wide tables scroll horizontally inside the page instead of breaking it, tighter cards/inputs/badges, sector bars capped to screen width, smaller chart height on phones
+
 ## [1.9.0] — 2026-07-08 · Valuation Engine + Scores
 
 - Intrinsic value on the Fundamentals tab: 10-year two-stage DCF (FCF-based, EPS fallback), Benjamin Graham formula, dividend discount model, earnings power value — with adjustable growth/discount/terminal assumptions

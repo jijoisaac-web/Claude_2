@@ -77,7 +77,37 @@ button.btn.danger{background:none;border:none;color:var(--red);cursor:pointer;fo
 .signal-detail{color:var(--muted);font-size:12px;display:block;margin-top:2px;text-align:left;}
 .disclaimer{color:var(--muted);font-size:11px;margin-top:24px;padding-top:12px;border-top:1px solid var(--border);}
 progress{width:180px;accent-color:var(--blue);}
-@media(max-width:700px){main{padding:12px;}th,td{padding:8px 6px;font-size:12px;}}
+/* table containers scroll horizontally instead of clipping */
+#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+@media(max-width:700px){
+  main{padding:10px;}
+  th,td{padding:7px 6px;font-size:12px;}
+  header{padding:8px 10px;gap:8px;flex-wrap:wrap;}
+  header h1{font-size:15px;white-space:nowrap;}
+  nav{overflow-x:auto;max-width:100%;flex:1 1 100%;padding-bottom:2px;scrollbar-width:none;}
+  nav::-webkit-scrollbar{display:none;}
+  nav button{padding:7px 10px;font-size:13px;white-space:nowrap;flex:0 0 auto;}
+  h2{font-size:13px;}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px;}
+  .card{padding:10px 12px;}
+  .card .price{font-size:17px;}
+  .cards.small{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .controls{gap:6px;}
+  select,input[type=text]{padding:7px 8px;font-size:13px;max-width:46vw;}
+  button.btn{padding:7px 10px;font-size:12px;}
+  /* wide tables: scroll inside their container */
+  #screenerTable table,#fsResults table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table{min-width:640px;}
+  #watchTable table,#peerView table{min-width:420px;}
+  .sectorRow .sname{width:96px;font-size:11px;}
+  .sectorRow .bar{max-width:34vw;}
+  .signal-detail{font-size:11px;}
+  .badge{font-size:10px;padding:1px 6px;}
+  .fund-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+  .fund-grid .card .price{font-size:15px;}
+  #chart{height:320px;}
+  .disclaimer{font-size:10px;}
+}
 </style>
 </head>
 <body>
