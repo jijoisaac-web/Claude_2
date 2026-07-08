@@ -2606,6 +2606,147 @@ function closeNavDD(){
     GOI:{name:'Goa',       icon:'🌴',tip:'Best: Oct–Mar · Peak beach season',     deal:'Jun–Sep',        dealNote:'Up to 60% off in monsoon'}
   };
 
+  // ─── AI INTELLIGENCE DATA ─────────────────────────────────────────────────
+  // Monthly fare index Jan–Dec (1.0 = avg). Based on GCC/global→India seasonal patterns.
+  var MONTHLY_IDX=[1.15,0.88,0.78,0.73,0.78,0.88,0.68,0.65,0.82,1.10,1.28,1.38];
+  var FL_MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Major Indian festivals with price spike data
+  var FESTIVALS=[
+    {name:'Diwali',         m:9, d:20, spike:70, note:'Fares spike 50–80%'},
+    {name:'Christmas &amp; NY',m:11,d:24,spike:85,note:'Fares spike 60–90%'},
+    {name:'Holi',           m:2, d:3,  spike:40, note:'Fares spike 30–50%'},
+    {name:'Eid al-Fitr',    m:2, d:19, spike:55, note:'Fares spike 40–65%'},
+    {name:'Navratri',       m:8, d:22, spike:45, note:'Fares spike 35–55%'},
+    {name:'Pongal',         m:0, d:14, spike:30, note:'Fares spike 20–40%'},
+  ];
+
+  // Best dates advice per month (Jan=0 … Dec=11)
+  var BEST_DATES=[
+    {best:'Jan 7–16',avoid:'Jan 1–6 (New Year), Jan 25–27 (Republic Day wknd)',bookBy:'5–7 wks ahead',dayTip:'Fly Tue–Thu — ~20% cheaper',note:'Post-NY prices drop fast. Jan 8+ is good value.'},
+    {best:'Feb 3–20',avoid:'None major — whole month is shoulder',bookBy:'4–5 wks ahead',dayTip:'Any midweek day — lowest demand',note:'One of the best-value months for India flights.'},
+    {best:'Mar 1–7 and Mar 18–28',avoid:'Mar 10–17 (Holi week — 40–50% spike)',bookBy:'5 wks; 8 wks for Holi dates',dayTip:'Avoid the Tue before Holi weekend',note:'Split by Holi. Before and after = great value.'},
+    {best:'Apr 7–25 (entire mid-month)',avoid:'Apr 1–5 (Easter weekend)',bookBy:'3–4 wks ahead — demand is low',dayTip:'Best value month — any day works',note:'Excellent deals. India is hot so fewer tourists.'},
+    {best:'May 6–22',avoid:'May 1 (Labour Day), May 23–31 (early summer rush)',bookBy:'4–5 wks ahead',dayTip:'Fly Tue/Wed — school holidays push Fri/Sun up',note:'Good value early-mid May; avoid last week.'},
+    {best:'Jun 9–26',avoid:'Jun 1–8 (school holiday rush), Jun 27–30',bookBy:'6–7 wks ahead',dayTip:'Midweek — weekends 20–25% pricier in Jun',note:'Monsoon begins in South India — great deals if you\'re OK with rain.'},
+    {best:'Jul 8–18 (sweet spot)',avoid:'Jul 1–7 (peak school hol start), Jul 25–31',bookBy:'6–8 wks ahead to lock in low fares',dayTip:'Fly Tue–Thu. Fri/Sun can be 25–30% higher',note:'Cheapest month overall — book well ahead.'},
+    {best:'Aug 5–13 and Aug 19–28',avoid:'Aug 14–17 (Independence Day ±2 days, ~30% spike)',bookBy:'5–6 wks ahead',dayTip:'Tue/Wed cheapest — lowest demand month',note:'Deep monsoon = lowest fares of the year.'},
+    {best:'Sep 2–15 only',avoid:'Sep 16–30 (Navratri begins — prices rising 20–30%)',bookBy:'Book by Aug 1 for Sep travel',dayTip:'Fly early September — prices climb week by week',note:'Book early; avoid anything close to Navratri start.'},
+    {best:'None — entire month is peak festival season',avoid:'Oct 1–31 (Navratri + Diwali = 50–80% above avg)',bookBy:'Book 10–14 wks ahead or consider Nov instead',dayTip:'Price difference by day is minimal — all expensive',note:'Diwali month: most expensive. Book months ahead or shift to Nov.'},
+    {best:'Nov 15–28 (post-Diwali sweet spot)',avoid:'Nov 1–14 (Diwali hangover + wedding season peak)',bookBy:'7–9 wks ahead',dayTip:'Tue–Thu mid-November onwards',note:'Fares drop sharply after Diwali. Nov 15+ is a great window.'},
+    {best:'Dec 3–12 only',avoid:'Dec 13–31 (Christmas &amp; NY — 60–90% above avg)',bookBy:'12–16 wks ahead for Dec 20–Jan 5 travel',dayTip:'Dec 3–12: Tue/Thu best. Dec 13+: all days expensive',note:'Dec 3–12 is a hidden gem. Dec 20+ is the priciest window of the year.'},
+  ];
+
+  // Best connections for long-haul countries (Gulf/Asia = direct, no entry needed)
+  var CONNECTIONS={
+    USD:{longHaul:true,country:'USA',directHrs:'15–17 hrs (Air India non-stop DEL/BOM from JFK/SFO)',hubs:[
+      {rank:1,via:'Doha (DOH)',airline:'Qatar Airways',addTime:'+2–4 hrs',saving:'~30–40% cheaper than direct — consistently cheapest option',tip:'Daily from JFK, ORD, LAX, SFO, IAD, ATL, BOS, MIA',stopover:'12hr+ layover = free Doha stopover (visit Museum of Islamic Art)'},
+      {rank:2,via:'Dubai (DXB)',airline:'Emirates',addTime:'+2–4 hrs',saving:'~25–35% cheaper than direct',tip:'Daily from JFK, EWR, ORD, LAX, SFO, IAD, IAH, ATL',stopover:'12hr+ = free Dubai stopover via Emirates program'},
+      {rank:3,via:'Abu Dhabi (AUH)',airline:'Etihad Airways',addTime:'+2–4 hrs',saving:'~20–30% cheaper than direct',tip:'Daily from JFK, ORD, LAX, SFO, IAD',stopover:'US immigration pre-clearance at AUH — faster US return'},
+      {rank:4,via:'London (LHR)',airline:'British Airways / Virgin',addTime:'+4–6 hrs',saving:'~15–20% cheaper than Air India direct',tip:'Good for East Coast — daily from JFK, BOS, ORD, LAX',stopover:'6hr+ layover = London city visit visa-free for many'},
+    ]},
+    GBP:{longHaul:true,country:'UK',directHrs:'8–9 hrs (Air India / BA non-stop)',hubs:[
+      {rank:1,via:'Doha (DOH)',airline:'Qatar Airways',addTime:'+1–2 hrs',saving:'~25–40% cheaper than BA/Virgin direct — often UK\'s cheapest',tip:'Daily from LHR, LGW, MAN, EDI',stopover:'3hr connection usually. Doha stopover packages from $15/night'},
+      {rank:2,via:'Dubai (DXB)',airline:'Emirates',addTime:'+1–2 hrs',saving:'~20–35% cheaper than direct',tip:'Multiple daily from LHR, LGW, MAN, BHX — most flexible',stopover:'12hr+ = free Dubai stopover program'},
+      {rank:3,via:'Abu Dhabi (AUH)',airline:'Etihad Airways',addTime:'+1–2 hrs',saving:'~20–30% cheaper than direct',tip:'Daily from LHR. Smooth 2–3hr connection at AUH',stopover:'Short layover option for fastest connection'},
+    ]},
+    EUR:{longHaul:true,country:'Europe',directHrs:'8–11 hrs (Lufthansa, KLM, Air France direct)',hubs:[
+      {rank:1,via:'Doha (DOH)',airline:'Qatar Airways',addTime:'+1–3 hrs',saving:'~30–45% cheaper than European carriers',tip:'Daily from FRA, MUC, AMS, CDG, ZRH, BCN, MAD, FCO',stopover:'Often under 3hrs connection — very smooth'},
+      {rank:2,via:'Dubai (DXB)',airline:'Emirates',addTime:'+1–3 hrs',saving:'~25–40% cheaper than direct',tip:'Daily from 30+ European cities including FRA, AMS, CDG, ZRH',stopover:'DXB has all Indian cities as hub — best connectivity'},
+      {rank:3,via:'Abu Dhabi (AUH)',airline:'Etihad Airways',addTime:'+2–3 hrs',saving:'~20–30% cheaper than direct',tip:'From FRA, AMS, CDG, MXP, MUC',stopover:'Modern terminal — comfortable connection'},
+    ]},
+    CAD:{longHaul:true,country:'Canada',directHrs:'15–16 hrs (Air India non-stop YYZ/YVR)',hubs:[
+      {rank:1,via:'Doha (DOH)',airline:'Qatar Airways',addTime:'+2–4 hrs',saving:'~35–45% cheaper than Air Canada direct — often cheapest option',tip:'Daily from YYZ, YVR, YUL',stopover:'Check fares 8–12 weeks ahead for best CAD→India rates'},
+      {rank:2,via:'Dubai (DXB)',airline:'Emirates',addTime:'+2–4 hrs',saving:'~25–35% cheaper than direct',tip:'Daily from YYZ, YVR, YUL',stopover:'12hr+ = free Dubai stopover program'},
+      {rank:3,via:'London (LHR)',airline:'Air Canada / British Airways',addTime:'+3–5 hrs',saving:'~15–20% cheaper',tip:'Good for stopover — daily from YYZ, YVR',stopover:'Great if you want a London stopover'},
+    ]},
+    AUD:{longHaul:true,country:'Australia',directHrs:'11–14 hrs (Air India direct from MEL/SYD)',hubs:[
+      {rank:1,via:'Singapore (SIN)',airline:'Singapore Airlines / Scoot',addTime:'+1–3 hrs',saving:'~20–35% vs Air India direct — most popular routing',tip:'Daily from SYD, MEL, BNE, PER. 1.5–3hr layover at SIN',stopover:'SIN airport is world-class — comfortable connection'},
+      {rank:2,via:'Kuala Lumpur (KUL)',airline:'AirAsia / Malaysia Airlines',addTime:'+2–4 hrs',saving:'~35–50% cheaper — often cheapest AUS→India option',tip:'Daily from SYD, MEL, BNE, PER',stopover:'AirAsia: check baggage fees. MAS: full-service at mid-price'},
+      {rank:3,via:'Dubai (DXB)',airline:'Emirates',addTime:'+3–5 hrs',saving:'~20–30% cheaper than direct',tip:'Daily from SYD, MEL, BNE, PER, ADL',stopover:'12hr+ = free Dubai stopover. Best for comfortable journey'},
+      {rank:4,via:'Doha (DOH)',airline:'Qatar Airways',addTime:'+3–5 hrs',saving:'~25–35% cheaper than direct',tip:'Daily from SYD, MEL, PER',stopover:'Award-winning service — great premium economy option'},
+    ]},
+    NZD:{longHaul:true,country:'New Zealand',directHrs:'No direct flights — all require connections',hubs:[
+      {rank:1,via:'Singapore (SIN)',airline:'Singapore Airlines',addTime:'Most seamless option',saving:'Best service quality for NZ→India journey',tip:'Daily from AKL, CHC, WLG. 2–4hr layover at SIN',stopover:'SIN transit hotel available for long layovers'},
+      {rank:2,via:'Kuala Lumpur (KUL)',airline:'AirAsia / Malaysia Airlines',addTime:'Budget option',saving:'~30–40% cheaper than Singapore Airlines',tip:'Multiple weekly from AKL. Watch for AirAsia add-on costs',stopover:'KUL is a decent stopover — budget accommodation options'},
+      {rank:3,via:'Dubai (DXB)',airline:'Emirates',addTime:'Longer but comfortable',saving:'Mid-range pricing — good for premium economy',tip:'Daily from AKL, CHC',stopover:'12hr+ = free Dubai stopover program'},
+    ]},
+  };
+
+  function _getDealInfo(){
+    var m=new Date().getMonth(), idx=MONTHLY_IDX[m];
+    if(idx<=0.73) return {cls:'low',     label:'🟢 Best Deals',     pct:Math.round((1-idx)*100)};
+    if(idx<=0.90) return {cls:'shoulder',label:'🟡 Shoulder Season', pct:Math.round((1-idx)*100)};
+    if(idx<=1.05) return {cls:'avg',     label:'⚪ Average Fares',   pct:0};
+    return               {cls:'peak',    label:'🔴 Peak Season',     pct:Math.round((idx-1)*100)};
+  }
+
+  function _getTrend(){
+    var m=new Date().getMonth();
+    var curr=MONTHLY_IDX[m], next=MONTHLY_IDX[(m+1)%12];
+    var pct=Math.round((next-curr)/curr*100);
+    if(pct> 6) return {arrow:'↑',color:'#ef4444',label:'Rising next month'};
+    if(pct<-6) return {arrow:'↓',color:'var(--teal)',label:'Falling next month'};
+    return            {arrow:'→',color:'var(--amber)',label:'Stable next 30 days'};
+  }
+
+  function _getBookNudge(){
+    var m=new Date().getMonth(), idx=MONTHLY_IDX[m];
+    if(idx<=0.73) return '🎯 You\'re in the cheapest window — book now';
+    if(idx<=0.90) return '✓ Shoulder season — good fares, book 3–4 weeks out';
+    if(idx>=1.20) return '⚡ Peak season — book 8–10 weeks ahead';
+    return '📅 Book 4–6 weeks out for best availability';
+  }
+
+  function _getFestivalAlert(){
+    var now=new Date(), y=now.getFullYear();
+    for(var i=0;i<FESTIVALS.length;i++){
+      var f=FESTIVALS[i];
+      var fd=new Date(y,f.m,f.d);
+      if(fd<now) fd=new Date(y+1,f.m,f.d);
+      var days=Math.round((fd-now)/86400000);
+      if(days>=0&&days<=60) return {name:f.name,days:days,spike:f.spike,note:f.note};
+    }
+    return null;
+  }
+
+  function _getHeatmapHTML(){
+    var m=new Date().getMonth(), out='<div class="fl-hm">';
+    for(var i=0;i<12;i++){
+      var idx=MONTHLY_IDX[i];
+      var cls=idx<=0.73?'fl-hm-low':idx<=0.90?'fl-hm-sh':idx<=1.05?'fl-hm-avg':'fl-hm-peak';
+      var cur=i===m?' fl-hm-cur':'';
+      var h=Math.max(4,Math.round(idx*22));
+      out+='<div class="fl-hm-bar'+cur+'" title="'+FL_MONTH_NAMES[i]+': '+(idx<0.85?'Cheap':idx<1.05?'Average':'Expensive')+'">'
+        +'<div class="fl-hm-fill '+cls+'" style="height:'+h+'px"></div>'
+        +'<div class="fl-hm-lbl">'+FL_MONTH_NAMES[i][0]+'</div>'
+        +'</div>';
+    }
+    return out+'</div>';
+  }
+
+  function _renderFestivalBanner(){
+    var el=document.getElementById('fl-festival-banner');
+    if(!el) return;
+    var f=_getFestivalAlert();
+    if(!f){el.style.display='none';return;}
+    el.style.display='block';
+    el.innerHTML='<strong>⚠️ '+f.name+'</strong> in '+f.days+' days — '+f.note+'. Book immediately or plan 2+ weeks after.';
+  }
+
+  function _renderDealStrip(){
+    var el=document.getElementById('fl-deal-strip');
+    if(!el) return;
+    var deal=_getDealInfo(), trend=_getTrend();
+    el.className='fl-deal-strip fl-ds-'+deal.cls;
+    el.innerHTML='<span class="fl-ds-score">'+deal.label
+      +(deal.pct>0?' &nbsp;·&nbsp; ~'+deal.pct+'% '+(deal.cls==='low'?'below avg':'above avg'):'')+'</span>'
+      +'<span class="fl-ds-sep">·</span>'
+      +'<span class="fl-ds-trend" style="color:'+trend.color+'">'+trend.arrow+' '+trend.label+'</span>'
+      +'<span class="fl-ds-sep">·</span>'
+      +'<span class="fl-ds-nudge">'+_getBookNudge()+'</span>';
+  }
+
   let _flOrigin=null;
 
   function initFlights(){
@@ -2615,6 +2756,8 @@ function closeNavDD(){
     var lbl=document.getElementById('fl-cur-label');
     if(lbl) lbl.innerHTML='Showing routes from <strong>'+data.country+'</strong> ('+cur+') — change country via the currency selector above';
     renderOrigins(data);
+    _renderFestivalBanner();
+    _renderDealStrip();
     renderDests(cur,data);
   }
   window.initFlights=initFlights;
@@ -2758,7 +2901,7 @@ function closeNavDD(){
         :wks<14?'Good time to start comparing — book within 3–4 weeks'
         :'Monitor prices; book 8–10 weeks before travel';
       html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-row"><span>📅 '+MONTH_NAMES[travelM]+'</span><strong>'+mGrade+'</strong></div>';
+      html+='<div class="fl-plan-row"><span>📅 '+FL_MONTH_NAMES[travelM]+'</span><strong>'+mGrade+'</strong></div>';
       html+='<div class="fl-plan-row"><span>📆 Weeks away</span><span>~'+wks+' weeks</span></div>';
       html+='<div class="fl-plan-advice">'+bookAdvice+'</div>';
       html+='</div>';
@@ -2767,7 +2910,7 @@ function closeNavDD(){
       for(var fi=0;fi<FESTIVALS.length;fi++){
         if(FESTIVALS[fi].m===travelM){
           html+='<div class="fl-plan-section fl-plan-festival">';
-          html+='⚠️ <strong>'+FESTIVALS[fi].name+'</strong> falls in '+MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Book immediately or shift travel by 2+ weeks.';
+          html+='⚠️ <strong>'+FESTIVALS[fi].name+'</strong> falls in '+FL_MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Book immediately or shift travel by 2+ weeks.';
           html+='</div>';
           break;
         }
@@ -2796,6 +2939,39 @@ function closeNavDD(){
         html+='<div class="fl-plan-advice">'+comfort+'</div>';
       } else {
         html+='<div class="fl-plan-advice">⚠️ Budget may not cover flights for '+groupN+' (min '+cur+' '+Math.round(flMin).toLocaleString()+') — consider increasing budget or travelling solo.</div>';
+      }
+      html+='</div>';
+    }
+
+    // ── Smart Dates ──
+    if(travelM>=0){
+      var bd=BEST_DATES[travelM];
+      html+='<div class="fl-plan-section">';
+      html+='<div class="fl-plan-sec-hd">📅 Best dates in '+FL_MONTH_NAMES[travelM]+'</div>';
+      html+='<div class="fl-plan-row"><span>✅ Best weeks</span><span>'+bd.best+'</span></div>';
+      html+='<div class="fl-plan-row"><span>⚠️ Avoid</span><span>'+bd.avoid+'</span></div>';
+      html+='<div class="fl-plan-row"><span>✈ Day tip</span><span>'+bd.dayTip+'</span></div>';
+      html+='<div class="fl-plan-row"><span>📆 Book by</span><span>'+bd.bookBy+'</span></div>';
+      html+='<div class="fl-plan-advice">'+bd.note+'</div>';
+      html+='</div>';
+    }
+
+    // ── Best connections (long-haul only) ──
+    var connData=CONNECTIONS[cur];
+    if(connData&&connData.longHaul){
+      html+='<div class="fl-plan-section">';
+      html+='<div class="fl-plan-sec-hd">✈ Best routing from '+connData.country+(d?' to '+d.name:'')+'</div>';
+      html+='<div class="fl-plan-row fl-plan-row-direct"><span>⏱ Going direct</span><span>'+connData.directHrs+'</span></div>';
+      for(var ci=0;ci<connData.hubs.length;ci++){
+        var h=connData.hubs[ci];
+        html+='<div class="fl-conn'+(ci===0?' fl-conn-best':'')+"'>"
+          +'<div class="fl-conn-top"><span class="fl-conn-rank">'+(ci===0?'🥇':ci===1?'🥈':'🥉')+'</span>'
+          +'<span class="fl-conn-via">Via '+h.via+'</span>'
+          +'<span class="fl-conn-airline">'+h.airline+'</span></div>'
+          +'<div class="fl-conn-meta">'+h.addTime+' &nbsp;·&nbsp; '+h.saving+'</div>'
+          +'<div class="fl-conn-tip">🛫 '+h.tip+'</div>'
+          +(h.stopover?'<div class="fl-conn-stopover">💡 '+h.stopover+'</div>':'')
+          +'</div>';
       }
       html+='</div>';
     }

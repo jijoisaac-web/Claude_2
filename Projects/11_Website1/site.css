@@ -1500,3 +1500,18 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-plan-row span:first-child{color:var(--muted);flex-shrink:0;}
 .fl-plan-advice{font-size:12px;color:var(--text2);background:rgba(20,184,166,.08);border:1px solid rgba(20,184,166,.15);border-radius:7px;padding:8px 10px;margin-top:10px;line-height:1.5;}
 .fl-plan-festival{font-size:12px;line-height:1.6;border-color:rgba(251,191,36,.3) !important;background:rgba(251,191,36,.07) !important;color:var(--text2);}
+
+/* ─── Smart Dates + Connections ───────────────────────────────── */
+.fl-plan-sec-hd{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.fl-plan-row-direct{border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:4px;}
+
+/* Connection option cards */
+.fl-conn{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin:8px 0;}
+.fl-conn-best{border-color:rgba(20,184,166,.35);background:rgba(20,184,166,.05);}
+.fl-conn-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px;}
+.fl-conn-rank{font-size:16px;flex-shrink:0;}
+.fl-conn-via{font-size:13px;font-weight:700;}
+.fl-conn-airline{font-size:11px;color:var(--muted);margin-left:auto;}
+.fl-conn-meta{font-size:12px;color:var(--teal);font-weight:600;margin-bottom:4px;}
+.fl-conn-tip{font-size:11px;color:var(--text2);margin-bottom:3px;}
+.fl-conn-stopover{font-size:11px;color:var(--amber);margin-top:3px;}
