@@ -21,7 +21,7 @@ Requires Python 3.10+ and internet access (data comes from Yahoo Finance, ~15 mi
 
 **Dashboard** — live cards for NIFTY 50, NIFTY Bank, Sensex, NIFTY IT, plus a personal watchlist (add/remove any NIFTY 50 stock; stored in SQLite so it persists).
 
-**Screener** — scans all NIFTY 50 stocks and flags opportunities: RSI oversold/overbought, golden/death cross (SMA50 vs SMA200), MACD crossovers, near 52-week high/low, volume spikes (2x+ average), Bollinger band touches. Filter by bullish/bearish. First scan takes ~30 seconds; results cached 10 minutes.
+**Screener** — scans a chosen universe (NIFTY 50, Midcap 150, Smallcap 250, or all ~450 stocks) and flags opportunities: RSI oversold/overbought, golden/death cross (SMA50 vs SMA200), MACD crossovers, near 52-week high/low, volume spikes (2x+ average), Bollinger band touches. Filter by bullish/bearish. Results cached 10 minutes per universe. Constituent lists come from official NSE archives (July 2026); the Cloudflare version (`site/universe.js`) covers all three indices, while the local Python version scans NIFTY 50.
 
 **Charts** — candlestick charts (1M–5Y) with volume, SMA 20/50/200, Bollinger Bands, and synced RSI + MACD panels. Click any stock row anywhere to jump to its chart.
 

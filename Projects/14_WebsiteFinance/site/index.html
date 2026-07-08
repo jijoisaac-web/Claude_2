@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>India Shares Tracker</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.1/lightweight-charts.standalone.production.min.js"></script>
+<script src="universe.js"></script>
 <style>
 :root{--bg:#0d1117;--panel:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;
 --green:#3fb950;--red:#f85149;--blue:#58a6ff;--amber:#d29922;}
@@ -87,6 +88,12 @@ progress{width:180px;accent-color:var(--blue);}
 <!-- SCREENER -->
 <section id="screener" class="tab">
   <div class="controls">
+    <select id="universeSelect" onchange="loadScreener()">
+      <option value="NIFTY 50">NIFTY 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+      <option value="ALL">All (~450 stocks)</option>
+    </select>
     <select id="signalFilter" onchange="renderScreener()">
       <option value="all">All stocks</option>
       <option value="signals">With signals only</option>
@@ -97,7 +104,7 @@ progress{width:180px;accent-color:var(--blue);}
     <span class="muted" id="screenerMeta"></span>
     <progress id="scanProgress" max="50" value="0" style="display:none"></progress>
   </div>
-  <div id="screenerTable"><div class="loading">Open this tab to scan NIFTY 50</div></div>
+  <div id="screenerTable"><div class="loading">Open this tab to scan</div></div>
 </section>
 
 <!-- CHARTS -->
@@ -129,26 +136,7 @@ progress{width:180px;accent-color:var(--blue);}
 </main>
 
 <script>
-/* ================= universe ================= */
-const INDICES = {"^NSEI":"NIFTY 50","^NSEBANK":"NIFTY BANK","^BSESN":"SENSEX","^CNXIT":"NIFTY IT"};
-const NIFTY50 = {
-"ADANIENT.NS":"Adani Enterprises","ADANIPORTS.NS":"Adani Ports","APOLLOHOSP.NS":"Apollo Hospitals",
-"ASIANPAINT.NS":"Asian Paints","AXISBANK.NS":"Axis Bank","BAJAJ-AUTO.NS":"Bajaj Auto",
-"BAJFINANCE.NS":"Bajaj Finance","BAJAJFINSV.NS":"Bajaj Finserv","BEL.NS":"Bharat Electronics",
-"BHARTIARTL.NS":"Bharti Airtel","CIPLA.NS":"Cipla","COALINDIA.NS":"Coal India",
-"DRREDDY.NS":"Dr Reddy's Labs","EICHERMOT.NS":"Eicher Motors","ETERNAL.NS":"Eternal (Zomato)",
-"GRASIM.NS":"Grasim Industries","HCLTECH.NS":"HCL Technologies","HDFCBANK.NS":"HDFC Bank",
-"HDFCLIFE.NS":"HDFC Life","HEROMOTOCO.NS":"Hero MotoCorp","HINDALCO.NS":"Hindalco",
-"HINDUNILVR.NS":"Hindustan Unilever","ICICIBANK.NS":"ICICI Bank","INDUSINDBK.NS":"IndusInd Bank",
-"INFY.NS":"Infosys","ITC.NS":"ITC","JIOFIN.NS":"Jio Financial","JSWSTEEL.NS":"JSW Steel",
-"KOTAKBANK.NS":"Kotak Mahindra Bank","LT.NS":"Larsen & Toubro","M&M.NS":"Mahindra & Mahindra",
-"MARUTI.NS":"Maruti Suzuki","NESTLEIND.NS":"Nestle India","NTPC.NS":"NTPC","ONGC.NS":"ONGC",
-"POWERGRID.NS":"Power Grid","RELIANCE.NS":"Reliance Industries","SBILIFE.NS":"SBI Life",
-"SBIN.NS":"State Bank of India","SHRIRAMFIN.NS":"Shriram Finance","SUNPHARMA.NS":"Sun Pharma",
-"TATACONSUM.NS":"Tata Consumer","TATAMOTORS.NS":"Tata Motors","TATASTEEL.NS":"Tata Steel",
-"TCS.NS":"TCS","TECHM.NS":"Tech Mahindra","TITAN.NS":"Titan","TRENT.NS":"Trent",
-"ULTRACEMCO.NS":"UltraTech Cement","WIPRO.NS":"Wipro"};
-const nameOf = s => NIFTY50[s] || INDICES[s] || s.replace(".NS","");
+/* ================= universe: loaded from universe.js (INDICES, UNIVERSES, ALL_STOCKS, nameOf) ================= */
 
 /* ================= helpers ================= */
 const $ = id => document.getElementById(id);
@@ -236,7 +224,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 
 /* ================= watchlist (localStorage) ================= */
 const WL_KEY = "ist_watchlist";
-const WL_DEFAULT = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","TATAMOTORS.NS"];
+const WL_DEFAULT = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","TMPV.NS"];
 function getWL(){ try{ const v = JSON.parse(localStorage.getItem(WL_KEY)); return Array.isArray(v)&&v.length?v:WL_DEFAULT; }catch(e){ return WL_DEFAULT; } }
 function setWL(v){ localStorage.setItem(WL_KEY, JSON.stringify(v)); }
 function addToWatchlist(){ const s=$("addSelect").value, wl=getWL(); if(!wl.includes(s)){ wl.push(s); setWL(wl);} loadDashboard(); }
@@ -308,19 +296,25 @@ function scanStock(sym, candles){
     pct_from_52w_high:(close-hi)/hi*100, signals};
 }
 
+function universeSymbols(){
+  const u = $("universeSelect").value;
+  return u === "ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[u]);
+}
 async function loadScreener(force){
-  if(!force){
-    try{ const c = JSON.parse(localStorage.getItem(SCAN_KEY));
+  const uni = $("universeSelect").value;
+  const cacheKey = SCAN_KEY + ":" + uni;
+  if(force !== true){
+    try{ const c = JSON.parse(localStorage.getItem(cacheKey));
       if(c && Date.now()-c.ts < 10*60*1000){ screenerData=c.data; $("screenerMeta").textContent=`As of ${c.data.as_of} · ${c.data.count} stocks scanned (cached)`; renderScreener(); return; } }catch(e){}
   }
-  const syms = Object.keys(NIFTY50);
-  $("screenerTable").innerHTML = '<div class="loading">Scanning NIFTY 50…</div>';
+  const syms = universeSymbols();
+  $("screenerTable").innerHTML = `<div class="loading">Scanning ${uni === "ALL" ? "all universes" : uni} (${syms.length} stocks)…</div>`;
   const prog = $("scanProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
-  const results = await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d"))), 6, ()=>prog.value++);
+  const results = await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d"))), 8, ()=>prog.value++);
   prog.style.display="none";
   const stocks = results.filter(Boolean).sort((a,b)=>b.signals.length-a.signals.length);
   screenerData = {as_of:new Date().toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}), count:stocks.length, stocks};
-  try{ localStorage.setItem(SCAN_KEY, JSON.stringify({ts:Date.now(),data:screenerData})); }catch(e){}
+  try{ localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(),data:screenerData})); }catch(e){}
   $("screenerMeta").textContent = `As of ${screenerData.as_of} · ${screenerData.count} stocks scanned`;
   renderScreener();
 }
@@ -435,7 +429,11 @@ async function loadFundamentals(){
 
 /* ================= init ================= */
 (function(){
-  const opts = Object.entries(NIFTY50).map(([s,n])=>`<option value="${s}">${s.replace(".NS","")} — ${n}</option>`).join("");
+  const opts = Object.entries(UNIVERSES).map(([uni, stocks]) =>
+    `<optgroup label="${uni}">` +
+    Object.entries(stocks).sort((a,b)=>a[1].localeCompare(b[1]))
+      .map(([s,n])=>`<option value="${s}">${n} (${s.replace(".NS","")})</option>`).join("") +
+    `</optgroup>`).join("");
   $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
   $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
   loadDashboard();
