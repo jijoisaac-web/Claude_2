@@ -1,4 +1,4 @@
-/* v5.8 */
+/* v5.9 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2942,9 +2942,12 @@ function closeNavDD(){
     // Duration picker
     html+='<div class="fl-dur-row">'
       +'<span class="fl-dur-label">Trip length:</span>'
+      +'<button class="fl-dur-btn'+(tripDays===2?' fl-dur-active':'')+'" onclick="flDurSet(2,this)">2 nights</button>'
+      +'<button class="fl-dur-btn'+(tripDays===3?' fl-dur-active':'')+'" onclick="flDurSet(3,this)">3 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===7?' fl-dur-active':'')+'" onclick="flDurSet(7,this)">7 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===10?' fl-dur-active':'')+'" onclick="flDurSet(10,this)">10 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===14?' fl-dur-active':'')+'" onclick="flDurSet(14,this)">14 nights</button>'
+      +'<button class="fl-dur-btn'+(tripDays===30?' fl-dur-active':'')+'" onclick="flDurSet(30,this)">30 nights</button>'
       +'</div>';
 
     // ── Header ──
