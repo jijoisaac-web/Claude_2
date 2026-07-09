@@ -959,6 +959,31 @@ tbody tr.income-row td:first-child{
   .stot-chip .stot-val{font-size:12px;}
   .stot-month{display:none;}
 }
+
+/* Bank import modal */
+.btn-teal{background:rgba(52,211,153,.15);color:var(--teal);border:1px solid rgba(52,211,153,.3);}
+.btn-teal:hover{background:rgba(52,211,153,.25);border-color:var(--teal);}
+#bankImportModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;padding:16px;}
+.bi-box{background:var(--surface);border-radius:var(--radius);padding:24px;width:100%;max-width:820px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.bi-box h2{font-size:16px;font-weight:800;margin-bottom:4px;}
+.bi-hint{font-size:12px;color:var(--text2);margin-bottom:14px;}
+.bi-banks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.bi-bank-chip{padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+.bi-upload{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:.2s;}
+.bi-upload:hover{border-color:var(--accent);background:var(--accent-s);}
+.bi-upload input{display:none;}
+.bi-upload-icon{font-size:32px;margin-bottom:8px;}
+.bi-upload-label{font-size:13px;font-weight:600;}
+.bi-upload-sub{font-size:11px;color:var(--text2);margin-top:4px;}
+.bi-status{font-size:12px;color:var(--text2);margin:10px 0;min-height:18px;}
+.bi-review-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.bi-review-table thead th{background:var(--surface3);padding:7px 9px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);white-space:nowrap;}
+.bi-review-table tbody tr{border-bottom:1px solid var(--border);}
+.bi-review-table tbody tr:hover{background:var(--surface2);}
+.bi-review-table td{padding:5px 9px;vertical-align:middle;}
+.bi-sel{font-size:11px;padding:3px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;}
+.bi-summary{display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-top:12px;font-size:12px;}
+.bi-summary span{font-weight:700;}
 </style>
 </head>
 <body>
@@ -1156,6 +1181,7 @@ tbody tr.income-row td:first-child{
     <button class="btn btn-gray"    onclick="openAddGroup()">＋ Group</button>
     <button class="btn btn-success" onclick="copyPrevMonth()">⎘ Copy Prev Month</button>
     <button class="btn btn-purple"  onclick="openCsvImport()">⬆ Import CSV</button>
+    <button class="btn btn-teal"     onclick="openBankImport()">🏦 Bank Statement</button>
   </div>
 
   <!-- Table -->
@@ -1342,6 +1368,31 @@ tbody tr.income-row td:first-child{
     <div class="modal-actions">
       <button class="btn btn-gray" onclick="closeModal('csvOverlay')">Cancel</button>
       <button class="btn btn-primary" onclick="processCsv()">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bank Statement Import -->
+<div id="bankImportModal">
+  <div class="bi-box">
+    <h2>🏦 Import Bank Statement</h2>
+    <div class="bi-hint">Supports CSV &amp; PDF. Transactions are matched to your categories — review before importing.</div>
+    <div class="bi-banks">
+      <span class="bi-bank-chip">🏦 Maybank Savings</span>
+      <span class="bi-bank-chip">💳 Maybank Credit Card</span>
+      <span class="bi-bank-chip">🏦 Standard Chartered</span>
+      <span class="bi-bank-chip">👛 Touch 'n Go</span>
+    </div>
+    <label class="bi-upload" onclick="document.getElementById('biFileInput').click()">
+      <input type="file" id="biFileInput" accept=".csv,.pdf,.txt" onchange="handleBankFile(this)">
+      <div class="bi-upload-icon">📂</div>
+      <div class="bi-upload-label">Click to upload statement</div>
+      <div class="bi-upload-sub">CSV or PDF · Maybank, SCB, Touch 'n Go</div>
+    </label>
+    <div class="bi-status" id="biStatus"></div>
+    <div id="biReview"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+      <button class="btn btn-gray" onclick="closeBankImport()">Close</button>
     </div>
   </div>
 </div>
@@ -2805,6 +2856,336 @@ function updateStickyTotals(){
   },{threshold:0, rootMargin:'-'+(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--hdr-h')||'62')+parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')||'52'))+'px 0px 0px 0px'});
   obs.observe(hero);
 })();
+
+
+/* ════════════════════════════════════════════
+   BANK STATEMENT IMPORT
+════════════════════════════════════════════ */
+function openBankImport(){
+  document.getElementById('bankImportModal').style.display='flex';
+  document.getElementById('biFileInput').value='';
+  document.getElementById('biReview').innerHTML='';
+  document.getElementById('biStatus').textContent='';
+}
+function closeBankImport(){
+  document.getElementById('bankImportModal').style.display='none';
+}
+
+function detectBank(filename, preview){
+  const fn=filename.toLowerCase(), p=preview.toLowerCase();
+  if(fn.includes('tng')||fn.includes('touchngo')||fn.includes('touch_n_go')||p.includes('touch 'n go')||p.includes('ewallet')) return 'tng';
+  if((fn.includes('maybank')||fn.includes('mbb'))&&(fn.includes('cc')||fn.includes('credit')||fn.includes('card'))) return 'maybank-cc';
+  if(fn.includes('maybank')||fn.includes('mbb')||p.includes('maybank berhad')||p.includes('malayan banking')) return 'maybank-sav';
+  if(fn.includes('scb')||fn.includes('standard')||fn.includes('chartered')||p.includes('standard chartered')) return 'scb';
+  // auto-detect from header columns
+  if(p.includes('debit')&&p.includes('credit')&&p.includes('balance')) return 'maybank-sav';
+  return 'unknown';
+}
+
+function bankLabel(b){
+  return {'maybank-sav':'Maybank Savings','maybank-cc':'Maybank Credit Card','scb':'Standard Chartered','tng':"Touch 'n Go",'unknown':'Auto-detect'}[b]||b;
+}
+
+function parseCsvLine(line){
+  const r=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    if(line[i]==='"') inQ=!inQ;
+    else if(line[i]===','&&!inQ){r.push(cur.trim());cur='';}
+    else cur+=line[i];
+  }
+  r.push(cur.trim()); return r;
+}
+
+function num(s){ return parseFloat((s||'').replace(/,/g,''))||0; }
+
+function parseCsvBank(text, bank){
+  const lines=text.trim().split(/\r?\n/).map(l=>l.trim()).filter(l=>l);
+  if(lines.length<2) return [];
+  const txns=[];
+  const header=lines[0].toLowerCase();
+
+  if(bank==='maybank-sav'){
+    // Date | Description | Debit | Credit | Balance
+    for(let i=1;i<lines.length;i++){
+      const c=parseCsvLine(lines[i]);
+      if(c.length<4) continue;
+      const date=c[0],desc=c[1],debit=num(c[2]),credit=num(c[3]);
+      if(!date||!desc) continue;
+      if(credit>0) txns.push({date,desc,amount:credit,type:'income'});
+      if(debit>0)  txns.push({date,desc,amount:debit, type:'expense'});
+    }
+  } else if(bank==='maybank-cc'){
+    // Date | Transaction Date | Description | Amount  OR  Date | Description | Amount
+    for(let i=1;i<lines.length;i++){
+      const c=parseCsvLine(lines[i]);
+      if(c.length<3) continue;
+      let date,desc,amount;
+      if(c.length>=4&&/\d/.test(c[1])){
+        date=c[0]; desc=c[2]; amount=num(c[3]);
+      } else {
+        date=c[0]; desc=c[1]; amount=num(c[2]);
+      }
+      if(!date||!desc||!amount) continue;
+      // negative = payment/credit, positive = spend
+      txns.push({date,desc,amount:Math.abs(amount),type:amount<0?'income':'expense'});
+    }
+  } else if(bank==='scb'){
+    // Transaction Date | Description | Debit | Credit | Running Balance
+    for(let i=1;i<lines.length;i++){
+      const c=parseCsvLine(lines[i]);
+      if(c.length<4) continue;
+      const date=c[0],desc=c[1],debit=num(c[2]),credit=num(c[3]);
+      if(!date||!desc) continue;
+      if(credit>0) txns.push({date,desc,amount:credit,type:'income'});
+      if(debit>0)  txns.push({date,desc,amount:debit, type:'expense'});
+    }
+  } else if(bank==='tng'){
+    // Date | Description | Amount | Type (Debit/Credit) | Balance
+    for(let i=1;i<lines.length;i++){
+      const c=parseCsvLine(lines[i]);
+      if(c.length<3) continue;
+      const date=c[0],desc=c[1],amount=Math.abs(num(c[2]));
+      const typeCol=(c[3]||'').toLowerCase();
+      const type=typeCol.includes('credit')||typeCol.includes('top up')||typeCol.includes('reload')?'income':'expense';
+      if(!date||!desc||!amount) continue;
+      txns.push({date,desc,amount,type});
+    }
+  } else {
+    // Generic: sniff columns from header
+    const hasCredit=header.includes('credit'), hasDebit=header.includes('debit');
+    for(let i=1;i<lines.length;i++){
+      const c=parseCsvLine(lines[i]);
+      if(c.length<3) continue;
+      const date=c[0],desc=c[1];
+      if(!date||!desc) continue;
+      if(hasDebit&&hasCredit){
+        const debit=num(c[2]),credit=num(c[3]);
+        if(credit>0) txns.push({date,desc,amount:credit,type:'income'});
+        if(debit>0)  txns.push({date,desc,amount:debit, type:'expense'});
+      } else {
+        const amount=Math.abs(num(c[2]));
+        if(amount>0) txns.push({date,desc,amount,type:'expense'});
+      }
+    }
+  }
+  return txns;
+}
+
+function matchCategory(desc){
+  const d=desc.toLowerCase();
+  const cats=state.categories;
+  // Direct name match
+  for(const c of cats) if(d.includes(c.name.toLowerCase())&&c.name.length>3) return c.id;
+  // Keyword rules
+  const rules=[
+    {keys:['salary','gaji','payroll','pay credit','wages'],  fn:c=>/salary|income|in hand/i.test(c.name)},
+    {keys:['grab food','foodpanda','mcdonalds','kfc','pizza','burger','mamak','restaurant','cafe','coffee','makan'],fn:c=>/food|dining|eat|resto/i.test(c.name)},
+    {keys:['petronas','shell','petrol','fuel','caltex','bhp'],fn:c=>/petrol|fuel|car/i.test(c.name)},
+    {keys:['grab','myrapid','rapidkl','bus','lrt','mrt','commute','taxi','e-hailing'],fn:c=>/transport|commute|travel/i.test(c.name)},
+    {keys:['car loan','hire purchase','auto loan'],fn:c=>/car loan|hire/i.test(c.name)},
+    {keys:['car service','workshop','tyre','battery'],fn:c=>/car service|maintenance/i.test(c.name)},
+    {keys:['insurance','takaful','prudential','aia','great eastern'],fn:c=>/insurance|takaful/i.test(c.name)},
+    {keys:['shopee','lazada','amazon','online shopping'],fn:c=>/shopping|online/i.test(c.name)},
+    {keys:['watson','guardian','pharmacy','klinik','clinic','hospital','medical','dentist'],fn:c=>/medical|health|clinic|pharmacy/i.test(c.name)},
+    {keys:['tesco','mydin','giant','aeon','jaya grocer','village grocer','supermarket','grocery'],fn:c=>/grocery|market|supermarket/i.test(c.name)},
+    {keys:['netflix','spotify','youtube','apple','google play','subscription'],fn:c=>/subscription|entertainment|streaming/i.test(c.name)},
+    {keys:['unifi','maxis','celcom','digi','yes ','time ','.internet','broadband','mobile bill'],fn:c=>/phone|internet|telco|mobile/i.test(c.name)},
+    {keys:['tnb','syabas','indah water','electric','water bill','utility'],fn:c=>/utility|electric|water/i.test(c.name)},
+    {keys:['rent','sewa','apartment','condo'],fn:c=>/rent|sewa/i.test(c.name)},
+    {keys:['school','tuition','education','university','college','upsr','spm'],fn:c=>/school|education|tuition/i.test(c.name)},
+    {keys:['parking','tol','highway','plus '],fn:c=>/parking|toll|tol/i.test(c.name)},
+    {keys:['badminton','gym','sport','swimming','futsal'],fn:c=>/sport|gym|fitness/i.test(c.name)},
+    {keys:['transfer','duitnow','ibg','rentas'],fn:c=>/transfer|savings/i.test(c.name)},
+    {keys:['maybank credit','credit card payment','cc payment'],fn:c=>/credit card|maybank cc|scb/i.test(c.name)},
+  ];
+  for(const rule of rules){
+    if(rule.keys.some(k=>d.includes(k))){
+      const match=cats.find(c=>rule.fn(c));
+      if(match) return match.id;
+    }
+  }
+  return '';
+}
+
+async function parsePdfBank(file){
+  if(!window.pdfjsLib){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload=res; s.onerror=rej;
+      document.head.appendChild(s);
+    });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc=
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const buf=await file.arrayBuffer();
+  const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
+  let full='';
+  for(let p=1;p<=pdf.numPages;p++){
+    const pg=await pdf.getPage(p);
+    const tc=await pg.getTextContent();
+    full+=tc.items.map(i=>i.str).join(' ')+'
+';
+  }
+  return parsePdfText(full, file.name);
+}
+
+function parsePdfText(text, filename){
+  const bank=detectBank(filename, text.slice(0,600));
+  const lines=text.split('
+').map(l=>l.trim()).filter(l=>l);
+  const txns=[];
+  const dateRe=/(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2,4})/i;
+  const amtRe=/[\d,]+\.\d{2}/g;
+  for(const line of lines){
+    const dm=line.match(dateRe);
+    const ams=line.match(amtRe);
+    if(!dm||!ams) continue;
+    const amount=parseFloat(ams[ams.length-1].replace(/,/g,''));
+    if(!amount||amount<0.01) continue;
+    let desc=line.replace(dm[0],'').replace(amtRe,'').replace(/\s+/g,' ').trim();
+    if(!desc||desc.length<3) continue;
+    const type=/credit|salary|gaji|cashback|refund|top.?up|reload/i.test(desc)?'income':'expense';
+    txns.push({date:dm[0],desc,amount,type});
+  }
+  return txns;
+}
+
+async function handleBankFile(input){
+  const file=input.files[0];
+  if(!file) return;
+  const status=document.getElementById('biStatus');
+  status.style.color='var(--text2)';
+  status.textContent='Reading file…';
+  try{
+    const ext=file.name.split('.').pop().toLowerCase();
+    let txns=[];
+    if(ext==='csv'||ext==='txt'){
+      const text=await file.text();
+      const bank=detectBank(file.name, text.slice(0,500));
+      status.textContent='Detected: '+bankLabel(bank)+' — parsing…';
+      txns=parseCsvBank(text, bank);
+    } else if(ext==='pdf'){
+      status.textContent='Parsing PDF… (may take a moment)';
+      txns=await parsePdfBank(file);
+    } else {
+      status.textContent='Unsupported file type. Please upload CSV or PDF.';
+      return;
+    }
+    if(!txns.length){
+      status.style.color='var(--red)';
+      status.textContent='No transactions found. Check the file format matches Maybank/SCB/TnG CSV export.';
+      return;
+    }
+    txns.forEach(t=>{t.catId=matchCategory(t.desc);t.include=true;});
+    const matched=txns.filter(t=>t.catId).length;
+    status.style.color='var(--accent)';
+    status.textContent=`Found ${txns.length} transactions · ${matched} auto-matched to categories · ${txns.length-matched} need manual assignment`;
+    renderBiReview(txns);
+  } catch(e){
+    status.style.color='var(--red)';
+    status.textContent='Error: '+e.message;
+    console.error(e);
+  }
+}
+
+let _biTxns=[];
+function renderBiReview(txns){
+  _biTxns=txns;
+  const cats=state.categories;
+  const catOpts='<option value="">— Skip —</option>'+
+    cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const incTotal=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const expTotal=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+
+  let html=`<div style="overflow-x:auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;">
+    <label style="font-size:12px;color:var(--text2);cursor:pointer;">
+      <input type="checkbox" id="biAll" checked onchange="toggleBiAll(this.checked)"> Select all
+    </label>
+    <button class="btn btn-primary" onclick="importBiTxns()">⬆ Import Selected</button>
+  </div>
+  <div class="bi-summary">
+    <div>Transactions: <span>${txns.length}</span></div>
+    <div style="color:var(--accent)">Income: <span>MYR ${fmt(incTotal)}</span></div>
+    <div style="color:var(--red)">Expenses: <span>MYR ${fmt(expTotal)}</span></div>
+  </div>
+  <table class="bi-review-table" style="margin-top:10px;">
+    <thead><tr>
+      <th style="width:28px;text-align:center">✓</th>
+      <th>Date</th>
+      <th>Description</th>
+      <th style="text-align:right">Amount</th>
+      <th style="text-align:center">Type</th>
+      <th style="min-width:150px">Category</th>
+    </tr></thead>
+    <tbody>`;
+
+  txns.forEach((t,i)=>{
+    const rowBg=t.type==='income'?'background:rgba(92,184,122,.05)':'';
+    html+=`<tr style="${rowBg}">
+      <td style="text-align:center"><input type="checkbox" class="bi-chk" data-i="${i}" checked></td>
+      <td style="white-space:nowrap;color:var(--text2)">${t.date}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.desc.replace(/"/g,'')}">${t.desc}</td>
+      <td style="text-align:right;font-weight:700;color:${t.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(t.amount)}</td>
+      <td style="text-align:center">
+        <select class="bi-sel bi-type" data-i="${i}">
+          <option value="expense" ${t.type==='expense'?'selected':''}>Expense</option>
+          <option value="income" ${t.type==='income'?'selected':''}>Income</option>
+        </select>
+      </td>
+      <td>
+        <select class="bi-sel bi-cat" data-i="${i}" style="width:100%">${catOpts}</select>
+      </td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  const rev=document.getElementById('biReview');
+  rev.innerHTML=html;
+
+  // Set matched categories
+  rev.querySelectorAll('.bi-cat').forEach(sel=>{
+    const t=_biTxns[+sel.dataset.i];
+    if(t.catId) sel.value=t.catId;
+  });
+}
+
+function toggleBiAll(v){
+  document.querySelectorAll('.bi-chk').forEach(cb=>cb.checked=v);
+}
+
+function importBiTxns(){
+  // Read current UI state
+  document.querySelectorAll('.bi-chk').forEach(cb=>{_biTxns[+cb.dataset.i].include=cb.checked;});
+  document.querySelectorAll('.bi-cat').forEach(s=>{_biTxns[+s.dataset.i].catId=s.value;});
+  document.querySelectorAll('.bi-type').forEach(s=>{_biTxns[+s.dataset.i].type=s.value;});
+
+  const toImport=_biTxns.filter(t=>t.include&&t.catId);
+  if(!toImport.length){
+    alert('No transactions selected or no categories assigned. Please assign a category to at least one transaction.');
+    return;
+  }
+
+  const md=getMonthData(currentMonth);
+  // Group amounts by catId
+  const grouped={};
+  toImport.forEach(t=>{
+    grouped[t.catId]=(grouped[t.catId]||0)+t.amount;
+  });
+
+  Object.entries(grouped).forEach(([catId,total])=>{
+    let entry=md.entries.find(e=>e.catId===catId);
+    if(entry){ entry.actual=(entry.actual||0)+total; }
+    else { md.entries.push({catId,actual:total,paid:false,note:''}); }
+  });
+
+  saveState();
+  closeBankImport();
+  renderMonthly();
+  const catCount=Object.keys(grouped).length;
+  alert(`✅ Imported ${toImport.length} transactions across ${catCount} categories for ${MONTHS[currentMonth]} ${currentYear}.`);
+}
 
 </script>
 </body>

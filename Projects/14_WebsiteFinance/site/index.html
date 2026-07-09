@@ -62,6 +62,8 @@ tbody tr:hover{background:#1c2129;}
 .badge.capS{background:rgba(188,140,255,.15);color:#bc8cff;}
 tr.chartRow td{padding:6px 8px;background:#0d1117;cursor:default;}
 tr.chartRow:hover{background:#0d1117;}
+tbody tr.sel{background:#1c2c1c;}
+tbody tr.sel:hover{background:#1f3320;}
 .controls{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
 select,input[type=text]{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:14px;}
 button.btn{background:#238636;border:none;color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;}
@@ -133,7 +135,7 @@ progress{width:180px;accent-color:var(--blue);}
     <button data-tab="charts">Charts</button>
     <button data-tab="fundamentals">Fundamentals</button>
     <button data-tab="portfolio">Portfolio</button>
-    <button data-tab="track">Track Record</button>
+    <button data-tab="track">Backtest</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -211,7 +213,7 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
     <span class="muted">⚠️ Rule-based technical ideas generated automatically from the latest scan (universe picked on the Screener tab).
     Educational tool, not investment advice — check fundamentals, news and your own risk tolerance before acting. Levels are indicative, based on ATR volatility.
-    <b>Setup Score (0–100)</b> grades how much is aligned behind a setup — trigger, trend, momentum, volume, entry risk. It is NOT a win probability: high-score setups still fail routinely, which is why every idea carries a stop. Paper trades record the score, so the Track Record tab will show you over time whether high scores actually outperform.</span>
+    <b>Setup Score (0–100)</b> grades how much is aligned behind a setup — trigger, trend, momentum, volume, entry risk. It is NOT a win probability: high-score setups still fail routinely, which is why every idea carries a stop. Use the Backtest tab to see how these rules have actually performed historically.</span>
   </div>
   <div class="controls">
     <button class="btn ghost" onclick="loadIdeas(true)">↻ Refresh from scan</button>
@@ -296,19 +298,9 @@ progress{width:180px;accent-color:var(--blue);}
   <div id="pfSuggest"><div class="loading">…</div></div>
 </section>
 
-<!-- TRACK RECORD (backtest + paper trades) -->
+<!-- BACKTEST -->
 <section id="track" class="tab">
-  <h2>Paper trades — auto-recorded from the Ideas engine</h2>
-  <div class="muted" style="font-size:11px;margin-bottom:8px">Every fresh scan records that day's short-term BUY ideas here as paper trades (one per stock per day, stored in your browser). Status updates against actual highs/lows: stop or target hit first wins; both same day counts as stopped (conservative).</div>
-  <div class="controls">
-    <button class="btn ghost" onclick="renderTrack(true)">↻ Update status</button>
-    <button class="btn ghost" onclick="ptClear()">Clear history</button>
-    <span class="muted" id="ptMeta"></span>
-  </div>
-  <div class="cards" id="ptSummary"></div>
-  <div id="ptTable"><div class="loading">No paper trades yet — run a scan on the Screener/Ideas tab and today's BUY ideas will be recorded.</div></div>
-
-  <h2 style="margin-top:24px">Backtest — replay the same buy rules on history</h2>
+  <h2>Backtest — replay the same buy rules on history</h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Simulates the Ideas engine's short-term BUY rules (breakout, MACD cross, gap-up, pullback dip, RSI oversold, BB lower touch — all filtered to stocks above SMA200) on past data. Entry at signal close, stop/target as the engine sets them, 10-session cooldown per stock. Shows what happened 1w/2w/1m/3m later.</div>
   <div class="controls">
     <span class="muted">Templates:</span>
@@ -531,7 +523,6 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
   if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
-  if(b.dataset.tab==="track" && !window._trackLoaded) renderTrack();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -747,6 +738,13 @@ function scanStock(sym, candles, bench63){
   // double bottom with neckline break
   const db = detectDoubleBottom(candles);
   if(db) signals.push({type:"DOUBLE_BOTTOM",side:"bullish",detail:`Double bottom near ₹${Math.round(db.low).toLocaleString("en-IN")} confirmed — closed above the neckline ₹${Math.round(db.neck).toLocaleString("en-IN")}`});
+  // hammer reversal candle after a slide
+  if(e.length>=4){
+    const body = Math.abs(last.close-last.open), lw = Math.min(last.open,last.close)-last.low, uw = last.high-Math.max(last.open,last.close);
+    const d1=e[e.length-2], d2=e[e.length-3], d3=e[e.length-4];
+    if(body>0 && lw>=2*body && uw<=body && d1.close<d2.close && d2.close<d3.close && r!=null && r<45)
+      signals.push({type:"HAMMER_REVERSAL",side:"bullish",detail:"Hammer candle after a multi-day slide — sellers pushed hard and lost; buyers reclaimed the range"});
+  }
 
   const sma200_20ago = e.length>20 ? e[e.length-21].sma200 : null;
   return {symbol:sym, name:nameOf(sym), price:close,
@@ -787,7 +785,6 @@ async function loadScreener(force){
   renderScreener();
   if(window._ideasLoaded) loadIdeas();
   renderPulse();
-  try{ recordPaperTrades(); }catch(e){}
 }
 function renderScreener(){
   if(!screenerData) return;
@@ -833,7 +830,7 @@ function setupScore(idea){
     has("BREAKOUT_20D") ? (has("VOLUME_SPIKE")?25:20) :
     has("GOLDEN_CROSS") ? 20 :
     has("MACD_BULL_CROSS") ? 18 : has("VOL_DRYUP") ? 18 : has("DOUBLE_BOTTOM") ? 18 :
-    has("PULLBACK_DIP") ? 16 : has("GAP_UP") ? 15 :
+    has("PULLBACK_DIP") ? 16 : has("GAP_UP") ? 15 : has("HAMMER_REVERSAL") ? 14 :
     (has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH")) ? 12 :
     has("BB_SQUEEZE") ? 12 : has("RSI_BULL_DIV") ? 10 : 0;
   if(idea.action==="ACCUMULATE") trig = Math.max(trig, 15);          // stage-2 base is itself the trigger
@@ -861,6 +858,7 @@ function buildIdeas(stocks){
       has("GAP_UP") ? "Gap-up with the trend — strength begets strength, but size smaller (gaps can fill)" :
       has("PULLBACK_DIP") ? "Three-day dip inside an uptrend, RSI reset" :
       has("VOL_DRYUP") ? "Quiet pullback to SMA50 on drying volume — sellers exhausted" :
+      has("HAMMER_REVERSAL") ? "Hammer reversal candle after a slide — buyers defended the low" :
       has("RSI_BULL_DIV") ? "Bullish RSI divergence — a reversal clue, speculative until price confirms" :
       has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH") ? "Oversold dip (RSI/lower band)" : null;
     // conviction: independent confirmations stacked on top of the trigger
@@ -1637,7 +1635,7 @@ async function analyzePortfolio(){
   }
 }
 
-/* ================= track record: backtest + paper trades ================= */
+/* ================= backtest ================= */
 function atrSeries(c, p=14){
   const out = new Array(c.length).fill(null); let atr = null;
   for(let i=0;i<c.length;i++){
@@ -1667,52 +1665,81 @@ function adxSeriesFull(c, p=14){   // rolling ADX/+DI/-DI arrays (Wilder)
   }
   return out;
 }
-// configurable rule evaluation as-of bar i
-function evalBuyAt(e, atr, i, cfg, adxArr, niftyR63){
+// configurable rule evaluation as-of bar i; aux = {adxArr, niftyR63, widths}
+function evalBuyAt(e, atr, i, cfg, aux={}){
   const d = e[i];
-  if(d.sma200==null || d.close<=d.sma200) return null;
+  if(d.sma200==null) return null;
+  if(cfg.aboveOnly && d.close<=d.sma200) return null;
   const a = atr[i]; if(!a) return null;
   const on = t => cfg.sigs.has(t);
   let sig = null, h20 = null;
-  if(on("BREAKOUT_20D") && i>=21){
-    let hi=-Infinity;
-    for(let k=i-20;k<i;k++) hi = Math.max(hi, e[k].high);
-    h20 = hi;
-    if(d.close>hi) sig = "BREAKOUT_20D";
+  if(i>=21){ let hi=-Infinity; for(let k=i-20;k<i;k++) hi = Math.max(hi, e[k].high); h20 = hi; }
+  if(on("BREAKOUT_20D") && h20!=null && d.close>h20) sig = "BREAKOUT_20D";
+  if(!sig && on("SQUEEZE_BREAK") && h20!=null && d.close>h20 && aux.widths && i>=141 && aux.widths[i-1]!=null){
+    let mn=Infinity;
+    for(let k=i-120;k<i;k++) if(aux.widths[k]!=null) mn = Math.min(mn, aux.widths[k]);
+    if(aux.widths[i-1] <= mn*1.1) sig = "SQUEEZE_BREAK";
   }
+  if(!sig && on("NEW_52W_HIGH") && i>=252){
+    let hi=-Infinity; for(let k=i-252;k<i;k++) hi = Math.max(hi, e[k].high);
+    if(d.close>hi) sig = "NEW_52W_HIGH";
+  }
+  if(!sig && on("GOLDEN_CROSS") && i>=1 && e[i-1].sma50!=null && e[i-1].sma200!=null && d.sma50!=null &&
+     e[i-1].sma50<=e[i-1].sma200 && d.sma50>d.sma200) sig = "GOLDEN_CROSS";
   if(!sig && on("MACD_BULL_CROSS") && i>=2 && e[i-2].macd_hist!=null && d.macd_hist!=null && e[i-2].macd_hist<0 && d.macd_hist>0) sig = "MACD_BULL_CROSS";
   if(!sig && on("GAP_UP") && i>=1 && e[i-1].close && (d.open-e[i-1].close)/e[i-1].close>=0.03) sig = "GAP_UP";
+  if(!sig && on("DOUBLE_BOTTOM") && i>=45){
+    const db = detectDoubleBottom(e.slice(0,i+1));
+    if(db && e[i-1].close<=db.neck) sig = "DOUBLE_BOTTOM";   // first close above the neckline
+  }
   if(!sig && on("PULLBACK_DIP") && i>=2 && [e[i-2],e[i-1],d].every(x=>x.close<x.open) && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=55) sig = "PULLBACK_DIP";
   if(!sig && on("VOL_DRYUP") && d.sma50!=null && Math.abs(d.close-d.sma50)/d.sma50<0.04 &&
      d.vol_avg20 && d.volume < 0.6*d.vol_avg20 && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=60) sig = "VOL_DRYUP";
+  if(!sig && on("HAMMER_REVERSAL") && i>=3){
+    const body = Math.abs(d.close-d.open), lw = Math.min(d.open,d.close)-d.low, uw = d.high-Math.max(d.open,d.close);
+    if(body>0 && lw>=2*body && uw<=body && e[i-1].close<e[i-2].close && e[i-2].close<e[i-3].close && d.rsi14!=null && d.rsi14<45)
+      sig = "HAMMER_REVERSAL";
+  }
+  if(!sig && on("RSI_BULL_DIV") && i>=40){
+    const win = e.slice(i-39,i+1);
+    if(win.every(x=>x.rsi14!=null)){
+      const H1 = win.slice(0,20), H2 = win.slice(20);
+      const lo1 = H1.reduce((m,x)=>x.low<m.low?x:m), lo2 = H2.reduce((m,x)=>x.low<m.low?x:m);
+      if(lo2.low<lo1.low && lo2.rsi14>lo1.rsi14+3 && d.rsi14<50) sig = "RSI_BULL_DIV";
+    }
+  }
   if(!sig && on("RSI_OVERSOLD") && d.rsi14!=null && d.rsi14<30) sig = "RSI_OVERSOLD";
   if(!sig && on("BB_LOWER_TOUCH") && d.bb_lower!=null && d.close<=d.bb_lower) sig = "BB_LOWER_TOUCH";
   if(!sig) return null;
   // required confirmations
   if(cfg.confTrend && !(d.sma20!=null && d.sma50!=null && d.close>d.sma20 && d.sma20>d.sma50 && d.sma50>d.sma200)) return null;
-  if(cfg.confADX){ const x = adxArr && adxArr[i]; if(!x || x.adx<=25 || x.pdi<=x.mdi) return null; }
+  if(cfg.confADX){ const x = aux.adxArr && aux.adxArr[i]; if(!x || x.adx<=25 || x.pdi<=x.mdi) return null; }
   if(cfg.confVol && !(d.vol_avg20 && d.volume > 1.5*d.vol_avg20)) return null;
   if(cfg.confRel){
     if(i<63 || !e[i-63].close) return null;
-    const rn = niftyR63 ? niftyR63[d.time] : null;
+    const rn = aux.niftyR63 ? aux.niftyR63[d.time] : null;
     if(rn==null || (d.close/e[i-63].close - 1) <= rn + 0.08) return null;
   }
-  const stop = sig==="BREAKOUT_20D" && h20 ? Math.max(h20*0.99, d.close-cfg.stopATR*a) : d.close-cfg.stopATR*a;
+  const breakoutFamily = sig==="BREAKOUT_20D" || sig==="SQUEEZE_BREAK" || sig==="NEW_52W_HIGH";
+  const stop = breakoutFamily && h20 ? Math.max(h20*0.99, d.close-cfg.stopATR*a) : d.close-cfg.stopATR*a;
   return {signal:sig, entry:d.close, stop, target:d.close+cfg.rr*(d.close-stop)};
 }
 const BT_TEMPLATES = {
-  momentum: {note:"Ride fresh range breaks with volume behind them, in aligned uptrends.", sigs:["BREAKOUT_20D"], trend:1, adx:0, vol:1, rel:0, stop:"1.5", rr:"2", hold:"63"},
-  gapgo:    {note:"Strong gaps in uptrends tend to keep going (your best performer in smallcaps).", sigs:["GAP_UP"], trend:1, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"42"},
-  dip:      {note:"Buy quiet pullbacks in strong trends — dips on drying volume, ADX confirms the trend.", sigs:["PULLBACK_DIP","VOL_DRYUP"], trend:0, adx:1, vol:0, rel:0, stop:"2", rr:"2", hold:"63"},
-  meanrev:  {note:"Oversold bounces with tight stops and quick targets — in and out.", sigs:["RSI_OVERSOLD","BB_LOWER_TOUCH"], trend:0, adx:0, vol:0, rel:0, stop:"1", rr:"1.5", hold:"21"},
-  trend:    {note:"MACD turns inside established, forceful trends — wider stop, bigger target.", sigs:["MACD_BULL_CROSS"], trend:1, adx:1, vol:0, rel:0, stop:"2.5", rr:"3", hold:"63"},
-  leaders:  {note:"Only stocks beating NIFTY by 8+ pts over 3 months — strength buys strength.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","PULLBACK_DIP"], trend:1, adx:0, vol:0, rel:1, stop:"1.5", rr:"2", hold:"63"},
-  all:      {note:"Every trigger, no confirmation filters — the default noisy baseline.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","GAP_UP","PULLBACK_DIP","VOL_DRYUP","RSI_OVERSOLD","BB_LOWER_TOUCH"], trend:0, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"63"},
+  momentum: {note:"Ride fresh range breaks with volume behind them, in aligned uptrends.", sigs:["BREAKOUT_20D"], above:1, trend:1, adx:0, vol:1, rel:0, stop:"1.5", rr:"2", hold:"63"},
+  gapgo:    {note:"Strong gaps in uptrends tend to keep going (your best performer in smallcaps).", sigs:["GAP_UP"], above:1, trend:1, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"42"},
+  dip:      {note:"Buy quiet pullbacks in strong trends — dips on drying volume, ADX confirms the trend.", sigs:["PULLBACK_DIP","VOL_DRYUP"], above:1, trend:0, adx:1, vol:0, rel:0, stop:"2", rr:"2", hold:"63"},
+  meanrev:  {note:"Oversold bounces with tight stops and quick targets — in and out.", sigs:["RSI_OVERSOLD","BB_LOWER_TOUCH"], above:1, trend:0, adx:0, vol:0, rel:0, stop:"1", rr:"1.5", hold:"21"},
+  trend:    {note:"MACD turns inside established, forceful trends — wider stop, bigger target.", sigs:["MACD_BULL_CROSS"], above:1, trend:1, adx:1, vol:0, rel:0, stop:"2.5", rr:"3", hold:"63"},
+  leaders:  {note:"Only stocks beating NIFTY by 8+ pts over 3 months — strength buys strength.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","PULLBACK_DIP"], above:1, trend:1, adx:0, vol:0, rel:1, stop:"1.5", rr:"2", hold:"63"},
+  highflyer:{note:"Fresh 52-week highs and squeeze breaks — buying strength at its strongest, volume confirmed.", sigs:["NEW_52W_HIGH","SQUEEZE_BREAK"], above:1, trend:1, adx:0, vol:1, rel:0, stop:"1.5", rr:"2", hold:"63"},
+  reversal: {note:"Bottom-fishing with confirmation: double bottoms, divergences, hammers. SMA200 filter OFF — reversals live below it. Expect lower win rate, bigger winners.", sigs:["DOUBLE_BOTTOM","RSI_BULL_DIV","HAMMER_REVERSAL"], above:0, trend:0, adx:0, vol:0, rel:0, stop:"2", rr:"2", hold:"42"},
+  all:      {note:"Every trigger, no confirmation filters — the default noisy baseline.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","GAP_UP","PULLBACK_DIP","VOL_DRYUP","RSI_OVERSOLD","BB_LOWER_TOUCH","GOLDEN_CROSS","NEW_52W_HIGH","SQUEEZE_BREAK","DOUBLE_BOTTOM","RSI_BULL_DIV","HAMMER_REVERSAL"], above:1, trend:0, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"63"},
 };
 function applyBtTemplate(){
   const t = BT_TEMPLATES[$("btTemplate").value];
   if(!t){ $("btTplNote").textContent=""; return; }
   document.querySelectorAll(".btSig").forEach(cb=>cb.checked = t.sigs.includes(cb.value));
+  $("btcAbove").checked=!!t.above;
   $("btcTrend").checked=!!t.trend; $("btcADX").checked=!!t.adx; $("btcVol").checked=!!t.vol; $("btcRel").checked=!!t.rel;
   $("btStop").value=t.stop; $("btRR").value=t.rr; $("btHold").value=t.hold;
   $("btTplNote").textContent = t.note + " — hit Run.";
@@ -1720,6 +1747,7 @@ function applyBtTemplate(){
 function btConfig(){
   return {
     sigs: new Set([...document.querySelectorAll(".btSig:checked")].map(cb=>cb.value)),
+    aboveOnly: $("btcAbove").checked,
     confTrend: $("btcTrend").checked, confADX: $("btcADX").checked,
     confVol: $("btcVol").checked, confRel: $("btcRel").checked,
     stopATR: parseFloat($("btStop").value), rr: parseFloat($("btRR").value),
@@ -1750,17 +1778,21 @@ async function runBacktest(){
     let c; try{ c = toCandles(await fetchChart(sym,"2y","1d")); }catch(e){ return; }
     if(c.length<280) return;
     const e = enrich(c), atr = atrSeries(c);
-    const adxArr = cfg.confADX ? adxSeriesFull(c) : null;
+    const aux = {
+      adxArr: cfg.confADX ? adxSeriesFull(c) : null,
+      niftyR63,
+      widths: cfg.sigs.has("SQUEEZE_BREAK") ? e.map(d=> d.bb_upper!=null && d.sma20 ? (d.bb_upper-d.bb_lower)/d.sma20 : null) : null,
+    };
     let cooldown = 0;
     for(let i=Math.max(220, c.length-lookback-cfg.maxHold); i<c.length-1; i++){
       if(cooldown>0){ cooldown--; continue; }
-      const t = evalBuyAt(e, atr, i, cfg, adxArr, niftyR63);
+      const t = evalBuyAt(e, atr, i, cfg, aux);
       if(!t) continue;
       cooldown = 10;
       const o = scanOutcome(c, i, t, cfg.maxHold);
       const H = n => i+n<c.length ? (c[i+n].close-t.entry)/t.entry*100 : null;
       trades.push({sym, date:c[i].time, signal:t.signal, entry:t.entry, ...o,
-        r5:H(5), r10:H(10), r21:H(21), r63:H(63),
+        r5:H(5), r10:H(10), r21:H(21), r63:H(63), rEnd:H(cfg.maxHold),
         n5:nH(c[i].time,5), n10:nH(c[i].time,10), n21:nH(c[i].time,21), n63:nH(c[i].time,63)});
     }
   }, 6, ()=>prog.value++);
@@ -1769,7 +1801,12 @@ async function runBacktest(){
   renderBacktest(trades, uni, lookback);
 }
 const avg = a => { const v=a.filter(x=>x!=null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : null; };
+function btFilterSig(sig){
+  window._btFilter = window._btFilter===sig ? null : sig;
+  if(window._bt) renderBacktest(window._bt.trades, window._bt.uni, window._bt.lookback);
+}
 function renderBacktest(trades, uni, lookback){
+  window._bt = {trades, uni, lookback};
   const cfg = btConfig();
   const reqs = [cfg.confTrend&&"trend-aligned", cfg.confADX&&"ADX>25", cfg.confVol&&"volume 1.5x", cfg.confRel&&"beating NIFTY"].filter(Boolean);
   $("btMeta").textContent = `${trades.length} trades · ${uni} · ${Math.round(lookback/21)} mo · ${[...cfg.sigs].length} triggers${reqs.length?" · req: "+reqs.join(", "):""} · stop ${cfg.stopATR} ATR · target ${cfg.rr}R · hold ≤${cfg.maxHold}d`;
@@ -1789,18 +1826,34 @@ function renderBacktest(trades, uni, lookback){
         <div class="price">${pctCell(avg(trades.map(t=>t[rk])))}</div>
         <div class="chg muted">NIFTY same dates: ${pctCell(avg(trades.map(t=>t[nk])))}</div></div>`).join("")}
     </div>
-    <h2>By signal type</h2>
-    <table><thead><tr><th>Signal</th><th>Trades</th><th>Win rate</th><th>Avg 1W</th><th>Avg 1M</th><th>Avg 3M</th></tr></thead><tbody>
+    <h2>By signal type <span class="muted" style="text-transform:none;font-weight:400">· click a row to filter the trade list below</span></h2>
+    <table><thead><tr><th style="text-align:left">Signal</th><th>Trades</th><th>Win rate</th><th>Timed-out %</th>
+      <th title="Average realised return of trades that hit stop or target">Avg realised</th>
+      <th title="Realised return for closed trades; return at max hold for timed-out ones — the closest thing to full-strategy expectancy per trade">Avg outcome (all)</th>
+      <th>Avg 1W</th><th>Avg 2W</th><th>Avg 1M</th><th>Avg 3M</th>
+      <th title="Median 1-month held return — resistant to one lucky outlier dragging the average">Med 1M</th>
+      <th>Best 1M</th><th>Worst 1M</th></tr></thead><tbody>
     ${[...new Set(trades.map(t=>t.signal))].map(sig=>{
       const g = trades.filter(t=>t.signal===sig), gc = g.filter(t=>t.status==="TARGET"||t.status==="STOP");
       const wr = gc.length? gc.filter(t=>t.status==="TARGET").length/gc.length*100 : null;
-      return `<tr><td>${sig.replaceAll("_"," ")}</td><td>${g.length}</td>
-        <td>${wr!=null?fmt(wr,0)+"%":"—"}</td><td>${pctCell(avg(g.map(t=>t.r5)))}</td>
-        <td>${pctCell(avg(g.map(t=>t.r21)))}</td><td>${pctCell(avg(g.map(t=>t.r63)))}</td></tr>`;}).join("")}
+      const timed = g.filter(t=>t.status==="TIMED OUT").length/g.length*100;
+      const outcome = g.map(t=>t.real!=null ? t.real : t.rEnd).filter(v=>v!=null);
+      const m21 = g.map(t=>t.r21).filter(v=>v!=null).sort((a,b)=>a-b);
+      const med = m21.length? (m21.length%2? m21[(m21.length-1)/2] : (m21[m21.length/2-1]+m21[m21.length/2])/2) : null;
+      return `<tr style="cursor:pointer" onclick="btFilterSig('${sig}')" class="${window._btFilter===sig?'sel':''}">
+        <td style="text-align:left">${window._btFilter===sig?"▶ ":""}${sig.replaceAll("_"," ")}</td><td>${g.length}</td>
+        <td>${wr!=null?`<span class="${wr>=50?'up':'down'}">${fmt(wr,0)}%</span>`:"—"}</td>
+        <td>${fmt(timed,0)}%</td>
+        <td>${pctCell(avg(gc.map(t=>t.real)))}</td>
+        <td>${pctCell(avg(outcome))}</td>
+        <td>${pctCell(avg(g.map(t=>t.r5)))}</td><td>${pctCell(avg(g.map(t=>t.r10)))}</td>
+        <td>${pctCell(avg(g.map(t=>t.r21)))}</td><td>${pctCell(avg(g.map(t=>t.r63)))}</td>
+        <td>${pctCell(med)}</td>
+        <td>${pctCell(m21.length?m21[m21.length-1]:null)}</td><td>${pctCell(m21.length?m21[0]:null)}</td></tr>`;}).join("")}
     </tbody></table>
-    <h2>Simulated trades — newest first (last 40)</h2>
+    <h2>Simulated trades — newest first${window._btFilter?` · filtered: ${window._btFilter.replaceAll("_"," ")} <a href="#" style="color:var(--blue)" onclick="event.preventDefault();btFilterSig(null)">clear ✕</a>`:" (last 40)"}</h2>
     <table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th><th>Entry ₹</th><th>Outcome</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>
-    ${trades.slice(-40).reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
+    ${(window._btFilter ? trades.filter(t=>t.signal===window._btFilter) : trades).slice(-40).reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
       <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
       <td style="text-align:left"><span class="badge neutral">${t.signal.replaceAll("_"," ")}</span></td>
       <td>${fmt(t.entry)}</td>
@@ -1808,77 +1861,6 @@ function renderBacktest(trades, uni, lookback){
       <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
     </tbody></table>
     <div class="muted" style="font-size:11px;margin-top:6px">Backtests overstate reality: no brokerage/slippage/taxes, entries at exact closes, and today's index constituents didn't all exist a year ago (survivorship bias). Treat relative comparisons (signal vs signal, strategy vs NIFTY) as more trustworthy than absolute returns.</div>`;
-}
-
-/* ---- paper trades ---- */
-const PT_KEY = "ist_papertrades";
-function getPT(){ try{ return JSON.parse(localStorage.getItem(PT_KEY))||[]; }catch(e){ return []; } }
-function setPT(t){ localStorage.setItem(PT_KEY, JSON.stringify(t)); }
-function ptClear(){ if(confirm("Delete all paper trades?")){ setPT([]); renderTrack(); } }
-function recordPaperTrades(){
-  if(!screenerData) return;
-  const today = new Date().toISOString().slice(0,10);
-  const {shortT} = buildIdeas(screenerData.stocks);
-  const trades = getPT();
-  let added = 0;
-  for(const s of shortT.filter(x=>x.action==="BUY")){
-    if(trades.some(t=>t.sym===s.symbol && (t.status==="OPEN" || t.date===today))) continue;
-    trades.push({date:today, sym:s.symbol, signal:(s.signals[0]?.type)||"BUY",
-      score:s.score??null, entry:s.entry, stop:s.stop, target:s.target, status:"OPEN"});
-    added++;
-  }
-  if(added) setPT(trades);
-}
-async function renderTrack(force){
-  window._trackLoaded = true;
-  const trades = getPT();
-  $("ptMeta").textContent = `${trades.length} recorded`;
-  if(!trades.length){
-    $("ptSummary").innerHTML = "";
-    $("ptTable").innerHTML = '<div class="loading">No paper trades yet — run a scan on the Screener/Ideas tab and today\'s BUY ideas will be recorded.</div>';
-    return;
-  }
-  $("ptTable").innerHTML = '<div class="loading">Updating against market data…</div>';
-  const need = [...new Set(trades.filter(t=>!t.done).map(t=>t.sym))];
-  const charts = {};
-  await pmap(need, async s=>{ try{ charts[s] = toCandles(await fetchChart(s,"1y","1d")); }catch(e){} }, 6);
-  for(const t of trades){
-    const c = charts[t.sym]; if(!c || t.done) continue;
-    const i0 = c.findIndex(d=>d.time>=t.date);
-    if(i0<0) continue;
-    let status = "OPEN", exit = null;
-    for(let j=i0+1; j<c.length; j++){
-      if(c[j].low<=t.stop){ status="STOP"; exit=c[j].time; break; }
-      if(c[j].high>=t.target){ status="TARGET"; exit=c[j].time; break; }
-    }
-    t.status = status; t.exitDate = exit;
-    t.last = c[c.length-1].close;
-    const H = n => i0+n<c.length ? +( (c[i0+n].close-t.entry)/t.entry*100 ).toFixed(2) : null;
-    t.r5=H(5); t.r10=H(10); t.r21=H(21); t.r63=H(63);
-    if(t.r63!=null && status!=="OPEN") t.done = true;   // fully resolved — stop refetching
-  }
-  setPT(trades);
-  const open = trades.filter(t=>t.status==="OPEN"), closed = trades.filter(t=>t.status==="TARGET"||t.status==="STOP");
-  const wins = closed.filter(t=>t.status==="TARGET").length;
-  const pnl = t => t.status==="TARGET" ? (t.target-t.entry)/t.entry*100 : t.status==="STOP" ? (t.stop-t.entry)/t.entry*100 : t.last!=null ? (t.last-t.entry)/t.entry*100 : null;
-  const pctCell = v => v==null?"—":`<span class="${cls(v)}">${sign(v)}${fmt(v,2)}%</span>`;
-  $("ptSummary").innerHTML = [
-    ["Open", open.length], ["Closed", closed.length],
-    ["Win rate", closed.length?fmt(wins/closed.length*100,0)+"%":"—"],
-    ["Avg closed P&L", closed.length?pctCell(avg(closed.map(pnl))):"—"],
-    ["Avg 1-month (held)", pctCell(avg(trades.map(t=>t.r21)))],
-  ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
-  $("ptTable").innerHTML = `<table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th><th>Score</th>
-    <th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>Status</th><th>P&L</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>` +
-    [...trades].sort((a,b)=> a.date>b.date ? -1 : a.date<b.date ? 1 : a.sym<b.sym ? -1 : 1).map(t=>`<tr onclick="openChart('${t.sym}')">
-      <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
-      <td style="text-align:left"><span class="badge neutral">${(t.signal||"").replaceAll("_"," ")}</span></td>
-      <td>${t.score!=null?`<span class="${scoreCls(t.score)}" style="font-weight:600">${t.score}</span>`:"—"}</td>
-      <td>${fmt(t.entry)}</td><td>${fmt(t.stop)}</td><td>${fmt(t.target)}</td>
-      <td><span class="badge ${t.status==="TARGET"?"bullish":t.status==="STOP"?"bearish":"neutral"}">${t.status}${t.exitDate?" · "+t.exitDate:""}</span></td>
-      <td>${pctCell(pnl(t))}</td>
-      <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("") +
-    "</tbody></table>";
 }
 
 /* ================= global search + keyboard shortcuts ================= */

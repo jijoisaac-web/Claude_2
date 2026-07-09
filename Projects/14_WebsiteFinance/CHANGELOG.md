@@ -2,6 +2,20 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.7.0] — 2026-07-09 · Backtest Analytics
+
+- "By signal type" expanded from 6 to 13 columns: trades, win rate, timed-out %, average realised return (closed trades), average outcome across all trades (closed + at-max-hold — closest to true per-trade expectancy), averages at 1W/2W/1M/3M, median 1M (outlier-resistant), best and worst 1M
+- Click any signal row to filter the simulated-trades list to that signal (click again or "clear ✕" to reset)
+- Removed the paper-trades section; the tab is now simply "Backtest"
+
+## [2.6.0] — 2026-07-09 · More Backtest Signals
+
+- Six more backtestable triggers (13 total): golden cross, fresh 52-week high, Bollinger-squeeze breakout, double bottom (first close above neckline), bullish RSI divergence, hammer reversal candle
+- New "Above SMA200 only" toggle (default on) — turn it off to test reversal setups, which naturally occur below the 200-day average and were previously excluded silently
+- Two new templates: 52-week-high momentum (new highs + squeeze breaks, volume confirmed) and Reversal hunter (double bottoms + divergences + hammers, SMA200 filter off)
+- Hammer reversal added to the live scanner and Ideas engine too (screener signal, buy trigger, setup-score weight)
+- Breakout-family stops (breakout/squeeze/new-high) anchor just under the broken level
+
 ## [2.5.0] — 2026-07-09 · Configurable Backtesting
 
 - Backtest is now fully configurable: pick any combination of 7 triggers (added volume dry-up), require confirmations (trend alignment, ADX>25 with +DI leading, volume ≥1.5x, beating NIFTY by 8pts/3mo), and tune exits (stop 1–2.5 ATR, target 1.5–3R, max hold 1–3 months)
