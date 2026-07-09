@@ -984,6 +984,33 @@ tbody tr.income-row td:first-child{
 .bi-sel{font-size:11px;padding:3px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;}
 .bi-summary{display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-top:12px;font-size:12px;}
 .bi-summary span{font-weight:700;}
+
+/* Version badge */
+.ver-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:var(--text3);cursor:pointer;user-select:none;
+  padding:3px 8px;border-radius:99px;
+  border:1px solid var(--border);background:var(--surface2);
+  transition:.2s;white-space:nowrap;
+}
+.ver-badge:hover{color:var(--accent);border-color:var(--accent);}
+.ver-badge .ver-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+/* Changelog popup */
+#changelogPopup{
+  display:none;position:fixed;top:calc(var(--hdr-h) + 6px);left:16px;
+  z-index:200;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);
+  width:320px;max-height:420px;overflow-y:auto;padding:16px;
+}
+#changelogPopup.open{display:block;}
+.cl-title{font-size:13px;font-weight:800;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.cl-ver{margin-bottom:14px;}
+.cl-ver-num{font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.3px;margin-bottom:5px;}
+.cl-ver-date{font-size:10px;color:var(--text3);margin-left:6px;font-weight:400;}
+.cl-item{font-size:11.5px;color:var(--text2);padding:3px 0;padding-left:14px;position:relative;line-height:1.5;}
+.cl-item::before{content:'•';position:absolute;left:4px;color:var(--accent);}
+@media(max-width:640px){#changelogPopup{width:calc(100vw - 32px);}}
 </style>
 </head>
 <body>
@@ -1097,7 +1124,12 @@ tbody tr.income-row td:first-child{
 <!-- Header -->
 <header>
   <div>
-    <h1>🇲🇾 Budget Tracker</h1>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <h1>🇲🇾 Budget Tracker</h1>
+      <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
+        <span class="ver-dot"></span>v2.5
+      </span>
+    </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
   </div>
   <div class="hdr-right">
@@ -1142,7 +1174,64 @@ tbody tr.income-row td:first-child{
 <!-- ──── MONTHLY VIEW ──── -->
 <div id="view-monthly" class="view active">
 
-  <!-- Month tabs -->
+  
+<!-- Changelog popup -->
+<div id="changelogPopup">
+  <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.5 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Bank statement import (Maybank Savings + CC PDF)</div>
+    <div class="cl-item">Auto category matching from merchant names</div>
+    <div class="cl-item">Transaction review table before import</div>
+    <div class="cl-item">Sticky totals bar on monthly scroll</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.4 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Year Budget Plan with group management</div>
+    <div class="cl-item">Fixed column alignment after Group column added</div>
+    <div class="cl-item">Cloudflare Pages deployment + GitHub auto-sync</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.3 <span class="cl-ver-date">Jun 2026</span></div>
+    <div class="cl-item">Budget plan live totals recalculation</div>
+    <div class="cl-item">Actual/expected value sync on budget save</div>
+    <div class="cl-item">Group subtotals in Year Budget view</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.2 <span class="cl-ver-date">Jun 2026</span></div>
+    <div class="cl-item">Dark green BudgetBuddy redesign</div>
+    <div class="cl-item">Background leaf SVGs and animated orbs</div>
+    <div class="cl-item">Light/dark theme toggle</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.1 <span class="cl-ver-date">Jun 2026</span></div>
+    <div class="cl-item">Category grouping with subtotals</div>
+    <div class="cl-item">Analytics view with charts</div>
+    <div class="cl-item">PIN lock screen</div>
+    <div class="cl-item">INR conversion bar</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.0 <span class="cl-ver-date">May 2026</span></div>
+    <div class="cl-item">Full UI redesign — mobile & desktop</div>
+    <div class="cl-item">Annual summary view</div>
+    <div class="cl-item">YTD tracking & progress bars</div>
+  </div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v1.0 <span class="cl-ver-date">Apr 2026</span></div>
+    <div class="cl-item">Initial budget tracker with categories</div>
+    <div class="cl-item">Expected vs Actual tracking</div>
+    <div class="cl-item">CSV export & multi-year support</div>
+  </div>
+</div>
+
+<!-- Month tabs -->
   <div id="monthTabs"></div>
 
   <!-- Sticky totals bar -->
@@ -3295,6 +3384,18 @@ function importBiTxns(){
   const catCount=Object.keys(grouped).length;
   alert(`✅ Imported ${toImport.length} transactions across ${catCount} categories for ${MONTHS[currentMonth]} ${currentYear}.`);
 }
+
+
+function toggleChangelog(){
+  document.getElementById('changelogPopup').classList.toggle('open');
+}
+// Close on outside click
+document.addEventListener('click', e=>{
+  const pop = document.getElementById('changelogPopup');
+  if(pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('.ver-badge')){
+    pop.classList.remove('open');
+  }
+});
 
 </script>
 </body>
