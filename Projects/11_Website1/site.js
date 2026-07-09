@@ -1,4 +1,4 @@
-/* v7.1 */
+/* v7.2 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2779,6 +2779,18 @@ function closeNavDD(){
     renderDests(cur,FL[cur]||FL['AED']);
   };
 
+  // ── CARD CLICK → PLANNER ────────────────────────────────────────────────
+  window._flPlanDest=function(card,query){
+    var inp=document.getElementById('fl-planner-input');
+    var planner=document.getElementById('fl-planner');
+    if(!inp) return;
+    inp.value=query;
+    if(planner) planner.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(function(){
+      if(typeof window.flPlanTrip==='function') window.flPlanTrip();
+    },350);
+  };
+
   function renderDests(cur,data){
     var wrap=document.getElementById('fl-dest-grid');
     if(!wrap) return;
@@ -2792,7 +2804,8 @@ function closeNavDD(){
         : '—';
       var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/';
       var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /,'+')+'%2C+India';
-      return '<div class="fl-dest-card">'
+      var planQuery=d.name+' next month';
+      return '<div class="fl-dest-card" onclick="_flPlanDest(this,'+JSON.stringify(planQuery)+')" style="cursor:pointer">'
         +'<div class="fl-dest-hd"><span class="fl-dest-icon">'+d.icon+'</span>'
         +'<div style="flex:1"><div class="fl-dest-name">'+d.name+'</div>'
         +'<div class="fl-dest-route">'+from+' → '+code+'</div></div>'
@@ -2808,7 +2821,8 @@ function closeNavDD(){
         +'<div class="fl-hm-label">Fare level by month</div>'
         +_getHeatmapHTML()
         +'<div class="fl-book-nudge">'+nudge+'</div>'
-        +'<div class="fl-btn-row">'
+        +'<div class="fl-dest-plan-hint">&#128204; Tap to plan this trip with AI insights</div>'
+        +'<div class="fl-btn-row" onclick="event.stopPropagation()">'
         +'<a class="fl-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">✈ Skyscanner</a>'
         +'<a class="fl-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
         +'</div></div>';

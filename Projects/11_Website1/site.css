@@ -1,4 +1,4 @@
-/* v7.1 */
+/* v7.2 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1762,3 +1762,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .fl-acc-hd{font-size:.8rem;padding:12px 14px;}
   .fl-acc-body{padding:4px 8px 12px;}
 }
+
+/* ── CARD → PLANNER HINT ────────────────────────────────────────────────── */
+.fl-dest-card{transition:box-shadow .18s,transform .15s;}
+.fl-dest-card:hover{box-shadow:0 0 0 2px var(--accent);transform:translateY(-1px);}
+.fl-dest-plan-hint{font-size:.7rem;color:var(--accent);margin:6px 0 2px;opacity:.8;letter-spacing:.01em;}
