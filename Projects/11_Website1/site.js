@@ -1,4 +1,4 @@
-/* v6.7 */
+/* v6.8 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3290,6 +3290,128 @@ function closeNavDD(){
     return html;
   }
 
+
+  // ── MILES & POINTS VALUE v6.8 ────────────────────────────────────────────
+  // Per currency: frequent flyer programs with approximate India route awards
+  // econ/biz = miles needed one-way, cpm = local currency value per mile
+  var FF_PROGRAMS={
+    AED:[
+      {prog:'Emirates Skywards',    econ:12000,biz:50000,cpm:0.045,link:'https://www.emirates.com/english/skywards/'},
+      {prog:'Etihad Guest',         econ:10000,biz:40000,cpm:0.042,link:'https://www.etihad.com/en/etihad-guest'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.035,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    SAR:[
+      {prog:'Saudia Alfursan',      econ:10000,biz:40000,cpm:0.065,link:'https://www.saudia.com/experience/alfursan'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.040,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    QAR:[
+      {prog:'Qatar Airways Privilege Club',econ:12000,biz:45000,cpm:0.055,link:'https://www.qatarairways.com/en/privilege-club.html'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.040,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    KWD:[
+      {prog:'Kuwait Airways Oasis',  econ:9000,biz:36000,cpm:0.016,link:'https://www.kuwaitairways.com/'},
+      {prog:'Emirates Skywards',     econ:12000,biz:50000,cpm:0.013,link:'https://www.emirates.com/english/skywards/'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.010,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    BHD:[
+      {prog:'Gulf Air Falconflyer',  econ:9000,biz:36000,cpm:0.016,link:'https://www.gulfair.com/falconflyer'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.013,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    OMR:[
+      {prog:'Oman Air Sindbad',      econ:9000,biz:36000,cpm:0.017,link:'https://www.omanair.com/en/sindbad'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.013,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    MYR:[
+      {prog:'AirAsia BIG Points',    econ:8000,biz:null,cpm:0.025,link:'https://www.airasia.com/big/en/'},
+      {prog:'Malaysia Airlines Enrich',econ:10000,biz:40000,cpm:0.028,link:'https://www.malaysiaairlines.com/my/en/enrich.html'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.020,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    SGD:[
+      {prog:'Singapore KrisFlyer',   econ:12000,biz:45000,cpm:0.020,link:'https://www.singaporeair.com/en_UK/krisflyer/'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.018,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    AUD:[
+      {prog:'Qantas Frequent Flyer', econ:18000,biz:54000,cpm:0.022,link:'https://www.qantas.com/au/en/frequent-flyer.html'},
+      {prog:'Velocity (Virgin Aus)', econ:14000,biz:50000,cpm:0.020,link:'https://www.virginaustralia.com/au/en/velocity/'},
+      {prog:'Singapore KrisFlyer',   econ:12000,biz:45000,cpm:0.018,link:'https://www.singaporeair.com/en_UK/krisflyer/'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.015,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    NZD:[
+      {prog:'Air NZ Airpoints',      econ:null,biz:null,cpm:0,link:'https://www.airnewzealand.co.nz/airpoints',note:'Airpoints uses dollar values not miles'},
+      {prog:'Qantas Frequent Flyer', econ:18000,biz:54000,cpm:0.019,link:'https://www.qantas.com/au/en/frequent-flyer.html'},
+      {prog:'Singapore KrisFlyer',   econ:12000,biz:45000,cpm:0.016,link:'https://www.singaporeair.com/en_UK/krisflyer/'}
+    ],
+    GBP:[
+      {prog:'British Airways Avios', econ:8500,biz:30000,cpm:0.012,link:'https://www.britishairways.com/en-gb/executive-club'},
+      {prog:'Virgin Atlantic Flying Club',econ:9000,biz:35000,cpm:0.011,link:'https://www.virginatlantic.com/en/gb/flying-club.html'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.009,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    USD:[
+      {prog:'United MileagePlus',    econ:15000,biz:55000,cpm:0.014,link:'https://www.united.com/en/us/fly/mileageplus.html'},
+      {prog:'Delta SkyMiles',        econ:14000,biz:50000,cpm:0.012,link:'https://www.delta.com/us/en/skymiles/overview'},
+      {prog:'American AAdvantage',   econ:15000,biz:55000,cpm:0.013,link:'https://www.aa.com/aadvantage/home.do'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.010,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    CAD:[
+      {prog:'Aeroplan (Air Canada)', econ:15000,biz:55000,cpm:0.018,link:'https://www.aircanada.com/ca/en/aco/home/aeroplan.html'},
+      {prog:'WestJet Rewards',       econ:null,biz:null,cpm:0,link:'https://www.westjet.com/en-ca/westjet-rewards',note:'WestJet uses dollar values not miles'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.010,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ],
+    EUR:[
+      {prog:'Lufthansa Miles & More',econ:12500,biz:45000,cpm:0.013,link:'https://www.miles-and-more.com/'},
+      {prog:'Air France/KLM Flying Blue',econ:11000,biz:42000,cpm:0.014,link:'https://www.flyingblue.com/'},
+      {prog:'Air India Flying Returns',econ:7500,biz:30000,cpm:0.009,link:'https://www.airindia.com/en-in/frequent-flyer'}
+    ]
+  };
+
+  function _renderMilesValue(cur,route,cabinFareMult,cabinClass){
+    var progs=FF_PROGRAMS[cur];
+    if(!progs||!route) return '';
+
+    var cashEcon=Math.round(route.min*1);
+    var cashBiz=Math.round(route.min*( (typeof BUSINESS_MULT!=='undefined'&&BUSINESS_MULT[cur])||3.5 ));
+    var isBiz=(cabinClass==='business');
+    var cashFare=isBiz?cashBiz:cashEcon;
+
+    var rows='';
+    for(var pi=0;pi<progs.length;pi++){
+      var p=progs[pi];
+      var milesNeeded=isBiz?p.biz:p.econ;
+      if(p.note){
+        rows+='<div class="fl-mi-row"><div class="fl-mi-prog"><a href="'+p.link+'" target="_blank" rel="noopener" class="fl-mi-link">'+p.prog+'</a></div>'
+          +'<div class="fl-mi-detail fl-mi-note">'+p.note+'</div></div>';
+        continue;
+      }
+      if(!milesNeeded) continue;
+      var milesVal=Math.round(milesNeeded*p.cpm);
+      var ratio=cashFare>0?milesVal/cashFare:0;
+      var verdict='';
+      var vClass='';
+      if(ratio>=1.2){verdict='&#127775; Great redemption — miles beat cash';vClass='fl-mi-great';}
+      else if(ratio>=0.9){verdict='&#9989; Fair — similar to cash price';vClass='fl-mi-fair';}
+      else if(ratio>=0.6){verdict='&#9888;&#65039; Below average — consider cash instead';vClass='fl-mi-weak';}
+      else{verdict='&#10060; Poor value — pay cash';vClass='fl-mi-poor';}
+
+      rows+='<div class="fl-mi-row">'
+        +'<div class="fl-mi-prog"><a href="'+p.link+'" target="_blank" rel="noopener" class="fl-mi-link">'+p.prog+'</a></div>'
+        +'<div class="fl-mi-detail">'
+        +'<span class="fl-mi-miles">'+milesNeeded.toLocaleString()+' pts &rarr; ~'+cur+' '+milesVal.toLocaleString()+' value</span>'
+        +'<span class="fl-mi-vs"> vs cash '+cur+' '+cashFare.toLocaleString()+'</span>'
+        +'</div>'
+        +'<div class="fl-mi-verdict '+vClass+'">'+verdict+'</div>'
+        +'</div>';
+    }
+
+    if(!rows) return '';
+
+    return '<div class="fl-mi-card">'
+      +'<div class="fl-mi-title">&#127760; Miles &amp; Points Value &mdash; '+(isBiz?'Business Class':'Economy Class')+'</div>'
+      +'<div class="fl-mi-sub">Points needed (one-way) &amp; whether redemption beats the cash fare of '+cur+' '+cashFare.toLocaleString()+'</div>'
+      +rows
+      +'<div class="fl-mi-footer">Redemption values are estimates. Award availability varies. Always compare cash vs points before booking.</div>'
+      +'</div>';
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -3606,6 +3728,9 @@ function closeNavDD(){
 
       // Departure Airport Comparison
       html+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
+
+      // Miles & Points Value
+      html+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
 
       // India Daily Cost Estimator
       if(destCode) html+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);

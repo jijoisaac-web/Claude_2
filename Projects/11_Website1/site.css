@@ -1,4 +1,4 @@
-/* v6.7 */
+/* v6.8 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1705,4 +1705,26 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .fl-apt-row{flex-wrap:wrap;gap:8px;}
   .fl-apt-left{min-width:100%;margin-bottom:2px;}
   .fl-apt-mid{flex:1;}
+}
+
+/* ── MILES & POINTS VALUE v6.8 ─────────────────────────────────────────── */
+.fl-mi-card{background:var(--card);border-radius:14px;padding:18px;margin:18px 0;border:1px solid var(--border);}
+.fl-mi-title{font-size:.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.fl-mi-sub{font-size:.73rem;color:var(--muted);margin-bottom:14px;}
+.fl-mi-row{padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--border);margin-bottom:8px;}
+.fl-mi-prog{margin-bottom:4px;}
+.fl-mi-link{font-size:.85rem;font-weight:700;color:var(--text);text-decoration:none;border-bottom:1px dotted var(--muted);}
+.fl-mi-link:hover{color:var(--accent);}
+.fl-mi-detail{font-size:.78rem;color:var(--muted);margin-bottom:5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.fl-mi-note{color:var(--muted);font-style:italic;}
+.fl-mi-miles{font-weight:600;color:var(--text);}
+.fl-mi-vs{color:var(--muted);}
+.fl-mi-verdict{font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:6px;display:inline-block;}
+.fl-mi-great{color:#15803d;background:rgba(34,197,94,.14);}
+.fl-mi-fair{color:#0369a1;background:rgba(14,165,233,.12);}
+.fl-mi-weak{color:#b45309;background:rgba(245,158,11,.12);}
+.fl-mi-poor{color:#b91c1c;background:rgba(220,38,38,.10);}
+.fl-mi-footer{font-size:.7rem;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-style:italic;}
+@media(max-width:640px){
+  .fl-mi-detail{flex-direction:column;gap:2px;}
 }
