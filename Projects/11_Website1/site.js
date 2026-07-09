@@ -1,4 +1,4 @@
-/* v6.8 */
+/* v6.9 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -865,7 +865,7 @@ function calcReturn(){
   const gapLocal=midRate>0?` (${baseCur} ${(gapInr/midRate/100000).toFixed(1)}L)`:'';
   const projLocal=midRate>0?` · ${baseCur} ${(projCorpus/midRate/100000).toFixed(1)}L`:'';
   document.getElementById('rp-verdict').innerHTML=onTrack
-    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L${projLocal} covers your inflation-adjusted lifestyle. Ensure you're invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
+    ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L${projLocal} covers your inflation-adjusted lifestyle. Ensure you are invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
     :`<div class="box-red">⚠️ <strong>Gap of ~₹${(gapInr/100000).toFixed(1)}L${gapLocal}.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
   document.getElementById('rp-result').style.display='block';
 }
@@ -951,7 +951,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     setTimeout(()=>openArticle(key),100);
   }
   updateExpTotal();
-  // ── Render default (AED) IMMEDIATELY so page isn't blank ──
+  // ── Render default (AED) IMMEDIATELY so page is not blank ──
   updateHeroBg('AED');
   updateAll();
   // Country → supported currency map
@@ -1604,14 +1604,14 @@ const ARTICLES={
         </tbody>
       </table>
       <h2>What About FCNR Accounts?</h2>
-      <p>There's a third option: <strong>Foreign Currency Non-Resident (FCNR)</strong> deposits. These are fixed deposits held in your home currency (USD, AED, GBP, EUR, etc.) — so you eliminate exchange rate risk entirely. Interest is tax-free. Great for large sums you don't want to convert to INR yet.</p>
+      <p>There's a third option: <strong>Foreign Currency Non-Resident (FCNR)</strong> deposits. These are fixed deposits held in your home currency (USD, AED, GBP, EUR, etc.) — so you eliminate exchange rate risk entirely. Interest is tax-free. Great for large sums you do not want to convert to INR yet.</p>
       <h2>Common Mistakes NRIs Make</h2>
       <ul>
         <li><strong>Keeping a regular savings account after becoming NRI</strong> — illegal under FEMA. Must convert to NRO within 6 months of becoming NRI.</li>
         <li><strong>Mixing foreign and India income in one account</strong> — defeats the purpose and creates tax complexity.</li>
         <li><strong>Not claiming DTAA benefit on NRO interest</strong> — you can reduce TDS from 30% to 10–15% in many countries.</li>
       </ul>
-      <div class="art-callout"><strong>Action checklist:</strong> 1) Open NRE account for your overseas salary · 2) Convert your old Indian savings account to NRO · 3) Check DTAA with your country of residence to reduce NRO TDS · 4) Consider FCNR FD for amounts above ₹20L you won't touch for 1–5 years</div>
+      <div class="art-callout"><strong>Action checklist:</strong> 1) Open NRE account for your overseas salary · 2) Convert your old Indian savings account to NRO · 3) Check DTAA with your country of residence to reduce NRO TDS · 4) Consider FCNR FD for amounts above ₹20L you will not touch for 1–5 years</div>
       <div class="art-cta"><div><div class="art-cta-text">Compare NRE FD Rates Across Banks</div><div class="art-cta-sub">See which bank offers the best NRE fixed deposit rate right now</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('nrenro',document.querySelector('[data-tab=nrenro]'))">Open FD Calculator &#8594;</button></div>
     `},
   'tax-saving':{
@@ -1680,7 +1680,7 @@ const ARTICLES={
         <li><strong>Loan or self-funded?</strong> — NRI home loans are available from most major banks at 7.25–9% p.a.</li>
       </ul>
       <h2>Step 2: Power of Attorney (POA)</h2>
-      <p>Since you're abroad, you'll need a <strong>Power of Attorney</strong> — a legal document authorising a trusted person in India (parent, sibling, spouse) to act on your behalf for signing agreements, registering the property, and taking possession.</p>
+      <p>Since you are abroad, you will need a <strong>Power of Attorney</strong> — a legal document authorising a trusted person in India (parent, sibling, spouse) to act on your behalf for signing agreements, registering the property, and taking possession.</p>
       <ul>
         <li>POA must be executed before an Indian consulate or notarised and apostilled in the country where you reside</li>
         <li>The original POA must be sent to India; your representative will get it stamped and registered</li>
@@ -1706,7 +1706,7 @@ const ARTICLES={
         <li>Funds in your NRE or NRO account</li>
         <li>Home loan proceeds</li>
       </ul>
-      <p>Cash transactions are <strong>not permitted</strong>. Keep all payment records — you'll need them to prove source of funds when you sell.</p>
+      <p>Cash transactions are <strong>not permitted</strong>. Keep all payment records — you will need them to prove source of funds when you sell.</p>
       <h2>Step 5: Registration and Stamp Duty</h2>
       <p>Property must be registered in India. Your POA holder can execute this in your absence. Stamp duty varies by state (typically 3–7% of property value). Registration fee is typically 1%. Budget 6–8% of property value for total acquisition costs including stamp duty, registration, and legal fees.</p>
       <h2>Tax on Rental Income</h2>
@@ -1735,7 +1735,7 @@ const ARTICLES={
         <li><strong>Exchange rate margin (spread)</strong> — the gap between the mid-market rate (what banks trade between themselves) and what you actually receive. This is the invisible cost.</li>
         <li><strong>Transfer fee</strong> — the flat or percentage fee charged per transaction. Easier to see, but often not the biggest cost.</li>
       </ul>
-      <p>Example: You're sending AED 5,000 to India. Mid-market rate = ₹22.80 per AED. If a provider gives you ₹22.35 instead, that's a 2% margin — you lose ₹2,250 on that one transfer.</p>
+      <p>Example: You're sending AED 5,000 to India. Mid-market rate = ₹22.80 per AED. If a provider gives you ₹22.35 instead, that is a 2% margin — you lose ₹2,250 on that one transfer.</p>
       <h2>The Main Transfer Methods Compared</h2>
       <table class="art-table">
         <thead><tr><th>Method</th><th>Typical Margin</th><th>Fee</th><th>Speed</th><th>Best For</th></tr></thead>
@@ -1793,13 +1793,13 @@ const ARTICLES={
       <p><strong>India Inflation Rate (% p.a.):</strong> Default is 6%, which is the historical average for India. Healthcare and education inflate faster (8–10%), so if those are major buckets for you, nudge this to 7%.</p>
 
       <h2>Step 4 — Set Corpus Return & Income</h2>
-      <p><strong>Investment Return on Corpus (% p.a.):</strong> The return your corpus earns after you return. Assume 8–9% for a balanced equity+debt portfolio, or 6–7% for a conservative FD-heavy approach. Do not use aggressive equity-only assumptions for money you'll actually be spending.</p>
-      <p><strong>Expected India Income After Return (₹/mo):</strong> Any income you'll earn in India — consultancy, rental income, part-time work, pension, interest from FDs. This reduces how much you withdraw from the corpus each month. Even ₹30,000/month in rental income can add 5–7 years to corpus life.</p>
+      <p><strong>Investment Return on Corpus (% p.a.):</strong> The return your corpus earns after you return. Assume 8–9% for a balanced equity+debt portfolio, or 6–7% for a conservative FD-heavy approach. Do not use aggressive equity-only assumptions for money you will actually be spending.</p>
+      <p><strong>Expected India Income After Return (₹/mo):</strong> Any income you will earn in India — consultancy, rental income, part-time work, pension, interest from FDs. This reduces how much you withdraw from the corpus each month. Even ₹30,000/month in rental income can add 5–7 years to corpus life.</p>
 
       <h2>Reading the Results</h2>
-      <p>After clicking Calculate, you'll see four key outputs:</p>
+      <p>After clicking Calculate, you will see four key outputs:</p>
       <ul>
-        <li><strong>Projected Corpus at Return:</strong> What you'll have when you land in India, based on your savings + contributions + ROI over the years until return.</li>
+        <li><strong>Projected Corpus at Return:</strong> What you will have when you land in India, based on your savings + contributions + ROI over the years until return.</li>
         <li><strong>Corpus Survives X Years:</strong> How many years your money lasts given your expenses, income, inflation, and investment returns.</li>
         <li><strong>Break-Even Monthly (Zero in 40 yrs):</strong> The maximum monthly spend that allows your corpus to last exactly 40 years — useful for setting a budget ceiling.</li>
         <li><strong>Sustainable Monthly (Forever):</strong> Monthly spend at which your corpus never depletes — the interest earned covers all withdrawals indefinitely.</li>
@@ -1816,7 +1816,7 @@ const ARTICLES={
 
       <h2>Common Mistakes to Avoid</h2>
       <p><strong>Ignoring inflation:</strong> Many people enter today's expenses and use a 0% inflation assumption. At 6% inflation, ₹1L/month today becomes ₹1.8L/month in 10 years. The planner auto-escalates expenses by your entered inflation rate each year.</p>
-      <p><strong>Over-estimating ROI:</strong> Using 12–15% equity returns for your post-retirement corpus is dangerous. You can't afford a 3-year market downturn when you're actually spending the money. Use 7–9% max.</p>
+      <p><strong>Over-estimating ROI:</strong> Using 12–15% equity returns for your post-retirement corpus is dangerous. You cannot afford a 3-year market downturn when you are actually spending the money. Use 7–9% max.</p>
       <p><strong>Forgetting one-time costs:</strong> Children's higher education, medical emergencies, home purchase. Add ₹30–50L to your required corpus as a one-time buffer for these.</p>
 
       <div class="art-cta"><div><div class="art-cta-text">Open the Return Planner</div><div class="art-cta-sub">Run your numbers with the interactive simulation</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('return',document.querySelector('[data-tab=return]'))">Open Return Planner &#8594;</button></div>
@@ -1828,7 +1828,7 @@ const ARTICLES={
     metaKw:'NRI retirement planning India, SIP SWP NRI, retire in India corpus, NRI retirement calculator 2026',tagLabel:'Planning',readTime:'7 min read',
     title:'How to Plan Your India Retirement Using SIP & SWP',
     content:`
-      <div class="art-callout indigo"><strong>The two-phase framework:</strong> Phase 1 — Accumulate a corpus using SIP (Systematic Investment Plan) while you're earning abroad. Phase 2 — Withdraw sustainably using SWP (Systematic Withdrawal Plan) after you return to India.</div>
+      <div class="art-callout indigo"><strong>The two-phase framework:</strong> Phase 1 — Accumulate a corpus using SIP (Systematic Investment Plan) while you are earning abroad. Phase 2 — Withdraw sustainably using SWP (Systematic Withdrawal Plan) after you return to India.</div>
       <h2>What Corpus Do You Actually Need?</h2>
       <p>The most common question — and the most personal. But here's a framework:</p>
       <ul>
@@ -1858,7 +1858,7 @@ const ARTICLES={
       <ul>
         <li>Keep withdrawal rate at or below 4–5% of corpus per year for long-term sustainability</li>
         <li>Step up your withdrawal by 5–6% per year to offset inflation</li>
-        <li>Keep 1–2 years of expenses in liquid funds / FD as a buffer — don't touch equity in a market downturn</li>
+        <li>Keep 1–2 years of expenses in liquid funds / FD as a buffer — do not touch equity in a market downturn</li>
       </ul>
       <div class=
       <div class="art-callout"><strong>The bucket strategy:</strong> Bucket 1 — 2 years expenses in FD/liquid fund. Bucket 2 — next 5 years in balanced/hybrid funds. Bucket 3 — remaining in equity funds. Refill Bucket 1 from Bucket 2 annually, and Bucket 2 from Bucket 3 every 3–4 years.</div>
@@ -3412,6 +3412,194 @@ function closeNavDD(){
       +'</div>';
   }
 
+
+  // ── BOOK IN WHICH CURRENCY v6.9 ─────────────────────────────────────────
+  var BOOK_CUR={
+    AED:{
+      best:'INR',
+      bestNote:'Air India, IndiGo and SpiceJet are priced in INR — booking directly on their Indian site or MMT India is consistently cheaper than AED-converted OTA prices.',
+      rules:[
+        {airline:'Air India',        rec:'INR', saving:'5–12%', how:'Book at airindia.com (India) or via MakeMyTrip India — prices shown in INR, no forex needed'},
+        {airline:'Emirates',         rec:'AED', saving:'0–3%',  how:'Emirates.com AED pricing matches USD. Either works — use a zero-forex card if paying USD'},
+        {airline:'Etihad',           rec:'AED', saving:'2–5%',  how:'AUH-origin Etihad fares in AED slightly beat USD pricing. Book direct at etihad.com'},
+        {airline:'IndiGo / SpiceJet',rec:'INR', saving:'8–15%', how:'These carriers only price in INR. Booking via GCC OTAs adds a 10–15% markup — always use Indian OTAs or direct'}
+      ],
+      cardTip:'Zero-forex cards (Emirates NBD Beyond, FAB Cashback, ADCB Payback) eliminate the 2.5–3% foreign currency fee when booking in INR or USD.',
+      dcWarn:'At checkout, if any non-AED airline offers to convert your total "to AED for convenience" — always decline. Dynamic Currency Conversion adds 3–5% instantly.'
+    },
+    SAR:{
+      best:'INR',
+      bestNote:'Budget Indian carriers priced in INR are 8–15% cheaper than SAR-converted OTA fares. Saudia flights best booked in SAR direct.',
+      rules:[
+        {airline:'Air India',        rec:'INR', saving:'5–12%', how:'Book at airindia.com (India) for INR pricing'},
+        {airline:'Saudia',           rec:'SAR', saving:'0–3%',  how:'saudia.com in SAR is the reference price. USD booking matches but adds forex risk'},
+        {airline:'IndiGo / SpiceJet',rec:'INR', saving:'8–15%', how:'SAR OTAs mark up these carriers heavily — use Indian booking sites directly'}
+      ],
+      cardTip:'Saudi MADA cards do not support international online transactions well. Use a Visa/Mastercard credit card with low forex fees for INR bookings.',
+      dcWarn:'Decline DCC at checkout — always pay in the the airline home currency.'
+    },
+    QAR:{
+      best:'INR',
+      bestNote:'Qatar Airways in QAR is the fair price. For Indian carriers, INR booking beats any QAR-converted OTA price.',
+      rules:[
+        {airline:'Qatar Airways',    rec:'QAR', saving:'1–4%',  how:'qatarairways.com QAR pricing is home-market baseline. USD is equivalent minus forex'},
+        {airline:'Air India',        rec:'INR', saving:'5–12%', how:'airindia.com India for INR — cheapest for direct Doha-India routes'},
+        {airline:'IndiGo',           rec:'INR', saving:'8–14%', how:'QAR OTAs add significant markup for Indian budget carriers'}
+      ],
+      cardTip:'Qatar National Bank and Commercial Bank Visa cards often have low forex fees for INR transactions.',
+      dcWarn:'Qatar Airways checkout sometimes offers QAR conversion for non-QAR cards. Always decline and pay in card billing currency.'
+    },
+    KWD:{
+      best:'INR',
+      bestNote:'Kuwait has few direct Indian budget routes — connecting via Gulf hubs is common. Book each leg in its home currency for best rates.',
+      rules:[
+        {airline:'Jazeera Airways',  rec:'KWD', saving:'0–3%',  how:'jazeeraairways.com KWD pricing is most accurate for Kuwait-origin routes'},
+        {airline:'Air India',        rec:'INR', saving:'5–10%', how:'INR booking on AI India site beats KWD-converted OTA prices'},
+        {airline:'Emirates / Flydubai',rec:'AED',saving:'2–5%', how:'These operate from DXB — compare AED pricing direct vs KWD on local OTAs'}
+      ],
+      cardTip:'NBK Travel Card and Burgan Bank Infinite Visa have competitive forex rates for INR bookings.',
+      dcWarn:'Decline DCC — always pay in merchant local currency.'
+    },
+    BHD:{
+      best:'INR',
+      bestNote:'Gulf Air is the home carrier. For Indian budget airlines, book in INR via Indian platforms.',
+      rules:[
+        {airline:'Gulf Air',         rec:'BHD', saving:'0–3%',  how:'gulfair.com BHD pricing is the baseline. Book direct for best fares'},
+        {airline:'Air India',        rec:'INR', saving:'5–10%', how:'INR booking on AI India site consistently cheaper than BHD OTA price'},
+        {airline:'Flydubai',         rec:'AED', saving:'2–4%',  how:'Flydubai AED pricing via BHD OTAs often inflated — book direct in AED'}
+      ],
+      cardTip:'BHD is pegged to USD. A USD-friendly card with low forex fees works well for most international bookings.',
+      dcWarn:'Always pay in the airline home currency — decline any conversion offer at checkout.'
+    },
+    OMR:{
+      best:'INR',
+      bestNote:'Oman Air is the flag carrier. Indian budget airlines should be booked in INR on Indian platforms for best prices.',
+      rules:[
+        {airline:'Oman Air',         rec:'OMR', saving:'0–3%',  how:'omanair.com OMR pricing is the reference. USD equivalent on the same site'},
+        {airline:'Air India',        rec:'INR', saving:'5–10%', how:'airindia.com India in INR beats any OMR-converted price'},
+        {airline:'IndiGo',           rec:'INR', saving:'8–13%', how:'Oman OTAs mark up IndiGo heavily — book via Indian sites directly'}
+      ],
+      cardTip:'Bank Muscat and HSBC Oman cards offer reasonable forex rates. A dedicated travel card saves 2–3% on INR bookings.',
+      dcWarn:'Decline DCC at checkout — pay in merchant local currency.'
+    },
+    MYR:{
+      best:'MYR',
+      bestNote:'AirAsia is cheapest in MYR on its own app. For Air India, INR booking beats MYR OTA pricing.',
+      rules:[
+        {airline:'AirAsia',          rec:'MYR', saving:'3–8%',  how:'AirAsia app/website in MYR is always cheaper than OTA prices — book direct'},
+        {airline:'Malaysia Airlines', rec:'MYR', saving:'2–5%', how:'MHonline.com MYR pricing is baseline — USD booking adds forex'},
+        {airline:'Air India',        rec:'INR', saving:'5–10%', how:'airindia.com India in INR beats MYR-converted OTA prices'}
+      ],
+      cardTip:'Maybank Visa and CIMB Travel cards offer zero forex fees on foreign currency bookings. Great for INR transactions.',
+      dcWarn:'Decline DCC — AirAsia sometimes offers MYR conversion for non-MYR cards at checkout.'
+    },
+    SGD:{
+      best:'SGD',
+      bestNote:'Singapore Airlines and Scoot are best booked in SGD on Singapore sites. For Air India, INR booking saves 5–10%.',
+      rules:[
+        {airline:'Singapore Airlines',rec:'SGD', saving:'2–5%',  how:'singaporeair.com SGD pricing is the home market rate — cheaper than USD equivalent'},
+        {airline:'Scoot',            rec:'SGD', saving:'3–6%',  how:'flyscoot.com SGD pricing — USD booking adds 2–4% forex'},
+        {airline:'Air India',        rec:'INR', saving:'5–10%', how:'INR booking on AI India site consistently beats SGD OTA prices'}
+      ],
+      cardTip:'DBS Altitude, Citi PremierMiles and UOB PRVI Miles cards earn miles with zero forex fees — ideal for mixed-currency bookings.',
+      dcWarn:'Decline DCC at checkout — Singapore airports and airlines sometimes offer SGD conversion for foreign cards.'
+    },
+    AUD:{
+      best:'AUD',
+      bestNote:'Qantas and Virgin Australia are cheapest in AUD on Australian sites. Air India in INR saves 8–15% vs AUD OTA prices.',
+      rules:[
+        {airline:'Qantas',           rec:'AUD', saving:'2–6%',  how:'qantas.com AUD pricing is home-market baseline — always book direct'},
+        {airline:'Singapore Airlines',rec:'AUD', saving:'1–3%', how:'singaporeair.com AU site in AUD — slightly cheaper than USD equivalent'},
+        {airline:'Air India',        rec:'INR', saving:'8–15%', how:'The biggest savings opportunity: AI India site INR pricing vs AUD OTA markup'}
+      ],
+      cardTip:'28 Degrees Mastercard and Bankwest Zero Platinum have zero forex fees. Essential for INR flight bookings from Australia.',
+      dcWarn:'Decline DCC — Australian travellers are frequently offered AUD conversion abroad. Always decline.'
+    },
+    NZD:{
+      best:'NZD',
+      bestNote:'Qantas and Air NZ are cheapest in NZD. Air India in INR beats NZD OTA pricing by 8–15%.',
+      rules:[
+        {airline:'Air New Zealand',  rec:'NZD', saving:'1–4%',  how:'airnewzealand.co.nz NZD pricing is baseline — Airpoints earn requires NZD booking'},
+        {airline:'Qantas',           rec:'NZD', saving:'2–5%',  how:'qantas.com NZ site in NZD — book via Singapore hub for India connections'},
+        {airline:'Air India',        rec:'INR', saving:'8–15%', how:'Biggest opportunity: AI India site INR prices vs NZD OTA conversion'}
+      ],
+      cardTip:'Wise multi-currency card or Revolut lets you hold INR and pay at interbank rate — saves 3–4% vs NZD credit card.',
+      dcWarn:'Decline DCC — always pay in merchant local currency.'
+    },
+    GBP:{
+      best:'GBP',
+      bestNote:'British Airways and Virgin are cheapest in GBP on UK sites. Air India in INR saves 8–12% vs GBP OTA prices.',
+      rules:[
+        {airline:'British Airways',  rec:'GBP', saving:'3–7%',  how:'ba.com GBP pricing is home market baseline — Avios earn requires GBP booking'},
+        {airline:'Air India',        rec:'INR', saving:'8–12%', how:'AI India site INR prices consistently beat GBP OTA conversion — biggest saving'},
+        {airline:'Virgin Atlantic',  rec:'GBP', saving:'2–5%',  how:'virginatlantic.com GBP pricing — avoid USD which adds forex'}
+      ],
+      cardTip:'Barclaycard Avios and Amex Platinum (UK) earn Avios on all spend. Chase UK and Starling have zero forex fees for INR bookings.',
+      dcWarn:'UK travellers are rarely pushed DCC but decline if offered — pay in INR or GBP as appropriate.'
+    },
+    USD:{
+      best:'INR',
+      bestNote:'For Indian budget carriers, INR booking via Indian platforms beats USD OTA prices by 10–20%. US carriers are best booked in USD.',
+      rules:[
+        {airline:'Air India',        rec:'INR', saving:'10–18%',how:'Biggest gap: AI India site INR prices vs USD OTA prices. Use a Wise or Revolut card to pay in INR'},
+        {airline:'United / Delta',   rec:'USD', saving:'0%',    how:'USD is home currency — no foreign booking arbitrage'},
+        {airline:'IndiGo / SpiceJet',rec:'INR', saving:'10–20%',how:'US-based OTAs add huge markup. Book via Indian OTAs or direct in INR — savings can be $50–150 per ticket'}
+      ],
+      cardTip:'Wise or Revolut lets you pay in INR at interbank rate. Capital One Venture and Chase Sapphire have zero forex fees for INR bookings.',
+      dcWarn:'When paying in INR on Indian sites, your US card may offer "pay in USD" — always decline. That DCC adds 4–6%.'
+    },
+    CAD:{
+      best:'INR',
+      bestNote:'Air India INR booking saves 10–15% vs CAD OTA prices. Air Canada is cheapest in CAD on its own site.',
+      rules:[
+        {airline:'Air India',        rec:'INR', saving:'10–15%',how:'AI India site INR pricing consistently beats CAD OTA markup — biggest saving'},
+        {airline:'Air Canada',       rec:'CAD', saving:'0%',    how:'aircanada.com CAD is home currency baseline — no arbitrage benefit'},
+        {airline:'WestJet',          rec:'CAD', saving:'0%',    how:'westjet.com CAD is baseline — book direct to earn Rewards dollars'}
+      ],
+      cardTip:'Scotiabank Passport Visa Infinite and HSBC World Elite have zero forex fees — ideal for INR bookings from Canada.',
+      dcWarn:'Decline DCC when booking in INR on Indian sites with a CAD card — typically adds 3–5%.'
+    },
+    EUR:{
+      best:'EUR',
+      bestNote:'European carriers are cheapest in EUR on home-market sites. Air India in INR saves 8–12% vs EUR OTA prices.',
+      rules:[
+        {airline:'Lufthansa',        rec:'EUR', saving:'2–6%',  how:'lufthansa.com EUR pricing is home baseline. USD booking on same site adds forex'},
+        {airline:'Air France / KLM', rec:'EUR', saving:'2–5%',  how:'airfrance.com and klm.com EUR pricing — Flying Blue earn requires EUR/home currency booking'},
+        {airline:'Air India',        rec:'INR', saving:'8–12%', how:'AI India site INR prices beat EUR OTA conversion — biggest saving for EUR-zone NRIs'}
+      ],
+      cardTip:'N26 Metal, Revolut Metal and Wise cards have zero forex fees across EUR and INR. Essential for cross-currency bookings.',
+      dcWarn:'Decline DCC at checkout — some Indian booking sites offer EUR conversion for EU cards. Always decline.'
+    }
+  };
+
+  function _renderBookCurrency(cur,route){
+    var b=BOOK_CUR[cur];
+    if(!b||!route) return '';
+
+    var rows='';
+    for(var ri=0;ri<b.rules.length;ri++){
+      var r=b.rules[ri];
+      rows+='<div class="fl-bc-row">'
+        +'<div class="fl-bc-airline">'+r.airline+'</div>'
+        +'<div class="fl-bc-rec">'
+          +'<span class="fl-bc-cur">'+r.rec+'</span>'
+          +(r.saving!=='0%'?'<span class="fl-bc-save">saves ~'+r.saving+'</span>':'<span class="fl-bc-base">home currency</span>')
+        +'</div>'
+        +'<div class="fl-bc-how">'+r.how+'</div>'
+        +'</div>';
+    }
+
+    return '<div class="fl-bc-card">'
+      +'<div class="fl-bc-title">&#128179; Book in which currency?</div>'
+      +'<div class="fl-bc-best">&#9989; Best strategy: Book <strong>'+b.best+'</strong> when available — '+b.bestNote+'</div>'
+      +'<div class="fl-bc-rows">'+rows+'</div>'
+      +'<div class="fl-bc-info">'
+        +'<div class="fl-bc-ctip">&#128179; <strong>Card tip:</strong> '+b.cardTip+'</div>'
+        +'<div class="fl-bc-dcc">&#9888;&#65039; <strong>DCC warning:</strong> '+b.dcWarn+'</div>'
+      +'</div>'
+      +'</div>';
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -3731,6 +3919,9 @@ function closeNavDD(){
 
       // Miles & Points Value
       html+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
+
+      // Book in Which Currency
+      html+=_renderBookCurrency(cur,route);
 
       // India Daily Cost Estimator
       if(destCode) html+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);

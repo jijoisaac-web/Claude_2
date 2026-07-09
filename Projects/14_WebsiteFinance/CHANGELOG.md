@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.3.0] — 2026-07-09 · Confirmation Signals + Conviction
+
+- Seven new scan signals: ADX trend strength (+DI/−DI direction), full MA alignment (price > SMA20 > SMA50 > SMA200), fresh 52-week-high close, volume dry-up pullback to SMA50, accumulation (13+ up-days of 20), short-term overextension (>3 ATR above SMA20), and double-bottom detection with neckline-break confirmation
+- Ideas now carry a **conviction rating (★1–5)**: the trigger plus independent confirmations (trend alignment, ADX, volume, relative strength, new high, accumulation); overextension subtracts. Short-term list sorts by conviction
+- Overextended setups become WAIT instead of BUY ("don't chase"); quiet volume-dry-up pullbacks added as buy triggers; confirmed double bottoms added to medium-term buys
+- The "why" text now names its confirmations
+
 ## [2.2.1] — 2026-07-09
 
 - Backtest trades are now sorted chronologically (they were grouped by stock); the trades table shows newest first, ties ordered by symbol. Paper-trades table likewise date-ordered

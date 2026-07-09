@@ -427,6 +427,41 @@ function atr14(c,p=14){ let atr=null;
     atr = i===0 ? tr : (i<p ? (atr*i+tr)/(i+1) : (atr*(p-1)+tr)/p);
   }
   return atr; }
+function adxLast(c, p=14){   // Wilder ADX with +DI/-DI, value as of last bar
+  if(c.length < p*3) return null;
+  let trS=0, pdmS=0, mdmS=0, adx=null, dxs=[];
+  for(let i=1;i<c.length;i++){
+    const up = c[i].high-c[i-1].high, dn = c[i-1].low-c[i].low;
+    const pdm = up>dn && up>0 ? up : 0, mdm = dn>up && dn>0 ? dn : 0;
+    const tr = Math.max(c[i].high-c[i].low, Math.abs(c[i].high-c[i-1].close), Math.abs(c[i].low-c[i-1].close));
+    if(i<=p){ trS+=tr; pdmS+=pdm; mdmS+=mdm; }
+    else{ trS+=tr-trS/p; pdmS+=pdm-pdmS/p; mdmS+=mdm-mdmS/p; }
+    if(i>=p){
+      const pdi = 100*pdmS/(trS||1e-9), mdi = 100*mdmS/(trS||1e-9);
+      const dx = 100*Math.abs(pdi-mdi)/((pdi+mdi)||1e-9);
+      if(adx==null){ dxs.push(dx); if(dxs.length===p) adx = dxs.reduce((a,b)=>a+b,0)/p; }
+      else adx = (adx*(p-1)+dx)/p;
+      if(i===c.length-1 && adx!=null) return {adx, pdi, mdi};
+    }
+  }
+  return null;
+}
+function detectDoubleBottom(c){   // heuristic over last ~70 bars: two matching lows, peak between, neckline broken
+  const w = c.slice(-70);
+  if(w.length < 40) return null;
+  const half = Math.floor(w.length/2);
+  let m1=0; for(let i=1;i<half;i++) if(w[i].low<w[m1].low) m1=i;
+  let m2=-1;
+  for(let i=m1+10;i<w.length-2;i++) if(m2<0 || w[i].low<w[m2].low) m2=i;
+  if(m2<0) return null;
+  const l1=w[m1].low, l2=w[m2].low;
+  if(Math.abs(l2-l1)/l1 > 0.03) return null;                      // lows must match within 3%
+  let neck=-Infinity; for(let i=m1;i<=m2;i++) neck=Math.max(neck, w[i].close);
+  if(neck < l1*1.05) return null;                                 // needs a real bounce between lows
+  const last = w[w.length-1].close;
+  if(last > neck) return {neck, low:Math.min(l1,l2)};             // neckline broken
+  return null;
+}
 
 function enrich(candles){
   const close = candles.map(d=>d.close), vol = candles.map(d=>d.volume);
@@ -591,7 +626,9 @@ function scanStock(sym, candles, bench63){
     else if(h3[0]>0 && h3[2]<0) signals.push({type:"MACD_BEAR_CROSS",side:"bearish",detail:"MACD crossed below signal line"});
   }
   const hi = Math.max(...yr.map(d=>d.high)), lo = Math.min(...yr.map(d=>d.low));
-  if(close >= hi*0.98) signals.push({type:"NEAR_52W_HIGH",side:"bullish",detail:`Within 2% of 52-week high ₹${Math.round(hi).toLocaleString("en-IN")} — momentum`});
+  const hiPrior = yr.length>1 ? Math.max(...yr.slice(0,-1).map(d=>d.high)) : hi;
+  if(close > hiPrior) signals.push({type:"NEW_52W_HIGH",side:"bullish",detail:`Closed at a fresh 52-week high — no overhead supply, strongest form of momentum`});
+  else if(close >= hi*0.98) signals.push({type:"NEAR_52W_HIGH",side:"bullish",detail:`Within 2% of 52-week high ₹${Math.round(hi).toLocaleString("en-IN")} — momentum`});
   else if(close <= lo*1.05) signals.push({type:"NEAR_52W_LOW",side:"bearish",detail:`Within 5% of 52-week low ₹${Math.round(lo).toLocaleString("en-IN")}`});
   if(last.vol_avg20 && last.volume > 2*last.vol_avg20)
     signals.push({type:"VOLUME_SPIKE",side:"neutral",detail:`Volume ${(last.volume/last.vol_avg20).toFixed(1)}x the 20-day average`});
@@ -638,12 +675,41 @@ function scanStock(sym, candles, bench63){
       signals.push({type:"REL_STRENGTH",side:"bullish",detail:`Beating NIFTY by ${((ret63-bench63)*100).toFixed(0)} pts over 3 months — institutional favourite behaviour`});
   }
 
+  // --- confirmation-layer signals (v2.3) ---
+  const atrNow = atr14(candles);
+  // ADX trend strength
+  const adxV = adxLast(candles);
+  if(adxV && adxV.adx>25){
+    if(adxV.pdi>adxV.mdi) signals.push({type:"ADX_TREND",side:"bullish",detail:`ADX ${adxV.adx.toFixed(0)} with +DI leading — trend has real strength behind it`});
+    else signals.push({type:"ADX_DOWNTREND",side:"bearish",detail:`ADX ${adxV.adx.toFixed(0)} with -DI leading — strong downtrend, don't fight it`});
+  }
+  // full moving-average alignment
+  if(last.sma20!=null && last.sma200!=null && close>last.sma20 && last.sma20>last.sma50 && last.sma50>last.sma200)
+    signals.push({type:"TREND_ALIGNED",side:"bullish",detail:"Price > SMA20 > SMA50 > SMA200 — textbook uptrend structure"});
+  // quiet pullback: near SMA50 on drying volume in an uptrend
+  if(aboveSMA200 && last.sma50!=null && Math.abs(close-last.sma50)/last.sma50<0.04 &&
+     last.vol_avg20 && last.volume < 0.6*last.vol_avg20 && r!=null && r>=35 && r<=60)
+    signals.push({type:"VOL_DRYUP",side:"bullish",detail:"Pullback to SMA50 on drying volume — sellers losing interest, classic low-risk entry zone"});
+  // accumulation: persistent buying pressure
+  const last20 = e.slice(-20);
+  if(last20.length===20){
+    const upDays = last20.filter(d=>d.close>d.open).length;
+    if(upDays>=13 && close>last20[0].close)
+      signals.push({type:"ACCUMULATION",side:"bullish",detail:`${upDays} of last 20 sessions closed up — steady accumulation pattern`});
+  }
+  // short-term overextension
+  if(atrNow && last.sma20!=null && close > last.sma20 + 3*atrNow)
+    signals.push({type:"STRETCHED",side:"bearish",detail:"More than 3 ATR above SMA20 — short-term overextended, poor entry point"});
+  // double bottom with neckline break
+  const db = detectDoubleBottom(candles);
+  if(db) signals.push({type:"DOUBLE_BOTTOM",side:"bullish",detail:`Double bottom near ₹${Math.round(db.low).toLocaleString("en-IN")} confirmed — closed above the neckline ₹${Math.round(db.neck).toLocaleString("en-IN")}`});
+
   const sma200_20ago = e.length>20 ? e[e.length-21].sma200 : null;
   return {symbol:sym, name:nameOf(sym), price:close,
     change_pct:(close-prev.close)/prev.close*100, rsi:r,
     above_sma200: aboveSMA200,
     pct_from_52w_high:(close-hi)/hi*100, signals,
-    atr:atr14(candles), sma50:last.sma50, sma200:last.sma200,
+    atr:atrNow, sma50:last.sma50, sma200:last.sma200,
     sma200_rising: last.sma200!=null && sma200_20ago!=null ? last.sma200>sma200_20ago : null,
     hi52:hi, lo52:lo, h20, l20, ret63,
     turnover: last.volume!=null ? close*last.volume : null};
@@ -730,13 +796,22 @@ function buildIdeas(stocks){
       has("MACD_BULL_CROSS") ? "Fresh MACD bullish crossover" :
       has("GAP_UP") ? "Gap-up with the trend — strength begets strength, but size smaller (gaps can fill)" :
       has("PULLBACK_DIP") ? "Three-day dip inside an uptrend, RSI reset" :
+      has("VOL_DRYUP") ? "Quiet pullback to SMA50 on drying volume — sellers exhausted" :
       has("RSI_BULL_DIV") ? "Bullish RSI divergence — a reversal clue, speculative until price confirms" :
       has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH") ? "Oversold dip (RSI/lower band)" : null;
-    if(s.above_sma200 && shortWhy){
+    // conviction: independent confirmations stacked on top of the trigger
+    const CONF = ["TREND_ALIGNED","ADX_TREND","VOLUME_SPIKE","REL_STRENGTH","NEW_52W_HIGH","ACCUMULATION"];
+    const conviction = Math.min(5, 1 + CONF.filter(has).length - (has("STRETCHED")?1:0));
+    if(s.above_sma200 && shortWhy && !has("STRETCHED")){
       const stop = has("BREAKOUT_20D") && s.h20 ? R(Math.max(s.h20*0.99, s.price-1.5*s.atr)) : R(s.price - 1.5*s.atr);
       const target = R(s.price + 2*(s.price-stop));
-      shortT.push({...s, action:"BUY", entry:R(s.price), stop, target,
-        why: shortWhy + " inside a long-term uptrend (above SMA200)" + (has("VOLUME_SPIKE") ? "; volume confirms" : "") + "."});
+      const confs = CONF.filter(has).map(t=>t.replaceAll("_"," ").toLowerCase());
+      shortT.push({...s, action:"BUY", conviction:Math.max(1,conviction), entry:R(s.price), stop, target,
+        why: shortWhy + " inside a long-term uptrend (above SMA200)" +
+             (confs.length ? `; confirmed by ${confs.join(", ")}` : "") + "."});
+    } else if(s.above_sma200 && shortWhy && has("STRETCHED")){
+      shortT.push({...s, action:"WAIT", conviction:1, entry:null, stop:null, target:null,
+        why: shortWhy + " — but price is >3 ATR above SMA20 (overextended). Wait for a pullback rather than chasing."});
     } else if(has("BREAKDOWN_20D") || has("GAP_DOWN")){
       shortT.push({...s, action:"EXIT / AVOID", entry:null, stop:null, target:null,
         why:(has("BREAKDOWN_20D") ? "Broke below its 20-day range" : "Gapped down hard") + " — short-term structure damaged. Stand aside until it stabilises."});
@@ -760,6 +835,10 @@ function buildIdeas(stocks){
       const stop = R(Math.min(s.sma50*0.95, s.price - 2.5*s.atr)), target = R(Math.max(s.hi52, s.price + 5*s.atr));
       medT.push({...s, action:"BUY", entry:R(s.price), stop, target,
         why:"Healthy pullback to SMA50 inside an uptrend, RSI reset to neutral — classic buy-the-dip zone with defined risk below the moving average."});
+    } else if(has("DOUBLE_BOTTOM")){
+      const stop = R(s.price - 2.5*s.atr), target = R(Math.max(s.hi52, s.price + 5*s.atr));
+      medT.push({...s, action:"BUY", entry:R(s.price), stop, target,
+        why:"Double bottom confirmed — neckline broken after two matching lows. A completed reversal base, not a guess at one."});
     } else if(has("BB_SQUEEZE") && s.above_sma200 && s.h20 && s.l20){
       const entry = R(s.h20*1.005), stop = R(s.l20), target = R(entry + 2*(entry-stop));
       medT.push({...s, action:"WATCH", entry, stop, target,
@@ -774,7 +853,7 @@ function buildIdeas(stocks){
             "Accumulate in tranches on dips; exit only if price closes decisively below SMA200."});
     }
   }
-  shortT.sort((a,b)=>b.signals.length-a.signals.length);
+  shortT.sort((a,b)=>(b.conviction||0)-(a.conviction||0) || b.signals.length-a.signals.length);
   medT.sort((a,b)=>(a.action==="BUY"?-1:1)-(b.action==="BUY"?-1:1) || b.pct_from_52w_high-a.pct_from_52w_high);
   longT.sort((a,b)=>b.pct_from_52w_high-a.pct_from_52w_high);
   return {shortT:shortT.slice(0,8), medT:medT.slice(0,8), longT:longT.slice(0,8)};
@@ -783,14 +862,16 @@ function buildIdeas(stocks){
 function ideaTable(rows){
   if(!rows.length) return '<div class="loading">No qualifying setups in this scan — that itself is information: don\'t force trades.</div>';
   const actCls = a => a==="BUY"||a==="ACCUMULATE" ? "bullish" : a==="BOOK PROFITS" ? "neutral" : "bearish";
-  return `<table><thead><tr><th>Stock</th><th style="text-align:left">Action</th>
-    <th style="text-align:left;width:38%">Why</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th></th></tr></thead><tbody>` +
+  return `<table><thead><tr><th>Stock</th><th style="text-align:left">Action</th><th title="Conviction: trigger + confirmations (trend alignment, ADX, volume, relative strength, new high, accumulation)">★</th>
+    <th style="text-align:left;width:36%">Why</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th></th></tr></thead><tbody>` +
     rows.map(s=>{
       const rr = s.entry&&s.stop&&s.target ? ((s.target-s.entry)/(s.entry-s.stop)).toFixed(1) : null;
       const cap = capOf(s.symbol), capCls = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+      const stars = s.conviction ? "★".repeat(s.conviction)+"☆".repeat(5-s.conviction) : "—";
       return `<tr onclick="toggleIdeaChart(this,'${s.symbol}',${s.entry??"null"},${s.stop??"null"},${s.target??"null"})" title="Click to preview chart">
       <td><span class="sym">${s.symbol.replace(".NS","")}</span> ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""}<br><span class="subname">${s.name}</span></td>
       <td style="text-align:left"><span class="badge ${actCls(s.action)}">${s.action}</span></td>
+      <td style="color:var(--amber);font-size:12px;white-space:nowrap">${stars}</td>
       <td style="text-align:left"><span class="signal-detail" style="font-size:12.5px">${s.why}</span></td>
       <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${s.target?fmt(s.target):"trail SMA50"}</td>
       <td>${rr ? rr+":1" : "—"}</td>
