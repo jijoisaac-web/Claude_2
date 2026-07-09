@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.4.0] — 2026-07-09 · Setup Score
+
+- Every idea now carries a **Setup Score (0–100)**: trigger quality (25) + trend context (25) + momentum strength (20) + participation (15) + entry risk (15), minus 8 per bearish co-signal. Color-coded, sorted by score, conviction stars in the tooltip
+- Applies across short/medium/long ideas (EXIT/AVOID/CAUTION rows get no score); explicitly framed as setup quality, not win probability
+- Paper trades record the score at entry and display it in Track Record — over time you can verify whether high-score setups actually win more
+
 ## [2.3.0] — 2026-07-09 · Confirmation Signals + Conviction
 
 - Seven new scan signals: ADX trend strength (+DI/−DI direction), full MA alignment (price > SMA20 > SMA50 > SMA200), fresh 52-week-high close, volume dry-up pullback to SMA50, accumulation (13+ up-days of 20), short-term overextension (>3 ATR above SMA20), and double-bottom detection with neckline-break confirmation

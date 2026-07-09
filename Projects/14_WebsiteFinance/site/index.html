@@ -210,7 +210,8 @@ progress{width:180px;accent-color:var(--blue);}
 <section id="ideas" class="tab">
   <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
     <span class="muted">⚠️ Rule-based technical ideas generated automatically from the latest scan (universe picked on the Screener tab).
-    Educational tool, not investment advice — check fundamentals, news and your own risk tolerance before acting. Levels are indicative, based on ATR volatility.</span>
+    Educational tool, not investment advice — check fundamentals, news and your own risk tolerance before acting. Levels are indicative, based on ATR volatility.
+    <b>Setup Score (0–100)</b> grades how much is aligned behind a setup — trigger, trend, momentum, volume, entry risk. It is NOT a win probability: high-score setups still fail routinely, which is why every idea carries a stop. Paper trades record the score, so the Track Record tab will show you over time whether high scores actually outperform.</span>
   </div>
   <div class="controls">
     <button class="btn ghost" onclick="loadIdeas(true)">↻ Refresh from scan</button>
@@ -782,6 +783,26 @@ function renderScreener(){
 }
 
 /* ================= ideas (rule-based trade candidates) ================= */
+// Setup Score 0–100: quality of the setup, NOT probability of profit.
+function setupScore(idea){
+  const has = t => idea.signals.some(x=>x.type===t);
+  let trig =
+    has("BREAKOUT_20D") ? (has("VOLUME_SPIKE")?25:20) :
+    has("GOLDEN_CROSS") ? 20 :
+    has("MACD_BULL_CROSS") ? 18 : has("VOL_DRYUP") ? 18 : has("DOUBLE_BOTTOM") ? 18 :
+    has("PULLBACK_DIP") ? 16 : has("GAP_UP") ? 15 :
+    (has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH")) ? 12 :
+    has("BB_SQUEEZE") ? 12 : has("RSI_BULL_DIV") ? 10 : 0;
+  if(idea.action==="ACCUMULATE") trig = Math.max(trig, 15);          // stage-2 base is itself the trigger
+  const trend = (idea.above_sma200?10:0) + (has("TREND_ALIGNED")?8:0) + (idea.sma200_rising?7:0);
+  const mom = (has("ADX_TREND")?10:0) + (has("REL_STRENGTH")?6:0) + ((has("NEW_52W_HIGH")||has("NEAR_52W_HIGH"))?4:0);
+  const vol = (has("VOLUME_SPIKE")?8:0) + (has("ACCUMULATION")?7:0);
+  const risk = (idea.rsi!=null && idea.rsi>=40 && idea.rsi<=70 ? 7 : idea.rsi!=null && idea.rsi>30 && idea.rsi<75 ? 4 : 0)
+             + (has("STRETCHED")?0:8);
+  const bear = ["RSI_BEAR_DIV","BB_UPPER_TOUCH","RSI_OVERBOUGHT","MACD_BEAR_CROSS","ADX_DOWNTREND"].filter(has).length;
+  return Math.max(0, Math.min(100, trig+trend+mom+vol+risk - bear*8));
+}
+const scoreCls = v => v>=80 ? "up" : v>=60 ? "" : v>=45 ? "muted" : "down";
 function buildIdeas(stocks){
   const shortT=[], medT=[], longT=[];
   const R = v => v==null?null:+v.toFixed(2);
@@ -853,25 +874,27 @@ function buildIdeas(stocks){
             "Accumulate in tranches on dips; exit only if price closes decisively below SMA200."});
     }
   }
-  shortT.sort((a,b)=>(b.conviction||0)-(a.conviction||0) || b.signals.length-a.signals.length);
-  medT.sort((a,b)=>(a.action==="BUY"?-1:1)-(b.action==="BUY"?-1:1) || b.pct_from_52w_high-a.pct_from_52w_high);
-  longT.sort((a,b)=>b.pct_from_52w_high-a.pct_from_52w_high);
+  const BUYISH = new Set(["BUY","ACCUMULATE","WATCH","WAIT"]);
+  [...shortT, ...medT, ...longT].forEach(i=>{ i.score = BUYISH.has(i.action) ? setupScore(i) : null; });
+  shortT.sort((a,b)=>(b.score||0)-(a.score||0) || b.signals.length-a.signals.length);
+  medT.sort((a,b)=>(a.action==="BUY"?-1:1)-(b.action==="BUY"?-1:1) || (b.score||0)-(a.score||0));
+  longT.sort((a,b)=>(b.score||0)-(a.score||0) || b.pct_from_52w_high-a.pct_from_52w_high);
   return {shortT:shortT.slice(0,8), medT:medT.slice(0,8), longT:longT.slice(0,8)};
 }
 
 function ideaTable(rows){
   if(!rows.length) return '<div class="loading">No qualifying setups in this scan — that itself is information: don\'t force trades.</div>';
   const actCls = a => a==="BUY"||a==="ACCUMULATE" ? "bullish" : a==="BOOK PROFITS" ? "neutral" : "bearish";
-  return `<table><thead><tr><th>Stock</th><th style="text-align:left">Action</th><th title="Conviction: trigger + confirmations (trend alignment, ADX, volume, relative strength, new high, accumulation)">★</th>
+  return `<table><thead><tr><th>Stock</th><th style="text-align:left">Action</th><th title="Setup Score 0–100: trigger quality + trend + momentum + participation + entry risk, minus bearish co-signals. Measures setup quality, NOT probability of profit — even 90-scores fail regularly; the stop is what protects you.">Score</th>
     <th style="text-align:left;width:36%">Why</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>R:R</th><th></th></tr></thead><tbody>` +
     rows.map(s=>{
       const rr = s.entry&&s.stop&&s.target ? ((s.target-s.entry)/(s.entry-s.stop)).toFixed(1) : null;
       const cap = capOf(s.symbol), capCls = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
-      const stars = s.conviction ? "★".repeat(s.conviction)+"☆".repeat(5-s.conviction) : "—";
+      const stars = s.conviction ? "★".repeat(s.conviction)+"☆".repeat(5-s.conviction) : "";
       return `<tr onclick="toggleIdeaChart(this,'${s.symbol}',${s.entry??"null"},${s.stop??"null"},${s.target??"null"})" title="Click to preview chart">
       <td><span class="sym">${s.symbol.replace(".NS","")}</span> ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""}<br><span class="subname">${s.name}</span></td>
       <td style="text-align:left"><span class="badge ${actCls(s.action)}">${s.action}</span></td>
-      <td style="color:var(--amber);font-size:12px;white-space:nowrap">${stars}</td>
+      <td title="${stars}"><span class="${scoreCls(s.score||0)}" style="font-weight:600;font-size:15px">${s.score!=null?s.score:"—"}</span>${s.score!=null?'<span class="muted" style="font-size:10px">/100</span>':""}</td>
       <td style="text-align:left"><span class="signal-detail" style="font-size:12.5px">${s.why}</span></td>
       <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${s.target?fmt(s.target):"trail SMA50"}</td>
       <td>${rr ? rr+":1" : "—"}</td>
@@ -1695,7 +1718,7 @@ function recordPaperTrades(){
   for(const s of shortT.filter(x=>x.action==="BUY")){
     if(trades.some(t=>t.sym===s.symbol && (t.status==="OPEN" || t.date===today))) continue;
     trades.push({date:today, sym:s.symbol, signal:(s.signals[0]?.type)||"BUY",
-      entry:s.entry, stop:s.stop, target:s.target, status:"OPEN"});
+      score:s.score??null, entry:s.entry, stop:s.stop, target:s.target, status:"OPEN"});
     added++;
   }
   if(added) setPT(trades);
@@ -1739,11 +1762,12 @@ async function renderTrack(force){
     ["Avg closed P&L", closed.length?pctCell(avg(closed.map(pnl))):"—"],
     ["Avg 1-month (held)", pctCell(avg(trades.map(t=>t.r21)))],
   ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
-  $("ptTable").innerHTML = `<table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th>
+  $("ptTable").innerHTML = `<table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th><th>Score</th>
     <th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>Status</th><th>P&L</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>` +
     [...trades].sort((a,b)=> a.date>b.date ? -1 : a.date<b.date ? 1 : a.sym<b.sym ? -1 : 1).map(t=>`<tr onclick="openChart('${t.sym}')">
       <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
       <td style="text-align:left"><span class="badge neutral">${(t.signal||"").replaceAll("_"," ")}</span></td>
+      <td>${t.score!=null?`<span class="${scoreCls(t.score)}" style="font-weight:600">${t.score}</span>`:"—"}</td>
       <td>${fmt(t.entry)}</td><td>${fmt(t.stop)}</td><td>${fmt(t.target)}</td>
       <td><span class="badge ${t.status==="TARGET"?"bullish":t.status==="STOP"?"bearish":"neutral"}">${t.status}${t.exitDate?" · "+t.exitDate:""}</span></td>
       <td>${pctCell(pnl(t))}</td>
