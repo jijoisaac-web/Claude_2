@@ -1,4 +1,4 @@
-/* v6.4 */
+/* v6.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2991,6 +2991,100 @@ function closeNavDD(){
       +'</div>';
   }
 
+
+  // ── BEST DAY TO BOOK ─────────────────────────────────────────────────────
+  // Per-airline booking intelligence
+  var AIRLINE_TIPS={
+    'Emirates':      {day:'Tue or Wed',time:'5–8 AM',why:'Emirates releases fare adjustments Tuesday morning. Mid-week searches beat weekend prices by 8–15%.'},
+    'Air India':     {day:'Wed or Thu',time:'6–9 AM',why:'Air India drops fares mid-week after Monday inventory resets. Thursday morning often has surprise deals.'},
+    'IndiGo':        {day:'Tue',       time:'Early AM',why:'IndiGo flash sales typically launch Tuesday. Set an alert and check first thing in the morning.'},
+    'AirAsia':       {day:'Mon or Tue',time:'Midnight–2 AM',why:'AirAsia Big Sales launch Monday midnight MYT. Their Tuesday fares are consistently the lowest of the week.'},
+    'Batik Air':     {day:'Tue',       time:'Early AM',why:'Batik Air follows AirAsia sale cycles. Tuesday morning searches give best prices.'},
+    'Qatar Airways': {day:'Tue or Wed',time:'5–9 AM',why:'Qatar Airways adjusts pricing mid-week. Tuesday/Wednesday searches often surface 10–20% cheaper fares.'},
+    'Etihad':        {day:'Mon or Tue',time:'6–9 AM',why:'Etihad Monday promotions carry into Tuesday. Avoid Friday/Saturday when prices peak.'},
+    'flydubai':      {day:'Wed',       time:'Any',why:'flydubai runs mid-week promotions. Wednesday searches consistently outperform weekend prices.'},
+    'Air Arabia':    {day:'Tue or Wed',time:'Early AM',why:'Air Arabia promotional fares typically go live Tuesday. Mid-week window beats weekend by 10–18%.'},
+    'Singapore Airlines':{day:'Tue',  time:'5–8 AM',why:'SIA Tuesday fare adjustments are well-documented. Early morning searches before 8 AM get the best rates.'},
+    'Malaysia Airlines': {day:'Tue or Wed',time:'Early AM',why:'MAS mid-week pricing is notably cheaper. Avoid booking Friday–Sunday.'},
+    'Scoot':         {day:'Tue',       time:'Any',why:'Scoot launches promotions Tuesday. Sign up for their newsletter for advance notice.'},
+    'British Airways':{day:'Tue',      time:'5–9 AM',why:'BA adjusts fares overnight Monday into Tuesday. Early morning Tuesday is optimal for Gulf and India routes.'},
+    'Lufthansa':     {day:'Wed',       time:'Early AM',why:'Lufthansa mid-week fares are typically 12–18% below weekend prices on India routes.'},
+    'Air Canada':    {day:'Tue or Wed',time:'6–9 AM',why:'Air Canada fare sales launch mid-week. Tuesday/Wednesday morning is the optimal search window.'},
+    'United Airlines':{day:'Tue',      time:'Early AM',why:'US carriers traditionally adjust fares Tuesday morning following weekend inventory changes.'},
+    'Qantas':        {day:'Tue or Wed',time:'Early AM',why:'Qantas mid-week fares on India routes are consistently 10–15% below Friday/Saturday prices.'}
+  };
+
+  // Optimal booking window by route region
+  var BOOKING_WINDOW={
+    gulf:   {sweet:'6–10 weeks',early:'12 weeks',late:'3 weeks', tip:'Gulf routes are competitive — airlines adjust prices frequently. The 6–10 week window gives best mix of price and availability.'},
+    sea:    {sweet:'4–8 weeks', early:'10 weeks',late:'2 weeks', tip:'SE Asia routes (AirAsia/budget carriers) often hold prices well. Flash sales at 4–6 weeks can beat early-bird fares.'},
+    longhaul:{sweet:'8–14 weeks',early:'16 weeks',late:'4 weeks',tip:'Long-haul routes require more lead time. Business class especially — book 12+ weeks ahead for best availability.'}
+  };
+
+  function _getRouteRegion(cur){
+    var gulf=['AED','SAR','QAR','KWD','BHD','OMR'];
+    var sea=['MYR','SGD'];
+    if(gulf.indexOf(cur)>=0) return 'gulf';
+    if(sea.indexOf(cur)>=0) return 'sea';
+    return 'longhaul';
+  }
+
+  function _renderBookingTips(route, cur, wks, cabinClass){
+    if(!route) return '';
+    var region=_getRouteRegion(cur);
+    var bw=BOOKING_WINDOW[region];
+
+    // Find best airline tip from route airlines string
+    var airStr=route.airlines||'';
+    var bestTip=null;
+    var bestAirline='';
+    for(var al in AIRLINE_TIPS){
+      if(airStr.indexOf(al)>=0){bestTip=AIRLINE_TIPS[al];bestAirline=al;break;}
+    }
+
+    // Booking window status
+    var wkNum=wks||0;
+    var sweetParts=bw.sweet.split('–');
+    var sweetMin=parseInt(sweetParts[0]);
+    var sweetMax=parseInt(sweetParts[1]||sweetParts[0]);
+    var inSweet=wkNum>=sweetMin&&wkNum<=sweetMax;
+    var tooEarly=wkNum>sweetMax;
+    var tooLate=wkNum<sweetMin;
+    var windowCls=inSweet?'fl-bk-sweet':tooEarly?'fl-bk-early':'fl-bk-late';
+    var windowIcon=inSweet?'🎯':tooEarly?'⏳':'⚡';
+    var windowLabel=inSweet?'You are in the sweet spot!':tooEarly?'Too early — wait '+(wkNum-sweetMax)+' weeks':' Book immediately — past optimal window';
+
+    var html='<div class="fl-bk-card">'
+      +'<div class="fl-bk-title">&#128197; Booking intelligence</div>'
+
+      // Booking window
+      +'<div class="fl-bk-window '+windowCls+'">'
+      +'<div class="fl-bk-win-top">'+windowIcon+' <strong>'+windowLabel+'</strong></div>'
+      +'<div class="fl-bk-win-detail">Sweet spot for this route: <strong>'+bw.sweet+' before travel</strong> &nbsp;&middot;&nbsp; You are at: <strong>~'+wkNum+' weeks</strong></div>'
+      +'<div class="fl-bk-win-tip">'+bw.tip+'</div>'
+      +'</div>';
+
+    // Best day tip
+    if(bestTip){
+      html+='<div class="fl-bk-day">'
+        +'<div class="fl-bk-day-top">'
+        +'<span class="fl-bk-day-label">Best day to search — <strong>'+bestAirline+'</strong></span>'
+        +'<span class="fl-bk-day-val">'+bestTip.day+'</span>'
+        +'</div>'
+        +'<div class="fl-bk-day-time">&#9200; Best time: '+bestTip.time+'</div>'
+        +'<div class="fl-bk-day-why">'+bestTip.why+'</div>'
+        +'</div>';
+    }
+
+    // Business class note
+    if(cabinClass==='business'){
+      html+='<div class="fl-bk-biz">&#128188; Business class tip: Book <strong>12+ weeks ahead</strong> for best seat selection. Last-minute business fares are typically 2–3× more expensive than advance purchase.</div>';
+    }
+
+    html+='</div>';
+    return html;
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -3301,6 +3395,9 @@ function closeNavDD(){
 
       // Weather + Hotel card
       if(destCode) html+=_renderWeatherHotel(destCode,travelM,route);
+
+      // Best Day to Book
+      html+=_renderBookingTips(route,cur,wks,cabinClass);
 
       // Best Month Bar Chart
       html+=_renderMonthChart(travelM,route,cur,cabinFareMult);

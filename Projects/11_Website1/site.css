@@ -1,4 +1,4 @@
-/* v6.4 */
+/* v6.5 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1645,4 +1645,22 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .fl-weather-icon{font-size:1.5rem;}
   .fl-weather-temp{font-size:.82rem;}
 }
+
+/* ── Best Day to Book card ── */
+.fl-bk-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.fl-bk-title{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:10px;}
+.fl-bk-window{border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+.fl-bk-sweet{background:color-mix(in srgb,#14b8a6 10%,var(--bg));border:1px solid #14b8a6;}
+.fl-bk-early{background:color-mix(in srgb,#6366f1 10%,var(--bg));border:1px solid #6366f1;}
+.fl-bk-late{background:color-mix(in srgb,#ef4444 10%,var(--bg));border:1px solid #ef4444;}
+.fl-bk-win-top{font-size:.82rem;font-weight:700;color:var(--fg);margin-bottom:4px;}
+.fl-bk-win-detail{font-size:.74rem;color:var(--muted);margin-bottom:4px;}
+.fl-bk-win-tip{font-size:.72rem;color:var(--muted);font-style:italic;line-height:1.4;}
+.fl-bk-day{background:var(--bg);border-radius:8px;padding:10px 12px;}
+.fl-bk-day-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:6px;}
+.fl-bk-day-label{font-size:.75rem;color:var(--muted);}
+.fl-bk-day-val{font-size:.82rem;font-weight:800;color:var(--teal);}
+.fl-bk-day-time{font-size:.72rem;color:var(--muted);margin-bottom:4px;}
+.fl-bk-day-why{font-size:.73rem;color:var(--muted);line-height:1.4;font-style:italic;}
+.fl-bk-biz{font-size:.74rem;color:#a5b4fc;margin-top:8px;padding:6px 10px;background:color-mix(in srgb,#6366f1 10%,transparent);border-radius:6px;line-height:1.4;}
 
