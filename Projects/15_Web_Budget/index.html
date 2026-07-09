@@ -2962,7 +2962,7 @@ function closeBankImport(){
 
 function detectBank(filename, preview){
   const fn=filename.toLowerCase(), p=preview.toLowerCase();
-  if(fn.includes('tng')||fn.includes('touchngo')||fn.includes('touch_n_go')||p.includes('touch 'n go')||p.includes('ewallet')) return 'tng';
+  if(fn.includes('tng')||fn.includes('touchngo')||fn.includes('touch_n_go')||p.includes("touch 'n go")||p.includes('ewallet')) return 'tng';
   if(/statement of credit card/i.test(p)||/maybank 2 plat/i.test(p)) return 'maybank-cc';
   if((fn.includes('maybank')||fn.includes('mbb'))&&(fn.includes('cc')||fn.includes('credit')||fn.includes('card'))) return 'maybank-cc';
   if(fn.includes('maybank')||fn.includes('mbb')||p.includes('maybank berhad')||p.includes('malayan banking')) return 'maybank-sav';

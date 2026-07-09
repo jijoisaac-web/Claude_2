@@ -1,4 +1,4 @@
-/* v7.2 */
+/* v7.3 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2804,8 +2804,7 @@ function closeNavDD(){
         : '—';
       var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/';
       var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /,'+')+'%2C+India';
-      var planQuery=d.name+' next month';
-      return '<div class="fl-dest-card" onclick="_flPlanDest(this,'+JSON.stringify(planQuery)+')" style="cursor:pointer">'
+      return '<div class="fl-dest-card fl-dest-clickable" data-plan="'+d.name+' next month" style="cursor:pointer">'
         +'<div class="fl-dest-hd"><span class="fl-dest-icon">'+d.icon+'</span>'
         +'<div style="flex:1"><div class="fl-dest-name">'+d.name+'</div>'
         +'<div class="fl-dest-route">'+from+' → '+code+'</div></div>'
@@ -2827,6 +2826,15 @@ function closeNavDD(){
         +'<a class="fl-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
         +'</div></div>';
     }).join('');
+
+    // Delegated click: card body → planner, buttons stay as links
+    wrap.onclick=function(e){
+      if(e.target.closest('.fl-btn-row')) return;
+      var card=e.target.closest('.fl-dest-clickable');
+      if(!card) return;
+      var query=card.getAttribute('data-plan');
+      if(query) window._flPlanDest(card,query);
+    };
   }
 
   // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
