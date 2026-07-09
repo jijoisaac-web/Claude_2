@@ -311,6 +311,40 @@ progress{width:180px;accent-color:var(--blue);}
   <h2 style="margin-top:24px">Backtest — replay the same buy rules on history</h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Simulates the Ideas engine's short-term BUY rules (breakout, MACD cross, gap-up, pullback dip, RSI oversold, BB lower touch — all filtered to stocks above SMA200) on past data. Entry at signal close, stop/target as the engine sets them, 10-session cooldown per stock. Shows what happened 1w/2w/1m/3m later.</div>
   <div class="controls">
+    <span class="muted">Templates:</span>
+    <select id="btTemplate" onchange="applyBtTemplate()">
+      <option value="">Custom…</option>
+      <option value="momentum">Momentum breakout</option>
+      <option value="gapgo">Gap &amp; go</option>
+      <option value="dip">Quiet dip buyer</option>
+      <option value="meanrev">Mean reversion (tight stops)</option>
+      <option value="trend">Trend rider</option>
+      <option value="leaders">Leaders only (RS filter)</option>
+      <option value="all">Everything (kitchen sink)</option>
+    </select>
+    <span class="muted" id="btTplNote"></span>
+  </div>
+  <div class="controls" style="flex-wrap:wrap">
+    <span class="muted">Triggers:</span>
+    <label class="muted"><input type="checkbox" class="btSig" value="BREAKOUT_20D" checked> Breakout 20D</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="MACD_BULL_CROSS" checked> MACD cross</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="GAP_UP" checked> Gap up</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="PULLBACK_DIP" checked> Pullback dip</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="VOL_DRYUP"> Volume dry-up</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="RSI_OVERSOLD" checked> RSI oversold</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="BB_LOWER_TOUCH" checked> BB lower touch</label>
+  </div>
+  <div class="controls" style="flex-wrap:wrap">
+    <span class="muted">Require:</span>
+    <label class="muted"><input type="checkbox" id="btcTrend"> Trend aligned (P&gt;20&gt;50&gt;200)</label>
+    <label class="muted"><input type="checkbox" id="btcADX"> ADX&gt;25 (+DI leading)</label>
+    <label class="muted"><input type="checkbox" id="btcVol"> Volume ≥1.5x avg</label>
+    <label class="muted"><input type="checkbox" id="btcRel"> Beating NIFTY (3-mo)</label>
+    <label class="muted">Stop <select id="btStop"><option value="1">1.0</option><option value="1.5" selected>1.5</option><option value="2">2.0</option><option value="2.5">2.5</option></select> ATR</label>
+    <label class="muted">Target <select id="btRR"><option value="1.5">1.5</option><option value="2" selected>2</option><option value="3">3</option></select> R</label>
+    <label class="muted">Max hold <select id="btHold"><option value="21">1 mo</option><option value="42">2 mo</option><option value="63" selected>3 mo</option></select></label>
+  </div>
+  <div class="controls">
     <select id="btUniverse">
       <option value="NIFTY 50">NIFTY 50</option>
       <option value="NEXT 50">NEXT 50</option>
@@ -1605,26 +1639,83 @@ function atrSeries(c, p=14){
   }
   return out;
 }
-// same short-term BUY rules as the Ideas engine, evaluated as-of bar i
-function evalBuyAt(e, atr, i){
+function adxSeriesFull(c, p=14){   // rolling ADX/+DI/-DI arrays (Wilder)
+  const out = new Array(c.length).fill(null);
+  let trS=0, pdmS=0, mdmS=0, adx=null, dxs=[];
+  for(let i=1;i<c.length;i++){
+    const up = c[i].high-c[i-1].high, dn = c[i-1].low-c[i].low;
+    const pdm = up>dn && up>0 ? up : 0, mdm = dn>up && dn>0 ? dn : 0;
+    const tr = Math.max(c[i].high-c[i].low, Math.abs(c[i].high-c[i-1].close), Math.abs(c[i].low-c[i-1].close));
+    if(i<=p){ trS+=tr; pdmS+=pdm; mdmS+=mdm; }
+    else{ trS+=tr-trS/p; pdmS+=pdm-pdmS/p; mdmS+=mdm-mdmS/p; }
+    if(i>=p){
+      const pdi = 100*pdmS/(trS||1e-9), mdi = 100*mdmS/(trS||1e-9);
+      const dx = 100*Math.abs(pdi-mdi)/((pdi+mdi)||1e-9);
+      if(adx==null){ dxs.push(dx); if(dxs.length===p) adx = dxs.reduce((a,b)=>a+b,0)/p; }
+      else adx = (adx*(p-1)+dx)/p;
+      if(adx!=null) out[i] = {adx, pdi, mdi};
+    }
+  }
+  return out;
+}
+// configurable rule evaluation as-of bar i
+function evalBuyAt(e, atr, i, cfg, adxArr, niftyR63){
   const d = e[i];
   if(d.sma200==null || d.close<=d.sma200) return null;
   const a = atr[i]; if(!a) return null;
+  const on = t => cfg.sigs.has(t);
   let sig = null, h20 = null;
-  if(i>=21){
+  if(on("BREAKOUT_20D") && i>=21){
     let hi=-Infinity;
     for(let k=i-20;k<i;k++) hi = Math.max(hi, e[k].high);
     h20 = hi;
     if(d.close>hi) sig = "BREAKOUT_20D";
   }
-  if(!sig && i>=2 && e[i-2].macd_hist!=null && d.macd_hist!=null && e[i-2].macd_hist<0 && d.macd_hist>0) sig = "MACD_BULL_CROSS";
-  if(!sig && i>=1 && e[i-1].close && (d.open-e[i-1].close)/e[i-1].close>=0.03) sig = "GAP_UP";
-  if(!sig && i>=2 && [e[i-2],e[i-1],d].every(x=>x.close<x.open) && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=55) sig = "PULLBACK_DIP";
-  if(!sig && d.rsi14!=null && d.rsi14<30) sig = "RSI_OVERSOLD";
-  if(!sig && d.bb_lower!=null && d.close<=d.bb_lower) sig = "BB_LOWER_TOUCH";
+  if(!sig && on("MACD_BULL_CROSS") && i>=2 && e[i-2].macd_hist!=null && d.macd_hist!=null && e[i-2].macd_hist<0 && d.macd_hist>0) sig = "MACD_BULL_CROSS";
+  if(!sig && on("GAP_UP") && i>=1 && e[i-1].close && (d.open-e[i-1].close)/e[i-1].close>=0.03) sig = "GAP_UP";
+  if(!sig && on("PULLBACK_DIP") && i>=2 && [e[i-2],e[i-1],d].every(x=>x.close<x.open) && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=55) sig = "PULLBACK_DIP";
+  if(!sig && on("VOL_DRYUP") && d.sma50!=null && Math.abs(d.close-d.sma50)/d.sma50<0.04 &&
+     d.vol_avg20 && d.volume < 0.6*d.vol_avg20 && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=60) sig = "VOL_DRYUP";
+  if(!sig && on("RSI_OVERSOLD") && d.rsi14!=null && d.rsi14<30) sig = "RSI_OVERSOLD";
+  if(!sig && on("BB_LOWER_TOUCH") && d.bb_lower!=null && d.close<=d.bb_lower) sig = "BB_LOWER_TOUCH";
   if(!sig) return null;
-  const stop = sig==="BREAKOUT_20D" && h20 ? Math.max(h20*0.99, d.close-1.5*a) : d.close-1.5*a;
-  return {signal:sig, entry:d.close, stop, target:d.close+2*(d.close-stop)};
+  // required confirmations
+  if(cfg.confTrend && !(d.sma20!=null && d.sma50!=null && d.close>d.sma20 && d.sma20>d.sma50 && d.sma50>d.sma200)) return null;
+  if(cfg.confADX){ const x = adxArr && adxArr[i]; if(!x || x.adx<=25 || x.pdi<=x.mdi) return null; }
+  if(cfg.confVol && !(d.vol_avg20 && d.volume > 1.5*d.vol_avg20)) return null;
+  if(cfg.confRel){
+    if(i<63 || !e[i-63].close) return null;
+    const rn = niftyR63 ? niftyR63[d.time] : null;
+    if(rn==null || (d.close/e[i-63].close - 1) <= rn + 0.08) return null;
+  }
+  const stop = sig==="BREAKOUT_20D" && h20 ? Math.max(h20*0.99, d.close-cfg.stopATR*a) : d.close-cfg.stopATR*a;
+  return {signal:sig, entry:d.close, stop, target:d.close+cfg.rr*(d.close-stop)};
+}
+const BT_TEMPLATES = {
+  momentum: {note:"Ride fresh range breaks with volume behind them, in aligned uptrends.", sigs:["BREAKOUT_20D"], trend:1, adx:0, vol:1, rel:0, stop:"1.5", rr:"2", hold:"63"},
+  gapgo:    {note:"Strong gaps in uptrends tend to keep going (your best performer in smallcaps).", sigs:["GAP_UP"], trend:1, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"42"},
+  dip:      {note:"Buy quiet pullbacks in strong trends — dips on drying volume, ADX confirms the trend.", sigs:["PULLBACK_DIP","VOL_DRYUP"], trend:0, adx:1, vol:0, rel:0, stop:"2", rr:"2", hold:"63"},
+  meanrev:  {note:"Oversold bounces with tight stops and quick targets — in and out.", sigs:["RSI_OVERSOLD","BB_LOWER_TOUCH"], trend:0, adx:0, vol:0, rel:0, stop:"1", rr:"1.5", hold:"21"},
+  trend:    {note:"MACD turns inside established, forceful trends — wider stop, bigger target.", sigs:["MACD_BULL_CROSS"], trend:1, adx:1, vol:0, rel:0, stop:"2.5", rr:"3", hold:"63"},
+  leaders:  {note:"Only stocks beating NIFTY by 8+ pts over 3 months — strength buys strength.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","PULLBACK_DIP"], trend:1, adx:0, vol:0, rel:1, stop:"1.5", rr:"2", hold:"63"},
+  all:      {note:"Every trigger, no confirmation filters — the default noisy baseline.", sigs:["BREAKOUT_20D","MACD_BULL_CROSS","GAP_UP","PULLBACK_DIP","VOL_DRYUP","RSI_OVERSOLD","BB_LOWER_TOUCH"], trend:0, adx:0, vol:0, rel:0, stop:"1.5", rr:"2", hold:"63"},
+};
+function applyBtTemplate(){
+  const t = BT_TEMPLATES[$("btTemplate").value];
+  if(!t){ $("btTplNote").textContent=""; return; }
+  document.querySelectorAll(".btSig").forEach(cb=>cb.checked = t.sigs.includes(cb.value));
+  $("btcTrend").checked=!!t.trend; $("btcADX").checked=!!t.adx; $("btcVol").checked=!!t.vol; $("btcRel").checked=!!t.rel;
+  $("btStop").value=t.stop; $("btRR").value=t.rr; $("btHold").value=t.hold;
+  $("btTplNote").textContent = t.note + " — hit Run.";
+}
+function btConfig(){
+  return {
+    sigs: new Set([...document.querySelectorAll(".btSig:checked")].map(cb=>cb.value)),
+    confTrend: $("btcTrend").checked, confADX: $("btcADX").checked,
+    confVol: $("btcVol").checked, confRel: $("btcRel").checked,
+    stopATR: parseFloat($("btStop").value), rr: parseFloat($("btRR").value),
+    maxHold: parseInt($("btHold").value),
+  };
 }
 function scanOutcome(c, i, t, maxHold=63){
   for(let j=i+1; j<=Math.min(i+maxHold, c.length-1); j++){
@@ -1635,6 +1726,8 @@ function scanOutcome(c, i, t, maxHold=63){
 }
 async function runBacktest(){
   const uni = $("btUniverse").value, lookback = +$("btLookback").value;
+  const cfg = btConfig();
+  if(!cfg.sigs.size){ $("btMeta").textContent = "Pick at least one trigger."; return; }
   const syms = Object.keys(UNIVERSES[uni]);
   const prog = $("btProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
   $("btMeta").textContent = "Fetching & simulating…";
@@ -1643,17 +1736,19 @@ async function runBacktest(){
   try{ nifty = toCandles(await fetchChart("^NSEI","2y","1d")); }catch(e){}
   const nIdx = {}; nifty.forEach((d,i)=>nIdx[d.time]=i);
   const nH = (date,n) => { const i = nIdx[date]; return i!=null && i+n<nifty.length ? (nifty[i+n].close-nifty[i].close)/nifty[i].close*100 : null; };
+  const niftyR63 = {}; for(let j=63;j<nifty.length;j++) niftyR63[nifty[j].time] = nifty[j].close/nifty[j-63].close - 1;
   await pmap(syms, async sym=>{
     let c; try{ c = toCandles(await fetchChart(sym,"2y","1d")); }catch(e){ return; }
     if(c.length<280) return;
     const e = enrich(c), atr = atrSeries(c);
+    const adxArr = cfg.confADX ? adxSeriesFull(c) : null;
     let cooldown = 0;
-    for(let i=Math.max(220, c.length-lookback-63); i<c.length-1; i++){
+    for(let i=Math.max(220, c.length-lookback-cfg.maxHold); i<c.length-1; i++){
       if(cooldown>0){ cooldown--; continue; }
-      const t = evalBuyAt(e, atr, i);
+      const t = evalBuyAt(e, atr, i, cfg, adxArr, niftyR63);
       if(!t) continue;
       cooldown = 10;
-      const o = scanOutcome(c, i, t);
+      const o = scanOutcome(c, i, t, cfg.maxHold);
       const H = n => i+n<c.length ? (c[i+n].close-t.entry)/t.entry*100 : null;
       trades.push({sym, date:c[i].time, signal:t.signal, entry:t.entry, ...o,
         r5:H(5), r10:H(10), r21:H(21), r63:H(63),
@@ -1666,7 +1761,9 @@ async function runBacktest(){
 }
 const avg = a => { const v=a.filter(x=>x!=null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : null; };
 function renderBacktest(trades, uni, lookback){
-  $("btMeta").textContent = `${trades.length} simulated trades · ${uni} · last ${Math.round(lookback/21)} months`;
+  const cfg = btConfig();
+  const reqs = [cfg.confTrend&&"trend-aligned", cfg.confADX&&"ADX>25", cfg.confVol&&"volume 1.5x", cfg.confRel&&"beating NIFTY"].filter(Boolean);
+  $("btMeta").textContent = `${trades.length} trades · ${uni} · ${Math.round(lookback/21)} mo · ${[...cfg.sigs].length} triggers${reqs.length?" · req: "+reqs.join(", "):""} · stop ${cfg.stopATR} ATR · target ${cfg.rr}R · hold ≤${cfg.maxHold}d`;
   if(!trades.length){ $("btResults").innerHTML = '<div class="loading">No signals fired in this window.</div>'; return; }
   const closed = trades.filter(t=>t.status==="TARGET"||t.status==="STOP");
   const winRate = closed.length ? closed.filter(t=>t.status==="TARGET").length/closed.length*100 : null;

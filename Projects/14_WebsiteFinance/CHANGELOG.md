@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.5.0] — 2026-07-09 · Configurable Backtesting
+
+- Backtest is now fully configurable: pick any combination of 7 triggers (added volume dry-up), require confirmations (trend alignment, ADX>25 with +DI leading, volume ≥1.5x, beating NIFTY by 8pts/3mo), and tune exits (stop 1–2.5 ATR, target 1.5–3R, max hold 1–3 months)
+- Seven strategy templates: Momentum breakout, Gap & go, Quiet dip buyer, Mean reversion (tight stops), Trend rider, Leaders only (relative-strength filter), Everything (baseline)
+- Results header echoes the exact configuration tested, so screenshots are self-documenting
+
 ## [2.4.0] — 2026-07-09 · Setup Score
 
 - Every idea now carries a **Setup Score (0–100)**: trigger quality (25) + trend context (25) + momentum strength (20) + participation (15) + entry risk (15), minus 8 per bearish co-signal. Color-coded, sorted by score, conviction stars in the tooltip
