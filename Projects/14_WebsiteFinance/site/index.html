@@ -1557,6 +1557,7 @@ async function runBacktest(){
     }
   }, 6, ()=>prog.value++);
   prog.style.display="none";
+  trades.sort((a,b)=> a.date<b.date ? -1 : a.date>b.date ? 1 : a.sym<b.sym ? -1 : 1);
   renderBacktest(trades, uni, lookback);
 }
 const avg = a => { const v=a.filter(x=>x!=null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : null; };
@@ -1587,7 +1588,7 @@ function renderBacktest(trades, uni, lookback){
         <td>${wr!=null?fmt(wr,0)+"%":"—"}</td><td>${pctCell(avg(g.map(t=>t.r5)))}</td>
         <td>${pctCell(avg(g.map(t=>t.r21)))}</td><td>${pctCell(avg(g.map(t=>t.r63)))}</td></tr>`;}).join("")}
     </tbody></table>
-    <h2>Most recent simulated trades</h2>
+    <h2>Simulated trades — newest first (last 40)</h2>
     <table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th><th>Entry ₹</th><th>Outcome</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>
     ${trades.slice(-40).reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
       <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
@@ -1659,7 +1660,7 @@ async function renderTrack(force){
   ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
   $("ptTable").innerHTML = `<table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th>
     <th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>Status</th><th>P&L</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>` +
-    [...trades].reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
+    [...trades].sort((a,b)=> a.date>b.date ? -1 : a.date<b.date ? 1 : a.sym<b.sym ? -1 : 1).map(t=>`<tr onclick="openChart('${t.sym}')">
       <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
       <td style="text-align:left"><span class="badge neutral">${(t.signal||"").replaceAll("_"," ")}</span></td>
       <td>${fmt(t.entry)}</td><td>${fmt(t.stop)}</td><td>${fmt(t.target)}</td>

@@ -1,4 +1,4 @@
-/* v6.2 */
+/* v6.4 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1600,4 +1600,49 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-signal-label{font-size:.88rem;font-weight:800;color:var(--fg);}
 .fl-signal-reason{font-size:.78rem;color:var(--muted);margin-bottom:5px;line-height:1.4;}
 .fl-signal-tip{font-size:.76rem;color:var(--teal);font-style:italic;}
+
+/* ── Best Month Bar Chart ── */
+.fl-mc-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.fl-mc-title{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:12px;}
+.fl-mc-bars{display:flex;gap:4px;align-items:flex-end;height:110px;padding-bottom:0;}
+.fl-mc-col{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;position:relative;}
+.fl-mc-col-sel .fl-mc-mn{color:var(--teal);font-weight:700;}
+.fl-mc-pct{font-size:.55rem;font-weight:700;margin-bottom:2px;white-space:nowrap;}
+.fl-mc-bar-track{flex:1;width:100%;display:flex;align-items:flex-end;min-height:40px;}
+.fl-mc-bar{width:100%;border-radius:3px 3px 0 0;transition:height .3s;}
+.fl-mc-bar-cheap{background:linear-gradient(180deg,#14b8a6,#0d9488);}
+.fl-mc-bar-peak{background:linear-gradient(180deg,#ef4444,#dc2626);}
+.fl-mc-bar-mid{background:var(--border);}
+.fl-mc-bar-sel{background:linear-gradient(180deg,#6366f1,#4f46e5);}
+.fl-mc-fare{font-size:.52rem;color:var(--muted);margin-top:3px;text-align:center;line-height:1.2;white-space:nowrap;}
+.fl-mc-mn{font-size:.62rem;color:var(--muted);margin-top:1px;font-weight:600;}
+.fl-mc-sel-dot{font-size:.55rem;color:var(--teal);margin-top:1px;}
+.fl-mc-legend{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;}
+.fl-mc-leg{font-size:.68rem;color:var(--muted);}
+.fl-mc-leg-cheap{color:#14b8a6;}
+.fl-mc-leg-peak{color:#ef4444;}
+.fl-mc-leg-sel{color:#818cf8;}
+@media(max-width:480px){
+  .fl-mc-bars{gap:2px;height:90px;}
+  .fl-mc-pct{font-size:.48rem;}
+  .fl-mc-fare{font-size:.45rem;}
+  .fl-mc-mn{font-size:.55rem;}
+}
+
+/* ── Weather + Hotel card ── */
+.fl-weather-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.fl-weather-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.fl-weather-icon{font-size:2rem;line-height:1;}
+.fl-weather-temp{font-size:.92rem;font-weight:700;color:var(--fg);}
+.fl-weather-rain{font-size:.75rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+.fl-hotel-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.fl-hotel-label{font-size:.75rem;color:var(--muted);white-space:nowrap;}
+.fl-hotel-dots{display:flex;gap:3px;}
+.fl-hotel-dot{width:10px;height:10px;border-radius:50%;}
+.fl-hotel-grade{font-size:.75rem;font-weight:700;}
+.fl-hotel-note{font-size:.76rem;color:var(--muted);font-style:italic;line-height:1.4;padding:6px 10px;background:var(--bg);border-radius:6px;}
+@media(max-width:480px){
+  .fl-weather-icon{font-size:1.5rem;}
+  .fl-weather-temp{font-size:.82rem;}
+}
 

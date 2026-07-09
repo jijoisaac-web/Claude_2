@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.2.1] — 2026-07-09
+
+- Backtest trades are now sorted chronologically (they were grouped by stock); the trades table shows newest first, ties ordered by symbol. Paper-trades table likewise date-ordered
+
 ## [2.2.0] — 2026-07-08 · Track Record
 
 - New **Track Record** tab (shortcut `8`) with two halves:

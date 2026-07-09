@@ -1,4 +1,4 @@
-/* v6.2 */
+/* v6.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2817,6 +2817,180 @@ function closeNavDD(){
 
   // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
   // ─── DATE WINDOW ENGINE ──────────────────────────────────────────────────
+
+  // ── WEATHER + HOTEL DATA ─────────────────────────────────────────────────
+  // Per destination: 12 months of weather. Fields: w=weather emoji, t=temp range,
+  // r=rain label, note=activity note, hotel=hotel demand (1-5), hotelNote=warning
+  var DEST_WEATHER={
+    GOI:[ // Goa
+      {w:'☀️',t:'23–32°C',r:'Dry',    note:'Peak beach season. Busy but perfect weather.',          hotel:5,hotelNote:'Fully booked by Nov. Book accommodation 3+ months ahead.'},
+      {w:'☀️',t:'23–33°C',r:'Dry',    note:'Still peak. Water sports season.',                      hotel:5,hotelNote:'High demand. Hotels 80%+ booked weeks ahead.'},
+      {w:'🌤️',t:'25–34°C',r:'Dry',    note:'Shoulder. Less crowded, good value.',                  hotel:3,hotelNote:'Good availability, book 4 weeks ahead.'},
+      {w:'🌤️',t:'26–35°C',r:'Dry',    note:'Hot but quiet. Great deals on hotels.',                hotel:2,hotelNote:'Easy availability. Walk-in possible.'},
+      {w:'🌦️',t:'27–34°C',r:'Pre-monsoon','note':'Pre-monsoon showers begin.',                     hotel:2,hotelNote:'Low demand. Great hotel deals.'},
+      {w:'🌧️',t:'25–30°C',r:'Heavy',  note:'Monsoon. Beaches unsafe, some closures.',              hotel:1,hotelNote:'Very low demand. Up to 60% off hotels.'},
+      {w:'⛈️',t:'24–29°C',r:'Very Heavy','note':'Peak monsoon. Most beach shacks closed.',         hotel:1,hotelNote:'Cheapest hotels of the year. Few tourists.'},
+      {w:'🌧️',t:'24–30°C',r:'Heavy',  note:'Monsoon easing. Lush green landscape.',               hotel:1,hotelNote:'Still low demand. Great for budget travelers.'},
+      {w:'🌦️',t:'25–32°C',r:'Light',  note:'Post-monsoon. Nature is beautiful.',                  hotel:2,hotelNote:'Rising demand. Book 3 weeks ahead.'},
+      {w:'⛅',t:'24–32°C',r:'Minimal', note:'Season starting. Crowds building.',                   hotel:4,hotelNote:'Book 6 weeks ahead — season demand rising fast.'},
+      {w:'☀️',t:'23–32°C',r:'Dry',    note:'Full peak season begins.',                             hotel:5,hotelNote:'Book 3+ months ahead. Festival + tourist rush.'},
+      {w:'☀️',t:'22–31°C',r:'Dry',    note:'Peak Christmas & NYE. Most expensive.',                hotel:5,hotelNote:'Fully booked by October. Book immediately.'}
+    ],
+    COK:[ // Kochi
+      {w:'☀️',t:'23–31°C',r:'Dry',    note:'Pleasant cool season. Great for sightseeing.',         hotel:4,hotelNote:'High demand. Book 4–6 weeks ahead.'},
+      {w:'☀️',t:'24–32°C',r:'Dry',    note:'Best month. Warm and dry.',                            hotel:3,hotelNote:'Good availability. Book 3 weeks ahead.'},
+      {w:'🌤️',t:'25–33°C',r:'Dry',    note:'Hot days. Perfect for backwaters.',                   hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'27–34°C',r:'Dry',    note:'Hot and humid. Off-peak.',                            hotel:2,hotelNote:'Good availability and deals.'},
+      {w:'🌦️',t:'28–33°C',r:'Pre-monsoon','note':'Pre-monsoon rains begin.',                      hotel:2,hotelNote:'Low demand. Hotel discounts available.'},
+      {w:'🌧️',t:'25–29°C',r:'Very Heavy','note':'Peak Kerala monsoon. Ayurveda season.',          hotel:2,hotelNote:'Monsoon packages available. Book Ayurveda retreats early.'},
+      {w:'⛈️',t:'24–28°C',r:'Very Heavy','note':'Heavy rains. Houseboat rides limited.',          hotel:1,hotelNote:'Very low demand. Cheapest rates of year.'},
+      {w:'🌧️',t:'24–28°C',r:'Heavy',  note:'Rains continue. Onam festival this month.',           hotel:3,hotelNote:'Onam week: book early. Rest of month easy.'},
+      {w:'🌦️',t:'24–30°C',r:'Moderate',note:'Post-monsoon. Greenery at its best.',               hotel:3,hotelNote:'Rising demand. Book 3 weeks ahead.'},
+      {w:'⛅',t:'23–30°C',r:'Light',   note:'Tourist season begins. Great weather.',               hotel:4,hotelNote:'Book 4–6 weeks ahead — season picks up fast.'},
+      {w:'☀️',t:'23–30°C',r:'Dry',    note:'Peak season. Film festival in Thiruvananthapuram.',   hotel:4,hotelNote:'High demand across Kerala. Book 6 weeks ahead.'},
+      {w:'☀️',t:'22–30°C',r:'Dry',    note:'Peak Christmas. Backwaters very popular.',            hotel:5,hotelNote:'Fully booked weeks ahead. Book immediately.'}
+    ],
+    BOM:[ // Mumbai
+      {w:'☀️',t:'17–31°C',r:'Dry',    note:'Best season. Cool, comfortable, festive.',             hotel:4,hotelNote:'High demand. Book 4–5 weeks ahead.'},
+      {w:'☀️',t:'18–32°C',r:'Dry',    note:'Pleasant. Good for Elephanta & Marine Drive.',        hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'21–33°C',r:'Dry',    note:'Getting hot. Holi festival.',                         hotel:3,hotelNote:'Holi weekend: book early.'},
+      {w:'☀️',t:'24–36°C',r:'Dry',    note:'Very hot. Low tourist season.',                       hotel:2,hotelNote:'Good deals available.'},
+      {w:'🌦️',t:'27–35°C',r:'Pre-monsoon','note':'Pre-monsoon. Hot and humid.',                   hotel:2,hotelNote:'Low season deals.'},
+      {w:'🌧️',t:'26–30°C',r:'Very Heavy','note':'Monsoon arrives. Heavy flooding possible.',      hotel:1,hotelNote:'Lowest demand. Up to 50% off hotels.'},
+      {w:'⛈️',t:'25–29°C',r:'Very Heavy','note':'Peak monsoon. City flooding common.',            hotel:1,hotelNote:'Cheapest rates. Business travel only.'},
+      {w:'🌧️',t:'25–29°C',r:'Heavy',  note:'Monsoon continues. Independence Day.',               hotel:2,hotelNote:'Low demand except Independence Day weekend.'},
+      {w:'🌦️',t:'25–31°C',r:'Moderate','note':'Monsoon ending. Ganesh Chaturthi festival.',      hotel:3,hotelNote:'Ganesh Chaturthi: very high demand 3 days.'},
+      {w:'⛅',t:'24–33°C',r:'Light',   note:'Post-monsoon. Navratri & Diwali.',                   hotel:4,hotelNote:'Festival demand. Book 6+ weeks ahead for Diwali.'},
+      {w:'☀️',t:'20–33°C',r:'Dry',    note:'Season starts. Mild and pleasant.',                   hotel:4,hotelNote:'High demand. Book 4 weeks ahead.'},
+      {w:'☀️',t:'17–32°C',r:'Dry',    note:'Peak Christmas. Busiest month.',                      hotel:5,hotelNote:'Fully booked. Book 3+ months ahead.'}
+    ],
+    DEL:[ // Delhi
+      {w:'🥶',t:'4–20°C', r:'Dry',    note:'Cold but clear. Republic Day parade.',                hotel:4,hotelNote:'Peak winter. Book 4–6 weeks ahead.'},
+      {w:'🌤️',t:'7–22°C', r:'Dry',    note:'Pleasant. Best sightseeing weather.',                hotel:3,hotelNote:'Good demand. Book 3 weeks ahead.'},
+      {w:'🌸',t:'13–28°C',r:'Dry',    note:'Spring. Holi festival. Flowers blooming.',            hotel:3,hotelNote:'Holi weekend books fast.'},
+      {w:'☀️',t:'19–36°C',r:'Dry',    note:'Getting hot. Less ideal for outdoor sights.',         hotel:2,hotelNote:'Low season deals available.'},
+      {w:'🌡️',t:'25–41°C',r:'Dry',    note:'Extreme heat. Avoid outdoor midday.',                hotel:1,hotelNote:'Cheapest rates. Indoor activities only.'},
+      {w:'🌧️',t:'27–38°C',r:'Moderate','note':'Monsoon begins. Some relief from heat.',          hotel:1,hotelNote:'Very low demand. Great hotel deals.'},
+      {w:'🌧️',t:'26–35°C',r:'Heavy',  note:'Peak monsoon. Waterlogging in streets.',             hotel:1,hotelNote:'Cheapest hotels of the year.'},
+      {w:'🌦️',t:'25–34°C',r:'Moderate','note':'Monsoon easing. Independence Day.',               hotel:2,hotelNote:'Low demand. Budget-friendly.'},
+      {w:'⛅',t:'21–34°C',r:'Light',   note:'Best post-monsoon. Navratri & Dussehra.',            hotel:3,hotelNote:'Festival week demand spikes.'},
+      {w:'☀️',t:'14–33°C',r:'Dry',    note:'Perfect season. Diwali. Pleasant days.',             hotel:5,hotelNote:'Diwali: fully booked. Book 3+ months ahead.'},
+      {w:'☀️',t:'8–28°C', r:'Dry',    note:'Cool and crisp. Great for monuments.',               hotel:4,hotelNote:'High demand. Book 4–5 weeks ahead.'},
+      {w:'🥶',t:'5–22°C', r:'Dry',    note:'Cold winter. Foggy mornings. Christmas.',            hotel:5,hotelNote:'Peak demand. Book 3+ months ahead for Dec.'}
+    ],
+    BLR:[ // Bangalore
+      {w:'☀️',t:'15–27°C',r:'Dry',    note:'Perfect weather. Cool evenings.',                     hotel:3,hotelNote:'Moderate demand. Book 3 weeks ahead.'},
+      {w:'☀️',t:'16–29°C',r:'Dry',    note:'Best month. Comfortable all day.',                   hotel:3,hotelNote:'Good availability.'},
+      {w:'🌤️',t:'18–31°C',r:'Dry',    note:'Warm days. Tech events season.',                     hotel:3,hotelNote:'Tech conference demand — check dates.'},
+      {w:'🌤️',t:'19–33°C',r:'Minimal','note':'Hot afternoons. Pre-summer.',                       hotel:2,hotelNote:'Good deals available.'},
+      {w:'🌦️',t:'20–32°C',r:'Light',  note:'Pre-monsoon showers. Cooling down.',                hotel:2,hotelNote:'Low season.'},
+      {w:'🌧️',t:'19–28°C',r:'Moderate','note':'Monsoon season. Lush greenery.',                 hotel:2,hotelNote:'Low demand. Hotel discounts.'},
+      {w:'🌧️',t:'18–26°C',r:'Moderate','note':'Comfortable despite rains. Gardens beautiful.',  hotel:2,hotelNote:'Good budget options.'},
+      {w:'🌦️',t:'18–27°C',r:'Moderate','note':'Mild rains. Pleasant temperatures.',              hotel:2,hotelNote:'Low demand continues.'},
+      {w:'⛅',t:'18–27°C',r:'Light',   note:'Post-monsoon. Navratri.',                            hotel:3,hotelNote:'Rising demand. Book 3 weeks ahead.'},
+      {w:'☀️',t:'17–27°C',r:'Dry',    note:'Perfect cool weather. Diwali.',                      hotel:4,hotelNote:'Festival demand. Book 4–6 weeks ahead.'},
+      {w:'☀️',t:'16–27°C',r:'Dry',    note:'Ideal conditions. Tech events resume.',              hotel:4,hotelNote:'Conference season — check event calendar.'},
+      {w:'☀️',t:'15–26°C',r:'Dry',    note:'Cool Christmas. Year-end events.',                   hotel:4,hotelNote:'Book 4 weeks ahead for December.'}
+    ],
+    MAA:[ // Chennai
+      {w:'☀️',t:'20–31°C',r:'Dry',    note:'Cool season. Best for sightseeing.',                  hotel:4,hotelNote:'High demand. Book 4 weeks ahead.'},
+      {w:'☀️',t:'22–33°C',r:'Dry',    note:'Warm but manageable. Music season ends.',            hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'24–35°C',r:'Dry',    note:'Getting hot. Water parks popular.',                  hotel:2,hotelNote:'Low season deals.'},
+      {w:'🌡️',t:'27–38°C',r:'Dry',    note:'Very hot. Low tourist period.',                      hotel:1,hotelNote:'Cheapest rates of year.'},
+      {w:'🌡️',t:'29–40°C',r:'Dry',    note:'Hottest month. Stay indoors midday.',                hotel:1,hotelNote:'Very low demand. Great value hotels.'},
+      {w:'🌧️',t:'28–36°C',r:'Moderate',note:'South-west monsoon begins.',                       hotel:2,hotelNote:'Low season.'},
+      {w:'🌧️',t:'27–34°C',r:'Moderate','note':'Monsoon. Beach visits limited.',                  hotel:2,hotelNote:'Low demand. Budget-friendly.'},
+      {w:'🌧️',t:'27–33°C',r:'Moderate','note':'Monsoon continues. Indoor activities best.',      hotel:2,hotelNote:'Good deals available.'},
+      {w:'🌧️',t:'26–33°C',r:'Heavy',  note:'North-east monsoon peak. Flooding risk.',           hotel:2,hotelNote:'Check weather forecast before travel.'},
+      {w:'🌧️',t:'24–31°C',r:'Heavy',  note:'Cyclone season. Monitor weather closely.',           hotel:2,hotelNote:'Travel insurance strongly recommended.'},
+      {w:'⛅',t:'22–30°C',r:'Light',   note:'Season starts. Classical music season begins.',      hotel:4,hotelNote:'Music season demand. Book 5 weeks ahead.'},
+      {w:'☀️',t:'20–29°C',r:'Dry',    note:'Peak season. Pongal preparations.',                  hotel:4,hotelNote:'High demand. Book 4–6 weeks ahead.'}
+    ],
+    HYD:[ // Hyderabad
+      {w:'☀️',t:'15–28°C',r:'Dry',    note:'Perfect cool weather. Charminar sightseeing.',       hotel:3,hotelNote:'Good demand. Book 3 weeks ahead.'},
+      {w:'☀️',t:'16–30°C',r:'Dry',    note:'Pleasant. Best for outdoor heritage sites.',         hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'20–33°C',r:'Dry',    note:'Warm. Holi festival.',                               hotel:3,hotelNote:'Holi week picks up.'},
+      {w:'☀️',t:'24–38°C',r:'Dry',    note:'Very hot. Indoor activities best.',                  hotel:2,hotelNote:'Low season deals.'},
+      {w:'🌡️',t:'27–40°C',r:'Dry',    note:'Hottest month. Avoid outdoor midday.',              hotel:1,hotelNote:'Cheapest rates. Business travel only.'},
+      {w:'🌧️',t:'25–33°C',r:'Moderate','note':'Monsoon relief. Temperatures drop.',              hotel:2,hotelNote:'Low demand.'},
+      {w:'🌧️',t:'23–30°C',r:'Heavy',  note:'Peak monsoon. Lakes full. Green city.',             hotel:1,hotelNote:'Very low demand. Cheapest hotels.'},
+      {w:'🌧️',t:'22–29°C',r:'Moderate','note':'Rains continue. Pleasant temperatures.',          hotel:2,hotelNote:'Low demand continues.'},
+      {w:'⛅',t:'21–30°C',r:'Light',   note:'Post-monsoon. Navratri & Bathukamma.',               hotel:3,hotelNote:'Festival demand. Book early for Navratri.'},
+      {w:'☀️',t:'18–30°C',r:'Dry',    note:'Ideal weather. Diwali. Very pleasant.',              hotel:4,hotelNote:'Diwali demand. Book 4–6 weeks ahead.'},
+      {w:'☀️',t:'16–29°C',r:'Dry',    note:'Great conditions. Slightly cooler.',                 hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🥶',t:'12–26°C',r:'Dry',    note:'Cool nights. Christmas. Comfortable days.',          hotel:4,hotelNote:'Year-end demand. Book 4 weeks ahead.'}
+    ],
+    CCU:[ // Kolkata
+      {w:'🥶',t:'12–24°C',r:'Dry',    note:'Cool and pleasant. Post Durga Puja glow.',           hotel:3,hotelNote:'Moderate demand.'},
+      {w:'☀️',t:'13–27°C',r:'Dry',    note:'Best month. Saraswati Puja.',                        hotel:3,hotelNote:'Puja days book fast.'},
+      {w:'🌸',t:'18–31°C',r:'Dry',    note:'Spring. Holi festival. Flowers everywhere.',         hotel:3,hotelNote:'Holi demand.'},
+      {w:'☀️',t:'23–36°C',r:'Dry',    note:'Hot and humid. Low tourist period.',                 hotel:2,hotelNote:'Good deals.'},
+      {w:'🌡️',t:'27–38°C',r:'Pre-monsoon','note':'Pre-monsoon. Storms possible.',               hotel:2,hotelNote:'Low season rates.'},
+      {w:'🌧️',t:'27–34°C',r:'Heavy',  note:'Monsoon. Humidity very high.',                      hotel:1,hotelNote:'Cheapest rates. Very low demand.'},
+      {w:'⛈️',t:'26–32°C',r:'Very Heavy','note':'Peak monsoon. Flooding common.',               hotel:1,hotelNote:'Cheapest hotels of year.'},
+      {w:'🌧️',t:'26–32°C',r:'Heavy',  note:'Monsoon continues. Independence Day.',              hotel:2,hotelNote:'Low demand.'},
+      {w:'🌦️',t:'25–33°C',r:'Moderate','note':'Monsoon ending. Durga Puja preparations.',       hotel:4,hotelNote:'Durga Puja: FULLY BOOKED. Book 3+ months ahead.'},
+      {w:'⛅',t:'21–31°C',r:'Light',   note:'Post-puja. Kali Puja & Diwali.',                    hotel:4,hotelNote:'Festival season. Book 6 weeks ahead.'},
+      {w:'☀️',t:'16–28°C',r:'Dry',    note:'Pleasant cool season begins.',                       hotel:3,hotelNote:'Good demand. Book 4 weeks ahead.'},
+      {w:'🥶',t:'12–24°C',r:'Dry',    note:'Cool Christmas. Book fair & events.',                hotel:4,hotelNote:'Year-end demand. Book 4+ weeks ahead.'}
+    ],
+    TRV:[ // Trivandrum
+      {w:'☀️',t:'22–31°C',r:'Dry',    note:'Best season. Beaches perfect.',                      hotel:4,hotelNote:'High demand. Book 4–6 weeks ahead.'},
+      {w:'☀️',t:'23–32°C',r:'Dry',    note:'Great weather. Ideal beach holiday.',                hotel:3,hotelNote:'Good demand. Book 3 weeks ahead.'},
+      {w:'🌤️',t:'25–33°C',r:'Dry',    note:'Hot. Less crowded. Good deals.',                    hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'26–34°C',r:'Dry',    note:'Hot and humid. Off-peak.',                          hotel:2,hotelNote:'Good availability.'},
+      {w:'🌦️',t:'27–33°C',r:'Pre-monsoon','note':'Pre-monsoon showers begin.',                  hotel:2,hotelNote:'Low season rates.'},
+      {w:'🌧️',t:'24–28°C',r:'Very Heavy','note':'Peak monsoon. Beaches unsafe for swimming.',   hotel:1,hotelNote:'Very low demand. Up to 50% off hotels.'},
+      {w:'⛈️',t:'23–27°C',r:'Very Heavy','note':'Heaviest rains of year. Nature is stunning.',  hotel:1,hotelNote:'Cheapest rates. Ayurveda season.'},
+      {w:'🌧️',t:'23–28°C',r:'Heavy',  note:'Onam festival. Heavy rains easing.',               hotel:3,hotelNote:'Onam: book early. Hotels fill for the festival.'},
+      {w:'🌦️',t:'23–30°C',r:'Light',  note:'Post-monsoon. Greenery beautiful.',                 hotel:3,hotelNote:'Rising demand. Book 3 weeks ahead.'},
+      {w:'☀️',t:'22–30°C',r:'Dry',    note:'Season starts. Kerala temple festivals.',            hotel:4,hotelNote:'Season building. Book 5 weeks ahead.'},
+      {w:'☀️',t:'22–30°C',r:'Dry',    note:'Peak begins. Padmanabhaswamy temple events.',       hotel:4,hotelNote:'High demand. Book 6 weeks ahead.'},
+      {w:'☀️',t:'21–30°C',r:'Dry',    note:'Peak Christmas. Beach holiday season.',             hotel:5,hotelNote:'Fully booked. Book 3+ months ahead.'}
+    ],
+    AMD:[ // Ahmedabad
+      {w:'🥶',t:'11–25°C',r:'Dry',    note:'Cool and pleasant. Kite Festival (Uttarayan).',      hotel:4,hotelNote:'Uttarayan: fully booked 2 days. Book 2+ months ahead.'},
+      {w:'☀️',t:'12–28°C',r:'Dry',    note:'Best weather. Comfortable days.',                    hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🌤️',t:'17–33°C',r:'Dry',    note:'Warm. Holi festival.',                               hotel:3,hotelNote:'Holi demand.'},
+      {w:'🌡️',t:'23–39°C',r:'Dry',    note:'Very hot. Low tourist season.',                      hotel:1,hotelNote:'Cheapest rates. Business travel.'},
+      {w:'🌡️',t:'28–42°C',r:'Dry',    note:'Hottest. Extreme heat. Avoid outdoor.',             hotel:1,hotelNote:'Very low demand.'},
+      {w:'🌧️',t:'27–36°C',r:'Moderate','note':'Monsoon brings relief.',                          hotel:1,hotelNote:'Low season.'},
+      {w:'🌧️',t:'25–32°C',r:'Heavy',  note:'Peak monsoon. Flooded streets possible.',           hotel:1,hotelNote:'Cheapest hotels. Very low demand.'},
+      {w:'🌧️',t:'25–32°C',r:'Moderate','note':'Rains easing. Independence Day.',                hotel:2,hotelNote:'Low demand.'},
+      {w:'⛅',t:'23–33°C',r:'Light',   note:'Post-monsoon. Navratri festival.',                   hotel:5,hotelNote:'Navratri: FULLY BOOKED. Book 3+ months ahead.'},
+      {w:'☀️',t:'18–33°C',r:'Dry',    note:'Perfect weather. Diwali.',                           hotel:4,hotelNote:'Diwali demand. Book 4–6 weeks ahead.'},
+      {w:'☀️',t:'14–30°C',r:'Dry',    note:'Cool and pleasant.',                                  hotel:3,hotelNote:'Moderate demand.'},
+      {w:'🥶',t:'11–26°C',r:'Dry',    note:'Cool Christmas. Great for heritage walks.',          hotel:3,hotelNote:'Year-end demand. Book 3 weeks ahead.'}
+    ]
+  };
+
+  function _renderWeatherHotel(destCode, travelM, route){
+    var dw=DEST_WEATHER[destCode];
+    if(!dw) return '';
+    var w=dw[travelM];
+    var hotelColor=w.hotel>=5?'#ef4444':w.hotel>=4?'#f59e0b':w.hotel>=3?'#14b8a6':'#64748b';
+    var hotelBars='';
+    for(var i=1;i<=5;i++){
+      hotelBars+='<span class="fl-hotel-dot" style="background:'+(i<=w.hotel?hotelColor:'var(--border)')+'"></span>';
+    }
+    var hotelLabel=w.hotel>=5?'Fully Booked Season':w.hotel>=4?'High Demand':w.hotel>=3?'Moderate Demand':w.hotel>=2?'Easy Availability':'Very Low Demand';
+    return '<div class="fl-weather-card">'
+      +'<div class="fl-weather-top">'
+      +'<span class="fl-weather-icon">'+w.w+'</span>'
+      +'<div class="fl-weather-info">'
+      +'<div class="fl-weather-temp">'+w.t+'</div>'
+      +'<div class="fl-weather-rain">'+w.r+' &nbsp;&middot;&nbsp; '+w.note+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="fl-hotel-row">'
+      +'<span class="fl-hotel-label">&#127968; Hotel demand:</span>'
+      +'<div class="fl-hotel-dots">'+hotelBars+'</div>'
+      +'<span class="fl-hotel-grade" style="color:'+hotelColor+'">'+hotelLabel+'</span>'
+      +'</div>'
+      +'<div class="fl-hotel-note">'+w.hotelNote+'</div>'
+      +'</div>';
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -2969,7 +3143,54 @@ function closeNavDD(){
 
 
 
-  window.flPlanTrip=function(){
+
+  // ── BEST MONTH BAR CHART ─────────────────────────────────────
+  function _renderMonthChart(travelM, route, cur, cabinFareMult){
+    var avg=MONTHLY_IDX.reduce(function(a,b){return a+b;},0)/12;
+    // Sort to find cheapest/priciest
+    var sorted=MONTHLY_IDX.slice().sort(function(a,b){return a-b;});
+    var cheapThresh=sorted[2];   // top-3 cheapest
+    var peakThresh=sorted[9];    // top-3 priciest
+
+    var html='<div class="fl-mc-wrap">'
+      +'<div class="fl-mc-title">&#128197; Best months to fly — fare index vs average</div>'
+      +'<div class="fl-mc-bars">';
+
+    var maxIdx=Math.max.apply(null,MONTHLY_IDX);
+    for(var m=0;m<12;m++){
+      var idx=MONTHLY_IDX[m];
+      var barPct=Math.round((idx/maxIdx)*100);
+      var fare=Math.round(route.min*idx*cabinFareMult);
+      var fareMax=Math.round(route.max*idx*cabinFareMult);
+      var isCheap=idx<=cheapThresh;
+      var isPeak=idx>=peakThresh;
+      var isSel=m===travelM;
+      var pctVsAvg=Math.round((idx/avg-1)*100);
+      var pctLabel=(pctVsAvg>=0?'+':'')+pctVsAvg+'%';
+      var barCls=isSel?'fl-mc-bar-sel':isCheap?'fl-mc-bar-cheap':isPeak?'fl-mc-bar-peak':'fl-mc-bar-mid';
+
+      html+='<div class="fl-mc-col'+(isSel?' fl-mc-col-sel':'')+'">'
+        +'<div class="fl-mc-pct" style="'+(isCheap?'color:#14b8a6':isPeak?'color:#ef4444':'color:#64748b')+'">'+pctLabel+'</div>'
+        +'<div class="fl-mc-bar-track">'
+        +'<div class="fl-mc-bar '+barCls+'" style="height:'+barPct+'%"></div>'
+        +'</div>'
+        +'<div class="fl-mc-fare">'+cur+'<br>'+fare.toLocaleString()+'</div>'
+        +'<div class="fl-mc-mn">'+FL_MONTH_NAMES[m].slice(0,3)+'</div>'
+        +(isSel?'<div class="fl-mc-sel-dot">&#9650;</div>':'')
+        +'</div>';
+    }
+
+    html+='</div>'
+      +'<div class="fl-mc-legend">'
+      +'<span class="fl-mc-leg fl-mc-leg-cheap">&#9632; Cheapest months</span>'
+      +'<span class="fl-mc-leg fl-mc-leg-peak">&#9632; Peak / avoid</span>'
+      +'<span class="fl-mc-leg fl-mc-leg-sel">&#9650; Your month</span>'
+      +'</div>'
+      +'</div>';
+    return html;
+  }
+
+    window.flPlanTrip=function(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
     if(!inp||!res)return;
@@ -3077,6 +3298,12 @@ function closeNavDD(){
         }
       }
       if(festHtml) html+=festHtml;
+
+      // Weather + Hotel card
+      if(destCode) html+=_renderWeatherHotel(destCode,travelM,route);
+
+      // Best Month Bar Chart
+      html+=_renderMonthChart(travelM,route,cur,cabinFareMult);
 
       for(var wi=0;wi<windows.length;wi++){
         var w=windows[wi];
