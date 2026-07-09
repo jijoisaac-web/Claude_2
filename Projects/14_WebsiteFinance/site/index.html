@@ -320,6 +320,8 @@ progress{width:180px;accent-color:var(--blue);}
       <option value="meanrev">Mean reversion (tight stops)</option>
       <option value="trend">Trend rider</option>
       <option value="leaders">Leaders only (RS filter)</option>
+      <option value="highflyer">52-week-high momentum</option>
+      <option value="reversal">Reversal hunter</option>
       <option value="all">Everything (kitchen sink)</option>
     </select>
     <span class="muted" id="btTplNote"></span>
@@ -333,9 +335,16 @@ progress{width:180px;accent-color:var(--blue);}
     <label class="muted"><input type="checkbox" class="btSig" value="VOL_DRYUP"> Volume dry-up</label>
     <label class="muted"><input type="checkbox" class="btSig" value="RSI_OVERSOLD" checked> RSI oversold</label>
     <label class="muted"><input type="checkbox" class="btSig" value="BB_LOWER_TOUCH" checked> BB lower touch</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="GOLDEN_CROSS"> Golden cross</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="NEW_52W_HIGH"> New 52w high</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="SQUEEZE_BREAK"> Squeeze breakout</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="DOUBLE_BOTTOM"> Double bottom</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="RSI_BULL_DIV"> RSI divergence</label>
+    <label class="muted"><input type="checkbox" class="btSig" value="HAMMER_REVERSAL"> Hammer reversal</label>
   </div>
   <div class="controls" style="flex-wrap:wrap">
     <span class="muted">Require:</span>
+    <label class="muted"><input type="checkbox" id="btcAbove" checked> Above SMA200 only</label>
     <label class="muted"><input type="checkbox" id="btcTrend"> Trend aligned (P&gt;20&gt;50&gt;200)</label>
     <label class="muted"><input type="checkbox" id="btcADX"> ADX&gt;25 (+DI leading)</label>
     <label class="muted"><input type="checkbox" id="btcVol"> Volume ≥1.5x avg</label>

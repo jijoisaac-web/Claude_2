@@ -1,4 +1,4 @@
-/* v6.9 */
+/* v7.0 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1748,4 +1748,17 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 @media(max-width:640px){
   .fl-bc-best{font-size:.75rem;}
   .fl-bc-how{font-size:.7rem;}
+}
+
+/* ── FLIGHT ACCORDIONS v7.0 ─────────────────────────────────────────────── */
+.fl-acc{margin:12px 0;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.fl-acc-hd{width:100%;text-align:left;padding:14px 18px;background:var(--card);border:none;cursor:pointer;font-size:.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .2s;}
+.fl-acc-hd:hover{background:color-mix(in srgb,var(--accent) 8%,var(--card));}
+.fl-acc-hd::after{content:'\276F';font-size:.75rem;color:var(--muted);transform:rotate(90deg);transition:transform .25s;}
+.fl-acc-open::after{transform:rotate(-90deg);}
+.fl-acc-open{background:color-mix(in srgb,var(--accent) 6%,var(--card));}
+.fl-acc-body{padding:4px 12px 14px;background:var(--bg);}
+@media(max-width:640px){
+  .fl-acc-hd{font-size:.8rem;padding:12px 14px;}
+  .fl-acc-body{padding:4px 8px 12px;}
 }

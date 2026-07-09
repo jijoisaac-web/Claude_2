@@ -1,4 +1,4 @@
-/* v6.9 */
+/* v7.0 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3887,7 +3887,7 @@ function closeNavDD(){
       var windows=_dateWindows(travelM,tripDays);
       var fromCode=flData.origins[0]?flData.origins[0].code:'DXB';
 
-      // Buy Now vs Wait signal
+      // ── Buy Now signal (always visible) ──────────────────────────────────
       var sig=_getBuySignal(travelM,wks,mIdx,cur);
       html+='<div class="fl-signal fl-signal-'+sig.cls+'">'
         +'<div class="fl-signal-top">'
@@ -3898,7 +3898,7 @@ function closeNavDD(){
         +'<div class="fl-signal-tip">&#128161; '+sig.tip+'</div>'
         +'</div>';
 
-      // Festival check
+      // ── Fare Trends accordion (closed) ────────────────────────────────────
       var festHtml='';
       for(var fi=0;fi<FESTIVALS.length;fi++){
         if(FESTIVALS[fi].m===travelM){
@@ -3906,29 +3906,25 @@ function closeNavDD(){
           break;
         }
       }
-      if(festHtml) html+=festHtml;
+      var secFare=festHtml+_renderMonthChart(travelM,route,cur,cabinFareMult);
+      html+=_flAcc('&#128202; Monthly Fare Trends','',secFare,false);
 
-      // Weather + Hotel card
-      if(destCode) html+=_renderWeatherHotel(destCode,travelM,route);
+      // ── Destination Guide accordion (closed) ──────────────────────────────
+      var secDest='';
+      if(destCode) secDest+=_renderWeatherHotel(destCode,travelM,route);
+      if(destCode) secDest+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
+      if(secDest) html+=_flAcc('&#127760; Destination Guide','',secDest,false);
 
-      // Best Day to Book
-      html+=_renderBookingTips(route,cur,wks,cabinClass);
+      // ── Booking Strategy accordion (closed) ───────────────────────────────
+      var secBook='';
+      secBook+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
+      secBook+=_renderBookCurrency(cur,route);
+      secBook+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
+      secBook+=_renderBookingTips(route,cur,wks,cabinClass);
+      html+=_flAcc('&#9992; Booking Strategy','',secBook,false);
 
-      // Departure Airport Comparison
-      html+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
-
-      // Miles & Points Value
-      html+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
-
-      // Book in Which Currency
-      html+=_renderBookCurrency(cur,route);
-
-      // India Daily Cost Estimator
-      if(destCode) html+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
-
-      // Best Month Bar Chart
-      html+=_renderMonthChart(travelM,route,cur,cabinFareMult);
-
+      // ── Best Travel Dates accordion (open by default) ───────────────────────
+      var secDates='';
       for(var wi=0;wi<windows.length;wi++){
         var w=windows[wi];
         var depDate=w.dep;
@@ -3970,7 +3966,7 @@ function closeNavDD(){
           connTip='<div class="fl-win-conn">&#129351; Best via '+bh.via+' ('+bh.airline+') &mdash; '+bh.saving+'</div>';
         }
 
-        html+='<div class="fl-window'+(wi===0?' fl-window-best':'')+'">'
+        secDates+='<div class="fl-window'+(wi===0?' fl-window-best':'')+'">'
           +'<div class="fl-win-header">'
           +'<span class="fl-win-label">'+w.lv.badge+'</span>'
           +'<span class="fl-win-desc">'+w.why+'</span>'
@@ -3997,18 +3993,20 @@ function closeNavDD(){
           +'</div>';
       }
 
+      // Month summary appended to dates section
       // mIdx and wks already computed above
       var mGrade=mIdx<=0.73?'&#127802; Best Deals Season':mIdx<=0.90?'&#127845; Shoulder &mdash; Good Value':mIdx<=1.05?'&#9898; Average Fares':'&#128308; Peak &mdash; Expensive';
       var bookAdvice=wks<4?'&#9889; Under 4 weeks away &mdash; book immediately'
         :wks<8?'&#10003; Book this week for best fares'
         :wks<14?'Good time to compare &mdash; book within 3&ndash;4 weeks'
         :'Monitor prices; book 8&ndash;10 weeks before travel';
-      html+='<div class="fl-plan-section">'
+      secDates+='<div class="fl-plan-section">'
         +'<div class="fl-plan-row"><span>&#128197; '+FL_MONTH_NAMES[travelM]+' '+tYear+'</span><strong>'+mGrade+'</strong></div>'
         +'<div class="fl-plan-row"><span>&#8987; Booking window</span><span>~'+wks+' weeks away &nbsp;&middot;&nbsp; '+bookAdvice+'</span></div>'
         +'<div class="fl-plan-row"><span>&#8987; Flight duration</span><span>'+route.dur+'</span></div>'
         +'<div class="fl-plan-row"><span>&#9992; Airlines</span><span>'+route.airlines+'</span></div>'
         +'</div>';
+      html+=_flAcc('&#128197; Best Travel Dates','',secDates,true);
     } else if(travelM<0&&route){
       html+='<div class="fl-plan-section">'
         +'<div class="fl-plan-sub">&#128197; Mention a month to get exact date windows with pre-filled booking links.</div>'
