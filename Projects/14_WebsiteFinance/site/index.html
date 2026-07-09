@@ -133,6 +133,7 @@ progress{width:180px;accent-color:var(--blue);}
     <button data-tab="charts">Charts</button>
     <button data-tab="fundamentals">Fundamentals</button>
     <button data-tab="portfolio">Portfolio</button>
+    <button data-tab="track">Track Record</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -144,7 +145,7 @@ progress{width:180px;accent-color:var(--blue);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–7</b></td><td>Switch tabs (Dashboard → Portfolio)</td></tr>
+      <tr><td><b>1–8</b></td><td>Switch tabs (Dashboard → Track Record)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -176,9 +177,10 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="controls">
     <select id="universeSelect" onchange="loadScreener()">
       <option value="NIFTY 50">NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
       <option value="MIDCAP 150">MIDCAP 150</option>
       <option value="SMALLCAP 250">SMALLCAP 250</option>
-      <option value="ALL">All (~450 stocks)</option>
+      <option value="ALL">All (~500 stocks)</option>
     </select>
     <select id="signalFilter" onchange="renderScreener()">
       <option value="all">All stocks</option>
@@ -242,9 +244,10 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="controls">
     <select id="fsUniverse">
       <option value="NIFTY 50">NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
       <option value="MIDCAP 150">MIDCAP 150</option>
       <option value="SMALLCAP 250">SMALLCAP 250</option>
-      <option value="ALL">All (~450)</option>
+      <option value="ALL">All (~500)</option>
     </select>
     <select id="fsSector"><option value="">All sectors</option></select>
     <button class="btn ghost" onclick="addFilterRow()">+ Add filter</button>
@@ -290,6 +293,39 @@ progress{width:180px;accent-color:var(--blue);}
   </div>
   <h2>Observations</h2>
   <div id="pfSuggest"><div class="loading">…</div></div>
+</section>
+
+<!-- TRACK RECORD (backtest + paper trades) -->
+<section id="track" class="tab">
+  <h2>Paper trades — auto-recorded from the Ideas engine</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Every fresh scan records that day's short-term BUY ideas here as paper trades (one per stock per day, stored in your browser). Status updates against actual highs/lows: stop or target hit first wins; both same day counts as stopped (conservative).</div>
+  <div class="controls">
+    <button class="btn ghost" onclick="renderTrack(true)">↻ Update status</button>
+    <button class="btn ghost" onclick="ptClear()">Clear history</button>
+    <span class="muted" id="ptMeta"></span>
+  </div>
+  <div class="cards" id="ptSummary"></div>
+  <div id="ptTable"><div class="loading">No paper trades yet — run a scan on the Screener/Ideas tab and today's BUY ideas will be recorded.</div></div>
+
+  <h2 style="margin-top:24px">Backtest — replay the same buy rules on history</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Simulates the Ideas engine's short-term BUY rules (breakout, MACD cross, gap-up, pullback dip, RSI oversold, BB lower touch — all filtered to stocks above SMA200) on past data. Entry at signal close, stop/target as the engine sets them, 10-session cooldown per stock. Shows what happened 1w/2w/1m/3m later.</div>
+  <div class="controls">
+    <select id="btUniverse">
+      <option value="NIFTY 50">NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+    </select>
+    <select id="btLookback">
+      <option value="63">Last 3 months</option>
+      <option value="126" selected>Last 6 months</option>
+      <option value="252">Last 12 months</option>
+    </select>
+    <button class="btn" onclick="runBacktest()">▶ Run backtest</button>
+    <progress id="btProgress" style="display:none"></progress>
+    <span class="muted" id="btMeta"></span>
+  </div>
+  <div id="btResults"></div>
 </section>
 
 <!-- CHARTS -->
@@ -416,6 +452,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
   if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
+  if(b.dataset.tab==="track" && !window._trackLoaded) renderTrack();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -640,6 +677,7 @@ async function loadScreener(force){
   renderScreener();
   if(window._ideasLoaded) loadIdeas();
   renderPulse();
+  try{ recordPaperTrades(); }catch(e){}
 }
 function renderScreener(){
   if(!screenerData) return;
@@ -1452,8 +1490,187 @@ async function analyzePortfolio(){
   }
 }
 
+/* ================= track record: backtest + paper trades ================= */
+function atrSeries(c, p=14){
+  const out = new Array(c.length).fill(null); let atr = null;
+  for(let i=0;i<c.length;i++){
+    const tr = i===0 ? c[0].high-c[0].low :
+      Math.max(c[i].high-c[i].low, Math.abs(c[i].high-c[i-1].close), Math.abs(c[i].low-c[i-1].close));
+    atr = i===0 ? tr : (i<p ? (atr*i+tr)/(i+1) : (atr*(p-1)+tr)/p);
+    out[i] = atr;
+  }
+  return out;
+}
+// same short-term BUY rules as the Ideas engine, evaluated as-of bar i
+function evalBuyAt(e, atr, i){
+  const d = e[i];
+  if(d.sma200==null || d.close<=d.sma200) return null;
+  const a = atr[i]; if(!a) return null;
+  let sig = null, h20 = null;
+  if(i>=21){
+    let hi=-Infinity;
+    for(let k=i-20;k<i;k++) hi = Math.max(hi, e[k].high);
+    h20 = hi;
+    if(d.close>hi) sig = "BREAKOUT_20D";
+  }
+  if(!sig && i>=2 && e[i-2].macd_hist!=null && d.macd_hist!=null && e[i-2].macd_hist<0 && d.macd_hist>0) sig = "MACD_BULL_CROSS";
+  if(!sig && i>=1 && e[i-1].close && (d.open-e[i-1].close)/e[i-1].close>=0.03) sig = "GAP_UP";
+  if(!sig && i>=2 && [e[i-2],e[i-1],d].every(x=>x.close<x.open) && d.rsi14!=null && d.rsi14>=35 && d.rsi14<=55) sig = "PULLBACK_DIP";
+  if(!sig && d.rsi14!=null && d.rsi14<30) sig = "RSI_OVERSOLD";
+  if(!sig && d.bb_lower!=null && d.close<=d.bb_lower) sig = "BB_LOWER_TOUCH";
+  if(!sig) return null;
+  const stop = sig==="BREAKOUT_20D" && h20 ? Math.max(h20*0.99, d.close-1.5*a) : d.close-1.5*a;
+  return {signal:sig, entry:d.close, stop, target:d.close+2*(d.close-stop)};
+}
+function scanOutcome(c, i, t, maxHold=63){
+  for(let j=i+1; j<=Math.min(i+maxHold, c.length-1); j++){
+    if(c[j].low<=t.stop) return {status:"STOP", exitDate:c[j].time, real:(t.stop-t.entry)/t.entry*100};
+    if(c[j].high>=t.target) return {status:"TARGET", exitDate:c[j].time, real:(t.target-t.entry)/t.entry*100};
+  }
+  return {status: i+maxHold<=c.length-1 ? "TIMED OUT" : "OPEN", exitDate:null, real:null};
+}
+async function runBacktest(){
+  const uni = $("btUniverse").value, lookback = +$("btLookback").value;
+  const syms = Object.keys(UNIVERSES[uni]);
+  const prog = $("btProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
+  $("btMeta").textContent = "Fetching & simulating…";
+  const trades = [];
+  let nifty = [];
+  try{ nifty = toCandles(await fetchChart("^NSEI","2y","1d")); }catch(e){}
+  const nIdx = {}; nifty.forEach((d,i)=>nIdx[d.time]=i);
+  const nH = (date,n) => { const i = nIdx[date]; return i!=null && i+n<nifty.length ? (nifty[i+n].close-nifty[i].close)/nifty[i].close*100 : null; };
+  await pmap(syms, async sym=>{
+    let c; try{ c = toCandles(await fetchChart(sym,"2y","1d")); }catch(e){ return; }
+    if(c.length<280) return;
+    const e = enrich(c), atr = atrSeries(c);
+    let cooldown = 0;
+    for(let i=Math.max(220, c.length-lookback-63); i<c.length-1; i++){
+      if(cooldown>0){ cooldown--; continue; }
+      const t = evalBuyAt(e, atr, i);
+      if(!t) continue;
+      cooldown = 10;
+      const o = scanOutcome(c, i, t);
+      const H = n => i+n<c.length ? (c[i+n].close-t.entry)/t.entry*100 : null;
+      trades.push({sym, date:c[i].time, signal:t.signal, entry:t.entry, ...o,
+        r5:H(5), r10:H(10), r21:H(21), r63:H(63),
+        n5:nH(c[i].time,5), n10:nH(c[i].time,10), n21:nH(c[i].time,21), n63:nH(c[i].time,63)});
+    }
+  }, 6, ()=>prog.value++);
+  prog.style.display="none";
+  renderBacktest(trades, uni, lookback);
+}
+const avg = a => { const v=a.filter(x=>x!=null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : null; };
+function renderBacktest(trades, uni, lookback){
+  $("btMeta").textContent = `${trades.length} simulated trades · ${uni} · last ${Math.round(lookback/21)} months`;
+  if(!trades.length){ $("btResults").innerHTML = '<div class="loading">No signals fired in this window.</div>'; return; }
+  const closed = trades.filter(t=>t.status==="TARGET"||t.status==="STOP");
+  const winRate = closed.length ? closed.filter(t=>t.status==="TARGET").length/closed.length*100 : null;
+  const horizons = [["1 week","r5","n5"],["2 weeks","r10","n10"],["1 month","r21","n21"],["3 months","r63","n63"]];
+  const pctCell = v => v==null?"—":`<span class="${cls(v)}">${sign(v)}${fmt(v,2)}%</span>`;
+  $("btResults").innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="name">Trades</div><div class="price">${trades.length}</div>
+        <div class="chg muted">${closed.length} hit stop/target</div></div>
+      <div class="card"><div class="name">Win rate (target vs stop)</div>
+        <div class="price ${winRate!=null&&winRate>=50?"up":"down"}">${winRate!=null?fmt(winRate,0)+"%":"—"}</div>
+        <div class="chg muted">avg realised ${pctCell(avg(closed.map(t=>t.real)))}</div></div>
+      ${horizons.map(([label,rk,nk])=>`<div class="card"><div class="name">Avg after ${label} (held)</div>
+        <div class="price">${pctCell(avg(trades.map(t=>t[rk])))}</div>
+        <div class="chg muted">NIFTY same dates: ${pctCell(avg(trades.map(t=>t[nk])))}</div></div>`).join("")}
+    </div>
+    <h2>By signal type</h2>
+    <table><thead><tr><th>Signal</th><th>Trades</th><th>Win rate</th><th>Avg 1W</th><th>Avg 1M</th><th>Avg 3M</th></tr></thead><tbody>
+    ${[...new Set(trades.map(t=>t.signal))].map(sig=>{
+      const g = trades.filter(t=>t.signal===sig), gc = g.filter(t=>t.status==="TARGET"||t.status==="STOP");
+      const wr = gc.length? gc.filter(t=>t.status==="TARGET").length/gc.length*100 : null;
+      return `<tr><td>${sig.replaceAll("_"," ")}</td><td>${g.length}</td>
+        <td>${wr!=null?fmt(wr,0)+"%":"—"}</td><td>${pctCell(avg(g.map(t=>t.r5)))}</td>
+        <td>${pctCell(avg(g.map(t=>t.r21)))}</td><td>${pctCell(avg(g.map(t=>t.r63)))}</td></tr>`;}).join("")}
+    </tbody></table>
+    <h2>Most recent simulated trades</h2>
+    <table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th><th>Entry ₹</th><th>Outcome</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>
+    ${trades.slice(-40).reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
+      <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
+      <td style="text-align:left"><span class="badge neutral">${t.signal.replaceAll("_"," ")}</span></td>
+      <td>${fmt(t.entry)}</td>
+      <td><span class="badge ${t.status==="TARGET"?"bullish":t.status==="STOP"?"bearish":"neutral"}">${t.status}</span></td>
+      <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px">Backtests overstate reality: no brokerage/slippage/taxes, entries at exact closes, and today's index constituents didn't all exist a year ago (survivorship bias). Treat relative comparisons (signal vs signal, strategy vs NIFTY) as more trustworthy than absolute returns.</div>`;
+}
+
+/* ---- paper trades ---- */
+const PT_KEY = "ist_papertrades";
+function getPT(){ try{ return JSON.parse(localStorage.getItem(PT_KEY))||[]; }catch(e){ return []; } }
+function setPT(t){ localStorage.setItem(PT_KEY, JSON.stringify(t)); }
+function ptClear(){ if(confirm("Delete all paper trades?")){ setPT([]); renderTrack(); } }
+function recordPaperTrades(){
+  if(!screenerData) return;
+  const today = new Date().toISOString().slice(0,10);
+  const {shortT} = buildIdeas(screenerData.stocks);
+  const trades = getPT();
+  let added = 0;
+  for(const s of shortT.filter(x=>x.action==="BUY")){
+    if(trades.some(t=>t.sym===s.symbol && (t.status==="OPEN" || t.date===today))) continue;
+    trades.push({date:today, sym:s.symbol, signal:(s.signals[0]?.type)||"BUY",
+      entry:s.entry, stop:s.stop, target:s.target, status:"OPEN"});
+    added++;
+  }
+  if(added) setPT(trades);
+}
+async function renderTrack(force){
+  window._trackLoaded = true;
+  const trades = getPT();
+  $("ptMeta").textContent = `${trades.length} recorded`;
+  if(!trades.length){
+    $("ptSummary").innerHTML = "";
+    $("ptTable").innerHTML = '<div class="loading">No paper trades yet — run a scan on the Screener/Ideas tab and today\'s BUY ideas will be recorded.</div>';
+    return;
+  }
+  $("ptTable").innerHTML = '<div class="loading">Updating against market data…</div>';
+  const need = [...new Set(trades.filter(t=>!t.done).map(t=>t.sym))];
+  const charts = {};
+  await pmap(need, async s=>{ try{ charts[s] = toCandles(await fetchChart(s,"1y","1d")); }catch(e){} }, 6);
+  for(const t of trades){
+    const c = charts[t.sym]; if(!c || t.done) continue;
+    const i0 = c.findIndex(d=>d.time>=t.date);
+    if(i0<0) continue;
+    let status = "OPEN", exit = null;
+    for(let j=i0+1; j<c.length; j++){
+      if(c[j].low<=t.stop){ status="STOP"; exit=c[j].time; break; }
+      if(c[j].high>=t.target){ status="TARGET"; exit=c[j].time; break; }
+    }
+    t.status = status; t.exitDate = exit;
+    t.last = c[c.length-1].close;
+    const H = n => i0+n<c.length ? +( (c[i0+n].close-t.entry)/t.entry*100 ).toFixed(2) : null;
+    t.r5=H(5); t.r10=H(10); t.r21=H(21); t.r63=H(63);
+    if(t.r63!=null && status!=="OPEN") t.done = true;   // fully resolved — stop refetching
+  }
+  setPT(trades);
+  const open = trades.filter(t=>t.status==="OPEN"), closed = trades.filter(t=>t.status==="TARGET"||t.status==="STOP");
+  const wins = closed.filter(t=>t.status==="TARGET").length;
+  const pnl = t => t.status==="TARGET" ? (t.target-t.entry)/t.entry*100 : t.status==="STOP" ? (t.stop-t.entry)/t.entry*100 : t.last!=null ? (t.last-t.entry)/t.entry*100 : null;
+  const pctCell = v => v==null?"—":`<span class="${cls(v)}">${sign(v)}${fmt(v,2)}%</span>`;
+  $("ptSummary").innerHTML = [
+    ["Open", open.length], ["Closed", closed.length],
+    ["Win rate", closed.length?fmt(wins/closed.length*100,0)+"%":"—"],
+    ["Avg closed P&L", closed.length?pctCell(avg(closed.map(pnl))):"—"],
+    ["Avg 1-month (held)", pctCell(avg(trades.map(t=>t.r21)))],
+  ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
+  $("ptTable").innerHTML = `<table><thead><tr><th>Date</th><th>Stock</th><th style="text-align:left">Signal</th>
+    <th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th><th>Status</th><th>P&L</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>` +
+    [...trades].reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
+      <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
+      <td style="text-align:left"><span class="badge neutral">${(t.signal||"").replaceAll("_"," ")}</span></td>
+      <td>${fmt(t.entry)}</td><td>${fmt(t.stop)}</td><td>${fmt(t.target)}</td>
+      <td><span class="badge ${t.status==="TARGET"?"bullish":t.status==="STOP"?"bearish":"neutral"}">${t.status}${t.exitDate?" · "+t.exitDate:""}</span></td>
+      <td>${pctCell(pnl(t))}</td>
+      <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("") +
+    "</tbody></table>";
+}
+
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio"];
+const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
@@ -1486,7 +1703,7 @@ document.addEventListener("keydown", e=>{
   if(typing) return;
   if(e.key==="/"){ e.preventDefault(); $("globalSearch").focus(); }
   else if(e.key==="?"){ const h=$("kbdHelp"); h.style.display = h.style.display==="none"?"block":"none"; }
-  else if(/^[1-7]$/.test(e.key)){
+  else if(/^[1-8]$/.test(e.key)){
     const btn = document.querySelector(`nav button[data-tab="${TAB_ORDER[+e.key-1]}"]`);
     if(btn) btn.click();
   }

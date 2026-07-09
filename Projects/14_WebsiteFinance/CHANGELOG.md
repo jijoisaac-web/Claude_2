@@ -2,6 +2,18 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.2.0] — 2026-07-08 · Track Record
+
+- New **Track Record** tab (shortcut `8`) with two halves:
+- **Paper trades**: every fresh scan auto-records that day's short-term BUY ideas (one per stock per day, browser-stored). Status tracked against real highs/lows — TARGET or STOP (whichever touches first; same-day tie counts as stop), with P&L and held-returns after 1W/2W/1M/3M
+- **Backtest**: replays the exact Ideas-engine buy rules (breakout, MACD cross, gap-up, pullback dip, RSI oversold, BB touch — SMA200-filtered, same stop/target math, 10-session cooldown) over 3/6/12 months of history per universe. Reports win rate, average returns per horizon vs NIFTY on the same dates, per-signal-type performance, and the trade list
+- Honest-caveats footer: no slippage/costs, survivorship bias, close-price fills
+
+## [2.1.0] — 2026-07-08
+
+- Added NIFTY Next 50 universe (ranks 51–100: DMart, Pidilite, Siemens, HAL, Divi's, TVS Motor…) from the official NSE list — the app now covers the full Nifty 500
+- Next 50 appears in both screeners' universe pickers, search, charts, fundamentals and ideas; tagged LARGE cap; sector groups updated for peer comparison
+
 ## [2.0.0] — 2026-07-08 · Portfolio Analyzer + UX
 
 - New **Portfolio** tab: upload a CSV (`symbol, quantity, avg_price` — flexible separators, .NS optional) or add holdings manually; everything stays in the browser

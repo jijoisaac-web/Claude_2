@@ -1,4 +1,4 @@
-/* v6.1 */
+/* v6.2 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2916,6 +2916,59 @@ function closeNavDD(){
     flPlanTrip();
   };
 
+
+  // ── BUY NOW vs WAIT signal ──────────────────────────────────
+  function _getBuySignal(travelM, wksAway, mIdx, cur){
+    var hasFestival=false;
+    for(var fi=0;fi<FESTIVALS.length;fi++){
+      if(FESTIVALS[fi].m===travelM&&FESTIVALS[fi].spike>=50){hasFestival=true;break;}
+    }
+    var curMIdx=MONTHLY_IDX[new Date().getMonth()];
+    var rising=mIdx>curMIdx*1.05;
+    var dailyCost=Math.round(mIdx*120);
+
+    if(wksAway<=3){
+      return {cls:'signal-now',icon:'🔴',label:'Book Immediately',
+        reason:'Less than 3 weeks away — fares rising '+dailyCost.toLocaleString()+' '+cur+' daily. Every day of delay costs more.',
+        tip:'Open all 3 date windows and book the cheapest available seat today.'};
+    }
+    if(wksAway<=6){
+      if(hasFestival||rising){
+        return {cls:'signal-now',icon:'🔴',label:'Book This Week',
+          reason:'Peak or festival period — you are in the surge window. Fares will not drop from here.',
+          tip:'Pick your preferred date window and book within 2-3 days.'};
+      }
+      return {cls:'signal-soon',icon:'🟡',label:'Book Within 2 Weeks',
+        reason:'Good availability still exists but fares are rising as departure approaches.',
+        tip:'Set a price alert on Skyscanner. If fares rise 10%, book immediately.'};
+    }
+    if(wksAway<=10){
+      if(hasFestival){
+        return {cls:'signal-now',icon:'🔴',label:'Book Soon — Festival Surge',
+          reason:'Festival period drives heavy demand. Seats fill 8-10 weeks ahead on this route.',
+          tip:'Do not wait. Book the Best Price window (🟢) now.'};
+      }
+      if(rising){
+        return {cls:'signal-soon',icon:'🟡',label:'Book in Next 3 Weeks',
+          reason:'Travel month fares are rising above current levels. The climb has likely started.',
+          tip:'The 2nd week Tuesday window offers the best current value.'};
+      }
+      return {cls:'signal-wait',icon:'🟢',label:'Safe to Wait 2–3 Weeks',
+        reason:'You are in the sweet spot booking window. Fares are stable right now.',
+        tip:'Monitor prices weekly. Book once the fare holds steady for 3+ days in a row.'};
+    }
+    if(wksAway<=16){
+      return {cls:'signal-wait',icon:'🟢',label:'Monitor — Book in 4–6 Weeks',
+        reason:'Too early. Airlines may release cheaper seats closer to departure.',
+        tip:'Check prices weekly. Optimal booking window for this route is 6-10 weeks before travel.'};
+    }
+    return {cls:'signal-early',icon:'⬜',label:'Too Early to Book',
+      reason:'More than 4 months out. Initial fares are rarely the cheapest.',
+      tip:'Set a Skyscanner alert now and revisit in '+(wksAway-12)+' weeks.'};
+  }
+
+
+
   window.flPlanTrip=function(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
@@ -2924,7 +2977,6 @@ function closeNavDD(){
     if(!q){res.style.display='none';return;}
     var lq=q.toLowerCase();
 
-    // ── Parse destination ──
     var destMap={
       'mumbai':'BOM','bombay':'BOM','bom':'BOM',
       'delhi':'DEL','new delhi':'DEL','del':'DEL',
@@ -2941,7 +2993,6 @@ function closeNavDD(){
     for(var k in destMap){if(lq.indexOf(k)>=0){destCode=destMap[k];break;}}
     var d=destCode?DEST[destCode]:null;
 
-    // ── Parse travel month ──
     var mFull=['january','february','march','april','may','june','july','august','september','october','november','december'];
     var mShort=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
     var travelM=-1;
@@ -2949,13 +3000,11 @@ function closeNavDD(){
       if(lq.indexOf(mFull[i])>=0||lq.indexOf(mShort[i])>=0){travelM=i;break;}
     }
 
-    // ── Parse group size ──
     var gm=lq.match(/(\d+)\s*(person|people|pax|adults?|passenger|travell?er)/);
     var groupN=gm?parseInt(gm[1]):1;
     if(lq.indexOf('couple')>=0) groupN=2;
     if(lq.indexOf('family')>=0&&!gm) groupN=4;
 
-    // ── Parse budget ──
     var nums=(q.match(/[\d,]+/g)||[]).map(function(n){return parseInt(n.replace(/,/g,''));}).filter(function(n){return n>200;});
     var budget=nums.length?Math.max.apply(null,nums):null;
 
@@ -2968,7 +3017,6 @@ function closeNavDD(){
     var cabinFareMult=(cabinClass==='business')?bizMult:1.0;
     var economyOnly=route?_isEconomyOnly(route.airlines):false;
 
-    // ── Build result HTML ──
     var html='<div class="fl-plan">';
 
     // Duration picker
@@ -2981,40 +3029,50 @@ function closeNavDD(){
       +'<button class="fl-dur-btn'+(tripDays===14?' fl-dur-active':'')+'" onclick="flDurSet(14,this)">14 nights</button>'
       +'<button class="fl-dur-btn'+(tripDays===30?' fl-dur-active':'')+'" onclick="flDurSet(30,this)">30 nights</button>'
       +'</div>'
-      // Cabin class picker
       +'<div class="fl-cabin-row">'
       +'<span class="fl-dur-label">Cabin:</span>'
       +'<button class="fl-cabin-btn'+(_flCabinClass==='economy'?' fl-cabin-active':'')+'" onclick="flCabinSet(&quot;economy&quot;,this)">&#9992; Economy</button>'
       +'<button class="fl-cabin-btn'+(_flCabinClass==='business'?' fl-cabin-active':'')+'" onclick="flCabinSet(&quot;business&quot;,this)">&#128188; Business</button>'
       +'</div>';
 
-    // ── Header ──
     var destLabel=d?d.icon+' '+d.name:'India';
-    var cabinLabel=(_flCabinClass==='business')?'💼 Business':'✈ Economy';
-    html+='<div class="fl-plan-hd">✦ Date Decision Tool — '+cur+' → '+destLabel+' &nbsp;<span class="fl-cabin-badge">'+cabinLabel+'</span></div>';
+    var cabinLabel=(cabinClass==='business')?'&#128188; Business':'&#9992; Economy';
+    html+='<div class="fl-plan-hd">&#10022; Date Decision Tool &mdash; '+cur+' &rarr; '+destLabel+' &nbsp;<span class="fl-cabin-badge">'+cabinLabel+'</span></div>';
 
     if(!d){
-      html+='<div class="fl-plan-section"><div class="fl-plan-sub">💡 Mention a city: Mumbai, Goa, Kochi, Delhi, Bangalore, Hyderabad, Chennai, Kolkata, Trivandrum, Ahmedabad</div></div>';
+      html+='<div class="fl-plan-section"><div class="fl-plan-sub">&#128161; Mention a city: Mumbai, Goa, Kochi, Delhi, Bangalore, Hyderabad, Chennai, Kolkata, Trivandrum, Ahmedabad</div></div>';
     }
-
     if(!route&&d){
-      html+='<div class="fl-plan-section"><div class="fl-plan-sub">Route data not available for this origin. Try searching on <a href="https://www.skyscanner.net" target="_blank" rel="noopener" style="color:var(--teal)">Skyscanner</a>.</div></div>';
+      html+='<div class="fl-plan-section"><div class="fl-plan-sub">Route data not available for this origin.</div></div>';
     }
 
-    // ── 3 Date Windows (only if month + route known) ──
     if(travelM>=0&&route&&typeof route.min==='number'){
       var now=new Date();
       var tYear=now.getFullYear();
       var tDate=new Date(tYear,travelM,1);
       if(tDate<=now) tYear++;
+      var mIdx=MONTHLY_IDX[travelM];
+      var tDate2=new Date(tYear,travelM,1);
+      var wks=Math.max(0,Math.round((tDate2-now)/604800000));
       var windows=_dateWindows(travelM,tripDays);
       var fromCode=flData.origins[0]?flData.origins[0].code:'DXB';
+
+      // Buy Now vs Wait signal
+      var sig=_getBuySignal(travelM,wks,mIdx,cur);
+      html+='<div class="fl-signal fl-signal-'+sig.cls+'">'
+        +'<div class="fl-signal-top">'
+        +'<span class="fl-signal-icon">'+sig.icon+'</span>'
+        +'<span class="fl-signal-label">'+sig.label+'</span>'
+        +'</div>'
+        +'<div class="fl-signal-reason">'+sig.reason+'</div>'
+        +'<div class="fl-signal-tip">&#128161; '+sig.tip+'</div>'
+        +'</div>';
 
       // Festival check
       var festHtml='';
       for(var fi=0;fi<FESTIVALS.length;fi++){
         if(FESTIVALS[fi].m===travelM){
-          festHtml='<div class="fl-plan-festival">⚠️ <strong>'+FESTIVALS[fi].name+'</strong> in '+FL_MONTH_NAMES[travelM]+' — '+FESTIVALS[fi].note+'. Check dates overlap below.</div>';
+          festHtml='<div class="fl-plan-festival">&#9888;&#65039; <strong>'+FESTIVALS[fi].name+'</strong> in '+FL_MONTH_NAMES[travelM]+' &mdash; '+FESTIVALS[fi].note+'. Check dates overlap below.</div>';
           break;
         }
       }
@@ -3025,7 +3083,6 @@ function closeNavDD(){
         var depDate=w.dep;
         var retDate=w.ret;
 
-        // Fare estimates (w.idx is monthly price multiplier × cabin class)
         var rtMin=Math.round(route.min*w.idx*cabinFareMult);
         var rtMax=Math.round(route.max*w.idx*cabinFareMult);
         var outMin=Math.round(rtMin*0.55);
@@ -3036,10 +3093,8 @@ function closeNavDD(){
         var sepMax=outMax+retMax;
         var savMin=sepMin-rtMin;
         var savMax=sepMax-rtMax;
-        var savNote=savMin<0?'Save '+cur+' '+Math.abs(savMin).toLocaleString()+'–'+Math.abs(savMax).toLocaleString()+' vs RT'
-          :'Similar to round-trip price';
+        var savNote=savMin<0?'Save '+cur+' '+Math.abs(savMin).toLocaleString()+'&ndash;'+Math.abs(savMax).toLocaleString()+' vs RT':'Similar to round-trip price';
 
-        // Skyscanner URLs
         var depSK=_fmtSK(depDate);
         var retSK=_fmtSK(retDate);
         var _skCabin=cabinClass==='business'?'?cabin=business':'?cabin=economy';
@@ -3047,8 +3102,7 @@ function closeNavDD(){
         var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+_skCabin;
         var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/'+_skCabin;
 
-        // Group multiplier
-        var gMult=groupN>1?' (×'+groupN+')':'';
+        var gMult=groupN>1?' (&times;'+groupN+')':'';
         var grpRtMin=Math.round(rtMin*groupN);
         var grpRtMax=Math.round(rtMax*groupN);
         var grpOutMin=Math.round(outMin*groupN);
@@ -3058,12 +3112,11 @@ function closeNavDD(){
         var grpSepMin=grpOutMin+grpRetMin;
         var grpSepMax=grpOutMax+grpRetMax;
 
-        // Connection tip
         var connData=CONNECTIONS[cur];
         var connTip='';
         if(connData&&connData.longHaul&&connData.hubs&&connData.hubs.length){
           var bh=connData.hubs[0];
-          connTip='<div class="fl-win-conn">🥇 Best via '+bh.via+' ('+bh.airline+') — '+bh.saving+'</div>';
+          connTip='<div class="fl-win-conn">&#129351; Best via '+bh.via+' ('+bh.airline+') &mdash; '+bh.saving+'</div>';
         }
 
         html+='<div class="fl-window'+(wi===0?' fl-window-best':'')+'">'
@@ -3073,106 +3126,91 @@ function closeNavDD(){
           +'</div>'
           +'<div class="fl-win-dates">'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">DEPART</div><div class="fl-win-dt">'+_fmtLong(depDate)+'</div></div>'
-          +'<div class="fl-win-arrow">✈ '+tripDays+'n →</div>'
+          +'<div class="fl-win-arrow">&#9992; '+tripDays+'n &rarr;</div>'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">RETURN</div><div class="fl-win-dt">'+_fmtLong(retDate)+'</div></div>'
           +'</div>'
           +'<div class="fl-win-fares">'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">✈ Outbound'+gMult+' ('+fromCode+'→'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'–'+grpOutMax.toLocaleString()+'</strong></div>'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">✈ Return'+gMult+' ('+destCode+'→'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'–'+grpRetMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong></div>'
           +'<div class="fl-win-fare-sep"></div>'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">📊 Separate total'+gMult+'</span><strong class="fl-win-fare-val">'+cur+' '+grpSepMin.toLocaleString()+'–'+grpSepMax.toLocaleString()+'</strong></div>'
-          +'<div class="fl-win-fare-row fl-win-fare-muted"><span class="fl-win-fare-lbl">🔄 vs Round-trip'+gMult+'</span><span class="fl-win-fare-val">'+cur+' '+grpRtMin.toLocaleString()+'–'+grpRtMax.toLocaleString()+' &nbsp;·&nbsp; '+savNote+'</span></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#128202; Separate total'+gMult+'</span><strong class="fl-win-fare-val">'+cur+' '+grpSepMin.toLocaleString()+'&ndash;'+grpSepMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row fl-win-fare-muted"><span class="fl-win-fare-lbl">&#128260; vs Round-trip'+gMult+'</span><span class="fl-win-fare-val">'+cur+' '+grpRtMin.toLocaleString()+'&ndash;'+grpRtMax.toLocaleString()+' &nbsp;&middot;&nbsp; '+savNote+'</span></div>'
           +'</div>'
+          +(economyOnly&&cabinClass==='business'?'<div class="fl-win-economy-note">&#9888;&#65039; Most flights on this route ('+route.airlines+') are <strong>economy-only</strong>. Check Air India or Emirates for business class.</div>':'')
           +connTip
-          +(economyOnly&&cabinClass==='business'?'<div class="fl-win-economy-note">⚠️ Most flights on this route ('+route.airlines+') are <strong>economy-only</strong>. Check Air India or Emirates for business class availability.</div>':'')
           +'<div class="fl-win-btns">'
-          +'<a class="fl-win-btn fl-win-btn-main" href="'+skRT+'" target="_blank" rel="noopener">Round-trip ↗</a>'
-          +'<a class="fl-win-btn" href="'+skOut+'" target="_blank" rel="noopener">Outbound only ↗</a>'
-          +'<a class="fl-win-btn" href="'+skRet+'" target="_blank" rel="noopener">Return only ↗</a>'
+          +'<a class="fl-win-btn fl-win-btn-main" href="'+skRT+'" target="_blank" rel="noopener">Round-trip &#8599;</a>'
+          +'<a class="fl-win-btn" href="'+skOut+'" target="_blank" rel="noopener">Outbound only &#8599;</a>'
+          +'<a class="fl-win-btn" href="'+skRet+'" target="_blank" rel="noopener">Return only &#8599;</a>'
           +'</div>'
           +'</div>';
       }
 
-      // Month grade summary
-      var mIdx=MONTHLY_IDX[travelM];
-      var mGrade=mIdx<=0.73?'🟢 Best Deals Season':mIdx<=0.90?'🟡 Shoulder — Good Value':mIdx<=1.05?'⚪ Average Fares':'🔴 Peak — Expensive';
-      var now2=new Date();
-      var tDate2=new Date(tYear,travelM,1);
-      var wks=Math.round((tDate2-now2)/604800000);
-      var bookAdvice=wks<4?'⚡ Under 4 weeks away — book immediately'
-        :wks<8?'✓ Book this week for best fares'
-        :wks<14?'Good time to compare — book within 3–4 weeks'
-        :'Monitor prices; book 8–10 weeks before travel';
+      // mIdx and wks already computed above
+      var mGrade=mIdx<=0.73?'&#127802; Best Deals Season':mIdx<=0.90?'&#127845; Shoulder &mdash; Good Value':mIdx<=1.05?'&#9898; Average Fares':'&#128308; Peak &mdash; Expensive';
+      var bookAdvice=wks<4?'&#9889; Under 4 weeks away &mdash; book immediately'
+        :wks<8?'&#10003; Book this week for best fares'
+        :wks<14?'Good time to compare &mdash; book within 3&ndash;4 weeks'
+        :'Monitor prices; book 8&ndash;10 weeks before travel';
       html+='<div class="fl-plan-section">'
-        +'<div class="fl-plan-row"><span>📅 '+FL_MONTH_NAMES[travelM]+' '+tYear+'</span><strong>'+mGrade+'</strong></div>'
-        +'<div class="fl-plan-row"><span>⏱ Booking window</span><span>~'+wks+' weeks away &nbsp;·&nbsp; '+bookAdvice+'</span></div>'
-        +'<div class="fl-plan-row"><span>⏱ Flight duration</span><span>'+route.dur+'</span></div>'
-        +'<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>'
+        +'<div class="fl-plan-row"><span>&#128197; '+FL_MONTH_NAMES[travelM]+' '+tYear+'</span><strong>'+mGrade+'</strong></div>'
+        +'<div class="fl-plan-row"><span>&#8987; Booking window</span><span>~'+wks+' weeks away &nbsp;&middot;&nbsp; '+bookAdvice+'</span></div>'
+        +'<div class="fl-plan-row"><span>&#8987; Flight duration</span><span>'+route.dur+'</span></div>'
+        +'<div class="fl-plan-row"><span>&#9992; Airlines</span><span>'+route.airlines+'</span></div>'
         +'</div>';
     } else if(travelM<0&&route){
-      // No month — show range only
       html+='<div class="fl-plan-section">'
-        +'<div class="fl-plan-sub">📅 Mention a month to get exact date windows with pre-filled booking links.</div>'
-        +'<div class="fl-plan-row"><span>✈ Price range'+( groupN>1?' (×'+groupN+')':'')+' per person</span><strong>'+cur+' '+route.min.toLocaleString()+'–'+route.max.toLocaleString()+'</strong></div>'
-        +'<div class="fl-plan-row"><span>⏱ Flight time</span><span>'+route.dur+'</span></div>'
-        +'<div class="fl-plan-row"><span>✈ Airlines</span><span>'+route.airlines+'</span></div>'
+        +'<div class="fl-plan-sub">&#128197; Mention a month to get exact date windows with pre-filled booking links.</div>'
+        +'<div class="fl-plan-row"><span>&#9992; Price range'+(groupN>1?' (&times;'+groupN+')':'')+' per person</span><strong>'+cur+' '+route.min.toLocaleString()+'&ndash;'+route.max.toLocaleString()+'</strong></div>'
+        +'<div class="fl-plan-row"><span>&#8987; Flight time</span><span>'+route.dur+'</span></div>'
+        +'<div class="fl-plan-row"><span>&#9992; Airlines</span><span>'+route.airlines+'</span></div>'
         +'</div>';
     }
 
-    // ── Budget breakdown ──
     if(budget&&route&&typeof route.min==='number'){
-      var flMin=route.min*groupN, flMax=route.max*groupN;
+      var flMin=route.min*cabinFareMult*groupN;
+      var flMax=route.max*cabinFareMult*groupN;
       var rem=budget-flMin;
       html+='<div class="fl-plan-section">';
-      html+='<div class="fl-plan-row"><span>💰 Your budget</span><strong>'+cur+' '+budget.toLocaleString()+'</strong></div>';
-      html+='<div class="fl-plan-row"><span>✈ Flights ('+groupN+'×, min estimate)</span><span>−'+cur+' '+Math.round(flMin).toLocaleString()+'</span></div>';
+      html+='<div class="fl-plan-row"><span>&#128176; Your budget</span><strong>'+cur+' '+budget.toLocaleString()+'</strong></div>';
+      html+='<div class="fl-plan-row"><span>&#9992; Flights ('+groupN+'&times;, min est.)</span><span>&minus;'+cur+' '+Math.round(flMin).toLocaleString()+'</span></div>';
       if(rem>0){
         var rate=typeof midRate==='number'&&midRate>0?midRate:85;
         var remINR=Math.round(rem*rate);
         var days=tripDays;
         var pdINR=Math.round(remINR/days);
-        var comfort=pdINR>15000?'Luxury — 4★ hotels, fine dining, activities'
-          :pdINR>8000?'Comfortable — good hotels, mix of dining'
-          :pdINR>4000?'Budget-friendly — guesthouses, local food'
-          :'Very tight — plan every expense carefully';
-        html+='<div class="fl-plan-row"><span>🏨 Hotels + local (remaining)</span><strong>'+cur+' '+Math.round(rem).toLocaleString()+'</strong></div>';
-        html+='<div class="fl-plan-row"><span>₹ India spending</span><span>≈ ₹'+remINR.toLocaleString()+' ('+days+' nights)</span></div>';
-        html+='<div class="fl-plan-row"><span>📅 Daily India budget</span><span>≈ ₹'+pdINR.toLocaleString()+'/day</span></div>';
+        var comfort=pdINR>15000?'Luxury &mdash; 4&#9733; hotels, fine dining, activities'
+          :pdINR>8000?'Comfortable &mdash; good hotels, mix of dining'
+          :pdINR>4000?'Budget-friendly &mdash; guesthouses, local food'
+          :'Very tight &mdash; plan every expense carefully';
+        html+='<div class="fl-plan-row"><span>&#127968; Hotels + local (remaining)</span><strong>'+cur+' '+Math.round(rem).toLocaleString()+'</strong></div>';
+        html+='<div class="fl-plan-row"><span>&#8377; India spending</span><span>&asymp; &#8377;'+remINR.toLocaleString()+' ('+days+' nights)</span></div>';
+        html+='<div class="fl-plan-row"><span>&#128197; Daily India budget</span><span>&asymp; &#8377;'+pdINR.toLocaleString()+'/day</span></div>';
         html+='<div class="fl-plan-advice">'+comfort+'</div>';
       } else {
-        html+='<div class="fl-plan-advice">⚠️ Budget may be tight for '+groupN+' traveller'+(groupN>1?'s':'')+' (min est. '+cur+' '+Math.round(flMin).toLocaleString()+') — increase budget or travel solo.</div>';
+        html+='<div class="fl-plan-advice">&#9888;&#65039; Budget may be tight for '+groupN+' traveller'+(groupN>1?'s':'')+' &mdash; min est. '+cur+' '+Math.round(flMin).toLocaleString()+'</div>';
       }
       html+='</div>';
     }
 
-    // ── Best connections (long-haul only, summary) ──
-    var connData2=CONNECTIONS[cur];
-    if(connData2&&connData2.longHaul&&destCode&&!route){
-      html+='<div class="fl-plan-section">'
-        +'<div class="fl-plan-sec-hd">✈ Long-haul routing to '+destLabel+'</div>'
-        +'<div class="fl-plan-sub">'+connData2.directHrs+'</div>'
-        +'</div>';
-    }
-
-    html+='</div>'; // .fl-plan
+    html+='</div>';
     res.innerHTML=html;
     res.style.display='block';
   };
 
-  // Hook showTab
+  // Hook showTab — init flights when tab is opened
   var _flShowOrig=window.showTab;
-  window.showTab=function(tabId,el){
-    if(typeof _flShowOrig==='function') _flShowOrig(tabId,el);
-    if(tabId==='flights') setTimeout(initFlights,30);
-  };
-  // Re-render on currency change (hook selectCurrency)
-  var _flCurOrig=window.selectCurrency;
-  window.selectCurrency=function(el){
-    if(typeof _flCurOrig==='function') _flCurOrig(el);
-    var flEl=document.getElementById('tab-flights');
-    if(flEl&&flEl.style.display!=='none'){
-      setTimeout(initFlights,80);
+  window.showTab=function(tab,el){
+    if(typeof _flShowOrig==='function') _flShowOrig(tab,el);
+    if(tab==='flights'&&typeof window.initFlights==='function'){
+      setTimeout(window.initFlights,80);
     }
   };
+  document.addEventListener('DOMContentLoaded',function(){
+    if(document.getElementById('tab-flights')&&
+       document.getElementById('tab-flights').style.display!=='none'&&
+       typeof window.initFlights==='function'){
+      window.initFlights();
+    }
+  });
 })();
-// ── END FLIGHTS ────────────────────────────────────────────────────────────
