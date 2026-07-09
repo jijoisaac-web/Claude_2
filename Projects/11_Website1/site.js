@@ -1,4 +1,4 @@
-/* v6.5 */
+/* v6.6 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3085,6 +3085,104 @@ function closeNavDD(){
     return html;
   }
 
+
+  // ── INDIA DAILY COST ESTIMATOR ───────────────────────────────────────────
+  // Per city, 3 tiers. All costs in INR/day per person.
+  // hotel=per night, food=meals, transport=local, act=activities/entry
+  var CITY_COSTS={
+    GOI:{city:'Goa',
+      budget:{total:2500, hotel:800,  food:900,  transport:400, act:400, note:'Guesthouse near beach, beach shacks & local joints, scooter rental, free beaches'},
+      mid:   {total:6500, hotel:3000, food:1800, transport:800, act:900, note:'Beach resort or boutique hotel, mix of cafes & restaurants, taxi/Ola, water sports'},
+      luxury:{total:18000,hotel:10000,food:4000, transport:2000,act:2000,note:'5-star resort, fine dining, private transfers, premium water sports & spa'}
+    },
+    COK:{city:'Kochi',
+      budget:{total:2000, hotel:700,  food:700,  transport:300, act:300, note:'Homestay, Kerala meals & local eateries, bus & auto, Fort Kochi walk'},
+      mid:   {total:5000, hotel:2200, food:1500, transport:700, act:600, note:'Heritage hotel, seafood restaurants, Ola/cab, houseboat day trip'},
+      luxury:{total:14000,hotel:7500, food:3000, transport:1500,act:2000,note:'Luxury houseboat overnight, fine dining, private driver, Ayurveda treatments'}
+    },
+    BOM:{city:'Mumbai',
+      budget:{total:2800, hotel:900,  food:900,  transport:500, act:500, note:'Budget hotel in suburbs, local trains & dabba food, Marine Drive & free sights'},
+      mid:   {total:7000, hotel:3500, food:1800, transport:800, act:900, note:'3-star business hotel, mid-range restaurants, Uber, Gateway of India tours'},
+      luxury:{total:20000,hotel:12000,food:4500, transport:2000,act:1500,note:'Taj/Oberoi, fine dining at Trishna or Trisha, private car, Elephanta premium tour'}
+    },
+    DEL:{city:'Delhi',
+      budget:{total:2200, hotel:700,  food:700,  transport:400, act:400, note:'Budget guesthouse in Paharganj, dhabas & street food, Metro, Old Delhi walk'},
+      mid:   {total:5500, hotel:2500, food:1500, transport:700, act:800, note:'3-star hotel near Connaught Place, restaurants, Uber, Qutub Minar & museum entry'},
+      luxury:{total:18000,hotel:10000,food:4000, transport:2000,act:2000,note:'ITC Maurya or Leela, fine dining, private chauffeur, exclusive heritage tours'}
+    },
+    BLR:{city:'Bangalore',
+      budget:{total:2000, hotel:700,  food:700,  transport:350, act:250, note:'PG or budget hotel, Darshinis (local eateries), Metro & bus, Lalbagh & Cubbon Park'},
+      mid:   {total:5000, hotel:2200, food:1500, transport:600, act:700, note:'3-star hotel, cafes & restaurants, Ola, tech parks & brewery tours'},
+      luxury:{total:15000,hotel:8000, food:3500, transport:1500,act:2000,note:'JW Marriott or ITC Windsor, fine dining, private car, vineyard day trips'}
+    },
+    MAA:{city:'Chennai',
+      budget:{total:2000, hotel:650,  food:700,  transport:350, act:300, note:'Budget lodge, filter coffee & meals, bus & auto, Marina Beach & temples'},
+      mid:   {total:5000, hotel:2200, food:1500, transport:600, act:700, note:'3-star hotel, seafood & restaurants, cab, Mahabalipuram day trip'},
+      luxury:{total:16000,hotel:9000, food:3500, transport:1500,act:2000,note:'ITC Grand Chola or Taj Coromandel, fine dining, private driver, temple circuit'}
+    },
+    HYD:{city:'Hyderabad',
+      budget:{total:2000, hotel:650,  food:700,  transport:350, act:300, note:'Budget hotel near Old City, biryani & irani chai, TSRTC bus, Charminar area'},
+      mid:   {total:5000, hotel:2200, food:1500, transport:600, act:700, note:'3-star hotel, Bawarchi & Paradise biryani, Ola, Golconda Fort & Ramoji'},
+      luxury:{total:15000,hotel:8500, food:3000, transport:1500,act:2000,note:'Taj Falaknuma Palace or ITC Kohenur, fine dining, private transfers, Nizam heritage tours'}
+    },
+    CCU:{city:'Kolkata',
+      budget:{total:1800, hotel:600,  food:600,  transport:300, act:300, note:'Guest house, mishti doi & kathi rolls, tram & Metro, Victoria Memorial free gardens'},
+      mid:   {total:4500, hotel:2000, food:1300, transport:600, act:600, note:'3-star hotel, Arsalan biryani & restaurants, Uber, Museum & Howrah Bridge tour'},
+      luxury:{total:14000,hotel:8000, food:3000, transport:1500,act:1500,note:'Taj Bengal or ITC Royal Bengal, fine dining, private car, exclusive heritage & cultural tours'}
+    },
+    TRV:{city:'Trivandrum',
+      budget:{total:1800, hotel:600,  food:650,  transport:300, act:250, note:'Homestay, Kerala sadya & tea shops, bus & auto, Padmanabhaswamy Temple area'},
+      mid:   {total:4500, hotel:2000, food:1300, transport:600, act:600, note:'3-star hotel, seafood & Keralite cuisine, cab, Kovalam beach & backwaters'},
+      luxury:{total:13000,hotel:7000, food:3000, transport:1500,act:1500,note:'Leela Kovalam or Taj Green Cove, Ayurveda resort, private driver, houseboat overnight'}
+    },
+    AMD:{city:'Ahmedabad',
+      budget:{total:1800, hotel:600,  food:600,  transport:300, act:300, note:'Guest house, thali & street food, BRTS bus & auto, Sabarmati Ashram (free entry)'},
+      mid:   {total:4500, hotel:2000, food:1200, transport:600, act:700, note:'3-star hotel, Agashiye rooftop restaurant, Ola, Heritage walk & Adalaj step well'},
+      luxury:{total:13000,hotel:7000, food:2800, transport:1500,act:1700,note:'House of MG or Hyatt, fine Gujarati dining, private car, Modhera Sun Temple day trip'}
+    }
+  };
+
+  function _renderCityCosts(destCode, tripDays, groupN, midRateVal){
+    var cc=CITY_COSTS[destCode];
+    if(!cc) return '';
+    var days=tripDays||7;
+    var pax=groupN||1;
+    var rate=midRateVal||85; // fallback INR rate
+
+    function tripTotal(daily){ return Math.round(daily*days*pax); }
+    function toFx(inr){ return Math.round(inr/rate); }
+
+    var tiers=[
+      {key:'budget',label:'&#127807; Budget',color:'#14b8a6', data:cc.budget},
+      {key:'mid',   label:'&#11088; Mid-range',color:'#f59e0b',data:cc.mid},
+      {key:'luxury',label:'&#128081; Luxury',  color:'#6366f1', data:cc.luxury}
+    ];
+
+    var html='<div class="fl-cost-card">'
+      +'<div class="fl-cost-title">&#128176; '+cc.city+' — daily spend per person (INR)</div>'
+      +'<div class="fl-cost-tiers">';
+
+    for(var ti=0;ti<tiers.length;ti++){
+      var t=tiers[ti]; var d=t.data;
+      var tripT=tripTotal(d.total);
+      html+='<div class="fl-cost-tier">'
+        +'<div class="fl-cost-tier-hd" style="color:'+t.color+'">'+t.label+'</div>'
+        +'<div class="fl-cost-total">&#8377;'+d.total.toLocaleString()+'/day</div>'
+        +'<div class="fl-cost-breakdown">'
+        +'<div class="fl-cost-row"><span>&#127968; Hotel/night</span><span>&#8377;'+d.hotel.toLocaleString()+'</span></div>'
+        +'<div class="fl-cost-row"><span>&#127860; Food</span><span>&#8377;'+d.food.toLocaleString()+'</span></div>'
+        +'<div class="fl-cost-row"><span>&#128663; Transport</span><span>&#8377;'+d.transport.toLocaleString()+'</span></div>'
+        +'<div class="fl-cost-row"><span>&#127981; Activities</span><span>&#8377;'+d.act.toLocaleString()+'</span></div>'
+        +'</div>'
+        +'<div class="fl-cost-trip">'+days+'n &times;'+pax+' = &#8377;'+tripT.toLocaleString()+'</div>'
+        +'<div class="fl-cost-note">'+d.note+'</div>'
+        +'</div>';
+    }
+
+    html+='</div></div>';
+    return html;
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -3398,6 +3496,9 @@ function closeNavDD(){
 
       // Best Day to Book
       html+=_renderBookingTips(route,cur,wks,cabinClass);
+
+      // India Daily Cost Estimator
+      if(destCode) html+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
 
       // Best Month Bar Chart
       html+=_renderMonthChart(travelM,route,cur,cabinFareMult);
