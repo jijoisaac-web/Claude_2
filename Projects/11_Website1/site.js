@@ -1,4 +1,4 @@
-/* v7.0 */
+/* v7.1 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3799,6 +3799,24 @@ function closeNavDD(){
     return html;
   }
 
+  // ── ACCORDION TOGGLE + HELPER ──────────────────────────────────────────
+  window._flT=function(btn){
+    btn.classList.toggle('fl-acc-open');
+    var c=btn.nextElementSibling;
+    c.style.display=c.style.display==='none'?'block':'none';
+  };
+  function _flAcc(title,body,open){
+    if(!body||!body.trim()) return '';
+    return '<div class="fl-acc">'
+      +'<button class="fl-acc-hd'+(open?' fl-acc-open':'')+'" onclick="_flT(this)">'
+      +title
+      +'</button>'
+      +'<div class="fl-acc-body" style="display:'+(open?'block':'none')+'">'
+      +body
+      +'</div>'
+      +'</div>';
+  }
+
     window.flPlanTrip=function(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
@@ -3907,13 +3925,13 @@ function closeNavDD(){
         }
       }
       var secFare=festHtml+_renderMonthChart(travelM,route,cur,cabinFareMult);
-      html+=_flAcc('&#128202; Monthly Fare Trends','',secFare,false);
+      html+=_flAcc('&#128202; Monthly Fare Trends',secFare,false);
 
       // ── Destination Guide accordion (closed) ──────────────────────────────
       var secDest='';
       if(destCode) secDest+=_renderWeatherHotel(destCode,travelM,route);
       if(destCode) secDest+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
-      if(secDest) html+=_flAcc('&#127760; Destination Guide','',secDest,false);
+      if(secDest) html+=_flAcc('&#127760; Destination Guide',secDest,false);
 
       // ── Booking Strategy accordion (closed) ───────────────────────────────
       var secBook='';
@@ -3921,7 +3939,7 @@ function closeNavDD(){
       secBook+=_renderBookCurrency(cur,route);
       secBook+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
       secBook+=_renderBookingTips(route,cur,wks,cabinClass);
-      html+=_flAcc('&#9992; Booking Strategy','',secBook,false);
+      html+=_flAcc('&#9992; Booking Strategy',secBook,false);
 
       // ── Best Travel Dates accordion (open by default) ───────────────────────
       var secDates='';
@@ -4006,7 +4024,7 @@ function closeNavDD(){
         +'<div class="fl-plan-row"><span>&#8987; Flight duration</span><span>'+route.dur+'</span></div>'
         +'<div class="fl-plan-row"><span>&#9992; Airlines</span><span>'+route.airlines+'</span></div>'
         +'</div>';
-      html+=_flAcc('&#128197; Best Travel Dates','',secDates,true);
+      html+=_flAcc('&#128197; Best Travel Dates',secDates,true);
     } else if(travelM<0&&route){
       html+='<div class="fl-plan-section">'
         +'<div class="fl-plan-sub">&#128197; Mention a month to get exact date windows with pre-filled booking links.</div>'

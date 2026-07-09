@@ -2874,6 +2874,7 @@ function closeBankImport(){
 function detectBank(filename, preview){
   const fn=filename.toLowerCase(), p=preview.toLowerCase();
   if(fn.includes('tng')||fn.includes('touchngo')||fn.includes('touch_n_go')||p.includes('touch 'n go')||p.includes('ewallet')) return 'tng';
+  if(/statement of credit card/i.test(p)||/maybank 2 plat/i.test(p)) return 'maybank-cc';
   if((fn.includes('maybank')||fn.includes('mbb'))&&(fn.includes('cc')||fn.includes('credit')||fn.includes('card'))) return 'maybank-cc';
   if(fn.includes('maybank')||fn.includes('mbb')||p.includes('maybank berhad')||p.includes('malayan banking')) return 'maybank-sav';
   if(fn.includes('scb')||fn.includes('standard')||fn.includes('chartered')||p.includes('standard chartered')) return 'scb';
@@ -2997,6 +2998,24 @@ function matchCategory(desc){
     {keys:['badminton','gym','sport','swimming','futsal'],fn:c=>/sport|gym|fitness/i.test(c.name)},
     {keys:['transfer','duitnow','ibg','rentas'],fn:c=>/transfer|savings/i.test(c.name)},
     {keys:['maybank credit','credit card payment','cc payment'],fn:c=>/credit card|maybank cc|scb/i.test(c.name)},
+    // Maybank CC specific
+    {keys:['nsk grocer','jaya grocer','village grocer','cold storage','tesco','mydin','giant','aeon big'],fn:c=>/grocery|supermarket|market/i.test(c.name)},
+    {keys:['modern store','99 speedmart','mydin'],fn:c=>/grocery|mart|supermarket/i.test(c.name)},
+    {keys:['shell ','petron ','shell-','caltex','bhp petrol'],fn:c=>/petrol|fuel|car/i.test(c.name)},
+    {keys:['apsb mex','apsb','plus tol','lpt tol','tol ','highway tol'],fn:c=>/toll|tol|car/i.test(c.name)},
+    {keys:['tng-ewallet','t n g ewallet','tng ewallet'],fn:c=>/touch|tng|toll|ewallet/i.test(c.name)},
+    {keys:['my tnb','tnb-ec','tenaga'],fn:c=>/electric|utility|tnb/i.test(c.name)},
+    {keys:['time dotcom','unifi ','maxis ','celcom ','digi '],fn:c=>/internet|phone|telco|utility/i.test(c.name)},
+    {keys:['gsc-','tgv ','mbo cinema','cinema'],fn:c=>/entertainment|cinema|leisure/i.test(c.name)},
+    {keys:['shopee my','lazada','amazon','zalora'],fn:c=>/shopping|online|shopee/i.test(c.name)},
+    {keys:['grab-ec','grab car','myrapid','rapidkl'],fn:c=>/transport|grab|commute/i.test(c.name)},
+    {keys:['ps otomobil','servis kereta','bengkel','workshop','auto'],fn:c=>/car service|maintenance|auto/i.test(c.name)},
+    {keys:['mr diy','ace hardware','builder'],fn:c=>/hardware|home|diy/i.test(c.name)},
+    {keys:['padini','uniqlo','h&m','zara','cotton on','brands outlet'],fn:c=>/cloth|fashion|shopping|apparel/i.test(c.name)},
+    {keys:['sang suria','jnt mgmt','parcel management','maintenance fee'],fn:c=>/maintenance|condo|management/i.test(c.name)},
+    {keys:['sangeetha','mr naan','mrs idly','restoran al bidayah','betel leaf','hameed nasi','jj chili','you lin','familymart','hawker','claypot','mamak'],fn:c=>/food|dining|eat|resto/i.test(c.name)},
+    {keys:['rs pro shop','badminton c','w (sentul) badminton'],fn:c=>/badminton|sport|equipment/i.test(c.name)},
+    {keys:['aa pharmacy','guardian','watson','klinik','clinic'],fn:c=>/medical|health|pharmacy/i.test(c.name)},
     // Maybank savings specific
     {keys:['gs pride enterprise','giis transport','school bus','transport sch'],fn:c=>/transport|school|giis/i.test(c.name)},
     {keys:['sk badminton','badminton centre','aiprosportspj','sports centre'],fn:c=>/badminton|sport/i.test(c.name)},
@@ -3047,6 +3066,12 @@ async function parsePdfBank(file){
     full+='\n';
   }
   // Detect Maybank savings transaction statement
+  const bank=detectBank(file.name, full.slice(0,800));
+  // Maybank credit card
+  if(bank==='maybank-cc'||/STATEMENT OF CREDIT CARD/i.test(full)){
+    return parseMaybankCcPdf(full, file.name);
+  }
+  // Maybank savings transaction statement
   const isMaybankTxn=/Maybank Islamic|Malayan Banking|SAVINGS ACCOUNT-i/i.test(full)
                     && /\d{2}\/\d{2}\/\d{2}\s+\S.+[\d,]+\.\d{2}[+-]/.test(full);
   if(isMaybankTxn) return parseMaybankSavPdf(full);
@@ -3055,6 +3080,37 @@ async function parsePdfBank(file){
     throw new Error('This is a Maybank profit/interest summary, not a transaction statement. Please upload your monthly transaction statement (the one listing individual transactions with dates and amounts).');
   }
   return parsePdfGeneric(full);
+}
+
+function parseMaybankCcPdf(text, filename){
+  // Extract year from filename e.g. _20260228 → 2026
+  const yrM=filename.match(/_(\d{4})\d{4}/);
+  const year=yrM?yrM[1]:'2026';
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
+  const skipPat=/^(STATEMENT OF CREDIT CARD|PENYATA AKAUN|Malayan Banking|Page\/Halaman|MR |B[0-9]|YOUR COMBINED|YOUR PREVIOUS|TOTAL CREDIT|TOTAL DEBIT|SUB TOTAL|JUMLAH|KOMBINASI|MAYBANK 2 PLAT|MAYBANK CARD|Account Number|WARNING ON|AMARAN|If you make|Jika anda|Menara|100 Jalan|Wilayah|50050|51100|PERSIARAN|KUALA LUMPUR$|Statement Date|Payment Due Date|Tarikh|RETAIL INTEREST|Posting Date|bankinginfo|www\.)/i;
+  const skipMerchant=/^(PYMT@MAYBANK2U|RETAIL INTEREST|SERVICE TAX|BALANCE B\/F|FINANCE CHARGE|ANNUAL FEE)/i;
+  // DD/MM  DD/MM  DESCRIPTION  AMOUNT[CR]
+  const txnPat=/^(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2})(CR)?\s*$/;
+  const txns=[];
+  for(const line of lines){
+    if(skipPat.test(line)) continue;
+    const m=line.match(txnPat);
+    if(!m) continue;
+    const [,postDate,txnDate,desc,amtStr,cr]=m;
+    if(skipMerchant.test(desc)) continue;
+    const amount=parseFloat(amtStr.replace(/,/g,''));
+    if(!amount) continue;
+    // Clean description: remove trailing location " CITY MY" or " MY"
+    const cleanDesc=desc.replace(/\s+[A-Z ]{2,20}\s+MY\s*$/, '').replace(/\s+MY\s*$/, '').trim();
+    const fullDate=txnDate+'/'+year;
+    if(cr){
+      // CR = refund/cashback, skip plain payment lines already filtered above
+      txns.push({date:fullDate,desc:cleanDesc+' [Refund]',amount,type:'income'});
+    } else {
+      txns.push({date:fullDate,desc:cleanDesc,amount,type:'expense'});
+    }
+  }
+  return txns;
 }
 
 function parseMaybankSavPdf(text){
