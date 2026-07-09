@@ -221,6 +221,7 @@ progress{width:180px;accent-color:var(--blue);}
   </div>
   <h2>Short term · 1–4 weeks (momentum / mean-reversion)</h2>
   <div id="ideasShort"><div class="loading">…</div></div>
+  <div id="briefsView"></div>
   <h2>Medium term · 1–6 months (trend following)</h2>
   <div id="ideasMed"><div class="loading">…</div></div>
   <h2>Long term · 6+ months (stage-2 accumulation)</h2>
@@ -957,6 +958,63 @@ async function loadIdeas(force){
   $("ideasShort").innerHTML = ideaTable(shortT);
   $("ideasMed").innerHTML = ideaTable(medT);
   $("ideasLong").innerHTML = ideaTable(longT);
+  renderBriefs(shortT.filter(s=>s.action==="BUY" && (s.score||0)>=60).slice(0,5));
+}
+
+/* ---- decision briefs: trade view vs invest view for high-score ideas ---- */
+async function renderBriefs(ideas){
+  const el = $("briefsView");
+  if(!ideas.length){ el.innerHTML = ""; return; }
+  el.innerHTML = `<h2>Decision briefs — BUY ideas scoring 60+</h2><div class="loading">Cross-checking fundamentals for ${ideas.length} idea${ideas.length>1?"s":""}…</div>`;
+  const briefs = await pmap(ideas, async s=>{
+    let f=null; try{ f = await fetchFundamentals(s.symbol); }catch(e){}
+    return {s, f};
+  }, 4);
+  el.innerHTML = `<h2>Decision briefs — BUY ideas scoring 60+</h2>` + briefs.map(({s,f})=>{
+    const cap = capOf(s.symbol), cc = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+    const stopPct = ((s.stop-s.entry)/s.entry*100).toFixed(1);
+    const tradeView = `<b>Trade view (1–4 wks):</b> ${s.why} Entry ₹${fmt(s.entry)}, stop ₹${fmt(s.stop)} (${stopPct}%), target ₹${fmt(s.target)} — 2:1. Size it so the stop costs ≤1% of capital (📐 on the ideas row).`;
+    let investView = `<b>Invest view:</b> no fundamental data available — treat purely as a technical trade.`;
+    let verdict = ["neutral","TRADE ONLY — no fundamental backing available to judge more."];
+    if(f && (f.eps!=null || f.fcf!=null)){
+      const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
+      const iv = computeIntrinsic(f, {g:defG, r:0.12, tg:0.04, y:7.5});
+      const q = scoreQuality(f).score, vt = scoreValueTrap(f).score;
+      const tgtGap = f.target_price!=null && f.price ? (f.target_price-f.price)/f.price*100 : null;
+      const revG = f.revenue_growth!=null ? f.revenue_growth*100 : null;
+      const earnG = f.earnings_growth!=null ? f.earnings_growth*100 : null;
+      const impl = iv && iv.implied!=null ? iv.implied*100 : null;
+      investView = `<b>Invest view:</b> fair value ₹${iv?fmt(iv.fair):"—"} (range ₹${iv?fmt(iv.lo,0):"—"}–₹${iv?fmt(iv.hi,0):"—"}) → margin of safety <span class="${iv&&iv.mos>0?"up":"down"}">${iv?fmt(iv.mos,0):"—"}%</span>.
+        Reverse DCF: market prices <b>${impl!=null?fmt(impl,0)+"%":"—"}</b> growth vs delivered sales ${revG!=null?fmt(revG,0)+"%":"—"} / earnings ${earnG!=null?fmt(earnG,0)+"%":"—"}.
+        Analyst: ${(f.recommendation||"—").toUpperCase()}${tgtGap!=null?` (target ₹${fmt(f.target_price,0)}, ${sign(tgtGap)}${fmt(tgtGap,0)}% vs price)`:""}.
+        Quality ${q??"—"}/100 · value-trap risk ${vt??"—"}/100.`;
+      const mos = iv ? iv.mos : null;
+      if(mos!=null && mos>=15 && (q??0)>=60)
+        verdict = ["bullish","TRADE + INVESTABLE — momentum entry with a genuine valuation cushion. Rare alignment; can be staged in rather than traded out."];
+      else if(mos!=null && mos>=0)
+        verdict = ["bullish","TRADE, INVESTMENT DEFENSIBLE — roughly fairly priced with momentum. Trade the setup; a longer hold survives scrutiny if growth holds."];
+      else if(impl!=null && ((revG!=null && impl<=revG) || (earnG!=null && impl<=earnG)))
+        verdict = ["neutral","TRADE FIRST — expensive on trailing models, but implied growth is below what the company recently delivered. Momentum with partial fundamental support."];
+      else if(mos!=null && (mos<=-50 || (impl!=null && impl>25)))
+        verdict = ["bearish",`TRADING ONLY — the price needs ${impl!=null?fmt(impl,0)+"%":"exceptional"} growth to be justified. Take the setup with a hard stop; if it breaks, do NOT convert into a holding.`];
+      else
+        verdict = ["neutral","TRADE WITH DISCIPLINE — momentum is ahead of fundamentals. Fine for the 1–4 week game; not an investment at this price."];
+      let notes = [];
+      if(tgtGap!=null && tgtGap<0) notes.push("Even bullish analysts' target sits below the price — expectations have run ahead.");
+      if(earnG!=null && earnG<-20) notes.push("Trailing earnings fell sharply — if this is a cyclical, trailing-data models understate fair value; check the cycle/order book before trusting them.");
+      if((vt??0)>=60) notes.push("Elevated value-trap markers — deteriorating fundamentals under the cheap/momentum surface.");
+      if(notes.length) investView += `<br><span class="muted">⚠ ${notes.join(" · ")}</span>`;
+    }
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="margin-bottom:6px"><span class="sym" style="font-size:15px">${s.symbol.replace(".NS","")}</span>
+        <span class="badge ${cc}">${cap}</span> <span class="badge bullish">BUY ${s.score}/100</span>
+        <span class="muted">· ${s.name} · ${sectorOf(s.symbol)||""}</span>
+        <span style="float:right"><button class="btn ghost" style="padding:3px 8px" onclick="openFundamentals('${s.symbol}')">📊</button>
+        <button class="btn ghost" style="padding:3px 8px" onclick="openChart('${s.symbol}')">📈</button></span></div>
+      <div style="font-size:13px;line-height:1.55">${tradeView}<br>${investView}<br>
+      <b>Verdict:</b> <span class="badge ${verdict[0]}">${verdict[1].split(" — ")[0]}</span> ${verdict[1].includes(" — ")?verdict[1].split(" — ").slice(1).join(" — "):""}</div>
+    </div>`;
+  }).join("") + `<div class="muted" style="font-size:11px;margin-bottom:14px">Rule-based synthesis of the technical setup and trailing fundamentals — decide which game you're playing before entering, and never let a failed trade become an accidental investment.</div>`;
 }
 
 /* inline chart preview inside the ideas tables */

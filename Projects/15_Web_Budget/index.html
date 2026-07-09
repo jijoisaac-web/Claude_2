@@ -2997,6 +2997,16 @@ function matchCategory(desc){
     {keys:['badminton','gym','sport','swimming','futsal'],fn:c=>/sport|gym|fitness/i.test(c.name)},
     {keys:['transfer','duitnow','ibg','rentas'],fn:c=>/transfer|savings/i.test(c.name)},
     {keys:['maybank credit','credit card payment','cc payment'],fn:c=>/credit card|maybank cc|scb/i.test(c.name)},
+    // Maybank savings specific
+    {keys:['gs pride enterprise','giis transport','school bus','transport sch'],fn:c=>/transport|school|giis/i.test(c.name)},
+    {keys:['sk badminton','badminton centre','aiprosportspj','sports centre'],fn:c=>/badminton|sport/i.test(c.name)},
+    {keys:['american express','maybank master card','pymt from a/c'],fn:c=>/credit card|amex|mastercard/i.test(c.name)},
+    {keys:['public mutual','fpx payment','unit trust','amanah'],fn:c=>/mutual|invest|saving|unit trust/i.test(c.name)},
+    {keys:['lulu money','remittance','western union','forex','overseas'],fn:c=>/remit|transfer|india|overseas/i.test(c.name)},
+    {keys:['restoran','claypot','mamak','nasi','warung','kedai makan','hawker'],fn:c=>/food|dining|eat|resto/i.test(c.name)},
+    {keys:['synergy vending','atlas vending','vending'],fn:c=>/food|snack|drink|misc/i.test(c.name)},
+    {keys:['ibk fund tfr to','fund transfer to a/','duitnow','ibg transfer in'],fn:c=>/income|transfer in|received/i.test(c.name)},
+    {keys:['cash withdrawal','atm'],fn:c=>/cash|misc|personal/i.test(c.name)},
   ];
   for(const rule of rules){
     if(rule.keys.some(k=>d.includes(k))){
@@ -3020,37 +3030,80 @@ async function parsePdfBank(file){
   }
   const buf=await file.arrayBuffer();
   const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
+  // Reconstruct text preserving line structure via Y-position grouping
   let full='';
   for(let p=1;p<=pdf.numPages;p++){
     const pg=await pdf.getPage(p);
     const tc=await pg.getTextContent();
-    full+=tc.items.map(i=>i.str).join(' ')+'
-';
+    const byY={};
+    tc.items.forEach(item=>{
+      const y=Math.round(item.transform[5]);
+      if(!byY[y]) byY[y]=[];
+      byY[y].push({x:item.transform[4],str:item.str});
+    });
+    Object.keys(byY).map(Number).sort((a,b)=>b-a).forEach(y=>{
+      full+=byY[y].sort((a,b)=>a.x-b.x).map(i=>i.str).join(' ')+'\n';
+    });
+    full+='\n';
   }
-  return parsePdfText(full, file.name);
+  // Detect Maybank savings transaction statement
+  const isMaybankTxn=/Maybank Islamic|Malayan Banking|SAVINGS ACCOUNT-i/i.test(full)
+                    && /\d{2}\/\d{2}\/\d{2}\s+\S.+[\d,]+\.\d{2}[+-]/.test(full);
+  if(isMaybankTxn) return parseMaybankSavPdf(full);
+  // Detect Maybank profit/interest summary (no transactions)
+  if(/Murabahah|Baki Harian|End Day Balance/i.test(full)&&!isMaybankTxn){
+    throw new Error('This is a Maybank profit/interest summary, not a transaction statement. Please upload your monthly transaction statement (the one listing individual transactions with dates and amounts).');
+  }
+  return parsePdfGeneric(full);
 }
 
-function parsePdfText(text, filename){
-  const bank=detectBank(filename, text.slice(0,600));
-  const lines=text.split('
-').map(l=>l.trim()).filter(l=>l);
+function parseMaybankSavPdf(text){
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
+  const skipPat=/^(BEGINNING BALANCE|ENDING BALANCE|TARIKH|ENTRY DATE|Perhation|Perhatian|Semua|All items|Sila |Please |Faedah|Interest|Maybank Islamic|15th Floor|Tower A|MUKA\/|JIJO |33B-|JALAN |KUALALUMPUR|50480|PROTECTED|URUSNIAGA|NOMBOR|ACCOUNT NUMBER|SAVINGS ACCOUNT|IBS PRIMA|TARIKH PENYATA|STATEMENT DATE|BUTIR|JUMLAH URUSNIAGA|BAKI PENYATA)/i;
+  const refNoise=/^(QR\d+$|MAE QR$|DUITNOW QR$|MBB CT|\d{14,}$|XXXX-XXXX)/;
+  const txnPat=/^(\d{2}\/\d{2}\/\d{2,4})\s+(.+?)\s+([\d,]+\.\d{2})([+-])\s+[\d,]+\.\d{2}\s*$/;
   const txns=[];
-  const dateRe=/(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2,4})/i;
+  let i=0;
+  while(i<lines.length){
+    const m=lines[i].match(txnPat);
+    if(m){
+      const amount=parseFloat(m[3].replace(/,/g,''));
+      const isCredit=m[4]==='+';
+      let desc=m[2];
+      const extra=[];
+      let j=i+1;
+      while(j<lines.length&&(j-i)<5){
+        const nxt=lines[j];
+        if(txnPat.test(nxt)||skipPat.test(nxt)) break;
+        if(!refNoise.test(nxt)&&nxt.length>1) extra.push(nxt);
+        j++;
+      }
+      i=j;
+      if(extra.length) desc+=' ('+extra.join(' | ')+')';
+      if(amount>0) txns.push({date:m[1],desc:desc.trim(),amount,type:isCredit?'income':'expense'});
+    } else { i++; }
+  }
+  return txns;
+}
+
+function parsePdfGeneric(text){
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
+  const txns=[];
+  const dateRe=/\b(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2,4})\b/i;
   const amtRe=/[\d,]+\.\d{2}/g;
   for(const line of lines){
     const dm=line.match(dateRe);
     const ams=line.match(amtRe);
     if(!dm||!ams) continue;
     const amount=parseFloat(ams[ams.length-1].replace(/,/g,''));
-    if(!amount||amount<0.01) continue;
-    let desc=line.replace(dm[0],'').replace(amtRe,'').replace(/\s+/g,' ').trim();
+    if(!amount) continue;
+    let desc=line.replace(dm[0],'').replace(/[\d,]+\.\d{2}/g,'').replace(/\s+/g,' ').trim();
     if(!desc||desc.length<3) continue;
     const type=/credit|salary|gaji|cashback|refund|top.?up|reload/i.test(desc)?'income':'expense';
     txns.push({date:dm[0],desc,amount,type});
   }
   return txns;
 }
-
 async function handleBankFile(input){
   const file=input.files[0];
   if(!file) return;

@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.8.1] — 2026-07-09
+
+- Decision-brief threshold lowered from score 70+ to 60+ (still top 5 by score)
+
+## [2.8.0] — 2026-07-09 · Decision Briefs
+
+- Ideas tab auto-generates **decision briefs** for short-term BUY ideas scoring 70+ (top 5): a trade view (trigger, levels, sizing rule) cross-checked against an invest view (fair value + margin of safety, reverse-DCF implied growth vs delivered sales/earnings growth, analyst stance and target-vs-price gap, Quality and Value-Trap scores)
+- Rule-based verdict per idea: TRADE + INVESTABLE / INVESTMENT DEFENSIBLE / TRADE FIRST / TRADE WITH DISCIPLINE / TRADING ONLY — with automatic caveats (analyst target below price, cyclical earnings distortion, value-trap markers)
+
 ## [2.7.0] — 2026-07-09 · Backtest Analytics
 
 - "By signal type" expanded from 6 to 13 columns: trades, win rate, timed-out %, average realised return (closed trades), average outcome across all trades (closed + at-max-hold — closest to true per-trade expectancy), averages at 1W/2W/1M/3M, median 1M (outlier-resistant), best and worst 1M
