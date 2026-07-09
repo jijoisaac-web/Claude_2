@@ -1,4 +1,4 @@
-/* v7.3 */
+/* v7.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2802,7 +2802,7 @@ function closeNavDD(){
       var price=typeof r.min==='number'
         ? cur+' '+r.min.toLocaleString()+'–'+r.max.toLocaleString()
         : '—';
-      var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/';
+      var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/?currency='+cur;
       var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /,'+')+'%2C+India';
       return '<div class="fl-dest-card fl-dest-clickable" data-plan="'+d.name+' next month" style="cursor:pointer">'
         +'<div class="fl-dest-hd"><span class="fl-dest-icon">'+d.icon+'</span>'
@@ -3291,7 +3291,7 @@ function closeNavDD(){
       var isBest=ap.diff===Math.min.apply(null,airports.map(function(a){return a.diff;}));
       var isMost=ai===0;
       var diffLabel=ap.diff===0?'Base':ap.diff<0?'Save '+cur+' '+Math.abs(ap.diff):'+ '+cur+' '+ap.diff;
-      var skUrl='https://www.skyscanner.net/transport/flights/'+ap.code+'/'+(destCode||'BOM')+'/';
+      var skUrl='https://www.skyscanner.net/transport/flights/'+ap.code+'/'+(destCode||'BOM')+'/?currency='+cur;
 
       html+='<div class="fl-apt-row'+(isBest?' fl-apt-best':'')+'">'
         +'<div class="fl-apt-left">'
@@ -3984,7 +3984,7 @@ function closeNavDD(){
 
         var depSK=_fmtSK(depDate);
         var retSK=_fmtSK(retDate);
-        var _skCabin=cabinClass==='business'?'?cabin=business':'?cabin=economy';
+        var _skCabin=cabinClass==='business'?'?cabin=business&currency='+cur:'?cabin=economy&currency='+cur;
         var skRT='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/'+_skCabin;
         var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+_skCabin;
         var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/'+_skCabin;
