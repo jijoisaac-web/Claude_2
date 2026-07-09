@@ -3061,12 +3061,38 @@ function parseCsvBank(text, bank){
   return txns;
 }
 
+/* ── Merchant memory: saves user's manual assignments ── */
+function getMerchantMap(){ try{return JSON.parse(localStorage.getItem('merchantMap')||'{}')}catch{return {};} }
+function saveMerchantMap(map){ localStorage.setItem('merchantMap', JSON.stringify(map)); }
+function extractMerchantKey(desc){
+  // Normalize: strip location suffixes, QR refs, take first meaningful segment
+  return desc.replace(/\s*\(.*\)$/,'')          // strip (...) extras
+             .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')  // strip CITY MY
+             .replace(/\s+MY\s*$/,'')
+             .replace(/[-*].*$/,'')               // strip after - or *
+             .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')
+             .trim().toUpperCase().slice(0,40);
+}
+
 function matchCategory(desc){
   const d=desc.toLowerCase();
   const cats=state.categories;
-  // Direct name match
+  // 1. Merchant memory (user's saved mappings)
+  const mmap=getMerchantMap();
+  const mkey=extractMerchantKey(desc);
+  if(mmap[mkey]&&cats.find(c=>c.id===mmap[mkey])) return mmap[mkey];
+  // 2. Direct category name match
   for(const c of cats) if(d.includes(c.name.toLowerCase())&&c.name.length>3) return c.id;
-  // Keyword rules
+  // 3. Fuzzy word overlap match against category names
+  const descWords=d.split(/\W+/).filter(w=>w.length>3);
+  let bestId='', bestScore=0;
+  for(const c of cats){
+    const cWords=c.name.toLowerCase().split(/\W+/).filter(w=>w.length>3);
+    const overlap=descWords.filter(w=>cWords.some(cw=>cw.includes(w)||w.includes(cw))).length;
+    if(overlap>bestScore){ bestScore=overlap; bestId=c.id; }
+  }
+  if(bestScore>0) return bestId;
+  // 4. Keyword rules
   const rules=[
     {keys:['salary','gaji','payroll','pay credit','wages'],  fn:c=>/salary|income|in hand/i.test(c.name)},
     {keys:['grab food','foodpanda','mcdonalds','kfc','pizza','burger','mamak','restaurant','cafe','coffee','makan'],fn:c=>/food|dining|eat|resto/i.test(c.name)},
@@ -3379,6 +3405,13 @@ function importBiTxns(){
   });
 
   saveState();
+  // Save merchant→category mappings for future imports
+  const mmap=getMerchantMap();
+  toImport.forEach(t=>{
+    const mkey=extractMerchantKey(t.desc);
+    if(mkey&&t.catId) mmap[mkey]=t.catId;
+  });
+  saveMerchantMap(mmap);
   closeBankImport();
   renderMonthly();
   const catCount=Object.keys(grouped).length;
