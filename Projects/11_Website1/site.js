@@ -1,4 +1,4 @@
-/* v6.6 */
+/* v6.7 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3183,6 +3183,113 @@ function closeNavDD(){
     return html;
   }
 
+
+  // ── DEPARTURE AIRPORT COMPARISON ─────────────────────────────────────────
+  // Per currency: airport fare differentials vs base airport (index 0)
+  // diff: negative = cheaper than main hub, positive = more expensive
+  var AIRPORT_CMP={
+    AED:{
+      airports:[
+        {code:'DXB',name:'Dubai',diff:0,     note:'Most routes, highest frequency — Emirates, flydubai, Air India'},
+        {code:'AUH',name:'Abu Dhabi',diff:-50, note:'Etihad hub. Often AED 50–150 cheaper on Etihad routes. Check direct vs via DXB'},
+        {code:'SHJ',name:'Sharjah',diff:-120, note:'Air Arabia home base. Typically cheapest for economy. Add ~45 min drive from Dubai'}
+      ],
+      tip:'SHJ is consistently cheapest but limited routes. AUH via Etihad beats DXB for South India.'
+    },
+    GBP:{
+      airports:[
+        {code:'LHR',name:'London Heathrow',diff:0,    note:'Main hub. Most airlines, most routes. Expensive — Heathrow surcharges add £30–60'},
+        {code:'LGW',name:'London Gatwick', diff:-80,  note:'Often £60–100 cheaper than LHR. IndiGo and some Air India flights depart here'},
+        {code:'MAN',name:'Manchester',     diff:-120,  note:'Great for North England. Direct flights to Mumbai, Delhi, Amritsar. Often £80–140 cheaper than LHR'},
+        {code:'BHX',name:'Birmingham',     diff:-90,  note:'Large Indian diaspora hub. Direct routes to several India cities. Check Jet2 and TUI'}
+      ],
+      tip:'MAN and BHX consistently beat LHR for India routes. Worth the journey from London if saving £100+.'
+    },
+    AUD:{
+      airports:[
+        {code:'SYD',name:'Sydney',   diff:0,    note:'Most routes, best frequency. Singapore Airlines, Qantas, Air India all operate'},
+        {code:'MEL',name:'Melbourne',diff:-80,  note:'Strong competition — AUD 50–120 cheaper than SYD on many routes. Air India direct to DEL'},
+        {code:'PER',name:'Perth',    diff:-200, note:'Closest Australian city to India (5–6 hr less travel). Often AUD 150–250 cheaper. IndiGo and Scoot serve PER'},
+        {code:'BNE',name:'Brisbane', diff:-60,  note:'Good for QLD residents. Via Singapore or Kuala Lumpur — check layover times'}
+      ],
+      tip:'PER is dramatically cheaper and closer to India. MEL often beats SYD on Air India direct routes.'
+    },
+    USD:{
+      airports:[
+        {code:'JFK',name:'New York JFK',diff:0,    note:'Busiest route. Air India, United, Jet Blue. High competition but also high demand'},
+        {code:'EWR',name:'Newark',       diff:-40,  note:'Often USD 30–60 cheaper than JFK. United hub. Easy from Manhattan via NJ Transit'},
+        {code:'ORD',name:'Chicago',      diff:-80,  note:'Air India direct to DEL/BOM. USD 60–120 cheaper than NYC for Midwest travelers'},
+        {code:'SFO',name:'San Francisco',diff:-60,  note:'Good for West Coast. Air India and United direct. USD 40–80 cheaper than JFK for Bay Area'}
+      ],
+      tip:'Chicago (ORD) has strong Air India direct service at competitive prices. PHL and IAD also worth checking.'
+    },
+    MYR:{
+      airports:[
+        {code:'KUL',name:'Kuala Lumpur', diff:0,   note:'KLIA — main hub. AirAsia, Malaysia Airlines, Air India all operate. Most routes'},
+        {code:'PEN',name:'Penang',        diff:-80, note:'MYR 60–120 cheaper for some routes. AirAsia KLIA2-style budget terminal. Fewer direct routes to India'}
+      ],
+      tip:'KUL has far more frequency and competition. PEN worth checking if you live in Northern Malaysia.'
+    },
+    CAD:{
+      airports:[
+        {code:'YYZ',name:'Toronto',    diff:0,    note:'Main hub. Air India, Air Canada, WestJet. Most Canada-India routes originate here'},
+        {code:'YVR',name:'Vancouver',  diff:-100, note:'West Coast — shorter flight to India. Air India direct to DEL. CAD 80–150 cheaper than YYZ'},
+        {code:'YUL',name:'Montreal',   diff:-60,  note:'Good for Quebec residents. Air India via LHR or direct. CAD 40–90 cheaper than YYZ'}
+      ],
+      tip:'YVR is geographically closer to India and often significantly cheaper. Worth the positioning flight from Toronto.'
+    },
+    EUR:{
+      airports:[
+        {code:'FRA',name:'Frankfurt',  diff:0,   note:'Lufthansa hub. Most India connections. Premium pricing but excellent connectivity'},
+        {code:'AMS',name:'Amsterdam',  diff:-60, note:'KLM hub. Often EUR 40–90 cheaper than FRA. Good connections to all India metros'},
+        {code:'CDG',name:'Paris CDG',  diff:-40, note:'Air France hub. EUR 30–60 cheaper for some routes. Direct to Mumbai and Delhi'},
+        {code:'ZRH',name:'Zurich',     diff:-30, note:'Swiss/Edelweiss. Niche but competitive pricing especially for South India routes'}
+      ],
+      tip:'AMS consistently offers the best EUR fares for India. FRA has the best connectivity but highest prices.'
+    }
+  };
+
+  function _renderAirportCompare(cur, destCode, route, cabinFareMult){
+    var cmp=AIRPORT_CMP[cur];
+    if(!cmp||!route) return '';
+    var airports=cmp.airports;
+    if(airports.length<2) return '';
+
+    var html='<div class="fl-apt-card">'
+      +'<div class="fl-apt-title">&#9992; Departure airport comparison — '+cmp.tip+'</div>'
+      +'<div class="fl-apt-rows">';
+
+    var baseMin=Math.round(route.min*cabinFareMult);
+    var baseMax=Math.round(route.max*cabinFareMult);
+
+    for(var ai=0;ai<airports.length;ai++){
+      var ap=airports[ai];
+      var aptMin=baseMin+ap.diff;
+      var aptMax=baseMax+ap.diff;
+      var isBest=ap.diff===Math.min.apply(null,airports.map(function(a){return a.diff;}));
+      var isMost=ai===0;
+      var diffLabel=ap.diff===0?'Base':ap.diff<0?'Save '+cur+' '+Math.abs(ap.diff):'+ '+cur+' '+ap.diff;
+      var skUrl='https://www.skyscanner.net/transport/flights/'+ap.code+'/'+(destCode||'BOM')+'/';
+
+      html+='<div class="fl-apt-row'+(isBest?' fl-apt-best':'')+'">'
+        +'<div class="fl-apt-left">'
+        +'<span class="fl-apt-code">'+ap.code+'</span>'
+        +'<span class="fl-apt-name">'+ap.name+'</span>'
+        +(isBest?'<span class="fl-apt-badge">&#127775; Cheapest</span>':'')
+        +'</div>'
+        +'<div class="fl-apt-mid">'
+        +'<div class="fl-apt-fare">'+cur+' '+Math.max(0,aptMin).toLocaleString()+'&ndash;'+Math.max(0,aptMax).toLocaleString()+'</div>'
+        +'<div class="fl-apt-diff'+(ap.diff<0?' fl-apt-save':ap.diff===0?' fl-apt-base':' fl-apt-prem')+'">'+diffLabel+'</div>'
+        +'</div>'
+        +'<a class="fl-apt-search" href="'+skUrl+'" target="_blank" rel="noopener">Search &#8599;</a>'
+        +'</div>'
+        +'<div class="fl-apt-note">'+ap.note+'</div>';
+    }
+
+    html+='</div></div>';
+    return html;
+  }
+
   var _flTripDays=10;
   var _flCabinClass='economy';
 
@@ -3496,6 +3603,9 @@ function closeNavDD(){
 
       // Best Day to Book
       html+=_renderBookingTips(route,cur,wks,cabinClass);
+
+      // Departure Airport Comparison
+      html+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
 
       // India Daily Cost Estimator
       if(destCode) html+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);

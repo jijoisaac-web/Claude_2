@@ -1,4 +1,4 @@
-/* v6.6 */
+/* v6.7 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1682,3 +1682,27 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .fl-cost-tiers{grid-template-columns:1fr 1fr;}
 }
 
+/* ── DEPARTURE AIRPORT COMPARISON v6.7 ─────────────────────────────────── */
+.fl-apt-card{background:var(--card);border-radius:14px;padding:18px;margin:18px 0;border:1px solid var(--border);}
+.fl-apt-title{font-size:.8rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;}
+.fl-apt-rows{display:flex;flex-direction:column;gap:10px;}
+.fl-apt-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:var(--bg);border:1px solid var(--border);transition:border-color .2s;}
+.fl-apt-row.fl-apt-best{border-color:var(--green,#22c55e);background:color-mix(in srgb,var(--green,#22c55e) 8%,var(--bg));}
+.fl-apt-left{display:flex;align-items:center;gap:8px;min-width:160px;flex-wrap:wrap;}
+.fl-apt-code{font-size:.95rem;font-weight:800;color:var(--text);letter-spacing:.02em;}
+.fl-apt-name{font-size:.8rem;color:var(--muted);flex:1;}
+.fl-apt-badge{font-size:.65rem;background:var(--green,#22c55e);color:#fff;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.fl-apt-mid{flex:1;text-align:center;}
+.fl-apt-fare{font-size:.9rem;font-weight:700;color:var(--text);}
+.fl-apt-diff{font-size:.75rem;font-weight:600;margin-top:2px;border-radius:6px;padding:1px 6px;display:inline-block;}
+.fl-apt-save{color:#16a34a;background:rgba(34,197,94,.12);}
+.fl-apt-base{color:var(--muted);}
+.fl-apt-prem{color:#dc2626;background:rgba(220,38,38,.1);}
+.fl-apt-search{font-size:.75rem;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap;padding:6px 10px;border-radius:8px;border:1px solid var(--accent);transition:background .2s;}
+.fl-apt-search:hover{background:var(--accent);color:#fff;}
+.fl-apt-note{font-size:.73rem;color:var(--muted);padding:4px 12px 6px;border-radius:0 0 8px 8px;margin-top:-6px;line-height:1.45;}
+@media(max-width:640px){
+  .fl-apt-row{flex-wrap:wrap;gap:8px;}
+  .fl-apt-left{min-width:100%;margin-bottom:2px;}
+  .fl-apt-mid{flex:1;}
+}
