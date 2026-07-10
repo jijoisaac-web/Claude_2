@@ -161,6 +161,8 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
   <h2>Global markets &amp; macro</h2>
   <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
+  <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
   <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div id="pulseView"><div class="loading">Analysing market…</div></div>
   <h2>Top opportunities today</h2>
@@ -534,6 +536,38 @@ const WL_KEY = "ist_watchlist";
 const WL_DEFAULT = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","TMPV.NS"];
 function getWL(){ try{ const v = JSON.parse(localStorage.getItem(WL_KEY)); return Array.isArray(v)&&v.length?v:WL_DEFAULT; }catch(e){ return WL_DEFAULT; } }
 function setWL(v){ localStorage.setItem(WL_KEY, JSON.stringify(v)); }
+/* ---- FII / DII provisional daily activity (NSE) ---- */
+async function loadFiiDii(){
+  try{
+    const r = await fetch("/api/fiidii");
+    const d = await r.json();
+    if(!r.ok || (!d.fii && !d.dii)) throw new Error(d.error || "no data");
+    $("fiidiiMeta").textContent = `· ${d.date || ""} · provisional, cash market, ₹ Cr`;
+    const card = (label, x) => {
+      if(!x) return "";
+      const netCls = x.net>=0 ? "up" : "down";
+      const read = x.net>=0 ? "net buyers" : "net sellers";
+      return `<div class="card"><div class="name">${label} — ${read}</div>
+        <div class="price ${netCls}">${sign(x.net)}₹${fmtInt(Math.round(Math.abs(x.net)))} Cr</div>
+        <div class="chg muted">bought ₹${fmtInt(Math.round(x.buy))} · sold ₹${fmtInt(Math.round(x.sell))}</div></div>`;
+    };
+    let insight = "";
+    if(d.fii && d.dii){
+      const f = d.fii.net, di = d.dii.net;
+      insight = f>=0 && di>=0 ? "Both buying — broad institutional support." :
+                f<0 && di<0 ? "Both selling — institutional risk-off; be careful with fresh longs." :
+                f<0 && di>=0 ? "FII selling, DII absorbing — the classic tug-of-war; domestic flows cushioning foreign exits." :
+                "FII buying, DII booking profits — foreign money leading.";
+      insight = `<div class="card"><div class="name">Read</div><div style="font-size:13px;margin-top:4px">${insight}</div></div>`;
+    }
+    $("fiidiiCards").innerHTML = card("FII / FPI", d.fii) + card("DII", d.dii) + insight;
+  }catch(e){
+    $("fiidiiCards").innerHTML = `<div class="card"><div class="name">Unavailable</div>
+      <div class="muted" style="font-size:12px;margin-top:4px">NSE didn't serve the data (${e.message}). It publishes provisional figures after ~6pm IST on trading days, and sometimes blocks automated access — try again later.</div></div>`;
+    $("fiidiiMeta").textContent = "";
+  }
+}
+
 /* ---- market pulse: breadth, sectors, movers — from the latest scan ---- */
 async function loadPulse(){
   if(!screenerData){
@@ -618,6 +652,7 @@ async function loadDashboard(){
     g = g.filter(Boolean).map(q => q.symbol==="^TNX" ? {...q, price:q.price/10, change:q.change/10} : q);  // ^TNX is 10x the yield
     $("globalCards").innerHTML = g.map(cardHTML).join("") || '<div class="loading">No data</div>';
   });
+  loadFiiDii();
   loadPulse();
   const wl = await pmap(getWL(), getQuote, 6);
   const rows = wl.filter(Boolean);

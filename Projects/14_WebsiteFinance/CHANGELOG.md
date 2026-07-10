@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.9.0] — 2026-07-09 · FII / DII Activity
+
+- Dashboard now shows NSE's provisional FII/FPI and DII cash-market activity for the latest trading day: net position (₹ Cr, green/red), buy/sell breakdown, and a one-line read of the flow combination (both buying / both selling / FII-selling-DII-absorbing / FII-led)
+- New serverless proxy `/api/fiidii` with NSE cookie bootstrap fallback and 30-min edge caching; graceful message when NSE withholds data (published ~6pm IST on trading days)
+- v2.8.2: added "Jump to decision briefs" button on the Ideas tab
+
 ## [2.8.1] — 2026-07-09
 
 - Decision-brief threshold lowered from score 70+ to 60+ (still top 5 by score)
