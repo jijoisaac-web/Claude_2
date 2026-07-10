@@ -323,24 +323,36 @@ header .subtitle{font-size:11px;color:var(--text2);font-weight:400;}
 .hero-stat-val.pending{color:#fde68a;}
 
 /* ══════════════════════════════════════════════
-   MONTH PILLS
+   MONTH SIDEBAR
 ══════════════════════════════════════════════ */
+#view-monthly.active{display:flex;align-items:flex-start;}
 #monthTabs{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;overflow-x:auto;padding:10px 16px;gap:7px;
+  width:78px;flex-shrink:0;
+  background:var(--surface2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:10px 8px;gap:4px;
+  position:sticky;top:calc(var(--hdr-h) + var(--nav-h));
+  height:calc(100vh - var(--hdr-h) - var(--nav-h));
+  overflow-y:auto;overflow-x:hidden;z-index:20;
 }
-#monthTabs::-webkit-scrollbar{height:0;}
+#monthTabs::-webkit-scrollbar{width:3px;}
+#monthTabs::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+#monthlyMain{flex:1;min-width:0;}
 .m-pill{
-  padding:6px 16px;border-radius:99px;
-  border:1px solid var(--border);background:var(--surface2);
-  font-size:12px;font-weight:500;color:var(--text2);
+  padding:7px 6px;border-radius:8px;
+  border:1px solid transparent;background:transparent;
+  font-size:11px;font-weight:500;color:var(--text2);
   cursor:pointer;white-space:nowrap;transition:all .18s;
-  display:flex;align-items:center;gap:5px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  text-align:center;width:100%;
 }
-.m-pill:hover{border-color:var(--accent);color:var(--accent);}
+.m-pill:hover{background:var(--surface3);color:var(--text1);}
 .m-pill.active{
   background:var(--accent);color:#fff;border-color:var(--accent);
-  font-weight:700;box-shadow:0 2px 12px var(--accent-g);
+  font-weight:700;box-shadow:0 2px 8px var(--accent-g);
+}
+@media(max-width:600px){
+  #monthTabs{width:52px;padding:8px 4px;}
+  .m-pill{font-size:10px;padding:6px 2px;}
 }
 .m-dot{width:5px;height:5px;border-radius:50%;display:none;}
 .m-pill.active .m-dot.has-paid{display:inline-block;background:rgba(255,255,255,.7);}
@@ -1160,7 +1172,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.0
+        <span class="ver-dot"></span>v3.1
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1217,6 +1229,12 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.1 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Month navigation moved to left sidebar for easy vertical scrolling</div>
+    <div class="cl-item">Inline editing of date, description &amp; amount in import review</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v3.0 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1307,8 +1325,11 @@ tbody tr.income-row td:first-child{
   </div>
 </div>
 
-<!-- Month tabs -->
+<!-- Month tabs sidebar -->
   <div id="monthTabs"></div>
+
+  <!-- Main monthly content -->
+  <div id="monthlyMain">
 
   <!-- Sticky totals bar -->
   <div id="stickyTotals">
@@ -1371,6 +1392,8 @@ tbody tr.income-row td:first-child{
       <tbody id="budgetBody"></tbody>
     </table>
   </div>
+
+  </div><!-- /monthlyMain -->
 </div><!-- /monthly -->
 
 <!-- ──── ANNUAL VIEW ──── -->
@@ -2000,17 +2023,17 @@ function renderMonthTabs(){
     const hasPaid=Object.values(state.months[i]||{}).some(v=>v.paid);
     const pill=document.createElement('div');
     pill.className='m-pill'+(i===currentMonth?' active':'');
-    pill.innerHTML=`${m}<span class="m-dot${hasPaid?' has-paid':''}"></span>`;
+    pill.title=m;
+    pill.innerHTML=`<span>${m.slice(0,3)}</span><span class="m-dot${hasPaid?' has-paid':''}"></span>`;
     pill.onclick=()=>{ currentMonth=i; renderAll();
-      // scroll active pill into view
-      pill.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+      pill.scrollIntoView({behavior:'smooth',block:'nearest'});
     };
     el.appendChild(pill);
   });
-  // auto-scroll active pill
+  // auto-scroll active pill into view
   setTimeout(()=>{
     const active=el.querySelector('.m-pill.active');
-    if(active) active.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    if(active) active.scrollIntoView({behavior:'smooth',block:'nearest'});
   },50);
 }
 
