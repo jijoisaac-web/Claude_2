@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.2
+        <span class="ver-dot"></span>v3.3
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1242,6 +1242,13 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.3 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">27 suggested categories across 8 groups (Food, Utilities, Health, Transport, Shopping, Entertainment, Kids, Savings)</div>
+    <div class="cl-item">Settings → "Add Suggested Categories" — pick and add missing ones without affecting existing data</div>
+    <div class="cl-item">Move imported transaction to a different category from the detail modal</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v3.2 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1510,6 +1517,28 @@ tbody tr.income-row td:first-child{
       </div>
     </div>
 
+    <div class="data-card">
+      <h3>➕ Add Suggested Categories</h3>
+      <p>Add commonly used Malaysian household categories that are missing from your current budget. Existing categories are skipped.</p>
+      <button class="btn btn-primary" onclick="openSuggestCats()">Browse Suggested Categories</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Suggested Categories Modal -->
+<div class="overlay" id="suggestCatsOverlay" onclick="if(event.target===this)document.getElementById('suggestCatsOverlay').style.display='none'" style="display:none">
+  <div class="modal" style="max-width:600px;width:95%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="margin:0;font-size:16px">➕ Suggested Categories</h2>
+      <button class="del-btn" onclick="document.getElementById('suggestCatsOverlay').style.display='none'">✕</button>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Tick the categories you want to add. Already-existing categories are greyed out.</div>
+    <div id="suggestCatsBody" style="max-height:60vh;overflow-y:auto"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-gray" onclick="document.getElementById('suggestCatsOverlay').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="addCheckedSuggestedCats()">Add Selected</button>
+    </div>
   </div>
 </div>
 
@@ -1722,33 +1751,113 @@ const CHART_COLORS = [
 ];
 
 const DEFAULT_CATS = [
+  // Income
   {id:'c1', type:'income',  name:'Income - Jijo In Hand',  expected:4500,  parentId:''},
   {id:'c2', type:'income',  name:'Income - Ansa In Hand',  expected:0,     parentId:''},
   {id:'c3', type:'income',  name:'Income - Jijo Salary',   expected:14000, parentId:''},
   {id:'c4', type:'income',  name:'Income - Ansa Salary',   expected:10000, parentId:''},
+  // Housing
   {id:'c5', type:'expense', name:'Rent',                   expected:1700,  parentId:''},
+  // School
   {id:'c6', type:'expense', name:'Johan School',           expected:2000,  parentId:'g_school'},
   {id:'c7', type:'expense', name:'Daniel School',          expected:1600,  parentId:'g_school'},
+  // Credit Cards
   {id:'c10',type:'expense', name:'Credit Card - Maybank',  expected:148,   parentId:'g_cc'},
   {id:'c11',type:'expense', name:'Credit Card - SCB',      expected:1700,  parentId:'g_cc'},
-  {id:'c12',type:'expense', name:'GIIS Transport',         expected:450,   parentId:''},
-  {id:'c13',type:'expense', name:'PRS',                    expected:500,   parentId:''},
-  {id:'c14',type:'expense', name:'Transfer India',         expected:13000, parentId:''},
-  {id:'c15',type:'expense', name:'Badminton - Kids',       expected:390,   parentId:''},
+  // Transport
+  {id:'c12',type:'expense', name:'GIIS Transport',         expected:450,   parentId:'g_transport'},
+  {id:'cs1',type:'expense', name:'Petrol / Fuel',          expected:300,   parentId:'g_transport'},
+  {id:'cs2',type:'expense', name:'Toll',                   expected:100,   parentId:'g_transport'},
+  {id:'cs3',type:'expense', name:'Parking',                expected:50,    parentId:'g_transport'},
+  {id:'cs4',type:'expense', name:'Grab / Taxi',            expected:80,    parentId:'g_transport'},
+  // Car
   {id:'c16',type:'expense', name:'Car Service',            expected:0,     parentId:'g_car'},
   {id:'c17',type:'expense', name:'Car Loan',               expected:1500,  parentId:'g_car'},
   {id:'c18',type:'expense', name:'Car Insurance',          expected:0,     parentId:'g_car'},
+  // Food & Dining
+  {id:'cf1',type:'expense', name:'Groceries',              expected:600,   parentId:'g_food'},
+  {id:'cf2',type:'expense', name:'Dining Out',             expected:400,   parentId:'g_food'},
+  {id:'cf3',type:'expense', name:'Food Delivery',          expected:200,   parentId:'g_food'},
+  {id:'cf4',type:'expense', name:'Coffee & Cafes',         expected:100,   parentId:'g_food'},
+  // Utilities
+  {id:'cu1',type:'expense', name:'Electricity (TNB)',      expected:150,   parentId:'g_util'},
+  {id:'cu2',type:'expense', name:'Water',                  expected:30,    parentId:'g_util'},
+  {id:'cu3',type:'expense', name:'Internet / WiFi',        expected:100,   parentId:'g_util'},
+  {id:'cu4',type:'expense', name:'Mobile Phone',           expected:80,    parentId:'g_util'},
+  {id:'cu5',type:'expense', name:'Astro / TV',             expected:0,     parentId:'g_util'},
+  // Health
+  {id:'ch1',type:'expense', name:'Medical / Doctor',       expected:0,     parentId:'g_health'},
+  {id:'ch2',type:'expense', name:'Pharmacy',               expected:50,    parentId:'g_health'},
+  {id:'ch3',type:'expense', name:'Dental',                 expected:0,     parentId:'g_health'},
+  {id:'ch4',type:'expense', name:'Health Insurance',       expected:300,   parentId:'g_health'},
+  // Shopping
+  {id:'csh1',type:'expense',name:'Clothing & Fashion',     expected:200,   parentId:'g_shop'},
+  {id:'csh2',type:'expense',name:'Online Shopping',        expected:200,   parentId:'g_shop'},
+  {id:'csh3',type:'expense',name:'Personal Care',          expected:100,   parentId:'g_shop'},
+  {id:'csh4',type:'expense',name:'Household Items',        expected:100,   parentId:'g_shop'},
+  // Entertainment
+  {id:'ce1',type:'expense', name:'Streaming (Netflix etc)',expected:50,    parentId:'g_ent'},
+  {id:'ce2',type:'expense', name:'Movies / Cinema',        expected:50,    parentId:'g_ent'},
+  {id:'ce3',type:'expense', name:'Sports',                 expected:500,   parentId:'g_ent'},
+  {id:'ce4',type:'expense', name:'Travel',                 expected:1000,  parentId:'g_ent'},
+  // Kids
+  {id:'ck1',type:'expense', name:'Badminton - Kids',       expected:390,   parentId:'g_kids'},
+  {id:'ck2',type:'expense', name:'Kids Pocket Money',      expected:100,   parentId:'g_kids'},
+  {id:'ck3',type:'expense', name:'Books & Stationery',     expected:50,    parentId:'g_kids'},
+  // Savings & Investment
+  {id:'c13',type:'expense', name:'PRS',                    expected:500,   parentId:'g_savings'},
+  {id:'csv1',type:'expense',name:'Emergency Fund',         expected:500,   parentId:'g_savings'},
+  {id:'csv2',type:'expense',name:'EPF Top-up',             expected:0,     parentId:'g_savings'},
+  // Transfers & Other
+  {id:'c14',type:'expense', name:'Transfer India',         expected:13000, parentId:''},
   {id:'c19',type:'expense', name:'Splitwise',              expected:300,   parentId:''},
-  {id:'c20',type:'expense', name:'Sports',                 expected:500,   parentId:''},
-  {id:'c21',type:'expense', name:'Travel',                 expected:1000,  parentId:''},
-  {id:'c22',type:'expense', name:'EXTRA',                  expected:0,     parentId:''},
   {id:'c23',type:'expense', name:'Income Tax',             expected:0,     parentId:''},
+  {id:'c22',type:'expense', name:'EXTRA',                  expected:0,     parentId:''},
 ];
 
 const DEFAULT_GROUPS = [
-  {id:'g_school', name:'School'},
-  {id:'g_cc',     name:'Credit Cards'},
-  {id:'g_car',    name:'Car'},
+  {id:'g_school',    name:'School'},
+  {id:'g_cc',        name:'Credit Cards'},
+  {id:'g_transport', name:'Transport'},
+  {id:'g_car',       name:'Car'},
+  {id:'g_food',      name:'Food & Dining'},
+  {id:'g_util',      name:'Utilities'},
+  {id:'g_health',    name:'Health'},
+  {id:'g_shop',      name:'Shopping'},
+  {id:'g_ent',       name:'Entertainment'},
+  {id:'g_kids',      name:'Kids'},
+  {id:'g_savings',   name:'Savings & Investment'},
+];
+
+// Suggested categories to offer existing users (excludes the ones already in most setups)
+const SUGGESTED_CATS = [
+  {id:'cs1', type:'expense', name:'Petrol / Fuel',          expected:300,  group:'Transport',           parentId:'g_transport'},
+  {id:'cs2', type:'expense', name:'Toll',                   expected:100,  group:'Transport',           parentId:'g_transport'},
+  {id:'cs3', type:'expense', name:'Parking',                expected:50,   group:'Transport',           parentId:'g_transport'},
+  {id:'cs4', type:'expense', name:'Grab / Taxi',            expected:80,   group:'Transport',           parentId:'g_transport'},
+  {id:'cf1', type:'expense', name:'Groceries',              expected:600,  group:'Food & Dining',       parentId:'g_food'},
+  {id:'cf2', type:'expense', name:'Dining Out',             expected:400,  group:'Food & Dining',       parentId:'g_food'},
+  {id:'cf3', type:'expense', name:'Food Delivery',          expected:200,  group:'Food & Dining',       parentId:'g_food'},
+  {id:'cf4', type:'expense', name:'Coffee & Cafes',         expected:100,  group:'Food & Dining',       parentId:'g_food'},
+  {id:'cu1', type:'expense', name:'Electricity (TNB)',      expected:150,  group:'Utilities',           parentId:'g_util'},
+  {id:'cu2', type:'expense', name:'Water',                  expected:30,   group:'Utilities',           parentId:'g_util'},
+  {id:'cu3', type:'expense', name:'Internet / WiFi',        expected:100,  group:'Utilities',           parentId:'g_util'},
+  {id:'cu4', type:'expense', name:'Mobile Phone',           expected:80,   group:'Utilities',           parentId:'g_util'},
+  {id:'cu5', type:'expense', name:'Astro / TV',             expected:0,    group:'Utilities',           parentId:'g_util'},
+  {id:'ch1', type:'expense', name:'Medical / Doctor',       expected:0,    group:'Health',              parentId:'g_health'},
+  {id:'ch2', type:'expense', name:'Pharmacy',               expected:50,   group:'Health',              parentId:'g_health'},
+  {id:'ch3', type:'expense', name:'Dental',                 expected:0,    group:'Health',              parentId:'g_health'},
+  {id:'ch4', type:'expense', name:'Health Insurance',       expected:300,  group:'Health',              parentId:'g_health'},
+  {id:'csh1',type:'expense', name:'Clothing & Fashion',     expected:200,  group:'Shopping',            parentId:'g_shop'},
+  {id:'csh2',type:'expense', name:'Online Shopping',        expected:200,  group:'Shopping',            parentId:'g_shop'},
+  {id:'csh3',type:'expense', name:'Personal Care',          expected:100,  group:'Shopping',            parentId:'g_shop'},
+  {id:'csh4',type:'expense', name:'Household Items',        expected:100,  group:'Shopping',            parentId:'g_shop'},
+  {id:'ce1', type:'expense', name:'Streaming (Netflix etc)',expected:50,   group:'Entertainment',       parentId:'g_ent'},
+  {id:'ce2', type:'expense', name:'Movies / Cinema',        expected:50,   group:'Entertainment',       parentId:'g_ent'},
+  {id:'ck2', type:'expense', name:'Kids Pocket Money',      expected:100,  group:'Kids',                parentId:'g_kids'},
+  {id:'ck3', type:'expense', name:'Books & Stationery',     expected:50,   group:'Kids',                parentId:'g_kids'},
+  {id:'csv1',type:'expense', name:'Emergency Fund',         expected:500,  group:'Savings & Investment',parentId:'g_savings'},
+  {id:'csv2',type:'expense', name:'EPF Top-up',             expected:0,    group:'Savings & Investment',parentId:'g_savings'},
 ];
 
 
@@ -3180,6 +3289,80 @@ function resetBudgetPlan(){
   renderBudgetPlan();
   if(document.getElementById('view-monthly').classList.contains('active')) renderMonthly();
   toast('Reset to defaults - actuals synced');
+}
+
+function openSuggestCats(){
+  const existing=new Set(state.categories.map(c=>c.name.trim().toLowerCase()));
+  // Group suggested by group label
+  const byGroup={};
+  SUGGESTED_CATS.forEach(s=>{
+    if(!byGroup[s.group]) byGroup[s.group]=[];
+    byGroup[s.group].push(s);
+  });
+  let html='';
+  Object.entries(byGroup).forEach(([grp,cats])=>{
+    html+=`<div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${grp}</div>`;
+    cats.forEach(s=>{
+      const exists=existing.has(s.name.trim().toLowerCase());
+      const idAttr='sug_'+s.id;
+      html+=`<label style="display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:6px;cursor:${exists?'default':'pointer'};opacity:${exists?'.45':'1'};margin-bottom:2px;${exists?'':'hover:background:var(--surface2)'}">
+        <input type="checkbox" id="${idAttr}" data-id="${s.id}" ${exists?'disabled checked':''}
+          style="accent-color:var(--accent);width:14px;height:14px">
+        <span style="flex:1;font-size:13px">${s.name}</span>
+        <span style="font-size:11px;color:var(--text3)">MYR ${s.expected}/mo</span>
+        ${exists?'<span style="font-size:10px;color:var(--accent);font-weight:700">EXISTS</span>':''}
+      </label>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('suggestCatsBody').innerHTML=html;
+  document.getElementById('suggestCatsOverlay').style.display='flex';
+}
+
+function addCheckedSuggestedCats(){
+  const existing=new Set(state.categories.map(c=>c.name.trim().toLowerCase()));
+  const toAdd=SUGGESTED_CATS.filter(s=>{
+    const cb=document.getElementById('sug_'+s.id);
+    return cb&&cb.checked&&!cb.disabled&&!existing.has(s.name.trim().toLowerCase());
+  });
+  if(!toAdd.length){ alert('No new categories selected.'); return; }
+
+  // Ensure required groups exist
+  const groupIds={
+    'Transport':'g_transport','Food & Dining':'g_food','Utilities':'g_util',
+    'Health':'g_health','Shopping':'g_shop','Entertainment':'g_ent',
+    'Kids':'g_kids','Savings & Investment':'g_savings'
+  };
+  const groupNames={
+    'g_transport':'Transport','g_food':'Food & Dining','g_util':'Utilities',
+    'g_health':'Health','g_shop':'Shopping','g_ent':'Entertainment',
+    'g_kids':'Kids','g_savings':'Savings & Investment'
+  };
+  toAdd.forEach(s=>{
+    const gid=s.parentId;
+    if(gid&&!state.groups.find(g=>g.id===gid)){
+      state.groups.push({id:gid,name:groupNames[gid]||s.group});
+    }
+  });
+
+  // Add categories
+  let added=0;
+  toAdd.forEach(s=>{
+    const cat={id:s.id+'_'+Date.now(),type:s.type,name:s.name,expected:s.expected,
+                parentId:s.parentId,order:state.categories.length};
+    state.categories.push(cat);
+    MONTHS.forEach((_,mi)=>{
+      if(!state.months[mi]) state.months[mi]={};
+      state.months[mi][cat.id]={actual:0,paid:false,note:'',transactions:[]};
+    });
+    added++;
+  });
+
+  saveState();
+  renderAll();
+  document.getElementById('suggestCatsOverlay').style.display='none';
+  alert('✅ Added '+added+' categor'+(added===1?'y':'ies')+' to your budget.');
 }
 
 function confirmResetMonth(){
