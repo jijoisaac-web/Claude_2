@@ -78,12 +78,33 @@ a:hover{text-decoration:underline}
   .art-table{font-size:.78rem}
   .art-table th,.art-table td{padding:8px 10px}
 }
+
+@media(max-width:600px){
+  .site-nav{padding:10px 16px;}
+  .nav-links{display:none;}
+  .nav-back{display:inline-flex !important;}
+}
+.nav-back{
+  display:none;
+  align-items:center;
+  gap:6px;
+  background:rgba(0,212,170,.12);
+  border:1px solid rgba(0,212,170,.25);
+  border-radius:8px;
+  padding:6px 12px;
+  color:var(--teal);
+  font-size:.78rem;
+  font-weight:700;
+  text-decoration:none;
+}
+.nav-back:hover{background:rgba(0,212,170,.2);text-decoration:none;}
 </style>
 </head>
 <body>
 
 <nav class="site-nav">
   <a class="nav-brand" href="/">NRI Finance Hub</a>
+  <a class="nav-back" href="/">&#8592; Home</a>
   <div class="nav-links">
     <a href="/#rates">Live Rates</a>
     <a href="/#calculators">Calculators</a>

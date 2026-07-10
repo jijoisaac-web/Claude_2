@@ -3135,11 +3135,17 @@ function parseCsvBank(text, bank){
 function getMerchantMap(){ try{return JSON.parse(localStorage.getItem('merchantMap')||'{}')}catch{return {};} }
 function saveMerchantMap(map){ localStorage.setItem('merchantMap', JSON.stringify(map)); }
 function extractMerchantKey(desc){
-  // Normalize: strip location suffixes, QR refs, take first meaningful segment
-  return desc.replace(/\s*\(.*\)$/,'')          // strip (...) extras
-             .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')  // strip CITY MY
+  // For Maybank savings IBK FUND TFR, the REAL merchant is inside (...)
+  const ibk=desc.match(/IBK FUND TFR\s+FR A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
+  if(ibk) return ibk[1].trim().toUpperCase().slice(0,40);
+  // For PYMT FROM A/C (MERCHANT) pattern
+  const pymt=desc.match(/PYMT FROM A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
+  if(pymt) return 'PYMT:'+pymt[1].trim().toUpperCase().slice(0,35);
+  // Normal extraction: strip trailing location/code suffixes
+  return desc.replace(/\s*\(.*?\)\s*$/,'')
+             .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')
              .replace(/\s+MY\s*$/,'')
-             .replace(/[-*].*$/,'')               // strip after - or *
+             .replace(/[-*].*$/,'')
              .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')
              .trim().toUpperCase().slice(0,40);
 }
@@ -3397,7 +3403,10 @@ function renderBiReview(txns){
     <label style="font-size:12px;color:var(--text2);cursor:pointer;">
       <input type="checkbox" id="biAll" checked onchange="toggleBiAll(this.checked)"> Select all
     </label>
-    <button class="btn btn-primary" onclick="importBiTxns()">⬆ Import Selected</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="rematchUnassigned()" title="Re-run auto-matching on unassigned rows" style="font-size:12px;padding:5px 10px">✨ Re-match</button>
+      <button class="btn btn-primary" onclick="importBiTxns()">⬆ Import Selected</button>
+    </div>
   </div>
   <div class="bi-summary">
     <div>Transactions: <span>${txns.length}</span></div>
@@ -3429,7 +3438,7 @@ function renderBiReview(txns){
         </select>
       </td>
       <td>
-        <select class="bi-sel bi-cat" data-i="${i}" style="width:100%">${catOpts}</select>
+        <select class="bi-sel bi-cat" data-i="${i}" data-mkey="${extractMerchantKey(t.desc).replace(/"/g,'&quot;')}" style="width:100%" onchange="biCatChanged(this)">${catOpts}</select>
       </td>
     </tr>`;
   });
@@ -3447,6 +3456,49 @@ function renderBiReview(txns){
 
 function toggleBiAll(v){
   document.querySelectorAll('.bi-chk').forEach(cb=>cb.checked=v);
+}
+
+/* When user assigns a category, auto-fill all unassigned rows with same merchant */
+function biCatChanged(sel){
+  const mkey=sel.dataset.mkey;
+  const val=sel.value;
+  if(!mkey||!val) return;
+  const all=document.querySelectorAll('.bi-cat[data-mkey="'+mkey.replace(/"/g,'\\"')+'"]');
+  let filled=0;
+  all.forEach(s=>{
+    if(s!==sel && s.value===''){
+      s.value=val;
+      // update txn object too
+      _biTxns[+s.dataset.i].catId=val;
+      filled++;
+    }
+  });
+  if(filled>0){
+    const st=document.getElementById('biStatus');
+    const prev=st.textContent;
+    st.style.color='var(--accent)';
+    st.textContent='✓ Also applied to '+filled+' similar transaction'+(filled>1?'s':'')+' (same merchant)';
+    setTimeout(()=>{ st.textContent=prev; st.style.color='var(--accent)'; },3000);
+  }
+  _biTxns[+sel.dataset.i].catId=val;
+}
+
+/* Re-run auto-matching on rows still set to Skip */
+function rematchUnassigned(){
+  let count=0;
+  document.querySelectorAll('.bi-cat').forEach(sel=>{
+    if(sel.value===''){
+      const t=_biTxns[+sel.dataset.i];
+      const cat=matchCategory(t.desc);
+      if(cat){ sel.value=cat; t.catId=cat; count++; }
+    }
+  });
+  const st=document.getElementById('biStatus');
+  const unmatched=document.querySelectorAll('.bi-cat[value=""]').length;
+  st.style.color='var(--accent)';
+  st.textContent=count>0
+    ? `✓ Matched ${count} more transactions · ${unmatched} still unassigned`
+    : `No new matches found · ${unmatched} still need manual assignment`;
 }
 
 function importBiTxns(){

@@ -1,4 +1,4 @@
-/* v7.4 */
+/* v7.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4103,3 +4103,10 @@ function closeNavDD(){
     }
   });
 })();
+
+/* ── v7.5: Bottom nav active state sync ── */
+window.setMobBnav=function(tabId){
+  document.querySelectorAll('.mob-bnav-btn').forEach(function(b){b.classList.remove('mob-active');});
+  var el=document.getElementById('mbn-'+tabId);
+  if(el) el.classList.add('mob-active');
+};

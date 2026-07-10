@@ -1,4 +1,4 @@
-/* v7.4 */
+/* v7.5 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1767,3 +1767,129 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-dest-card{transition:box-shadow .18s,transform .15s;}
 .fl-dest-card:hover{box-shadow:0 0 0 2px var(--accent);transform:translateY(-1px);}
 .fl-dest-plan-hint{font-size:.7rem;color:var(--accent);margin:6px 0 2px;opacity:.8;letter-spacing:.01em;}
+
+
+/* ══════════════════════════════════════════════════════
+   v7.5 — MOBILE UX IMPROVEMENTS
+   ══════════════════════════════════════════════════════ */
+
+/* ── Hamburger button (hidden on desktop) ── */
+.nav-hamburger{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:38px;height:38px;
+  background:var(--elevated);
+  border:1px solid var(--border);
+  border-radius:10px;
+  cursor:pointer;
+  color:var(--text);
+  font-size:17px;
+  transition:background .2s,border-color .2s,color .2s;
+  flex-shrink:0;
+}
+.nav-hamburger:hover{border-color:var(--amber);color:var(--amber);}
+
+@media(max-width:640px){
+  /* Hide clutter from nav; show hamburger */
+  .nav-live-badge{display:none !important;}
+  .nav-cta{display:none !important;}
+  .nav-hamburger{display:flex;}
+  /* Tighter nav padding on small screens */
+  nav.site-nav{padding:0 12px;}
+}
+
+/* ── Active Tool Bar: stick it right under the fixed nav ── */
+.active-tool-bar{
+  top:64px;   /* matches nav height */
+}
+
+/* ── BOTTOM NAVIGATION BAR ─────────────────────────── */
+.mob-bnav{
+  display:none;
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:250;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:0 0 env(safe-area-inset-bottom,0);
+}
+@media(max-width:768px){
+  .mob-bnav{display:flex;}
+  /* Prevent content hiding under bottom nav */
+  .main{padding-bottom:76px;}
+  .hero-section{padding-bottom:0 !important;}
+}
+.mob-bnav-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:8px 4px 10px;
+  cursor:pointer;
+  border:none;
+  background:none;
+  color:var(--muted);
+  transition:color .15s,background .15s;
+  -webkit-tap-highlight-color:transparent;
+  min-height:56px;
+}
+.mob-bnav-btn.mob-active{color:var(--amber);}
+.mob-bnav-btn:hover{color:var(--text);background:var(--elevated);}
+.mob-bnav-icon{font-size:20px;line-height:1;}
+.mob-bnav-lbl{font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap;}
+/* Active indicator bar */
+.mob-bnav-btn.mob-active::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:var(--amber);
+  border-radius:0 0 2px 2px;
+}
+.mob-bnav-btn{position:relative;}
+
+/* Light theme bottom nav */
+[data-theme="light"] .mob-bnav{background:rgba(244,246,251,.96);border-top-color:rgba(15,23,42,.1);}
+[data-theme="light"] .mob-bnav-btn{color:#64748b;}
+[data-theme="light"] .mob-bnav-btn.mob-active{color:var(--amber);}
+
+/* ── Fix unreadable flight chart fonts ──────────────── */
+@media(max-width:480px){
+  .fl-mc-pct{font-size:.62rem !important;}
+  .fl-mc-fare{font-size:.6rem !important;}
+  .fl-mc-mn{font-size:.65rem !important;}
+  /* Hide percentage labels on very small bars, keep fares */
+  .fl-mc-bars{gap:3px;height:100px;}
+}
+/* Heatmap: wider cells on small screens */
+@media(max-width:480px){
+  .fl-hm-cell{min-width:26px !important;font-size:.62rem !important;}
+  .fl-hm-row{gap:3px !important;}
+}
+
+/* ── Touch target minimums (44px Apple HIG) ─────────── */
+.fl-dur-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
+.fl-cabin-btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;}
+.fl-win-btn{min-height:48px;display:flex;align-items:center;justify-content:center;}
+
+/* ── Article page nav: show hamburger on mobile ─────── */
+@media(max-width:600px){
+  .site-nav .nav-links{display:none;}
+  .art-mob-menu{display:flex !important;}
+}
+.art-mob-menu{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:38px;height:38px;
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--border);
+  border-radius:8px;
+  cursor:pointer;
+  color:var(--text);
+  font-size:16px;
+}
