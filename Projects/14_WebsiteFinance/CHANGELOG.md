@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.10.0] — 2026-07-09 · Bulk & Block Deals
+
+- Dashboard shows NSE's disclosed bulk deals (>0.5% of equity by one client) and block deals (negotiated window trades): institution/client name, BUY/SELL, quantity, weighted average price, deal value in ₹ Cr
+- Top 15 by value, optional filter to Nifty-500 universe stocks; universe stocks click through to their chart
+- New `/api/largedeals` proxy (same NSE cookie-bootstrap pattern, 30-min edge cache)
+
 ## [2.9.0] — 2026-07-09 · FII / DII Activity
 
 - Dashboard now shows NSE's provisional FII/FPI and DII cash-market activity for the latest trading day: net position (₹ Cr, green/red), buy/sell breakdown, and a one-line read of the flow combination (both buying / both selling / FII-selling-DII-absorbing / FII-led)

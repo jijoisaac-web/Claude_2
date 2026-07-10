@@ -163,6 +163,11 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
   <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
+  <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="controls">
+    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
+  </div>
+  <div id="dealsTable"><div class="loading">Loading…</div></div>
   <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div id="pulseView"><div class="loading">Analysing market…</div></div>
   <h2>Top opportunities today</h2>
@@ -568,6 +573,42 @@ async function loadFiiDii(){
   }
 }
 
+/* ---- bulk & block deals (NSE) ---- */
+let dealsData = null;
+async function loadDeals(){
+  try{
+    const r = await fetch("/api/largedeals");
+    const d = await r.json();
+    if(!r.ok || !d.deals) throw new Error(d.error || "no data");
+    dealsData = d.deals;
+    renderDeals();
+  }catch(e){
+    $("dealsTable").innerHTML = `<div class="loading">NSE didn't serve deal data (${e.message}) — published after market close on trading days; try again later.</div>`;
+  }
+}
+function renderDeals(){
+  if(!dealsData) return;
+  let deals = [...dealsData];
+  if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
+  deals.sort((a,b)=>(b.valueCr||0)-(a.valueCr||0));
+  const shown = deals.slice(0,15);
+  $("dealsMeta").textContent = `· ${dealsData[0]?.date||""} · ${deals.length} deals · showing top ${shown.length} by value`;
+  $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
+    <th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
+    shown.map(d=>{
+      const inUni = ALL_STOCKS[d.symbol+".NS"];
+      return `<tr ${inUni?`onclick="openChart('${d.symbol}.NS')" style="cursor:pointer"`:'style="cursor:default"'}>
+      <td style="text-align:left;max-width:280px">${d.client}</td>
+      <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
+      <td><span class="sym">${d.symbol}</span><br><span class="subname">${d.name||""}</span></td>
+      <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
+      <td><b>${d.valueCr!=null?fmt(d.valueCr,1):"—"}</b></td>
+      <td><span class="badge ${d.type==="BLOCK"?"capL":"capM"}">${d.type}</span></td></tr>`;}).join("") +
+    `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
+    : '<div class="loading">No deals matching the filter.</div>';
+}
+
 /* ---- market pulse: breadth, sectors, movers — from the latest scan ---- */
 async function loadPulse(){
   if(!screenerData){
@@ -653,6 +694,7 @@ async function loadDashboard(){
     $("globalCards").innerHTML = g.map(cardHTML).join("") || '<div class="loading">No data</div>';
   });
   loadFiiDii();
+  loadDeals();
   loadPulse();
   const wl = await pmap(getWL(), getQuote, 6);
   const rows = wl.filter(Boolean);
