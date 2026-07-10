@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.10"/>
+<link rel="stylesheet" href="/site.css?v=7.12"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.10</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.12</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -993,15 +993,37 @@ document.addEventListener('DOMContentLoaded',function(){
       <div style="font-size:.82rem;color:var(--muted)">Live exchange rate vs 30, 90 &amp; 180-day history — know when to send</div>
     </div>
 
-    <!-- Pair selector -->
-    <div class="rt-pairs" id="rt-pairs">
-      <button class="rt-pair-btn rt-active" onclick="rtSetPair('USD',this)"><span class="rt-pair-flag">🇺🇸</span>USD → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('AED',this)"><span class="rt-pair-flag">🇦🇪</span>AED → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('GBP',this)"><span class="rt-pair-flag">🇬🇧</span>GBP → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('EUR',this)"><span class="rt-pair-flag">🇪🇺</span>EUR → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('CAD',this)"><span class="rt-pair-flag">🇨🇦</span>CAD → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('AUD',this)"><span class="rt-pair-flag">🇦🇺</span>AUD → INR</button>
-      <button class="rt-pair-btn" onclick="rtSetPair('SGD',this)"><span class="rt-pair-flag">🇸🇬</span>SGD → INR</button>
+    <!-- Pair selector — all currencies from top flag dropdown -->
+    <div class="rt-pairs-wrap">
+      <div class="rt-pairs-group-lbl">🌙 Gulf</div>
+      <div class="rt-pairs" id="rt-pairs">
+        <button class="rt-pair-btn rt-active" onclick="rtSetPair('AED',this)"><span class="fi fi-ae fis rt-pair-fi"></span>AED</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('SAR',this)"><span class="fi fi-sa fis rt-pair-fi"></span>SAR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('QAR',this)"><span class="fi fi-qa fis rt-pair-fi"></span>QAR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('KWD',this)"><span class="fi fi-kw fis rt-pair-fi"></span>KWD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('BHD',this)"><span class="fi fi-bh fis rt-pair-fi"></span>BHD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('OMR',this)"><span class="fi fi-om fis rt-pair-fi"></span>OMR</button>
+      </div>
+      <div class="rt-pairs-group-lbl">🌍 Western</div>
+      <div class="rt-pairs">
+        <button class="rt-pair-btn" onclick="rtSetPair('USD',this)"><span class="fi fi-us fis rt-pair-fi"></span>USD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('GBP',this)"><span class="fi fi-gb fis rt-pair-fi"></span>GBP</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('EUR',this)"><span class="fi fi-eu fis rt-pair-fi"></span>EUR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('CAD',this)"><span class="fi fi-ca fis rt-pair-fi"></span>CAD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('AUD',this)"><span class="fi fi-au fis rt-pair-fi"></span>AUD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('NZD',this)"><span class="fi fi-nz fis rt-pair-fi"></span>NZD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('CHF',this)"><span class="fi fi-ch fis rt-pair-fi"></span>CHF</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('SEK',this)"><span class="fi fi-se fis rt-pair-fi"></span>SEK</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('NOK',this)"><span class="fi fi-no fis rt-pair-fi"></span>NOK</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('DKK',this)"><span class="fi fi-dk fis rt-pair-fi"></span>DKK</button>
+      </div>
+      <div class="rt-pairs-group-lbl">🌏 Asia-Pacific</div>
+      <div class="rt-pairs">
+        <button class="rt-pair-btn" onclick="rtSetPair('SGD',this)"><span class="fi fi-sg fis rt-pair-fi"></span>SGD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('MYR',this)"><span class="fi fi-my fis rt-pair-fi"></span>MYR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('JPY',this)"><span class="fi fi-jp fis rt-pair-fi"></span>JPY</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('HKD',this)"><span class="fi fi-hk fis rt-pair-fi"></span>HKD</button>
+      </div>
     </div>
 
     <!-- Loading message -->
@@ -2156,6 +2178,89 @@ document.addEventListener('DOMContentLoaded',function(){
           <div class="art-summary">How to legally move money from India to your foreign account. LRS limit, Form 15CA/CB, TCS on remittances above ₹7L, and FEMA compliance.</div>
           <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
         </div>
+        <!-- Country Guides -->
+        <div class="art-card" onclick="window.location.href='uae-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">UAE NRI Finance Guide: AED to INR, Banking &amp; Tax (2026)</div>
+          <div class="art-summary">Complete guide for Indians in UAE — best remittance rates, NRE/NRO accounts, India-UAE DTAA benefits, and KrisFlyer vs Air India miles strategy.</div>
+          <div class="art-meta"><span>&#128337; 9 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='uk-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">UK NRI Finance Guide: GBP to INR, Banking &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in the UK: how to optimise GBP→INR remittance, claim India-UK DTAA relief, manage NRE FDs, and handle NHS pension vs Indian assets.</div>
+          <div class="art-meta"><span>&#128337; 9 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='singapore-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Singapore NRI Guide: SGD to INR, CPF &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Singapore: SGD→INR remittance comparison, CPF vs NRE FD decision, India-Singapore DTAA, and KrisFlyer redemption strategy for India flights.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='australia-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Australia NRI Guide: AUD to INR, Superannuation &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Australia: AUD→INR remittance, Superannuation DASP decision, FITO credits to avoid double taxation, and Qantas miles for India travel.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='canada-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Canada NRI Guide: CAD to INR, TFSA, RRSP &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Canada: CAD→INR remittance, TFSA vs RRSP vs NRE FD strategy, PFIC warning on Indian mutual funds, and Aeroplan redemptions.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Estate & Legal -->
+        <div class="art-card" onclick="window.location.href='nri-will-estate-planning.html'">
+          <div><span class="art-tag planning">Estate Planning</span></div>
+          <div class="art-title">NRI Will &amp; Estate Planning: Cross-Border Inheritance Guide (2026)</div>
+          <div class="art-summary">Two-will strategy, succession laws for Hindu/Muslim/Christian NRIs, nominations vs legal heirs, and country-by-country inheritance tax comparison.</div>
+          <div class="art-meta"><span>&#128337; 10 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='power-of-attorney-nri.html'">
+          <div><span class="art-tag planning">Legal</span></div>
+          <div class="art-title">NRI Power of Attorney: Manage Indian Property from Abroad (2026)</div>
+          <div class="art-summary">How to create, apostille, and register a POA to manage Indian property while living abroad. Specific vs General POA, bank POA, and revocation process.</div>
+          <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Education & Life -->
+        <div class="art-card" onclick="window.location.href='nri-education-planning.html'">
+          <div><span class="art-tag planning">Education</span></div>
+          <div class="art-title">NRI Education Planning: Children&apos;s Corpus, Fees &amp; Strategy (2026)</div>
+          <div class="art-summary">IIT vs UK vs US costs, SSY rules for NRIs, PFIC warning on Indian mutual funds, and 529 plan strategy for NRIs in the USA.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='nri-insurance.html'">
+          <div><span class="art-tag banking">Insurance</span></div>
+          <div class="art-title">NRI Insurance Guide: Life &amp; Health Coverage in India (2026)</div>
+          <div class="art-summary">Can NRIs buy Indian term insurance? ULIP rules, claim settlement abroad, LIC for NRIs, and whether you need both Indian and host-country coverage.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Tax deep dives -->
+        <div class="art-card" onclick="window.location.href='capital-gains-nri.html'">
+          <div><span class="art-tag tax">Tax</span></div>
+          <div class="art-title">Capital Gains Tax for NRIs: Stocks, Mutual Funds &amp; Property (2026)</div>
+          <div class="art-summary">NRI TDS on capital gains is higher than for residents. Calculate LTCG/STCG, understand TDS deduction rates, and learn how to claim refunds.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='tds-refund-nri.html'">
+          <div><span class="art-tag tax">Tax</span></div>
+          <div class="art-title">TDS Refund for NRIs: How to Claim Back Excess Tax Deducted (2026)</div>
+          <div class="art-summary">Bank FD TDS at 30%, property TDS at 20% — NRIs often overpay. Step-by-step guide to filing ITR and claiming your TDS refund from the Indian government.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='nri-pan-card-guide.html'">
+          <div><span class="art-tag tax">Compliance</span></div>
+          <div class="art-title">NRI PAN Card Guide: Apply, Update &amp; Link Aadhaar from Abroad (2026)</div>
+          <div class="art-summary">Form 49AA online application, Aadhaar linking NRI exemption, residential status update via Form CSF, and e-PAN download. All steps with screenshots.</div>
+          <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Banking -->
+        <div class="art-card" onclick="window.location.href='fcnr-deposits.html'">
+          <div><span class="art-tag banking">Banking</span></div>
+          <div class="art-title">FCNR Deposits: Earn in USD, GBP, AED Without Currency Risk (2026)</div>
+          <div class="art-summary">FCNR lets you lock foreign currency in an Indian bank FD and earn 4–6% with no forex risk. Break-even vs NRE FD, premature withdrawal rules and best banks.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
       </div>
       <div class="info" style="margin-top:20px">&#9888;&#65039; These guides are for informational purposes only. Consult a SEBI-registered advisor or CA for personalised advice.</div>
     </div>
@@ -2582,14 +2687,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.10 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.12 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.10"></script>
+<script src="/site.js?v=7.12"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

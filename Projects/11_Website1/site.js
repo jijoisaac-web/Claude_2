@@ -1,4 +1,4 @@
-/* v7.10 */
+/* v7.12 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.10 — BULK & BLOCK DEALS ENGINE
+   v7.12 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4420,19 +4420,35 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.10 — SEND NOW OR WAIT? RATE TIMER
+   v7.12 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 (function(){
 
-  /* Currency pairs config */
+  /* Currency pairs config — matches all currencies in top flag dropdown */
   var RT_PAIRS = [
-    {id:'USD',label:'USD → INR',flag:'🇺🇸',key:'inr',cross:null},
-    {id:'AED',label:'AED → INR',flag:'🇦🇪',key:'inr',cross:'aed'},
-    {id:'GBP',label:'GBP → INR',flag:'🇬🇧',key:'inr',cross:'gbp'},
-    {id:'EUR',label:'EUR → INR',flag:'🇪🇺',key:'inr',cross:'eur'},
-    {id:'CAD',label:'CAD → INR',flag:'🇨🇦',key:'inr',cross:'cad'},
-    {id:'AUD',label:'AUD → INR',flag:'🇦🇺',key:'inr',cross:'aud'},
-    {id:'SGD',label:'SGD → INR',flag:'🇸🇬',key:'inr',cross:'sgd'}
+    /* Gulf */
+    {id:'AED',label:'AED → INR',flag:'🇦🇪',fi:'ae',key:'inr',cross:'aed',region:'Gulf'},
+    {id:'SAR',label:'SAR → INR',flag:'🇸🇦',fi:'sa',key:'inr',cross:'sar',region:'Gulf'},
+    {id:'QAR',label:'QAR → INR',flag:'🇶🇦',fi:'qa',key:'inr',cross:'qar',region:'Gulf'},
+    {id:'KWD',label:'KWD → INR',flag:'🇰🇼',fi:'kw',key:'inr',cross:'kwd',region:'Gulf'},
+    {id:'BHD',label:'BHD → INR',flag:'🇧🇭',fi:'bh',key:'inr',cross:'bhd',region:'Gulf'},
+    {id:'OMR',label:'OMR → INR',flag:'🇴🇲',fi:'om',key:'inr',cross:'omr',region:'Gulf'},
+    /* Western */
+    {id:'USD',label:'USD → INR',flag:'🇺🇸',fi:'us',key:'inr',cross:null,region:'Western'},
+    {id:'GBP',label:'GBP → INR',flag:'🇬🇧',fi:'gb',key:'inr',cross:'gbp',region:'Western'},
+    {id:'EUR',label:'EUR → INR',flag:'🇪🇺',fi:'eu',key:'inr',cross:'eur',region:'Western'},
+    {id:'CAD',label:'CAD → INR',flag:'🇨🇦',fi:'ca',key:'inr',cross:'cad',region:'Western'},
+    {id:'AUD',label:'AUD → INR',flag:'🇦🇺',fi:'au',key:'inr',cross:'aud',region:'Western'},
+    {id:'NZD',label:'NZD → INR',flag:'🇳🇿',fi:'nz',key:'inr',cross:'nzd',region:'Western'},
+    {id:'CHF',label:'CHF → INR',flag:'🇨🇭',fi:'ch',key:'inr',cross:'chf',region:'Western'},
+    {id:'SEK',label:'SEK → INR',flag:'🇸🇪',fi:'se',key:'inr',cross:'sek',region:'Western'},
+    {id:'NOK',label:'NOK → INR',flag:'🇳🇴',fi:'no',key:'inr',cross:'nok',region:'Western'},
+    {id:'DKK',label:'DKK → INR',flag:'🇩🇰',fi:'dk',key:'inr',cross:'dkk',region:'Western'},
+    /* Asia-Pacific */
+    {id:'SGD',label:'SGD → INR',flag:'🇸🇬',fi:'sg',key:'inr',cross:'sgd',region:'Asia'},
+    {id:'MYR',label:'MYR → INR',flag:'🇲🇾',fi:'my',key:'inr',cross:'myr',region:'Asia'},
+    {id:'JPY',label:'JPY → INR',flag:'🇯🇵',fi:'jp',key:'inr',cross:'jpy',region:'Asia'},
+    {id:'HKD',label:'HKD → INR',flag:'🇭🇰',fi:'hk',key:'inr',cross:'hkd',region:'Asia'}
   ];
 
   /* State */
@@ -4691,7 +4707,7 @@ function _fmtQ(v){
 
       if (!currentRate) {
         /* Fallback sample rates if API fails */
-        var FALLBACK = {USD:84.5,AED:23.02,GBP:107.2,EUR:91.4,CAD:62.1,AUD:55.3,SGD:63.8};
+        var FALLBACK = {AED:23.02,SAR:22.53,QAR:23.20,KWD:275.1,BHD:224.5,OMR:219.8,USD:84.5,GBP:107.2,EUR:91.4,CAD:62.1,AUD:55.3,NZD:50.2,CHF:95.8,SEK:8.42,NOK:8.15,DKK:12.25,SGD:63.8,MYR:19.2,JPY:0.555,HKD:10.85};
         currentRate = FALLBACK[_rtPair.id] || 84.5;
       }
 
