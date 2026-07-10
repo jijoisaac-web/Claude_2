@@ -92,7 +92,7 @@ progress{width:180px;accent-color:var(--blue);}
 .allocRow .aname{width:120px;font-size:12px;color:var(--muted);text-align:right;}
 .allocRow .bar{height:14px;border-radius:3px;background:var(--blue);min-width:2px;max-width:40vw;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#pfTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#pfTable,#dealsTable,#btResults,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -114,7 +114,7 @@ progress{width:180px;accent-color:var(--blue);}
   select,input[type=text]{padding:7px 8px;font-size:13px;max-width:46vw;}
   button.btn{padding:7px 10px;font-size:12px;}
   /* wide tables: scroll inside their container */
-  #screenerTable table,#fsResults table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table{min-width:640px;}
+  #screenerTable table,#fsResults table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table{min-width:640px;}
   #watchTable table,#peerView table{min-width:420px;}
   .sectorRow .sname{width:96px;font-size:11px;}
   .sectorRow .bar{max-width:34vw;}
@@ -139,6 +139,7 @@ progress{width:180px;accent-color:var(--blue);}
     <button data-tab="fundamentals">Fundamentals</button>
     <button data-tab="portfolio">Portfolio</button>
     <button data-tab="track">Backtest</button>
+    <button data-tab="insti">FII/DII</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -150,7 +151,7 @@ progress{width:180px;accent-color:var(--blue);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–8</b></td><td>Switch tabs (Dashboard → Track Record)</td></tr>
+      <tr><td><b>1–9</b></td><td>Switch tabs (Dashboard → FII/DII)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -164,13 +165,6 @@ progress{width:180px;accent-color:var(--blue);}
   <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
   <h2>Global markets &amp; macro</h2>
   <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
-  <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
-  <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="controls">
-    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
-  </div>
-  <div id="dealsTable"><div class="loading">Loading…</div></div>
   <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div id="pulseView"><div class="loading">Analysing market…</div></div>
   <h2>Top opportunities today</h2>
@@ -308,6 +302,17 @@ progress{width:180px;accent-color:var(--blue);}
   </div>
   <h2>Observations</h2>
   <div id="pfSuggest"><div class="loading">…</div></div>
+</section>
+
+<!-- INSTITUTIONS: FII/DII + large deals -->
+<section id="insti" class="tab">
+  <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
+  <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="controls">
+    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
+  </div>
+  <div id="dealsTable"><div class="loading">Loading…</div></div>
 </section>
 
 <!-- BACKTEST -->
@@ -535,6 +540,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
   if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
+  if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -696,8 +702,6 @@ async function loadDashboard(){
     g = g.filter(Boolean).map(q => q.symbol==="^TNX" ? {...q, price:q.price/10, change:q.change/10} : q);  // ^TNX is 10x the yield
     $("globalCards").innerHTML = g.map(cardHTML).join("") || '<div class="loading">No data</div>';
   });
-  loadFiiDii();
-  loadDeals();
   loadPulse();
   const wl = await pmap(getWL(), getQuote, 6);
   const rows = wl.filter(Boolean);
@@ -2003,7 +2007,7 @@ function renderBacktest(trades, uni, lookback){
 }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track"];
+const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
@@ -2036,7 +2040,7 @@ document.addEventListener("keydown", e=>{
   if(typing) return;
   if(e.key==="/"){ e.preventDefault(); $("globalSearch").focus(); }
   else if(e.key==="?"){ const h=$("kbdHelp"); h.style.display = h.style.display==="none"?"block":"none"; }
-  else if(/^[1-8]$/.test(e.key)){
+  else if(/^[1-9]$/.test(e.key)){
     const btn = document.querySelector(`nav button[data-tab="${TAB_ORDER[+e.key-1]}"]`);
     if(btn) btn.click();
   }

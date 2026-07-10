@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.11.0] — 2026-07-09
+
+- FII/DII activity and bulk & block deals moved from the dashboard into a dedicated **FII/DII** tab (shortcut `9`); data loads on first open. Dashboard is leaner
+- Mobile fix (found by rendering the live site at 390px): the deals and backtest-results tables caused page-level horizontal scroll — both now scroll within their own containers like every other wide table
+
 ## [2.10.1] — 2026-07-09
 
 - Added Cloudflare Web Analytics beacon (privacy-friendly, no cookies)
