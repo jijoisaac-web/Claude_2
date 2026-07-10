@@ -1027,6 +1027,19 @@ tbody tr.income-row td:first-child{
 .bi-edit:hover{border-bottom-color:var(--text3);}
 .bi-edit:focus{background:rgba(255,255,255,.06);border-bottom-color:var(--accent);}
 .bi-edit-amt{text-align:right;font-weight:700;}
+/* Bank import tabs */
+.bi-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin:14px -4px 0;padding:0 4px;}
+.bi-tab-btn{padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);transition:color .15s,border-color .15s;white-space:nowrap;}
+.bi-tab-btn:hover{color:var(--text1);}
+.bi-tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.bi-tab-panel{display:none;}
+.bi-tab-panel.active{display:block;}
+.map-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;}
+.map-table thead th{background:var(--surface3);padding:7px 10px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);}
+.map-table tbody tr{border-bottom:1px solid var(--border);}
+.map-table tbody tr:hover{background:var(--surface2);}
+.map-table td{padding:7px 10px;vertical-align:middle;}
+.map-saved-badge{font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(92,184,122,.18);color:var(--accent);font-weight:700;margin-left:5px;}
 .bi-summary{display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-top:12px;font-size:12px;}
 .bi-summary span{font-weight:700;}
 
@@ -1172,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.1
+        <span class="ver-dot"></span>v3.2
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1229,6 +1242,12 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.2 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Category Mapping tab in import modal — see all unique merchants, assign &amp; save mappings</div>
+    <div class="cl-item">Saved mappings show SAVED badge; auto-apply on future imports</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v3.1 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1582,38 +1601,52 @@ tbody tr.income-row td:first-child{
     </label>
     <div class="bi-status" id="biStatus"></div>
 
-    <!-- Quick-create category/group panel -->
-    <div id="biQuickCreate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:10px 0">
-      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">➕ New Category</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-        <div style="flex:2;min-width:120px">
-          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">CATEGORY NAME</label>
-          <input id="biqName" class="modal-input" placeholder="e.g. Dining Out" style="width:100%;box-sizing:border-box">
-        </div>
-        <div style="flex:1;min-width:90px">
-          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">TYPE</label>
-          <select id="biqType" class="bi-sel" style="width:100%;padding:7px 6px">
-            <option value="expense">Expense</option>
-            <option value="income">Income</option>
-          </select>
-        </div>
-        <div style="flex:2;min-width:120px">
-          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">GROUP (optional)</label>
-          <select id="biqGroup" class="bi-sel" style="width:100%;padding:7px 6px">
-            <option value="">— No group —</option>
-            <option value="__new__">+ Create new group…</option>
-          </select>
-        </div>
-        <div id="biqNewGroupWrap" style="display:none;flex:2;min-width:120px">
-          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">NEW GROUP NAME</label>
-          <input id="biqGroupName" class="modal-input" placeholder="e.g. Transport" style="width:100%;box-sizing:border-box">
-        </div>
-        <button class="btn btn-primary" onclick="biQuickCreateCat()" style="padding:7px 14px;font-size:12px;white-space:nowrap">Create</button>
-        <button class="btn btn-gray" onclick="document.getElementById('biQuickCreate').style.display='none'" style="padding:7px 10px;font-size:12px">✕</button>
-      </div>
+    <!-- Tabs (shown once data is loaded) -->
+    <div class="bi-tabs" id="biTabBar" style="display:none">
+      <div class="bi-tab-btn active" id="biTabBtnTxns" onclick="switchBiTab('txns',this)">📋 Transactions</div>
+      <div class="bi-tab-btn" id="biTabBtnMapping" onclick="switchBiTab('mapping',this)">🗂 Category Mapping</div>
     </div>
 
-    <div id="biReview"></div>
+    <!-- Transactions panel -->
+    <div id="biTabTxns" class="bi-tab-panel active">
+      <!-- Quick-create category/group panel -->
+      <div id="biQuickCreate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:10px 0">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">➕ New Category</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:2;min-width:120px">
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">CATEGORY NAME</label>
+            <input id="biqName" class="modal-input" placeholder="e.g. Dining Out" style="width:100%;box-sizing:border-box">
+          </div>
+          <div style="flex:1;min-width:90px">
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">TYPE</label>
+            <select id="biqType" class="bi-sel" style="width:100%;padding:7px 6px">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+          </div>
+          <div style="flex:2;min-width:120px">
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">GROUP (optional)</label>
+            <select id="biqGroup" class="bi-sel" style="width:100%;padding:7px 6px">
+              <option value="">— No group —</option>
+              <option value="__new__">+ Create new group…</option>
+            </select>
+          </div>
+          <div id="biqNewGroupWrap" style="display:none;flex:2;min-width:120px">
+            <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">NEW GROUP NAME</label>
+            <input id="biqGroupName" class="modal-input" placeholder="e.g. Transport" style="width:100%;box-sizing:border-box">
+          </div>
+          <button class="btn btn-primary" onclick="biQuickCreateCat()" style="padding:7px 14px;font-size:12px;white-space:nowrap">Create</button>
+          <button class="btn btn-gray" onclick="document.getElementById('biQuickCreate').style.display='none'" style="padding:7px 10px;font-size:12px">✕</button>
+        </div>
+      </div>
+      <div id="biReview"></div>
+    </div>
+
+    <!-- Category Mapping panel -->
+    <div id="biTabMapping" class="bi-tab-panel">
+      <div id="biMappingContent"></div>
+    </div>
+
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
       <button class="btn btn-gray" onclick="closeBankImport()">Close</button>
     </div>
@@ -3238,7 +3271,14 @@ function openBankImport(){
   document.getElementById('bankImportModal').style.display='flex';
   document.getElementById('biFileInput').value='';
   document.getElementById('biReview').innerHTML='';
+  document.getElementById('biMappingContent').innerHTML='';
   document.getElementById('biStatus').textContent='';
+  document.getElementById('biTabBar').style.display='none';
+  // Reset to Transactions tab
+  document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('biTabBtnTxns').classList.add('active');
+  document.querySelectorAll('.bi-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('biTabTxns').classList.add('active');
 }
 function closeBankImport(){
   document.getElementById('bankImportModal').style.display='none';
@@ -3714,6 +3754,117 @@ function renderBiReview(txns){
     const t=_biTxns[+sel.dataset.i];
     if(t.catId) sel.value=t.catId;
   });
+
+  // Show tab bar and reset to Transactions tab
+  document.getElementById('biTabBar').style.display='flex';
+  document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('biTabBtnTxns').classList.add('active');
+  document.querySelectorAll('.bi-tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('biTabTxns').classList.add('active');
+}
+
+function switchBiTab(name, btn){
+  document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.bi-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(name==='txns'?'biTabTxns':'biTabMapping').classList.add('active');
+  if(name==='mapping') renderMappingTab();
+}
+
+function renderMappingTab(){
+  const cats=state.categories;
+  const mmap=getMerchantMap();
+  const catOpts='<option value="">— Unassigned —</option>'
+    +cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+
+  // Group loaded transactions by merchant key
+  const groups={};
+  (_biTxns||[]).forEach((t,i)=>{
+    const mk=extractMerchantKey(t.desc);
+    if(!groups[mk]) groups[mk]={count:0,total:0,catId:t.catId||'',sample:t.desc,indices:[]};
+    groups[mk].count++;
+    groups[mk].total+=t.amount;
+    groups[mk].indices.push(i);
+    if(t.catId&&!groups[mk].catId) groups[mk].catId=t.catId;
+  });
+
+  const keys=Object.keys(groups);
+  if(!keys.length){
+    document.getElementById('biMappingContent').innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">Load a bank statement first to see merchant mappings.</div>';
+    return;
+  }
+
+  const unassigned=keys.filter(k=>!groups[k].catId).length;
+  let html=`<div style="margin:12px 0 8px;font-size:12px;color:var(--text3)">
+    <strong style="color:var(--text1)">${keys.length}</strong> unique merchants from loaded file.
+    ${unassigned?`<span style="color:var(--yellow)"> ${unassigned} unassigned.</span>`:'<span style="color:var(--accent)"> All mapped ✓</span>'}
+    <span style="float:right;cursor:pointer;color:var(--accent)" onclick="saveMappingAndApply()">💾 Save all mappings</span>
+  </div>
+  <div style="overflow-x:auto"><table class="map-table">
+    <thead><tr>
+      <th>Merchant</th>
+      <th style="text-align:center">Txns</th>
+      <th style="text-align:right">Total (MYR)</th>
+      <th style="min-width:170px">Category</th>
+    </tr></thead><tbody>`;
+
+  keys.forEach(mk=>{
+    const g=groups[mk];
+    const savedBadge=mmap[mk]?'<span class="map-saved-badge">SAVED</span>':'';
+    html+=`<tr>
+      <td>
+        <div style="font-weight:600;font-size:12px">${mk}${savedBadge}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px;word-break:break-word">${g.sample}</div>
+      </td>
+      <td style="text-align:center;color:var(--text2)">${g.count}</td>
+      <td style="text-align:right;font-weight:700;color:var(--red)">MYR ${fmt(g.total)}</td>
+      <td>
+        <select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}"
+          style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select>
+      </td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  const panel=document.getElementById('biMappingContent');
+  panel.innerHTML=html;
+
+  // Set current values
+  panel.querySelectorAll('.map-cat-sel').forEach(sel=>{
+    const mk=sel.dataset.mkey;
+    const catId=groups[mk]?.catId||(mmap[mk]&&cats.find(c=>c.id===mmap[mk])?mmap[mk]:'');
+    if(catId) sel.value=catId;
+  });
+}
+
+function mapCatChanged(sel){
+  const mk=sel.dataset.mkey;
+  const catId=sel.value;
+  // Apply to all loaded transactions with this merchant key
+  (_biTxns||[]).forEach((t,i)=>{
+    if(extractMerchantKey(t.desc)===mk){
+      t.catId=catId;
+      // Update Transactions tab dropdowns too
+      const s=document.querySelector(`.bi-cat[data-i="${i}"]`);
+      if(s) s.value=catId;
+    }
+  });
+}
+
+function saveMappingAndApply(){
+  const mmap=getMerchantMap();
+  document.querySelectorAll('.map-cat-sel').forEach(sel=>{
+    const mk=sel.dataset.mkey;
+    if(sel.value) mmap[mk]=sel.value;
+    else delete mmap[mk];
+  });
+  saveMerchantMap(mmap);
+  // Re-render to show SAVED badges
+  renderMappingTab();
+  const st=document.getElementById('biStatus');
+  st.style.color='var(--accent)';
+  st.textContent='✓ Mappings saved — will auto-apply on future imports';
+  setTimeout(()=>st.textContent='',3000);
 }
 
 function toggleBiAll(v){
