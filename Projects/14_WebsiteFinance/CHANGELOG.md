@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.12.2] — 2026-07-10
+
+- Fixed Options tab ("NSE 404"): NSE retired the old option-chain endpoints; the proxy now uses the v3 API — expiry list via contract-info first, then the chain for the chosen expiry (past expiries filtered out)
+
 ## [2.12.1] — 2026-07-10
 
 - Chart API edge cache raised from 5 to 15 minutes (daily candles change once a day) — cuts repeat-scan traffic to Yahoo roughly 3x and lifts the CDN cache-hit rate
