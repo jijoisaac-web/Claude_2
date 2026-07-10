@@ -140,6 +140,7 @@ progress{width:180px;accent-color:var(--blue);}
     <button data-tab="portfolio">Portfolio</button>
     <button data-tab="track">Backtest</button>
     <button data-tab="insti">FII/DII</button>
+    <button data-tab="options">Options</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -313,6 +314,31 @@ progress{width:180px;accent-color:var(--blue);}
     <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
+</section>
+
+<!-- OPTIONS -->
+<section id="options" class="tab">
+  <div class="controls">
+    <select id="optSymbol" onchange="loadOptions()">
+      <optgroup label="Indices">
+        <option value="NIFTY" selected>NIFTY</option>
+        <option value="BANKNIFTY">BANKNIFTY</option>
+        <option value="FINNIFTY">FINNIFTY</option>
+        <option value="MIDCPNIFTY">MIDCPNIFTY</option>
+      </optgroup>
+      <optgroup label="Stocks (F&O only)" id="optStockGroup"></optgroup>
+    </select>
+    <select id="optExpiry" onchange="loadOptions($('optExpiry').value)"></select>
+    <button class="btn ghost" onclick="loadOptions()">↻ Refresh</button>
+    <span class="muted" id="optMeta"></span>
+  </div>
+  <div class="cards" id="optCards"><div class="loading">Pick a symbol — loads NSE option chain</div></div>
+  <div id="optVerdict"></div>
+  <h2>Open interest by strike <span class="muted" style="text-transform:none;font-weight:400">· green = puts (support below), red = calls (resistance above)</span></h2>
+  <div class="card" id="optLadder"></div>
+  <h2>Biggest OI changes today</h2>
+  <div id="optChanges"></div>
+  <div class="muted" style="font-size:11px;margin-top:6px">OI reads are strongest near expiry and for liquid names. Writers (sellers) drive OI walls: heavy put OI = a level someone is paid to defend; heavy call OI = a ceiling someone is paid to cap. Data ~3-min delayed during market hours; stale after close. Not investment advice.</div>
 </section>
 
 <!-- BACKTEST -->
@@ -541,6 +567,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
   if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
   if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
+  if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -2004,6 +2031,101 @@ function renderBacktest(trades, uni, lookback){
       <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
     </tbody></table>
     <div class="muted" style="font-size:11px;margin-top:6px">Backtests overstate reality: no brokerage/slippage/taxes, entries at exact closes, and today's index constituents didn't all exist a year ago (survivorship bias). Treat relative comparisons (signal vs signal, strategy vs NIFTY) as more trustworthy than absolute returns.</div>`;
+}
+
+/* ================= options: chain analysis ================= */
+function maxPain(strikes){
+  let best=null, bestPay=Infinity;
+  for(const s of strikes){
+    let pay=0;
+    for(const x of strikes){
+      if(x.ce&&x.ce.oi) pay += x.ce.oi*Math.max(0, s.k-x.k);
+      if(x.pe&&x.pe.oi) pay += x.pe.oi*Math.max(0, x.k-s.k);
+    }
+    if(pay<bestPay){ bestPay=pay; best=s.k; }
+  }
+  return best;
+}
+async function loadOptions(expiry){
+  window._optLoaded = true;
+  const sym = $("optSymbol").value;
+  $("optCards").innerHTML = '<div class="loading">Fetching option chain…</div>';
+  $("optVerdict").innerHTML = ""; $("optLadder").innerHTML = ""; $("optChanges").innerHTML = "";
+  try{
+    const r = await fetch(`/api/optionchain?symbol=${encodeURIComponent(sym)}${expiry?`&expiry=${encodeURIComponent(expiry)}`:""}`);
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || r.status);
+    $("optExpiry").innerHTML = d.expiries.map(x=>`<option ${x===d.expiry?"selected":""}>${x}</option>`).join("");
+    $("optMeta").textContent = `· ${d.asOf || ""}`;
+    const st = d.strikes;
+    const ceOI = st.reduce((s,x)=>s+((x.ce&&x.ce.oi)||0),0);
+    const peOI = st.reduce((s,x)=>s+((x.pe&&x.pe.oi)||0),0);
+    const ceChg = st.reduce((s,x)=>s+((x.ce&&x.ce.chg)||0),0);
+    const peChg = st.reduce((s,x)=>s+((x.pe&&x.pe.chg)||0),0);
+    const pcr = ceOI ? peOI/ceOI : null;
+    const mp = maxPain(st);
+    const atmIdx = st.reduce((m,x,i)=>Math.abs(x.k-d.spot)<Math.abs(st[m].k-d.spot)?i:m, 0);
+    const atm = st[atmIdx];
+    const support = [...st].filter(x=>x.pe&&x.pe.oi&&x.k<=d.spot).sort((a,b)=>b.pe.oi-a.pe.oi)[0];
+    const resist  = [...st].filter(x=>x.ce&&x.ce.oi&&x.k>=d.spot).sort((a,b)=>b.ce.oi-a.ce.oi)[0];
+    const mpGap = mp!=null && d.spot ? (d.spot-mp)/d.spot*100 : null;
+
+    $("optCards").innerHTML = [
+      ["Spot", fmt(d.spot), d.expiry],
+      ["PCR (OI)", pcr!=null?`<span class="${pcr>=1?"up":"down"}">${fmt(pcr,2)}</span>`:"—", pcr!=null?(pcr>=1.2?"put writers dominant":pcr<=0.7?"call writers dominant":"balanced"):""],
+      ["Max pain", mp!=null?fmt(mp,0):"—", mpGap!=null?`spot ${sign(mpGap)}${fmt(mpGap,1)}% vs max pain`:""],
+      ["Support (put wall)", support?fmt(support.k,0):"—", support?fmtInt(support.pe.oi)+" OI":""],
+      ["Resistance (call wall)", resist?fmt(resist.k,0):"—", resist?fmtInt(resist.ce.oi)+" OI":""],
+      ["ATM IV", atm&&atm.ce&&atm.ce.iv!=null?`${fmt(atm.ce.iv,1)} / ${atm.pe&&atm.pe.iv!=null?fmt(atm.pe.iv,1):"—"}`:"—", "call / put"],
+    ].map(([k,v,sub])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div><div class="chg muted">${sub}</div></div>`).join("");
+
+    // verdict
+    const reads = [];
+    if(pcr!=null){
+      if(pcr>=1.2) reads.push(`PCR ${fmt(pcr,2)} — put writers are confident; dips toward the put wall tend to get bought.`);
+      else if(pcr<=0.7) reads.push(`PCR ${fmt(pcr,2)} — call writers dominate; rallies are being sold into.`);
+      else reads.push(`PCR ${fmt(pcr,2)} — no side dominant.`);
+    }
+    if(support && resist) reads.push(`OI walls imply an expected expiry range of roughly <b>${fmt(support.k,0)}–${fmt(resist.k,0)}</b>.`);
+    if(mpGap!=null && Math.abs(mpGap)>1.5) reads.push(`Spot is ${fmt(Math.abs(mpGap),1)}% ${mpGap>0?"above":"below"} max pain (${fmt(mp,0)}) — option sellers profit if price drifts ${mpGap>0?"down":"up"} toward it into expiry.`);
+    if(peChg>ceChg*1.5 && peChg>0) reads.push(`Fresh OI today skews to puts (+${fmtInt(peChg)} vs +${fmtInt(ceChg)} calls) — intraday positioning leans bullish (put writing).`);
+    else if(ceChg>peChg*1.5 && ceChg>0) reads.push(`Fresh OI today skews to calls (+${fmtInt(ceChg)} vs +${fmtInt(peChg)} puts) — positioning leans bearish (call writing) unless price is breaking out.`);
+    if(atm&&atm.ce&&atm.pe&&atm.ce.iv!=null&&atm.pe.iv!=null&&atm.pe.iv-atm.ce.iv>3) reads.push(`Put IV well above call IV at ATM — downside protection is expensive; the market is nervous.`);
+    $("optVerdict").innerHTML = `<div class="card" style="margin-bottom:12px"><div class="name">Trend read</div>
+      <div style="font-size:13px;line-height:1.6;margin-top:4px">${reads.join("<br>")}</div></div>`;
+
+    // OI ladder ±8 strikes around ATM
+    const lo = Math.max(0, atmIdx-8), hi = Math.min(st.length, atmIdx+9);
+    const win = st.slice(lo,hi);
+    const maxOI = Math.max(1, ...win.map(x=>Math.max((x.ce&&x.ce.oi)||0,(x.pe&&x.pe.oi)||0)));
+    $("optLadder").innerHTML = win.map(x=>{
+      const pw = ((x.pe&&x.pe.oi)||0)/maxOI*160, cw = ((x.ce&&x.ce.oi)||0)/maxOI*160;
+      const isATM = x.k===atm.k, isMP = x.k===mp;
+      return `<div style="display:flex;align-items:center;gap:6px;margin:2px 0;font-size:11px">
+        <div style="width:170px;display:flex;justify-content:flex-end"><div style="height:12px;width:${pw}px;background:var(--green);border-radius:2px;opacity:.8"></div></div>
+        <div style="width:78px;text-align:center;${isATM?"color:var(--blue);font-weight:700":""}${isMP?";text-decoration:underline":""}">${fmt(x.k,0)}${isATM?" ◀":""}${isMP?" ⚖":""}</div>
+        <div style="width:170px"><div style="height:12px;width:${cw}px;background:var(--red);border-radius:2px;opacity:.8"></div></div>
+      </div>`;}).join("") +
+      `<div class="muted" style="font-size:10px;margin-top:4px">◀ ATM · ⚖ max pain</div>`;
+
+    // biggest OI changes
+    const chgRows = [];
+    st.forEach(x=>{
+      if(x.ce&&x.ce.chg) chgRows.push({k:x.k, side:"CALL", chg:x.ce.chg, oi:x.ce.oi, ltp:x.ce.ltp});
+      if(x.pe&&x.pe.chg) chgRows.push({k:x.k, side:"PUT", chg:x.pe.chg, oi:x.pe.oi, ltp:x.pe.ltp});
+    });
+    chgRows.sort((a,b)=>Math.abs(b.chg)-Math.abs(a.chg));
+    $("optChanges").innerHTML = `<table><thead><tr><th>Strike</th><th>Side</th><th>OI change</th><th>Total OI</th><th>LTP ₹</th><th style="text-align:left">Read</th></tr></thead><tbody>` +
+      chgRows.slice(0,8).map(c=>{
+        const read = c.side==="PUT" ? (c.chg>0?"put writing — support building":"put unwinding — support weakening")
+                                    : (c.chg>0?"call writing — resistance building":"call unwinding — ceiling lifting");
+        return `<tr><td>${fmt(c.k,0)}</td><td><span class="badge ${c.side==="PUT"?"bullish":"bearish"}">${c.side}</span></td>
+        <td class="${cls(c.chg)}">${sign(c.chg)}${fmtInt(Math.abs(c.chg))}</td><td>${fmtInt(c.oi)}</td><td>${fmt(c.ltp)}</td>
+        <td style="text-align:left" class="muted">${read}</td></tr>`;}).join("") + "</tbody></table>";
+  }catch(e){
+    $("optCards").innerHTML = `<div class="card"><div class="name">Unavailable</div>
+      <div class="muted" style="font-size:12px;margin-top:4px">${e.message}. Stock may not be in the F&O segment, or NSE is withholding data — try an index or another stock.</div></div>`;
+  }
 }
 
 /* ================= global search + keyboard shortcuts ================= */
