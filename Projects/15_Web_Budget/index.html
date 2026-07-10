@@ -1510,9 +1510,10 @@ tbody tr.income-row td:first-child{
 
     <div class="data-card">
       <h3>🗑 Reset Data</h3>
-      <p>Clear actual amounts, transactions, and paid status for the current month, or delete all data for the year.</p>
+      <p>Clear actual amounts, transactions, and paid status — by month, all actuals for the year, or full year wipe.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-danger" onclick="confirmResetMonth()">↺ Reset Month Data</button>
+        <button class="btn btn-danger" onclick="confirmResetMonth()">↺ Reset Month Actuals</button>
+        <button class="btn btn-danger" onclick="confirmResetAllActuals()">↺ Reset All Actuals</button>
         <button class="btn btn-danger" onclick="confirmReset()">↺ Reset Year Data</button>
       </div>
     </div>
@@ -3375,6 +3376,18 @@ function confirmResetMonth(){
   }
   saveState(); renderAll();
   alert('✅ '+mname+' has been reset.');
+}
+
+function confirmResetAllActuals(){
+  if(!confirm('⚠️ Reset ALL actuals, transactions and paid status for every month in '+currentYear+'?\n\nCategory names and expected amounts are kept.\nThis cannot be undone.')) return;
+  MONTHS.forEach((_,mi)=>{
+    if(!state.months[mi]) state.months[mi]={};
+    state.categories.forEach(c=>{
+      state.months[mi][c.id]={actual:0,paid:false,note:'',transactions:[]};
+    });
+  });
+  saveState(); renderAll();
+  alert('✅ All actuals cleared for '+currentYear+'. Categories and budgets are intact.');
 }
 
 function confirmReset(){
