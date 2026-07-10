@@ -3552,31 +3552,63 @@ function importBiTxns(){
     return;
   }
 
-  const md=getMonthData(currentMonth);
-  // Group amounts by catId
-  const grouped={};
+  // Parse "DD/MM/YY" or "DD/MM/YYYY" → {month (0-based), year}
+  function parseTxnDate(dateStr){
+    const p=(dateStr||'').split('/');
+    if(p.length<3) return {month:currentMonth, year:currentYear};
+    const month=parseInt(p[1])-1;
+    let year=parseInt(p[2]);
+    if(year<100) year+=2000;
+    return {month:isNaN(month)?currentMonth:month, year:isNaN(year)?currentYear:year};
+  }
+
+  // Group by year+month → catId → total amount
+  const byMonth={};
   toImport.forEach(t=>{
-    grouped[t.catId]=(grouped[t.catId]||0)+t.amount;
+    const {month,year}=parseTxnDate(t.date);
+    const key=year+'-'+month;
+    if(!byMonth[key]) byMonth[key]={year,month,grouped:{}};
+    byMonth[key].grouped[t.catId]=(byMonth[key].grouped[t.catId]||0)+t.amount;
   });
 
-  Object.entries(grouped).forEach(([catId,total])=>{
-    let entry=md.entries.find(e=>e.catId===catId);
-    if(entry){ entry.actual=(entry.actual||0)+total; }
-    else { md.entries.push({catId,actual:total,paid:false,note:''}); }
+  const monthsUpdated=[];
+
+  Object.values(byMonth).forEach(({year,month,grouped})=>{
+    // Load different year's state if needed
+    let tState=state;
+    if(year!==currentYear){
+      tState=loadState(year);
+    }
+    // Ensure month bucket exists
+    if(!tState.months[month]) tState.months[month]={};
+
+    Object.entries(grouped).forEach(([catId,total])=>{
+      if(!tState.months[month][catId])
+        tState.months[month][catId]={actual:0,paid:false,note:''};
+      tState.months[month][catId].actual=(tState.months[month][catId].actual||0)+total;
+    });
+
+    if(year!==currentYear){
+      localStorage.setItem(sKey(year), JSON.stringify(tState));
+    }
+    monthsUpdated.push(MONTHS[month]+' '+year);
   });
 
   saveState();
-  // Save merchant→category mappings for future imports
+
+  // Save merchant→category memory for future imports
   const mmap=getMerchantMap();
   toImport.forEach(t=>{
     const mkey=extractMerchantKey(t.desc);
     if(mkey&&t.catId) mmap[mkey]=t.catId;
   });
   saveMerchantMap(mmap);
+
   closeBankImport();
   renderMonthly();
-  const catCount=Object.keys(grouped).length;
-  alert(`✅ Imported ${toImport.length} transactions across ${catCount} categories for ${MONTHS[currentMonth]} ${currentYear}.`);
+
+  const uniqueMonths=[...new Set(monthsUpdated)].join(', ');
+  alert('\u2705 Imported '+toImport.length+' transactions into: '+uniqueMonths);
 }
 
 
