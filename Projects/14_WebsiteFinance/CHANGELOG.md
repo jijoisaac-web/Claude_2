@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.13.0] — 2026-07-10 · Options Momentum Scanner
+
+- New scanner on the Options tab: scores ~30 liquid F&O names 0–100 on bullish options-flow positioning — PCR (20), today's put-vs-call writing skew (20), put-wall proximity below spot (15), headroom to the call wall (15), spot above max pain (10), call unwinding overhead (20)
+- ≥65 = LONG FLOW with a ready-made trade structure (entry ~spot, stop below the put wall, target at the call wall); ≤35 = BEARISH FLOW; else MIXED
+- Row click opens the full chain for that symbol; results include plain-language reads of the flow
+
 ## [2.12.2] — 2026-07-10
 
 - Fixed Options tab ("NSE 404"): NSE retired the old option-chain endpoints; the proxy now uses the v3 API — expiry list via contract-info first, then the chain for the chosen expiry (past expiries filtered out)

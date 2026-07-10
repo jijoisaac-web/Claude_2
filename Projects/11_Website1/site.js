@@ -1,4 +1,4 @@
-/* v7.8 */
+/* v7.9 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2579,7 +2579,7 @@ function closeNavDD(){
     SGD:{country:'Singapore',origins:[{code:'SIN',name:'Singapore'}],
       routes:{BOM:{min:350,max:900,dur:'~5–6 hrs',airlines:'IndiGo, Air India, Singapore Airlines'},DEL:{min:350,max:900,dur:'~6 hrs',airlines:'Air India, Singapore Airlines, IndiGo'},BLR:{min:320,max:850,dur:'~5 hrs',airlines:'IndiGo, Air India, Scoot'},MAA:{min:300,max:800,dur:'~4–5 hrs',airlines:'IndiGo, Scoot, Air India'},HYD:{min:320,max:850,dur:'~5–6 hrs',airlines:'IndiGo, Air India'},COK:{min:350,max:900,dur:'~5 hrs',airlines:'IndiGo, Air India, Scoot'},CCU:{min:380,max:950,dur:'~3–4 hrs',airlines:'IndiGo, Air India, Scoot'},TRV:{min:330,max:850,dur:'~5 hrs',airlines:'Scoot, Air India'},AMD:{min:360,max:900,dur:'~6 hrs',airlines:'IndiGo, Air India'},GOI:{min:370,max:920,dur:'~5 hrs',airlines:'IndiGo, Air India'}}},
     MYR:{country:'Malaysia',origins:[{code:'KUL',name:'Kuala Lumpur'},{code:'PEN',name:'Penang'}],
-      routes:{BOM:{min:1200,max:3200,dur:'~5–6 hrs',airlines:'AirAsia, Air India, Batik Air'},DEL:{min:1200,max:3200,dur:'~6 hrs',airlines:'AirAsia, Air India, MAS'},BLR:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},MAA:{min:1000,max:2800,dur:'~4 hrs',airlines:'AirAsia, IndiGo'},HYD:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},COK:{min:1150,max:3100,dur:'~5 hrs',airlines:'AirAsia, Air India'},CCU:{min:1300,max:3400,dur:'~3 hrs',airlines:'Batik Air, IndiGo'},TRV:{min:1100,max:3000,dur:'~5 hrs',airlines:'AirAsia'},AMD:{min:1200,max:3200,dur:'~6 hrs',airlines:'AirAsia, IndiGo'},GOI:{min:1250,max:3300,dur:'~5–6 hrs',airlines:'AirAsia, IndiGo'}}},
+      routes:{BOM:{min:1050,max:2100,dur:'~5–6 hrs',airlines:'AirAsia, Air India, Batik Air'},DEL:{min:1050,max:2100,dur:'~6 hrs',airlines:'AirAsia, Air India, MAS'},BLR:{min:950,max:1950,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},MAA:{min:900,max:1800,dur:'~4 hrs',airlines:'AirAsia, IndiGo'},HYD:{min:950,max:1950,dur:'~5 hrs',airlines:'AirAsia, IndiGo'},COK:{min:1000,max:1850,dur:'~5 hrs',airlines:'AirAsia, Air India'},CCU:{min:1150,max:2250,dur:'~3 hrs',airlines:'Batik Air, IndiGo'},TRV:{min:950,max:1850,dur:'~5 hrs',airlines:'AirAsia'},AMD:{min:1050,max:2100,dur:'~6 hrs',airlines:'AirAsia, IndiGo'},GOI:{min:1050,max:2050,dur:'~5–6 hrs',airlines:'AirAsia, IndiGo'}}},
     AUD:{country:'Australia',origins:[{code:'SYD',name:'Sydney'},{code:'MEL',name:'Melbourne'},{code:'PER',name:'Perth'},{code:'BNE',name:'Brisbane'}],
       routes:{BOM:{min:900,max:2400,dur:'~14–18 hrs',airlines:'Qantas, Air India, Singapore Airlines'},DEL:{min:900,max:2400,dur:'~15–18 hrs',airlines:'Air India, Qantas, Emirates'},BLR:{min:950,max:2500,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},MAA:{min:1000,max:2600,dur:'~13–17 hrs',airlines:'Singapore Airlines, Air India'},HYD:{min:950,max:2500,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},COK:{min:1000,max:2600,dur:'~14–18 hrs',airlines:'Singapore Airlines, Air India'},CCU:{min:1050,max:2700,dur:'~12–15 hrs',airlines:'Singapore Airlines, Air India'},TRV:{min:1000,max:2600,dur:'~13–17 hrs',airlines:'Air India, Singapore Airlines'},AMD:{min:950,max:2500,dur:'~15–18 hrs',airlines:'Air India, Singapore Airlines'},GOI:{min:1000,max:2600,dur:'~14–18 hrs',airlines:'Air India, Singapore Airlines'}}},
     NZD:{country:'New Zealand',origins:[{code:'AKL',name:'Auckland'},{code:'WLG',name:'Wellington'}],
@@ -4016,11 +4016,11 @@ function closeNavDD(){
           +'<div class="fl-win-arrow">&#9992; '+tripDays+'n &rarr;</div>'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">RETURN</div><div class="fl-win-dt">'+_fmtLong(retDate)+'</div></div>'
           +'</div>'
-          +'<div class="fl-win-fares">'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong></div>'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on Skyscanner</div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+outMin.toLocaleString()+'&ndash;'+outMax.toLocaleString()+'/person</span>':'')+' </div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+retMin.toLocaleString()+'&ndash;'+retMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-sep"></div>'
-          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#128202; Separate total'+gMult+'</span><strong class="fl-win-fare-val">'+cur+' '+grpSepMin.toLocaleString()+'&ndash;'+grpSepMax.toLocaleString()+'</strong></div>'
+          +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#128202; Separate total'+gMult+'</span><strong class="fl-win-fare-val">'+cur+' '+grpSepMin.toLocaleString()+'&ndash;'+grpSepMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+sepMin.toLocaleString()+'&ndash;'+sepMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-row fl-win-fare-muted"><span class="fl-win-fare-lbl">&#128260; vs Round-trip'+gMult+'</span><span class="fl-win-fare-val">'+cur+' '+grpRtMin.toLocaleString()+'&ndash;'+grpRtMax.toLocaleString()+' &nbsp;&middot;&nbsp; '+savNote+'</span></div>'
           +'</div>'
           +(economyOnly&&cabinClass==='business'?'<div class="fl-win-economy-note">&#9888;&#65039; Most flights on this route ('+route.airlines+') are <strong>economy-only</strong>. Check Air India or Emirates for business class.</div>':'')
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.8 — BULK & BLOCK DEALS ENGINE
+   v7.9 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4420,7 +4420,7 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.8 — SEND NOW OR WAIT? RATE TIMER
+   v7.9 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 (function(){
 

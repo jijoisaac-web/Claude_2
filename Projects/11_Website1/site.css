@@ -1,4 +1,4 @@
-/* v7.8 */
+/* v7.9 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1895,7 +1895,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ══════════════════════════════════════════════════════
-   v7.8 — BULK & BLOCK DEALS TAB
+   v7.9 — BULK & BLOCK DEALS TAB
    ══════════════════════════════════════════════════════ */
 .deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
@@ -1976,7 +1976,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ============================================================
-   v7.8 — SEND NOW OR WAIT? RATE TIMER
+   v7.9 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 
 /* Pair selector */
@@ -2054,3 +2054,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .rt-pairs{gap:5px;}
   .rt-pair-btn{padding:6px 11px;font-size:.76rem;}
 }
+
+/* v7.9 — Flight fare per-person annotation + estimate label */
+.fl-win-fare-pp{font-size:.72rem;color:var(--muted);font-weight:400;}
+.fl-win-fare-est{font-size:.72rem;color:rgba(240,165,32,.7);margin-bottom:8px;padding:5px 10px;background:rgba(240,165,32,.06);border-radius:6px;border:1px solid rgba(240,165,32,.15);}
