@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.14.0] — 2026-07-10 · Visual Refresh
+
+- New look: Inter typeface, deep-navy palette with a blue→violet gradient identity (logo, nav pills, section markers), ambient background glow
+- Cards get gradients, rounded corners and hover lift; tables get sticky headers, rounded frames and smooth row hovers
+- Primary buttons get a green gradient with press feedback; inputs get proper focus rings; custom slim scrollbars
+- Tabs fade in; loading states pulse; chart canvases recolored to match the theme
+- Pure CSS/theme layer — zero logic changes
+
 ## [2.13.0] — 2026-07-10 · Options Momentum Scanner
 
 - New scanner on the Options tab: scores ~30 liquid F&O names 0–100 on bullish options-flow positioning — PCR (20), today's put-vs-call writing skew (20), put-wall proximity below spot (15), headroom to the call wall (15), spot above max pain (10), call unwinding overhead (20)
