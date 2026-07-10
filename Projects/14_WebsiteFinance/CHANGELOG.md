@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.12.0] — 2026-07-10 · Options & F&O Trend Analysis
+
+- New **Options** tab (shortcut `0`): NSE option chain for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY and any F&O stock, with expiry selector
+- Summary cards: spot, put-call ratio with writer read, max pain with spot gap, strongest put wall (support), strongest call wall (resistance), ATM IV (call/put)
+- Trend-read engine: PCR interpretation, OI-implied expiry range, max-pain drift, fresh-OI skew (put vs call writing today), and IV fear-skew detection
+- Open-interest ladder: put/call OI bars per strike around ATM, with ATM and max-pain markers
+- "Biggest OI changes today" table with plain-language reads (put writing = support building, call unwinding = ceiling lifting, etc.)
+- New `/api/optionchain` proxy: trims NSE's ~1MB chain response to the chosen expiry (~30KB), 5-min edge cache
+
 ## [2.11.0] — 2026-07-09
 
 - FII/DII activity and bulk & block deals moved from the dashboard into a dedicated **FII/DII** tab (shortcut `9`); data loads on first open. Dashboard is leaner
