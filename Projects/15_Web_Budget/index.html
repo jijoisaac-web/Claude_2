@@ -1011,6 +1011,10 @@ tbody tr.income-row td:first-child{
 .bi-review-table tbody tr:hover{background:var(--surface2);}
 .bi-review-table td{padding:5px 9px;vertical-align:middle;}
 .bi-sel{font-size:11px;padding:3px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:5px;}
+.bi-edit{outline:none;cursor:text;display:inline-block;min-width:20px;padding:1px 3px;border-radius:3px;border-bottom:1px dashed var(--border);transition:background .15s,border-color .15s;}
+.bi-edit:hover{border-bottom-color:var(--text3);}
+.bi-edit:focus{background:rgba(255,255,255,.06);border-bottom-color:var(--accent);}
+.bi-edit-amt{text-align:right;font-weight:700;}
 .bi-summary{display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-radius:8px;margin-top:12px;font-size:12px;}
 .bi-summary span{font-weight:700;}
 
@@ -3641,9 +3645,9 @@ function renderBiReview(txns){
   <table class="bi-review-table" style="margin-top:10px;">
     <thead><tr>
       <th style="width:28px;text-align:center">✓</th>
-      <th>Date</th>
-      <th>Description</th>
-      <th style="text-align:right">Amount</th>
+      <th>Date ✎</th>
+      <th>Description ✎</th>
+      <th style="text-align:right">Amount ✎</th>
       <th style="text-align:center">Type</th>
       <th style="min-width:150px">Category</th>
     </tr></thead>
@@ -3651,13 +3655,23 @@ function renderBiReview(txns){
 
   txns.forEach((t,i)=>{
     const rowBg=t.type==='income'?'background:rgba(92,184,122,.05)':'';
+    const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
     html+=`<tr style="${rowBg}">
       <td style="text-align:center"><input type="checkbox" class="bi-chk" data-i="${i}" checked></td>
-      <td style="white-space:nowrap;color:var(--text2)">${t.date}</td>
-      <td style="word-break:break-word;min-width:140px">${t.desc}</td>
-      <td style="text-align:right;font-weight:700;color:${t.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(t.amount)}</td>
+      <td style="white-space:nowrap;color:var(--text2)">
+        <span class="bi-edit" contenteditable="true"
+          onblur="_biTxns[${i}].date=this.textContent.trim()">${t.date}</span>
+      </td>
+      <td style="word-break:break-word;min-width:140px">
+        <span class="bi-edit" contenteditable="true"
+          onblur="_biTxns[${i}].desc=this.textContent.trim()">${t.desc}</span>
+      </td>
+      <td style="text-align:right">
+        <span class="bi-edit bi-edit-amt" contenteditable="true" style="color:${amtCol}"
+          onblur="_biTxns[${i}].amount=Math.abs(parseFloat(this.textContent.replace(/[^0-9.]/g,''))||0);this.textContent=_biTxns[${i}].amount">${t.amount}</span>
+      </td>
       <td style="text-align:center">
-        <select class="bi-sel bi-type" data-i="${i}">
+        <select class="bi-sel bi-type" data-i="${i}" onchange="biTypeChanged(this)">
           <option value="expense" ${t.type==='expense'?'selected':''}>Expense</option>
           <option value="income" ${t.type==='income'?'selected':''}>Income</option>
         </select>
@@ -3761,6 +3775,18 @@ function biQuickCreateCat(){
 }
 
 /* When user assigns a category, auto-fill all unassigned rows with same merchant */
+function biTypeChanged(sel){
+  const i=+sel.dataset.i;
+  _biTxns[i].type=sel.value;
+  // update amount colour in same row
+  const row=sel.closest('tr');
+  if(row){
+    const amtSpan=row.querySelector('.bi-edit-amt');
+    if(amtSpan) amtSpan.style.color=sel.value==='income'?'var(--accent)':'var(--red)';
+    row.style.background=sel.value==='income'?'rgba(92,184,122,.05)':'';
+  }
+}
+
 function biCatChanged(sel){
   const mkey=sel.dataset.mkey;
   const val=sel.value;
