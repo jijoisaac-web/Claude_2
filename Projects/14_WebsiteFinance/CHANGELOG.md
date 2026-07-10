@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.10.1] — 2026-07-09
+
+- Added Cloudflare Web Analytics beacon (privacy-friendly, no cookies)
+
 ## [2.10.0] — 2026-07-09 · Bulk & Block Deals
 
 - Dashboard shows NSE's disclosed bulk deals (>0.5% of equity by one client) and block deals (negotiated window trades): institution/client name, BUY/SELL, quantity, weighted average price, deal value in ₹ Cr
