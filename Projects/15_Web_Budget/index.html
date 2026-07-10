@@ -278,6 +278,25 @@ header .subtitle{font-size:11px;color:var(--text2);font-weight:400;}
 .mob-tab.tapping .mob-icon svg{animation:mobTap .22s cubic-bezier(.34,1.56,.64,1) forwards;}
 
 /* ══════════════════════════════════════════════
+   ROW HOVER TOOLTIP
+══════════════════════════════════════════════ */
+#rowTooltip{
+  position:fixed;z-index:9999;pointer-events:none;
+  background:var(--surface3);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.55);
+  font-size:12px;min-width:190px;max-width:240px;
+  opacity:0;transition:opacity .14s;
+}
+#rowTooltip.visible{opacity:1;}
+.rtip-title{font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text1);}
+.rtip-row{display:flex;justify-content:space-between;gap:16px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.rtip-row:last-child{border-bottom:none;}
+.rtip-lbl{color:var(--text3);}
+.rtip-val{font-weight:600;color:var(--text1);}
+.rtip-note{margin-top:7px;color:var(--text2);font-size:11px;font-style:italic;}
+
+/* ══════════════════════════════════════════════
    VIEWS
 ══════════════════════════════════════════════ */
 .view{display:none;animation:fadeUp .22s ease;}
@@ -1544,6 +1563,9 @@ tbody tr.income-row td:first-child{
   </div>
 </div>
 
+<!-- Row hover tooltip -->
+<div id="rowTooltip"></div>
+
 <!-- PIN Setup -->
 <div class="overlay" id="pinOverlay">
   <div class="modal">
@@ -1973,6 +1995,37 @@ function switchViewMob(name,tab){
   switchView(name, {classList:{add:()=>{},remove:()=>{},toggle:()=>{}}});
 }
 
+/* Row hover tooltip */
+function showRowTip(e,catId){
+  const cat=state.categories.find(c=>c.id===catId);
+  if(!cat) return;
+  const md=state.months[currentMonth]||{};
+  const d=md[catId]||{actual:cat.expected,paid:false,note:''};
+  const isInc=cat.type==='income';
+  const diff=isInc?(d.actual-cat.expected):(cat.expected-d.actual);
+  const pct=cat.expected>0?Math.min(Math.round((d.actual/cat.expected)*100),999):0;
+  const ytd=calcYtdForCat(catId,currentMonth);
+  const diffCol=diff>=0?'var(--accent)':'var(--red)';
+  const pctCol=pct>=100?'var(--red)':pct>=80?'var(--yellow)':'var(--accent)';
+  const tip=document.getElementById('rowTooltip');
+  tip.innerHTML=
+    '<div class="rtip-title">'+cat.name+'</div>'+
+    '<div class="rtip-row"><span class="rtip-lbl">Budget</span><span class="rtip-val">MYR '+fmt(cat.expected)+'</span></div>'+
+    '<div class="rtip-row"><span class="rtip-lbl">Actual</span><span class="rtip-val">MYR '+fmt(d.actual)+'</span></div>'+
+    '<div class="rtip-row"><span class="rtip-lbl">'+(isInc?'Surplus':'Remaining')+'</span><span class="rtip-val" style="color:'+diffCol+'">'+(diff>=0?'+':'')+fmt(diff)+'</span></div>'+
+    '<div class="rtip-row"><span class="rtip-lbl">Used</span><span class="rtip-val" style="color:'+pctCol+'">'+pct+'%</span></div>'+
+    '<div class="rtip-row"><span class="rtip-lbl">YTD Actual</span><span class="rtip-val">MYR '+fmt(ytd)+'</span></div>'+
+    (d.paid?'<div class="rtip-row"><span class="rtip-lbl">Status</span><span class="rtip-val" style="color:var(--accent)">✓ Paid</span></div>':'')+
+    (d.note?'<div class="rtip-note">📝 '+d.note+'</div>':'');
+  const x=Math.min(e.clientX+16,window.innerWidth-250);
+  const y=Math.min(e.clientY+10,window.innerHeight-200);
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+  tip.classList.add('visible');
+}
+function hideRowTip(){
+  document.getElementById('rowTooltip').classList.remove('visible');
+}
+
 /* Summary cards */
 function renderSummaryCards(){
   const s=calcMonth(currentMonth);
@@ -2166,6 +2219,8 @@ function appendCatRows(cat,md,tbody,extraClass){
   tr.className=extraClass;
   tr.draggable=true;
   tr.dataset.catId=cat.id;
+  tr.setAttribute('onmouseenter',"showRowTip(event,'"+cat.id+"')");
+  tr.setAttribute('onmouseleave','hideRowTip()');
   tr.innerHTML=`
     <td class="c col-drag"><span class="drag-handle" title="Drag to reorder">⠿</span></td>
     <td style="${indent}">
@@ -2949,6 +3004,15 @@ function resetBudgetPlan(){
   renderBudgetPlan();
   if(document.getElementById('view-monthly').classList.contains('active')) renderMonthly();
   toast('Reset to defaults - actuals synced');
+}
+
+function confirmReset(){
+  if(!confirm('⚠️ Delete ALL budget data for '+currentYear+'?\nThis cannot be undone.')) return;
+  localStorage.removeItem(sKey(currentYear));
+  state=loadState(currentYear);
+  ensureMonth(currentMonth);
+  renderAll();
+  alert('✅ All data for '+currentYear+' has been reset to defaults.');
 }
 
 /* Called after adding a group or category */
