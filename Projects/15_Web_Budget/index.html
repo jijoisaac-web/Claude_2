@@ -1156,7 +1156,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v2.9
+        <span class="ver-dot"></span>v3.0
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1213,6 +1213,13 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.0 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Full descriptions shown in transaction detail &amp; import review (no more truncation)</div>
+    <div class="cl-item">Reset Month Data button — clear actuals for current month only</div>
+    <div class="cl-item">Fixed blank app caused by truncated file (missing closing script tag)</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v2.9 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1450,8 +1457,11 @@ tbody tr.income-row td:first-child{
 
     <div class="data-card">
       <h3>🗑 Reset Data</h3>
-      <p>Delete all budget data for the currently selected year. This cannot be undone.</p>
-      <button class="btn btn-danger" onclick="confirmReset()">↺ Reset Year Data</button>
+      <p>Clear actual amounts, transactions, and paid status for the current month, or delete all data for the year.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-danger" onclick="confirmResetMonth()">↺ Reset Month Data</button>
+        <button class="btn btn-danger" onclick="confirmReset()">↺ Reset Year Data</button>
+      </div>
     </div>
 
   </div>
@@ -2064,7 +2074,7 @@ function openCatDetail(catId){
       const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
       body+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
         +'<td style="padding:5px 6px;white-space:nowrap;color:var(--text2)">'+t.date+'</td>'
-        +'<td style="padding:5px 6px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+t.desc.replace(/"/g,'')+'">'+t.desc+'</td>'
+        +'<td style="padding:5px 6px;word-break:break-word;min-width:140px">'+t.desc+'</td>'
         +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+amtCol+'">MYR '+fmt(t.amount)+'</td>'
         +'<td style="padding:5px 6px;text-align:center"><button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button></td>'
         +'</tr>';
@@ -3082,6 +3092,18 @@ function resetBudgetPlan(){
   toast('Reset to defaults - actuals synced');
 }
 
+function confirmResetMonth(){
+  const mname=MONTHS[currentMonth]+' '+currentYear;
+  if(!confirm('⚠️ Reset all actuals, transactions and paid status for '+mname+'?\nThis cannot be undone.')) return;
+  if(state.months[currentMonth]){
+    Object.keys(state.months[currentMonth]).forEach(catId=>{
+      state.months[currentMonth][catId]={actual:0,paid:false,note:'',transactions:[]};
+    });
+  }
+  saveState(); renderAll();
+  alert('✅ '+mname+' has been reset.');
+}
+
 function confirmReset(){
   if(!confirm('⚠️ Delete ALL budget data for '+currentYear+'?\nThis cannot be undone.')) return;
   localStorage.removeItem(sKey(currentYear));
@@ -3632,7 +3654,7 @@ function renderBiReview(txns){
     html+=`<tr style="${rowBg}">
       <td style="text-align:center"><input type="checkbox" class="bi-chk" data-i="${i}" checked></td>
       <td style="white-space:nowrap;color:var(--text2)">${t.date}</td>
-      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.desc.replace(/"/g,'')}">${t.desc}</td>
+      <td style="word-break:break-word;min-width:140px">${t.desc}</td>
       <td style="text-align:right;font-weight:700;color:${t.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(t.amount)}</td>
       <td style="text-align:center">
         <select class="bi-sel bi-type" data-i="${i}">
