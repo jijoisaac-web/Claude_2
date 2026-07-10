@@ -1,4 +1,4 @@
-/* v7.9 */
+/* v7.10 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.9 — BULK & BLOCK DEALS ENGINE
+   v7.10 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4420,7 +4420,7 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.9 — SEND NOW OR WAIT? RATE TIMER
+   v7.10 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 (function(){
 
