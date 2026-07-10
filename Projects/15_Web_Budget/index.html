@@ -3875,4 +3875,10 @@ function toggleChangelog(){
 // Close on outside click
 document.addEventListener('click', e=>{
   const pop = document.getElementById('changelogPopup');
-  if(pop.classList.contains('open') && !pop.contains(e.ta
+  if(pop.classList.contains('open') && !pop.contains(e.target)) {
+    toggleChangelog();
+  }
+});
+</script>
+</body>
+</html>

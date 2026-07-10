@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.12.1] — 2026-07-10
+
+- Chart API edge cache raised from 5 to 15 minutes (daily candles change once a day) — cuts repeat-scan traffic to Yahoo roughly 3x and lifts the CDN cache-hit rate
+
 ## [2.12.0] — 2026-07-10 · Options & F&O Trend Analysis
 
 - New **Options** tab (shortcut `0`): NSE option chain for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY and any F&O stock, with expiry selector

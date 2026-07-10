@@ -25,7 +25,7 @@ export async function onRequestGet({ request, params }) {
     status: y.status,
     headers: {
       "content-type": "application/json",
-      "cache-control": "public, s-maxage=300, max-age=120",
+      "cache-control": "public, s-maxage=900, max-age=300",
       "access-control-allow-origin": "*",
     },
   });
