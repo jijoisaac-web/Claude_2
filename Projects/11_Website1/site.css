@@ -1,4 +1,4 @@
-/* v7.5 */
+/* v7.6 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1892,4 +1892,85 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   cursor:pointer;
   color:var(--text);
   font-size:16px;
+}
+
+/* ══════════════════════════════════════════════════════
+   v7.6 — BULK & BLOCK DEALS TAB
+   ══════════════════════════════════════════════════════ */
+.deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
+.deals-subtitle{font-size:.78rem;color:var(--muted);margin-top:2px;}
+.deals-live-badge{display:flex;align-items:center;gap:6px;background:var(--green-dim);border:1px solid rgba(34,211,154,.2);border-radius:20px;padding:5px 12px;font-size:.75rem;font-weight:700;color:var(--green);}
+.deals-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+.deals-error-badge{display:flex;align-items:center;gap:6px;background:rgba(240,165,32,.08);border:1px solid rgba(240,165,32,.25);border-radius:20px;padding:5px 12px;font-size:.75rem;font-weight:700;color:var(--amber);}
+
+/* Stat cards */
+.deals-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.deals-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.deals-stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.deals-stat-val{font-size:1.15rem;font-weight:800;color:var(--text);}
+.deals-stat-val.buy{color:var(--green);}
+.deals-stat-val.sell{color:#f87171;}
+.deals-stat-sub{font-size:.7rem;color:var(--muted);margin-top:2px;}
+
+/* Sub-tabs (Bulk / Block) */
+.deals-subtabs{display:flex;gap:6px;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:5px;}
+.deals-stab{flex:1;text-align:center;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;}
+.deals-stab.active{background:var(--elevated);color:var(--amber);}
+.deals-stab:hover:not(.active){color:var(--text);}
+
+/* Filters */
+.deals-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.deals-filter-group{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px;}
+.deals-fbtn{padding:5px 12px;border-radius:7px;border:none;background:none;color:var(--muted);font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.deals-fbtn.active{background:var(--elevated);color:var(--amber);}
+.deals-fbtn:hover:not(.active){color:var(--text);}
+.deals-search{flex:1;min-width:180px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--text);font-size:.82rem;outline:none;transition:border-color .2s;}
+.deals-search:focus{border-color:var(--amber);}
+.deals-search::placeholder{color:var(--muted);}
+.deals-refresh{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 14px;color:var(--muted);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.deals-refresh:hover{border-color:var(--amber);color:var(--amber);}
+.deals-refresh svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.deals-refresh.spinning svg{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Table */
+.deals-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+.deals-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+.deals-table th{background:var(--elevated);padding:10px 14px;text-align:left;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;}
+.deals-table th:hover{color:var(--text);}
+.deals-table th.sort-asc::after{content:' ↑';}
+.deals-table th.sort-desc::after{content:' ↓';}
+.deals-table td{padding:10px 14px;border-top:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+.deals-table tr:hover td{background:rgba(255,255,255,.025);}
+.deals-badge-buy{display:inline-flex;align-items:center;justify-content:center;padding:3px 9px;border-radius:6px;font-size:.7rem;font-weight:800;background:rgba(34,211,154,.12);color:var(--green);border:1px solid rgba(34,211,154,.2);}
+.deals-badge-sell{display:inline-flex;align-items:center;justify-content:center;padding:3px 9px;border-radius:6px;font-size:.7rem;font-weight:800;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.2);}
+.deals-sym{font-weight:800;color:var(--amber);font-size:.82rem;}
+.deals-co{font-size:.72rem;color:var(--muted);}
+.deals-val{font-weight:700;color:var(--text);}
+.deals-client{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.deals-exch-nse{color:#22d39a;font-weight:700;font-size:.72rem;}
+.deals-exch-bse{color:#60a5fa;font-weight:700;font-size:.72rem;}
+.deals-date{color:var(--muted);font-size:.75rem;white-space:nowrap;}
+.deals-empty{text-align:center;padding:48px 24px;color:var(--muted);}
+.deals-empty-icon{font-size:2rem;margin-bottom:8px;}
+
+/* Loading skeleton */
+.deals-skeleton td{animation:shimmer 1.5s infinite;}
+.deals-skeleton td div{height:14px;border-radius:4px;background:var(--elevated);}
+@keyframes shimmer{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+/* Disclaimer */
+.deals-disclaimer{margin-top:14px;padding:10px 14px;background:rgba(240,165,32,.06);border:1px solid rgba(240,165,32,.15);border-radius:8px;font-size:.72rem;color:var(--muted);line-height:1.6;}
+.deals-disclaimer a{color:var(--amber);}
+
+/* Responsive */
+@media(max-width:768px){
+  .deals-stats{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:480px){
+  .deals-stats{grid-template-columns:1fr 1fr;}
+  .deals-table{font-size:.74rem;}
+  .deals-table th,.deals-table td{padding:8px 10px;}
+  .deals-client{max-width:120px;}
 }

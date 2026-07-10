@@ -1,4 +1,4 @@
-/* v7.5 */
+/* v7.6 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4110,3 +4110,311 @@ window.setMobBnav=function(tabId){
   var el=document.getElementById('mbn-'+tabId);
   if(el) el.classList.add('mob-active');
 };
+
+/* ══════════════════════════════════════════════════════
+   v7.6 — BULK & BLOCK DEALS ENGINE
+   ══════════════════════════════════════════════════════ */
+
+/* ── Trading day calculator ── */
+function _tradingDays(n){
+  var days=[],d=new Date(),added=0;
+  // Indian market holidays 2026 (approx)
+  var holidays=['2026-01-26','2026-03-25','2026-04-14','2026-04-02','2026-08-15','2026-10-02','2026-10-20','2026-11-04','2026-12-25'];
+  while(added<n){
+    d.setDate(d.getDate()-1);
+    var dow=d.getDay();
+    if(dow===0||dow===6) continue;
+    var ds=d.toISOString().slice(0,10);
+    if(holidays.indexOf(ds)>-1) continue;
+    days.push(ds);
+    added++;
+  }
+  return days;
+}
+
+/* ── Format helpers ── */
+function _fmtCr(v){
+  if(v>=10000) return (v/10000).toFixed(1)+'L Cr';
+  if(v>=100) return (v/100).toFixed(0)+' Cr';
+  return v.toFixed(1)+' Cr';
+}
+function _fmtQ(v){
+  if(v>=10000000) return (v/10000000).toFixed(2)+' Cr';
+  if(v>=100000) return (v/100000).toFixed(2)+' L';
+  if(v>=1000) return (v/1000).toFixed(1)+'K';
+  return v.toString();
+}
+
+/* ── Sample deal data generator ── */
+(function(){
+  var BULK_TMPL=[
+    {sym:'HDFCBANK',co:'HDFC Bank Ltd',clients:['BlackRock Emerging Mkts Fund','Norges Bank Investment Mgmt','Vanguard Emerging Markets Fund','SBI Life Insurance Co Ltd'],price:1842,sector:'Banking'},
+    {sym:'RELIANCE',co:'Reliance Industries Ltd',clients:['SBI Mutual Fund - ELSS','LIC of India','Morgan Stanley Asia Pacific','GIC Singapore Pte Ltd'],price:2983,sector:'Energy'},
+    {sym:'TCS',co:'Tata Consultancy Services Ltd',clients:['ICICI Prudential MF - Bluechip','Fidelity India Fund','Dimensional Fund Advisors','Nippon India MF'],price:3978,sector:'IT'},
+    {sym:'INFY',co:'Infosys Ltd',clients:['UTI MF - Equity Fund','Mirae Asset MF','T Rowe Price Funds','Franklin Templeton India'],price:1826,sector:'IT'},
+    {sym:'WIPRO',co:'Wipro Ltd',clients:['Government Pension Fund Global','Azim Premji Trust','DSP MF - Tax Saver','HDFC Mutual Fund'],price:542,sector:'IT'},
+    {sym:'ICICIBANK',co:'ICICI Bank Ltd',clients:['Kotak MF - Flexi Cap','GIC Re','Invesco India MF','Allianz Global Investors'],price:1385,sector:'Banking'},
+    {sym:'KOTAKBANK',co:'Kotak Mahindra Bank Ltd',clients:['Uday Kotak - Promoter','Aberdeen Asset Mgmt','Axis Mutual Fund','Jupiter Asset Mgmt'],price:2240,sector:'Banking'},
+    {sym:'SBIN',co:'State Bank of India',clients:['Government of India - Promoter','LIC of India','SBI MF - Large Cap','HDFC Life Insurance'],price:824,sector:'Banking'},
+    {sym:'AXISBANK',co:'Axis Bank Ltd',clients:['Bain Capital - PE','Max Life Insurance','HDFC MF - Banking ETF','Mirae Asset MF'],price:1343,sector:'Banking'},
+    {sym:'BAJFINANCE',co:'Bajaj Finance Ltd',clients:['GQG Partners LLC','SBI MF - Large Mid Cap','Bajaj Holdings - Promoter','Fidelity India Fund'],price:7245,sector:'NBFC'},
+    {sym:'MARUTI',co:'Maruti Suzuki India Ltd',clients:['Suzuki Motor - Promoter','Nippon India MF','ICICI Pru Life Insurance','Franklin India Fund'],price:13250,sector:'Auto'},
+    {sym:'TATAMOTORS',co:'Tata Motors Ltd',clients:['Tata Sons Pvt Ltd - Promoter','Clsa Ltd','HDFC MF - Equity','UBS AG London Branch'],price:984,sector:'Auto'},
+    {sym:'SUNPHARMA',co:'Sun Pharmaceutical Industries',clients:['Dilip Shanghvi - Promoter','DSP MF - Flexi Cap','HDFC MF - Mid Cap','Invesco India MF'],price:1926,sector:'Pharma'},
+    {sym:'DRREDDY',co:'Dr Reddys Laboratories Ltd',clients:['Aberdeen India Equity','K Satish Reddy - Promoter','Axis MF - Long Term','Mirae Asset India Equity'],price:6340,sector:'Pharma'},
+    {sym:'ADANIENT',co:'Adani Enterprises Ltd',clients:['GQG Partners Emerging Mkts','Adani Infra - Promoter','SBI Life Insurance','Societe Generale'],price:2890,sector:'Conglomerate'},
+    {sym:'ADANIPORTS',co:'Adani Ports and SEZ Ltd',clients:['GQG Partners LLC','Adani Family - Promoter','ICICI Prudential Life','Morgan Stanley Funds'],price:1582,sector:'Infra'},
+    {sym:'ITC',co:'ITC Ltd',clients:['BAT Group - Promoter Entity','LIC of India','Nippon India MF','UTI MF - Value Fund'],price:463,sector:'FMCG'},
+    {sym:'HUL',co:'Hindustan Unilever Ltd',clients:['Unilever NV - Promoter','DSP MF - India Equity','Axis Life Insurance','HDFC MF - Balanced Adv'],price:2735,sector:'FMCG'},
+    {sym:'ONGC',co:'Oil and Natural Gas Corp Ltd',clients:['Government of India - Promoter','LIC of India','SBI MF - Value Fund','ICICI Pru Large Cap'],price:278,sector:'Energy'},
+    {sym:'NTPC',co:'NTPC Ltd',clients:['Government of India','LIC - Pension Fund','DSP MF - Equity','Axis MF - Banking'],price:384,sector:'Power'},
+    {sym:'HCLTECH',co:'HCL Technologies Ltd',clients:['Shiv Nadar Trust - Promoter','Vanguard Institutional Index','SBI MF - Contra','Aberdeen Asset Mgmt'],price:1862,sector:'IT'},
+    {sym:'TECHM',co:'Tech Mahindra Ltd',clients:['Mahindra and Mahindra - Promoter','Franklin Templeton India','Kotak MF - Emerging Equity','Mirae Asset MF'],price:1765,sector:'IT'},
+    {sym:'NESTLEIND',co:'Nestle India Ltd',clients:['Nestle SA - Promoter','HDFC MF - Focussed','Axis MF - Bluechip','UTI Equity Fund'],price:2425,sector:'FMCG'},
+    {sym:'BAJAJFINSV',co:'Bajaj Finserv Ltd',clients:['Bajaj Group - Promoter','Sanjiv Bajaj - Director','SBI MF - Small Cap','ICICI Pru MF'],price:1890,sector:'Finance'},
+    {sym:'POWERGRID',co:'Power Grid Corp of India',clients:['Government of India','LIC of India','HDFC MF - Infrastructure','Nippon India ETF'],price:342,sector:'Power'},
+    {sym:'COALINDIA',co:'Coal India Ltd',clients:['Government of India - Promoter','LIC of India - Markets','DSP MF - Value Fund','SBI MF - Contra'],price:498,sector:'Mining'},
+    {sym:'HINDALCO',co:'Hindalco Industries Ltd',clients:['Aditya Birla Group','Fidelity India Equity','HSBC Global Asset Mgmt','Axis MF - Flexi Cap'],price:718,sector:'Metals'},
+    {sym:'TATASTEEL',co:'Tata Steel Ltd',clients:['Tata Sons - Promoter','GIC Singapore','SBI MF - PSU Banking','DSP MF - Equity Savings'],price:192,sector:'Metals'},
+    {sym:'JSWSTEEL',co:'JSW Steel Ltd',clients:['JSW Group - Promoter','Fidelity Emerging Mkts','Nippon India MF','HDFC MF - Equity Savings'],price:1025,sector:'Metals'},
+    {sym:'ZOMATO',co:'Zomato Ltd',clients:['Tiger Global Mgmt LLC','Ant Group Investment','Mirae Asset MF','UTI MF - Flexi Cap'],price:264,sector:'Consumer Tech'},
+  ];
+
+  var BLOCK_EXTRA=[
+    {sym:'HDFCLIFE',co:'HDFC Life Insurance Co Ltd',clients:['Standard Life Aberdeen','HDFC Ltd - Promoter','Nippon India MF','Axis MF'],price:724,sector:'Insurance'},
+    {sym:'SBILIFE',co:'SBI Life Insurance Co Ltd',clients:['State Bank of India - Promoter','BNP Paribas Cardif','ICICI Pru Life','HDFC MF'],price:1892,sector:'Insurance'},
+    {sym:'DMART',co:'Avenue Supermarts Ltd',clients:['Radhakishan Damani - Promoter','SBI MF - Dividend Yield','Mirae Asset India','Franklin India Opp'],price:5240,sector:'Retail'},
+    {sym:'NAUKRI',co:'Info Edge India Ltd',clients:['Sanjeev Bikhchandani - Founder','Tiger Global Mgmt','ICICI Prudential MF','SBI MF - Bluechip'],price:8620,sector:'Internet'},
+    {sym:'PIDILITIND',co:'Pidilite Industries Ltd',clients:['Madhukar Parekh - Promoter','Vanguard Emerging Mkts','HDFC MF - Equity','DSP MF - Flexi Cap'],price:3120,sector:'Chemicals'},
+  ];
+
+  function _rnd(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+  function _pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+  function _genDeals(days,type){
+    var out=[];
+    var pool=type==='block'?BULK_TMPL.slice(0,20).concat(BLOCK_EXTRA):BULK_TMPL;
+    var id=1;
+    days.forEach(function(dateStr,di){
+      var nDeals=type==='block'?_rnd(8,16):_rnd(22,38);
+      var usedPairs={};
+      var count=0;
+      while(count<nDeals){
+        var item=_pick(pool);
+        var client=_pick(item.clients);
+        var key=item.sym+'|'+client;
+        if(usedPairs[key]) continue;
+        usedPairs[key]=1;
+        var bs=Math.random()>0.48?'B':'S';
+        var priceVar=(1+(_rnd(-8,8)/100));
+        var price=Math.round(item.price*priceVar*100)/100;
+        var qty,minQ,maxQ;
+        if(type==='block'){
+          // Block: >5L shares OR >5cr value
+          var minShares=Math.max(500000,Math.ceil(5000000/price));
+          qty=minShares+_rnd(100000,2000000);
+        } else {
+          // Bulk: 0.5-3% of typical float
+          qty=_rnd(200000,4500000);
+        }
+        var val=(qty*price)/10000000; // crore
+        out.push({
+          id:id++,date:dateStr,
+          exch:Math.random()>0.45?'NSE':'BSE',
+          sym:item.sym,co:item.co,sector:item.sector,
+          client:client,bs:bs,qty:qty,price:price,val:val
+        });
+        count++;
+      }
+    });
+    return out;
+  }
+
+  /* ── State ── */
+  window._dealsState={
+    bulk:[],block:[],
+    activeType:'bulk',   // bulk | block
+    exchFilter:'ALL',    // ALL | NSE | BSE
+    bsFilter:'ALL',      // ALL | B | S
+    search:'',
+    sortCol:'date',sortDir:-1,
+    loaded:false,liveOk:false
+  };
+
+  /* ── Init ── */
+  window.initDeals=function(){
+    var ds=window._dealsState;
+    if(ds.loaded) { _renderDeals(); return; }
+    var days=_tradingDays(7);
+    ds.bulk=_genDeals(days,'bulk');
+    ds.block=_genDeals(days,'block');
+    ds.loaded=true;
+    ds.liveOk=false;
+    // Try live NSE fetch (CORS will likely block; graceful fallback)
+    _tryLiveFetch(days).then(function(ok){
+      ds.liveOk=ok;
+      _renderDeals();
+    });
+    _renderDeals();
+  };
+
+  function _tryLiveFetch(days){
+    return new Promise(function(resolve){
+      var to=days[0],from=days[days.length-1];
+      var url='https://www.nseindia.com/api/bulk-deals-data?type=bulk_deals&from_date='+
+              from.split('-').reverse().join('-')+'&to_date='+to.split('-').reverse().join('-');
+      var timer=setTimeout(function(){resolve(false);},4000);
+      fetch(url,{headers:{'Accept':'application/json'},mode:'cors'})
+        .then(function(r){return r.json();})
+        .then(function(data){
+          clearTimeout(timer);
+          if(data&&(data.data||data.bulkDealData)){
+            // Parse live data if available
+            var rows=data.data||data.bulkDealData||[];
+            if(rows.length>0){
+              // Map NSE fields to our format
+              window._dealsState.bulk=rows.map(function(r,i){
+                return {
+                  id:i+1,
+                  date:r.BD_DT_DATE||r.date||'',
+                  exch:'NSE',
+                  sym:r.BD_SYMBOL||r.symbol||'',
+                  co:r.BD_COMP_NAME||r.companyName||'',
+                  client:r.BD_CLIENT_NAME||r.clientName||'',
+                  bs:(r.BD_BUY_SELL||r.buySell||'B').trim().charAt(0),
+                  qty:parseInt(r.BD_QTY_TRD||r.quantity||0),
+                  price:parseFloat(r.BD_TP_WATP||r.price||0),
+                  val:parseFloat(r.BD_REMARKS||0)||((parseInt(r.BD_QTY_TRD||0)*parseFloat(r.BD_TP_WATP||0))/10000000)
+                };
+              });
+              resolve(true);
+            } else { resolve(false); }
+          } else { resolve(false); }
+        })
+        .catch(function(){ clearTimeout(timer); resolve(false); });
+    });
+  }
+
+  /* ── Filter & sort ── */
+  function _filteredData(){
+    var ds=window._dealsState;
+    var data=ds.activeType==='bulk'?ds.bulk:ds.block;
+    var s=ds.search.toLowerCase();
+    return data
+      .filter(function(r){
+        if(ds.exchFilter!=='ALL'&&r.exch!==ds.exchFilter) return false;
+        if(ds.bsFilter!=='ALL'&&r.bs!==ds.bsFilter) return false;
+        if(s&&r.sym.toLowerCase().indexOf(s)<0&&r.co.toLowerCase().indexOf(s)<0&&r.client.toLowerCase().indexOf(s)<0) return false;
+        return true;
+      })
+      .sort(function(a,b){
+        var col=ds.sortCol,dir=ds.sortDir;
+        var av=a[col],bv=b[col];
+        if(typeof av==='string') av=av.toLowerCase(),bv=bv.toLowerCase();
+        return av<bv?dir:av>bv?-dir:0;
+      });
+  }
+
+  /* ── Stats ── */
+  function _computeStats(rows){
+    var buyVal=0,sellVal=0,buyCount=0,sellCount=0;
+    rows.forEach(function(r){
+      if(r.bs==='B'){ buyVal+=r.val; buyCount++; }
+      else { sellVal+=r.val; sellCount++; }
+    });
+    return {buyVal:buyVal,sellVal:sellVal,buyCount:buyCount,sellCount:sellCount,total:rows.length};
+  }
+
+  /* ── Render ── */
+  function _renderDeals(){
+    var ds=window._dealsState;
+    var rows=_filteredData();
+    var stats=_computeStats(rows);
+
+    // Update stats cards
+    var el=function(id){return document.getElementById(id);};
+    if(el('deals-stat-total')) el('deals-stat-total').textContent=rows.length;
+    if(el('deals-stat-buy')) el('deals-stat-buy').textContent=_fmtCr(stats.buyVal);
+    if(el('deals-stat-sell')) el('deals-stat-sell').textContent=_fmtCr(stats.sellVal);
+    if(el('deals-stat-net')){
+      var net=stats.buyVal-stats.sellVal;
+      el('deals-stat-net').textContent=(net>=0?'+':'')+_fmtCr(Math.abs(net));
+      el('deals-stat-net').className='deals-stat-val '+(net>=0?'buy':'sell');
+    }
+
+    // Update badge
+    var badge=el('deals-data-badge');
+    if(badge){
+      if(ds.liveOk){
+        badge.className='deals-live-badge';
+        badge.innerHTML='<span class="deals-live-dot"></span>Live NSE Data';
+      } else {
+        badge.className='deals-error-badge';
+        badge.innerHTML='&#9888; Sample Data &#8212; NSE blocked (CORS)';
+      }
+    }
+
+    // Build table rows
+    var tbody=el('deals-tbody');
+    if(!tbody) return;
+    if(rows.length===0){
+      tbody.innerHTML='<tr><td colspan="9" class="deals-empty"><div class="deals-empty-icon">&#128269;</div>No deals match your filter</td></tr>';
+      return;
+    }
+    var html='';
+    rows.forEach(function(r){
+      var bsCls=r.bs==='B'?'deals-badge-buy':'deals-badge-sell';
+      var bsTxt=r.bs==='B'?'BUY':'SELL';
+      var exchCls=r.exch==='NSE'?'deals-exch-nse':'deals-exch-bse';
+      html+='<tr>'
+        +'<td class="deals-date">'+r.date+'</td>'
+        +'<td><span class="'+exchCls+'">'+r.exch+'</span></td>'
+        +'<td><div class="deals-sym">'+r.sym+'</div><div class="deals-co">'+r.co+'</div></td>'
+        +'<td class="deals-client" title="'+r.client+'">'+r.client+'</td>'
+        +'<td><span class="'+bsCls+'">'+bsTxt+'</span></td>'
+        +'<td class="deals-val" style="text-align:right">'+_fmtQ(r.qty)+'</td>'
+        +'<td style="text-align:right">&#8377;'+r.price.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td>'
+        +'<td class="deals-val" style="text-align:right">&#8377;'+_fmtCr(r.val)+'</td>'
+        +'</tr>';
+    });
+    tbody.innerHTML=html;
+  }
+
+  /* ── Public API ── */
+  window.dealsSetType=function(type,btn){
+    window._dealsState.activeType=type;
+    document.querySelectorAll('.deals-stab').forEach(function(b){b.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    _renderDeals();
+  };
+  window.dealsSetExch=function(v,btn){
+    window._dealsState.exchFilter=v;
+    document.querySelectorAll('.deals-filter-group.exch .deals-fbtn').forEach(function(b){b.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    _renderDeals();
+  };
+  window.dealsSetBS=function(v,btn){
+    window._dealsState.bsFilter=v;
+    document.querySelectorAll('.deals-filter-group.bs .deals-fbtn').forEach(function(b){b.classList.remove('active');});
+    if(btn) btn.classList.add('active');
+    _renderDeals();
+  };
+  window.dealsSearch=function(v){
+    window._dealsState.search=v;
+    _renderDeals();
+  };
+  window.dealsSort=function(col,thEl){
+    var ds=window._dealsState;
+    if(ds.sortCol===col) ds.sortDir*=-1;
+    else { ds.sortCol=col; ds.sortDir=-1; }
+    document.querySelectorAll('.deals-table th').forEach(function(t){t.className='';});
+    if(thEl) thEl.className=ds.sortDir===1?'sort-asc':'sort-desc';
+    _renderDeals();
+  };
+  window.dealsRefresh=function(btn){
+    btn.classList.add('spinning');
+    window._dealsState.loaded=false;
+    window.initDeals();
+    setTimeout(function(){btn.classList.remove('spinning');},1800);
+  };
+})();

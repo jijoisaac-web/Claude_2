@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.5"/>
+<link rel="stylesheet" href="/site.css?v=7.6"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.5</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.6</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -894,7 +894,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-head">
       <div>
         <div class="drawer-brand">NRI <span>Finance Hub</span></div>
-        <div class="drawer-sub">18+ tools for Indians abroad</div>
+        <div class="drawer-sub">19+ tools for Indians abroad</div>
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
@@ -972,8 +972,110 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">NRI Finance Guides</div><div class="drawer-desc">Tax, banking, property &amp; more</div></div>
     </div>
+    <div class="drawer-section-lbl">&#128200; Markets</div>
+    <div class="drawer-item" data-tab="deals" onclick="showTab('deals',this);initDeals()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Bulk &amp; Block Deals</div><div class="drawer-desc">Last 7 days · NSE + BSE</div></div>
+    </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
   </div>
+
+  <!-- TAB: BULK & BLOCK DEALS -->
+  <div class="tool-section" id="tab-deals">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(34,211,154,.12),rgba(34,211,154,.04));border-color:rgba(34,211,154,.2)">
+      <div class="tool-banner-icon" style="background:rgba(34,211,154,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="#22d39a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div><div class="tool-banner-title">Bulk &amp; Block Deals</div><div class="tool-banner-desc">Large institutional trades on NSE &amp; BSE · Last 7 trading days</div></div>
+    </div>
+
+    <!-- Header row -->
+    <div class="deals-header">
+      <div>
+        <div class="deals-title">Bulk &amp; Block Deals &#8212; Last 7 Trading Days</div>
+        <div class="deals-subtitle">Bulk deals &gt;0.5% of equity | Block deals &gt;5L shares or &gt;&#8377;5 Cr</div>
+      </div>
+      <div id="deals-data-badge" class="deals-error-badge">&#9203; Loading&hellip;</div>
+    </div>
+
+    <!-- Summary stat cards -->
+    <div class="deals-stats">
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Total Deals</div>
+        <div class="deals-stat-val" id="deals-stat-total">&#8212;</div>
+        <div class="deals-stat-sub">filtered rows</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Buy Value</div>
+        <div class="deals-stat-val buy" id="deals-stat-buy">&#8212;</div>
+        <div class="deals-stat-sub">total purchase value</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Sell Value</div>
+        <div class="deals-stat-val sell" id="deals-stat-sell">&#8212;</div>
+        <div class="deals-stat-sub">total sale value</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Net Flow</div>
+        <div class="deals-stat-val buy" id="deals-stat-net">&#8212;</div>
+        <div class="deals-stat-sub">buy minus sell</div>
+      </div>
+    </div>
+
+    <!-- Sub-tabs: Bulk / Block -->
+    <div class="deals-subtabs">
+      <div class="deals-stab active" onclick="dealsSetType('bulk',this)">&#128230; Bulk Deals</div>
+      <div class="deals-stab" onclick="dealsSetType('block',this)">&#127381; Block Deals</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="deals-filters">
+      <div class="deals-filter-group exch">
+        <button class="deals-fbtn active" onclick="dealsSetExch('ALL',this)">All</button>
+        <button class="deals-fbtn" onclick="dealsSetExch('NSE',this)">NSE</button>
+        <button class="deals-fbtn" onclick="dealsSetExch('BSE',this)">BSE</button>
+      </div>
+      <div class="deals-filter-group bs">
+        <button class="deals-fbtn active" onclick="dealsSetBS('ALL',this)">Buy + Sell</button>
+        <button class="deals-fbtn" onclick="dealsSetBS('B',this)">Buy Only</button>
+        <button class="deals-fbtn" onclick="dealsSetBS('S',this)">Sell Only</button>
+      </div>
+      <input class="deals-search" type="text" placeholder="&#128269; Search symbol, company, client&#8230;" oninput="dealsSearch(this.value)">
+      <button class="deals-refresh" onclick="dealsRefresh(this)">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="deals-table-wrap">
+      <table class="deals-table">
+        <thead>
+          <tr>
+            <th onclick="dealsSort('date',this)">Date</th>
+            <th onclick="dealsSort('exch',this)">Exch</th>
+            <th onclick="dealsSort('sym',this)">Symbol / Company</th>
+            <th onclick="dealsSort('client',this)">Client Name</th>
+            <th onclick="dealsSort('bs',this)">B/S</th>
+            <th onclick="dealsSort('qty',this)" style="text-align:right">Quantity</th>
+            <th onclick="dealsSort('price',this)" style="text-align:right">Avg Price</th>
+            <th onclick="dealsSort('val',this)" style="text-align:right">Value</th>
+          </tr>
+        </thead>
+        <tbody id="deals-tbody">
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="deals-disclaimer">
+      <strong>Data source:</strong> Attempting live fetch from NSE India public API. If blocked by CORS, representative sample data is shown for illustration. For authoritative data, visit
+      <a href="https://www.nseindia.com/market-data/bulk-deals" target="_blank" rel="noopener">NSE Bulk Deals</a> or
+      <a href="https://www.nseindia.com/market-data/block-deals" target="_blank" rel="noopener">NSE Block Deals</a>.
+      Not investment advice.
+    </div>
+  </div>
+
 
   <!-- ACTIVE TOOL BAR (replaces tab nav) -->
   <div class="active-tool-bar" onclick="openDrawer()">
@@ -2377,14 +2479,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.5 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.6 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.5"></script>
+<script src="/site.js?v=7.6"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

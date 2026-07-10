@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Malaysia Budget Tracker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'7'%20fill%3D'%231B5E20'%2F%3E%3Ccircle%20cx%3D'15'%20cy%3D'16'%20r%3D'7'%20fill%3D'none'%20stroke%3D'%23FFD700'%20stroke-width%3D'2.5'%2F%3E%3Cpath%20d%3D'M15%209a7%207%200%201%200%200%2014%205%205%200%201%201%200-14'%20fill%3D'%23FFD700'%2F%3E%3Ccircle%20cx%3D'21.5'%20cy%3D'13'%20r%3D'1.5'%20fill%3D'%23FFD700'%2F%3E%3C%2Fsvg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'7'%20fill%3D'%231B5E20'%2F%3E%3Ccircle%20cx%3D'15'%20cy%3D'16'%20r%3D'7'%20fill%3D'none'%20stroke%3D'%23FFD700'%20stroke-width%3D'2.5'%2F%3E%3Cpath%20d%3D'M15%209a7%207%200%201%200%200%2014%205%205%200%201%201%200-14'%20fill%3D'%23FFD700'%2F%3E%3Ccircle%20cx%3D'21.5'%20cy%3D'13'%20r%3D'1.5'%20fill%3D'%23FFD700'%2F%3E%3C%2Fsvg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1506,10 +1508,10 @@ tbody tr.income-row td:first-child{
       <span class="bi-bank-chip">👛 Touch 'n Go</span>
     </div>
     <label class="bi-upload" onclick="document.getElementById('biFileInput').click()">
-      <input type="file" id="biFileInput" accept=".csv,.pdf,.txt" onchange="handleBankFile(this)">
+      <input type="file" id="biFileInput" accept=".csv,.pdf,.txt" multiple onchange="handleBankFile(this)">
       <div class="bi-upload-icon">📂</div>
-      <div class="bi-upload-label">Click to upload statement</div>
-      <div class="bi-upload-sub">CSV or PDF · Maybank, SCB, Touch 'n Go</div>
+      <div class="bi-upload-label">Click to upload statements</div>
+      <div class="bi-upload-sub">CSV or PDF · Multiple files at once · Maybank, SCB, Touch 'n Go</div>
     </label>
     <div class="bi-status" id="biStatus"></div>
     <div id="biReview"></div>
@@ -3351,42 +3353,79 @@ function parsePdfGeneric(text){
   }
   return txns;
 }
+function getOrCreateOthersCategory(){
+  let cat=state.categories.find(c=>/^others?$/i.test(c.name.trim())||/^misc/i.test(c.name.trim()));
+  if(!cat){
+    const id='cat_others_'+Date.now();
+    cat={id,name:'Others',group:state.groups&&state.groups.length?'':''};
+    state.categories.push(cat);
+    saveState();
+  }
+  return cat;
+}
+
 async function handleBankFile(input){
-  const file=input.files[0];
-  if(!file) return;
+  const files=Array.from(input.files);
+  if(!files.length) return;
   const status=document.getElementById('biStatus');
   status.style.color='var(--text2)';
-  status.textContent='Reading file…';
-  try{
-    const ext=file.name.split('.').pop().toLowerCase();
-    let txns=[];
-    if(ext==='csv'||ext==='txt'){
-      const text=await file.text();
-      const bank=detectBank(file.name, text.slice(0,500));
-      status.textContent='Detected: '+bankLabel(bank)+' — parsing…';
-      txns=parseCsvBank(text, bank);
-    } else if(ext==='pdf'){
-      status.textContent='Parsing PDF… (may take a moment)';
-      txns=await parsePdfBank(file);
-    } else {
-      status.textContent='Unsupported file type. Please upload CSV or PDF.';
-      return;
+
+  let allTxns=[];
+  let errors=[];
+  for(let fi=0;fi<files.length;fi++){
+    const file=files[fi];
+    status.textContent=files.length>1
+      ? `Processing file ${fi+1}/${files.length}: ${file.name}…`
+      : 'Reading file…';
+    try{
+      const ext=file.name.split('.').pop().toLowerCase();
+      let txns=[];
+      if(ext==='csv'||ext==='txt'){
+        const text=await file.text();
+        const bank=detectBank(file.name, text.slice(0,500));
+        txns=parseCsvBank(text, bank);
+      } else if(ext==='pdf'){
+        txns=await parsePdfBank(file);
+      } else {
+        errors.push(file.name+': unsupported format');
+        continue;
+      }
+      allTxns=allTxns.concat(txns);
+    } catch(e){
+      errors.push(file.name+': '+e.message);
+      console.error(e);
     }
-    if(!txns.length){
-      status.style.color='var(--red)';
-      status.textContent='No transactions found. Check the file format matches Maybank/SCB/TnG CSV export.';
-      return;
-    }
-    txns.forEach(t=>{t.catId=matchCategory(t.desc);t.include=true;});
-    const matched=txns.filter(t=>t.catId).length;
-    status.style.color='var(--accent)';
-    status.textContent=`Found ${txns.length} transactions · ${matched} auto-matched to categories · ${txns.length-matched} need manual assignment`;
-    renderBiReview(txns);
-  } catch(e){
-    status.style.color='var(--red)';
-    status.textContent='Error: '+e.message;
-    console.error(e);
   }
+
+  if(!allTxns.length){
+    status.style.color='var(--red)';
+    status.textContent='No transactions found.'+(errors.length?' Errors: '+errors.join('; '):'');
+    return;
+  }
+
+  // De-duplicate by date+desc+amount (handles uploading same file twice)
+  const seen=new Set();
+  allTxns=allTxns.filter(t=>{
+    const key=t.date+'|'+t.desc+'|'+t.amount;
+    if(seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+  allTxns.sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Match categories — unknown → "Others"
+  const othCat=getOrCreateOthersCategory();
+  allTxns.forEach(t=>{
+    t.catId=matchCategory(t.desc);
+    if(!t.catId) t.catId=othCat.id;
+    t.include=true;
+  });
+
+  const matched=allTxns.filter(t=>t.catId&&t.catId!==othCat.id).length;
+  const inOthers=allTxns.filter(t=>t.catId===othCat.id).length;
+  status.style.color='var(--accent)';
+  const fileSuffix=files.length>1?` from ${files.length} files`:'';
+  status.textContent=`Found ${allTxns.length} transactions${fileSuffix} · ${matched} auto-matched · ${inOthers} assigned to Others`;
+  renderBiReview(allTxns);
 }
 
 let _biTxns=[];
