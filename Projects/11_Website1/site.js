@@ -1,4 +1,4 @@
-/* v7.7 */
+/* v7.8 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.7 — BULK & BLOCK DEALS ENGINE
+   v7.8 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4417,4 +4417,330 @@ function _fmtQ(v){
     window.initDeals();
     setTimeout(function(){btn.classList.remove('spinning');},1800);
   };
+})();
+
+/* ============================================================
+   v7.8 — SEND NOW OR WAIT? RATE TIMER
+   ============================================================ */
+(function(){
+
+  /* Currency pairs config */
+  var RT_PAIRS = [
+    {id:'USD',label:'USD → INR',flag:'🇺🇸',key:'inr',cross:null},
+    {id:'AED',label:'AED → INR',flag:'🇦🇪',key:'inr',cross:'aed'},
+    {id:'GBP',label:'GBP → INR',flag:'🇬🇧',key:'inr',cross:'gbp'},
+    {id:'EUR',label:'EUR → INR',flag:'🇪🇺',key:'inr',cross:'eur'},
+    {id:'CAD',label:'CAD → INR',flag:'🇨🇦',key:'inr',cross:'cad'},
+    {id:'AUD',label:'AUD → INR',flag:'🇦🇺',key:'inr',cross:'aud'},
+    {id:'SGD',label:'SGD → INR',flag:'🇸🇬',key:'inr',cross:'sgd'}
+  ];
+
+  /* State */
+  var _rtPair = RT_PAIRS[0];
+  var _rtTf   = 90;
+  var _rtData  = {};   /* { 'YYYY-MM-DD': rate } */
+  var _rtLoading = false;
+
+  /* Fetch rate for a single date from jsDelivr currency CDN */
+  function _rtFetch(dateStr) {
+    var url = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@' + dateStr + '/v1/currencies/usd.json';
+    return fetch(url, {signal: AbortSignal.timeout(6000)})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ return d.usd || {}; })
+      .catch(function(){ return null; });
+  }
+
+  /* Get cross rate from USD-base data */
+  function _rtRate(usdData, pair) {
+    if (!usdData) return null;
+    var inr = usdData[pair.key];
+    if (!inr) return null;
+    if (!pair.cross) return inr;
+    var crossVal = usdData[pair.cross];
+    if (!crossVal) return null;
+    return inr / crossVal;
+  }
+
+  /* Build date strings going back N days (weekly samples) */
+  function _rtDates(days) {
+    var dates = [];
+    var step  = Math.max(7, Math.floor(days / 26));
+    var d     = new Date();
+    var added = 0;
+    while (added < 26 && (d - new Date(Date.now() - days * 86400000)) > 0) {
+      d.setDate(d.getDate() - step);
+      var ds = d.toISOString().slice(0,10);
+      dates.push(ds);
+      added++;
+    }
+    return dates;
+  }
+
+  /* Percentile: what % of historical rates are <= current rate */
+  function _rtPercentile(current, hist) {
+    if (!hist.length) return 50;
+    var below = hist.filter(function(v){ return v <= current; }).length;
+    return Math.round((below / hist.length) * 100);
+  }
+
+  /* Recommendation based on percentile */
+  function _rtRec(pct) {
+    if (pct >= 65) return {cls:'rt-rec-send', icon:'✅', text:'Send Now', sub:'Rate is better than ' + pct + '% of recent days'};
+    if (pct >= 40) return {cls:'rt-rec-neutral', icon:'⏳', text:'Rate is Average', sub:'Neutral — ' + pct + '% of recent days were lower'};
+    return {cls:'rt-rec-wait', icon:'⏳', text:'Consider Waiting', sub:'Rate is lower than ' + (100-pct) + '% of recent days'};
+  }
+
+  /* Draw sparkline chart */
+  function _rtDrawChart(dates, rates, currentRate) {
+    var canvas = document.getElementById('rt-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.offsetWidth || 600;
+    var H = canvas.offsetHeight || 160;
+    canvas.width  = W * window.devicePixelRatio;
+    canvas.height = H * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.clearRect(0, 0, W, H);
+
+    if (!rates.length) return;
+
+    var pad = {t:10, r:10, b:28, l:50};
+    var cW  = W - pad.l - pad.r;
+    var cH  = H - pad.t - pad.b;
+
+    var allRates = rates.concat([currentRate]);
+    var minR = Math.min.apply(null, allRates) * 0.999;
+    var maxR = Math.max.apply(null, allRates) * 1.001;
+    var range = maxR - minR || 1;
+
+    function xPos(i, total){ return pad.l + (i / (total - 1)) * cW; }
+    function yPos(v){ return pad.t + cH - ((v - minR) / range) * cH; }
+
+    /* Grid lines */
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    for (var g = 0; g <= 4; g++) {
+      var gy = pad.t + (g / 4) * cH;
+      ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l + cW, gy); ctx.stroke();
+      var val = maxR - (g / 4) * range;
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('₹' + val.toFixed(2), pad.l - 4, gy + 4);
+    }
+
+    /* Historical avg line */
+    var avg = rates.reduce(function(a,b){return a+b;},0) / rates.length;
+    var avgY = yPos(avg);
+    ctx.strokeStyle = 'rgba(240,165,32,0.35)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(pad.l, avgY); ctx.lineTo(pad.l + cW, avgY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(240,165,32,0.6)';
+    ctx.font = '9px Arial'; ctx.textAlign = 'left';
+    ctx.fillText('avg ₹' + avg.toFixed(2), pad.l + 4, avgY - 3);
+
+    /* Line path + gradient fill */
+    var gradient = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+    gradient.addColorStop(0, 'rgba(0,212,170,0.3)');
+    gradient.addColorStop(1, 'rgba(0,212,170,0)');
+
+    ctx.beginPath();
+    rates.forEach(function(v, i){
+      var x = xPos(i, rates.length); var y = yPos(v);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = 'rgba(0,212,170,0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    /* Fill area */
+    ctx.lineTo(xPos(rates.length-1, rates.length), pad.t + cH);
+    ctx.lineTo(pad.l, pad.t + cH);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    /* Dots at each point */
+    ctx.fillStyle = 'rgba(0,212,170,0.6)';
+    rates.forEach(function(v, i){
+      ctx.beginPath();
+      ctx.arc(xPos(i, rates.length), yPos(v), 2.5, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    /* Current rate marker */
+    var curX = pad.l + cW;
+    var curY = yPos(currentRate);
+    ctx.beginPath();
+    ctx.arc(curX, curY, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#f0a520';
+    ctx.fill();
+    ctx.strokeStyle = 'var(--bg, #060b1c)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    /* X-axis date labels */
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '9px Arial'; ctx.textAlign = 'center';
+    var step = Math.max(1, Math.floor(dates.length / 5));
+    dates.forEach(function(d, i){
+      if (i % step === 0) {
+        var x = xPos(i, dates.length);
+        var label = d.slice(5); /* MM-DD */
+        ctx.fillText(label, x, H - pad.b + 14);
+      }
+    });
+  }
+
+  /* Update sim result */
+  function _rtUpdateSim() {
+    var inp = document.getElementById('rt-sim-amt');
+    var res = document.getElementById('rt-sim-res');
+    var avg30 = parseFloat(document.getElementById('rt-stat-30d') && document.getElementById('rt-stat-30d').dataset.raw);
+    var cur   = parseFloat(document.getElementById('rt-rate-val') && document.getElementById('rt-rate-val').dataset.raw);
+    if (!inp || !res || !avg30 || !cur) return;
+    var amt = parseFloat(inp.value) || 1000;
+    var diff = (cur - avg30) * amt;
+    var sign = diff >= 0 ? '+' : '';
+    res.textContent = 'vs 30D avg: ' + sign + '₹' + Math.round(diff).toLocaleString('en-IN');
+    res.className = 'rt-sim-result ' + (diff >= 0 ? 'pos' : 'neg');
+  }
+
+  /* Render the full UI with fetched data */
+  function _rtRender(currentRate, datesSorted, ratesSorted) {
+    var hist = ratesSorted.slice();
+
+    var pct   = _rtPercentile(currentRate, hist);
+    var rec   = _rtRec(pct);
+
+    /* Rate display */
+    var rateEl = document.getElementById('rt-rate-val');
+    if (rateEl) { rateEl.textContent = '₹' + currentRate.toFixed(4); rateEl.dataset.raw = currentRate; }
+
+    var subEl = document.getElementById('rt-rate-sub');
+    if (subEl) subEl.textContent = '1 ' + _rtPair.id + ' = ₹' + currentRate.toFixed(2);
+
+    /* Recommendation */
+    var pillEl = document.getElementById('rt-rec-pill');
+    if (pillEl) { pillEl.textContent = rec.icon + ' ' + rec.text; pillEl.className = 'rt-rec-pill ' + rec.cls; }
+    var subRecEl = document.getElementById('rt-rec-sub');
+    if (subRecEl) subRecEl.textContent = rec.sub;
+
+    /* Percentile bar */
+    var fillEl = document.getElementById('rt-pct-fill');
+    var markEl = document.getElementById('rt-pct-marker');
+    var pctValEl = document.getElementById('rt-pct-val');
+    if (fillEl) fillEl.style.width = pct + '%';
+    if (markEl) markEl.style.left = pct + '%';
+    if (pctValEl) pctValEl.textContent = 'Better than ' + pct + '% of the last ' + _rtTf + ' days';
+
+    /* Stats */
+    var last30  = ratesSorted.slice(-4);
+    var last90  = ratesSorted.slice(-13);
+    var avg30v  = last30.reduce(function(a,b){return a+b;},0) / (last30.length||1);
+    var avg90v  = last90.reduce(function(a,b){return a+b;},0) / (last90.length||1);
+    var hiV     = Math.max.apply(null, hist);
+    var loV     = Math.min.apply(null, hist);
+
+    function _setS(id, val, raw) {
+      var el = document.getElementById(id);
+      if (el) { el.textContent = '₹' + val.toFixed(2); if (raw !== undefined) el.dataset.raw = raw; }
+    }
+    _setS('rt-stat-30d', avg30v, avg30v);
+    _setS('rt-stat-90d', avg90v);
+    _setS('rt-stat-hi', hiV);
+    _setS('rt-stat-lo', loV);
+
+    var s30 = document.getElementById('rt-stat-30d');
+    if (s30) s30.className = 'rt-stat-val ' + (currentRate >= avg30v ? 'up' : 'dn');
+
+    /* Chart */
+    _rtDrawChart(datesSorted, ratesSorted, currentRate);
+
+    /* Sim */
+    _rtUpdateSim();
+
+    /* Updated time */
+    var upEl = document.getElementById('rt-updated');
+    if (upEl) upEl.textContent = 'Updated: ' + new Date().toLocaleTimeString();
+
+    /* Hide skeleton */
+    var sk = document.getElementById('rt-skeleton-msg');
+    if (sk) sk.style.display = 'none';
+  }
+
+  /* Main init — called when tab opens */
+  window.initRateTimer = function() {
+    if (_rtLoading) return;
+    _rtLoading = true;
+
+    var sk = document.getElementById('rt-skeleton-msg');
+    if (sk) sk.style.display = 'block';
+
+    var today = new Date().toISOString().slice(0,10);
+    var histDates = _rtDates(_rtTf);
+
+    var allDates = histDates.concat([today]);
+    var promises = allDates.map(function(d){ return _rtFetch(d); });
+
+    Promise.all(promises).then(function(results) {
+      var currentRaw = results[results.length - 1];
+      var currentRate = _rtRate(currentRaw, _rtPair);
+
+      if (!currentRate) {
+        /* Fallback sample rates if API fails */
+        var FALLBACK = {USD:84.5,AED:23.02,GBP:107.2,EUR:91.4,CAD:62.1,AUD:55.3,SGD:63.8};
+        currentRate = FALLBACK[_rtPair.id] || 84.5;
+      }
+
+      var datesSorted = [];
+      var ratesSorted = [];
+      histDates.forEach(function(d, i) {
+        var r = _rtRate(results[i], _rtPair);
+        if (r) { datesSorted.push(d); ratesSorted.push(r); }
+      });
+
+      /* Sort oldest to newest */
+      var combined = datesSorted.map(function(d,i){return {d:d,r:ratesSorted[i]};});
+      combined.sort(function(a,b){return a.d < b.d ? -1 : 1;});
+      datesSorted = combined.map(function(x){return x.d;});
+      ratesSorted = combined.map(function(x){return x.r;});
+
+      _rtData = {};
+      datesSorted.forEach(function(d,i){_rtData[d]=ratesSorted[i];});
+
+      _rtLoading = false;
+      _rtRender(currentRate, datesSorted, ratesSorted);
+    }).catch(function(){
+      _rtLoading = false;
+      var sk2 = document.getElementById('rt-skeleton-msg');
+      if (sk2) sk2.textContent = 'Could not load rate data. Check your connection.';
+    });
+  };
+
+  /* Pair switch */
+  window.rtSetPair = function(id, el) {
+    document.querySelectorAll('.rt-pair-btn').forEach(function(b){b.classList.remove('rt-active');});
+    if (el) el.classList.add('rt-active');
+    _rtPair = RT_PAIRS.filter(function(p){return p.id===id;})[0] || RT_PAIRS[0];
+    _rtData = {};
+    _rtLoading = false;
+    initRateTimer();
+  };
+
+  /* Timeframe switch */
+  window.rtSetTf = function(days, el) {
+    document.querySelectorAll('.rt-tf-btn').forEach(function(b){b.classList.remove('rt-tf-active');});
+    if (el) el.classList.add('rt-tf-active');
+    _rtTf = days;
+    _rtData = {};
+    _rtLoading = false;
+    initRateTimer();
+  };
+
+  /* Sim input */
+  window.rtSimCalc = function() { _rtUpdateSim(); };
+
 })();

@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.7"/>
+<link rel="stylesheet" href="/site.css?v=7.8"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.7</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.8</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -903,6 +903,10 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Live Rates</div><div class="drawer-desc">Compare 50+ remittance providers</div></div>
     </div>
+    <div class="drawer-item" data-tab="timer" onclick="showTab('timer',this);initRateTimer()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Send Now or Wait?</div><div class="drawer-desc">Rate timer · USD, AED, GBP &amp; more</div></div>
+    </div>
     <div class="drawer-section-lbl">✈ Flights</div>
     <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
@@ -978,6 +982,103 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-info"><div class="drawer-name">Bulk &amp; Block Deals</div><div class="drawer-desc">Last 7 days · NSE + BSE</div></div>
     </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
+  </div>
+
+  <!-- TAB: RATE TIMER — SEND NOW OR WAIT? -->
+  <div class="tool-section" id="tab-timer">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(240,165,32,.12),rgba(240,165,32,.04));border-color:rgba(240,165,32,.2)">
+      <div style="font-size:1.3rem;font-weight:700;color:var(--amber);margin-bottom:4px">⏱ Send Now or Wait?</div>
+      <div style="font-size:.82rem;color:var(--muted)">Live exchange rate vs 30, 90 &amp; 180-day history — know when to send</div>
+    </div>
+
+    <!-- Pair selector -->
+    <div class="rt-pairs" id="rt-pairs">
+      <button class="rt-pair-btn rt-active" onclick="rtSetPair('USD',this)"><span class="rt-pair-flag">🇺🇸</span>USD → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('AED',this)"><span class="rt-pair-flag">🇦🇪</span>AED → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('GBP',this)"><span class="rt-pair-flag">🇬🇧</span>GBP → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('EUR',this)"><span class="rt-pair-flag">🇪🇺</span>EUR → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('CAD',this)"><span class="rt-pair-flag">🇨🇦</span>CAD → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('AUD',this)"><span class="rt-pair-flag">🇦🇺</span>AUD → INR</button>
+      <button class="rt-pair-btn" onclick="rtSetPair('SGD',this)"><span class="rt-pair-flag">🇸🇬</span>SGD → INR</button>
+    </div>
+
+    <!-- Loading message -->
+    <div id="rt-skeleton-msg" style="text-align:center;padding:12px;font-size:.8rem;color:var(--muted);">Fetching live rate data…</div>
+
+    <!-- Hero: rate + recommendation -->
+    <div class="rt-hero">
+      <div class="rt-rate-block">
+        <div class="rt-rate-label">Current Rate</div>
+        <div class="rt-rate-value" id="rt-rate-val" data-raw="">—</div>
+        <div class="rt-rate-sub" id="rt-rate-sub">Fetching…</div>
+      </div>
+      <div class="rt-rec-block">
+        <div class="rt-rec-pill rt-rec-neutral" id="rt-rec-pill">⏳ Loading…</div>
+        <div class="rt-rec-sub" id="rt-rec-sub"></div>
+      </div>
+    </div>
+
+    <!-- Percentile bar -->
+    <div class="rt-pct-wrap">
+      <div class="rt-pct-label">
+        <span>Worst rate (period low)</span>
+        <span>Best rate (period high)</span>
+      </div>
+      <div class="rt-pct-track">
+        <div class="rt-pct-fill" id="rt-pct-fill" style="width:50%"></div>
+        <div class="rt-pct-marker" id="rt-pct-marker" style="left:50%"></div>
+      </div>
+      <div class="rt-pct-value" id="rt-pct-val">Calculating…</div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="rt-stats">
+      <div class="rt-stat">
+        <div class="rt-stat-label">30-Day Avg</div>
+        <div class="rt-stat-val" id="rt-stat-30d">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">90-Day Avg</div>
+        <div class="rt-stat-val" id="rt-stat-90d">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">Period High</div>
+        <div class="rt-stat-val up" id="rt-stat-hi">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">Period Low</div>
+        <div class="rt-stat-val dn" id="rt-stat-lo">—</div>
+      </div>
+    </div>
+
+    <!-- Timeframe selector -->
+    <div class="rt-tf-row">
+      <span class="rt-tf-label">Compare vs:</span>
+      <button class="rt-tf-btn" onclick="rtSetTf(30,this)">30 Days</button>
+      <button class="rt-tf-btn rt-tf-active" onclick="rtSetTf(90,this)">90 Days</button>
+      <button class="rt-tf-btn" onclick="rtSetTf(180,this)">180 Days</button>
+      <button class="rt-tf-btn" onclick="rtSetTf(365,this)">1 Year</button>
+    </div>
+
+    <!-- Chart -->
+    <div class="rt-chart-wrap">
+      <div class="rt-chart-title">Rate history — dashed line = average &nbsp;|&nbsp; <span style="color:var(--amber)">●</span> today</div>
+      <canvas id="rt-canvas"></canvas>
+    </div>
+
+    <!-- Amount simulator -->
+    <div class="rt-sim">
+      <div class="rt-sim-title">💡 Simulate your transfer</div>
+      <div class="rt-sim-row">
+        <span style="font-size:.82rem;color:var(--muted)">If I send</span>
+        <input class="rt-sim-input" id="rt-sim-amt" type="number" value="1000" min="1" oninput="rtSimCalc()" />
+        <span class="rt-sim-vs" id="rt-sim-base-cur">USD</span>
+        <span class="rt-sim-result" id="rt-sim-res">—</span>
+      </div>
+    </div>
+
+    <div class="rt-updated" id="rt-updated"></div>
+    <div class="deals-disclaimer">Rate data via <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" rel="noopener">Open Exchange API</a> (ECB/IMF sources). For indicative purposes only — actual transfer rates vary by provider. Use the <span style="color:var(--teal);cursor:pointer" onclick="showTab('rates',null)">Live Rates tab</span> to compare exact provider rates.</div>
   </div>
 
   <!-- TAB: BULK & BLOCK DEALS -->
@@ -2479,14 +2580,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.7 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.8 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.7"></script>
+<script src="/site.js?v=7.8"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

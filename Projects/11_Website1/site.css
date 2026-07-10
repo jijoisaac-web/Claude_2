@@ -1,4 +1,4 @@
-/* v7.7 */
+/* v7.8 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1895,7 +1895,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ══════════════════════════════════════════════════════
-   v7.7 — BULK & BLOCK DEALS TAB
+   v7.8 — BULK & BLOCK DEALS TAB
    ══════════════════════════════════════════════════════ */
 .deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
@@ -1973,4 +1973,84 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .deals-table{font-size:.74rem;}
   .deals-table th,.deals-table td{padding:8px 10px;}
   .deals-client{max-width:120px;}
+}
+
+/* ============================================================
+   v7.8 — SEND NOW OR WAIT? RATE TIMER
+   ============================================================ */
+
+/* Pair selector */
+.rt-pairs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.rt-pair-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:.82rem;cursor:pointer;transition:all .2s;}
+.rt-pair-btn:hover{border-color:var(--amber);color:var(--amber);}
+.rt-pair-btn.rt-active{background:rgba(240,165,32,.12);border-color:var(--amber);color:var(--amber);font-weight:600;}
+.rt-pair-flag{font-size:1rem;}
+
+/* Main rate display */
+.rt-hero{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:20px 24px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;}
+.rt-rate-block{}
+.rt-rate-label{font-size:.75rem;color:var(--muted);margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase;}
+.rt-rate-value{font-size:2.4rem;font-weight:700;color:var(--text);letter-spacing:-.02em;line-height:1;}
+.rt-rate-sub{font-size:.78rem;color:var(--muted);margin-top:5px;}
+.rt-rec-block{text-align:center;}
+.rt-rec-pill{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:30px;font-size:1rem;font-weight:700;letter-spacing:.01em;}
+.rt-rec-send{background:rgba(34,211,154,.14);color:var(--green);border:1.5px solid rgba(34,211,154,.3);}
+.rt-rec-wait{background:rgba(248,113,113,.1);color:#f87171;border:1.5px solid rgba(248,113,113,.25);}
+.rt-rec-neutral{background:rgba(240,165,32,.1);color:var(--amber);border:1.5px solid rgba(240,165,32,.25);}
+.rt-rec-sub{font-size:.72rem;color:var(--muted);margin-top:6px;text-align:center;}
+
+/* Percentile bar */
+.rt-pct-wrap{margin-bottom:16px;}
+.rt-pct-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:6px;}
+.rt-pct-track{height:8px;background:var(--elevated);border-radius:6px;position:relative;overflow:visible;}
+.rt-pct-fill{height:100%;border-radius:6px;transition:width .6s ease;background:linear-gradient(90deg,#f87171,var(--amber) 50%,var(--green));}
+.rt-pct-marker{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--text);border:2px solid var(--bg);transform:translateX(-50%);transition:left .6s ease;box-shadow:0 0 0 2px var(--amber);}
+.rt-pct-value{font-size:.8rem;color:var(--amber);font-weight:600;margin-top:6px;}
+
+/* Stats grid */
+.rt-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.rt-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.rt-stat-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.rt-stat-val{font-size:1.05rem;font-weight:600;color:var(--text);}
+.rt-stat-val.up{color:var(--green);}
+.rt-stat-val.dn{color:#f87171;}
+
+/* Timeframe selector */
+.rt-tf-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.rt-tf-label{font-size:.75rem;color:var(--muted);margin-right:4px;}
+.rt-tf-btn{padding:5px 14px;border-radius:16px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.78rem;cursor:pointer;transition:all .15s;}
+.rt-tf-btn.rt-tf-active{background:rgba(240,165,32,.12);border-color:var(--amber);color:var(--amber);font-weight:600;}
+
+/* Chart */
+.rt-chart-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;}
+.rt-chart-title{font-size:.8rem;color:var(--muted);margin-bottom:10px;}
+#rt-canvas{width:100%;height:160px;display:block;}
+
+/* Amount simulator */
+.rt-sim{background:rgba(240,165,32,.06);border:1px solid rgba(240,165,32,.15);border-radius:12px;padding:16px;margin-bottom:16px;}
+.rt-sim-title{font-size:.8rem;font-weight:600;color:var(--amber);margin-bottom:10px;}
+.rt-sim-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rt-sim-input{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:.9rem;width:140px;}
+.rt-sim-vs{font-size:.78rem;color:var(--muted);}
+.rt-sim-result{font-size:.9rem;font-weight:600;}
+.rt-sim-result.pos{color:var(--green);}
+.rt-sim-result.neg{color:#f87171;}
+
+/* Loading skeleton */
+.rt-skeleton{animation:shimmer 1.5s infinite;}
+
+/* Last updated */
+.rt-updated{font-size:.7rem;color:var(--muted);text-align:right;margin-top:8px;}
+
+@media(max-width:768px){
+  .rt-stats{grid-template-columns:repeat(2,1fr);}
+  .rt-hero{flex-direction:column;align-items:flex-start;gap:14px;}
+  .rt-rec-block{width:100%;}
+  .rt-rec-pill{width:100%;justify-content:center;}
+  .rt-rate-value{font-size:2rem;}
+}
+@media(max-width:480px){
+  .rt-stats{grid-template-columns:1fr 1fr;}
+  .rt-pairs{gap:5px;}
+  .rt-pair-btn{padding:6px 11px;font-size:.76rem;}
 }
