@@ -278,25 +278,6 @@ header .subtitle{font-size:11px;color:var(--text2);font-weight:400;}
 .mob-tab.tapping .mob-icon svg{animation:mobTap .22s cubic-bezier(.34,1.56,.64,1) forwards;}
 
 /* ══════════════════════════════════════════════
-   ROW HOVER TOOLTIP
-══════════════════════════════════════════════ */
-#rowTooltip{
-  position:fixed;z-index:9999;pointer-events:none;
-  background:var(--surface3);border:1px solid var(--border);
-  border-radius:12px;padding:12px 16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.55);
-  font-size:12px;min-width:190px;max-width:240px;
-  opacity:0;transition:opacity .14s;
-}
-#rowTooltip.visible{opacity:1;}
-.rtip-title{font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text1);}
-.rtip-row{display:flex;justify-content:space-between;gap:16px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-.rtip-row:last-child{border-bottom:none;}
-.rtip-lbl{color:var(--text3);}
-.rtip-val{font-weight:600;color:var(--text1);}
-.rtip-note{margin-top:7px;color:var(--text2);font-size:11px;font-style:italic;}
-
-/* ══════════════════════════════════════════════
    VIEWS
 ══════════════════════════════════════════════ */
 .view{display:none;animation:fadeUp .22s ease;}
@@ -1175,7 +1156,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v2.8
+        <span class="ver-dot"></span>v2.9
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1232,6 +1213,13 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.9 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Click category name to view individual imported transactions</div>
+    <div class="cl-item">Delete individual transaction entries from category detail</div>
+    <div class="cl-item">Quick-create category &amp; group directly from import review</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v2.8 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1556,6 +1544,38 @@ tbody tr.income-row td:first-child{
       <div class="bi-upload-sub">CSV or PDF · Multiple files at once · Maybank, SCB, Touch 'n Go</div>
     </label>
     <div class="bi-status" id="biStatus"></div>
+
+    <!-- Quick-create category/group panel -->
+    <div id="biQuickCreate" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:10px 0">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">➕ New Category</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:2;min-width:120px">
+          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">CATEGORY NAME</label>
+          <input id="biqName" class="modal-input" placeholder="e.g. Dining Out" style="width:100%;box-sizing:border-box">
+        </div>
+        <div style="flex:1;min-width:90px">
+          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">TYPE</label>
+          <select id="biqType" class="bi-sel" style="width:100%;padding:7px 6px">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <div style="flex:2;min-width:120px">
+          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">GROUP (optional)</label>
+          <select id="biqGroup" class="bi-sel" style="width:100%;padding:7px 6px">
+            <option value="">— No group —</option>
+            <option value="__new__">+ Create new group…</option>
+          </select>
+        </div>
+        <div id="biqNewGroupWrap" style="display:none;flex:2;min-width:120px">
+          <label style="font-size:10px;color:var(--text3);display:block;margin-bottom:3px">NEW GROUP NAME</label>
+          <input id="biqGroupName" class="modal-input" placeholder="e.g. Transport" style="width:100%;box-sizing:border-box">
+        </div>
+        <button class="btn btn-primary" onclick="biQuickCreateCat()" style="padding:7px 14px;font-size:12px;white-space:nowrap">Create</button>
+        <button class="btn btn-gray" onclick="document.getElementById('biQuickCreate').style.display='none'" style="padding:7px 10px;font-size:12px">✕</button>
+      </div>
+    </div>
+
     <div id="biReview"></div>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
       <button class="btn btn-gray" onclick="closeBankImport()">Close</button>
@@ -1563,8 +1583,16 @@ tbody tr.income-row td:first-child{
   </div>
 </div>
 
-<!-- Row hover tooltip -->
-<div id="rowTooltip"></div>
+<!-- Transaction Detail Modal -->
+<div class="overlay" id="txnDetailOverlay" onclick="if(event.target===this)closeTxnDetail()" style="display:none">
+  <div class="modal" style="max-width:540px;width:95%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 id="txnDetailTitle" style="margin:0;font-size:16px"></h2>
+      <button class="del-btn" onclick="closeTxnDetail()" style="font-size:16px;padding:4px 8px">✕</button>
+    </div>
+    <div id="txnDetailBody"></div>
+  </div>
+</div>
 
 <!-- PIN Setup -->
 <div class="overlay" id="pinOverlay">
@@ -1995,35 +2023,84 @@ function switchViewMob(name,tab){
   switchView(name, {classList:{add:()=>{},remove:()=>{},toggle:()=>{}}});
 }
 
-/* Row hover tooltip */
-function showRowTip(e,catId){
+/* Category transaction detail modal */
+function openCatDetail(catId){
   const cat=state.categories.find(c=>c.id===catId);
   if(!cat) return;
   const md=state.months[currentMonth]||{};
-  const d=md[catId]||{actual:cat.expected,paid:false,note:''};
+  const d=md[catId]||{actual:cat.expected,paid:false,note:'',transactions:[]};
+  const txns=d.transactions||[];
   const isInc=cat.type==='income';
   const diff=isInc?(d.actual-cat.expected):(cat.expected-d.actual);
-  const pct=cat.expected>0?Math.min(Math.round((d.actual/cat.expected)*100),999):0;
-  const ytd=calcYtdForCat(catId,currentMonth);
   const diffCol=diff>=0?'var(--accent)':'var(--red)';
-  const pctCol=pct>=100?'var(--red)':pct>=80?'var(--yellow)':'var(--accent)';
-  const tip=document.getElementById('rowTooltip');
-  tip.innerHTML=
-    '<div class="rtip-title">'+cat.name+'</div>'+
-    '<div class="rtip-row"><span class="rtip-lbl">Budget</span><span class="rtip-val">MYR '+fmt(cat.expected)+'</span></div>'+
-    '<div class="rtip-row"><span class="rtip-lbl">Actual</span><span class="rtip-val">MYR '+fmt(d.actual)+'</span></div>'+
-    '<div class="rtip-row"><span class="rtip-lbl">'+(isInc?'Surplus':'Remaining')+'</span><span class="rtip-val" style="color:'+diffCol+'">'+(diff>=0?'+':'')+fmt(diff)+'</span></div>'+
-    '<div class="rtip-row"><span class="rtip-lbl">Used</span><span class="rtip-val" style="color:'+pctCol+'">'+pct+'%</span></div>'+
-    '<div class="rtip-row"><span class="rtip-lbl">YTD Actual</span><span class="rtip-val">MYR '+fmt(ytd)+'</span></div>'+
-    (d.paid?'<div class="rtip-row"><span class="rtip-lbl">Status</span><span class="rtip-val" style="color:var(--accent)">✓ Paid</span></div>':'')+
-    (d.note?'<div class="rtip-note">📝 '+d.note+'</div>':'');
-  const x=Math.min(e.clientX+16,window.innerWidth-250);
-  const y=Math.min(e.clientY+10,window.innerHeight-200);
-  tip.style.left=x+'px'; tip.style.top=y+'px';
-  tip.classList.add('visible');
+  const pct=cat.expected>0?Math.min(Math.round((d.actual/cat.expected)*100),999):0;
+
+  document.getElementById('txnDetailTitle').textContent=cat.name+' — '+MONTHS[currentMonth]+' '+currentYear;
+
+  let body='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">';
+  const pills=[
+    {l:'Budget',    v:'MYR '+fmt(cat.expected), c:'var(--text1)'},
+    {l:'Actual',    v:'MYR '+fmt(d.actual),      c:'var(--text1)'},
+    {l:isInc?'Surplus':'Remaining', v:(diff>=0?'+':'')+fmt(diff), c:diffCol},
+    {l:'Used',      v:pct+'%', c:pct>=100?'var(--red)':pct>=80?'var(--yellow)':'var(--accent)'},
+  ];
+  pills.forEach(p=>{
+    body+='<div style="flex:1;min-width:90px;background:var(--surface2);border-radius:8px;padding:8px 10px">'
+      +'<div style="font-size:10px;color:var(--text3);margin-bottom:2px">'+p.l+'</div>'
+      +'<div style="font-weight:700;font-size:13px;color:'+p.c+'">'+p.v+'</div></div>';
+  });
+  body+='</div>';
+
+  if(txns.length){
+    body+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+txns.length+' imported transaction'+(txns.length>1?'s':'')+'</div>';
+    body+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
+      +'<thead><tr style="color:var(--text3);border-bottom:1px solid var(--border)">'
+      +'<th style="text-align:left;padding:4px 6px;font-weight:600">Date</th>'
+      +'<th style="text-align:left;padding:4px 6px;font-weight:600">Description</th>'
+      +'<th style="text-align:right;padding:4px 6px;font-weight:600">Amount</th>'
+      +'<th style="width:28px"></th>'
+      +'</tr></thead><tbody>';
+    txns.forEach((t,i)=>{
+      const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
+      body+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
+        +'<td style="padding:5px 6px;white-space:nowrap;color:var(--text2)">'+t.date+'</td>'
+        +'<td style="padding:5px 6px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+t.desc.replace(/"/g,'')+'">'+t.desc+'</td>'
+        +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+amtCol+'">MYR '+fmt(t.amount)+'</td>'
+        +'<td style="padding:5px 6px;text-align:center"><button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button></td>'
+        +'</tr>';
+    });
+    body+='</tbody></table></div>';
+  } else {
+    body+='<div style="text-align:center;padding:28px 0;color:var(--text3)">'
+      +'<div style="font-size:28px;margin-bottom:8px">📋</div>'
+      +'<div>No imported transactions for this category this month.</div>'
+      +'<div style="font-size:11px;margin-top:4px">Actual amount was entered manually.</div>'
+      +'</div>';
+  }
+
+  body+='<div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">'
+    +'<button class="btn btn-gray" onclick="closeTxnDetail()">Close</button></div>';
+
+  document.getElementById('txnDetailBody').innerHTML=body;
+  document.getElementById('txnDetailOverlay').style.display='flex';
 }
-function hideRowTip(){
-  document.getElementById('rowTooltip').classList.remove('visible');
+
+function closeTxnDetail(){
+  document.getElementById('txnDetailOverlay').style.display='none';
+}
+
+function deleteCatTxn(btn){ deleteTxnEntry(btn.dataset.cid, parseInt(btn.dataset.ti)); }
+
+function deleteTxnEntry(catId,idx){
+  const md=state.months[currentMonth];
+  if(!md||!md[catId]) return;
+  const txns=md[catId].transactions||[];
+  const removed=txns.splice(idx,1)[0];
+  md[catId].transactions=txns;
+  md[catId].actual=Math.max(0,(md[catId].actual||0)-removed.amount);
+  saveState();
+  renderMonthly();
+  openCatDetail(catId); // refresh modal
 }
 
 /* Summary cards */
@@ -2219,14 +2296,13 @@ function appendCatRows(cat,md,tbody,extraClass){
   tr.className=extraClass;
   tr.draggable=true;
   tr.dataset.catId=cat.id;
-  tr.setAttribute('onmouseenter',"showRowTip(event,'"+cat.id+"')");
-  tr.setAttribute('onmouseleave','hideRowTip()');
+
   tr.innerHTML=`
     <td class="c col-drag"><span class="drag-handle" title="Drag to reorder">⠿</span></td>
     <td style="${indent}">
       <div class="cat-name-wrap">
         ${(()=>{const ic=getCatIcon(cat.name);return `<div class="cat-icon-wrap" style="background:${ic.bg}"><span style="font-size:15px">${ic.emoji}</span></div>`;})()}
-        <span class="cat-name-text">${cat.name}</span>
+        <span class="cat-name-text" onclick="openCatDetail('${cat.id}')" style="cursor:pointer" title="View transactions">${cat.name}</span>
       </div>
     </td>
     <td class="r"><span class="editable" contenteditable="true" data-id="${cat.id}" data-field="exp"
@@ -3530,6 +3606,7 @@ function renderBiReview(txns){
       <input type="checkbox" id="biAll" checked onchange="toggleBiAll(this.checked)"> Select all
     </label>
     <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="toggleBiQuickCreate()" style="font-size:12px;padding:5px 10px">➕ New Category</button>
       <button class="btn" onclick="rematchUnassigned()" title="Re-run auto-matching on unassigned rows" style="font-size:12px;padding:5px 10px">✨ Re-match</button>
       <button class="btn btn-primary" onclick="importBiTxns()">⬆ Import Selected</button>
     </div>
@@ -3582,6 +3659,83 @@ function renderBiReview(txns){
 
 function toggleBiAll(v){
   document.querySelectorAll('.bi-chk').forEach(cb=>cb.checked=v);
+}
+
+function toggleBiQuickCreate(){
+  const panel=document.getElementById('biQuickCreate');
+  const open=panel.style.display==='none';
+  panel.style.display=open?'block':'none';
+  if(open){
+    // Populate group dropdown from current state
+    const grpSel=document.getElementById('biqGroup');
+    // Keep first two options (no group, new group), replace rest
+    while(grpSel.options.length>2) grpSel.remove(2);
+    (state.groups||[]).forEach(g=>{
+      const o=document.createElement('option');
+      o.value=g.id; o.textContent=g.name;
+      grpSel.appendChild(o);
+    });
+    document.getElementById('biqName').focus();
+  }
+}
+
+/* Show/hide new group name field */
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='biqGroup'){
+    document.getElementById('biqNewGroupWrap').style.display=
+      e.target.value==='__new__'?'block':'none';
+  }
+});
+
+function biQuickCreateCat(){
+  const name=document.getElementById('biqName').value.trim();
+  if(!name){ alert('Please enter a category name.'); return; }
+  const type=document.getElementById('biqType').value;
+  const grpSel=document.getElementById('biqGroup');
+  let parentId='';
+
+  // Create new group if requested
+  if(grpSel.value==='__new__'){
+    const gname=document.getElementById('biqGroupName').value.trim();
+    if(!gname){ alert('Please enter a group name.'); return; }
+    const gid='grp_'+Date.now();
+    if(!state.groups) state.groups=[];
+    state.groups.push({id:gid,name:gname});
+    parentId=''; // groups don't use parentId for expense cats directly
+    // Note: in this app, groups are separate from categories
+    // We'll assign the category to this group's id
+    parentId=gid;
+  } else if(grpSel.value){
+    parentId=grpSel.value;
+  }
+
+  const catId='cat_'+Date.now();
+  const newCat={id:catId,name,type,expected:0,order:state.categories.length};
+  if(parentId&&type==='expense') newCat.parentId=parentId;
+  state.categories.push(newCat);
+  // Initialise in all months
+  MONTHS.forEach((_,mi)=>{
+    if(!state.months[mi]) state.months[mi]={};
+    state.months[mi][catId]={actual:0,paid:false,note:'',transactions:[]};
+  });
+  saveState();
+
+  // Refresh all category dropdowns in review table
+  const newOpt='<option value="'+catId+'">'+name+'</option>';
+  document.querySelectorAll('.bi-cat').forEach(sel=>{
+    sel.insertAdjacentHTML('beforeend',newOpt);
+  });
+
+  // Reset form & hide panel
+  document.getElementById('biqName').value='';
+  document.getElementById('biqGroupName').value='';
+  document.getElementById('biqNewGroupWrap').style.display='none';
+  document.getElementById('biQuickCreate').style.display='none';
+
+  // Show confirmation
+  const st=document.getElementById('biStatus');
+  st.style.color='var(--accent)';
+  st.textContent='✓ Category "'+name+'" created — select it from the dropdowns below';
 }
 
 /* When user assigns a category, auto-fill all unassigned rows with same merchant */
@@ -3660,6 +3814,16 @@ function importBiTxns(){
 
   const monthsUpdated=[];
 
+  // Also build per-month per-cat transaction list
+  const txnsByMonth={}; // key:"year-month" → catId → [{date,desc,amount,type}]
+  toImport.forEach(t=>{
+    const {month,year}=parseTxnDate(t.date);
+    const key=year+'-'+month;
+    if(!txnsByMonth[key]) txnsByMonth[key]={};
+    if(!txnsByMonth[key][t.catId]) txnsByMonth[key][t.catId]=[];
+    txnsByMonth[key][t.catId].push({date:t.date,desc:t.desc,amount:t.amount,type:t.type});
+  });
+
   Object.values(byMonth).forEach(({year,month,grouped})=>{
     // Load different year's state if needed
     let tState=state;
@@ -3669,10 +3833,16 @@ function importBiTxns(){
     // Ensure month bucket exists
     if(!tState.months[month]) tState.months[month]={};
 
+    const mkey=year+'-'+month;
     Object.entries(grouped).forEach(([catId,total])=>{
       if(!tState.months[month][catId])
-        tState.months[month][catId]={actual:0,paid:false,note:''};
+        tState.months[month][catId]={actual:0,paid:false,note:'',transactions:[]};
       tState.months[month][catId].actual=(tState.months[month][catId].actual||0)+total;
+      // Append individual transactions
+      if(!tState.months[month][catId].transactions)
+        tState.months[month][catId].transactions=[];
+      const newTxns=(txnsByMonth[mkey]||{})[catId]||[];
+      tState.months[month][catId].transactions.push(...newTxns);
     });
 
     if(year!==currentYear){
@@ -3705,11 +3875,4 @@ function toggleChangelog(){
 // Close on outside click
 document.addEventListener('click', e=>{
   const pop = document.getElementById('changelogPopup');
-  if(pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('.ver-badge')){
-    pop.classList.remove('open');
-  }
-});
-
-</script>
-</body>
-</html>
+  if(pop.classList.contains('open') && !pop.contains(e.ta

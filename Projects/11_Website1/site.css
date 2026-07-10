@@ -1,4 +1,4 @@
-/* v7.6 */
+/* v7.7 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1895,7 +1895,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ══════════════════════════════════════════════════════
-   v7.6 — BULK & BLOCK DEALS TAB
+   v7.7 — BULK & BLOCK DEALS TAB
    ══════════════════════════════════════════════════════ */
 .deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
