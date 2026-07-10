@@ -233,20 +233,47 @@ header .subtitle{font-size:11px;color:var(--text2);font-weight:400;}
 .mobile-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;z-index:90;
   background:var(--surface);border-top:1px solid var(--border);
-  height:var(--bot-h);padding:0 8px;
+  height:var(--bot-h);padding:0 4px;
   padding-bottom:env(safe-area-inset-bottom);
   justify-content:space-around;align-items:center;
   box-shadow:0 -4px 24px rgba(0,0,0,.35);
 }
+/* sliding pill behind active tab */
+.mob-pill-track{
+  position:absolute;top:6px;left:4px;right:4px;
+  height:calc(var(--bot-h) - 18px);
+  pointer-events:none;z-index:0;
+}
+.mob-pill-bg{
+  position:absolute;top:0;height:100%;width:20%;
+  border-radius:12px;background:rgba(92,184,122,.13);
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+  left:0;
+}
 .mob-tab{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;padding:6px 4px;cursor:pointer;border-radius:12px;
-  color:var(--text3);transition:all .2s;
+  gap:3px;padding:7px 2px 4px;cursor:pointer;border-radius:12px;
+  color:var(--text3);transition:color .2s;
+  position:relative;z-index:1;
+  -webkit-tap-highlight-color:transparent;user-select:none;
 }
-.mob-tab .mob-icon{font-size:22px;line-height:1;transition:transform .2s;}
-.mob-tab .mob-label{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+.mob-tab .mob-icon svg{
+  width:22px;height:22px;display:block;
+  stroke:currentColor;stroke-width:1.8;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+}
+.mob-tab .mob-label{font-size:10px;font-weight:600;letter-spacing:.1px;}
+.mob-tab .mob-dot{
+  width:4px;height:4px;border-radius:50%;margin-top:1px;
+  background:var(--accent);
+  transform:scale(0);transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+}
 .mob-tab.active{color:var(--accent);}
-.mob-tab.active .mob-icon{transform:scale(1.15);}
+.mob-tab.active .mob-icon svg{transform:translateY(-2px) scale(1.08);}
+.mob-tab.active .mob-dot{transform:scale(1);}
+@keyframes mobTap{0%{transform:scale(.82) translateY(-2px)}100%{transform:scale(1.08) translateY(-2px)}}
+.mob-tab.tapping .mob-icon svg{animation:mobTap .22s cubic-bezier(.34,1.56,.64,1) forwards;}
 
 /* ══════════════════════════════════════════════
    VIEWS
@@ -1151,20 +1178,26 @@ tbody tr.income-row td:first-child{
 
 <!-- Mobile Bottom Nav -->
 <div class="mobile-nav" id="mobileNav">
+  <div class="mob-pill-track"><div class="mob-pill-bg" id="mobPillBg"></div></div>
   <div class="mob-tab active" id="mobt-monthly" onclick="switchViewMob('monthly',this)">
-    <div class="mob-icon">📅</div><div class="mob-label">Monthly</div>
+    <div class="mob-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="mob-label">Monthly</div><div class="mob-dot"></div>
   </div>
   <div class="mob-tab" id="mobt-annual" onclick="switchViewMob('annual',this)">
-    <div class="mob-icon">📊</div><div class="mob-label">Annual</div>
+    <div class="mob-icon"><svg viewBox="0 0 24 24"><rect x="2" y="12" width="5" height="9"/><rect x="9.5" y="7" width="5" height="14"/><rect x="17" y="3" width="5" height="18"/></svg></div>
+    <div class="mob-label">Annual</div><div class="mob-dot"></div>
   </div>
   <div class="mob-tab" id="mobt-budget" onclick="switchViewMob('budget',this)">
-    <div class="mob-icon">🎯</div><div class="mob-label">Budget</div>
+    <div class="mob-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+    <div class="mob-label">Budget</div><div class="mob-dot"></div>
   </div>
   <div class="mob-tab" id="mobt-analytics" onclick="switchViewMob('analytics',this)">
-    <div class="mob-icon">📈</div><div class="mob-label">Charts</div>
+    <div class="mob-icon"><svg viewBox="0 0 24 24"><polyline points="3 17 7 11 11 14 16 7 21 4"/><line x1="3" y1="21" x2="21" y2="21"/></svg></div>
+    <div class="mob-label">Charts</div><div class="mob-dot"></div>
   </div>
   <div class="mob-tab" id="mobt-data" onclick="switchViewMob('data',this)">
-    <div class="mob-icon">⚙️</div><div class="mob-label">Settings</div>
+    <div class="mob-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+    <div class="mob-label">Settings</div><div class="mob-dot"></div>
   </div>
 </div>
 
@@ -1893,13 +1926,25 @@ function renderMonthTabs(){
 }
 
 /* Mobile nav sync */
+const MOB_VIEWS=['monthly','annual','budget','analytics','data'];
+function moveMobPill(idx){
+  const pill=document.getElementById('mobPillBg');
+  if(pill) pill.style.left=(idx*20)+'%';
+}
 function switchViewMob(name,tab){
+  // tap animation
+  tab.classList.remove('tapping');
+  void tab.offsetWidth; // reflow to restart animation
+  tab.classList.add('tapping');
+  setTimeout(()=>tab.classList.remove('tapping'),300);
+
   document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('active'));
   tab.classList.add('active');
+  const idx=MOB_VIEWS.indexOf(name);
+  moveMobPill(idx);
   // also sync desktop nav
   const desktopTabs=document.querySelectorAll('.nav-tab');
-  const viewNames=['monthly','annual','budget','analytics','data'];
-  desktopTabs.forEach((t,i)=>{ t.classList.toggle('active', viewNames[i]===name); });
+  desktopTabs.forEach((t,i)=>{ t.classList.toggle('active', MOB_VIEWS[i]===name); });
   switchView(name, {classList:{add:()=>{},remove:()=>{},toggle:()=>{}}});
 }
 
@@ -2916,6 +2961,31 @@ state=loadState(currentYear);
 ensureMonth(currentMonth);
 checkLock();
 renderAll();
+
+/* Mobile swipe gesture */
+(function(){
+  let tx=0, ty=0, swiping=false;
+  const THRESHOLD=55, VERT_LOCK=60;
+  document.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1) return;
+    tx=e.touches[0].clientX; ty=e.touches[0].clientY; swiping=true;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!swiping) return; swiping=false;
+    const dx=e.changedTouches[0].clientX-tx;
+    const dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dy)>VERT_LOCK) return; // mostly vertical — ignore
+    if(Math.abs(dx)<THRESHOLD) return;
+    const cur=MOB_VIEWS.indexOf(document.querySelector('.mob-tab.active')?.id.replace('mobt-',''));
+    if(cur<0) return;
+    const next=dx<0?Math.min(cur+1,4):Math.max(cur-1,0);
+    if(next===cur) return;
+    const tab=document.getElementById('mobt-'+MOB_VIEWS[next]);
+    if(tab) switchViewMob(MOB_VIEWS[next],tab);
+  },{passive:true});
+  // init pill position
+  moveMobPill(0);
+})();
 
 new MutationObserver(()=>{
   if(document.getElementById('view-analytics').classList.contains('active')) renderChart();
