@@ -1,4 +1,4 @@
-/* v7.13 */
+/* v7.14 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1895,7 +1895,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ══════════════════════════════════════════════════════
-   v7.13 — BULK & BLOCK DEALS TAB
+   v7.14 — BULK & BLOCK DEALS TAB
    ══════════════════════════════════════════════════════ */
 .deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
@@ -1976,7 +1976,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ============================================================
-   v7.13 — SEND NOW OR WAIT? RATE TIMER
+   v7.14 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 
 /* Pair selector */
@@ -2055,11 +2055,11 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .rt-pair-btn{padding:6px 11px;font-size:.76rem;}
 }
 
-/* v7.13 — Flight fare per-person annotation + estimate label */
+/* v7.14 — Flight fare per-person annotation + estimate label */
 .fl-win-fare-pp{font-size:.72rem;color:var(--muted);font-weight:400;}
 .fl-win-fare-est{font-size:.72rem;color:rgba(240,165,32,.7);margin-bottom:8px;padding:5px 10px;background:rgba(240,165,32,.06);border-radius:6px;border:1px solid rgba(240,165,32,.15);}
 
-/* v7.13 — Rate Timer expanded pair selector */
+/* v7.14 — Rate Timer expanded pair selector */
 .rt-pairs-wrap{margin-bottom:20px;}
 .rt-pairs-group-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;font-weight:600;}
 .rt-pairs-wrap .rt-pairs{margin-bottom:4px;}
@@ -2068,7 +2068,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rt-pairs-wrap .rt-pair-btn{padding:6px 10px;font-size:.78rem;gap:5px;}
 
 /* ============================================================
-   v7.13 — EDUCATION ABROAD COST PLANNER TAB
+   v7.14 — EDUCATION ABROAD COST PLANNER TAB
    ============================================================ */
 
 /* Country grid */

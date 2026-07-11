@@ -1,4 +1,4 @@
-/* v7.13 */
+/* v7.14 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.13 — BULK & BLOCK DEALS ENGINE
+   v7.14 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4420,7 +4420,7 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.13 — SEND NOW OR WAIT? RATE TIMER
+   v7.14 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 (function(){
 
@@ -4762,7 +4762,7 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.13 — EDUCATION ABROAD COST PLANNER
+   v7.14 — EDUCATION ABROAD COST PLANNER
    ============================================================ */
 (function(){
 
