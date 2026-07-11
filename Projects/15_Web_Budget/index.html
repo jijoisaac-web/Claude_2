@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9
+        <span class="ver-dot"></span>v3.9.1
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -2554,7 +2554,7 @@ function appendCatRows(cat,md,tbody,extraClass){
     <td class="r"><span class="editable" contenteditable="true" data-id="${cat.id}" data-field="exp"
         onblur="onEditExp(this)" onkeydown="blurEnter(event)">${cat.expected}</span></td>
     <td class="r ${ac}"><span class="editable" contenteditable="true" data-id="${cat.id}" data-field="act"
-        onblur="onEditAct(this)" onkeydown="blurEnter(event)">${d.actual}</span></td>
+        onblur="onEditAct(this)" onkeydown="blurEnter(event)">${Math.round((d.actual||0)*100)/100}</span></td>
     <td class="c"><input type="checkbox" class="paid-check" ${d.paid?'checked':''} onchange="onPaid('${cat.id}',this.checked)"></td>
     <td class="r" style="color:${diff>=0?'var(--green)':'var(--red)'}">${fmtDiff(diff)}</td>
     <td class="c">
@@ -2609,7 +2609,7 @@ function onEditExp(el){
 }
 function onEditAct(el){
   const id=el.dataset.id;
-  const val=parseFloat(el.textContent.replace(/[^0-9.-]/g,''))||0;
+  const val=Math.round((parseFloat(el.textContent.replace(/[^0-9.-]/g,''))||0)*100)/100;
   ensureMonth(currentMonth);
   if(!state.months[currentMonth][id]) state.months[currentMonth][id]={actual:val,paid:false,note:''};
   state.months[currentMonth][id].actual=val;
@@ -4288,7 +4288,7 @@ function importBiTxns(){
     const mkey=year+'-'+month;
     Object.entries(grouped).forEach(([catId,total])=>{
       if(!tState.months[month][catId]) tState.months[month][catId]={actual:0,paid:false,note:'',transactions:[]};
-      tState.months[month][catId].actual=(tState.months[month][catId].actual||0)+total;
+      tState.months[month][catId].actual=Math.round(((tState.months[month][catId].actual||0)+total)*100)/100;
       if(!tState.months[month][catId].transactions) tState.months[month][catId].transactions=[];
       tState.months[month][catId].transactions.push(...((txnsByMonth[mkey]||{})[catId]||[]));
     });
