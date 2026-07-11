@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BestDeals — Find the Best Deals Worldwide</title>
+<style>
+  :root {
+    --bg: #0f1222;
+    --card: #1a1e33;
+    --card-hover: #232849;
+    --accent: #ff6b35;
+    --accent2: #ffd166;
+    --text: #eef0ff;
+    --muted: #9aa0c3;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  header { padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .tagline { color: var(--muted); font-size: 0.85rem; }
+
+  /* Country toggle */
+  .country-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 16px 0 6px;
+    scrollbar-width: thin;
+  }
+  .country-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 30px;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .country-chip .flag { font-size: 1.1rem; }
+  .country-chip:hover { border-color: var(--accent); color: var(--text); }
+  .country-chip.active {
+    background: linear-gradient(90deg, var(--accent), #ff8f5e);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .hero { text-align: center; padding: 40px 0 24px; }
+  .hero h1 {
+    font-size: clamp(1.7rem, 5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p { color: var(--muted); font-size: 1.02rem; max-width: 620px; margin: 0 auto; }
+  .hero .current-country { color: var(--accent2); font-weight: 700; }
+
+  .search-box {
+    display: flex;
+    gap: 10px;
+    max-width: 640px;
+    margin: 30px auto 10px;
+    background: var(--card);
+    padding: 8px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  }
+  .search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 1.05rem;
+    padding: 12px 18px;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+  .search-box button {
+    background: linear-gradient(90deg, var(--accent), #ff8f5e);
+    color: #fff;
+    border: none;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .search-box button:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(255,107,53,0.4); }
+
+  .quick-tags { text-align: center; margin-bottom: 8px; }
+  .quick-tags span {
+    display: inline-block;
+    margin: 4px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 30px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quick-tags span:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .section-title { font-size: 1.15rem; font-weight: 700; margin: 44px 0 6px; }
+  .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .site-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--text);
+  }
+  .site-card:hover {
+    background: var(--card-hover);
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  }
+  .site-card .icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .site-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .site-card p { color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+  .site-card .badge {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(255,107,53,0.15);
+    color: var(--accent2);
+  }
+
+  .open-all {
+    display: block;
+    margin: 10px auto 0;
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    padding: 12px 30px;
+    border-radius: 40px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .open-all:hover { background: var(--accent); color: #fff; }
+
+  .tips {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 50px 0;
+  }
+  .tips h2 { font-size: 1.1rem; margin-bottom: 14px; }
+  .tips ul { list-style: none; }
+  .tips li { padding: 8px 0; color: var(--muted); font-size: 0.92rem; display: flex; gap: 10px; }
+  .tips li::before { content: "💡"; }
+
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 24px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .search-box { flex-direction: column; border-radius: var(--radius); }
+    .search-box button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">Best<span>Deals</span></div>
+    <div class="tagline">One search. Every marketplace. 15 countries.</div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="country-bar" id="countryBar"></div>
+
+  <section class="hero">
+    <h1>Find the <em>best deal</em> on anything, anywhere</h1>
+    <p>Shopping in <span class="current-country" id="countryName"></span> — search local stores, marketplaces and deal sites all at once. Switch country above.</p>
+  </section>
+
+  <div class="search-box">
+    <input type="text" id="query" placeholder="e.g. iPhone 15, air fryer, gaming chair…" autofocus>
+    <button onclick="doSearch()">🔍 Find Deals</button>
+  </div>
+
+  <div class="quick-tags" id="quickTags">
+    <span>iPhone 15</span><span>PS5</span><span>Air Fryer</span><span>Laptop</span><span>Sofa</span><span>Bicycle</span><span>Smart TV</span>
+  </div>
+
+  <h2 class="section-title">🛒 Online Stores</h2>
+  <p class="section-sub" id="storeSub">Best for new items &amp; price comparison</p>
+  <div class="grid" id="storeGrid"></div>
+
+  <h2 class="section-title">🤝 Local &amp; Social Marketplaces</h2>
+  <p class="section-sub">Best for used items, local pickup &amp; hidden gems</p>
+  <div class="grid" id="socialGrid"></div>
+
+  <h2 class="section-title">🏷️ Deal, Coupon &amp; Price-Compare Sites</h2>
+  <p class="section-sub">Community-voted deals, price drops &amp; promo codes</p>
+  <div class="grid" id="dealGrid"></div>
+
+  <button class="open-all" onclick="openAll()">🚀 Open Top 5 Sites at Once</button>
+
+  <section class="tips">
+    <h2>Pro tips for getting the best deal</h2>
+    <ul>
+      <li>Check price history before buying — many "deals" aren't real discounts. Use the price-compare site listed for your country.</li>
+      <li>On Facebook Marketplace, sort by "Date listed: Newest first" and message quickly — good deals go in hours.</li>
+      <li>Search Instagram hashtags like #sale or #dealoftheday plus your product to find small-shop promos.</li>
+      <li>Add items to your cart and wait 24–48 hours — many stores email a discount code to recover the sale.</li>
+      <li>Compare refurbished/open-box listings — often 30–50% cheaper with warranty.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    BestDeals is a free global search hub — it links you directly to results on each marketplace. Prices and availability are shown on the destination sites.
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ---------- URL builders for global platforms ---------- */
+  const amazon    = tld => q => `https://www.amazon.${tld}/s?k=${q}&s=price-asc-rank`;
+  const ebay      = tld => q => `https://www.ebay.${tld}/sch/i.html?_nkw=${q}&_sop=15`;
+  const gShop     = (gl, hl) => q => `https://www.google.com/search?tbm=shop&q=${q}&gl=${gl}&hl=${hl}`;
+  const fbMarket  = () => q => `https://www.facebook.com/marketplace/search/?query=${q}`;
+  const insta     = () => q => `https://www.instagram.com/explore/search/keyword/?q=${q}%20sale`;
+  const alix      = () => q => `https://www.aliexpress.com/wholesale?SearchText=${q}`;
+
+  const AMZ  = (tld, note) => ({ name: "Amazon", icon: "📦", desc: note || "Huge selection, sorted by lowest price.", badge: "Global giant", url: amazon(tld) });
+  const EBAY = tld => ({ name: "eBay", icon: "🔨", desc: "Auctions & used bargains, lowest price first.", badge: "Best for used", url: ebay(tld) });
+  const GS   = (gl, hl) => ({ name: "Google Shopping", icon: "🔎", desc: "Compare prices across hundreds of local stores.", badge: "Compare all", url: gShop(gl, hl) });
+  const FBM  = { name: "Facebook Marketplace", icon: "📘", desc: "Local used deals near you (log in to Facebook).", badge: "Local pickup", url: fbMarket() };
+  const IG   = { name: "Instagram", icon: "📸", desc: "Shops & hashtag deals from small sellers.", badge: "#dealoftheday", url: insta() };
+  const ALI  = { name: "AliExpress", icon: "🌏", desc: "Direct-from-factory prices, longer shipping.", badge: "Lowest prices", url: alix() };
+
+  const S = (name, icon, desc, badge, url) => ({ name, icon, desc, badge, url });
+
+  /* ---------- 15 countries ---------- */
+  const countries = {
+    us: { flag: "🇺🇸", name: "United States",
+      store: [AMZ("com"), EBAY("com"),
+        S("Walmart","🏪","Rollbacks & clearance, lowest price first.","Clearance", q=>`https://www.walmart.com/search?q=${q}&sort=price_low`),
+        S("Best Buy","🔌","Electronics deals & open-box discounts.","Open-box", q=>`https://www.bestbuy.com/site/searchpage.jsp?st=${q}`),
+        S("Target","🎯","Weekly deals and Circle offers.","Circle deals", q=>`https://www.target.com/s?searchTerm=${q}`), ALI],
+      social: [FBM, IG,
+        S("Craigslist","📋","Classic local classifieds.","Local", q=>`https://www.craigslist.org/search/sss?query=${q}&sort=priceasc`),
+        S("OfferUp","🤝","Local buying & selling, great for furniture.","Local pickup", q=>`https://offerup.com/search?q=${q}`),
+        S("Mercari","🛍️","Used goods shipped to you.","Shipped used", q=>`https://www.mercari.com/search/?keyword=${q}`),
+        S("Nextdoor","🏘️","Neighborhood 'For Sale & Free' listings.","Free finds", q=>`https://nextdoor.com/for_sale_and_free/?query=${q}`)],
+      deal: [GS("us","en"),
+        S("Slickdeals","🔥","Community-voted hottest deals & coupons.","Community rated", q=>`https://slickdeals.net/newsearch.php?q=${q}&searcharea=deals`),
+        S("CamelCamelCamel","🐪","Amazon price-history charts — spot fake discounts.","Price history", q=>`https://camelcamelcamel.com/search?sq=${q}`),
+        S("RetailMeNot","🎟️","Promo codes & cash-back offers.","Coupons", q=>`https://www.retailmenot.com/s/${q}`),
+        S("Woot","⚡","Amazon's daily-deals outlet.","Daily deals", q=>`https://www.woot.com/search?query=${q}`)] },
+
+    uk: { flag: "🇬🇧", name: "United Kingdom",
+      store: [AMZ("co.uk"), EBAY("co.uk"),
+        S("Argos","🛒","UK catalogue giant, same-day collection.","Click & collect", q=>`https://www.argos.co.uk/search/${q}/`),
+        S("Currys","🔌","Electronics deals & clearance.","Epic deals", q=>`https://www.currys.co.uk/search?q=${q}`),
+        S("John Lewis","🏬","Quality goods, 'Never Knowingly Undersold' heritage.","Price match", q=>`https://www.johnlewis.com/search?search-term=${q}`), ALI],
+      social: [FBM, IG,
+        S("Gumtree","🌳","UK's biggest local classifieds.","Local", q=>`https://www.gumtree.com/search?search_category=all&q=${q}`),
+        S("Vinted","👗","Second-hand fashion bargains.","Fashion", q=>`https://www.vinted.co.uk/catalog?search_text=${q}`),
+        S("Shpock","📱","Local marketplace app.","Local pickup", q=>`https://www.shpock.com/en-gb/results?q=${q}`)],
+      deal: [GS("uk","en"),
+        S("HotUKDeals","🔥","UK's biggest deal community.","Community rated", q=>`https://www.hotukdeals.com/search?q=${q}`),
+        S("CamelCamelCamel UK","🐪","Amazon UK price history.","Price history", q=>`https://uk.camelcamelcamel.com/search?sq=${q}`),
+        S("VoucherCodes","🎟️","Promo & voucher codes.","Coupons", q=>`https://www.vouchercodes.co.uk/search?q=${q}`)] },
+
+    ca: { flag: "🇨🇦", name: "Canada",
+      store: [AMZ("ca"), EBAY("ca"),
+        S("Walmart Canada","🏪","Rollbacks & clearance.","Clearance", q=>`https://www.walmart.ca/search?q=${q}`),
+        S("Best Buy Canada","🔌","Electronics & open-box deals.","Open-box", q=>`https://www.bestbuy.ca/en-ca/search?search=${q}`),
+        S("Canadian Tire","🔧","Home, auto & outdoor deals.","Weekly flyer", q=>`https://www.canadiantire.ca/en/search-results.html?q=${q}`), ALI],
+      social: [FBM, IG,
+        S("Kijiji","📋","Canada's biggest local classifieds.","Local", q=>`https://www.kijiji.ca/b-canada/${q}/k0l0`),
+        S("VarageSale","🏘️","Community-verified local selling.","Verified sellers", q=>`https://www.varagesale.com/search?q=${q}`),
+        S("Craigslist","📋","Local classifieds in major cities.","Local", q=>`https://www.craigslist.org/search/sss?query=${q}`)],
+      deal: [GS("ca","en"),
+        S("RedFlagDeals","🔥","Canada's deal-hunting community.","Community rated", q=>`https://www.redflagdeals.com/search/#!/q=${q}`),
+        S("CamelCamelCamel CA","🐪","Amazon.ca price history.","Price history", q=>`https://ca.camelcamelcamel.com/search?sq=${q}`),
+        S("Flipp","📰","All Canadian store flyers in one place.","Flyers", q=>`https://flipp.com/en-ca/search/${q}`)] },
+
+    au: { flag: "🇦🇺", name: "Australia",
+      store: [AMZ("com.au"), EBAY("com.au"),
+        S("JB Hi-Fi","🎧","Electronics & entertainment deals.","Big discounts", q=>`https://www.jbhifi.com.au/search?query=${q}`),
+        S("Kogan","💻","Online-only bargains on tech & home.","Online prices", q=>`https://www.kogan.com/au/shop/?q=${q}`),
+        S("The Good Guys","🏠","Appliances & electronics.","Price match", q=>`https://www.thegoodguys.com.au/SearchDisplay?searchTerm=${q}`), ALI],
+      social: [FBM, IG,
+        S("Gumtree Australia","🌳","Australia's biggest classifieds.","Local", q=>`https://www.gumtree.com.au/s-${q}/k0`),
+        S("Depop","👕","Second-hand fashion.","Fashion", q=>`https://www.depop.com/search/?q=${q}`)],
+      deal: [GS("au","en"),
+        S("OzBargain","🔥","Australia's deal community — vote-ranked bargains.","Community rated", q=>`https://www.ozbargain.com.au/search/node/${q}`),
+        S("CamelCamelCamel AU","🐪","Amazon.com.au price history.","Price history", q=>`https://au.camelcamelcamel.com/search?sq=${q}`),
+        S("Catch","⚡","Daily deals & clearance.","Daily deals", q=>`https://www.catch.com.au/search?query=${q}`)] },
+
+    in: { flag: "🇮🇳", name: "India",
+      store: [AMZ("in"),
+        S("Flipkart","🛒","India's biggest online store — Big Billion deals.","Big Billion", q=>`https://www.flipkart.com/search?q=${q}`),
+        S("Myntra","👗","Fashion & lifestyle deals.","Fashion", q=>`https://www.myntra.com/${q}`),
+        S("Snapdeal","🏷️","Budget-friendly bargains.","Budget buys", q=>`https://www.snapdeal.com/search?keyword=${q}`),
+        S("Croma","🔌","Electronics & appliances.","Electronics", q=>`https://www.croma.com/searchB?q=${q}`), ALI],
+      social: [FBM, IG,
+        S("OLX India","📋","India's biggest classifieds — used everything.","Local", q=>`https://www.olx.in/items/q-${q}`),
+        S("Quikr","🤝","Local classifieds & services.","Local", q=>`https://www.quikr.com/search?q=${q}`)],
+      deal: [GS("in","en"),
+        S("DesiDime","🔥","India's deal community — vote-ranked offers.","Community rated", q=>`https://www.desidime.com/search?q=${q}`),
+        S("CashKaro","💰","Cashback + coupons on top stores.","Cashback", q=>`https://cashkaro.com/search?q=${q}`),
+        S("PriceDekho","🔎","Compare prices across Indian stores.","Compare all", q=>`https://www.pricedekho.com/search?q=${q}`)] },
+
+    de: { flag: "🇩🇪", name: "Germany",
+      store: [AMZ("de"), EBAY("de"),
+        S("Otto","🏬","Germany's home-shopping giant.","Sale section", q=>`https://www.otto.de/suche/${q}/`),
+        S("MediaMarkt","🔌","Electronics deals & outlet.","Outlet", q=>`https://www.mediamarkt.de/de/search.html?query=${q}`),
+        S("Saturn","🪐","Tech deals & clearance.","Clearance", q=>`https://www.saturn.de/de/search.html?query=${q}`), ALI],
+      social: [FBM, IG,
+        S("Kleinanzeigen","📋","Germany's biggest classifieds (ex-eBay Kleinanzeigen).","Local", q=>`https://www.kleinanzeigen.de/s-${q}/k0`),
+        S("Vinted","👗","Second-hand fashion.","Fashion", q=>`https://www.vinted.de/catalog?search_text=${q}`)],
+      deal: [GS("de","de"),
+        S("Idealo","🔎","Germany's top price-comparison site.","Compare all", q=>`https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q=${q}`),
+        S("mydealz","🔥","Germany's deal community.","Community rated", q=>`https://www.mydealz.de/search?q=${q}`),
+        S("Geizhals","💶","Detailed tech price comparison.","Tech prices", q=>`https://geizhals.de/?fs=${q}`)] },
+
+    fr: { flag: "🇫🇷", name: "France",
+      store: [AMZ("fr"), EBAY("fr"),
+        S("Cdiscount","🛒","France's discount giant.","Soldes", q=>`https://www.cdiscount.com/search/10/${q}.html`),
+        S("Fnac","📚","Tech, books & culture deals.","Adhérent deals", q=>`https://www.fnac.com/SearchResult/ResultList.aspx?Search=${q}`),
+        S("Darty","🔌","Electronics & appliances.","Price match", q=>`https://www.darty.com/nav/recherche?text=${q}`), ALI],
+      social: [FBM, IG,
+        S("Leboncoin","📋","France's biggest classifieds.","Local", q=>`https://www.leboncoin.fr/recherche?text=${q}`),
+        S("Vinted","👗","Second-hand fashion.","Fashion", q=>`https://www.vinted.fr/catalog?search_text=${q}`)],
+      deal: [GS("fr","fr"),
+        S("Dealabs","🔥","France's deal community.","Community rated", q=>`https://www.dealabs.com/search?q=${q}`),
+        S("Idealo France","🔎","Price comparison across French stores.","Compare all", q=>`https://www.idealo.fr/prechcat.html?q=${q}`),
+        S("Ma Reduc","🎟️","Codes promo & réductions.","Coupons", q=>`https://www.mareduc.com/recherche.php?q=${q}`)] },
+
+    it: { flag: "🇮🇹", name: "Italy",
+      store: [AMZ("it"), EBAY("it"),
+        S("MediaWorld","🔌","Electronics deals & volantino offers.","Volantino", q=>`https://www.mediaworld.it/it/search.html?query=${q}`),
+        S("Unieuro","💻","Tech & appliance discounts.","Sottocosto", q=>`https://www.unieuro.it/online/ricerca?q=${q}`),
+        S("ePRICE","🛒","Online electronics bargains.","Online prices", q=>`https://www.eprice.it/search?q=${q}`), ALI],
+      social: [FBM, IG,
+        S("Subito","📋","Italy's biggest classifieds.","Local", q=>`https://www.subito.it/annunci-italia/vendita/usato/?q=${q}`),
+        S("Vinted","👗","Second-hand fashion.","Fashion", q=>`https://www.vinted.it/catalog?search_text=${q}`)],
+      deal: [GS("it","it"),
+        S("Pepper.it","🔥","Italy's deal community.","Community rated", q=>`https://www.pepper.it/search?q=${q}`),
+        S("Idealo Italia","🔎","Price comparison across Italian stores.","Compare all", q=>`https://www.idealo.it/prechcat.html?q=${q}`),
+        S("Trovaprezzi","💶","Compare prices from hundreds of shops.","Compare all", q=>`https://www.trovaprezzi.it/categoria.aspx?libera=${q}`)] },
+
+    es: { flag: "🇪🇸", name: "Spain",
+      store: [AMZ("es"), EBAY("es"),
+        S("El Corte Inglés","🏬","Spain's department-store giant.","Rebajas", q=>`https://www.elcorteingles.es/search/?s=${q}`),
+        S("PcComponentes","💻","Tech deals & flash sales.","Flash sales", q=>`https://www.pccomponentes.com/buscar/?query=${q}`),
+        S("MediaMarkt España","🔌","Electronics offers.","Ofertas", q=>`https://www.mediamarkt.es/es/search.html?query=${q}`), ALI],
+      social: [FBM, IG,
+        S("Wallapop","📋","Spain's favourite second-hand app.","Local", q=>`https://es.wallapop.com/search?keywords=${q}`),
+        S("Milanuncios","🤝","Classifieds for everything.","Local", q=>`https://www.milanuncios.com/anuncios/${q}.htm`),
+        S("Vinted","👗","Second-hand fashion.","Fashion", q=>`https://www.vinted.es/catalog?search_text=${q}`)],
+      deal: [GS("es","es"),
+        S("Chollometro","🔥","Spain's deal community.","Community rated", q=>`https://www.chollometro.com/search?q=${q}`),
+        S("Idealo España","🔎","Price comparison across Spanish stores.","Compare all", q=>`https://www.idealo.es/prechcat.html?q=${q}`)] },
+
+    jp: { flag: "🇯🇵", name: "Japan",
+      store: [AMZ("co.jp"),
+        S("Rakuten","🛍️","Japan's e-commerce giant — point bonanzas.","Rakuten points", q=>`https://search.rakuten.co.jp/search/mall/${q}/`),
+        S("Yahoo! Shopping","🛒","PayPay points & daily coupons.","PayPay points", q=>`https://shopping.yahoo.co.jp/search?p=${q}`),
+        S("Yodobashi","🔌","Electronics with 10% point return.","10% points", q=>`https://www.yodobashi.com/?word=${q}`), ALI],
+      social: [FBM, IG,
+        S("Mercari Japan","📋","Japan's #1 flea-market app.","Used bargains", q=>`https://jp.mercari.com/search?keyword=${q}`),
+        S("Yahoo! Auctions","🔨","Japan's biggest auction site.","Auctions", q=>`https://auctions.yahoo.co.jp/search/search?p=${q}`),
+        S("Rakuma","🛍️","Rakuten's flea-market app.","Used bargains", q=>`https://fril.jp/search/${q}`)],
+      deal: [GS("jp","ja"),
+        S("Kakaku.com","🔎","Japan's definitive price-comparison site.","Compare all", q=>`https://kakaku.com/search_results/${q}/`),
+        S("Keepa Japan","🐪","Amazon.co.jp price history.","Price history", q=>`https://keepa.com/#!search/5-${q}`)] },
+
+    kr: { flag: "🇰🇷", name: "South Korea",
+      store: [
+        S("Coupang","🚀","Korea's Amazon — Rocket Delivery.","Rocket delivery", q=>`https://www.coupang.com/np/search?q=${q}`),
+        S("Gmarket","🛒","Deals & global shipping.","Smile points", q=>`https://browse.gmarket.co.kr/search?keyword=${q}`),
+        S("11st","🏷️","Discount coupons daily.","Daily coupons", q=>`https://search.11st.co.kr/Search.tmall?kwd=${q}`),
+        S("SSG","🏬","Shinsegae mall — premium deals.","Premium", q=>`https://www.ssg.com/search.ssg?query=${q}`), ALI],
+      social: [FBM, IG,
+        S("Danggeun (Karrot)","🥕","Korea's neighborhood used-goods app.","Local", q=>`https://www.daangn.com/search/${q}`),
+        S("Bunjang","📱","Second-hand marketplace.","Used bargains", q=>`https://m.bunjang.co.kr/search/products?q=${q}`)],
+      deal: [GS("kr","ko"),
+        S("Danawa","🔎","Korea's top price-comparison site.","Compare all", q=>`https://search.danawa.com/dsearch.php?query=${q}`),
+        S("Enuri","💶","Price comparison & lowest-price alerts.","Compare all", q=>`https://www.enuri.com/search.jsp?keyword=${q}`)] },
+
+    cn: { flag: "🇨🇳", name: "China",
+      store: [
+        S("Taobao","🛍️","World's biggest marketplace — everything imaginable.","Everything", q=>`https://s.taobao.com/search?q=${q}`),
+        S("JD.com","🚚","Fast logistics & authentic goods.","Same-day", q=>`https://search.jd.com/Search?keyword=${q}`),
+        S("Tmall","🏬","Brand flagship stores & 11.11 sales.","11.11 sales", q=>`https://list.tmall.com/search_product.htm?q=${q}`),
+        S("Pinduoduo","🍑","Group-buying rock-bottom prices.","Group buying", q=>`https://mobile.yangkeduo.com/search_result.html?search_key=${q}`)],
+      social: [IG,
+        S("Xianyu (via Taobao)","🐟","Alibaba's used-goods market.","Used bargains", q=>`https://s.taobao.com/search?q=${q}%20二手`),
+        S("Xiaohongshu","📕","Social shopping & product reviews.","Social deals", q=>`https://www.xiaohongshu.com/search_result?keyword=${q}`)],
+      deal: [GS("cn","zh-CN"),
+        S("Smzdm (What's Worth Buying)","🔥","China's deal-hunting community.","Community rated", q=>`https://search.smzdm.com/?s=${q}`),
+        S("Manmanbuy","🔎","Price history & comparison.","Price history", q=>`https://www.manmanbuy.com/searchlist.aspx?key=${q}`)] },
+
+    br: { flag: "🇧🇷", name: "Brazil",
+      store: [AMZ("com.br"),
+        S("Mercado Livre","🛒","Latin America's e-commerce giant.","#1 in Brazil", q=>`https://lista.mercadolivre.com.br/${q}`),
+        S("Magazine Luiza","🏬","Big retail deals & Magalu days.","Magalu deals", q=>`https://www.magazineluiza.com.br/busca/${q}/`),
+        S("Americanas","🛍️","Wide selection & flash offers.","Flash offers", q=>`https://www.americanas.com.br/busca/${q}`),
+        S("Casas Bahia","🏠","Furniture & electronics instalments.","Instalments", q=>`https://www.casasbahia.com.br/${q}/b`), ALI],
+      social: [FBM, IG,
+        S("OLX Brasil","📋","Brazil's biggest classifieds.","Local", q=>`https://www.olx.com.br/brasil?q=${q}`),
+        S("Enjoei","👗","Second-hand fashion & goods.","Used bargains", q=>`https://www.enjoei.com.br/s?q=${q}`)],
+      deal: [GS("br","pt-BR"),
+        S("Pelando","🔥","Brazil's deal community.","Community rated", q=>`https://www.pelando.com.br/busca?q=${q}`),
+        S("Zoom","🔎","Compare prices across Brazilian stores.","Compare all", q=>`https://www.zoom.com.br/search?q=${q}`),
+        S("Buscapé","💶","Price comparison & history.","Price history", q=>`https://www.buscape.com.br/search?q=${q}`)] },
+
+    mx: { flag: "🇲🇽", name: "Mexico",
+      store: [AMZ("com.mx"),
+        S("Mercado Libre","🛒","Mexico's biggest marketplace.","#1 in Mexico", q=>`https://listado.mercadolibre.com.mx/${q}`),
+        S("Walmart México","🏪","Rollbacks & grocery deals.","Rollbacks", q=>`https://www.walmart.com.mx/search?q=${q}`),
+        S("Liverpool","🏬","Department-store offers.","Ofertas", q=>`https://www.liverpool.com.mx/tienda?s=${q}`),
+        S("Coppel","🏠","Credit-friendly electronics & home.","Instalments", q=>`https://www.coppel.com/SearchDisplay?searchTerm=${q}`), ALI],
+      social: [FBM, IG,
+        S("Segundamano","📋","Mexico's classifieds.","Local", q=>`https://www.segundamano.mx/anuncios?q=${q}`)],
+      deal: [GS("mx","es-419"),
+        S("PromoDescuentos","🔥","Mexico's deal community.","Community rated", q=>`https://www.promodescuentos.com/search?q=${q}`)] },
+
+    ae: { flag: "🇦🇪", name: "UAE",
+      store: [AMZ("ae"),
+        S("Noon","🌙","Middle East's homegrown giant — daily sales.","Yellow Friday", q=>`https://www.noon.com/uae-en/search/?q=${q}`),
+        S("Sharaf DG","🔌","Electronics megastore deals.","Electronics", q=>`https://uae.sharafdg.com/?q=${q}&post_type=product`),
+        S("Carrefour UAE","🏪","Groceries & electronics offers.","Hypermarket", q=>`https://www.carrefouruae.com/mafuae/en/v4/search?keyword=${q}`),
+        S("Namshi","👗","Fashion deals.","Fashion", q=>`https://www.namshi.com/uae-en/search/?q=${q}`), ALI],
+      social: [FBM, IG,
+        S("Dubizzle","📋","UAE's biggest classifieds.","Local", q=>`https://www.dubizzle.com/search/?keyword=${q}`)],
+      deal: [GS("ae","en"),
+        S("Pricena","🔎","Compare prices across Gulf stores.","Compare all", q=>`https://ae.pricena.com/en/search?q=${q}`),
+        S("VogaCloset & coupons via CouponMoto","🎟️","UAE coupon codes.","Coupons", q=>`https://www.couponmoto.com/search?q=${q}`)] }
+  };
+
+  const order = ["us","uk","ca","au","in","de","fr","it","es","jp","kr","cn","br","mx","ae"];
+  let current = "us";
+  try { const saved = localStorage.getItem("bd_country"); if (saved && countries[saved]) current = saved; } catch(e) {}
+
+  /* ---------- UI ---------- */
+  function getQuery() { return document.getElementById("query").value.trim(); }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function openSite(site) {
+    if (!getQuery()) { showToast("⚠️ Type a product first!"); document.getElementById("query").focus(); return; }
+    window.open(site.url(encodeURIComponent(getQuery())), "_blank");
+  }
+
+  function doSearch() {
+    if (!getQuery()) { showToast("⚠️ Type a product first!"); return; }
+    showToast(`✅ Ready! Click any site below to see "${getQuery()}" deals`);
+    document.getElementById("storeGrid").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function openAll() {
+    if (!getQuery()) { showToast("⚠️ Type a product first!"); document.getElementById("query").focus(); return; }
+    const c = countries[current];
+    const top = [...c.store.slice(0, 2), ...c.social.slice(0, 1), ...c.deal.slice(0, 2)];
+    let delay = 0;
+    top.forEach(site => setTimeout(() => window.open(site.url(encodeURIComponent(getQuery())), "_blank"), delay += 150));
+    showToast("🚀 Opening top 5 marketplaces… (allow pop-ups)");
+  }
+
+  function renderGrid(id, list) {
+    const grid = document.getElementById(id);
+    grid.innerHTML = list.map((s, i) => `
+      <div class="site-card" data-i="${i}">
+        <div class="icon">${s.icon}</div>
+        <h3>${s.name}</h3>
+        <p>${s.desc}</p>
+        <span class="badge">${s.badge}</span>
+      </div>`).join("");
+    grid.querySelectorAll(".site-card").forEach(card => {
+      card.addEventListener("click", () => openSite(list[card.dataset.i]));
+    });
+  }
+
+  function renderCountryBar() {
+    const bar = document.getElementById("countryBar");
+    bar.innerHTML = order.map(code => `
+      <div class="country-chip ${code === current ? "active" : ""}" data-code="${code}">
+        <span class="flag">${countries[code].flag}</span>${countries[code].name}
+      </div>`).join("");
+    bar.querySelectorAll(".country-chip").forEach(chip => {
+      chip.addEventListener("click", () => setCountry(chip.dataset.code));
+    });
+  }
+
+  function setCountry(code) {
+    current = code;
+    try { localStorage.setItem("bd_country", code); } catch(e) {}
+    const c = countries[code];
+    document.getElementById("countryName").textContent = `${c.flag} ${c.name}`;
+    renderCountryBar();
+    renderGrid("storeGrid", c.store);
+    renderGrid("socialGrid", c.social);
+    renderGrid("dealGrid", c.deal);
+    showToast(`${c.flag} Switched to ${c.name}`);
+  }
+
+  /* ---------- init ---------- */
+  setCountry(current);
+
+  document.getElementById("quickTags").querySelectorAll("span").forEach(tag => {
+    tag.addEventListener("click", () => {
+      document.getElementById("query").value = tag.textContent;
+      doSearch();
+    });
+  });
+  document.getElementById("query").addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
+</script>
+
+</body>
+</html>
+

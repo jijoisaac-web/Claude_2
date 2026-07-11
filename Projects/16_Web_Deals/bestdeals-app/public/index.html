@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BestDeals — Compare Prices, Find the Best Deal</title>
+<style>
+  :root {
+    --bg: #f6f8fc;
+    --card: #ffffff;
+    --ink: #1a2340;
+    --muted: #64708d;
+    --accent: #4361ee;
+    --accent2: #7209b7;
+    --green: #0aa574;
+    --amber: #f59e0b;
+    --border: #e6eaf3;
+    --radius: 18px;
+    --shadow: 0 8px 30px rgba(26,35,64,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  /* modern gradient background art */
+  .bg-art { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.45; }
+  .blob.b1 { width: 520px; height: 520px; background: #c7d5ff; top: -180px; right: -120px; }
+  .blob.b2 { width: 420px; height: 420px; background: #ffd9c2; bottom: -140px; left: -120px; }
+  .blob.b3 { width: 360px; height: 360px; background: #e3c7ff; top: 40%; left: 55%; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  header {
+    padding: 16px 0;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .logo { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  select#country {
+    padding: 9px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .hero { text-align: center; padding: 52px 0 8px; }
+  .hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.9rem); font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+  .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { color: var(--muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+  .demo-banner {
+    max-width: 720px;
+    margin: 20px auto 0;
+    background: #fff8e6;
+    border: 1px solid #ffe2a8;
+    color: #8a6100;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 0.88rem;
+    text-align: center;
+    display: none;
+  }
+
+  .search-box {
+    display: flex; gap: 10px;
+    max-width: 640px;
+    margin: 30px auto 14px;
+    background: var(--card);
+    padding: 8px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .search-box input { flex: 1; background: transparent; border: none; outline: none; color: var(--ink); font-size: 1.05rem; padding: 12px 18px; }
+  .search-box input::placeholder { color: #9aa5c0; }
+  .search-box button {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 40px;
+    padding: 12px 28px; font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .search-box button:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(67,97,238,0.35); }
+
+  .categories { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+  .cat {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-size: 0.9rem; font-weight: 600; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cat:hover, .cat.active { border-color: var(--accent); color: var(--accent); background: #eef2ff; }
+
+  /* results */
+  #results { padding-bottom: 60px; display: none; }
+  .status { text-align: center; color: var(--muted); padding: 30px 0; font-size: 1rem; }
+  .spinner { display: inline-block; width: 22px; height: 22px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .best-card {
+    background: linear-gradient(135deg, #eef2ff, #f8efff);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin: 10px 0 26px;
+    display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+    box-shadow: var(--shadow);
+  }
+  .best-card .trophy { font-size: 2.6rem; }
+  .best-card .info { flex: 1; min-width: 220px; }
+  .best-card .label { font-size: 0.78rem; font-weight: 800; letter-spacing: 1px; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+  .best-card h2 { font-size: 1.15rem; margin-bottom: 6px; }
+  .best-card .meta { color: var(--muted); font-size: 0.88rem; }
+  .best-card .price-块, .best-card .price-block { text-align: right; }
+  .best-card .price { font-size: 2rem; font-weight: 800; color: var(--green); }
+  .best-card .save { font-size: 0.85rem; color: var(--green); font-weight: 700; }
+  .best-card a.go {
+    display: inline-block; margin-top: 8px;
+    background: var(--green); color: #fff; text-decoration: none;
+    padding: 10px 22px; border-radius: 30px; font-weight: 700; font-size: 0.92rem;
+    transition: transform 0.15s;
+  }
+  .best-card a.go:hover { transform: scale(1.05); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .deal-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: all 0.18s;
+    box-shadow: 0 2px 10px rgba(26,35,64,0.04);
+  }
+  .deal-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #c9d4f5; }
+  .deal-card .top { display: flex; align-items: center; justify-content: space-between; }
+  .deal-card .source { font-weight: 700; font-size: 0.95rem; }
+  .deal-card .badge { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: #eef7f2; color: var(--green); }
+  .deal-card .badge.zero { background: #f1f3f9; color: var(--muted); }
+  .deal-card img { width: 100%; height: 120px; object-fit: contain; border-radius: 10px; background: #f4f6fb; }
+  .deal-card .title { font-size: 0.86rem; color: var(--muted); line-height: 1.4; min-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .deal-card .price-row { display: flex; align-items: baseline; gap: 8px; }
+  .deal-card .price { font-size: 1.35rem; font-weight: 800; }
+  .deal-card .orig { color: #b0b8cc; text-decoration: line-through; font-size: 0.88rem; }
+  .deal-card .ship { color: var(--muted); font-size: 0.78rem; }
+  .deal-card a.view {
+    margin-top: auto; text-align: center; text-decoration: none;
+    border: 1.5px solid var(--accent); color: var(--accent);
+    border-radius: 30px; padding: 8px 0; font-weight: 700; font-size: 0.88rem;
+    transition: all 0.15s;
+  }
+  .deal-card a.view:hover { background: var(--accent); color: #fff; }
+
+  .section-head { font-size: 1.05rem; font-weight: 700; margin: 6px 0 14px; color: var(--ink); }
+
+  footer { border-top: 1px solid var(--border); padding: 22px 0; text-align: center; color: var(--muted); font-size: 0.82rem; background: rgba(255,255,255,0.6); }
+
+  @media (max-width: 600px) {
+    .search-box { flex-direction: column; border-radius: var(--radius); }
+    .search-box button { width: 100%; }
+    .best-card .price-block { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-art"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+
+<header>
+  <div class="container header-inner">
+    <div class="logo">Best<span>Deals</span></div>
+    <select id="country" title="Country"></select>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Compare prices. <em>Grab the best deal.</em></h1>
+    <p>Search any product — we check marketplaces side by side and highlight the lowest price.</p>
+  </section>
+
+  <div class="demo-banner" id="demoBanner">
+    🧪 <strong>Demo mode</strong> — showing sample prices. Add free API keys (see README) to fetch live prices from eBay, Best Buy &amp; Google Shopping.
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="query" placeholder="e.g. iPhone 15, air fryer, PS5…" autofocus>
+    <button onclick="search()">🔍 Compare Prices</button>
+  </div>
+
+  <div class="categories" id="cats">
+    <div class="cat" data-q="iPhone 15">📱 Electronics</div>
+    <div class="cat" data-q="Nike running shoes">👟 Fashion</div>
+    <div class="cat" data-q="air fryer">🏠 Home &amp; Kitchen</div>
+    <div class="cat" data-q="PS5 console">🎮 Gaming</div>
+    <div class="cat" data-q="dumbbells set">🏋️ Sports</div>
+    <div class="cat" data-q="LEGO set">🧸 Toys</div>
+  </div>
+
+  <section id="results">
+    <div class="status" id="status"></div>
+    <div id="bestWrap"></div>
+    <div class="section-head" id="allHead" style="display:none">All prices, lowest first</div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">BestDeals compares prices via official marketplace APIs. Always confirm the final price on the seller's site.</div>
+</footer>
+
+<script>
+  let country = "us";
+  try { country = localStorage.getItem("bd_country") || "us"; } catch (e) {}
+
+  async function loadCountries() {
+    const r = await fetch("/api/countries");
+    const cs = await r.json();
+    const sel = document.getElementById("country");
+    sel.innerHTML = Object.entries(cs).map(([code, c]) =>
+      `<option value="${code}" ${code === country ? "selected" : ""}>${c.flag} ${c.name}</option>`).join("");
+    sel.addEventListener("change", () => {
+      country = sel.value;
+      try { localStorage.setItem("bd_country", country); } catch (e) {}
+      if (document.getElementById("query").value.trim()) search();
+    });
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
+  function fmt(sym, n) { return sym + Number(n).toLocaleString(undefined, { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
+
+  async function search() {
+    const q = document.getElementById("query").value.trim();
+    if (!q) { document.getElementById("query").focus(); return; }
+    const results = document.getElementById("results");
+    const status = document.getElementById("status");
+    results.style.display = "block";
+    document.getElementById("bestWrap").innerHTML = "";
+    document.getElementById("grid").innerHTML = "";
+    document.getElementById("allHead").style.display = "none";
+    status.innerHTML = `<span class="spinner"></span> Comparing prices for "<strong>${esc(q)}</strong>"…`;
+    results.scrollIntoView({ behavior: "smooth" });
+
+    try {
+      const r = await fetch(`/api/search?q=${encodeURIComponent(q)}&country=${country}`);
+      const data = await r.json();
+      if (data.error) { status.textContent = "⚠️ " + data.error; return; }
+
+      document.getElementById("demoBanner").style.display = data.demo ? "block" : "none";
+      status.textContent = "";
+      const sym = data.currencySymbol;
+      const best = data.best;
+
+      document.getElementById("bestWrap").innerHTML = `
+        <div class="best-card">
+          <div class="trophy">🏆</div>
+          <div class="info">
+            <div class="label">Best deal found</div>
+            <h2>${best.icon || ""} ${esc(best.source)}</h2>
+            <div class="meta">${esc(best.title)}${best.condition ? " · " + esc(best.condition) : ""}${best.shipping ? " · " + esc(best.shipping) : ""}</div>
+          </div>
+          <div class="price-block">
+            <div class="price">${fmt(sym, best.price)}</div>
+            ${best.savingsPct ? `<div class="save">Save ${best.savingsPct}% vs highest price</div>` : ""}
+            <a class="go" href="${esc(best.url)}" target="_blank" rel="noopener">Go to deal →</a>
+          </div>
+        </div>`;
+
+      document.getElementById("allHead").style.display = "block";
+      document.getElementById("grid").innerHTML = data.results.map(d => `
+        <div class="deal-card">
+          <div class="top">
+            <span class="source">${d.icon || "🛒"} ${esc(d.source)}</span>
+            <span class="badge ${d.savingsPct ? "" : "zero"}">${d.savingsPct ? "−" + d.savingsPct + "%" : "baseline"}</span>
+          </div>
+          ${d.image ? `<img src="${esc(d.image)}" alt="" loading="lazy">` : ""}
+          <div class="title">${esc(d.title)}</div>
+          <div class="price-row">
+            <span class="price">${fmt(sym, d.price)}</span>
+            ${d.originalPrice ? `<span class="orig">${fmt(sym, d.originalPrice)}</span>` : ""}
+          </div>
+          <div class="ship">${esc(d.condition || "")}${d.shipping ? " · " + esc(d.shipping) : ""}</div>
+          <a class="view" href="${esc(d.url)}" target="_blank" rel="noopener">View deal</a>
+        </div>`).join("");
+    } catch (e) {
+      status.textContent = "⚠️ Could not reach the BestDeals server. Is it running? (npm start)";
+    }
+  }
+
+  document.getElementById("query").addEventListener("keydown", e => { if (e.key === "Enter") search(); });
+  document.querySelectorAll(".cat").forEach(c => c.addEventListener("click", () => {
+    document.querySelectorAll(".cat").forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+    document.getElementById("query").value = c.dataset.q;
+    search();
+  }));
+
+  loadCountries();
+</script>
+
+</body>
+</html>
