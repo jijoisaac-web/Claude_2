@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.3
+        <span class="ver-dot"></span>v3.4
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1970,6 +1970,7 @@ function switchView(name,tab){
   if(name==='annual') renderAnnual();
   if(name==='budget') renderBudgetPlan();
   if(name==='analytics') renderChart();
+  if(name==='data') setTimeout(ghLoadConfig,50);
 }
 
 
@@ -3741,7 +3742,6 @@ async function parsePdfBank(file){
   }
   const buf=await file.arrayBuffer();
   const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
-  // Reconstruct text preserving line structure via Y-position grouping
   let full='';
   for(let p=1;p<=pdf.numPages;p++){
     const pg=await pdf.getPage(p);
@@ -3757,31 +3757,25 @@ async function parsePdfBank(file){
     });
     full+='\n';
   }
-  // Detect Maybank savings transaction statement
   const bank=detectBank(file.name, full.slice(0,800));
-  // Maybank credit card
   if(bank==='maybank-cc'||/STATEMENT OF CREDIT CARD/i.test(full)){
     return parseMaybankCcPdf(full, file.name);
   }
-  // Maybank savings transaction statement
   const isMaybankTxn=/Maybank Islamic|Malayan Banking|SAVINGS ACCOUNT-i/i.test(full)
                     && /\d{2}\/\d{2}\/\d{2}\s+\S.+[\d,]+\.\d{2}[+-]/.test(full);
   if(isMaybankTxn) return parseMaybankSavPdf(full);
-  // Detect Maybank profit/interest summary (no transactions)
   if(/Murabahah|Baki Harian|End Day Balance/i.test(full)&&!isMaybankTxn){
-    throw new Error('This is a Maybank profit/interest summary, not a transaction statement. Please upload your monthly transaction statement (the one listing individual transactions with dates and amounts).');
+    throw new Error('This is a Maybank profit/interest summary, not a transaction statement.');
   }
   return parsePdfGeneric(full);
 }
 
 function parseMaybankCcPdf(text, filename){
-  // Extract year from filename e.g. _20260228 → 2026
   const yrM=filename.match(/_(\d{4})\d{4}/);
   const year=yrM?yrM[1]:'2026';
   const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
   const skipPat=/^(STATEMENT OF CREDIT CARD|PENYATA AKAUN|Malayan Banking|Page\/Halaman|MR |B[0-9]|YOUR COMBINED|YOUR PREVIOUS|TOTAL CREDIT|TOTAL DEBIT|SUB TOTAL|JUMLAH|KOMBINASI|MAYBANK 2 PLAT|MAYBANK CARD|Account Number|WARNING ON|AMARAN|If you make|Jika anda|Menara|100 Jalan|Wilayah|50050|51100|PERSIARAN|KUALA LUMPUR$|Statement Date|Payment Due Date|Tarikh|RETAIL INTEREST|Posting Date|bankinginfo|www\.)/i;
   const skipMerchant=/^(PYMT@MAYBANK2U|RETAIL INTEREST|SERVICE TAX|BALANCE B\/F|FINANCE CHARGE|ANNUAL FEE)/i;
-  // DD/MM  DD/MM  DESCRIPTION  AMOUNT[CR]
   const txnPat=/^(\d{2}\/\d{2})\s+(\d{2}\/\d{2})\s+(.+?)\s+([\d,]+\.\d{2})(CR)?\s*$/;
   const txns=[];
   for(const line of lines){
@@ -3792,11 +3786,9 @@ function parseMaybankCcPdf(text, filename){
     if(skipMerchant.test(desc)) continue;
     const amount=parseFloat(amtStr.replace(/,/g,''));
     if(!amount) continue;
-    // Clean description: remove trailing location " CITY MY" or " MY"
     const cleanDesc=desc.replace(/\s+[A-Z ]{2,20}\s+MY\s*$/, '').replace(/\s+MY\s*$/, '').trim();
     const fullDate=txnDate+'/'+year;
     if(cr){
-      // CR = refund/cashback, skip plain payment lines already filtered above
       txns.push({date:fullDate,desc:cleanDesc+' [Refund]',amount,type:'income'});
     } else {
       txns.push({date:fullDate,desc:cleanDesc,amount,type:'expense'});
@@ -3852,13 +3844,13 @@ function parsePdfGeneric(text){
   }
   return txns;
 }
+
 function getOrCreateOthersCategory(){
   let cat=state.categories.find(c=>/^others?$/i.test(c.name.trim())||/^misc/i.test(c.name.trim()));
   if(!cat){
     const id='cat_others_'+Date.now();
-    cat={id,name:'Others',group:state.groups&&state.groups.length?'':''};
-    state.categories.push(cat);
-    saveState();
+    cat={id,name:'Others',group:''};
+    state.categories.push(cat); saveState();
   }
   return cat;
 }
@@ -3868,14 +3860,10 @@ async function handleBankFile(input){
   if(!files.length) return;
   const status=document.getElementById('biStatus');
   status.style.color='var(--text2)';
-
-  let allTxns=[];
-  let errors=[];
+  let allTxns=[], errors=[];
   for(let fi=0;fi<files.length;fi++){
     const file=files[fi];
-    status.textContent=files.length>1
-      ? `Processing file ${fi+1}/${files.length}: ${file.name}…`
-      : 'Reading file…';
+    status.textContent=files.length>1?`Processing file ${fi+1}/${files.length}: ${file.name}...`:'Reading file...';
     try{
       const ext=file.name.split('.').pop().toLowerCase();
       let txns=[];
@@ -3885,24 +3873,15 @@ async function handleBankFile(input){
         txns=parseCsvBank(text, bank);
       } else if(ext==='pdf'){
         txns=await parsePdfBank(file);
-      } else {
-        errors.push(file.name+': unsupported format');
-        continue;
-      }
+      } else { errors.push(file.name+': unsupported format'); continue; }
       allTxns=allTxns.concat(txns);
-    } catch(e){
-      errors.push(file.name+': '+e.message);
-      console.error(e);
-    }
+    } catch(e){ errors.push(file.name+': '+e.message); console.error(e); }
   }
-
   if(!allTxns.length){
     status.style.color='var(--red)';
     status.textContent='No transactions found.'+(errors.length?' Errors: '+errors.join('; '):'');
     return;
   }
-
-  // De-duplicate by date+desc+amount (handles uploading same file twice)
   const seen=new Set();
   allTxns=allTxns.filter(t=>{
     const key=t.date+'|'+t.desc+'|'+t.amount;
@@ -3910,15 +3889,8 @@ async function handleBankFile(input){
     seen.add(key); return true;
   });
   allTxns.sort((a,b)=>a.date.localeCompare(b.date));
-
-  // Match categories — unknown → "Others"
   const othCat=getOrCreateOthersCategory();
-  allTxns.forEach(t=>{
-    t.catId=matchCategory(t.desc);
-    if(!t.catId) t.catId=othCat.id;
-    t.include=true;
-  });
-
+  allTxns.forEach(t=>{ t.catId=matchCategory(t.desc); if(!t.catId) t.catId=othCat.id; t.include=true; });
   const matched=allTxns.filter(t=>t.catId&&t.catId!==othCat.id).length;
   const inOthers=allTxns.filter(t=>t.catId===othCat.id).length;
   status.style.color='var(--accent)';
@@ -3931,20 +3903,16 @@ let _biTxns=[];
 function renderBiReview(txns){
   _biTxns=txns;
   const cats=state.categories;
-  const catOpts='<option value="">— Skip —</option>'+
-    cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const catOpts='<option value="">— Skip —</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   const incTotal=txns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const expTotal=txns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-
   let html=`<div style="overflow-x:auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;">
-    <label style="font-size:12px;color:var(--text2);cursor:pointer;">
-      <input type="checkbox" id="biAll" checked onchange="toggleBiAll(this.checked)"> Select all
-    </label>
+    <label style="font-size:12px;color:var(--text2);cursor:pointer;"><input type="checkbox" id="biAll" checked onchange="toggleBiAll(this.checked)"> Select all</label>
     <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn" onclick="toggleBiQuickCreate()" style="font-size:12px;padding:5px 10px">➕ New Category</button>
-      <button class="btn" onclick="rematchUnassigned()" title="Re-run auto-matching on unassigned rows" style="font-size:12px;padding:5px 10px">✨ Re-match</button>
-      <button class="btn btn-primary" onclick="importBiTxns()">⬆ Import Selected</button>
+      <button class="btn" onclick="toggleBiQuickCreate()" style="font-size:12px;padding:5px 10px">+ New Category</button>
+      <button class="btn" onclick="rematchUnassigned()" style="font-size:12px;padding:5px 10px">Re-match</button>
+      <button class="btn btn-primary" onclick="importBiTxns()">Import Selected</button>
     </div>
   </div>
   <div class="bi-summary">
@@ -3954,55 +3922,28 @@ function renderBiReview(txns){
   </div>
   <table class="bi-review-table" style="margin-top:10px;">
     <thead><tr>
-      <th style="width:28px;text-align:center">✓</th>
-      <th>Date ✎</th>
-      <th>Description ✎</th>
-      <th style="text-align:right">Amount ✎</th>
+      <th style="width:28px;text-align:center">&#x2713;</th>
+      <th>Date &#x270e;</th><th>Description &#x270e;</th>
+      <th style="text-align:right">Amount &#x270e;</th>
       <th style="text-align:center">Type</th>
       <th style="min-width:150px">Category</th>
-    </tr></thead>
-    <tbody>`;
-
+    </tr></thead><tbody>`;
   txns.forEach((t,i)=>{
     const rowBg=t.type==='income'?'background:rgba(92,184,122,.05)':'';
     const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
     html+=`<tr style="${rowBg}">
       <td style="text-align:center"><input type="checkbox" class="bi-chk" data-i="${i}" checked></td>
-      <td style="white-space:nowrap;color:var(--text2)">
-        <span class="bi-edit" contenteditable="true"
-          onblur="_biTxns[${i}].date=this.textContent.trim()">${t.date}</span>
-      </td>
-      <td style="word-break:break-word;min-width:140px">
-        <span class="bi-edit" contenteditable="true"
-          onblur="_biTxns[${i}].desc=this.textContent.trim()">${t.desc}</span>
-      </td>
-      <td style="text-align:right">
-        <span class="bi-edit bi-edit-amt" contenteditable="true" style="color:${amtCol}"
-          onblur="_biTxns[${i}].amount=Math.abs(parseFloat(this.textContent.replace(/[^0-9.]/g,''))||0);this.textContent=_biTxns[${i}].amount">${t.amount}</span>
-      </td>
-      <td style="text-align:center">
-        <select class="bi-sel bi-type" data-i="${i}" onchange="biTypeChanged(this)">
-          <option value="expense" ${t.type==='expense'?'selected':''}>Expense</option>
-          <option value="income" ${t.type==='income'?'selected':''}>Income</option>
-        </select>
-      </td>
-      <td>
-        <select class="bi-sel bi-cat" data-i="${i}" data-mkey="${extractMerchantKey(t.desc).replace(/"/g,'&quot;')}" style="width:100%" onchange="biCatChanged(this)">${catOpts}</select>
-      </td>
+      <td style="white-space:nowrap;color:var(--text2)"><span class="bi-edit" contenteditable="true" onblur="_biTxns[${i}].date=this.textContent.trim()">${t.date}</span></td>
+      <td style="word-break:break-word;min-width:140px"><span class="bi-edit" contenteditable="true" onblur="_biTxns[${i}].desc=this.textContent.trim()">${t.desc}</span></td>
+      <td style="text-align:right"><span class="bi-edit bi-edit-amt" contenteditable="true" style="color:${amtCol}" onblur="_biTxns[${i}].amount=Math.abs(parseFloat(this.textContent.replace(/[^0-9.]/g,''))||0);this.textContent=_biTxns[${i}].amount">${t.amount}</span></td>
+      <td style="text-align:center"><select class="bi-sel bi-type" data-i="${i}" onchange="biTypeChanged(this)"><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option><option value="income" ${t.type==='income'?'selected':''}>Income</option></select></td>
+      <td><select class="bi-sel bi-cat" data-i="${i}" data-mkey="${extractMerchantKey(t.desc).replace(/"/g,'&quot;')}" style="width:100%" onchange="biCatChanged(this)">${catOpts}</select></td>
     </tr>`;
   });
-
   html+=`</tbody></table></div>`;
   const rev=document.getElementById('biReview');
   rev.innerHTML=html;
-
-  // Set matched categories
-  rev.querySelectorAll('.bi-cat').forEach(sel=>{
-    const t=_biTxns[+sel.dataset.i];
-    if(t.catId) sel.value=t.catId;
-  });
-
-  // Show tab bar and reset to Transactions tab
+  rev.querySelectorAll('.bi-cat').forEach(sel=>{ const t=_biTxns[+sel.dataset.i]; if(t.catId) sel.value=t.catId; });
   document.getElementById('biTabBar').style.display='flex';
   document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('biTabBtnTxns').classList.add('active');
@@ -4010,7 +3951,7 @@ function renderBiReview(txns){
   document.getElementById('biTabTxns').classList.add('active');
 }
 
-function switchBiTab(name, btn){
+function switchBiTab(name,btn){
   document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.bi-tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
@@ -4021,62 +3962,27 @@ function switchBiTab(name, btn){
 function renderMappingTab(){
   const cats=state.categories;
   const mmap=getMerchantMap();
-  const catOpts='<option value="">— Unassigned —</option>'
-    +cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-
-  // Group loaded transactions by merchant key
+  const catOpts='<option value="">— Unassigned —</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   const groups={};
   (_biTxns||[]).forEach((t,i)=>{
     const mk=extractMerchantKey(t.desc);
     if(!groups[mk]) groups[mk]={count:0,total:0,catId:t.catId||'',sample:t.desc,indices:[]};
-    groups[mk].count++;
-    groups[mk].total+=t.amount;
-    groups[mk].indices.push(i);
+    groups[mk].count++; groups[mk].total+=t.amount; groups[mk].indices.push(i);
     if(t.catId&&!groups[mk].catId) groups[mk].catId=t.catId;
   });
-
   const keys=Object.keys(groups);
-  if(!keys.length){
-    document.getElementById('biMappingContent').innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">Load a bank statement first to see merchant mappings.</div>';
-    return;
-  }
-
+  if(!keys.length){ document.getElementById('biMappingContent').innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">Load a bank statement first.</div>'; return; }
   const unassigned=keys.filter(k=>!groups[k].catId).length;
-  let html=`<div style="margin:12px 0 8px;font-size:12px;color:var(--text3)">
-    <strong style="color:var(--text1)">${keys.length}</strong> unique merchants from loaded file.
-    ${unassigned?`<span style="color:var(--yellow)"> ${unassigned} unassigned.</span>`:'<span style="color:var(--accent)"> All mapped ✓</span>'}
-    <span style="float:right;cursor:pointer;color:var(--accent)" onclick="saveMappingAndApply()">💾 Save all mappings</span>
-  </div>
-  <div style="overflow-x:auto"><table class="map-table">
-    <thead><tr>
-      <th>Merchant</th>
-      <th style="text-align:center">Txns</th>
-      <th style="text-align:right">Total (MYR)</th>
-      <th style="min-width:170px">Category</th>
-    </tr></thead><tbody>`;
-
+  let html=`<div style="margin:12px 0 8px;font-size:12px;color:var(--text3)"><strong style="color:var(--text1)">${keys.length}</strong> unique merchants. ${unassigned?`<span style="color:var(--yellow)">${unassigned} unassigned.</span>`:'<span style="color:var(--accent)">All mapped</span>'}<span style="float:right;cursor:pointer;color:var(--accent)" onclick="saveMappingAndApply()">Save all mappings</span></div>
+  <div style="overflow-x:auto"><table class="map-table"><thead><tr><th>Merchant</th><th style="text-align:center">Txns</th><th style="text-align:right">Total</th><th style="min-width:170px">Category</th></tr></thead><tbody>`;
   keys.forEach(mk=>{
     const g=groups[mk];
     const savedBadge=mmap[mk]?'<span class="map-saved-badge">SAVED</span>':'';
-    html+=`<tr>
-      <td>
-        <div style="font-weight:600;font-size:12px">${mk}${savedBadge}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:2px;word-break:break-word">${g.sample}</div>
-      </td>
-      <td style="text-align:center;color:var(--text2)">${g.count}</td>
-      <td style="text-align:right;font-weight:700;color:var(--red)">MYR ${fmt(g.total)}</td>
-      <td>
-        <select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}"
-          style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select>
-      </td>
-    </tr>`;
+    html+=`<tr><td><div style="font-weight:600;font-size:12px">${mk}${savedBadge}</div><div style="font-size:10px;color:var(--text3);margin-top:2px;word-break:break-word">${g.sample}</div></td><td style="text-align:center">${g.count}</td><td style="text-align:right;font-weight:700;color:var(--red)">MYR ${fmt(g.total)}</td><td><select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}" style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select></td></tr>`;
   });
-
   html+=`</tbody></table></div>`;
   const panel=document.getElementById('biMappingContent');
   panel.innerHTML=html;
-
-  // Set current values
   panel.querySelectorAll('.map-cat-sel').forEach(sel=>{
     const mk=sel.dataset.mkey;
     const catId=groups[mk]?.catId||(mmap[mk]&&cats.find(c=>c.id===mmap[mk])?mmap[mk]:'');
@@ -4085,268 +3991,211 @@ function renderMappingTab(){
 }
 
 function mapCatChanged(sel){
-  const mk=sel.dataset.mkey;
-  const catId=sel.value;
-  // Apply to all loaded transactions with this merchant key
-  (_biTxns||[]).forEach((t,i)=>{
-    if(extractMerchantKey(t.desc)===mk){
-      t.catId=catId;
-      // Update Transactions tab dropdowns too
-      const s=document.querySelector(`.bi-cat[data-i="${i}"]`);
-      if(s) s.value=catId;
-    }
-  });
+  const mk=sel.dataset.mkey, catId=sel.value;
+  (_biTxns||[]).forEach((t,i)=>{ if(extractMerchantKey(t.desc)===mk){ t.catId=catId; const s=document.querySelector(`.bi-cat[data-i="${i}"]`); if(s) s.value=catId; } });
 }
 
 function saveMappingAndApply(){
   const mmap=getMerchantMap();
-  document.querySelectorAll('.map-cat-sel').forEach(sel=>{
-    const mk=sel.dataset.mkey;
-    if(sel.value) mmap[mk]=sel.value;
-    else delete mmap[mk];
-  });
-  saveMerchantMap(mmap);
-  // Re-render to show SAVED badges
-  renderMappingTab();
-  const st=document.getElementById('biStatus');
-  st.style.color='var(--accent)';
-  st.textContent='✓ Mappings saved — will auto-apply on future imports';
-  setTimeout(()=>st.textContent='',3000);
+  document.querySelectorAll('.map-cat-sel').forEach(sel=>{ const mk=sel.dataset.mkey; if(sel.value) mmap[mk]=sel.value; else delete mmap[mk]; });
+  saveMerchantMap(mmap); renderMappingTab();
+  const st=document.getElementById('biStatus'); st.style.color='var(--accent)';
+  st.textContent='Mappings saved'; setTimeout(()=>st.textContent='',3000);
 }
 
-function toggleBiAll(v){
-  document.querySelectorAll('.bi-chk').forEach(cb=>cb.checked=v);
-}
+function toggleBiAll(v){ document.querySelectorAll('.bi-chk').forEach(cb=>cb.checked=v); }
 
 function toggleBiQuickCreate(){
   const panel=document.getElementById('biQuickCreate');
   const open=panel.style.display==='none';
   panel.style.display=open?'block':'none';
   if(open){
-    // Populate group dropdown from current state
     const grpSel=document.getElementById('biqGroup');
-    // Keep first two options (no group, new group), replace rest
     while(grpSel.options.length>2) grpSel.remove(2);
-    (state.groups||[]).forEach(g=>{
-      const o=document.createElement('option');
-      o.value=g.id; o.textContent=g.name;
-      grpSel.appendChild(o);
-    });
+    (state.groups||[]).forEach(g=>{ const o=document.createElement('option'); o.value=g.id; o.textContent=g.name; grpSel.appendChild(o); });
     document.getElementById('biqName').focus();
   }
 }
 
-/* Show/hide new group name field */
 document.addEventListener('change',function(e){
   if(e.target&&e.target.id==='biqGroup'){
-    document.getElementById('biqNewGroupWrap').style.display=
-      e.target.value==='__new__'?'block':'none';
+    document.getElementById('biqNewGroupWrap').style.display=e.target.value==='__new__'?'block':'none';
   }
 });
 
 function biQuickCreateCat(){
   const name=document.getElementById('biqName').value.trim();
-  if(!name){ alert('Please enter a category name.'); return; }
+  if(!name){ alert('Enter a category name.'); return; }
   const type=document.getElementById('biqType').value;
   const grpSel=document.getElementById('biqGroup');
   let parentId='';
-
-  // Create new group if requested
   if(grpSel.value==='__new__'){
     const gname=document.getElementById('biqGroupName').value.trim();
-    if(!gname){ alert('Please enter a group name.'); return; }
+    if(!gname){ alert('Enter a group name.'); return; }
     const gid='grp_'+Date.now();
     if(!state.groups) state.groups=[];
-    state.groups.push({id:gid,name:gname});
-    parentId=''; // groups don't use parentId for expense cats directly
-    // Note: in this app, groups are separate from categories
-    // We'll assign the category to this group's id
-    parentId=gid;
-  } else if(grpSel.value){
-    parentId=grpSel.value;
-  }
-
+    state.groups.push({id:gid,name:gname}); parentId=gid;
+  } else if(grpSel.value){ parentId=grpSel.value; }
   const catId='cat_'+Date.now();
   const newCat={id:catId,name,type,expected:0,order:state.categories.length};
   if(parentId&&type==='expense') newCat.parentId=parentId;
   state.categories.push(newCat);
-  // Initialise in all months
-  MONTHS.forEach((_,mi)=>{
-    if(!state.months[mi]) state.months[mi]={};
-    state.months[mi][catId]={actual:0,paid:false,note:'',transactions:[]};
-  });
+  MONTHS.forEach((_,mi)=>{ if(!state.months[mi]) state.months[mi]={}; state.months[mi][catId]={actual:0,paid:false,note:'',transactions:[]}; });
   saveState();
-
-  // Refresh all category dropdowns in review table
   const newOpt='<option value="'+catId+'">'+name+'</option>';
-  document.querySelectorAll('.bi-cat').forEach(sel=>{
-    sel.insertAdjacentHTML('beforeend',newOpt);
-  });
-
-  // Reset form & hide panel
-  document.getElementById('biqName').value='';
-  document.getElementById('biqGroupName').value='';
+  document.querySelectorAll('.bi-cat').forEach(sel=>sel.insertAdjacentHTML('beforeend',newOpt));
+  document.getElementById('biqName').value=''; document.getElementById('biqGroupName').value='';
   document.getElementById('biqNewGroupWrap').style.display='none';
   document.getElementById('biQuickCreate').style.display='none';
-
-  // Show confirmation
-  const st=document.getElementById('biStatus');
-  st.style.color='var(--accent)';
-  st.textContent='✓ Category "'+name+'" created — select it from the dropdowns below';
+  const st=document.getElementById('biStatus'); st.style.color='var(--accent)';
+  st.textContent='Category "'+name+'" created';
 }
 
-/* When user assigns a category, auto-fill all unassigned rows with same merchant */
 function biTypeChanged(sel){
-  const i=+sel.dataset.i;
-  _biTxns[i].type=sel.value;
-  // update amount colour in same row
+  const i=+sel.dataset.i; _biTxns[i].type=sel.value;
   const row=sel.closest('tr');
-  if(row){
-    const amtSpan=row.querySelector('.bi-edit-amt');
-    if(amtSpan) amtSpan.style.color=sel.value==='income'?'var(--accent)':'var(--red)';
-    row.style.background=sel.value==='income'?'rgba(92,184,122,.05)':'';
-  }
+  if(row){ const s=row.querySelector('.bi-edit-amt'); if(s) s.style.color=sel.value==='income'?'var(--accent)':'var(--red)'; row.style.background=sel.value==='income'?'rgba(92,184,122,.05)':''; }
 }
 
 function biCatChanged(sel){
-  const mkey=sel.dataset.mkey;
-  const val=sel.value;
+  const mkey=sel.dataset.mkey, val=sel.value;
   if(!mkey||!val) return;
   const all=document.querySelectorAll('.bi-cat[data-mkey="'+mkey.replace(/"/g,'\\"')+'"]');
   let filled=0;
-  all.forEach(s=>{
-    if(s!==sel && s.value===''){
-      s.value=val;
-      // update txn object too
-      _biTxns[+s.dataset.i].catId=val;
-      filled++;
-    }
-  });
-  if(filled>0){
-    const st=document.getElementById('biStatus');
-    const prev=st.textContent;
-    st.style.color='var(--accent)';
-    st.textContent='✓ Also applied to '+filled+' similar transaction'+(filled>1?'s':'')+' (same merchant)';
-    setTimeout(()=>{ st.textContent=prev; st.style.color='var(--accent)'; },3000);
-  }
+  all.forEach(s=>{ if(s!==sel&&s.value===''){ s.value=val; _biTxns[+s.dataset.i].catId=val; filled++; } });
+  if(filled>0){ const st=document.getElementById('biStatus'); st.style.color='var(--accent)'; st.textContent='Applied to '+filled+' similar transaction'+(filled>1?'s':''); setTimeout(()=>st.textContent='',3000); }
   _biTxns[+sel.dataset.i].catId=val;
 }
 
-/* Re-run auto-matching on rows still set to Skip */
 function rematchUnassigned(){
   let count=0;
-  document.querySelectorAll('.bi-cat').forEach(sel=>{
-    if(sel.value===''){
-      const t=_biTxns[+sel.dataset.i];
-      const cat=matchCategory(t.desc);
-      if(cat){ sel.value=cat; t.catId=cat; count++; }
-    }
-  });
+  document.querySelectorAll('.bi-cat').forEach(sel=>{ if(sel.value===''){ const t=_biTxns[+sel.dataset.i]; const cat=matchCategory(t.desc); if(cat){ sel.value=cat; t.catId=cat; count++; } } });
   const st=document.getElementById('biStatus');
-  const unmatched=document.querySelectorAll('.bi-cat[value=""]').length;
   st.style.color='var(--accent)';
-  st.textContent=count>0
-    ? `✓ Matched ${count} more transactions · ${unmatched} still unassigned`
-    : `No new matches found · ${unmatched} still need manual assignment`;
+  st.textContent=count>0?'Matched '+count+' more transactions':'No new matches found';
 }
 
 function importBiTxns(){
-  // Read current UI state
   document.querySelectorAll('.bi-chk').forEach(cb=>{_biTxns[+cb.dataset.i].include=cb.checked;});
   document.querySelectorAll('.bi-cat').forEach(s=>{_biTxns[+s.dataset.i].catId=s.value;});
   document.querySelectorAll('.bi-type').forEach(s=>{_biTxns[+s.dataset.i].type=s.value;});
-
   const toImport=_biTxns.filter(t=>t.include&&t.catId);
-  if(!toImport.length){
-    alert('No transactions selected or no categories assigned. Please assign a category to at least one transaction.');
-    return;
-  }
-
-  // Parse "DD/MM/YY" or "DD/MM/YYYY" → {month (0-based), year}
+  if(!toImport.length){ alert('No transactions selected or no categories assigned.'); return; }
   function parseTxnDate(dateStr){
     const p=(dateStr||'').split('/');
-    if(p.length<3) return {month:currentMonth, year:currentYear};
-    const month=parseInt(p[1])-1;
-    let year=parseInt(p[2]);
-    if(year<100) year+=2000;
-    return {month:isNaN(month)?currentMonth:month, year:isNaN(year)?currentYear:year};
+    if(p.length<3) return {month:currentMonth,year:currentYear};
+    const month=parseInt(p[1])-1; let year=parseInt(p[2]); if(year<100) year+=2000;
+    return {month:isNaN(month)?currentMonth:month,year:isNaN(year)?currentYear:year};
   }
-
-  // Group by year+month → catId → total amount
-  const byMonth={};
+  const byMonth={}, txnsByMonth={}, monthsUpdated=[];
   toImport.forEach(t=>{
-    const {month,year}=parseTxnDate(t.date);
-    const key=year+'-'+month;
+    const {month,year}=parseTxnDate(t.date); const key=year+'-'+month;
     if(!byMonth[key]) byMonth[key]={year,month,grouped:{}};
     byMonth[key].grouped[t.catId]=(byMonth[key].grouped[t.catId]||0)+t.amount;
-  });
-
-  const monthsUpdated=[];
-
-  // Also build per-month per-cat transaction list
-  const txnsByMonth={}; // key:"year-month" → catId → [{date,desc,amount,type}]
-  toImport.forEach(t=>{
-    const {month,year}=parseTxnDate(t.date);
-    const key=year+'-'+month;
     if(!txnsByMonth[key]) txnsByMonth[key]={};
     if(!txnsByMonth[key][t.catId]) txnsByMonth[key][t.catId]=[];
     txnsByMonth[key][t.catId].push({date:t.date,desc:t.desc,amount:t.amount,type:t.type});
   });
-
   Object.values(byMonth).forEach(({year,month,grouped})=>{
-    // Load different year's state if needed
-    let tState=state;
-    if(year!==currentYear){
-      tState=loadState(year);
-    }
-    // Ensure month bucket exists
+    let tState=state; if(year!==currentYear) tState=loadState(year);
     if(!tState.months[month]) tState.months[month]={};
-
     const mkey=year+'-'+month;
     Object.entries(grouped).forEach(([catId,total])=>{
-      if(!tState.months[month][catId])
-        tState.months[month][catId]={actual:0,paid:false,note:'',transactions:[]};
+      if(!tState.months[month][catId]) tState.months[month][catId]={actual:0,paid:false,note:'',transactions:[]};
       tState.months[month][catId].actual=(tState.months[month][catId].actual||0)+total;
-      // Append individual transactions
-      if(!tState.months[month][catId].transactions)
-        tState.months[month][catId].transactions=[];
-      const newTxns=(txnsByMonth[mkey]||{})[catId]||[];
-      tState.months[month][catId].transactions.push(...newTxns);
+      if(!tState.months[month][catId].transactions) tState.months[month][catId].transactions=[];
+      tState.months[month][catId].transactions.push(...((txnsByMonth[mkey]||{})[catId]||[]));
     });
-
-    if(year!==currentYear){
-      localStorage.setItem(sKey(year), JSON.stringify(tState));
-    }
+    if(year!==currentYear) localStorage.setItem(sKey(year),JSON.stringify(tState));
     monthsUpdated.push(MONTHS[month]+' '+year);
   });
-
   saveState();
-
-  // Save merchant→category memory for future imports
   const mmap=getMerchantMap();
-  toImport.forEach(t=>{
-    const mkey=extractMerchantKey(t.desc);
-    if(mkey&&t.catId) mmap[mkey]=t.catId;
-  });
+  toImport.forEach(t=>{ const mk=extractMerchantKey(t.desc); if(mk&&t.catId) mmap[mk]=t.catId; });
   saveMerchantMap(mmap);
-
-  closeBankImport();
-  renderMonthly();
-
-  const uniqueMonths=[...new Set(monthsUpdated)].join(', ');
-  alert('\u2705 Imported '+toImport.length+' transactions into: '+uniqueMonths);
+  closeBankImport(); renderMonthly();
+  alert('✅ Imported '+toImport.length+' transactions into: '+[...new Set(monthsUpdated)].join(', '));
 }
 
+/* ── GitHub Gist Cloud Sync ── */
+function ghSaveConfig(){
+  const token=document.getElementById('ghToken').value.trim();
+  const gistId=document.getElementById('ghGistId').value.trim();
+  if(token) localStorage.setItem('gh_token',token);
+  if(gistId) localStorage.setItem('gh_gist_id',gistId);
+}
+
+function ghLoadConfig(){
+  const t=document.getElementById('ghToken');
+  const g=document.getElementById('ghGistId');
+  if(t&&!t.value) t.value=localStorage.getItem('gh_token')||'';
+  if(g&&!g.value) g.value=localStorage.getItem('gh_gist_id')||'';
+  const lastTime=localStorage.getItem('gh_sync_time');
+  const el=document.getElementById('syncLastTime');
+  if(el&&lastTime) el.textContent='Last synced: '+new Date(lastTime).toLocaleString();
+}
+
+function ghGetSyncPayload(){
+  const data={version:2,savedAt:new Date().toISOString(),years:{},merchantMap:getMerchantMap()};
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key&&key.startsWith('budget_')){ try{ data.years[key]=JSON.parse(localStorage.getItem(key)); }catch(e){} }
+  }
+  return data;
+}
+
+async function syncSaveToGist(){
+  const token=document.getElementById('ghToken').value.trim()||localStorage.getItem('gh_token')||'';
+  const gistId=document.getElementById('ghGistId').value.trim()||localStorage.getItem('gh_gist_id')||'';
+  const status=document.getElementById('syncStatus');
+  if(!token){ status.textContent='Enter your GitHub token first.'; return; }
+  localStorage.setItem('gh_token',token);
+  status.textContent='Saving...';
+  const payload=ghGetSyncPayload();
+  const body={description:'Budget Tracker Data',public:false,files:{'budget_data.json':{content:JSON.stringify(payload,null,2)}}};
+  const url=gistId?'https://api.github.com/gists/'+gistId:'https://api.github.com/gists';
+  const method=gistId?'PATCH':'POST';
+  try{
+    const res=await fetch(url,{method,headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.message||'API error '+res.status);
+    localStorage.setItem('gh_gist_id',data.id); localStorage.setItem('gh_sync_time',new Date().toISOString());
+    document.getElementById('ghGistId').value=data.id;
+    status.style.color='var(--accent)'; status.textContent='Saved at '+new Date().toLocaleTimeString();
+    document.getElementById('syncLastTime').textContent='Last synced: '+new Date().toLocaleString();
+  }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
+}
+
+async function syncLoadFromGist(){
+  const token=document.getElementById('ghToken').value.trim()||localStorage.getItem('gh_token')||'';
+  const gistId=document.getElementById('ghGistId').value.trim()||localStorage.getItem('gh_gist_id')||'';
+  const status=document.getElementById('syncStatus');
+  if(!token){ status.textContent='Enter your GitHub token first.'; return; }
+  if(!gistId){ status.textContent='No Gist ID — save first to create one.'; return; }
+  localStorage.setItem('gh_token',token);
+  status.textContent='Loading...';
+  try{
+    const res=await fetch('https://api.github.com/gists/'+gistId,{headers:{'Authorization':'token '+token}});
+    const gist=await res.json();
+    if(!res.ok) throw new Error(gist.message||'API error '+res.status);
+    const content=gist.files['budget_data.json']?.content;
+    if(!content) throw new Error('No budget_data.json found in Gist');
+    const data=JSON.parse(content);
+    if(!confirm('Load cloud data saved at '+new Date(data.savedAt).toLocaleString()+'?\nThis overwrites local data.')) return;
+    Object.entries(data.years||{}).forEach(([key,val])=>localStorage.setItem(key,JSON.stringify(val)));
+    if(data.merchantMap) saveMerchantMap(data.merchantMap);
+    state=loadState(currentYear); renderAll();
+    localStorage.setItem('gh_sync_time',new Date().toISOString());
+    status.style.color='var(--accent)'; status.textContent='Loaded from cloud ('+new Date(data.savedAt).toLocaleString()+')';
+  }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
+}
 
 function toggleChangelog(){
   document.getElementById('changelogPopup').classList.toggle('open');
 }
-// Close on outside click
 document.addEventListener('click', e=>{
-  const pop = document.getElementById('changelogPopup');
-  if(pop.classList.contains('open') && !pop.contains(e.target)) {
-    toggleChangelog();
-  }
+  const pop=document.getElementById('changelogPopup');
+  if(pop.classList.contains('open')&&!pop.contains(e.target)) toggleChangelog();
 });
 </script>
 </body>
