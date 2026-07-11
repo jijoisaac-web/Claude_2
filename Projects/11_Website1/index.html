@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.16"/>
+<link rel="stylesheet" href="/site.css?v=7.18"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,9 +273,23 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.16</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.18</span>
   <div class="nav-links-center">
-    <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
+    <div class="nav-dropdown-wrap">
+      <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
+      <div class="nav-dropdown" id="dd-rates">
+        <div class="nav-dd-col">
+          <div class="nav-dd-heading">Rates &amp; Timing</div>
+          <a onclick="closeNavDD();showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📡 Live Remittance Rates</a>
+          <a onclick="closeNavDD();showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">⏱ Rate Timer — Send Now or Wait?</a>
+        </div>
+      </div>
+    </div>
+    <a onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏠 Return Corpus</a>
+    <a onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</a>
+    <a onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📈 Invest</a>
+    <a onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">✈ Flights</a>
+    <a onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏦 Banking</a>
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-calc')">Calculators ▾</a>
       <div class="nav-dropdown" id="dd-calc">
@@ -308,13 +322,7 @@ document.addEventListener('DOMContentLoaded',function(){
         </div>
       </div>
     </div>
-    <a onclick="document.querySelector('.guides-section') && document.querySelector('.guides-section').scrollIntoView({behavior:'smooth'})">Guides</a>
-    <a onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">Banking</a>
-    <a onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Tax</a>
-    <a onclick="showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">⏱ Rate Timer</a>
-    <a onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</a>
-    <a onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📈 Invest</a>
-    <a onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">✈ Flights</a>
+    <a onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Guides</a>
   </div>
   <div class="nav-right">
     <button class="nav-hamburger" onclick="openDrawer()" aria-label="Open navigation menu">&#9776;</button>
@@ -2829,14 +2837,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.16 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.18 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.16"></script>
+<script src="/site.js?v=7.18"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
@@ -2855,6 +2863,10 @@ document.addEventListener('DOMContentLoaded',function(){
   <button class="mob-bnav-btn" id="mbn-invest" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));setMobBnav('invest')" aria-label="Invest">
     <span class="mob-bnav-icon">📈</span>
     <span class="mob-bnav-lbl">Invest</span>
+  </button>
+  <button class="mob-bnav-btn" id="mbn-homeloan" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));setMobBnav('homeloan')" aria-label="Loan">
+    <span class="mob-bnav-icon">🏗️</span>
+    <span class="mob-bnav-lbl">Loan</span>
   </button>
   <button class="mob-bnav-btn" id="mbn-flights" onclick="showTab('flights',document.querySelector('[data-tab=flights]'));setMobBnav('flights')" aria-label="Flights">
     <span class="mob-bnav-icon">✈️</span>

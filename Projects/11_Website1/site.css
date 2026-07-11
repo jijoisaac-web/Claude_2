@@ -1,4 +1,4 @@
-/* v7.16 */
+/* v7.18 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1827,7 +1827,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   align-items:center;
   justify-content:center;
   gap:3px;
-  padding:8px 4px 10px;
+  padding:6px 2px 8px;
   cursor:pointer;
   border:none;
   background:none;
@@ -1838,8 +1838,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 .mob-bnav-btn.mob-active{color:var(--amber);}
 .mob-bnav-btn:hover{color:var(--text);background:var(--elevated);}
-.mob-bnav-icon{font-size:18px;line-height:1;}
-.mob-bnav-lbl{font-size:9px;font-weight:700;letter-spacing:.2px;white-space:nowrap;}
+.mob-bnav-icon{font-size:16px;line-height:1;}
+.mob-bnav-lbl{font-size:8px;font-weight:700;letter-spacing:.1px;white-space:nowrap;}
 /* Active indicator bar */
 .mob-bnav-btn.mob-active::before{
   content:'';
