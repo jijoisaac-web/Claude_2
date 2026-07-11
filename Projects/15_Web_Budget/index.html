@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.5
+        <span class="ver-dot"></span>v3.9.6
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3707,17 +3707,19 @@ function saveMerchantMap(map){ localStorage.setItem('merchantMap', JSON.stringif
 function extractMerchantKey(desc){
   // For Maybank savings IBK FUND TFR, the REAL merchant is inside (...)
   const ibk=desc.match(/IBK FUND TFR\s+FR A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
-  if(ibk) return ibk[1].trim().toUpperCase().slice(0,40);
+  if(ibk) return ibk[1].trim().toUpperCase();
   // For PYMT FROM A/C (MERCHANT) pattern
   const pymt=desc.match(/PYMT FROM A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
-  if(pymt) return 'PYMT:'+pymt[1].trim().toUpperCase().slice(0,35);
-  // Normal extraction: strip trailing location/code suffixes
-  return desc.replace(/\s*\(.*?\)\s*$/,'')
-             .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')
-             .replace(/\s+MY\s*$/,'')
-             .replace(/[-*].*$/,'')
-             .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')
-             .trim().toUpperCase().slice(0,40);
+  if(pymt) return 'PYMT:'+pymt[1].trim().toUpperCase();
+  // Normal extraction: strip trailing location/code suffixes only
+  return desc
+    .replace(/\s*\(.*?\)\s*$/,'')          // strip trailing (...)
+    .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')   // strip trailing CITY MY
+    .replace(/\s+MY\s*$/,'')                 // strip trailing MY
+    .replace(/\s*[*]\s*\d{4,}.*$/,'')       // strip *refcode (digits only)
+    .replace(/\s+\d{6,}\s*$/,'')            // strip trailing long ref numbers
+    .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')   // strip trailing bank codes
+    .trim().toUpperCase();
 }
 
 function matchCategory(desc){
@@ -4272,19 +4274,55 @@ function renderMappingTab(){
   const groups={};
   (_biTxns||[]).forEach((t,i)=>{
     const mk=extractMerchantKey(t.desc);
-    if(!groups[mk]) groups[mk]={count:0,total:0,catId:t.catId||'',sample:t.desc,indices:[]};
+    if(!groups[mk]) groups[mk]={count:0,total:0,catId:t.catId||'',samples:new Set(),entries:[],indices:[]};
     groups[mk].count++; groups[mk].total+=t.amount; groups[mk].indices.push(i);
+    groups[mk].samples.add(t.desc);
+    groups[mk].entries.push({i,date:t.date,desc:t.desc,amount:t.amount,type:t.type});
     if(t.catId&&!groups[mk].catId) groups[mk].catId=t.catId;
   });
-  const keys=Object.keys(groups);
+  const keys=Object.keys(groups).sort((a,b)=>groups[b].total-groups[a].total);
   if(!keys.length){ document.getElementById('biMappingContent').innerHTML='<div style="text-align:center;padding:32px;color:var(--text3)">Load a bank statement first.</div>'; return; }
   const unassigned=keys.filter(k=>!groups[k].catId).length;
-  let html=`<div style="margin:12px 0 8px;font-size:12px;color:var(--text3)"><strong style="color:var(--text1)">${keys.length}</strong> unique merchants. ${unassigned?`<span style="color:var(--yellow)">${unassigned} unassigned.</span>`:'<span style="color:var(--accent)">All mapped</span>'}<span style="float:right;cursor:pointer;color:var(--accent)" onclick="saveMappingAndApply()">Save all mappings</span></div>
-  <div style="overflow-x:auto"><table class="map-table"><thead><tr><th>Merchant</th><th style="text-align:center">Txns</th><th style="text-align:right">Total</th><th style="min-width:170px">Category</th></tr></thead><tbody>`;
-  keys.forEach(mk=>{
+  let html=`<div style="margin:12px 0 8px;font-size:12px;color:var(--text3)">
+    <strong style="color:var(--text1)">${keys.length}</strong> unique merchants · ${unassigned?`<span style="color:var(--yellow)">${unassigned} unassigned</span>`:'<span style="color:var(--accent)">All mapped ✓</span>'}
+    <span style="float:right;cursor:pointer;color:var(--accent)" onclick="saveMappingAndApply()">💾 Save all mappings</span>
+  </div>
+  <div style="overflow-x:auto"><table class="map-table"><thead><tr>
+    <th>Merchant / Raw Descriptions</th>
+    <th style="text-align:center">Txns</th>
+    <th style="text-align:right">Total</th>
+    <th style="min-width:170px">Category</th>
+  </tr></thead><tbody>`;
+  keys.forEach((mk,ki)=>{
     const g=groups[mk];
     const savedBadge=mmap[mk]?'<span class="map-saved-badge">SAVED</span>':'';
-    html+=`<tr><td><div style="font-weight:600;font-size:12px">${mk}${savedBadge}</div><div style="font-size:10px;color:var(--text3);margin-top:2px;word-break:break-word">${g.sample}</div></td><td style="text-align:center">${g.count}</td><td style="text-align:right;font-weight:700;color:var(--red)">MYR ${fmt(g.total)}</td><td><select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}" style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select></td></tr>`;
+    const samplesArr=[...g.samples];
+    // Show all unique raw descriptions (not just one sample)
+    const samplesHtml=samplesArr.map(s=>`<div style="font-size:10px;color:var(--text3);word-break:break-word;margin-top:2px;padding-left:6px;border-left:2px solid var(--border)">↳ ${s}</div>`).join('');
+    // Expandable entries list
+    const entriesId=`map-entries-${ki}`;
+    const entriesHtml=g.entries.map(e=>`
+      <div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);font-size:10px">
+        <span style="color:var(--text3);white-space:nowrap;min-width:72px">${e.date}</span>
+        <span style="flex:1;word-break:break-word;color:var(--text1)">${e.desc}</span>
+        <span style="white-space:nowrap;color:${e.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(e.amount)}</span>
+      </div>`).join('');
+    html+=`<tr>
+      <td>
+        <div style="font-weight:600;font-size:12px;margin-bottom:3px">${mk}${savedBadge}</div>
+        ${samplesHtml}
+        <div style="margin-top:5px">
+          <span onclick="document.getElementById('${entriesId}').style.display=document.getElementById('${entriesId}').style.display==='none'?'block':'none'"
+            style="font-size:10px;color:var(--accent);cursor:pointer">▼ show ${g.count} entr${g.count===1?'y':'ies'}</span>
+          <div id="${entriesId}" style="display:none;margin-top:6px;padding:4px 6px;background:var(--bg2);border-radius:6px;max-height:180px;overflow-y:auto">
+            ${entriesHtml}
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center;vertical-align:top;padding-top:8px">${g.count}</td>
+      <td style="text-align:right;font-weight:700;color:var(--red);vertical-align:top;padding-top:8px">MYR ${fmt(g.total)}</td>
+      <td style="vertical-align:top;padding-top:6px"><select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}" style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select></td>
+    </tr>`;
   });
   html+=`</tbody></table></div>`;
   const panel=document.getElementById('biMappingContent');
@@ -4778,7 +4816,6 @@ function renderInsights(){
     document.getElementById('insightsMerchants').innerHTML='<div style="color:var(--text3);font-size:12px;margin-top:8px">No transaction data yet. Import bank statements to see merchant breakdown.</div>';
   }
 }
-
 </script>
 </body>
 </html>

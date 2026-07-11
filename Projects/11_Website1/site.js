@@ -1,4 +1,4 @@
-/* v7.33 */
+/* v7.34 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -17,6 +17,12 @@ const CUR_META={
   CAD:{flag:'<span class="fi fi-ca fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ca',name:'Canadian Dollar',region:'Americas'},
   EUR:{flag:'<span class="fi fi-eu fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'eu',name:'Euro',region:'Europe'},
   GBP:{flag:'<span class="fi fi-gb fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'gb',name:'British Pound',region:'Europe'},
+  CHF:{flag:'<span class="fi fi-ch fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'ch',name:'Swiss Franc',region:'Europe'},
+  SEK:{flag:'<span class="fi fi-se fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'se',name:'Swedish Krona',region:'Europe'},
+  NOK:{flag:'<span class="fi fi-no fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'no',name:'Norwegian Krone',region:'Europe'},
+  DKK:{flag:'<span class="fi fi-dk fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'dk',name:'Danish Krone',region:'Europe'},
+  JPY:{flag:'<span class="fi fi-jp fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'jp',name:'Japanese Yen',region:'Asia Pacific'},
+  HKD:{flag:'<span class="fi fi-hk fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>',cc:'hk',name:'Hong Kong Dollar',region:'Asia Pacific'},
 };
 
 // ── CUSTOM DROPDOWN ────────────────────────────────
@@ -30,17 +36,22 @@ function toggleCurDropdown(e){
 }
 function selectCurrency(el){
   const val=el.dataset.val;
-  // Update checkmarks
+  const cc=el.querySelector('.fi')?el.querySelector('.fi').className.match(/fi-([a-z]+)/)?.[1]:'';
+  // Update checkmarks — highlight all entries sharing the same currency val
   document.querySelectorAll('.ci-check').forEach(c=>c.style.display='none');
   document.querySelectorAll('.cur-item').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  const ck=document.getElementById('ck-'+val);
-  if(ck)ck.style.display='';
-  // Update button display
+  document.querySelectorAll('.cur-item[data-val="'+val+'"]').forEach(function(c){c.classList.add('active');});
+  document.querySelectorAll('[id^="ck-'+val+'"]').forEach(function(c){c.style.display='';});
+  // Update button display — use the clicked country flag if available
   const meta=CUR_META[val]||{flag:'🌐',name:val,region:''};
-  document.getElementById('curBtnFlag').innerHTML=meta.flag;
+  const clickedName=el.dataset.name||meta.name;
+  const region=el.dataset.region||meta.region;
+  // Show clicked country flag in button (not generic EUR flag when Germany clicked)
+  var btnFlag=meta.flag;
+  if(cc&&cc!=='eu') btnFlag='<span class="fi fi-'+cc+' fis" style="font-size:20px;border-radius:3px;line-height:1;flex-shrink:0;"></span>';
+  document.getElementById('curBtnFlag').innerHTML=btnFlag;
   document.getElementById('curBtnCode').textContent=val;
-  document.getElementById('curBtnRegion').textContent=meta.region;
+  document.getElementById('curBtnRegion').textContent=region;
   // Close panel
   document.getElementById('curPanel').classList.remove('open');
   document.getElementById('curBtn').classList.remove('open');
