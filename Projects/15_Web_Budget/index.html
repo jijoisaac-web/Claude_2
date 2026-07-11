@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.4
+        <span class="ver-dot"></span>v3.9.5
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4504,6 +4504,281 @@ async function syncLoadFromGist(){
     setTimeout(()=>{ closeSyncModal(); init(); },800);
   }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
 }
+
+/* ═══════════════════════════════════════════════════
+   ANALYTICS: Savings Rate + Top Merchants charts
+   ═══════════════════════════════════════════════════ */
+function buildSavingsChart(gc,tc){
+  const labels=MONTHS.map(m=>m.slice(0,3));
+  const rates=MONTHS.map((_,mi)=>{
+    const d=calcMonth(mi);
+    if(!d.income) return 0;
+    return Math.round((d.balance/d.income)*100*10)/10;
+  });
+  const colors=rates.map(r=>r>=0?'rgba(92,184,122,.75)':'rgba(248,113,113,.75)');
+  chartInstance=new Chart(document.getElementById('mainChart'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Savings Rate %',data:rates,backgroundColor:colors,borderRadius:5},
+      {label:'Target (20%)',data:MONTHS.map(()=>20),type:'line',borderColor:'#fbbf24',
+       backgroundColor:'transparent',borderDash:[4,4],pointRadius:0}
+    ]},
+    options:{...baseChartOpts(gc,tc),plugins:{...baseChartOpts(gc,tc).plugins,
+      title:{display:true,text:'Monthly Savings Rate (%)',color:tc}}}
+  });
+}
+
+function buildMerchantsChart(tc){
+  const txns=[];
+  MONTHS.forEach((_,mi)=>{
+    state.categories.forEach(cat=>{
+      const d=getMonthData(mi,cat.id);
+      if(d.transactions) txns.push(...d.transactions.filter(t=>t.type==='expense'));
+    });
+  });
+  const map={};
+  txns.forEach(t=>{
+    const k=t.desc||'Other';
+    map[k]=(map[k]||0)+t.amount;
+  });
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  if(!sorted.length){document.getElementById('noChart').style.display='block';return;}
+  const palette=['#5cb87a','#60a5fa','#fbbf24','#f87171','#c084fc','#34d399','#fb923c','#818cf8','#86efac','#fca5a5','#93c5fd','#fde68a'];
+  chartInstance=new Chart(document.getElementById('mainChart'),{
+    type:'bar',
+    data:{
+      labels:sorted.map(([k])=>k.length>18?k.slice(0,16)+'…':k),
+      datasets:[{label:'Total Spent (MYR)',data:sorted.map(([,v])=>Math.round(v*100)/100),
+        backgroundColor:palette,borderRadius:5}]
+    },
+    options:{
+      indexAxis:'y',responsive:true,
+      plugins:{legend:{display:false},title:{display:true,text:'Top Merchants by Spending',color:tc}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:tc}},y:{grid:{display:false},ticks:{color:tc}}}
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   INSIGHTS ENGINE
+   ═══════════════════════════════════════════════════ */
+function getInsightsState(year){
+  if(year===currentYear) return state;
+  const raw=localStorage.getItem('budget_'+year);
+  return raw?JSON.parse(raw):null;
+}
+
+function renderInsights(){
+  // Populate year selector
+  const ySel=document.getElementById('insightsYear');
+  if(ySel && !ySel.options.length){
+    for(let y=2026;y<=2032;y++){
+      const o=document.createElement('option');
+      o.value=y; o.textContent=y;
+      if(y===currentYear) o.selected=true;
+      ySel.appendChild(o);
+    }
+  }
+  const year=ySel?parseInt(ySel.value):currentYear;
+  const st=getInsightsState(year);
+  if(!st){
+    document.getElementById('insightsMetrics').innerHTML='<div style="color:var(--text3);font-size:13px">No data for '+year+'.</div>';
+    document.getElementById('insightsCards').innerHTML='';
+    document.getElementById('insightsMerchants').innerHTML='';
+    return;
+  }
+
+  const cats=st.categories||[];
+  const nowMi=year===currentYear?currentMonth:11;
+
+  // ── Compute per-month stats ──
+  const monthStats=MONTHS.map((_,mi)=>{
+    const md=st.months?.[mi]||{};
+    let inc=0,exp=0;
+    cats.forEach(cat=>{
+      const d=md[cat.id]||{};
+      const act=d.actual!==undefined?d.actual:0;
+      if(cat.type==='income') inc+=act; else if(cat.type==='expense') exp+=act;
+    });
+    return {mi,inc:Math.round(inc*100)/100,exp:Math.round(exp*100)/100,bal:Math.round((inc-exp)*100)/100};
+  });
+
+  const activeMos=monthStats.filter(m=>m.inc>0||m.exp>0);
+  const totalInc=activeMos.reduce((s,m)=>s+m.inc,0);
+  const totalExp=activeMos.reduce((s,m)=>s+m.exp,0);
+  const totalBal=totalInc-totalExp;
+  const savingsRate=totalInc?Math.round(totalBal/totalInc*1000)/10:0;
+  const deficitMos=activeMos.filter(m=>m.bal<0);
+  const onTrackMos=activeMos.filter(m=>m.bal>=0);
+  const avgMonthlyExp=activeMos.length?Math.round(totalExp/activeMos.length):0;
+
+  // ── Per-category overspend analysis ──
+  const catStats=cats.filter(c=>c.type==='expense').map(cat=>{
+    let overCount=0,totalActual=0,totalExpected=0,txnList=[];
+    MONTHS.forEach((_,mi)=>{
+      const md=st.months?.[mi]||{};
+      const d=md[cat.id]||{};
+      const act=d.actual||0;
+      const exp2=cat.expected||0;
+      totalActual+=act; totalExpected+=exp2;
+      if(act>exp2*1.05&&exp2>0) overCount++;
+      if(d.transactions) txnList.push(...d.transactions);
+    });
+    return {cat,overCount,totalActual:Math.round(totalActual*100)/100,
+      totalExpected:Math.round(totalExpected*100)/100,txnList};
+  }).filter(s=>s.totalActual>0||s.totalExpected>0);
+
+  // ── Top merchants ──
+  const merchantMap={};
+  cats.forEach(cat=>{
+    MONTHS.forEach((_,mi)=>{
+      const md=st.months?.[mi]||{};
+      const d=md[cat.id]||{};
+      if(d.transactions) d.transactions.filter(t=>t.type==='expense').forEach(t=>{
+        const k=(t.desc||'Other').trim();
+        if(!merchantMap[k]) merchantMap[k]={amt:0,cnt:0};
+        merchantMap[k].amt+=t.amount;
+        merchantMap[k].cnt++;
+      });
+    });
+  });
+  const topMerchants=Object.entries(merchantMap)
+    .map(([k,v])=>({name:k,amt:Math.round(v.amt*100)/100,cnt:v.cnt}))
+    .sort((a,b)=>b.amt-a.amt).slice(0,15);
+
+  // ── Render metrics row ──
+  const savCol=savingsRate>=20?'var(--accent)':savingsRate>=10?'#fbbf24':'var(--red)';
+  document.getElementById('insightsMetrics').innerHTML=`
+    <div class="insight-metric">
+      <div class="im-value" style="color:${savCol}">${savingsRate}%</div>
+      <div class="im-label">Savings Rate</div>
+      <div class="im-sub">${year} YTD</div>
+    </div>
+    <div class="insight-metric">
+      <div class="im-value">MYR ${avgMonthlyExp.toLocaleString()}</div>
+      <div class="im-label">Avg Monthly Spend</div>
+      <div class="im-sub">across ${activeMos.length} active months</div>
+    </div>
+    <div class="insight-metric">
+      <div class="im-value" style="color:${onTrackMos.length>=activeMos.length*.7?'var(--accent)':'var(--red)'}">
+        ${onTrackMos.length}/${activeMos.length}
+      </div>
+      <div class="im-label">Months Surplus</div>
+      <div class="im-sub">${deficitMos.length} deficit month${deficitMos.length!==1?'s':''}</div>
+    </div>
+    <div class="insight-metric">
+      <div class="im-value" style="color:${totalBal>=0?'var(--accent)':'var(--red)'}">
+        ${totalBal>=0?'+':''}MYR ${Math.abs(Math.round(totalBal)).toLocaleString()}
+      </div>
+      <div class="im-label">Net Balance</div>
+      <div class="im-sub">${year} total</div>
+    </div>
+    <div class="insight-metric">
+      <div class="im-value">${topMerchants[0]?topMerchants[0].name.slice(0,14)+(topMerchants[0].name.length>14?'…':''):'-'}</div>
+      <div class="im-label">Top Merchant</div>
+      <div class="im-sub">${topMerchants[0]?'MYR '+topMerchants[0].amt.toLocaleString():''}</div>
+    </div>`;
+
+  // ── Generate recommendation cards ──
+  const cards=[];
+
+  // Savings rate verdict
+  if(savingsRate>=20){
+    cards.push({type:'good',icon:'🌟',title:'Excellent savings discipline',
+      body:`You're saving ${savingsRate}% of income in ${year} — well above the recommended 20%. Keep it up!`});
+  } else if(savingsRate>=10){
+    cards.push({type:'tip',icon:'💡',title:'Savings rate could be stronger',
+      body:`You're saving ${savingsRate}% of income in ${year}. Aim for 20%+ to build a stronger financial cushion. Try cutting your top 2 spending categories by 10%.`});
+  } else if(activeMos.length>0){
+    cards.push({type:'warn',icon:'⚠️',title:'Low savings rate: '+savingsRate+'%',
+      body:`Savings rate in ${year} is below 10%. Review your biggest expense categories and look for quick wins.`});
+  }
+
+  // Deficit months
+  if(deficitMos.length>0){
+    const names=deficitMos.map(m=>MONTHS[m.mi].slice(0,3)).join(', ');
+    cards.push({type:'warn',icon:'📉',title:`Deficit in ${deficitMos.length} month${deficitMos.length>1?'s':''}`,
+      body:`Expenses exceeded income in: ${names}. Check what pushed spending up in those months.`});
+  }
+
+  // Chronically over-budget categories
+  const chronic=catStats.filter(s=>s.overCount>=3).sort((a,b)=>b.overCount-a.overCount);
+  chronic.slice(0,3).forEach(s=>{
+    const pct=s.totalExpected?Math.round((s.totalActual-s.totalExpected)/s.totalExpected*100):0;
+    cards.push({type:'warn',icon:'🔴',title:`${s.cat.name} consistently over budget`,
+      body:`Over budget ${s.overCount} months this year (+${pct}% vs expected total). Consider raising the budget or reducing spending in this category.`});
+  });
+
+  // Best-performing categories (well under budget)
+  const stars=catStats.filter(s=>s.totalExpected>0&&s.totalActual<s.totalExpected*.75&&s.totalActual>0)
+    .sort((a,b)=>(a.totalActual/a.totalExpected)-(b.totalActual/b.totalExpected));
+  if(stars.length>0){
+    const s=stars[0];
+    const saved=Math.round(s.totalExpected-s.totalActual);
+    cards.push({type:'good',icon:'✅',title:`${s.cat.name}: great spending control`,
+      body:`You're MYR ${saved} under budget in ${s.cat.name} this year — ${Math.round((1-s.totalActual/s.totalExpected)*100)}% below your planned amount.`});
+  }
+
+  // Biggest single expense category
+  const bigCat=catStats.sort((a,b)=>b.totalActual-a.totalActual)[0];
+  if(bigCat&&totalExp>0){
+    const pct=Math.round(bigCat.totalActual/totalExp*100);
+    if(pct>35){
+      cards.push({type:'info',icon:'📊',title:`${bigCat.cat.name} is ${pct}% of all spending`,
+        body:`Your single largest expense is ${bigCat.cat.name} at MYR ${bigCat.totalActual.toLocaleString()} (${pct}% of total expenses). This is worth monitoring closely.`});
+    }
+  }
+
+  // Top merchant insight
+  if(topMerchants.length>0){
+    const t=topMerchants[0];
+    cards.push({type:'info',icon:'🏪',title:`Top merchant: ${t.name}`,
+      body:`You've spent MYR ${t.amt.toLocaleString()} at ${t.name} across ${t.cnt} transaction${t.cnt>1?'s':''} in ${year}.`});
+  }
+
+  // Monthly trend: is spending rising?
+  if(activeMos.length>=3){
+    const last3=activeMos.slice(-3);
+    const trend=last3[2].exp-last3[0].exp;
+    if(trend>200){
+      cards.push({type:'tip',icon:'📈',title:'Spending trending upward',
+        body:`Your expenses have risen by MYR ${Math.round(trend)} over the last 3 active months. Review recent imports to identify the cause.`});
+    } else if(trend<-200){
+      cards.push({type:'good',icon:'📉',title:'Spending trending downward',
+        body:`Expenses dropped by MYR ${Math.abs(Math.round(trend))} over the last 3 active months — great progress!`});
+    }
+  }
+
+  if(!cards.length){
+    cards.push({type:'info',icon:'📋',title:'Add more transaction data for insights',
+      body:'Import bank statements to get personalised spending recommendations.'});
+  }
+
+  document.getElementById('insightsCards').innerHTML=cards.map(card=>`
+    <div class="insight-card ${card.type}">
+      <div class="ic-title">${card.icon} ${card.title}</div>
+      <div class="ic-body">${card.body}</div>
+    </div>`).join('');
+
+  // ── Top merchants list ──
+  if(topMerchants.length>0){
+    const maxAmt=topMerchants[0].amt;
+    document.getElementById('insightsMerchants').innerHTML=`
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">Top Merchants — ${year}</div>
+      <div class="merchants-list">`+
+      topMerchants.map(m=>`
+        <div class="merchant-row">
+          <div class="merchant-name">${m.name}</div>
+          <div class="merchant-bar-wrap"><div class="merchant-bar-fill" style="width:${Math.round(m.amt/maxAmt*100)}%"></div></div>
+          <div class="merchant-amt">MYR ${m.amt.toLocaleString()}</div>
+          <div class="merchant-cnt">${m.cnt} txn${m.cnt>1?'s':''}</div>
+        </div>`).join('')+
+      '</div>';
+  } else {
+    document.getElementById('insightsMerchants').innerHTML='<div style="color:var(--text3);font-size:12px;margin-top:8px">No transaction data yet. Import bank statements to see merchant breakdown.</div>';
+  }
+}
+
 </script>
 </body>
 </html>
