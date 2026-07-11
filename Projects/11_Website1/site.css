@@ -1,4 +1,4 @@
-/* v7.12 */
+/* v7.13 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1895,7 +1895,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ══════════════════════════════════════════════════════
-   v7.12 — BULK & BLOCK DEALS TAB
+   v7.13 — BULK & BLOCK DEALS TAB
    ══════════════════════════════════════════════════════ */
 .deals-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
 .deals-title{font-size:1.1rem;font-weight:800;color:var(--text);}
@@ -1976,7 +1976,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 
 /* ============================================================
-   v7.12 — SEND NOW OR WAIT? RATE TIMER
+   v7.13 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 
 /* Pair selector */
@@ -2055,14 +2055,95 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .rt-pair-btn{padding:6px 11px;font-size:.76rem;}
 }
 
-/* v7.12 — Flight fare per-person annotation + estimate label */
+/* v7.13 — Flight fare per-person annotation + estimate label */
 .fl-win-fare-pp{font-size:.72rem;color:var(--muted);font-weight:400;}
 .fl-win-fare-est{font-size:.72rem;color:rgba(240,165,32,.7);margin-bottom:8px;padding:5px 10px;background:rgba(240,165,32,.06);border-radius:6px;border:1px solid rgba(240,165,32,.15);}
 
-/* v7.12 — Rate Timer expanded pair selector */
+/* v7.13 — Rate Timer expanded pair selector */
 .rt-pairs-wrap{margin-bottom:20px;}
 .rt-pairs-group-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;font-weight:600;}
 .rt-pairs-wrap .rt-pairs{margin-bottom:4px;}
 .rt-pair-fi{font-size:16px;border-radius:3px;line-height:1;flex-shrink:0;}
 /* Compact buttons since there are more now */
 .rt-pairs-wrap .rt-pair-btn{padding:6px 10px;font-size:.78rem;gap:5px;}
+
+/* ============================================================
+   v7.13 — EDUCATION ABROAD COST PLANNER TAB
+   ============================================================ */
+
+/* Country grid */
+.edab-country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.edab-country-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all .2s;text-align:center;}
+.edab-country-card:hover{border-color:var(--teal);transform:translateY(-2px);}
+.edab-country-card.edab-active{border-color:var(--teal);background:rgba(0,212,170,.08);}
+.edab-country-flag{font-size:2rem;margin-bottom:6px;}
+.edab-country-name{font-size:.82rem;font-weight:600;color:var(--text);}
+.edab-country-sub{font-size:.68rem;color:var(--muted);margin-top:3px;}
+
+/* Course level selector */
+.edab-course-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;}
+.edab-course-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .15s;}
+.edab-course-btn:hover{border-color:var(--teal);color:var(--teal);}
+.edab-course-btn.edab-active{background:rgba(0,212,170,.1);border-color:var(--teal);color:var(--teal);font-weight:600;}
+
+/* Cost overview cards */
+.edab-cost-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.edab-cost-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.edab-cost-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.edab-cost-val{font-size:1rem;font-weight:700;color:var(--text);}
+.edab-cost-sub{font-size:.68rem;color:var(--muted);margin-top:3px;}
+
+/* University table */
+.edab-table-wrap{overflow-x:auto;margin-bottom:20px;}
+.edab-table{width:100%;border-collapse:collapse;font-size:.81rem;}
+.edab-table th{background:var(--elevated);color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;text-align:left;white-space:nowrap;}
+.edab-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.edab-table tr:last-child td{border-bottom:none;}
+.edab-table tr:hover td{background:var(--elevated);}
+.edab-uni-name{font-weight:600;color:var(--text);}
+.edab-uni-city{font-size:.72rem;color:var(--muted);}
+.edab-rank-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:600;background:rgba(240,165,32,.1);color:var(--amber);border:1px solid rgba(240,165,32,.2);}
+.edab-fee-hi{color:var(--text);font-weight:600;}
+.edab-fee-inr{font-size:.72rem;color:var(--muted);display:block;}
+.edab-total-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:600;background:rgba(0,212,170,.08);color:var(--teal);border:1px solid rgba(0,212,170,.15);}
+
+/* Savings calculator */
+.edab-calc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.edab-calc-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.edab-calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+.edab-calc-field{display:flex;flex-direction:column;gap:5px;}
+.edab-calc-label{font-size:.72rem;color:var(--muted);font-weight:500;}
+.edab-calc-input{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.9rem;}
+.edab-calc-input:focus{outline:none;border-color:var(--teal);}
+.edab-calc-select{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:.85rem;cursor:pointer;}
+
+/* Result strip */
+.edab-result-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.edab-result-card{border-radius:12px;padding:14px 16px;text-align:center;}
+.edab-result-card.amber{background:rgba(240,165,32,.1);border:1px solid rgba(240,165,32,.2);}
+.edab-result-card.teal{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);}
+.edab-result-card.green{background:rgba(34,211,154,.1);border:1px solid rgba(34,211,154,.2);}
+.edab-result-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+.edab-result-val{font-size:1.3rem;font-weight:700;}
+.edab-result-card.amber .edab-result-val{color:var(--amber);}
+.edab-result-card.teal .edab-result-val{color:var(--teal);}
+.edab-result-card.green .edab-result-val{color:var(--green);}
+.edab-result-sub{font-size:.68rem;color:var(--muted);margin-top:4px;}
+
+/* Inflation note */
+.edab-inflation-note{font-size:.72rem;color:var(--muted);background:rgba(240,165,32,.06);border:1px solid rgba(240,165,32,.12);border-radius:8px;padding:10px 14px;margin-top:14px;line-height:1.6;}
+
+/* Scholarship badge */
+.edab-schol{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:.65rem;background:rgba(34,211,154,.1);color:var(--green);border:1px solid rgba(34,211,154,.2);}
+
+@media(max-width:768px){
+  .edab-country-grid{grid-template-columns:repeat(2,1fr);}
+  .edab-cost-strip{grid-template-columns:repeat(2,1fr);}
+  .edab-calc-grid{grid-template-columns:1fr 1fr;}
+  .edab-result-strip{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .edab-country-grid{grid-template-columns:repeat(2,1fr);}
+  .edab-calc-grid{grid-template-columns:1fr;}
+  .edab-cost-strip{grid-template-columns:1fr 1fr;}
+}

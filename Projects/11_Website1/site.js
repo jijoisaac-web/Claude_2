@@ -1,4 +1,4 @@
-/* v7.12 */
+/* v7.13 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4112,7 +4112,7 @@ window.setMobBnav=function(tabId){
 };
 
 /* ══════════════════════════════════════════════════════
-   v7.12 — BULK & BLOCK DEALS ENGINE
+   v7.13 — BULK & BLOCK DEALS ENGINE
    ══════════════════════════════════════════════════════ */
 
 /* ── Trading day calculator ── */
@@ -4420,7 +4420,7 @@ function _fmtQ(v){
 })();
 
 /* ============================================================
-   v7.12 — SEND NOW OR WAIT? RATE TIMER
+   v7.13 — SEND NOW OR WAIT? RATE TIMER
    ============================================================ */
 (function(){
 
@@ -4758,5 +4758,243 @@ function _fmtQ(v){
 
   /* Sim input */
   window.rtSimCalc = function() { _rtUpdateSim(); };
+
+})();
+
+/* ============================================================
+   v7.13 — EDUCATION ABROAD COST PLANNER
+   ============================================================ */
+(function(){
+
+  /* ── Country + University data ──────────────────────────────── */
+  var EDAB = {
+    USA:{name:'United States',flag:'🇺🇸',fi:'us',cur:'USD',inrRate:84.5,edInflation:5,
+      courses:{
+        'UG (4yr)':{dur:4,tuition:[32000,58000],living:[18000,24000]},
+        'MS / MTech':{dur:2,tuition:[28000,55000],living:[20000,26000]},
+        'MBA':{dur:2,tuition:[65000,90000],living:[24000,30000]},
+        'MBBS / MD':{dur:4,tuition:[55000,80000],living:[22000,28000]},
+        'PhD':{dur:5,tuition:[0,25000],living:[20000,26000]}
+      },
+      unis:[
+        {name:'MIT',city:'Cambridge, MA',rank:'#1 QS',ug:57986,pg:57986,living:21000,schol:'Merit-based — rare for intl'},
+        {name:'Stanford University',city:'Palo Alto, CA',rank:'#5 QS',ug:56169,pg:56169,living:22000,schol:'Need-blind for intl students'},
+        {name:'Carnegie Mellon (CS)',city:'Pittsburgh, PA',rank:'#52 QS',ug:59864,pg:53000,living:19000,schol:'Limited merit aid'},
+        {name:'Univ. of Texas Austin',city:'Austin, TX',rank:'#197 QS',ug:40032,pg:20000,living:18000,schol:'Merit scholarships available'},
+        {name:'Purdue University',city:'West Lafayette, IN',rank:'#109 QS',ug:32192,pg:18000,living:16000,schol:'Strong for Engineering'},
+        {name:'Arizona State Univ.',city:'Tempe, AZ',rank:'#216 QS',ug:30000,pg:18000,living:15000,schol:'Several intl scholarships'}
+      ]},
+    UK:{name:'United Kingdom',flag:'🇬🇧',fi:'gb',cur:'GBP',inrRate:107.5,edInflation:4,
+      courses:{
+        'UG (3yr)':{dur:3,tuition:[22000,38000],living:[12000,18000]},
+        'MSc (1yr)':{dur:1,tuition:[22000,40000],living:[13000,18000]},
+        'MBA':{dur:1,tuition:[35000,65000],living:[15000,20000]},
+        'MBBS (5yr)':{dur:5,tuition:[25000,38000],living:[12000,16000]},
+        'PhD':{dur:4,tuition:[18000,28000],living:[13000,17000]}
+      },
+      unis:[
+        {name:'University of Oxford',city:'Oxford',rank:'#3 QS',ug:32000,pg:30000,living:16000,schol:'Clarendon — partial funding'},
+        {name:'Imperial College London',city:'London',rank:'#8 QS',ug:35000,pg:36000,living:18000,schol:'President Scholarship'},
+        {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS',ug:24000,pg:26000,living:13000,schol:'Global Scholarship Programme'},
+        {name:'University of Manchester',city:'Manchester',rank:'#32 QS',ug:22000,pg:24000,living:12000,schol:'Merit scholarships available'},
+        {name:'King College London',city:'London',rank:'#40 QS',ug:23000,pg:26000,living:18000,schol:'King Scholarship — 20% off'},
+        {name:'Univ. of Nottingham',city:'Nottingham',rank:'#113 QS',ug:20000,pg:21000,living:11000,schol:'Excellence Scholarship'}
+      ]},
+    AUS:{name:'Australia',flag:'🇦🇺',fi:'au',cur:'AUD',inrRate:55.2,edInflation:4.5,
+      courses:{
+        'UG (3yr)':{dur:3,tuition:[32000,48000],living:[20000,28000]},
+        'MS (2yr)':{dur:2,tuition:[34000,52000],living:[22000,30000]},
+        'MBA':{dur:2,tuition:[38000,65000],living:[24000,30000]},
+        'MBBS (5yr)':{dur:5,tuition:[56000,75000],living:[20000,28000]},
+        'PhD':{dur:4,tuition:[26000,40000],living:[22000,28000]}
+      },
+      unis:[
+        {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',ug:44000,pg:48000,living:26000,schol:'Melbourne International Scholarship'},
+        {name:'ANU',city:'Canberra, ACT',rank:'#30 QS',ug:41000,pg:44000,living:22000,schol:'ANU Chancellor Scholarship'},
+        {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',ug:45000,pg:48000,living:28000,schol:'Sydney International Scholarship'},
+        {name:'UNSW Sydney',city:'Sydney, NSW',rank:'#19 QS',ug:44000,pg:46000,living:28000,schol:'UNSW Scientia Scholarship'},
+        {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',ug:38000,pg:40000,living:24000,schol:'Monash International Merit'},
+        {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',ug:36000,pg:40000,living:21000,schol:'UQ Excellence Scholarship'}
+      ]},
+    CAN:{name:'Canada',flag:'🇨🇦',fi:'ca',cur:'CAD',inrRate:62.3,edInflation:4,
+      courses:{
+        'UG (4yr)':{dur:4,tuition:[28000,44000],living:[16000,24000]},
+        'MS (2yr)':{dur:2,tuition:[18000,38000],living:[18000,24000]},
+        'MBA':{dur:2,tuition:[38000,60000],living:[20000,26000]},
+        'MBBS/MD':{dur:4,tuition:[30000,50000],living:[18000,24000]},
+        'PhD':{dur:4,tuition:[8000,22000],living:[18000,24000]}
+      },
+      unis:[
+        {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS',ug:44000,pg:32000,living:22000,schol:'Lester B. Pearson Scholarship'},
+        {name:'UBC',city:'Vancouver, BC',rank:'#34 QS',ug:38000,pg:28000,living:24000,schol:'International Leader of Tomorrow'},
+        {name:'McGill University',city:'Montreal, QC',rank:'#46 QS',ug:28000,pg:22000,living:16000,schol:'McGill Entrance Scholarship'},
+        {name:'Univ. of Waterloo',city:'Waterloo, ON',rank:'#112 QS',ug:38000,pg:24000,living:18000,schol:'President International Experience'},
+        {name:'Univ. of Alberta',city:'Edmonton, AB',rank:'#111 QS',ug:28000,pg:18000,living:16000,schol:'International Entrance Scholarship'},
+        {name:'Simon Fraser Univ.',city:'Vancouver, BC',rank:'#308 QS',ug:24000,pg:16000,living:22000,schol:'SFU Graduate Fellowship'}
+      ]},
+    SGP:{name:'Singapore',flag:'🇸🇬',fi:'sg',cur:'SGD',inrRate:63.7,edInflation:3.5,
+      courses:{
+        'UG (4yr)':{dur:4,tuition:[28000,38000],living:[16000,22000]},
+        'MS (1-2yr)':{dur:2,tuition:[30000,48000],living:[18000,24000]},
+        'MBA':{dur:1,tuition:[60000,80000],living:[20000,26000]},
+        'PhD':{dur:4,tuition:[18000,28000],living:[18000,24000]}
+      },
+      unis:[
+        {name:'NUS',city:'Singapore',rank:'#8 QS',ug:34400,pg:38000,living:20000,schol:'ASEAN Undergraduate Scholarship'},
+        {name:'NTU',city:'Singapore',rank:'#15 QS',ug:32000,pg:34000,living:19000,schol:'Nanyang Scholarship'},
+        {name:'SMU',city:'Singapore',rank:'#511 QS',ug:30000,pg:38000,living:20000,schol:'SMU Merit Scholarship'},
+        {name:'SUTD',city:'Singapore',rank:'n/a',ug:28000,pg:32000,living:18000,schol:'SUTD Merit Award'}
+      ]},
+    GER:{name:'Germany',flag:'🇩🇪',fi:'de',cur:'EUR',inrRate:91.5,edInflation:3,
+      courses:{
+        'UG (3yr)':{dur:3,tuition:[500,3000],living:[10000,14000]},
+        'MS (2yr)':{dur:2,tuition:[500,5000],living:[10000,14000]},
+        'MBA':{dur:2,tuition:[15000,35000],living:[11000,15000]},
+        'PhD':{dur:4,tuition:[0,2000],living:[10000,14000]}
+      },
+      unis:[
+        {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',ug:144,pg:144,living:12000,schol:'Almost free — admin fee only'},
+        {name:'LMU Munich',city:'Munich',rank:'#59 QS',ug:144,pg:144,living:12000,schol:'DAAD Scholarship available'},
+        {name:'Heidelberg University',city:'Heidelberg',rank:'#87 QS',ug:1500,pg:3000,living:11000,schol:'Heidelberg Scholarships'},
+        {name:'TU Berlin',city:'Berlin',rank:'#154 QS',ug:307,pg:307,living:12000,schol:'DAAD — up to €1000/month'},
+        {name:'RWTH Aachen',city:'Aachen',rank:'#106 QS',ug:650,pg:2000,living:10000,schol:'RWTH Excellence Scholarship'}
+      ]}
+  };
+
+  var _edCountry = 'USA';
+  var _edCourse  = 'UG (4yr)';
+
+  /* ── Helpers ─────────────────────────────────────────────── */
+  function _edFmt(n, cur){ return cur+' '+Math.round(n).toLocaleString(); }
+  function _edFmtINR(n, rate){ return '≈ ₹'+Math.round(n*rate/100000).toFixed(1)+'L'; }
+
+  function _edCalcFV(todayCost, yearsAway, inflation){
+    return todayCost * Math.pow(1 + inflation/100, yearsAway);
+  }
+
+  function _edMonthlyInvestment(futureAmount, yearsAway, annualReturn){
+    var months = yearsAway * 12;
+    var r = annualReturn / 100 / 12;
+    if(r === 0) return futureAmount / months;
+    return futureAmount * r / (Math.pow(1+r, months) - 1);
+  }
+
+  /* ── Render university table ─────────────────────────────── */
+  function _edRenderTable(){
+    var d = EDAB[_edCountry];
+    if(!d) return;
+    var c = d.courses[_edCourse] || Object.values(d.courses)[0];
+    var minFee = c.tuition[0], maxFee = c.tuition[1];
+    var minLiv = c.living[0],  maxLiv = c.living[1];
+    var dur    = c.dur;
+
+    /* Cost overview cards */
+    var rate = d.inrRate;
+    var totalLow  = (minFee + minLiv) * dur;
+    var totalHigh = (maxFee + maxLiv) * dur;
+
+    var s = document.getElementById('edab-cost-tuition'); if(s) s.textContent = _edFmt(minFee,d.cur)+'–'+_edFmt(maxFee,d.cur)+'/yr';
+    var l = document.getElementById('edab-cost-living');  if(l) l.textContent = _edFmt(minLiv,d.cur)+'–'+_edFmt(maxLiv,d.cur)+'/yr';
+    var t = document.getElementById('edab-cost-total');   if(t) t.textContent = _edFmt(totalLow,d.cur)+'–'+_edFmt(totalHigh,d.cur);
+    var r = document.getElementById('edab-cost-inr');     if(r) r.textContent = '₹'+Math.round(totalLow*rate/100000).toFixed(0)+'L–₹'+Math.round(totalHigh*rate/100000).toFixed(0)+'L';
+
+    /* University table */
+    var tbody = document.getElementById('edab-tbody');
+    if(!tbody) return;
+    var rows = '';
+    d.unis.forEach(function(u){
+      var fee = _edCourse.indexOf('MBA') > -1 ? u.pg*1.5 :
+                _edCourse.indexOf('MS') > -1 || _edCourse.indexOf('MTech') > -1 ? u.pg :
+                _edCourse.indexOf('PhD') > -1 ? Math.round(u.pg*0.4) : u.ug;
+      var totalCost = (fee + u.living) * dur;
+      rows += '<tr>'
+        +'<td><div class="edab-uni-name">'+u.name+'</div><div class="edab-uni-city">'+u.city+'</div></td>'
+        +'<td><span class="edab-rank-badge">'+u.rank+'</span></td>'
+        +'<td class="edab-fee-hi">'+_edFmt(fee,d.cur)+'<span class="edab-fee-inr">'+_edFmtINR(fee,rate)+'/yr</span></td>'
+        +'<td>'+_edFmt(u.living,d.cur)+'<span class="edab-fee-inr">'+_edFmtINR(u.living,rate)+'/yr</span></td>'
+        +'<td><span class="edab-total-badge">'+_edFmt(totalCost,d.cur)+'</span><span class="edab-fee-inr">'+_edFmtINR(totalCost,rate)+'</span></td>'
+        +'<td style="font-size:.72rem;color:var(--muted)">'+u.schol+'</td>'
+        +'</tr>';
+    });
+    tbody.innerHTML = rows;
+
+    /* Update duration in course selector sub-label */
+    var dl = document.getElementById('edab-dur-lbl');
+    if(dl) dl.textContent = dur+'-year programme · '+d.cur;
+  }
+
+  /* ── Savings calculator ──────────────────────────────────── */
+  window.edabCalc = function(){
+    var d = EDAB[_edCountry];
+    if(!d) return;
+    var c = d.courses[_edCourse] || Object.values(d.courses)[0];
+
+    var childAge = parseInt(document.getElementById('edab-age').value) || 0;
+    var startAge = parseInt(document.getElementById('edab-start-age').value) || 18;
+    var yearsAway = Math.max(1, startAge - childAge);
+    var annualReturn = parseFloat(document.getElementById('edab-return').value) || 10;
+
+    var tuitionAvg = (c.tuition[0] + c.tuition[1]) / 2;
+    var livingAvg  = (c.living[0]  + c.living[1])  / 2;
+    var annualCostNow = (tuitionAvg + livingAvg) * d.inrRate; /* in INR */
+    var totalCostNow  = annualCostNow * c.dur;
+
+    /* Inflate by education inflation + currency depreciation (3% INR/yr) */
+    var effectiveInflation = d.edInflation + 3;
+    var futureTotalINR = _edCalcFV(totalCostNow, yearsAway, effectiveInflation);
+
+    /* Monthly SIP needed */
+    var monthly = _edMonthlyInvestment(futureTotalINR, yearsAway, annualReturn);
+
+    var fv = document.getElementById('edab-res-future');
+    var sm = document.getElementById('edab-res-sip');
+    var ti = document.getElementById('edab-res-today');
+    if(fv) fv.textContent = '₹'+Math.round(futureTotalINR/100000).toFixed(1)+'L';
+    if(sm) sm.textContent = '₹'+Math.round(monthly/1000).toFixed(1)+'K/mo';
+    if(ti) ti.textContent = '₹'+Math.round(totalCostNow/100000).toFixed(1)+'L';
+
+    var note = document.getElementById('edab-infl-note');
+    if(note) note.textContent = 'Assuming '+d.edInflation+'% education inflation + 3% INR depreciation/yr = '+effectiveInflation+'% effective inflation. SIP return: '+annualReturn+'% p.a. Starting in '+yearsAway+' years when child is '+startAge+'.';
+  };
+
+  /* ── Public: set country ─────────────────────────────────── */
+  window.edabSetCountry = function(code, el){
+    _edCountry = code;
+    document.querySelectorAll('.edab-country-card').forEach(function(c){ c.classList.remove('edab-active'); });
+    if(el) el.classList.add('edab-active');
+
+    /* Reset course to first available */
+    var d = EDAB[code];
+    if(d){
+      var courses = Object.keys(d.courses);
+      _edCourse = courses[0];
+      /* Update course buttons */
+      var row = document.getElementById('edab-course-row');
+      if(row){
+        row.innerHTML = courses.map(function(k,i){
+          return '<button class="edab-course-btn'+(i===0?' edab-active':'')+'" onclick="edabSetCourse(\''+k+'\',this)">'+k+'</button>';
+        }).join('');
+      }
+      /* Update currency label */
+      var cl = document.getElementById('edab-cur-lbl');
+      if(cl) cl.textContent = 'Costs in '+d.cur+' · 1 '+d.cur+' ≈ ₹'+d.inrRate;
+    }
+    _edRenderTable();
+    window.edabCalc();
+  };
+
+  /* ── Public: set course ──────────────────────────────────── */
+  window.edabSetCourse = function(course, el){
+    _edCourse = course;
+    document.querySelectorAll('.edab-course-btn').forEach(function(b){ b.classList.remove('edab-active'); });
+    if(el) el.classList.add('edab-active');
+    _edRenderTable();
+    window.edabCalc();
+  };
+
+  /* ── Init ─────────────────────────────────────────────────── */
+  window.initEdAbroad = function(){
+    edabSetCountry('USA', document.querySelector('.edab-country-card'));
+  };
 
 })();

@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.12"/>
+<link rel="stylesheet" href="/site.css?v=7.13"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.12</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.13</span>
   <div class="nav-links-center">
     <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
     <div class="nav-dropdown-wrap">
@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded',function(){
           <div class="nav-dd-heading">Life Planning</div>
           <a onclick="closeNavDD();showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🏡 Return to India</a>
           <a onclick="closeNavDD();showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🎓 Education Corpus</a>
+          <a onclick="closeNavDD();showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">✈🎓 Study Abroad Planner</a>
           <a onclick="closeNavDD();showTab('panaadhaar',document.querySelector('[data-tab=panaadhaar]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🪪 PAN &amp; Aadhaar</a>
           <a onclick="closeNavDD();showTab('budget',document.querySelector('[data-tab=budget]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">💰 Budget Tracker</a>
         </div>
@@ -963,6 +964,10 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
     </div>
+    <div class="drawer-item" data-tab="edabroad" onclick="showTab('edabroad',this);initEdAbroad()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M2 20c0-4 4.5-7 10-7s10 3 10 7"/><line x1="18" y1="2" x2="18" y2="8"/><line x1="15" y1="5" x2="21" y2="5"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Study Abroad Planner</div><div class="drawer-desc">University costs &amp; savings plan</div></div>
+    </div>
     <div class="drawer-section-lbl">Travel</div>
     <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
@@ -984,6 +989,141 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-info"><div class="drawer-name">Bulk &amp; Block Deals</div><div class="drawer-desc">Last 7 days · NSE + BSE</div></div>
     </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
+  </div>
+
+  <!-- TAB: STUDY ABROAD COST PLANNER -->
+  <div class="tool-section" id="tab-edabroad">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(0,212,170,.04));border-color:rgba(0,212,170,.2)">
+      <div style="font-size:1.3rem;font-weight:700;color:var(--teal);margin-bottom:4px">✈ 🎓 Study Abroad Cost Planner</div>
+      <div style="font-size:.82rem;color:var(--muted)">Real university fees across 6 countries · forecast inflation-adjusted cost · calculate monthly SIP to fund it</div>
+    </div>
+
+    <!-- Country selector -->
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em">Select country</div>
+    <div class="edab-country-grid">
+      <div class="edab-country-card edab-active" onclick="edabSetCountry('USA',this)">
+        <div class="edab-country-flag"><span class="fi fi-us" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">United States</div>
+        <div class="edab-country-sub">USD · $32K–$90K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('UK',this)">
+        <div class="edab-country-flag"><span class="fi fi-gb" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">United Kingdom</div>
+        <div class="edab-country-sub">GBP · £20K–£65K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('AUS',this)">
+        <div class="edab-country-flag"><span class="fi fi-au" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Australia</div>
+        <div class="edab-country-sub">AUD · A$32K–$65K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('CAN',this)">
+        <div class="edab-country-flag"><span class="fi fi-ca" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Canada</div>
+        <div class="edab-country-sub">CAD · C$24K–$60K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('SGP',this)">
+        <div class="edab-country-flag"><span class="fi fi-sg" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Singapore</div>
+        <div class="edab-country-sub">SGD · S$28K–$80K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('GER',this)">
+        <div class="edab-country-flag"><span class="fi fi-de" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Germany</div>
+        <div class="edab-country-sub">EUR · Nearly free tuition</div>
+      </div>
+    </div>
+
+    <!-- Currency note -->
+    <div id="edab-cur-lbl" style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Costs in USD · 1 USD ≈ ₹84.5</div>
+
+    <!-- Course type selector -->
+    <div id="edab-course-row" class="edab-course-row">
+      <button class="edab-course-btn edab-active" onclick="edabSetCourse('UG (4yr)',this)">UG (4yr)</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MS / MTech',this)">MS / MTech</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MBA',this)">MBA</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MBBS / MD',this)">MBBS / MD</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('PhD',this)">PhD</button>
+    </div>
+    <div id="edab-dur-lbl" style="font-size:.72rem;color:var(--muted);margin-bottom:14px;">4-year programme · USD</div>
+
+    <!-- Cost overview -->
+    <div class="edab-cost-strip">
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Tuition / yr</div>
+        <div class="edab-cost-val" id="edab-cost-tuition">—</div>
+      </div>
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Living / yr</div>
+        <div class="edab-cost-val" id="edab-cost-living">—</div>
+      </div>
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Total course cost</div>
+        <div class="edab-cost-val" id="edab-cost-total">—</div>
+      </div>
+      <div class="edab-cost-card" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.2)">
+        <div class="edab-cost-label">In Indian Rupees</div>
+        <div class="edab-cost-val" style="color:var(--teal)" id="edab-cost-inr">—</div>
+      </div>
+    </div>
+
+    <!-- University table -->
+    <div style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:10px;">Top universities — actual fee data</div>
+    <div class="edab-table-wrap">
+      <table class="edab-table">
+        <thead>
+          <tr>
+            <th>University</th>
+            <th>QS Rank</th>
+            <th>Tuition / yr</th>
+            <th>Living / yr</th>
+            <th>Total course</th>
+            <th>Scholarship / Aid</th>
+          </tr>
+        </thead>
+        <tbody id="edab-tbody">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Savings calculator -->
+    <div class="edab-calc">
+      <div class="edab-calc-title">🧮 How much to save every month?</div>
+      <div class="edab-calc-grid">
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Child's current age</label>
+          <input class="edab-calc-input" id="edab-age" type="number" value="5" min="0" max="17" oninput="edabCalc()"/>
+        </div>
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Study starts at age</label>
+          <input class="edab-calc-input" id="edab-start-age" type="number" value="18" min="16" max="30" oninput="edabCalc()"/>
+        </div>
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Expected SIP return (% p.a.)</label>
+          <input class="edab-calc-input" id="edab-return" type="number" value="10" min="4" max="18" step="0.5" oninput="edabCalc()"/>
+        </div>
+      </div>
+      <div class="edab-result-strip">
+        <div class="edab-result-card amber">
+          <div class="edab-result-label">Today's cost (INR)</div>
+          <div class="edab-result-val" id="edab-res-today">—</div>
+          <div class="edab-result-sub">Based on current fees</div>
+        </div>
+        <div class="edab-result-card teal">
+          <div class="edab-result-label">Inflation-adjusted cost</div>
+          <div class="edab-result-val" id="edab-res-future">—</div>
+          <div class="edab-result-sub">When child starts college</div>
+        </div>
+        <div class="edab-result-card green">
+          <div class="edab-result-label">Monthly SIP needed</div>
+          <div class="edab-result-val" id="edab-res-sip">—</div>
+          <div class="edab-result-sub">Start investing today</div>
+        </div>
+      </div>
+      <div class="edab-inflation-note" id="edab-infl-note">Calculation includes education inflation and INR depreciation. Adjust return % for equity vs debt SIP.</div>
+    </div>
+
+    <div class="deals-disclaimer">Fee data sourced from university websites (2024–25 published rates). Exchange rates are indicative. Actual costs vary — verify at official university admissions portals. <a href="nri-education-planning.html">Read full NRI Education Planning Guide →</a></div>
   </div>
 
   <!-- TAB: RATE TIMER — SEND NOW OR WAIT? -->
@@ -2687,14 +2827,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.12 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.13 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.12"></script>
+<script src="/site.js?v=7.13"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
