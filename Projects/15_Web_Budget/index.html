@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.3
+        <span class="ver-dot"></span>v3.9.4
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4360,7 +4360,14 @@ function importBiTxns(){
   const toImport=_biTxns.filter(t=>t.include&&t.catId);
   if(!toImport.length){ alert('No transactions selected or no categories assigned.'); return; }
   function parseTxnDate(dateStr){
-    const p=(dateStr||'').split('/');
+    if(!dateStr) return {month:currentMonth,year:currentYear};
+    // ISO format: YYYY-MM-DD (used by TNG, SC parsers)
+    if(/^\d{4}-\d{2}-\d{2}$/.test(dateStr)){
+      const p=dateStr.split('-');
+      return {month:parseInt(p[1])-1,year:parseInt(p[0])};
+    }
+    // Slash format: DD/MM/YYYY (used by Maybank parsers)
+    const p=dateStr.split('/');
     if(p.length<3) return {month:currentMonth,year:currentYear};
     const month=parseInt(p[1])-1; let year=parseInt(p[2]); if(year<100) year+=2000;
     return {month:isNaN(month)?currentMonth:month,year:isNaN(year)?currentYear:year};
