@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.2
+        <span class="ver-dot"></span>v3.9.3
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3769,6 +3769,50 @@ function matchCategory(desc){
   return '';
 }
 
+async function parseTngPdfItems(pdf){
+  // TNG PDF uses a transposed table: each transaction = one X-column; each attribute = one Y-row
+  // Y values are fixed across all pages (template PDF)
+  const INCOME_RE=/^(Reload|Cash Reward|Transfer In|Refund|Cashback|Cash Back|Reward|Voucher)/i;
+  const TXN_TYPES=['DuitNow QR TNGD','DuitNow QR','PayDirect Payment','RFID Payment',
+    'Cash Reward','Transfer to Wallet','Transfer In','Reload','Payment','Refund',
+    'Cash Out','Cashback','Voucher Redemption','Scan & Pay','QR Payment'];
+  const Y_DATE=20,Y_STATUS=80,Y_TYPE=140,Y_DESC=295,Y_AMT=682,TOL=8;
+  const allTxns=[];
+  for(let p=1;p<=pdf.numPages;p++){
+    const pg=await pdf.getPage(p);
+    const tc=await pg.getTextContent();
+    const pm={};
+    for(const item of tc.items){
+      const str=item.str.trim(); if(!str) continue;
+      const x=Math.round(item.transform[4]);
+      const y=Math.round(item.transform[5]);
+      if(Math.abs(y-Y_DATE)<=TOL && /\d{1,2}\/\d{1,2}\/\d{4}/.test(str)){
+        (pm[x]=pm[x]||{}).date=str;
+      } else if(Math.abs(y-Y_STATUS)<=TOL && /^(Success|Failed|Pending)$/.test(str)){
+        (pm[x]=pm[x]||{}).status=str;
+      } else if(Math.abs(y-Y_TYPE)<=TOL && str.length>1){
+        (pm[x]=pm[x]||{}).typeRaw=str;
+      } else if(Math.abs(y-Y_DESC)<=TOL && str.length>1){
+        (pm[x]=pm[x]||{}).desc=str;
+      } else if(Math.abs(y-Y_AMT)<=TOL && /^RM/.test(str)){
+        (pm[x]=pm[x]||{}).amtStr=str;
+      }
+    }
+    Object.entries(pm).filter(([,t])=>t.date&&t.status==='Success'&&t.amtStr)
+      .sort((a,b)=>+a[0]-+b[0]).forEach(([,t])=>{
+        const amtM=t.amtStr.match(/RM([\d,]+\.\d{2})/); if(!amtM) return;
+        const amount=parseFloat(amtM[1].replace(/,/g,'')); if(!amount) return;
+        let txnType='';
+        for(const tp of [...TXN_TYPES].sort((a,b)=>b.length-a.length))
+          if(t.typeRaw?.startsWith(tp)){txnType=tp;break;}
+        const dp=t.date.split('/');
+        const date=`${dp[2]}-${String(parseInt(dp[1])).padStart(2,'0')}-${String(parseInt(dp[0])).padStart(2,'0')}`;
+        allTxns.push({date,desc:t.desc||txnType,amount,type:INCOME_RE.test(txnType)?'income':'expense'});
+      });
+  }
+  return allTxns;
+}
+
 async function parsePdfBank(file, _pwd){
   if(!window.pdfjsLib){
     await new Promise((res,rej)=>{
@@ -3792,6 +3836,9 @@ async function parsePdfBank(file, _pwd){
     }
     throw e;
   }
+  // TNG: use column-based parser (PDF stores each transaction as a vertical column)
+  const isTng=detectBank(file.name,'').includes('tng')||file.name.toLowerCase().includes('tng');
+  if(isTng) return parseTngPdfItems(pdf);
   let full='';
   for(let p=1;p<=pdf.numPages;p++){
     const pg=await pdf.getPage(p);
@@ -3809,7 +3856,7 @@ async function parsePdfBank(file, _pwd){
   }
   const bank=detectBank(file.name, full.slice(0,800));
   if(/TNG WALLET TRANSACTION HISTORY/i.test(full)||bank==='tng'){
-    return parseTngPdf(full);
+    return parseTngPdfItems(pdf);
   }
   if(bank==='scb'||/Standard Chartered Bank Malaysia/i.test(full)){
     return parseScbCcPdf(full);
