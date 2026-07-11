@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.26"/>
+<link rel="stylesheet" href="/site.css?v=7.27"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.26</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.27</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -2770,36 +2770,17 @@ document.addEventListener('DOMContentLoaded',function(){
                onkeydown="if(event.key==='Enter')flPlanTrip()">
         <button class="fl-planner-btn" onclick="flPlanTrip()">Plan ✦</button>
       </div>
-      <div class="fl-ai-chips-lbl">Try a destination:</div>
-      <div class="fl-ai-chips">
-        <button class="fl-ai-chip" onclick="flChip('Goa in December, 2 people')">🌴 Goa · Dec</button>
-        <button class="fl-ai-chip" onclick="flChip('Mumbai next month, 1 person')">🏙️ Mumbai</button>
-        <button class="fl-ai-chip" onclick="flChip('Kerala Kochi in January, 2 people')">⛵ Kochi · Jan</button>
-        <button class="fl-ai-chip" onclick="flChip('Delhi in November, family of 4')">🕌 Delhi · Nov</button>
-        <button class="fl-ai-chip" onclick="flChip('Bangalore in February, 2 people')">💻 Bangalore</button>
-        <button class="fl-ai-chip" onclick="flChip('Hyderabad in October, 2 people')">🏯 Hyderabad</button>
-        <button class="fl-ai-chip" onclick="flChip('Goa monsoon July, 2 people budget trip')">🏷️ Goa · Budget</button>
-        <button class="fl-ai-chip" onclick="flChip('Chennai in February, 1 person')">🌊 Chennai</button>
-      </div>
+      <div class="fl-ai-chips-lbl">Choose a destination:</div>
+      <div class="fl-ai-chips" id="fl-ai-chips"><!-- JS renders all 22 city chips --></div>
       <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
     </div>
 
-    <!-- Departure airport -->
-    <div class="card">
-      <p id="fl-cur-label" style="font-size:11px;color:var(--muted);margin:0 0 12px;line-height:1.5;">Loading route data&hellip;</p>
-      <div class="fl-origin-lbl">Departure airport</div>
-      <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
-    </div>
-
-    <!-- Festival warning (JS-rendered) -->
-    <div id="fl-festival-banner" class="fl-festival-banner" style="display:none"></div>
-    <!-- Season deal strip (JS-rendered) -->
-    <div id="fl-deal-strip" class="fl-deal-strip"></div>
-
-    <!-- Compact city list -->
-    <div id="fl-dest-grid" class="fl-dest-list"><!-- JS renders city rows --></div>
-
-    <div class="aff-disclaimer" style="text-align:center;font-size:9px;color:var(--muted);padding:8px 0 4px;">&#9992; Prices are typical economy round-trip ranges &mdash; actual fares vary by date &amp; airline. Always verify on Skyscanner or Google Flights before booking.</div>
+    <!-- Hidden anchors for JS (departure origin tracking) -->
+    <p id="fl-cur-label" style="display:none"></p>
+    <div id="fl-origins" style="display:none"></div>
+    <div id="fl-festival-banner" style="display:none"></div>
+    <div id="fl-deal-strip" style="display:none"></div>
+    <div id="fl-dest-grid" style="display:none"></div>
   </div>
 
 </div><!-- /.main -->
@@ -2849,14 +2830,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.26 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.27 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.26"></script>
+<script src="/site.js?v=7.27"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

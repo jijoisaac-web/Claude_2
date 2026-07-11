@@ -1,4 +1,4 @@
-/* v7.26 */
+/* v7.27 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2824,12 +2824,25 @@ function closeNavDD(){
     var cur=baseCur||'AED';
     var data=FL[cur]||FL['AED'];
     _flOrigin=data.origins[0].code;
-    var lbl=document.getElementById('fl-cur-label');
-    if(lbl) lbl.innerHTML='Showing routes from <strong>'+data.country+'</strong> ('+cur+') — change country via the currency selector above';
-    renderOrigins(data);
-    _renderFestivalBanner();
-    _renderDealStrip();
-    renderDests(cur,data);
+    // Render all destination chips
+    var chipWrap=document.getElementById('fl-ai-chips');
+    if(chipWrap){
+      chipWrap.innerHTML=Object.keys(DEST).map(function(code){
+        var d=DEST[code];
+        return '<button class="fl-ai-chip" data-city="'+d.name+'" onclick="flFillChip(this)">'+d.icon+' '+d.name+'</button>';
+      }).join('');
+    }
+    // Reset result on new input
+    var inp=document.getElementById('fl-planner-input');
+    if(inp&&!inp._resetBound){
+      inp._resetBound=true;
+      inp.addEventListener('input',function(){
+        var res=document.getElementById('fl-planner-result');
+        if(res&&res.style.display!=='none'){res.style.display='none';res.innerHTML='';}
+        // Remove active chip highlight
+        document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
+      });
+    }
   }
   window.initFlights=initFlights;
 
@@ -2931,8 +2944,26 @@ function closeNavDD(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
     if(inp){inp.value=q;inp.focus();}
-    if(res){res.style.display='none';}
-    if(typeof window.flPlanTrip==='function') window.flPlanTrip();
+    if(res){res.style.display='none';res.innerHTML='';}
+    inp&&inp.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+
+  // Fill input from chip button (city name only — user types month/people then hits Plan)
+  window.flFillChip=function(el){
+    var city=el.getAttribute('data-city');
+    var inp=document.getElementById('fl-planner-input');
+    var res=document.getElementById('fl-planner-result');
+    if(inp){
+      inp.value=city+', ';
+      inp.focus();
+      // Move cursor to end
+      var len=inp.value.length;
+      inp.setSelectionRange(len,len);
+    }
+    if(res){res.style.display='none';res.innerHTML='';}
+    // Highlight active chip
+    document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
+    el.classList.add('active');
     inp&&inp.scrollIntoView({behavior:'smooth',block:'center'});
   };
 
