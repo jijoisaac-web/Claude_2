@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.5
+        <span class="ver-dot"></span>v3.6
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3538,7 +3538,7 @@ function detectBank(filename, preview){
   if(/statement of credit card/i.test(p)||/maybank 2 plat/i.test(p)) return 'maybank-cc';
   if((fn.includes('maybank')||fn.includes('mbb'))&&(fn.includes('cc')||fn.includes('credit')||fn.includes('card'))) return 'maybank-cc';
   if(fn.includes('maybank')||fn.includes('mbb')||p.includes('maybank berhad')||p.includes('malayan banking')) return 'maybank-sav';
-  if(fn.includes('scb')||fn.includes('standard')||fn.includes('chartered')||p.includes('standard chartered')) return 'scb';
+  if(fn.includes('scb')||fn.includes('standard')||fn.includes('chartered')||p.includes('standard chartered')||p.includes('visa platinum')||/myr\s+\d.*\b(dr|cr)\b/i.test(p)) return 'scb';
   // auto-detect from header columns
   if(p.includes('debit')&&p.includes('credit')&&p.includes('balance')) return 'maybank-sav';
   return 'unknown';
@@ -3592,14 +3592,38 @@ function parseCsvBank(text, bank){
       txns.push({date,desc,amount:Math.abs(amount),type:amount<0?'income':'expense'});
     }
   } else if(bank==='scb'){
-    // Transaction Date | Description | Debit | Credit | Running Balance
-    for(let i=1;i<lines.length;i++){
-      const c=parseCsvLine(lines[i]);
+    // SC Credit Card CSV export:
+    // Header rows: VISA PLATINUM, date range, blank lines
+    // Data header: Date,Description,Foreign Currency Amount,MYR Amount
+    // Data row: 10/07/2026,[UNPOSTED] GRAB-EC,"",MYR 85.10 DR
+    // Footer: Current Balance, Approved Credit Limit, etc.
+    let dataStart=1;
+    for(let i=0;i<lines.length;i++){
+      if(/^date[,\t]description/i.test(lines[i].replace(/^\s+/,''))){ dataStart=i+1; break; }
+    }
+    const footerRx=/^(current balance|approved credit|billed balance|minimum payment|payment due|bonus points)/i;
+    for(let i=dataStart;i<lines.length;i++){
+      const raw=lines[i].replace(/^\s+/,''); // strip leading tabs/spaces
+      if(!raw||footerRx.test(raw)) break;
+      const c=parseCsvLine(raw);
       if(c.length<4) continue;
-      const date=c[0],desc=c[1],debit=num(c[2]),credit=num(c[3]);
-      if(!date||!desc) continue;
-      if(credit>0) txns.push({date,desc,amount:credit,type:'income'});
-      if(debit>0)  txns.push({date,desc,amount:debit, type:'expense'});
+      const rawDate=c[0].trim();
+      const rawDesc=c[1].trim().replace(/^\[UNPOSTED\]\s*/i,''); // strip [UNPOSTED] tag
+      const rawAmt=(c[3]||'').trim(); // "MYR 85.10 DR" or "MYR 85.10 CR"
+      if(!rawDate||!rawDesc||!rawAmt) continue;
+      // Convert date DD/MM/YYYY -> YYYY-MM-DD
+      const dm=rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(!dm) continue;
+      const date=`${dm[3]}-${dm[2].padStart(2,'0')}-${dm[1].padStart(2,'0')}`;
+      // Parse "MYR 85.10 DR" -> amount=85.10, DR=expense, CR=payment/income
+      const am=rawAmt.match(/MYR\s*([\d,]+\.?\d*)\s*(DR|CR)/i);
+      if(!am) continue;
+      const amount=parseFloat(am[1].replace(/,/g,''));
+      const type=am[2].toUpperCase()==='CR'?'income':'expense';
+      // Strip trailing location noise: "GRAB-EC  PETALING JAYAMY" -> "GRAB-EC"
+      const desc=rawDesc.replace(/\s{2,}[\w\s()]+MY\s*$/,'').trim();
+      if(!amount) continue;
+      txns.push({date,desc,amount,type});
     }
   } else if(bank==='tng'){
     // Date | Description | Amount | Type (Debit/Credit) | Balance
