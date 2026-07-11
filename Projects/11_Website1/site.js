@@ -2866,38 +2866,65 @@ function closeNavDD(){
     if(!wrap) return;
     var from=_flOrigin||data.origins[0].code;
     var trend=_getTrend();
-    // Header row
-    var header='<div class="fl-list-header">'
-      +'<span class="fl-list-hcity">Destination</span>'
-      +'<span class="fl-list-hroute">Route</span>'
-      +'<span class="fl-list-hfare">Typical Fare (RT Economy)</span>'
-      +'<span class="fl-list-htrend">Trend</span>'
-      +'<span class="fl-list-hlinks">Search Live</span>'
-      +'</div>';
-    var rows=Object.keys(DEST).map(function(code){
+    // Build destination pills + detail panel
+    var pills=Object.keys(DEST).map(function(code,i){
       var d=DEST[code];
-      var r=data.routes[code]||{min:null,max:null,dur:'varies',airlines:'Check Skyscanner'};
-      var price=typeof r.min==='number'
-        ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
-        : '—';
-      var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/?currency='+cur;
-      var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /g,'+')+'%2C+India';
-      var planQ=d.name+' next month, 2 people';
-      return '<div class="fl-list-row" data-pq="1" onclick="(function(el){var q=el.getAttribute(\'data-city\')+\' next month, 2 people\';window.flChip(q);})(this)" data-city="'+d.name+'" title="Tap to plan this trip">'
-        +'<span class="fl-list-city"><span class="fl-list-icon">'+d.icon+'</span>'
-        +'<span class="fl-list-name-wrap"><span class="fl-list-cname">'+d.name+'</span>'
-        +'<span class="fl-list-tip">'+d.tip+'</span></span></span>'
-        +'<span class="fl-list-route">'+from+' &#8594; '+code+'</span>'
-        +'<span class="fl-list-fare">'+price+'</span>'
-        +'<span class="fl-list-trend" style="color:'+trend.color+'">'+trend.arrow+' '+trend.label+'</span>'
-        +'<span class="fl-list-links" onclick="event.stopPropagation()">'
-        +'<a class="fl-list-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">&#9992; Skyscanner</a>'
-        +'<a class="fl-list-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
-        +'</span>'
-        +'</div>';
+      return '<button class="fl-dest-pill'+(i===0?' active':'')+'" data-code="'+code+'" onclick="flPickDest(\''+code+'\',this)">'+d.icon+' '+d.name+'</button>';
     }).join('');
-    wrap.innerHTML='<div class="fl-list-note">&#128204; Tap any city to plan your trip with the AI planner above</div>'+header+rows;
+    // Build detail for first city by default
+    var firstCode=Object.keys(DEST)[0];
+    wrap.innerHTML='<div class="fl-dest-pills-wrap"><div class="fl-dest-pills">'+pills+'</div></div>'
+      +'<div id="fl-dest-detail"></div>';
+    flShowDestDetail(firstCode,from,cur,data,trend);
   }
+
+  window.flPickDest=function(code,el){
+    document.querySelectorAll('.fl-dest-pill').forEach(function(p){p.classList.remove('active');});
+    el.classList.add('active');
+    var cur=baseCur||'AED';
+    var flD=FL[cur]||FL['AED'];
+    var from=_flOrigin||flD.origins[0].code;
+    var trend=_getTrend();
+    flShowDestDetail(code,from,cur,flD,trend);
+  };
+
+  window.flShowDestDetail=function(code,from,cur,data,trend){
+    var panel=document.getElementById('fl-dest-detail');
+    if(!panel) return;
+    var d=DEST[code];
+    if(!d){panel.innerHTML='';return;}
+    var r=data.routes[code]||{min:null,max:null,dur:'varies',airlines:'Check Skyscanner'};
+    var price=typeof r.min==='number'
+      ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
+      : '—';
+    var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/?currency='+cur;
+    var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /g,'+')+'%2C+India';
+    panel.innerHTML='<div class="fl-dest-card-detail">'
+      +'<div class="fl-dcd-top">'
+      +'<span class="fl-dcd-icon">'+d.icon+'</span>'
+      +'<div class="fl-dcd-info">'
+      +'<div class="fl-dcd-name">'+d.name+'</div>'
+      +'<div class="fl-dcd-tip">'+d.tip+'</div>'
+      +'</div>'
+      +'<div class="fl-dcd-fare">'
+      +'<div class="fl-dcd-price">'+price+'</div>'
+      +'<div class="fl-dcd-label">RT Economy</div>'
+      +'</div>'
+      +'</div>'
+      +'<div class="fl-dcd-row2">'
+      +'<span class="fl-dcd-route">'+from+' &#8594; '+code+'</span>'
+      +'<span class="fl-dcd-dur">&#128336; '+r.dur+'</span>'
+      +'<span class="fl-dcd-airlines">&#9992; '+r.airlines+'</span>'
+      +'<span class="fl-dcd-trend" style="color:'+trend.color+'">'+trend.arrow+' '+trend.label+'</span>'
+      +'</div>'
+      +'<div class="fl-dcd-actions">'
+      +'<a class="fl-dcd-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">&#9992; Skyscanner</a>'
+      +'<a class="fl-dcd-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
+      +'<button class="fl-dcd-btn fl-dcd-plan" onclick="window.flChip(\''
+      +d.name+' next month, 2 people\')">✶ Plan with AI</button>'
+      +'</div>'
+      +'</div>';
+  };
 
   // flChip — fill AI planner input and trigger plan
   window.flChip=function(q){

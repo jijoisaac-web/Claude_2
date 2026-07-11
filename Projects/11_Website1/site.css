@@ -2241,6 +2241,54 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   text-decoration:none;transition:opacity .12s;white-space:nowrap;
 }
 .fl-list-btn:hover{opacity:.82;}
+
+/* ── DESTINATION PILLS ─────────────────────────────────────────────────── */
+.fl-dest-pills-wrap{margin-top:12px;margin-bottom:4px;}
+.fl-dest-pills{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);}
+.fl-dest-pill{
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text2);border-radius:20px;
+  padding:6px 14px;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+  white-space:nowrap;
+}
+.fl-dest-pill:hover{border-color:var(--teal);color:var(--teal);}
+.fl-dest-pill.active{background:var(--teal);border-color:var(--teal);color:#000;font-weight:700;}
+
+/* ── DESTINATION DETAIL CARD ──────────────────────────────────────────── */
+.fl-dest-card-detail{
+  margin-top:10px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:12px;
+  padding:16px;
+}
+.fl-dcd-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.fl-dcd-icon{font-size:36px;flex-shrink:0;line-height:1;}
+.fl-dcd-info{flex:1;}
+.fl-dcd-name{font-size:20px;font-weight:700;color:var(--text);line-height:1.2;}
+.fl-dcd-tip{font-size:12px;color:var(--muted);margin-top:3px;}
+.fl-dcd-fare{text-align:right;flex-shrink:0;}
+.fl-dcd-price{font-size:18px;font-weight:800;color:var(--amber);}
+.fl-dcd-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+.fl-dcd-row2{
+  display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;
+  padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  margin-bottom:12px;font-size:12px;color:var(--text2);
+}
+.fl-dcd-route{font-weight:700;font-size:13px;color:var(--text);}
+.fl-dcd-dur{color:var(--text2);}
+.fl-dcd-airlines{color:var(--muted);}
+.fl-dcd-trend{font-weight:600;}
+.fl-dcd-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.fl-dcd-btn{
+  padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;
+  text-decoration:none;cursor:pointer;transition:opacity .12s;
+  border:none;font-family:inherit;white-space:nowrap;
+}
+.fl-dcd-btn:hover{opacity:.82;}
+.fl-btn-sky{background:#0770e3;color:#fff;}
+.fl-btn-gf{background:#4285f4;color:#fff;}
+.fl-dcd-plan{background:var(--teal);color:#000;}
+
 @media(max-width:640px){
   .fl-list-header{display:none;}
   .fl-list-row{grid-template-columns:1fr;gap:4px;padding:12px 14px;}
