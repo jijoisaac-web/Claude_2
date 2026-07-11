@@ -1,4 +1,4 @@
-/* v7.18 */
+/* v7.19 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -399,6 +399,51 @@ async function fetchRate(c){
   catch(e){rateIsLive=false;return FB[c]||null;}
 }
 
+/* ── RATE CROSS-CHECK ─────────────────────────────────────── */
+async function fetchRateCrossCheck(c){
+  var cu=c.toLowerCase();
+  var tout=function(ms){return new Promise(function(_,rej){setTimeout(function(){rej('timeout');},ms);});};
+  function safeFetch(p){return Promise.race([p,tout(7000)]).catch(function(){return null;});}
+  var r1=safeFetch(fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/'+cu+'.json').then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){var v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
+  var r2=safeFetch(fetch('https://latest.currency-api.pages.dev/v1/currencies/'+cu+'.json').then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){var v=d[cu]&&d[cu].inr;if(v)return v;throw 0;}));
+  var r3=safeFetch(fetch('https://api.frankfurter.app/latest?from='+c+'&to=INR').then(function(r){return r.ok?r.json():Promise.reject();}).then(function(d){var v=d.rates&&d.rates.INR;if(v)return v;throw 0;}));
+  var results=await Promise.all([r1,r2,r3]);
+  return [
+    {label:'jsDelivr / fawazahmed0',v:results[0]},
+    {label:'currency-api.pages.dev',v:results[1]},
+    {label:'Frankfurter (ECB)',v:results[2]}
+  ];
+}
+
+function renderRateCrossCheck(results){
+  var el=document.getElementById('rate-crosscheck');
+  if(!el)return;
+  var valid=results.filter(function(r){return r.v!==null&&r.v!==undefined;});
+  if(!valid.length){el.style.display='none';return;}
+  var values=valid.map(function(r){return r.v;});
+  var avg=values.reduce(function(a,b){return a+b;},0)/values.length;
+  var minV=Math.min.apply(null,values);
+  var maxV=Math.max.apply(null,values);
+  var variance=valid.length>1?((maxV-minV)/minV*100):0;
+  var statusCls,statusIcon,statusText;
+  if(valid.length===1){statusCls='rcc-amber';statusIcon='&#9888;';statusText='Only 1 source responded — treat with caution';}
+  else if(variance<0.1){statusCls='rcc-green';statusIcon='&#10003;';statusText='All sources agree within 0.1% — data is reliable';}
+  else if(variance<0.5){statusCls='rcc-amber';statusIcon='&#9888;';statusText='Minor variance of '+variance.toFixed(3)+'% across sources';}
+  else{statusCls='rcc-red';statusIcon='&#9888;';statusText='Significant variance '+variance.toFixed(3)+'% — verify manually';}
+  var rows=results.map(function(r){
+    if(r.v===null||r.v===undefined){
+      return '<div class="rcc-row"><span class="rcc-src">'+r.label+'</span><span class="rcc-val rcc-fail">Timed out</span><span class="rcc-dot rcc-dot-red">&#9679;</span></div>';
+    }
+    var diff=valid.length>1?((r.v-avg)/avg*100):0;
+    var diffStr=diff>=0?'+'+diff.toFixed(4)+'%':diff.toFixed(4)+'%';
+    var dotCls=Math.abs(diff)<0.1?'rcc-dot-green':'rcc-dot-amber';
+    return '<div class="rcc-row"><span class="rcc-src">'+r.label+'</span><span class="rcc-val">&#8377;'+r.v.toFixed(4)+'</span><span class="rcc-diff">'+diffStr+'</span><span class="rcc-dot '+dotCls+'">&#9679;</span></div>';
+  }).join('');
+  var updated=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  el.innerHTML='<div class="rcc-head"><span class="rcc-title">&#128269; Rate Cross-Check</span><span class="rcc-sub">3 independent sources &middot; '+updated+'</span></div>'+rows+'<div class="rcc-status '+statusCls+'"><span>'+statusIcon+'</span><span>'+statusText+'</span></div>';
+  el.style.display='block';
+}
+
 async function updateAll(){
   // baseCur is managed by the custom dropdown (selectCurrency); use global as-is
   const _hfl2=document.getElementById('heroFromLabel');if(_hfl2)_hfl2.textContent=baseCur;
@@ -420,13 +465,14 @@ async function updateAll(){
     rc.style.display='none';rn.style.display='none';
   }
 
-  // Fetch live rate in parallel (all 3 sources race)
-  const live=await fetchRate(baseCur);
+  // Fetch live rate (race) + cross-check all sources in parallel
+  const [live,crossResults]=await Promise.all([fetchRate(baseCur),fetchRateCrossCheck(baseCur)]);
   ld.style.display='none';
   if(live){
     midRate=live;rateIsLive=true;updateHeroRate();
     rc.style.display='flex';rn.style.display='flex';
     renderRates();renderRatePreview();renderMarketRate();
+    renderRateCrossCheck(crossResults||[]);
     // Show last-updated timestamp
     const ts=getLastUpdatedStr();
     const hrdStatus=document.getElementById('hrd-status');

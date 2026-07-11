@@ -3865,33 +3865,51 @@ function parseScbCcPdf(text){
 }
 
 function parseTngPdf(text){
-  // TNG eWallet PDF: Date | Status | TxnType+Ref+Desc | Amount | Balance
+  // TNG eWallet PDF — robust multi-line parser
+  // PDF.js may split each table row across several lines due to Y-coordinate differences
   const INCOME_RE=/^(Reload|Cash Reward|Transfer In|Refund|Cashback|Cash Back|Reward|Voucher)/i;
   const TXN_TYPES=['DuitNow QR TNGD','DuitNow QR','PayDirect Payment','RFID Payment',
     'Cash Reward','Transfer to Wallet','Transfer In','Reload','Payment','Refund',
     'Cash Out','Cashback','Voucher Redemption','Scan & Pay','QR Payment'];
-  const rowRe=/^(\d{1,2}\/\d{1,2}\/\d{4})\s+(Success|Failed|Pending)\s+(.+?)\s+(RM[\d,]+\.\d{2})\s+(RM[\d,]+\.\d{2})\s*$/;
+  const DATE_LINE=/^(\d{1,2}\/\d{1,2}\/\d{4})\s+(Success|Failed|Pending)\s*(.*)/;
+  const NEXT_TXN=/^\d{1,2}\/\d{1,2}\/\d{4}\s+(?:Success|Failed|Pending)/;
+  const SKIP_RE=/^(Date\s+Status|Registered|Wallet ID|Account Status|Generated|Transaction Period|This is|Amount \(RM\)|Wallet Balance|\*This)/i;
+  const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
   const txns=[];
-  for(const raw of text.split('\n')){
-    const m=raw.trim().match(rowRe);
-    if(!m) continue;
-    const [,dateStr,status,middle,amtStr]=m;
-    if(status!=='Success') continue;
-    const amount=parseFloat(amtStr.replace('RM','').replace(/,/g,''));
-    if(!amount) continue;
-    // Extract txn type + description from middle
-    let txnType='', rest=middle.trim();
-    for(const t of TXN_TYPES.sort((a,b)=>b.length-a.length)){
-      if(rest.startsWith(t)){ txnType=t; rest=rest.slice(t.length).trim(); break; }
+  let i=0;
+  while(i<lines.length){
+    const line=lines[i];
+    if(SKIP_RE.test(line)){ i++; continue; }
+    const dm=line.match(DATE_LINE);
+    if(!dm){ i++; continue; }
+    const [,dateStr,status,rest]=dm;
+    if(status!=='Success'){ i++; continue; }
+    // Accumulate continuation lines until we find an RM amount or next transaction
+    let combined=line; let j=i+1;
+    while(j<lines.length && j-i<10){
+      if(NEXT_TXN.test(lines[j])) break;
+      combined+=' '+lines[j]; j++;
+      if(/RM[\d,]+\.\d{2}/.test(combined)) break;
     }
-    // Strip reference number (first token if alphanumeric/digits)
-    rest=rest.replace(/^\S+\s+/,'').trim();
-    const desc=rest||txnType;
-    // Date DD/M/YYYY -> YYYY-MM-DD
+    i=j;
+    // Extract first RM amount (transaction amount)
+    const amtM=combined.match(/RM([\d,]+\.\d{2})/);
+    if(!amtM) continue;
+    const amount=parseFloat(amtM[1].replace(/,/g,''));
+    if(!amount) continue;
+    // Extract type + description from rest (text after date+status)
+    let txnType='', desc=rest.trim();
+    for(const t of [...TXN_TYPES].sort((a,b)=>b.length-a.length)){
+      if(desc.startsWith(t)){ txnType=t; desc=desc.slice(t.length).trim(); break; }
+    }
+    // Strip reference number (first whitespace-separated token)
+    desc=desc.replace(/^\S+\s*/,'').trim();
+    // Strip trailing date-time, long digit strings, "Nil"
+    desc=desc.replace(/\s+\d{2}\/\d{2}\/\d{4}\s+.*$/,'').replace(/\s+\d{12,}.*$/,'').replace(/\s+Nil\s*$/i,'').trim();
+    if(!desc) desc=txnType;
     const dp=dateStr.split('/');
     const date=`${dp[2]}-${String(parseInt(dp[1])).padStart(2,'0')}-${String(parseInt(dp[0])).padStart(2,'0')}`;
-    const type=INCOME_RE.test(txnType)?'income':'expense';
-    txns.push({date,desc,amount,type});
+    txns.push({date,desc,amount,type:INCOME_RE.test(txnType)?'income':'expense'});
   }
   return txns;
 }
