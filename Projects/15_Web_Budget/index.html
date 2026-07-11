@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.7
+        <span class="ver-dot"></span>v3.9
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1651,6 +1651,20 @@ tbody tr.income-row td:first-child{
       <div class="bi-upload-sub">CSV or PDF · Multiple files at once · Maybank, SCB, Touch 'n Go</div>
     </label>
     <div class="bi-status" id="biStatus"></div>
+
+    <!-- Date range filter (shown after parsing) -->
+    <div id="biDateFilter" style="display:none;margin:10px 0;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📅 Filter by date range</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <div id="biMonthBtns" style="display:flex;gap:4px;flex-wrap:wrap;flex:1"></div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          <input type="date" id="biDateFrom" class="modal-input" style="padding:5px 8px;font-size:12px;width:130px" onchange="applyBiDateFilter()">
+          <span style="color:var(--text3);font-size:11px">→</span>
+          <input type="date" id="biDateTo" class="modal-input" style="padding:5px 8px;font-size:12px;width:130px" onchange="applyBiDateFilter()">
+          <button class="btn btn-gray" onclick="clearBiDateFilter()" style="padding:5px 10px;font-size:11px;white-space:nowrap">All</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Tabs (shown once data is loaded) -->
     <div class="bi-tabs" id="biTabBar" style="display:none">
@@ -3522,6 +3536,8 @@ function openBankImport(){
   document.getElementById('biMappingContent').innerHTML='';
   document.getElementById('biStatus').textContent='';
   document.getElementById('biTabBar').style.display='none';
+  document.getElementById('biDateFilter').style.display='none';
+  _biTxnsAll=[];
   // Reset to Transactions tab
   document.querySelectorAll('.bi-tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('biTabBtnTxns').classList.add('active');
@@ -3792,6 +3808,9 @@ async function parsePdfBank(file, _pwd){
     full+='\n';
   }
   const bank=detectBank(file.name, full.slice(0,800));
+  if(/TNG WALLET TRANSACTION HISTORY/i.test(full)||bank==='tng'){
+    return parseTngPdf(full);
+  }
   if(bank==='scb'||/Standard Chartered Bank Malaysia/i.test(full)){
     return parseScbCcPdf(full);
   }
@@ -3841,6 +3860,38 @@ function parseScbCcPdf(text){
     if(!amount||!desc) continue;
     const isCredit=cr==='-'||/^(PAYMENT|PEMBAYARAN)/i.test(desc);
     txns.push({date,desc,amount,type:isCredit?'income':'expense'});
+  }
+  return txns;
+}
+
+function parseTngPdf(text){
+  // TNG eWallet PDF: Date | Status | TxnType+Ref+Desc | Amount | Balance
+  const INCOME_RE=/^(Reload|Cash Reward|Transfer In|Refund|Cashback|Cash Back|Reward|Voucher)/i;
+  const TXN_TYPES=['DuitNow QR TNGD','DuitNow QR','PayDirect Payment','RFID Payment',
+    'Cash Reward','Transfer to Wallet','Transfer In','Reload','Payment','Refund',
+    'Cash Out','Cashback','Voucher Redemption','Scan & Pay','QR Payment'];
+  const rowRe=/^(\d{1,2}\/\d{1,2}\/\d{4})\s+(Success|Failed|Pending)\s+(.+?)\s+(RM[\d,]+\.\d{2})\s+(RM[\d,]+\.\d{2})\s*$/;
+  const txns=[];
+  for(const raw of text.split('\n')){
+    const m=raw.trim().match(rowRe);
+    if(!m) continue;
+    const [,dateStr,status,middle,amtStr]=m;
+    if(status!=='Success') continue;
+    const amount=parseFloat(amtStr.replace('RM','').replace(/,/g,''));
+    if(!amount) continue;
+    // Extract txn type + description from middle
+    let txnType='', rest=middle.trim();
+    for(const t of TXN_TYPES.sort((a,b)=>b.length-a.length)){
+      if(rest.startsWith(t)){ txnType=t; rest=rest.slice(t.length).trim(); break; }
+    }
+    // Strip reference number (first token if alphanumeric/digits)
+    rest=rest.replace(/^\S+\s+/,'').trim();
+    const desc=rest||txnType;
+    // Date DD/M/YYYY -> YYYY-MM-DD
+    const dp=dateStr.split('/');
+    const date=`${dp[2]}-${String(parseInt(dp[1])).padStart(2,'0')}-${String(parseInt(dp[0])).padStart(2,'0')}`;
+    const type=INCOME_RE.test(txnType)?'income':'expense';
+    txns.push({date,desc,amount,type});
   }
   return txns;
 }
@@ -3970,11 +4021,71 @@ async function handleBankFile(input){
   const inOthers=allTxns.filter(t=>t.catId===othCat.id).length;
   status.style.color='var(--accent)';
   const fileSuffix=files.length>1?` from ${files.length} files`:'';
-  status.textContent=`Found ${allTxns.length} transactions${fileSuffix} · ${matched} auto-matched · ${inOthers} assigned to Others`;
-  renderBiReview(allTxns);
+  status.textContent=`Found ${allTxns.length} transactions${fileSuffix} · ${matched} auto-matched · ${inOthers} in Others`;
+  _biTxnsAll=allTxns;
+  showBiDateFilter(allTxns);
 }
 
-let _biTxns=[];
+let _biTxns=[], _biTxnsAll=[];
+
+function normDateISO(d){
+  if(!d) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const m1=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m1) return `${m1[3]}-${m1[2].padStart(2,'0')}-${m1[1].padStart(2,'0')}`;
+  const m2=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  if(m2) return `20${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
+  return d;
+}
+
+function showBiDateFilter(txns){
+  const months=[...new Set(txns.map(t=>normDateISO(t.date).slice(0,7)))].filter(Boolean).sort();
+  const btns=document.getElementById('biMonthBtns');
+  btns.innerHTML=months.map(ym=>{
+    const [y,mo]=ym.split('-');
+    const lbl=new Date(parseInt(y),parseInt(mo)-1,1).toLocaleDateString('en-MY',{month:'short',year:'2-digit'});
+    return `<button class="btn btn-gray" style="font-size:11px;padding:4px 8px" onclick="setBiMonth('${ym}',this)">${lbl}</button>`;
+  }).join('');
+  // Default to current month if present, else last month in file
+  const now=new Date();
+  const curYM=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const defaultYM=months.includes(curYM)?curYM:months[months.length-1]||curYM;
+  document.getElementById('biDateFilter').style.display='block';
+  // Trigger click on default month button
+  const target=btns.querySelector(`[onclick*="'${defaultYM}'"]`);
+  if(target) setBiMonth(defaultYM, target);
+  else applyBiDateFilter();
+}
+
+function setBiMonth(ym, btn){
+  const [y,m]=ym.split('-');
+  const lastDay=new Date(parseInt(y),parseInt(m),0).getDate();
+  document.getElementById('biDateFrom').value=`${ym}-01`;
+  document.getElementById('biDateTo').value=`${ym}-${String(lastDay).padStart(2,'0')}`;
+  document.querySelectorAll('#biMonthBtns .btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-gray');});
+  if(btn){btn.classList.add('btn-primary');btn.classList.remove('btn-gray');}
+  applyBiDateFilter();
+}
+
+function applyBiDateFilter(){
+  const from=document.getElementById('biDateFrom').value;
+  const to=document.getElementById('biDateTo').value;
+  const filtered=_biTxnsAll.filter(t=>{
+    const d=normDateISO(t.date);
+    if(from&&d<from) return false;
+    if(to&&d>to) return false;
+    return true;
+  });
+  renderBiReview(filtered);
+}
+
+function clearBiDateFilter(){
+  document.getElementById('biDateFrom').value='';
+  document.getElementById('biDateTo').value='';
+  document.querySelectorAll('#biMonthBtns .btn').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-gray');});
+  renderBiReview(_biTxnsAll);
+}
+
 function renderBiReview(txns){
   _biTxns=txns;
   const cats=state.categories;
@@ -4209,7 +4320,6 @@ function ghLoadConfig(){
   const el=document.getElementById('syncLastTime');
   if(el&&lastTime) el.textContent='Last synced: '+new Date(lastTime).toLocaleString();
 }
-
 function ghGetSyncPayload(){
   const data={version:2,savedAt:new Date().toISOString(),years:{},merchantMap:getMerchantMap()};
   for(let i=0;i<localStorage.length;i++){
@@ -4218,7 +4328,6 @@ function ghGetSyncPayload(){
   }
   return data;
 }
-
 async function syncSaveToGist(){
   const token=document.getElementById('ghToken').value.trim()||localStorage.getItem('gh_token')||'';
   const gistId=document.getElementById('ghGistId').value.trim()||localStorage.getItem('gh_gist_id')||'';
@@ -4266,6 +4375,7 @@ async function syncLoadFromGist(){
 </script>
 </body>
 </html>
+>
 
 ){
   document.getElementById('changelogPopup').classList.toggle('open');
