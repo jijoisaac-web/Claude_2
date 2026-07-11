@@ -39,6 +39,42 @@ One call returns real prices from hundreds of stores (Walmart, Target, Amazon se
 - ❌ Facebook Marketplace & Instagram have no public API; scraping them violates their terms. Not included.
 - Amazon direct prices require an Amazon Associates (affiliate) account + PA-API; Google Shopping usually covers Amazon listings anyway.
 
-## Hosting it online
+## Deploy to Cloudflare Pages (free)
 
-Any Node host works: Render.com or Railway.app (free tiers) — push this folder, set the env vars in their dashboard, done.
+The `functions/` folder contains the API rewritten as Cloudflare Pages Functions, so the whole app runs serverless on Cloudflare — no Node server needed in production.
+
+### Step 1 — push to GitHub
+
+1. Create a free account at https://github.com and click **New repository** (name it `bestdeals`, keep it public or private, don't add any files).
+2. Install git from https://git-scm.com if you don't have it.
+3. In Command Prompt:
+
+```
+cd C:\Users\Ansa\Claude\Projects\16_Web_Deals\bestdeals-app
+git init
+git add .
+git commit -m "BestDeals v2.0.0"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/bestdeals.git
+git push -u origin main
+```
+
+### Step 2 — connect Cloudflare Pages
+
+1. Sign up free at https://dash.cloudflare.com.
+2. Go to **Workers & Pages → Create → Pages → Connect to Git** and pick your `bestdeals` repo.
+3. Build settings:
+   - Framework preset: **None**
+   - Build command: *(leave empty)*
+   - Build output directory: **public**
+4. Click **Save and Deploy**. Your site goes live at `https://bestdeals-xxx.pages.dev`.
+
+### Step 3 — add API keys (for live prices)
+
+In your Pages project: **Settings → Environment variables → Add** — add `SERPAPI_KEY`, `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET`, `BESTBUY_API_KEY` (whichever you have), then **Deployments → Retry deployment**. Without keys it serves demo prices.
+
+Every future `git push` auto-redeploys the site.
+
+## Alternative hosting
+
+The Express version (`server.js`) still works for local dev (`npm start`) or any Node host (Render.com, Railway.app) — set the same env vars in their dashboard.
