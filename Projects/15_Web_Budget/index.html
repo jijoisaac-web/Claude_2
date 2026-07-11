@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.1
+        <span class="ver-dot"></span>v3.9.2
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4377,31 +4377,24 @@ async function syncLoadFromGist(){
   status.textContent='Loading...';
   try{
     const res=await fetch('https://api.github.com/gists/'+gistId,{headers:{'Authorization':'token '+token}});
-    const gist=await res.json();
-    if(!res.ok) throw new Error(gist.message||'API error '+res.status);
-    const content=gist.files['budget_data.json']?.content;
-    if(!content) throw new Error('No budget_data.json found in Gist');
-    const data=JSON.parse(content);
-    if(!confirm('Load cloud data saved at '+new Date(data.savedAt).toLocaleString()+'?\nThis overwrites local data.')) return;
-    Object.entries(data.years||{}).forEach(([key,val])=>localStorage.setItem(key,JSON.stringify(val)));
-    if(data.merchantMap) saveMerchantMap(data.merchantMap);
-    state=loadState(currentYear); renderAll();
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.message||'API error '+res.status);
+    const file=data.files&&data.files['budget_data.json'];
+    if(!file) throw new Error('No budget_data.json found in Gist.');
+    const payload=JSON.parse(file.content);
+    if(payload.years){
+      for(const [key,val] of Object.entries(payload.years)){
+        localStorage.setItem(key,JSON.stringify(val));
+      }
+    }
+    if(payload.merchantMap) localStorage.setItem('merchantMap',JSON.stringify(payload.merchantMap));
+    localStorage.setItem('gh_gist_id',gistId);
     localStorage.setItem('gh_sync_time',new Date().toISOString());
-    status.style.color='var(--accent)'; status.textContent='Loaded from cloud ('+new Date(data.savedAt).toLocaleString()+')';
+    status.style.color='var(--accent)'; status.textContent='Loaded at '+new Date().toLocaleTimeString();
+    document.getElementById('syncLastTime').textContent='Last synced: '+new Date().toLocaleString();
+    setTimeout(()=>{ closeSyncModal(); init(); },800);
   }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
 }
-</script>
-</body>
-</html>
->
-
-){
-  document.getElementById('changelogPopup').classList.toggle('open');
-}
-document.addEventListener('click', e=>{
-  const pop=document.getElementById('changelogPopup');
-  if(pop.classList.contains('open')&&!pop.contains(e.target)) toggleChangelog();
-});
 </script>
 </body>
 </html>

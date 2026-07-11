@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad</title>
-<meta name="description" content="NRI Finance Hub — 19+ free tools for NRIs: compare live remittance rates from Wise, InstaReM, Remitly &amp; 50+ providers. NRE/NRO FD rates, home loan EMI, SIP/SWP, DTAA tax, bulk &amp; block deals, tax residency &amp; India return planner. Trusted by Indians in UAE, USA, UK, Canada, Singapore &amp; Australia."/>
+<meta name="description" content="NRI Finance Hub — 20+ free tools for Indians abroad: compare live remittance rates from 50+ providers, time transfers with Rate Timer, plan Study Abroad costs, calculate SIP, DTAA tax, home loan EMI, Return Corpus &amp; more. No sign-up. Trusted by NRIs in UAE, USA, UK, Canada, Singapore &amp; Australia."/>
 <meta name="keywords" content="NRI remittance rates 2026, best way to send money to India, NRE vs NRO account, NRI home loan calculator, NRI tax calculator, DTAA India, NRI return to India planner, NRI SIP calculator, NRE FD rates, NRI tax residency status, send money UAE to India, send money USA to India, Wise vs Remitly India"/>
 <meta name="author" content="NRI Finance Hub"/>
 <meta name="robots" content="index, follow"/>
@@ -23,7 +23,7 @@
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://nrifinancehub.com/"/>
 <meta property="og:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
-<meta property="og:description" content="Free NRI tools: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner, DTAA tax calculator & India return planner."/>
+<meta property="og:description" content="20+ free NRI tools: live remittance rates from 50+ providers, Rate Timer to time your transfer, Study Abroad Cost Planner, Return Corpus, SIP/SWP, DTAA tax, home loan EMI & bulk deals. No sign-up."/>
 <meta property="og:image" content="https://nrifinancehub.com/og-image.svg"/>
 <meta property="og:site_name" content="NRI Finance Hub"/>
 <meta property="og:locale" content="en_IN"/>
@@ -31,12 +31,12 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
 <meta name="twitter:image" content="https://nrifinancehub.com/og-image.svg"/>
-<meta name="twitter:description" content="Free NRI tools: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner & India return planner."/>
+<meta name="twitter:description" content="20+ free NRI tools: live rates, Rate Timer, Study Abroad Planner, Return Corpus, SIP, DTAA tax, home loan EMI & more. No sign-up needed."/>
 <!-- JSON-LD: WebSite + SearchAction -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.19"/>
+<link rel="stylesheet" href="/site.css?v=7.21"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.19</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.21</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -405,8 +405,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span class="plain">Built for You</span>
     </h1>
     <p class="hero-sub">
-      Compare live remittance rates from 50+ providers, calculate taxes, plan your return to India, 
-      and access 19+ free financial tools — all in one place.
+      Compare live rates across 50+ providers, time your transfer with Rate Timer, plan Study Abroad costs, track investments &amp; return corpus — 20+ free tools built for NRIs, all in one place.
     </p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
@@ -907,7 +906,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-head">
       <div>
         <div class="drawer-brand">NRI <span>Finance Hub</span></div>
-        <div class="drawer-sub">19+ tools for Indians abroad</div>
+        <div class="drawer-sub">20+ free tools for Indians abroad</div>
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
@@ -2756,28 +2755,15 @@ document.addEventListener('DOMContentLoaded',function(){
   <!-- TAB: FLIGHTS TO INDIA -->
   <div class="tool-section" id="tab-flights">
   <div class="calc-cur-bar" id="ccb-flights"><span class="ccb-flag" id="ccb-flag-flights"></span><span class="ccb-rate" id="ccb-rate-flights">Showing fares in your currency</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-flights" type="number" placeholder="Amount" oninput="ccbConvert('flights')"/><span id="ccb-cur-flights" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">&rarr;</span><span class="ccb-result" id="ccb-out-flights">&#8377;&mdash;</span></div></div>
-    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(7,112,227,0.12),rgba(56,189,248,0.06));border-color:rgba(7,112,227,0.3);">
-      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
-      <div class="tool-banner-body">
-        <div class="tool-banner-title">Flights to India</div>
-        <div class="tool-banner-sub">Typical round-trip fares from your country to top Indian cities. Select your departure airport below, then click any destination to search live prices.</div>
-      </div>
-    </div>
-    <div class="card">
-      <p id="fl-cur-label" style="font-size:11px;color:var(--muted);margin:0 0 12px;line-height:1.5;">Loading route data&hellip;</p>
-      <div class="fl-origin-lbl">Departure airport</div>
-      <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
-    </div>
-    <!-- Festival warning (JS-rendered) -->
-    <div id="fl-festival-banner" class="fl-festival-banner" style="display:none"></div>
-    <!-- Season deal strip (JS-rendered) -->
-    <div id="fl-deal-strip" class="fl-deal-strip"></div>
-    <!-- AI Trip Planner -->
-    <div class="card fl-planner-card">
-      <div class="fl-planner-hd">
+
+    <!-- AI Trip Planner — HERO at top -->
+    <div class="fl-ai-hero">
+      <div class="fl-ai-hero-hd">
         <span class="fl-planner-icon">✦</span>
-        <div><div class="fl-planner-title">AI Trip Planner</div>
-        <div class="fl-planner-sub">Tell me your plans &mdash; I'll estimate fares, timing &amp; budget</div></div>
+        <div>
+          <div class="fl-ai-hero-title">Plan Your Trip to India</div>
+          <div class="fl-ai-hero-sub">Get fare estimates, best travel dates &amp; budget breakdown — just describe your trip</div>
+        </div>
       </div>
       <div class="fl-planner-input-row">
         <input type="text" id="fl-planner-input" class="fl-planner-input"
@@ -2785,9 +2771,35 @@ document.addEventListener('DOMContentLoaded',function(){
                onkeydown="if(event.key==='Enter')flPlanTrip()">
         <button class="fl-planner-btn" onclick="flPlanTrip()">Plan ✦</button>
       </div>
+      <div class="fl-ai-chips-lbl">Try a destination:</div>
+      <div class="fl-ai-chips">
+        <button class="fl-ai-chip" onclick="flChip('Goa in December, 2 people')">🌴 Goa · Dec</button>
+        <button class="fl-ai-chip" onclick="flChip('Mumbai next month, 1 person')">🏙️ Mumbai</button>
+        <button class="fl-ai-chip" onclick="flChip('Kerala Kochi in January, 2 people')">⛵ Kochi · Jan</button>
+        <button class="fl-ai-chip" onclick="flChip('Delhi in November, family of 4')">🕌 Delhi · Nov</button>
+        <button class="fl-ai-chip" onclick="flChip('Bangalore in February, 2 people')">💻 Bangalore</button>
+        <button class="fl-ai-chip" onclick="flChip('Hyderabad in October, 2 people')">🏯 Hyderabad</button>
+        <button class="fl-ai-chip" onclick="flChip('Goa monsoon July, 2 people budget trip')">🏷️ Goa · Budget</button>
+        <button class="fl-ai-chip" onclick="flChip('Chennai in February, 1 person')">🌊 Chennai</button>
+      </div>
       <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
     </div>
-    <div id="fl-dest-grid" class="fl-dest-grid"><!-- JS renders destination cards --></div>
+
+    <!-- Departure airport -->
+    <div class="card">
+      <p id="fl-cur-label" style="font-size:11px;color:var(--muted);margin:0 0 12px;line-height:1.5;">Loading route data&hellip;</p>
+      <div class="fl-origin-lbl">Departure airport</div>
+      <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
+    </div>
+
+    <!-- Festival warning (JS-rendered) -->
+    <div id="fl-festival-banner" class="fl-festival-banner" style="display:none"></div>
+    <!-- Season deal strip (JS-rendered) -->
+    <div id="fl-deal-strip" class="fl-deal-strip"></div>
+
+    <!-- Compact city list -->
+    <div id="fl-dest-grid" class="fl-dest-list"><!-- JS renders city rows --></div>
+
     <div class="aff-disclaimer" style="text-align:center;font-size:9px;color:var(--muted);padding:8px 0 4px;">&#9992; Prices are typical economy round-trip ranges &mdash; actual fares vary by date &amp; airline. Always verify on Skyscanner or Google Flights before booking.</div>
   </div>
 
@@ -2838,14 +2850,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.19 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.21 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.19"></script>
+<script src="/site.js?v=7.21"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
