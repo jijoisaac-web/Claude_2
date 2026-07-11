@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.4
+        <span class="ver-dot"></span>v3.5
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1706,12 +1706,12 @@ tbody tr.income-row td:first-child{
 
 <!-- Transaction Detail Modal -->
 <div class="overlay" id="txnDetailOverlay" onclick="if(event.target===this)closeTxnDetail()" style="display:none">
-  <div class="modal" style="max-width:540px;width:95%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+  <div class="modal" style="max-width:860px;width:96vw;display:flex;flex-direction:column;overflow:hidden;max-height:92vh;padding-bottom:0">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0">
       <h2 id="txnDetailTitle" style="margin:0;font-size:16px"></h2>
       <button class="del-btn" onclick="closeTxnDetail()" style="font-size:16px;padding:4px 8px">✕</button>
     </div>
-    <div id="txnDetailBody"></div>
+    <div id="txnDetailBody" style="overflow-y:auto;flex:1;min-height:0;padding-bottom:20px"></div>
   </div>
 </div>
 
@@ -2258,24 +2258,24 @@ function openCatDetail(catId){
       +state.categories.filter(c=>c.id!==catId)
         .map(c=>'<option value="'+c.id+'">'+c.name+'</option>').join('');
     body+='<div style="font-size:11px;color:var(--text3);margin-bottom:8px">'+txns.length+' imported transaction'+(txns.length>1?'s':'')+'</div>';
-    body+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'
-      +'<thead><tr style="color:var(--text3);border-bottom:1px solid var(--border)">'
-      +'<th style="text-align:left;padding:4px 6px;font-weight:600">Date</th>'
-      +'<th style="text-align:left;padding:4px 6px;font-weight:600">Description</th>'
-      +'<th style="text-align:right;padding:4px 6px;font-weight:600">Amount</th>'
-      +'<th style="padding:4px 6px;font-weight:600;min-width:130px">Move to</th>'
-      +'<th style="width:28px"></th>'
+    body+='<div style="overflow-x:auto;overflow-y:auto;max-height:calc(92vh - 200px);border-radius:6px;border:1px solid var(--border)"><table style="width:100%;min-width:580px;border-collapse:collapse;font-size:12px">'
+      +'<thead><tr style="color:var(--text3);border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2);z-index:2">'
+      +'<th style="text-align:left;padding:6px 8px;font-weight:600">Date</th>'
+      +'<th style="text-align:left;padding:6px 8px;font-weight:600">Description</th>'
+      +'<th style="text-align:right;padding:6px 8px;font-weight:600;white-space:nowrap">Amount</th>'
+      +'<th style="padding:6px 8px;font-weight:600;min-width:150px">Move to</th>'
+      +'<th style="width:32px"></th>'
       +'</tr></thead><tbody>';
     txns.forEach((t,i)=>{
       const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
       body+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
-        +'<td style="padding:5px 6px;white-space:nowrap;color:var(--text2)">'+t.date+'</td>'
-        +'<td style="padding:5px 6px;word-break:break-word;min-width:140px">'+t.desc+'</td>'
-        +'<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+amtCol+'">MYR '+fmt(t.amount)+'</td>'
-        +'<td style="padding:5px 6px">'
+        +'<td style="padding:7px 8px;white-space:nowrap;color:var(--text2)">'+t.date+'</td>'
+        +'<td style="padding:7px 8px;word-break:break-word;min-width:160px">'+t.desc+'</td>'
+        +'<td style="padding:7px 8px;text-align:right;font-weight:700;white-space:nowrap;color:'+amtCol+'">MYR '+fmt(t.amount)+'</td>'
+        +'<td style="padding:7px 8px">'
           +'<select class="bi-sel" style="width:100%;font-size:11px" data-cid="'+catId+'" data-ti="'+i+'" onchange="moveTxnCategory(this)">'
           +catMoveOpts+'</select></td>'
-        +'<td style="padding:5px 6px;text-align:center"><button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button></td>'
+        +'<td style="padding:7px 8px;text-align:center"><button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button></td>'
         +'</tr>';
     });
     body+='</tbody></table></div>';
@@ -4189,8 +4189,10 @@ async function syncLoadFromGist(){
     status.style.color='var(--accent)'; status.textContent='Loaded from cloud ('+new Date(data.savedAt).toLocaleString()+')';
   }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
 }
-
-function toggleChangelog(){
+</script>
+</body>
+</html>
+){
   document.getElementById('changelogPopup').classList.toggle('open');
 }
 document.addEventListener('click', e=>{
