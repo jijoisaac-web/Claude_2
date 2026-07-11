@@ -1,4 +1,4 @@
-/* v7.30 */
+/* v7.32 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2259,6 +2259,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   text-decoration:none;transition:opacity .12s;white-space:nowrap;
 }
 .fl-list-btn:hover{opacity:.82;}
+
+/* ── DEPARTURE AIRPORT CARD ─────────────────────────────────────────────── */
+.fl-origin-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;margin-top:12px;
+}
+.fl-cur-label-txt{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.fl-origin-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
 
 /* ── DESTINATION PILLS ─────────────────────────────────────────────────── */
 .fl-dest-pills-wrap{margin-top:12px;margin-bottom:4px;}

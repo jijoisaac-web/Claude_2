@@ -1,4 +1,4 @@
-/* v7.30 */
+/* v7.32 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -54,6 +54,11 @@ function selectCurrency(el){
   const activePill=document.querySelector('.cflag[data-cur="'+val+'"]');
   if(activePill)activePill.classList.add('active');
   updateAll();
+  // Re-init flights if tab is active so departure airports update for new country
+  var flTab=document.getElementById('tab-flights');
+  if(flTab&&flTab.classList.contains('active')&&typeof window.initFlights==='function'){
+    window.initFlights();
+  }
 }
 // Close dropdown on outside click
 document.addEventListener('click',function(e){
@@ -2821,9 +2826,29 @@ function closeNavDD(){
   let _flOrigin=null;
 
   function initFlights(){
+    // Reset all UI to defaults on every (re-)init
+    var inp=document.getElementById('fl-planner-input');
+    var res=document.getElementById('fl-planner-result');
+    if(inp){inp.value='';inp._resetBound=false;}
+    if(res){res.style.display='none';res.innerHTML='';}
+    var sm=document.getElementById('fl-opt-month');
+    var sd=document.getElementById('fl-opt-dur');
+    var sc=document.getElementById('fl-opt-cabin');
+    var sp=document.getElementById('fl-opt-pax');
+    if(sm) sm.selectedIndex=0;
+    if(sd){for(var i=0;i<sd.options.length;i++){if(sd.options[i].value==='7 nights'){sd.selectedIndex=i;break;}}}
+    if(sc) sc.selectedIndex=0;
+    if(sp){for(var i=0;i<sp.options.length;i++){if(sp.options[i].value==='2 people'){sp.selectedIndex=i;break;}}}
+    document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
+
     var cur=baseCur||'AED';
     var data=FL[cur]||FL['AED'];
     _flOrigin=data.origins[0].code;
+    // Update departure label
+    var lbl=document.getElementById('fl-cur-label');
+    if(lbl) lbl.innerHTML='Showing routes from <strong>'+data.country+'</strong> ('+cur+') &mdash; change country via the currency selector above';
+    // Render departure airport pills
+    renderOrigins(data);
     // Render all destination chips
     var chipWrap=document.getElementById('fl-ai-chips');
     if(chipWrap){
@@ -2839,7 +2864,6 @@ function closeNavDD(){
       inp.addEventListener('input',function(){
         var res=document.getElementById('fl-planner-result');
         if(res&&res.style.display!=='none'){res.style.display='none';res.innerHTML='';}
-        // Remove active chip highlight
         document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
       });
     }
