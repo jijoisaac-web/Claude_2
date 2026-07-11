@@ -1,4 +1,4 @@
-/* v7.32 */
+/* v7.33 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3868,6 +3868,9 @@ function closeNavDD(){
     _flTripDays=days;
     document.querySelectorAll('.fl-dur-btn').forEach(function(b){b.classList.remove('active');});
     if(btn)btn.classList.add('active');
+    // Sync dropdown
+    var sd=document.getElementById('fl-opt-dur');
+    if(sd){for(var i=0;i<sd.options.length;i++){if(sd.options[i].value===days+' nights'||sd.options[i].value===days+' night'){sd.selectedIndex=i;break;}}}
     var inp=document.getElementById('fl-planner-input');
     if(inp&&inp.value.trim())flPlanTrip();
   };
@@ -3876,6 +3879,9 @@ function closeNavDD(){
     _flCabinClass=cls;
     document.querySelectorAll('.fl-cabin-btn').forEach(function(b){b.classList.remove('fl-cabin-active');});
     if(btn)btn.classList.add('fl-cabin-active');
+    // Sync dropdown
+    var sc=document.getElementById('fl-opt-cabin');
+    if(sc) sc.value=cls;
     flPlanTrip();
   };
 
@@ -4066,7 +4072,12 @@ function closeNavDD(){
     var cur=baseCur||'AED';
     var flData=FL[cur]||FL['AED'];
     var route=destCode&&flData.routes[destCode]?flData.routes[destCode]:null;
-    var tripDays=_flTripDays||10;
+    // Sync internal vars from dropdowns (dropdowns are source of truth)
+    var selDurVal=selDur?selDur.value:'7 nights';
+    var durMatch=selDurVal.match(/(\d+)/);
+    if(durMatch) _flTripDays=parseInt(durMatch[1]);
+    if(cabin==='economy'||cabin==='business') _flCabinClass=cabin;
+    var tripDays=_flTripDays||7;
     var cabinClass=_flCabinClass||'economy';
     var bizMult=BUSINESS_MULT[cur]||3.8;
     var cabinFareMult=(cabinClass==='business')?bizMult:1.0;
