@@ -1,4 +1,4 @@
-/* v7.27 */
+/* v7.28 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2948,23 +2948,27 @@ function closeNavDD(){
     inp&&inp.scrollIntoView({behavior:'smooth',block:'center'});
   };
 
-  // Fill input from chip button (city name only — user types month/people then hits Plan)
+  // Fill input from chip button — city name only; selectors supply month/cabin/pax
   window.flFillChip=function(el){
     var city=el.getAttribute('data-city');
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
     if(inp){
-      inp.value=city+', ';
+      inp.value=city;
       inp.focus();
-      // Move cursor to end
       var len=inp.value.length;
       inp.setSelectionRange(len,len);
     }
     if(res){res.style.display='none';res.innerHTML='';}
-    // Highlight active chip
     document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
     el.classList.add('active');
     inp&&inp.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+
+  // Reset result panel (called by selector changes)
+  window.flResetResult=function(){
+    var res=document.getElementById('fl-planner-result');
+    if(res&&res.style.display!=='none'){res.style.display='none';res.innerHTML='';}
   };
 
   // ─── AI TRIP PLANNER ─────────────────────────────────────────────────────
@@ -3973,7 +3977,22 @@ function closeNavDD(){
     var inp=document.getElementById('fl-planner-input');
     var res=document.getElementById('fl-planner-result');
     if(!inp||!res)return;
-    var q=(inp.value||'').trim();
+    // Build query from structured selectors + free text
+    var freeText=(inp.value||'').trim();
+    var selMonth=document.getElementById('fl-opt-month');
+    var selDur=document.getElementById('fl-opt-dur');
+    var selCabin=document.getElementById('fl-opt-cabin');
+    var selPax=document.getElementById('fl-opt-pax');
+    var month=selMonth?selMonth.value:'';
+    var dur=selDur?selDur.value:'';
+    var cabin=selCabin?selCabin.value:'economy';
+    var pax=selPax?selPax.value:'2 people';
+    // Compose q: city from free text, then append structured parts if not already present
+    var q=freeText;
+    if(month && q.toLowerCase().indexOf(month.toLowerCase())<0) q+=(q?' in ':'')+month;
+    if(dur && q.toLowerCase().indexOf(dur.toLowerCase().split(' ')[0])<0) q+=(q?', ':'')+dur;
+    if(pax && q.toLowerCase().indexOf(pax.split(' ')[0])<0) q+=(q?', ':'')+pax;
+    if(cabin==='business' && q.toLowerCase().indexOf('business')<0) q+=(q?', ':'')+'business class';
     if(!q){res.style.display='none';return;}
     var lq=q.toLowerCase();
 

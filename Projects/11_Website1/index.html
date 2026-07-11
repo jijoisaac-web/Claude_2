@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.27"/>
+<link rel="stylesheet" href="/site.css?v=7.28"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.27</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.28</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -462,9 +462,10 @@ document.addEventListener('DOMContentLoaded',function(){
 
     <!-- Right: Corpus Calculator widget -->
     <div class="hero-corpus-panel">
+      <div class="hcp-heading">How much do I need?</div>
       <!-- Tab bar -->
       <div class="hcp-tabs">
-        <button class="hcp-tab-btn active" onclick="hcpSetTab('corpus',this)">&#127968; Corpus</button>
+        <button class="hcp-tab-btn active" onclick="hcpSetTab('corpus',this)">&#x1F4B0; Retire</button>
         <button class="hcp-tab-btn" onclick="hcpSetTab('homeloan',this)">&#127963;&#65039; Loan</button>
         <button class="hcp-tab-btn" onclick="hcpSetTab('realty',this)">&#127970; Realty</button>
       </div>
@@ -2770,6 +2771,48 @@ document.addEventListener('DOMContentLoaded',function(){
                onkeydown="if(event.key==='Enter')flPlanTrip()">
         <button class="fl-planner-btn" onclick="flPlanTrip()">Plan ✦</button>
       </div>
+      <!-- Trip options row -->
+      <div class="fl-trip-opts">
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Month</label>
+          <select id="fl-opt-month" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="">Any month</option>
+            <option>January</option><option>February</option><option>March</option>
+            <option>April</option><option>May</option><option>June</option>
+            <option>July</option><option>August</option><option>September</option>
+            <option>October</option><option>November</option><option>December</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Trip length</label>
+          <select id="fl-opt-dur" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="">Any</option>
+            <option value="5 nights">5 nights</option>
+            <option value="7 nights" selected>7 nights</option>
+            <option value="10 nights">10 nights</option>
+            <option value="14 nights">14 nights</option>
+            <option value="21 nights">21 nights</option>
+            <option value="1 month">1 month</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Cabin</label>
+          <select id="fl-opt-cabin" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Travellers</label>
+          <select id="fl-opt-pax" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="1 person">1</option>
+            <option value="2 people" selected>2</option>
+            <option value="3 people">3</option>
+            <option value="4 people">4</option>
+            <option value="family of 5">5+</option>
+          </select>
+        </div>
+      </div>
       <div class="fl-ai-chips-lbl">Choose a destination:</div>
       <div class="fl-ai-chips" id="fl-ai-chips"><!-- JS renders all 22 city chips --></div>
       <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
@@ -2830,14 +2873,14 @@ document.addEventListener('DOMContentLoaded',function(){
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.27 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.28 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.27"></script>
+<script src="/site.js?v=7.28"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

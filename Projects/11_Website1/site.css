@@ -1,4 +1,4 @@
-/* v7.27 */
+/* v7.28 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1259,6 +1259,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hcp-divider{height:1px;background:var(--border);margin:8px 0 12px;}
 
 /* ── Hero panel tabs ── */
+.hcp-heading{font-size:11px;font-weight:800;color:var(--text);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;opacity:.6;}
 .hcp-tabs{display:flex;gap:4px;margin-bottom:12px;}
 .hcp-tab-btn{flex:1;padding:7px 3px;border-radius:14px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1.2;}
 .hcp-tab-btn.active{background:rgba(20,184,166,0.15);border-color:var(--teal);color:var(--teal);}
@@ -2204,6 +2205,21 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 }
 .fl-ai-chip:hover{background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:var(--text);}
 .fl-ai-chip.active{background:var(--teal);border-color:var(--teal);color:#000;font-weight:700;}
+
+/* ── TRIP OPTIONS ROW ────────────────────────────────────────────────── */
+.fl-trip-opts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px;}
+.fl-opt-group{display:flex;flex-direction:column;gap:3px;flex:1;min-width:90px;}
+.fl-opt-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
+.fl-opt-sel{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);border-radius:8px;padding:6px 10px;
+  font-size:13px;font-weight:500;cursor:pointer;
+  font-family:inherit;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  padding-right:26px;
+}
+.fl-opt-sel:focus{outline:none;border-color:var(--teal);}
 
 /* Compact city list */
 .fl-dest-list{margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
