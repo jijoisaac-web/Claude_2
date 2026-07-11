@@ -1185,7 +1185,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.6
+        <span class="ver-dot"></span>v3.7
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3753,7 +3753,7 @@ function matchCategory(desc){
   return '';
 }
 
-async function parsePdfBank(file){
+async function parsePdfBank(file, _pwd){
   if(!window.pdfjsLib){
     await new Promise((res,rej)=>{
       const s=document.createElement('script');
@@ -3765,7 +3765,17 @@ async function parsePdfBank(file){
       'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
   const buf=await file.arrayBuffer();
-  const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
+  let pdf;
+  try {
+    pdf=await window.pdfjsLib.getDocument({data:buf,password:_pwd||''}).promise;
+  } catch(e){
+    if(e.name==='PasswordException'||(typeof e.code==='number'&&e.code<=2)){
+      const pwd=prompt('"'+file.name+'" is password-protected.\nEnter the PDF password:',_pwd||'');
+      if(pwd===null) throw new Error('Password entry cancelled.');
+      return parsePdfBank(file, pwd);
+    }
+    throw e;
+  }
   let full='';
   for(let p=1;p<=pdf.numPages;p++){
     const pg=await pdf.getPage(p);
@@ -3782,6 +3792,9 @@ async function parsePdfBank(file){
     full+='\n';
   }
   const bank=detectBank(file.name, full.slice(0,800));
+  if(bank==='scb'||/Standard Chartered Bank Malaysia/i.test(full)){
+    return parseScbCcPdf(full);
+  }
   if(bank==='maybank-cc'||/STATEMENT OF CREDIT CARD/i.test(full)){
     return parseMaybankCcPdf(full, file.name);
   }
@@ -3792,6 +3805,44 @@ async function parsePdfBank(file){
     throw new Error('This is a Maybank profit/interest summary, not a transaction statement.');
   }
   return parsePdfGeneric(full);
+}
+
+function parseScbCcPdf(text){
+  const MONS={Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  const monPat='(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)';
+  // Extract statement month/year for year-rollover logic
+  const stmtM=text.match(new RegExp('Statement Date[^:]*:\\s*(\\d{1,2})\\s+('+monPat+')\\s+(\\d{4})','i'));
+  const stmtYear=stmtM?parseInt(stmtM[3]):new Date().getFullYear();
+  const stmtMon=stmtM?MONS[stmtM[2]]:1;
+  // Row pattern: DD Mon  DD Mon  description...  amount[-]
+  const txnRe=new RegExp('^(\\d{1,2})\\s+('+monPat+')\\s+(\\d{1,2})\\s+('+monPat+')\\s+(.+?)\\s+([\\d,]+\\.\\d{2})(-?)\\s*$');
+  const skipRe=/^(BALANCE FROM|PREVIOUS STATEMENT|Baki|Payment Due|Pembayaran|Finance Charge|Annual Fee|Service Tax|Interest|Page|JIJO|BLOCK|SANG SURIA|Standard Chartered|sc\.com|VISA PLATINUM|Approved|Available|Statement Date|New Balance|Min\.|Total\s|WARNING|AMARAN|A Standard)/i;
+  const txns=[];
+  for(const raw of text.split('\n')){
+    const line=raw.trim();
+    if(!line||skipRe.test(line)) continue;
+    const m=line.match(txnRe);
+    if(!m) continue;
+    const [,,, txnDay,txnMon,rawDesc,amtStr,cr]=m;
+    const txnM=MONS[txnMon]; if(!txnM) continue;
+    const year=txnM>stmtMon?stmtYear-1:stmtYear;
+    const date=`${year}-${String(txnM).padStart(2,'0')}-${String(parseInt(txnDay)).padStart(2,'0')}`;
+    // Clean: strip Txn Ref, strip trailing location+country code
+    let desc=rawDesc
+      .replace(/\s+Txn Ref:\s*\S*\s*$/i,'')
+      .replace(/\s+Tax Invoice Ref.*$/i,'');
+    // Strip trailing location+country (e.g. "W.P.KLMY", "KUALA LUMPUMY", "InternetSG")
+    if(/[A-Z]{2}\s*$/.test(desc)){
+      desc=desc.replace(/\s+[\w\.\-]+(?:MY|SG|TH|ID|AU|GB|JP|HK|AE)\s*$/i,'');
+      desc=desc.replace(/\s+(?:KUALA|PETALING|SHAH|SELANGOR|BANGSAR|BRICKFIELDS|SUBANG|SENTUL|SEPANG)\s*$/i,'');
+    }
+    desc=desc.trim();
+    const amount=parseFloat(amtStr.replace(/,/g,''));
+    if(!amount||!desc) continue;
+    const isCredit=cr==='-'||/^(PAYMENT|PEMBAYARAN)/i.test(desc);
+    txns.push({date,desc,amount,type:isCredit?'income':'expense'});
+  }
+  return txns;
 }
 
 function parseMaybankCcPdf(text, filename){
@@ -4189,7 +4240,6 @@ async function syncSaveToGist(){
     document.getElementById('syncLastTime').textContent='Last synced: '+new Date().toLocaleString();
   }catch(e){ status.style.color='var(--red)'; status.textContent='Error: '+e.message; }
 }
-
 async function syncLoadFromGist(){
   const token=document.getElementById('ghToken').value.trim()||localStorage.getItem('gh_token')||'';
   const gistId=document.getElementById('ghGistId').value.trim()||localStorage.getItem('gh_gist_id')||'';
@@ -4216,6 +4266,7 @@ async function syncLoadFromGist(){
 </script>
 </body>
 </html>
+
 ){
   document.getElementById('changelogPopup').classList.toggle('open');
 }
