@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.15.0] — 2026-07-10 · Playbook
+
+- New **Playbook** tab: the daily discipline checklist — market gate → shortlist (score ≥60 + decision briefs) → options-flow confirmation → business check for investments → 1%-risk sizing → write the plan. Checkboxes persist per trading day; each step links to its tab; the gate shows a live breadth read from the latest scan
+- Weekly maintenance list (portfolio health, backtest revalidation, institutional context) tracked per calendar week
+- "Rules that save you" card: the five failure modes and their antidotes
+
 ## [2.14.0] — 2026-07-10 · Visual Refresh
 
 - New look: Inter typeface, deep-navy palette with a blue→violet gradient identity (logo, nav pills, section markers), ambient background glow

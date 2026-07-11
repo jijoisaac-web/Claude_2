@@ -1524,6 +1524,27 @@ tbody tr.income-row td:first-child{
       <button class="btn btn-primary" onclick="openSuggestCats()">Browse Suggested Categories</button>
     </div>
 
+    <div class="data-card">
+      <h3>☁️ Cloud Sync — GitHub Gist</h3>
+      <p>Back up and sync all your budget data across devices using a private GitHub Gist. Free — only needs a GitHub account.</p>
+      <div style="display:grid;gap:10px;margin-bottom:14px">
+        <div>
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">GITHUB TOKEN <span style="color:var(--text3);font-weight:400">(Settings → Developer Settings → Personal Access Tokens → gist scope)</span></label>
+          <input type="password" id="ghToken" class="modal-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%;box-sizing:border-box;font-family:monospace" oninput="ghSaveConfig()">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">GIST ID <span style="color:var(--text3);font-weight:400">(auto-filled after first save)</span></label>
+          <input type="text" id="ghGistId" class="modal-input" placeholder="Leave blank to create new" style="width:100%;box-sizing:border-box;font-family:monospace" oninput="ghSaveConfig()">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary" onclick="syncSaveToGist()">☁️ Save to Cloud</button>
+        <button class="btn btn-gray" onclick="syncLoadFromGist()">⬇️ Load from Cloud</button>
+        <span id="syncStatus" style="font-size:12px;color:var(--text2)"></span>
+      </div>
+      <div id="syncLastTime" style="font-size:11px;color:var(--text3);margin-top:8px"></div>
+    </div>
+
   </div>
 </div>
 

@@ -193,6 +193,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="track">Backtest</button>
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
+    <button data-tab="playbook">Playbook</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -400,6 +401,23 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="omResults"></div>
   <div class="muted" style="font-size:11px;margin-top:6px">OI reads are strongest near expiry and for liquid names. Writers (sellers) drive OI walls: heavy put OI = a level someone is paid to defend; heavy call OI = a ceiling someone is paid to cap. Data ~3-min delayed during market hours; stale after close. Not investment advice.</div>
+</section>
+
+<!-- PLAYBOOK: daily discipline checklist -->
+<section id="playbook" class="tab">
+  <h2>Daily playbook <span class="muted" id="pbMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="muted" style="font-size:12px;margin-bottom:10px">The edge isn't any single signal — it's confluence plus damage control. Work top to bottom; checkboxes reset each trading day.</div>
+  <div id="pbDaily"></div>
+  <h2 style="margin-top:20px">Weekly maintenance <span class="muted" id="pbWeekMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div id="pbWeekly"></div>
+  <h2 style="margin-top:20px">Rules that save you</h2>
+  <div class="card" style="font-size:13px;line-height:1.7">
+    <b>1. Confluence over quantity.</b> Trade the few names where the technical score (70+), options flow (LONG FLOW) and market gate all agree — not every idea on the list. A+ setups appear a few times a week, not a few times a day.<br>
+    <b>2. The stop is the decision.</b> Size every position so the stop costs ≤1% of capital, and honor it mechanically. A stopped-out trade never becomes an "investment" — that's how traders become bagholders.<br>
+    <b>3. Decide the game before entry.</b> The decision brief tells you: TRADING ONLY names are rented, not owned. INVESTABLE names may be accumulated. Never let one morph into the other mid-trade.<br>
+    <b>4. Distrust your own backtests.</b> A combination you tuned until it looked great is curve-fit. Trust rules that work across universes and periods — and kill signals your own data shows don't pay (your smallcap test: gap-ups earned their keep, RSI-oversold didn't).<br>
+    <b>5. When the gate is red, do less.</b> Weak breadth + institutions selling = smaller size or cash. Missing a rally costs nothing; catching a falling market costs compounding.
+  </div>
 </section>
 
 <!-- BACKTEST -->
@@ -629,6 +647,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
   if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
+  if(b.dataset.tab==="playbook") renderPlaybook();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
 });
@@ -2261,8 +2280,54 @@ async function scanOptionsMomentum(){
     <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its full chain above. Flow scores describe positioning, not guarantees — cross-check the stock's own chart (Ideas/Charts tabs) before acting; the strongest setups have price momentum AND supportive flow.</div>`;
 }
 
+/* ================= playbook: daily discipline checklist ================= */
+const PB_DAILY = [
+  ["gate","Market gate — should I be aggressive today?","Dashboard: breadth bar risk-on? FII/DII both buying? Green = full size. Mixed = half size. Red = watch, don't chase.","dashboard"],
+  ["scan","Scan & shortlist","Ideas tab: consider only Setup Score ≥ 60. Read the decision briefs — they tell you which game each name is (TRADE ONLY vs INVESTABLE).","ideas"],
+  ["flow","Confirm with options flow","Options scanner: an idea that also shows LONG FLOW is your A+ setup. Fresh call-writing into a breakout = downgrade it.","options"],
+  ["biz","Business check (investments only)","Fundamentals: Quality ≥ 60, Value-Trap low, in line or stronger vs peers, and reverse-DCF implied growth the company has actually delivered.","fundamentals"],
+  ["size","Size the position","📐 on the idea row: risk ≤ 1% of capital to the stop. If the quantity feels too small, the stop is too far — not the risk too low.","ideas"],
+  ["log","Write the plan down","Entry, stop, target, and WHY — before entering. If you can't state the exit, you don't have a trade.",null],
+];
+const PB_WEEKLY = [
+  ["pf","Portfolio health","Concentration (no stock >15%, no sector >30%), beta, small-cap share, laggards vs NIFTY.","portfolio"],
+  ["bt","Revalidate the rules","Backtest your active signal combos on your traded universes. Kill what stopped paying.","track"],
+  ["insti","Institutional context","FII/DII weekly direction + any bulk-deal accumulation in names you hold or stalk.","insti"],
+];
+function pbKey(){ return "ist_pb:" + new Date().toISOString().slice(0,10); }
+function pbWeekKey(){ const d=new Date(); const onejan=new Date(d.getFullYear(),0,1);
+  const wk=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7); return `ist_pbw:${d.getFullYear()}-${wk}`; }
+function pbState(key){ try{ return JSON.parse(localStorage.getItem(key))||{}; }catch(e){ return {}; } }
+function pbToggle(key, id){ const s=pbState(key); s[id]=!s[id]; localStorage.setItem(key,JSON.stringify(s)); renderPlaybook(); }
+function pbList(items, key, doneLabelEl){
+  const s = pbState(key);
+  const done = items.filter(([id])=>s[id]).length;
+  $(doneLabelEl).textContent = `· ${done}/${items.length} done`;
+  return items.map(([id,title,desc,tab])=>`
+    <div class="card" style="margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;${s[id]?"opacity:.55":""}">
+      <input type="checkbox" ${s[id]?"checked":""} onchange="pbToggle('${key}','${id}')" style="margin-top:4px;width:16px;height:16px;accent-color:var(--green);cursor:pointer">
+      <div style="flex:1">
+        <div style="font-weight:600;${s[id]?"text-decoration:line-through":""}">${title}</div>
+        <div class="muted" style="font-size:12px;margin-top:2px;line-height:1.5">${desc}</div>
+      </div>
+      ${tab?`<button class="btn ghost" style="padding:4px 10px;flex:0 0 auto" onclick="document.querySelector('nav button[data-tab=${tab}]').click()">Open ↗</button>`:""}
+    </div>`).join("");
+}
+function renderPlaybook(){
+  window._pbLoaded = true;
+  let gateHint = "";
+  if(screenerData){
+    const st = screenerData.stocks;
+    const adv = st.filter(s=>s.change_pct>0).length, dec = st.filter(s=>s.change_pct<0).length;
+    const pct = adv/(adv+dec||1)*100;
+    gateHint = `<div class="muted" style="font-size:12px;margin-bottom:8px">Latest scan (${$("universeSelect").value}): ${adv} advancing / ${dec} declining — ${pct>=60?'<span class="up">risk-on</span>':pct<=40?'<span class="down">risk-off</span>':'<span class="muted">mixed</span>'}.</div>`;
+  }
+  $("pbDaily").innerHTML = gateHint + pbList(PB_DAILY, pbKey(), "pbMeta");
+  $("pbWeekly").innerHTML = pbList(PB_WEEKLY, pbWeekKey(), "pbWeekMeta");
+}
+
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti","options"];
+const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti","options","playbook"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
