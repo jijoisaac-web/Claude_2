@@ -1225,7 +1225,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.7
+        <span class="ver-dot"></span>v3.9.8
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3745,20 +3745,33 @@ function parseCsvBank(text, bank){
 function getMerchantMap(){ try{return JSON.parse(localStorage.getItem('merchantMap')||'{}')}catch{return {};} }
 function saveMerchantMap(map){ localStorage.setItem('merchantMap', JSON.stringify(map)); }
 function extractMerchantKey(desc){
-  // For Maybank savings IBK FUND TFR, the REAL merchant is inside (...)
-  const ibk=desc.match(/IBK FUND TFR\s+FR A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
-  if(ibk) return ibk[1].trim().toUpperCase();
-  // For PYMT FROM A/C (MERCHANT) pattern
-  const pymt=desc.match(/PYMT FROM A\/C\s*\(([^)]+?)(?:\s*-[^)]*)?\)/i);
-  if(pymt) return 'PYMT:'+pymt[1].trim().toUpperCase();
-  // Normal extraction: strip trailing location/code suffixes only
+  // Extract person/business name from inside brackets — stop at * or | (reference/note separators)
+  function bracketName(s){
+    return s.replace(/[*|].*$/,'').replace(/\s+/g,' ').trim();
+  }
+  // IBK FUND TFR FR/TO A/C (NAME * | note) → NAME
+  const ibk=desc.match(/IBK FUND TFR\s+(?:FR|TO)\s+A\/C\s*\(([^)]+)\)/i);
+  if(ibk) return bracketName(ibk[1]).toUpperCase();
+  // BK FUND TFR FR/TO A/C (NAME * | note) → NAME
+  const bk=desc.match(/BK FUND TFR\s+(?:FR|TO)\s+A\/C\s*\(([^)]+)\)/i);
+  if(bk) return bracketName(bk[1]).toUpperCase();
+  // TRANSFER FROM A/C (NAME * | note) → NAME  ← key fix: was stripping whole bracket
+  const tfr=desc.match(/TRANSFER FROM A\/C\s*\(([^)]+)\)/i);
+  if(tfr) return bracketName(tfr[1]).toUpperCase();
+  // FUND TRANSFER TO A/ (NAME * | note) → NAME
+  const ft=desc.match(/FUND TRANSFER TO A\/\s*\(([^)]+)\)/i);
+  if(ft) return bracketName(ft[1]).toUpperCase();
+  // PYMT FROM A/C (MERCHANT * | note) → MERCHANT (credit card payments)
+  const pymt=desc.match(/PYMT FROM A\/C\s*\(([^)]+)\)/i);
+  if(pymt) return 'PYMT:'+bracketName(pymt[1]).toUpperCase();
+  // Normal extraction: strip trailing noise only
   return desc
     .replace(/\s*\(.*?\)\s*$/,'')          // strip trailing (...)
     .replace(/\s+[A-Z]{2,}\s+MY\s*$/,'')   // strip trailing CITY MY
-    .replace(/\s+MY\s*$/,'')                 // strip trailing MY
-    .replace(/\s*[*]\s*\d{4,}.*$/,'')       // strip *refcode (digits only)
-    .replace(/\s+\d{6,}\s*$/,'')            // strip trailing long ref numbers
-    .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')   // strip trailing bank codes
+    .replace(/\s+MY\s*$/,'')               // strip trailing MY
+    .replace(/\s*[*]\s*\d{4,}.*$/,'')      // strip *refcode (digits only)
+    .replace(/\s+\d{6,}\s*$/,'')           // strip trailing long ref numbers
+    .replace(/\s+(EC|SP|WT|OTR)\s*$/i,'')  // strip trailing bank codes
     .trim().toUpperCase();
 }
 
