@@ -1,7 +1,7 @@
 {
-  "name": "bestdeals",
-  "version": "2.0.0",
-  "description": "BestDeals - compare live prices across marketplaces",
+  "name": "reviewrank",
+  "version": "1.0.0",
+  "description": "ReviewRank - rank restaurants, gadgets and more by real user reviews",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
