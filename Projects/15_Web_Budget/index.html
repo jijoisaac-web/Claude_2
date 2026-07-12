@@ -1225,7 +1225,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.8
+        <span class="ver-dot"></span>v3.9.9
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -3761,6 +3761,9 @@ function extractMerchantKey(desc){
   // FUND TRANSFER TO A/ (NAME * | note) → NAME
   const ft=desc.match(/FUND TRANSFER TO A\/\s*\(([^)]+)\)/i);
   if(ft) return bracketName(ft[1]).toUpperCase();
+  // FPX PAYMENT FR A/ (REFCODE * | MERCHANT NAME) → MERCHANT NAME (ref code comes first, merchant after |)
+  const fpx=desc.match(/FPX PAYMENT.*?\|\s*([^|)]+)/i);
+  if(fpx) return fpx[1].trim().toUpperCase();
   // PYMT FROM A/C (MERCHANT * | note) → MERCHANT (credit card payments)
   const pymt=desc.match(/PYMT FROM A\/C\s*\(([^)]+)\)/i);
   if(pymt) return 'PYMT:'+bracketName(pymt[1]).toUpperCase();
