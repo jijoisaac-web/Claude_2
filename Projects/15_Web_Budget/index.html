@@ -1225,7 +1225,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.10
+        <span class="ver-dot"></span>v3.9.11
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4103,7 +4103,9 @@ function parseMaybankCcPdf(text, filename){
 
 function parseMaybankSavPdf(text){
   const lines=text.split('\n').map(l=>l.trim()).filter(l=>l);
-  const skipPat=/^(BEGINNING BALANCE|ENDING BALANCE|TARIKH|ENTRY DATE|Perhation|Perhatian|Semua|All items|Sila |Please |Faedah|Interest|Maybank Islamic|15th Floor|Tower A|MUKA\/|JIJO |33B-|JALAN |KUALALUMPUR|50480|PROTECTED|URUSNIAGA|NOMBOR|ACCOUNT NUMBER|SAVINGS ACCOUNT|IBS PRIMA|TARIKH PENYATA|STATEMENT DATE|BUTIR|JUMLAH URUSNIAGA|BAKI PENYATA)/i;
+  const skipPat=/^(BEGINNING BALANCE|ENDING BALANCE|TARIKH|ENTRY DATE|Perhation|Perhatian|Semua|All items|Sila |Please |Faedah|Interest|Maybank Islamic|15th Floor|Tower A|MUKA\/|PROTECTED|URUSNIAGA|NOMBOR|ACCOUNT NUMBER|SAVINGS ACCOUNT|IBS PRIMA|TARIKH PENYATA|STATEMENT DATE|BUTIR|JUMLAH URUSNIAGA|BAKI PENYATA)/i;
+  // Note: removed JIJO/33B-/JALAN/KUALALUMPUR/50480 — personal address tokens that were incorrectly
+  // breaking continuation capture when recipient name started with those strings (e.g. JIJO PALATHINKAL IS*)
   const refNoise=/^(QR\d+$|MAE QR$|DUITNOW QR$|MBB CT|\d{14,}$|XXXX-XXXX)/;
   const txnPat=/^(\d{2}\/\d{2}\/\d{2,4})\s+(.+?)\s+([\d,]+\.\d{2})([+-])\s+[\d,]+\.\d{2}\s*$/;
   const txns=[];
