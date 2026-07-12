@@ -1069,6 +1069,46 @@ tbody tr.income-row td:first-child{
 .cl-item{font-size:11.5px;color:var(--text2);padding:3px 0;padding-left:14px;position:relative;line-height:1.5;}
 .cl-item::before{content:'•';position:absolute;left:4px;color:var(--accent);}
 @media(max-width:640px){#changelogPopup{width:calc(100vw - 32px);}}
+
+/* ══════════════════════ INSIGHTS TAB ══════════════════════ */
+.insights-wrap{max-width:860px;margin:0 auto;padding:20px 16px 40px;}
+.insights-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+.insights-title{font-size:18px;font-weight:800;color:var(--text1);}
+.insights-controls{display:flex;gap:8px;align-items:center;}
+
+/* Metric row */
+.insights-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
+.insight-metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center;}
+.im-value{font-size:22px;font-weight:800;line-height:1.15;margin-bottom:4px;}
+.im-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+.im-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+
+/* Insight cards */
+.insights-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:24px;}
+.insight-card{border-radius:12px;padding:14px 16px;border-left:4px solid transparent;}
+.insight-card.warn{background:rgba(248,113,113,.08);border-color:var(--red);}
+.insight-card.good{background:rgba(92,184,122,.08);border-color:var(--accent);}
+.insight-card.info{background:rgba(96,165,250,.08);border-color:#60a5fa;}
+.insight-card.tip{background:rgba(251,191,36,.08);border-color:#fbbf24;}
+.ic-title{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text1);}
+.ic-body{font-size:12px;color:var(--text2);line-height:1.55;}
+
+/* Merchants bar list */
+.insights-merchants-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.insights-section-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.7px;text-transform:uppercase;margin-bottom:12px;}
+.merchant-row{display:grid;grid-template-columns:180px 1fr 90px 52px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+.merchant-row:last-child{border-bottom:none;}
+.merchant-name{font-size:12px;font-weight:600;color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.merchant-bar-wrap{background:var(--surface2);border-radius:99px;height:6px;overflow:hidden;}
+.merchant-bar-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .4s;}
+.merchant-amt{font-size:12px;font-weight:700;color:var(--red);text-align:right;}
+.merchant-cnt{font-size:10px;color:var(--text3);text-align:right;}
+@media(max-width:600px){
+  .merchant-row{grid-template-columns:1fr 80px;gap:4px;}
+  .merchant-bar-wrap,.merchant-cnt{display:none;}
+  .insights-cards{grid-template-columns:1fr;}
+}
+
 </style>
 </head>
 <body>
@@ -1185,7 +1225,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.6
+        <span class="ver-dot"></span>v3.9.7
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4667,13 +4707,35 @@ function renderInsights(){
   }).filter(s=>s.totalActual>0||s.totalExpected>0);
 
   // ── Top merchants ──
+  // Normalize raw desc → clean display merchant name for insights
+  function insightMerchantName(raw){
+    // FPX PAYMENT FR A/ (1248261482941719 * | LULU MONEY (MALAYSIA)) → LULU MONEY
+    const fpx=raw.match(/FPX PAYMENT.*?\|\s*([^(|]+)/i);
+    if(fpx) return fpx[1].trim();
+    // BK FUND TFR FR A/C (CHAI MEAU KHUAN * | June26rentSS | RentJune26SangSuria) → use raw[0..30]
+    const bk=raw.match(/BK FUND TFR FR A\/C\s*\(([^*|]+)/i);
+    if(bk) return 'TFR: '+bk[1].trim().slice(0,30);
+    // TRANSFER FROM A/C (RITHEESH VALIYA VEE* | Ritheesh) → RITHEESH VALIYA VEE
+    const tfr=raw.match(/TRANSFER FROM A\/C\s*\(([^*|)]+)/i);
+    if(tfr) return 'TFR: '+tfr[1].trim().slice(0,30);
+    // PYMT FROM A/C (MAYBANK MASTER CARD* | 00) → MAYBANK MASTER CARD
+    const pymt=raw.match(/PYMT FROM A\/C\s*\(([^*|)]+)/i);
+    if(pymt) return pymt[1].trim();
+    // IBK FUND TFR FR A/C (NAME) → NAME
+    const ibk=raw.match(/IBK FUND TFR\s+FR A\/C\s*\(([^)|]+)/i);
+    if(ibk) return 'TFR: '+ibk[1].trim().slice(0,30);
+    return raw.replace(/\s*\(.*?\)\s*$/, '').trim();
+  }
+  // Skip purely internal/transfer entries from merchant insights
+  const SKIP_RE=/^(BK FUND TFR|IBK FUND TFR|TRANSFER FROM|PYMT FROM A\/C|CARD RELOAD|Card Reload)/i;
   const merchantMap={};
   cats.forEach(cat=>{
     MONTHS.forEach((_,mi)=>{
       const md=st.months?.[mi]||{};
       const d=md[cat.id]||{};
-      if(d.transactions) d.transactions.filter(t=>t.type==='expense').forEach(t=>{
-        const k=(t.desc||'Other').trim();
+      if(d.transactions) d.transactions.filter(t=>t.type==='expense'&&!SKIP_RE.test(t.desc||'')).forEach(t=>{
+        const k=insightMerchantName(t.desc||'Other');
+        if(!k) return;
         if(!merchantMap[k]) merchantMap[k]={amt:0,cnt:0};
         merchantMap[k].amt+=t.amount;
         merchantMap[k].cnt++;
@@ -4682,7 +4744,7 @@ function renderInsights(){
   });
   const topMerchants=Object.entries(merchantMap)
     .map(([k,v])=>({name:k,amt:Math.round(v.amt*100)/100,cnt:v.cnt}))
-    .sort((a,b)=>b.amt-a.amt).slice(0,15);
+    .sort((a,b)=>b.amt-a.amt).slice(0,12);
 
   // ── Render metrics row ──
   const savCol=savingsRate>=20?'var(--accent)':savingsRate>=10?'#fbbf24':'var(--red)';
@@ -4802,11 +4864,11 @@ function renderInsights(){
   if(topMerchants.length>0){
     const maxAmt=topMerchants[0].amt;
     document.getElementById('insightsMerchants').innerHTML=`
-      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">Top Merchants — ${year}</div>
-      <div class="merchants-list">`+
+      <div class="insights-merchants-wrap">
+        <div class="insights-section-label">🏪 Top Merchants — ${year}</div>`+
       topMerchants.map(m=>`
         <div class="merchant-row">
-          <div class="merchant-name">${m.name}</div>
+          <div class="merchant-name" title="${m.name}">${m.name}</div>
           <div class="merchant-bar-wrap"><div class="merchant-bar-fill" style="width:${Math.round(m.amt/maxAmt*100)}%"></div></div>
           <div class="merchant-amt">MYR ${m.amt.toLocaleString()}</div>
           <div class="merchant-cnt">${m.cnt} txn${m.cnt>1?'s':''}</div>
