@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.34"/>
+<link rel="stylesheet" href="/site.css?v=7.35"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.34</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.35</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1414,9 +1414,17 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="rates-disclaimer">
       <div class="rd-icon">&#9888;&#65039;</div>
       <div class="rd-body">
-        <div class="rd-title">Disclaimer &amp; Important Notice</div>
+        <div class="rd-title">Disclaimer &amp; Data Sources</div>
         <div class="rd-text">
           Rates shown on this page are <strong>indicative estimates only</strong>, calculated using live mid-market exchange rates adjusted by each provider&apos;s <em>typical</em> margin and fee. They are <strong>not guaranteed</strong> and may differ from the actual rate offered at the time of your transfer.
+          <br><br>
+          <strong>Mid-market rate sources (fetched live, cross-checked across 3 APIs):</strong>
+          <ul class="rd-sources">
+            <li><strong>Frankfurter / European Central Bank (ECB)</strong> &mdash; <code>api.frankfurter.app</code> &mdash; Official ECB published rates. Most authoritative for EUR cross-rates.</li>
+            <li><strong>fawazahmed0 Currency API</strong> &mdash; <code>cdn.jsdelivr.net/npm/@fawazahmed0/currency-api</code> &mdash; Free, open-source dataset covering 150+ currencies, updated daily.</li>
+            <li><strong>currency-api.pages.dev</strong> &mdash; Cloudflare-hosted mirror of the above dataset, used as a redundant fallback.</li>
+          </ul>
+          These are <strong>interbank mid-market rates</strong> &mdash; the midpoint between buy and sell prices. Remittance providers add their own margin on top of this rate. The actual rate you receive will always be slightly lower than the mid-market rate shown.
           <br><br>
           Exchange rates fluctuate continuously. Provider margins, fees, and promotions change without notice. NRI Finance Hub is an <strong>independent comparison tool</strong> and has no commercial affiliation with any remittance provider listed. We do not process, facilitate, or guarantee any money transfers.
           <br><br>
@@ -2888,14 +2896,14 @@ document.addEventListener('DOMContentLoaded',function(){
         Questions or feedback? &nbsp;&#9993;&nbsp;
         <a href="mailto:nrifinancehub3@gmail.com" style="color:var(--teal);font-weight:600;">nrifinancehub3@gmail.com</a>
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.34 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.35 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.34"></script>
+<script src="/site.js?v=7.35"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

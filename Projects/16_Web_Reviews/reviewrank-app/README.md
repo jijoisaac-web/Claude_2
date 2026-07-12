@@ -45,6 +45,7 @@ R = restaurant's rating · v = review count · m = 100 · C = mean rating of res
 
 ## Version history
 
+- **v2.3.0** — dark "fine dining" results panel with jewel-tone banner cards and glass tiles; matching dark page background; removed the demo-mode banner; Clear-filters button appears once you've searched and the state changes or the cuisine field is blank.
 - **v2.2.0** — 14 food categories per country; single-page flow (description section hides when results show); modernized results view: banner cards with gradient/photo headers, medal badges, floating score rings, stacked feedback chips.
 - **v2.1.0** — "What ReviewRank really offers" section on the home page; full-page background imagery; top 3 diner feedbacks (👍👍👎) on every restaurant card (live mode shows featured Google quotes when the API provides them).
 - **v2.0.0** — restaurants-only focus; India & Malaysia trial; state/city picker; file cache + TTL; stale-serve; query log; `refresh.js` precompute; hidden gems; freshness chip.

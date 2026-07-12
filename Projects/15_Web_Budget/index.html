@@ -1225,7 +1225,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.9
+        <span class="ver-dot"></span>v3.9.10
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -4355,29 +4355,41 @@ function renderMappingTab(){
     const samplesArr=[...g.samples];
     // Show all unique raw descriptions (not just one sample)
     const samplesHtml=samplesArr.map(s=>`<div style="font-size:10px;color:var(--text3);word-break:break-word;margin-top:2px;padding-left:6px;border-left:2px solid var(--border)">↳ ${s}</div>`).join('');
-    // Expandable entries list
+    // Expandable entries list — each row has its own category override dropdown
     const entriesId=`map-entries-${ki}`;
+    const allSameDesc=samplesArr.length===1; // only hide desc column if all entries are identical
     const entriesHtml=g.entries.map(e=>`
-      <div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border);font-size:10px">
-        <span style="color:var(--text3);white-space:nowrap;min-width:72px">${e.date}</span>
-        <span style="flex:1;word-break:break-word;color:var(--text1)">${e.desc}</span>
-        <span style="white-space:nowrap;color:${e.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(e.amount)}</span>
+      <div style="display:grid;grid-template-columns:68px 1fr auto auto;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text3);font-size:10px;white-space:nowrap">${e.date}</span>
+        <span style="font-size:10px;word-break:break-word;color:var(--text2)">${allSameDesc?'—':e.desc}</span>
+        <span style="font-size:10px;white-space:nowrap;color:${e.type==='income'?'var(--accent)':'var(--red)'}">MYR ${fmt(e.amount)}</span>
+        <select class="bi-sel bi-cat" data-i="${e.i}" data-mkey="${mk.replace(/"/g,'&quot;')}"
+          style="font-size:10px;padding:2px 4px;min-width:110px;max-width:140px"
+          onchange="biCatChanged(this)"
+          title="Override category for this single transaction">
+          ${catOpts}
+        </select>
       </div>`).join('');
+    // Show "ambiguous" warning when all descriptions are identical (can't auto-distinguish)
+    const ambiguous=allSameDesc&&g.count>1;
     html+=`<tr>
       <td>
-        <div style="font-weight:600;font-size:12px;margin-bottom:3px">${mk}${savedBadge}</div>
-        ${samplesHtml}
+        <div style="font-weight:600;font-size:12px;margin-bottom:3px">${mk}${savedBadge}${ambiguous?'<span style="font-size:9px;background:rgba(251,191,36,.2);color:#fbbf24;border-radius:4px;padding:1px 5px;margin-left:5px">⚠ ambiguous — set per entry</span>':''}</div>
+        ${allSameDesc?'':samplesHtml}
         <div style="margin-top:5px">
-          <span onclick="document.getElementById('${entriesId}').style.display=document.getElementById('${entriesId}').style.display==='none'?'block':'none'"
-            style="font-size:10px;color:var(--accent);cursor:pointer">▼ show ${g.count} entr${g.count===1?'y':'ies'}</span>
-          <div id="${entriesId}" style="display:none;margin-top:6px;padding:4px 6px;background:var(--bg2);border-radius:6px;max-height:180px;overflow-y:auto">
+          <span onclick="(function(el){el.style.display=el.style.display==='none'?'block':'none'})(document.getElementById('${entriesId}'))"
+            style="font-size:10px;color:var(--accent);cursor:pointer">▼ ${ambiguous?'assign each entry':'show '+g.count+' entr'+(g.count===1?'y':'ies')}</span>
+          <div id="${entriesId}" style="display:${ambiguous?'block':'none'};margin-top:6px;padding:6px 8px;background:var(--bg2);border-radius:6px;max-height:260px;overflow-y:auto">
             ${entriesHtml}
           </div>
         </div>
       </td>
       <td style="text-align:center;vertical-align:top;padding-top:8px">${g.count}</td>
       <td style="text-align:right;font-weight:700;color:var(--red);vertical-align:top;padding-top:8px">MYR ${fmt(g.total)}</td>
-      <td style="vertical-align:top;padding-top:6px"><select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}" style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select></td>
+      <td style="vertical-align:top;padding-top:6px">
+        <select class="bi-sel map-cat-sel" data-mkey="${mk.replace(/"/g,'&quot;')}" style="width:100%" onchange="mapCatChanged(this)">${catOpts}</select>
+        ${ambiguous?`<div style="font-size:9px;color:var(--text3);margin-top:3px">Sets all — or use per-entry ↑</div>`:''}
+      </td>
     </tr>`;
   });
   html+=`</tbody></table></div>`;
@@ -4872,14 +4884,7 @@ function renderInsights(){
 
   document.getElementById('insightsCards').innerHTML=cards.map(card=>`
     <div class="insight-card ${card.type}">
-      <div class="ic-title">${card.icon} ${card.title}</div>
-      <div class="ic-body">${card.body}</div>
-    </div>`).join('');
-
-  // ── Top merchants list ──
-  if(topMerchants.length>0){
-    const maxAmt=topMerchants[0].amt;
-    document.getElementById('insightsMerchants').innerHTML=`
+      <div class="ic-title">${card.icon} ${card.ti    document.getElementById('insightsMerchants').innerHTML=`
       <div class="insights-merchants-wrap">
         <div class="insights-section-label">🏪 Top Merchants — ${year}</div>`+
       topMerchants.map(m=>`
