@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.21.0] — 2026-07-13 · Tab Cleanup + Background Art
+
+- Removed the **Value Screener** and **Portfolio** tabs and all their dedicated code (fundamental filter builder, saved screens, CSV import/export, P&L and allocation analysis) — cleaned up every reference: nav, keyboard-shortcut tab order, the init routine that was populating a portfolio-add dropdown, and the Playbook's weekly "Portfolio health" checklist item (removed, since its underlying tool is gone)
+- Existing `localStorage` data from these tabs (`ist_portfolio`, `ist_screens`) is left in place but now unused — harmless, no migration needed
+- Added subtle background art: a faint dot-grid texture across the page and a low-opacity candlestick/line-chart watermark fixed to the bottom-right corner (hidden on mobile), layered behind the existing ambient gradient glow — decorative only, doesn't affect any data or interaction
+
 ## [2.20.0] — 2026-07-13 · Morning Brief Tab
 
 - New **Brief** tab: one page combining the market gate (breadth + FII/DII combined into a GREEN/AMBER/RED read with sizing guidance), an options-edge summary (top long-flow names, IV-rich and IV-cheap shortlists from the two Options-tab scanners), and today's top technical BUY setups (score ≥60) — the exact checks the Playbook's daily "market gate" step already asked for, now automated instead of manual

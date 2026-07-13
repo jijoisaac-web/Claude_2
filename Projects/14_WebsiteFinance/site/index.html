@@ -91,11 +91,8 @@ progress{width:180px;accent-color:var(--blue);}
 #searchResults .sr{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;gap:8px;}
 #searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
 #kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
-.allocRow{display:flex;align-items:center;gap:8px;margin:4px 0;}
-.allocRow .aname{width:120px;font-size:12px;color:var(--muted);text-align:right;}
-.allocRow .bar{height:14px;border-radius:3px;background:var(--blue);min-width:2px;max-width:40vw;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#fsResults,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#pfTable,#dealsTable,#btResults,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -117,7 +114,7 @@ progress{width:180px;accent-color:var(--blue);}
   select,input[type=text]{padding:7px 8px;font-size:13px;max-width:46vw;}
   button.btn{padding:7px 10px;font-size:12px;}
   /* wide tables: scroll inside their container */
-  #screenerTable table,#fsResults table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table{min-width:640px;}
+  #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table{min-width:640px;}
   #watchTable table,#peerView table{min-width:420px;}
   .sectorRow .sname{width:96px;font-size:11px;}
   .sectorRow .bar{max-width:34vw;}
@@ -131,10 +128,18 @@ progress{width:180px;accent-color:var(--blue);}
 /* ===================== visual refresh (v2.14) — override layer ===================== */
 :root{--bg:#0a0e17;--panel:#111827;--border:#26314a;--text:#e8edf7;--muted:#93a0bd;
 --green:#34d399;--red:#fb7185;--blue:#60a5fa;--amber:#fbbf24;--violet:#a78bfa;}
-body{font-family:'Inter','Segoe UI',system-ui,sans-serif;
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;position:relative;
   background:radial-gradient(1100px 480px at 50% -8%, rgba(96,110,250,.13), transparent 60%),
-             radial-gradient(800px 400px at 90% 10%, rgba(167,139,250,.06), transparent 55%), var(--bg);
+             radial-gradient(800px 400px at 90% 10%, rgba(167,139,250,.06), transparent 55%),
+             radial-gradient(circle, rgba(96,165,250,.22) 1.4px, transparent 1.6px) 0 0/34px 34px,
+             var(--bg);
   background-attachment:fixed;}
+/* faint chart-motif watermark, fixed to the viewport, sits behind all content */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='300' viewBox='0 0 520 300'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cline x1='20' y1='40' x2='20' y2='120' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='12' y='60' width='16' height='40' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='60' y1='20' x2='60' y2='150' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='52' y='55' width='16' height='55' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cline x1='100' y1='70' x2='100' y2='180' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='92' y='90' width='16' height='60' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='140' y1='30' x2='140' y2='130' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='132' y='45' width='16' height='50' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='180' y1='90' x2='180' y2='220' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='172' y='120' width='16' height='65' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cline x1='220' y1='50' x2='220' y2='160' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='212' y='70' width='16' height='55' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='260' y1='100' x2='260' y2='240' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='252' y='130' width='16' height='70' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='300' y1='60' x2='300' y2='170' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='292' y='85' width='16' height='55' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cpath d='M20 80 L60 90 L100 130 L140 70 L180 150 L220 100 L260 165 L300 110' stroke='%2360a5fa' stroke-opacity='0.5' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:bottom -10px right -20px;background-size:min(46vw,520px) auto;
+  opacity:.16;}
+@media(max-width:900px){body::before{display:none;}}
 header{background:rgba(11,16,28,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
 header h1{font-weight:800;letter-spacing:-.3px;}
 header h1 span{background:linear-gradient(90deg,var(--blue),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;}
@@ -172,7 +177,7 @@ select:focus,input[type=text]:focus{outline:none;border-color:var(--blue);box-sh
 ::-webkit-scrollbar-track{background:transparent;}
 #searchResults{border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.55);}
 #globalSearch{background:#0d1424;}
-.breadthBar,.sectorRow .bar,.allocRow .bar{border-radius:5px;}
+.breadthBar,.sectorRow .bar{border-radius:5px;}
 .chg{font-weight:500;}
 .price{letter-spacing:-.3px;}
 progress{accent-color:var(--violet);}
@@ -186,10 +191,8 @@ progress{accent-color:var(--violet);}
     <button data-tab="dashboard" class="active">Dashboard</button>
     <button data-tab="screener">Screener</button>
     <button data-tab="ideas">Ideas</button>
-    <button data-tab="fscreener">Value Screener</button>
     <button data-tab="charts">Charts</button>
     <button data-tab="fundamentals">Fundamentals</button>
-    <button data-tab="portfolio">Portfolio</button>
     <button data-tab="track">Backtest</button>
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
@@ -206,7 +209,7 @@ progress{accent-color:var(--violet);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–9</b></td><td>Switch tabs (Dashboard → FII/DII)</td></tr>
+      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Brief)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -301,62 +304,6 @@ progress{accent-color:var(--violet);}
     <div id="pcOut" class="muted">Click 📐 on any idea to prefill entry/stop.</div>
     <div class="muted" style="font-size:11px;margin-top:6px;">Leverage amplifies losses as much as gains — a 5x intraday position loses 5% of capital on a 1% adverse move. Delivery (1x) is safest while learning.</div>
   </div>
-</section>
-
-<!-- VALUE SCREENER (fundamental filters) -->
-<section id="fscreener" class="tab">
-  <div class="controls">
-    <select id="fsUniverse">
-      <option value="NIFTY 50">NIFTY 50</option>
-      <option value="NEXT 50">NEXT 50</option>
-      <option value="MIDCAP 150">MIDCAP 150</option>
-      <option value="SMALLCAP 250">SMALLCAP 250</option>
-      <option value="ALL">All (~500)</option>
-    </select>
-    <select id="fsSector"><option value="">All sectors</option></select>
-    <button class="btn ghost" onclick="addFilterRow()">+ Add filter</button>
-    <button class="btn" onclick="runFScreen()">▶ Run screen</button>
-    <progress id="fsProgress" style="display:none"></progress>
-    <span class="muted" id="fsMeta"></span>
-  </div>
-  <div id="filterRows"></div>
-  <div class="controls" style="margin-top:4px">
-    <span class="muted">Presets:</span>
-    <button class="btn ghost" onclick="applyPreset('quality')">Quality compounders</button>
-    <button class="btn ghost" onclick="applyPreset('value')">Deep value</button>
-    <button class="btn ghost" onclick="applyPreset('dividend')">Dividend champs</button>
-    <button class="btn ghost" onclick="applyPreset('garp')">GARP</button>
-    <span style="flex:1"></span>
-    <button class="btn ghost" onclick="saveScreen()">💾 Save screen</button>
-    <select id="savedScreens" onchange="loadSavedScreen()"><option value="">Saved screens…</option></select>
-    <button class="btn ghost" onclick="exportFScreenCSV()">⬇ CSV</button>
-  </div>
-  <div id="fsResults"><div class="loading">Add filters (or pick a preset) and hit Run. First run fetches fundamentals for the whole universe — NIFTY 50 takes ~15s, All ~2 min, then it's cached for an hour.</div></div>
-</section>
-
-<!-- PORTFOLIO -->
-<section id="portfolio" class="tab">
-  <div class="controls">
-    <label class="btn ghost" style="cursor:pointer">📁 Upload CSV<input type="file" id="pfFile" accept=".csv,.txt" style="display:none" onchange="importPortfolioCSV(this)"></label>
-    <select id="pfAddSym"></select>
-    <input type="text" id="pfAddQty" size="5" placeholder="qty">
-    <input type="text" id="pfAddPrice" size="7" placeholder="avg ₹">
-    <button class="btn" onclick="pfAddRow()">+ Add</button>
-    <button class="btn ghost" onclick="analyzePortfolio()">↻ Refresh</button>
-    <button class="btn ghost" onclick="pfClear()">Clear all</button>
-    <span class="muted" id="pfMeta"></span>
-  </div>
-  <div class="muted" style="font-size:11px;margin-bottom:10px">CSV columns: <b>symbol, quantity, avg_price</b> (header row optional; symbols with or without .NS — e.g. <code>RELIANCE, 10, 2450</code>). Everything stays in your browser.</div>
-  <div class="cards" id="pfSummary"></div>
-  <h2>Holdings</h2>
-  <div id="pfTable"><div class="loading">Upload a CSV or add holdings above</div></div>
-  <div class="pulse-grid" style="margin-top:14px">
-    <div><h2 style="margin-top:0">Sector allocation</h2><div id="pfSectors"></div></div>
-    <div><h2 style="margin-top:0">Cap allocation</h2><div id="pfCaps"></div></div>
-    <div><h2 style="margin-top:0">Risk (1 year)</h2><div id="pfRisk"></div></div>
-  </div>
-  <h2>Observations</h2>
-  <div id="pfSuggest"><div class="loading">…</div></div>
 </section>
 
 <!-- INSTITUTIONS: FII/DII + large deals -->
@@ -698,8 +645,6 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   b.classList.add("active"); $(b.dataset.tab).classList.add("visible");
   if(b.dataset.tab==="screener" && !screenerData) loadScreener();
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
-  if(b.dataset.tab==="fscreener" && !window._fsLoaded) initFScreener();
-  if(b.dataset.tab==="portfolio" && !window._pfLoaded) analyzePortfolio();
   if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="playbook") renderPlaybook();
@@ -1385,141 +1330,6 @@ async function loadChart(){
   }catch(e){ $("chart").innerHTML = `<div class="loading">Chart failed: ${e.message}</div>`; }
 }
 
-/* ================= value screener (fundamental filters) ================= */
-// key: [label, unit] — unit: "x" plain ratio, "pct" fraction→%, "%" already %, "cr" ₹→Cr, "₹" price
-const FS_FIELDS = {
-  market_cap:["Market Cap","cr"], enterprise_value:["Enterprise Value","cr"], price:["Price","₹"],
-  pe:["P/E","x"], forward_pe:["Forward P/E","x"], peg:["PEG","x"], pb:["P/B","x"], ps:["P/S","x"],
-  ev_ebitda:["EV/EBITDA","x"], dividend_yield:["Dividend Yield","%"], roe:["ROE","pct"], roa:["ROA","pct"],
-  operating_margin:["Operating Margin","pct"], profit_margin:["Net Margin","pct"], gross_margin:["Gross Margin","pct"],
-  debt_to_equity:["Debt/Equity","x"], current_ratio:["Current Ratio","x"], quick_ratio:["Quick Ratio","x"],
-  ocf:["Operating Cash Flow","cr"], fcf:["Free Cash Flow","cr"],
-  revenue_growth:["Sales Growth","pct"], earnings_growth:["Profit Growth","pct"],
-  beta:["Beta","x"], off_high:["% from 52w High","%"],
-};
-const fsVal = (f, key) => {
-  if(key==="off_high") return f.price!=null && f.high_52w ? (f.price-f.high_52w)/f.high_52w*100 : null;
-  let v = f[key]; if(v==null) return null;
-  const unit = FS_FIELDS[key][1];
-  if(unit==="pct") return v*100;
-  if(unit==="cr") return v/1e7;
-  if(key==="debt_to_equity" && v>10) return v/100;   // yahoo returns D/E as a percentage
-  return v;
-};
-const fsShow = (v, key) => v==null ? "—" : FS_FIELDS[key][1]==="cr" ? fmtInt(Math.round(v)) : fmt(v, 2);
-
-let fsData = null, fsUniLoaded = null, fsResults = [];
-
-function addFilterRow(field, op, val){
-  const div = document.createElement("div");
-  div.className = "controls"; div.style.margin = "4px 0";
-  div.innerHTML = `<select class="fsField">${Object.entries(FS_FIELDS).map(([k,[l,u]])=>
-      `<option value="${k}" ${k===field?"selected":""}>${l}${u==="cr"?" (₹ Cr)":u==="pct"||u==="%"?" (%)":""}</option>`).join("")}</select>
-    <select class="fsOp"><option ${op===">="?"selected":""}>&gt;=</option><option ${op==="<="?"selected":""}>&lt;=</option></select>
-    <input type="text" class="fsVal" size="8" value="${val!=null?val:""}" placeholder="value">
-    <button class="btn danger" onclick="this.parentElement.remove()">✕</button>`;
-  $("filterRows").appendChild(div);
-}
-function getFilters(){
-  return [...document.querySelectorAll("#filterRows .controls")].map(r=>({
-    field: r.querySelector(".fsField").value,
-    op: r.querySelector(".fsOp").value.includes(">") || r.querySelector(".fsOp").value==="&gt;=" ? ">=" : "<=",
-    val: parseFloat(r.querySelector(".fsVal").value),
-  })).filter(f=>!isNaN(f.val));
-}
-function setFilters(filters){
-  $("filterRows").innerHTML = "";
-  filters.forEach(f=>addFilterRow(f.field, f.op, f.val));
-}
-const FS_PRESETS = {
-  quality: [{field:"roe",op:">=",val:15},{field:"operating_margin",op:">=",val:15},{field:"debt_to_equity",op:"<=",val:0.5},{field:"revenue_growth",op:">=",val:10}],
-  value: [{field:"pe",op:"<=",val:15},{field:"pb",op:"<=",val:2},{field:"debt_to_equity",op:"<=",val:1},{field:"off_high",op:"<=",val:-20}],
-  dividend: [{field:"dividend_yield",op:">=",val:2},{field:"roe",op:">=",val:12},{field:"debt_to_equity",op:"<=",val:1}],
-  garp: [{field:"peg",op:"<=",val:1.5},{field:"earnings_growth",op:">=",val:15},{field:"roe",op:">=",val:15}],
-};
-function applyPreset(name){ setFilters(FS_PRESETS[name]); }
-function initFScreener(){
-  window._fsLoaded = true;
-  $("fsSector").innerHTML = '<option value="">All sectors</option>' +
-    Object.keys(SECTORS).map(s=>`<option value="${s}">${s}</option>`).join("");
-  refreshScreensDropdown();
-  if(!$("filterRows").children.length) applyPreset("quality");
-}
-
-async function ensureFsData(){
-  const uni = $("fsUniverse").value;
-  if(fsData && fsUniLoaded === uni) return;
-  const syms = uni==="ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni]);
-  const prog = $("fsProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
-  $("fsMeta").textContent = `Fetching fundamentals for ${syms.length} stocks…`;
-  const rows = await pmap(syms, async s=>{ const f = await fetchFundamentals(s); f.symbol=s; return f; }, 6, ()=>prog.value++);
-  prog.style.display="none";
-  fsData = rows.filter(Boolean); fsUniLoaded = uni;
-  $("fsMeta").textContent = `${fsData.length}/${syms.length} loaded`;
-}
-async function runFScreen(){
-  try{ await ensureFsData(); }catch(e){ $("fsResults").innerHTML = `<div class="loading">Fetch failed: ${e.message}</div>`; return; }
-  const filters = getFilters(), sector = $("fsSector").value;
-  let rows = fsData;
-  if(sector) rows = rows.filter(f=>sectorOf(f.symbol)===sector);
-  for(const flt of filters)
-    rows = rows.filter(f=>{ const v = fsVal(f, flt.field); return v!=null && (flt.op===">=" ? v>=flt.val : v<=flt.val); });
-  fsResults = rows;
-  renderFScreen(filters);
-}
-let fsSortKey = "market_cap", fsSortDir = -1;
-function fsSort(key){ fsSortDir = key===fsSortKey ? -fsSortDir : -1; fsSortKey = key; renderFScreen(getFilters()); }
-function renderFScreen(filters){
-  const cols = [...new Set(["market_cap","pe","roe", ...filters.map(f=>f.field)])];
-  const rows = [...fsResults].sort((a,b)=>{
-    const va = fsVal(a,fsSortKey), vb = fsVal(b,fsSortKey);
-    return ((va==null)-(vb==null)) || (va>vb?1:va<vb?-1:0)*fsSortDir;
-  });
-  $("fsMeta").textContent = `${rows.length} match${rows.length===1?"":"es"}`;
-  $("fsResults").innerHTML = rows.length ? `<table><thead><tr>
-    <th>Stock</th>${cols.map(c=>`<th style="cursor:pointer" onclick="fsSort('${c}')" title="sort">${FS_FIELDS[c][0]}${c===fsSortKey?(fsSortDir<0?" ↓":" ↑"):""}</th>`).join("")}<th></th></tr></thead><tbody>` +
-    rows.map(f=>{ const cap=capOf(f.symbol), cc=cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
-      return `<tr onclick="openFundamentals('${f.symbol}')">
-      <td><span class="sym">${f.symbol.replace(".NS","")}</span> <span class="badge ${cc}">${cap}</span><br><span class="subname">${nameOf(f.symbol)} · ${sectorOf(f.symbol)||""}</span></td>
-      ${cols.map(c=>`<td>${fsShow(fsVal(f,c),c)}</td>`).join("")}
-      <td><button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openChart('${f.symbol}')">📈</button></td></tr>`;}).join("") +
-    "</tbody></table>" : '<div class="loading">No matches — loosen a filter or two.</div>';
-}
-
-/* saved screens + CSV export */
-const SCREENS_KEY = "ist_screens";
-function getScreens(){ try{ return JSON.parse(localStorage.getItem(SCREENS_KEY))||{}; }catch(e){ return {}; } }
-function refreshScreensDropdown(){
-  const s = getScreens();
-  $("savedScreens").innerHTML = '<option value="">Saved screens…</option>' +
-    Object.keys(s).map(n=>`<option value="${n}">${n}</option>`).join("");
-}
-function saveScreen(){
-  const filters = getFilters();
-  if(!filters.length){ alert("Add at least one filter first."); return; }
-  const name = prompt("Name this screen:");
-  if(!name) return;
-  const s = getScreens(); s[name] = filters;
-  localStorage.setItem(SCREENS_KEY, JSON.stringify(s));
-  refreshScreensDropdown();
-}
-function loadSavedScreen(){
-  const name = $("savedScreens").value; if(!name) return;
-  setFilters(getScreens()[name] || []);
-}
-function exportFScreenCSV(){
-  if(!fsResults.length){ alert("Run a screen first."); return; }
-  const cols = Object.keys(FS_FIELDS);
-  const head = ["Symbol","Name","Sector","Cap", ...cols.map(c=>FS_FIELDS[c][0])];
-  const lines = [head.join(",")].concat(fsResults.map(f=>
-    [f.symbol.replace(".NS",""), `"${(nameOf(f.symbol)||"").replace(/"/g,"")}"`, `"${sectorOf(f.symbol)||""}"`, capOf(f.symbol)||"",
-     ...cols.map(c=>{ const v = fsVal(f,c); return v==null?"":(+v.toFixed(3)); })].join(",")));
-  const blob = new Blob([lines.join("\n")], {type:"text/csv"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "screen_results.csv"; a.click();
-  URL.revokeObjectURL(a.href);
-}
-
 /* ================= fundamentals ================= */
 const FUND_CACHE = "ist_fund2:";
 async function fetchFundamentals(sym){
@@ -1791,155 +1601,6 @@ async function loadPeerComparison(sym, me){
       <td style="text-align:left">${vBadge(r.verdict)}</td></tr>`).join("") +
     `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:6px;">"Better" = beats the peer median by >10% in the favourable direction (lower for P/E, P/B, D/E; higher for the rest). Sector medians hide business-mix differences — read alongside the company's own history.</div>`;
-}
-
-/* ================= portfolio analyzer ================= */
-const PF_KEY = "ist_portfolio";
-function getPF(){ try{ return JSON.parse(localStorage.getItem(PF_KEY))||[]; }catch(e){ return []; } }
-function setPF(h){ localStorage.setItem(PF_KEY, JSON.stringify(h)); }
-
-function normSym(s){
-  s = s.trim().toUpperCase().replace(/\.NS$/,"");
-  return s ? s+".NS" : null;
-}
-function importPortfolioCSV(input){
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const lines = reader.result.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-    const holdings = getPF(); let added=0, skipped=[];
-    for(const line of lines){
-      const parts = line.split(/[,;\t]/).map(x=>x.trim().replace(/^"|"$/g,""));
-      if(parts.length<2) continue;
-      if(/symbol|qty|quantity|price/i.test(parts[0])) continue;   // header row
-      const sym = normSym(parts[0]);
-      const qty = parseFloat(parts[1]), avg = parseFloat(parts[2] ?? "0");
-      if(!sym || isNaN(qty) || qty<=0){ skipped.push(parts[0]); continue; }
-      const ex = holdings.find(h=>h.sym===sym);
-      if(ex){ ex.avg = (ex.avg*ex.qty + (avg||0)*qty)/(ex.qty+qty); ex.qty += qty; }
-      else holdings.push({sym, qty, avg: isNaN(avg)?0:avg});
-      added++;
-    }
-    setPF(holdings); input.value = "";
-    $("pfMeta").textContent = `${added} row${added===1?"":"s"} imported${skipped.length?`, skipped: ${skipped.slice(0,5).join(", ")}`:""}`;
-    analyzePortfolio();
-  };
-  reader.readAsText(file);
-}
-function pfAddRow(){
-  const sym = $("pfAddSym").value, qty = parseFloat($("pfAddQty").value), avg = parseFloat($("pfAddPrice").value);
-  if(!sym || isNaN(qty) || qty<=0){ alert("Enter a quantity."); return; }
-  const holdings = getPF(); const ex = holdings.find(h=>h.sym===sym);
-  if(ex){ ex.avg = (ex.avg*ex.qty + (avg||0)*qty)/(ex.qty+qty); ex.qty += qty; }
-  else holdings.push({sym, qty, avg: isNaN(avg)?0:avg});
-  setPF(holdings); $("pfAddQty").value=""; $("pfAddPrice").value="";
-  analyzePortfolio();
-}
-function pfRemove(sym){ setPF(getPF().filter(h=>h.sym!==sym)); analyzePortfolio(); }
-function pfClear(){ if(confirm("Remove all holdings?")){ setPF([]); analyzePortfolio(); } }
-
-async function analyzePortfolio(){
-  window._pfLoaded = true;
-  const holdings = getPF();
-  if(!holdings.length){
-    $("pfTable").innerHTML = '<div class="loading">Upload a CSV or add holdings above</div>';
-    $("pfSummary").innerHTML = ""; $("pfSectors").innerHTML=""; $("pfCaps").innerHTML=""; $("pfRisk").innerHTML="";
-    $("pfSuggest").innerHTML = '<div class="loading">…</div>'; return;
-  }
-  $("pfTable").innerHTML = '<div class="loading">Fetching live prices…</div>';
-  const quotes = await pmap(holdings, async h=>getQuote(h.sym).catch(()=>null), 5);
-  const funds  = await pmap(holdings, async h=>fetchFundamentals(h.sym).catch(()=>null), 5);
-  const rows = holdings.map((h,i)=>{
-    const q = quotes[i], f = funds[i];
-    const ltp = q?q.price:null, cur = ltp!=null?ltp*h.qty:null, inv = h.avg*h.qty;
-    return {...h, name:nameOf(h.sym), sector:sectorOf(h.sym), cap:capOf(h.sym),
-      ltp, cur, inv, dayPct:q?q.change_pct:null, dayAbs:q&&ltp!=null?q.change*h.qty:null,
-      pnl: cur!=null&&h.avg>0 ? cur-inv : null,
-      beta: f?f.beta:null, divYield: f?f.dividend_yield:null, pe: f?f.pe:null};
-  });
-  const totCur = rows.reduce((s,r)=>s+(r.cur||0),0);
-  const totInv = rows.filter(r=>r.avg>0).reduce((s,r)=>s+r.inv,0);
-  const totPnl = rows.reduce((s,r)=>s+(r.pnl||0),0);
-  const totDay = rows.reduce((s,r)=>s+(r.dayAbs||0),0);
-  rows.forEach(r=>r.weight = r.cur!=null&&totCur ? r.cur/totCur*100 : null);
-  const divInc = rows.reduce((s,r)=>s+((r.divYield||0)/100*(r.cur||0)),0);
-  const known = rows.filter(r=>r.beta!=null&&r.weight!=null);
-  const pfBeta = known.length ? known.reduce((s,r)=>s+r.beta*r.weight,0)/known.reduce((s,r)=>s+r.weight,0) : null;
-
-  $("pfSummary").innerHTML = [
-    ["Invested","₹"+fmtInt(Math.round(totInv))], ["Current value","₹"+fmtInt(Math.round(totCur))],
-    ["Total P&L",`<span class="${cls(totPnl)}">${sign(totPnl)}₹${fmtInt(Math.round(Math.abs(totPnl)))} (${totInv?fmt(totPnl/totInv*100,1):"—"}%)</span>`],
-    ["Today",`<span class="${cls(totDay)}">${sign(totDay)}₹${fmtInt(Math.round(Math.abs(totDay)))}</span>`],
-    ["Est. annual dividend","₹"+fmtInt(Math.round(divInc))],
-    ["Portfolio beta", pfBeta!=null?fmt(pfBeta,2):"—"],
-  ].map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
-
-  $("pfTable").innerHTML = `<table><thead><tr><th>Stock</th><th>Qty</th><th>Avg ₹</th><th>LTP ₹</th><th>Value ₹</th><th>P&L</th><th>P&L %</th><th>Day %</th><th>Weight</th><th></th></tr></thead><tbody>` +
-    rows.map(r=>`<tr onclick="openChart('${r.sym}')">
-      <td><span class="sym">${r.sym.replace(".NS","")}</span> ${r.cap?`<span class="badge ${r.cap==="LARGE"?"capL":r.cap==="MID"?"capM":"capS"}">${r.cap}</span>`:""}<br><span class="subname">${r.name} · ${r.sector||"?"}</span></td>
-      <td>${fmt(r.qty,0)}</td><td>${r.avg?fmt(r.avg):"—"}</td><td>${fmt(r.ltp)}</td><td>${fmtInt(Math.round(r.cur||0))}</td>
-      <td class="${cls(r.pnl)}">${r.pnl!=null?sign(r.pnl)+fmtInt(Math.round(Math.abs(r.pnl))):"—"}</td>
-      <td class="${cls(r.pnl)}">${r.pnl!=null&&r.inv?sign(r.pnl)+fmt(r.pnl/r.inv*100,1)+"%":"—"}</td>
-      <td class="${cls(r.dayPct)}">${r.dayPct!=null?sign(r.dayPct)+fmt(r.dayPct,2)+"%":"—"}</td>
-      <td>${r.weight!=null?fmt(r.weight,1)+"%":"—"}</td>
-      <td><button class="btn danger" onclick="event.stopPropagation();pfRemove('${r.sym}')">✕</button></td></tr>`).join("") + "</tbody></table>";
-
-  // allocations
-  const alloc = (keyFn) => {
-    const agg = {};
-    rows.forEach(r=>{ if(r.cur==null) return; const k = keyFn(r)||"Other"; agg[k]=(agg[k]||0)+r.cur; });
-    return Object.entries(agg).map(([k,v])=>({k, pct:v/totCur*100})).sort((a,b)=>b.pct-a.pct);
-  };
-  const bars = list => list.map(x=>`<div class="allocRow"><span class="aname">${x.k}</span>
-    <div class="bar" style="width:${x.pct*2.4}px"></div><span class="sval">${fmt(x.pct,1)}%</span></div>`).join("");
-  const secAlloc = alloc(r=>r.sector), capAlloc = alloc(r=>r.cap);
-  $("pfSectors").innerHTML = bars(secAlloc);
-  $("pfCaps").innerHTML = bars(capAlloc);
-
-  // risk: 1y weighted daily returns → vol, max drawdown, vs NIFTY
-  $("pfRisk").innerHTML = '<div class="loading">Computing…</div>';
-  try{
-    const hists = await pmap(rows, async r=>({sym:r.sym, w:(r.weight||0)/100, c:toCandles(await fetchChart(r.sym,"1y","1d"))}), 5);
-    const nifty = toCandles(await fetchChart("^NSEI","1y","1d"));
-    const byDate = {};
-    hists.forEach(h=>{ if(!h) return; for(let i=1;i<h.c.length;i++){
-      const d=h.c[i].time, ret=h.c[i].close/h.c[i-1].close-1;
-      (byDate[d]=byDate[d]||[]).push(ret*h.w); }});
-    const dates = Object.keys(byDate).sort();
-    const pRets = dates.map(d=>byDate[d].reduce((a,b)=>a+b,0));
-    const mean = pRets.reduce((a,b)=>a+b,0)/pRets.length;
-    const vol = Math.sqrt(pRets.reduce((s,r)=>s+(r-mean)*(r-mean),0)/(pRets.length-1))*Math.sqrt(252)*100;
-    let peak=1, cum=1, maxDD=0;
-    pRets.forEach(r=>{ cum*=(1+r); peak=Math.max(peak,cum); maxDD=Math.min(maxDD,cum/peak-1); });
-    const pfRet = (cum-1)*100;
-    const nRet = nifty.length>1 ? (nifty[nifty.length-1].close/nifty[0].close-1)*100 : null;
-    $("pfRisk").innerHTML = `<table><tbody>
-      <tr><td>1-yr return (weights as today)</td><td class="${cls(pfRet)}">${sign(pfRet)}${fmt(pfRet,1)}%</td></tr>
-      <tr><td>NIFTY 50 same period</td><td class="${cls(nRet)}">${nRet!=null?sign(nRet)+fmt(nRet,1)+"%":"—"}</td></tr>
-      <tr><td>Annualised volatility</td><td>${fmt(vol,1)}%</td></tr>
-      <tr><td>Max drawdown</td><td class="down">${fmt(maxDD*100,1)}%</td></tr>
-      <tr><td>Largest holding</td><td>${rows.length?fmt(Math.max(...rows.map(r=>r.weight||0)),1)+"%":"—"}</td></tr>
-    </tbody></table>`;
-    // observations
-    const notes = [];
-    const topSec = secAlloc[0];
-    if(topSec && topSec.pct>35) notes.push(`⚠️ ${fmt(topSec.pct,0)}% in ${topSec.k} — a sector-specific downturn hits hard. Consider trimming toward 25–30%.`);
-    const topStock = [...rows].sort((a,b)=>(b.weight||0)-(a.weight||0))[0];
-    if(topStock && topStock.weight>20) notes.push(`⚠️ ${topStock.sym.replace(".NS","")} is ${fmt(topStock.weight,0)}% of the portfolio — single-stock risk. Classic guidance is no more than 10–15% in one name.`);
-    if(pfBeta!=null && pfBeta>1.2) notes.push(`⚠️ Portfolio beta ${fmt(pfBeta,2)} — expect swings ~${fmt((pfBeta-1)*100,0)}% larger than the market, both ways.`);
-    if(pfBeta!=null && pfBeta<0.8) notes.push(`ℹ️ Portfolio beta ${fmt(pfBeta,2)} — defensive tilt; will likely lag in strong rallies.`);
-    const smallPct = capAlloc.find(x=>x.k==="SMALL");
-    if(smallPct && smallPct.pct>40) notes.push(`⚠️ ${fmt(smallPct.pct,0)}% in small caps — high growth potential but deeper drawdowns and lower liquidity in corrections.`);
-    if(nRet!=null && pfRet < nRet - 3) notes.push(`ℹ️ Portfolio trailed NIFTY by ${fmt(nRet-pfRet,1)} pts over 1 yr (using today's weights) — worth checking whether the laggards still earn their place.`);
-    const richPE = rows.filter(r=>r.pe!=null && r.pe>50);
-    if(richPE.length) notes.push(`ℹ️ Rich valuations (P/E > 50): ${richPE.map(r=>r.sym.replace(".NS","")).join(", ")} — fine while growth delivers, punishing if it stumbles.`);
-    if(rows.length<5) notes.push(`ℹ️ Only ${rows.length} holding${rows.length===1?"":"s"} — diversification benefits kick in meaningfully around 8–15 uncorrelated names.`);
-    $("pfSuggest").innerHTML = notes.length ? notes.map(n=>`<div class="card" style="margin-bottom:8px;font-size:13px">${n}</div>`).join("")
-      : '<div class="card" style="font-size:13px">✅ No allocation red flags — sensible concentration, beta and sector spread.</div>';
-  }catch(e){
-    $("pfRisk").innerHTML = `<div class="loading">Risk calc failed: ${e.message}</div>`;
-    $("pfSuggest").innerHTML = "";
-  }
 }
 
 /* ================= backtest ================= */
@@ -2783,7 +2444,6 @@ const PB_DAILY = [
   ["log","Write the plan down","Entry, stop, target, and WHY — before entering. If you can't state the exit, you don't have a trade.",null],
 ];
 const PB_WEEKLY = [
-  ["pf","Portfolio health","Concentration (no stock >15%, no sector >30%), beta, small-cap share, laggards vs NIFTY.","portfolio"],
   ["bt","Revalidate the rules","Backtest your active signal combos on your traded universes. Kill what stopped paying.","track"],
   ["insti","Institutional context","FII/DII weekly direction + any bulk-deal accumulation in names you hold or stalk.","insti"],
 ];
@@ -2820,7 +2480,7 @@ function renderPlaybook(){
 }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti","options","playbook","brief"];
+const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","playbook","brief"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
@@ -2869,7 +2529,7 @@ document.addEventListener("click", e=>{ if(!e.target.closest("#searchWrap")) $("
     Object.entries(stocks).sort((a,b)=>a[1].localeCompare(b[1]))
       .map(([s,n])=>`<option value="${s}">${n} (${s.replace(".NS","")})</option>`).join("") +
     `</optgroup>`).join("");
-  $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts; $("pfAddSym").innerHTML = opts;
+  $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
   $("optStockGroup").innerHTML = Object.entries(ALL_STOCKS).sort((a,b)=>a[1].localeCompare(b[1]))
     .map(([s,n])=>`<option value="${s.replace(".NS","")}">${n} (${s.replace(".NS","")})</option>`).join("");
   const ospStocks = OM_SYMBOLS.filter(s=>s!=="NIFTY"&&s!=="BANKNIFTY").map(s=>s+".NS");
