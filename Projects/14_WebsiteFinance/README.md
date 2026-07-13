@@ -27,6 +27,8 @@ Requires Python 3.10+ and internet access (data comes from Yahoo Finance, ~15 mi
 
 **Fundamentals** — P/E, P/B, EPS, market cap, ROE, debt/equity, margins, growth, dividend yield, beta, 52-week range, analyst consensus and target price — plus intrinsic value (DCF, Graham, DDM, EPV with margin of safety and reverse DCF), five composite scores (Value, Quality, Multibagger, Value-Trap, Dividend), and peer comparison vs the industry median.
 
+**Backtest** — replays the Ideas engine's buy signals on history, plus an options spread probability panel: historical weekly/monthly move distribution for NIFTY and BANKNIFTY turned into a hit-rate table (and custom-width calculator) for sizing credit spreads and iron condors.
+
 **Ideas** — rule-based trade candidates by horizon (short/medium/long) with entry/stop/target, inline chart previews, and a position-size calculator.
 
 **Value Screener** — 24 fundamental filters with presets, saved screens, and CSV export.

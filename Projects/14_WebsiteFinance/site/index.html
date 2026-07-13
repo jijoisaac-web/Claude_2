@@ -484,6 +484,29 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="btMeta"></span>
   </div>
   <div id="btResults"></div>
+
+  <h2 style="margin-top:28px">Options spread probability — NIFTY / BankNifty</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the index actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE index options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only).</div>
+  <div class="controls">
+    <select id="ospSymbol">
+      <option value="^NSEI">NIFTY</option>
+      <option value="^NSEBANK">BANKNIFTY</option>
+    </select>
+    <select id="ospPeriod">
+      <option value="5">Weekly (~5 trading days)</option>
+      <option value="21" selected>Monthly (~21 trading days)</option>
+    </select>
+    <select id="ospLookback">
+      <option value="1y">Last 1Y</option>
+      <option value="2y">Last 2Y</option>
+      <option value="3y" selected>Last 3Y</option>
+      <option value="5y">Last 5Y</option>
+      <option value="10y">Last 10Y (max)</option>
+    </select>
+    <button class="btn" onclick="runOptionsSpread()">▶ Analyze</button>
+    <span class="muted" id="ospMeta"></span>
+  </div>
+  <div id="ospResults"></div>
 </section>
 
 <!-- CHARTS -->
@@ -2111,6 +2134,85 @@ function renderBacktest(trades, uni, lookback){
       <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
     </tbody></table>
     <div class="muted" style="font-size:11px;margin-top:6px">Backtests overstate reality: no brokerage/slippage/taxes, entries at exact closes, and today's index constituents didn't all exist a year ago (survivorship bias). Treat relative comparisons (signal vs signal, strategy vs NIFTY) as more trustworthy than absolute returns.</div>`;
+}
+
+/* ================= options: spread width probability ================= */
+function ospWindows(candles, period){
+  const out = [];
+  for(let i=0; i+period<candles.length; i+=period){
+    const start = candles[i].close, end = candles[i+period].close;
+    if(!start) continue;
+    out.push({from:candles[i].time, to:candles[i+period].time, pts:end-start, pct:(end-start)/start*100});
+  }
+  return out;
+}
+function ospPercentile(sortedAbs, p){
+  if(!sortedAbs.length) return null;
+  const idx = Math.min(sortedAbs.length-1, Math.floor(p/100*sortedAbs.length));
+  return sortedAbs[idx];
+}
+async function runOptionsSpread(){
+  const sym = $("ospSymbol").value, period = +$("ospPeriod").value, range = $("ospLookback").value;
+  $("ospMeta").textContent = "Fetching…"; $("ospResults").innerHTML = '<div class="loading">Loading…</div>';
+  let candles;
+  try{ candles = toCandles(await fetchChart(sym, range, "1d")); }
+  catch(e){ $("ospMeta").textContent = "Failed to load data."; $("ospResults").innerHTML = ""; return; }
+  if(candles.length < period*10){ $("ospMeta").textContent = "Not enough history for this window."; $("ospResults").innerHTML = ""; return; }
+  renderOptionsSpread(sym, period, range, ospWindows(candles, period), candles[candles.length-1].close);
+}
+function renderOptionsSpread(sym, period, range, windows, spot){
+  window._osp = {spot, windows};
+  const n = windows.length;
+  const absPct = windows.map(w=>Math.abs(w.pct)).sort((a,b)=>a-b);
+  const meanAbsPct = absPct.reduce((s,v)=>s+v,0)/n;
+  const meanPct = windows.reduce((s,w)=>s+w.pct,0)/n;
+  const stdPct = Math.sqrt(windows.reduce((s,w)=>s+(w.pct-meanPct)**2,0)/n);
+  const medAbsPct = absPct[Math.floor(n/2)];
+  const p68 = ospPercentile(absPct,68), p90 = ospPercentile(absPct,90), p95 = ospPercentile(absPct,95);
+  const symName = sym==="^NSEI" ? "NIFTY" : "BANKNIFTY", periodLabel = period===5?"weekly":"monthly";
+  const maxAbs = absPct[absPct.length-1] || 1;
+  const widthPcts = [0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,15].filter(w=>w<=maxAbs*1.05);
+  const hitColor = v => v>=70 ? "var(--green)" : v>=50 ? "var(--amber)" : "var(--red)";
+  const rows = widthPcts.map(w=>{
+    const pts = Math.round(spot*w/100);
+    return {w, pts,
+      inside: windows.filter(x=>Math.abs(x.pct)<=w).length/n*100,
+      callSafe: windows.filter(x=>x.pct<=w).length/n*100,
+      putSafe: windows.filter(x=>x.pct>=-w).length/n*100};
+  });
+  $("ospMeta").textContent = `${n} ${periodLabel} windows · ${symName} · spot ${fmt(spot,0)} · lookback ${range}`;
+  $("ospResults").innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="name">Avg move</div><div class="price">${fmt(meanAbsPct,2)}%</div><div class="chg muted">≈±${fmtInt(Math.round(spot*meanAbsPct/100))} pts</div></div>
+      <div class="card"><div class="name">Median move</div><div class="price">${fmt(medAbsPct,2)}%</div><div class="chg muted">≈±${fmtInt(Math.round(spot*medAbsPct/100))} pts</div></div>
+      <div class="card"><div class="name">Std dev (1σ)</div><div class="price">${fmt(stdPct,2)}%</div><div class="chg muted">≈±${fmtInt(Math.round(spot*stdPct/100))} pts</div></div>
+      <div class="card"><div class="name">68 / 90 / 95 pct moves</div><div class="price" style="font-size:16px">${fmt(p68,1)} / ${fmt(p90,1)} / ${fmt(p95,1)}%</div><div class="chg muted">historical move size at these percentiles</div></div>
+    </div>
+    <h2>Spread width vs historical hit rate</h2>
+    <div class="muted" style="font-size:11px;margin-bottom:6px">"Inside both" = short strangle/iron condor body held (both strikes safe). "Call side safe" = bear call spread's short strike held. "Put side safe" = bull put spread's short strike held. Based on ${n} historical ${periodLabel} closes.</div>
+    <table><thead><tr><th style="text-align:left">Width</th><th>Short strikes (≈)</th><th>Inside both</th><th>Call side safe</th><th>Put side safe</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td style="text-align:left">±${fmt(r.w,2)}% (±${fmtInt(r.pts)} pts)</td>
+      <td>${fmtInt(Math.round(spot-r.pts))} / ${fmtInt(Math.round(spot+r.pts))}</td>
+      <td><span style="color:${hitColor(r.inside)}">${fmt(r.inside,0)}%</span></td>
+      <td><span style="color:${hitColor(r.callSafe)}">${fmt(r.callSafe,0)}%</span></td>
+      <td><span style="color:${hitColor(r.putSafe)}">${fmt(r.putSafe,0)}%</span></td></tr>`).join("")}
+    </tbody></table>
+    <div class="controls" style="margin-top:10px">
+      <span class="muted">Custom width (points from spot):</span>
+      <input type="number" id="ospCustomPts" placeholder="e.g. 250" style="width:110px" oninput="ospCustom()">
+      <span class="muted" id="ospCustomOut"></span>
+    </div>
+    <div class="muted" style="font-size:11px;margin-top:6px">Statistical proxy from index price history, not real option premiums (see note above). Ignores premium collected/paid, brokerage and taxes. Past move distribution is not a guarantee of future moves, especially around events (budget, RBI policy, elections, global shocks).</div>`;
+}
+function ospCustom(){
+  const o = window._osp; if(!o) return;
+  const pts = +$("ospCustomPts").value;
+  if(!pts || pts<=0){ $("ospCustomOut").textContent = ""; return; }
+  const w = pts/o.spot*100, n = o.windows.length;
+  const inside = o.windows.filter(x=>Math.abs(x.pct)<=w).length/n*100;
+  const callSafe = o.windows.filter(x=>x.pct<=w).length/n*100;
+  const putSafe = o.windows.filter(x=>x.pct>=-w).length/n*100;
+  $("ospCustomOut").textContent = `±${fmtInt(pts)} pts (${fmt(w,2)}%) → inside both ${fmt(inside,0)}% · call side safe ${fmt(callSafe,0)}% · put side safe ${fmt(putSafe,0)}%`;
 }
 
 /* ================= options: chain analysis ================= */

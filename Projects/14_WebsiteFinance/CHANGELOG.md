@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.16.0] — 2026-07-13 · Options Spread Probability
+
+- New **Options spread probability** panel on the Backtest tab: for NIFTY and BANKNIFTY, measures how far the index actually moved between past weekly (~5 trading day) and monthly (~21 trading day) windows using existing price history, and turns that into a historical "closed inside the range" hit rate for a spread width you pick
+- Since NSE index options are cash-settled on the closing level, this maps to probability of profit for credit spreads/iron condors (ignoring premium and costs) without needing NSE's paywalled historical option-premium data
+- Table of standard widths (±0.5% to ±15% of spot) showing short strikes, "inside both" (condor/strangle), "call side safe" (bear call), "put side safe" (bull put) hit rates, plus a custom-width calculator and avg/median/std-dev/percentile move-size summary cards
+- Weekly/monthly are trading-day proxies rather than exact calendar expiry days, since NSE has changed the actual expiry weekday over time (NIFTY weekly moved Thu→Tue Sep 2025; BankNifty weekly discontinued Nov 2024, monthly-only now — shown here in weekly form too for comparison)
+
 ## [2.15.0] — 2026-07-10 · Playbook
 
 - New **Playbook** tab: the daily discipline checklist — market gate → shortlist (score ≥60 + decision briefs) → options-flow confirmation → business check for investments → 1%-risk sizing → write the plan. Checkboxes persist per trading day; each step links to its tab; the gate shows a live breadth read from the latest scan
