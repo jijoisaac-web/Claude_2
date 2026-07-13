@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobScout — Real Job Opportunities, Ranked Fairly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --card: #ffffff;
+    --ink: #0b1220;
+    --muted: #64748b;
+    --accent: #0d9488;
+    --accent-deep: #0f766e;
+    --blue: #2563eb;
+    --border: #e2e8f0;
+    --radius: 16px;
+    --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    --shadow-lg: 0 20px 40px -12px rgba(15,23,42,0.18);
+    --panel-bg-1: #0d1a1a;
+    --panel-bg-2: #060d0d;
+    --panel-border: rgba(255,255,255,0.08);
+    --panel-text: #eef7f5;
+    --panel-muted: rgba(238,247,245,0.6);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif; color: var(--ink); min-height: 100vh;
+    background:
+      linear-gradient(180deg, rgba(8,14,18,0.94) 0%, rgba(5,9,12,0.97) 100%),
+      url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1800&q=70') center / cover fixed no-repeat;
+  }
+  h1, h2, h3, .logo { font-family: 'Sora', 'Inter', sans-serif; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  header { position: absolute; top: 0; left: 0; right: 0; z-index: 20; padding: 20px 0; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+  .logo b { color: #5eead4; }
+  .version-chip { font-size: 0.7rem; font-weight: 700; color: #ccfbf1; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); padding: 3px 10px; border-radius: 20px; backdrop-filter: blur(4px); }
+  .no-ads-chip { font-size: 0.72rem; font-weight: 700; color: #fff; background: rgba(13,148,136,0.35); border: 1px solid rgba(94,234,212,0.4); padding: 4px 12px; border-radius: 20px; backdrop-filter: blur(6px); }
+
+  .hero {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(6,12,15,0.8) 0%, rgba(6,12,15,0.6) 55%, rgba(5,9,12,1) 100%),
+      url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1800&q=70') center 40% / cover no-repeat;
+    padding: 122px 0 80px;
+    text-align: center;
+  }
+  .hero h1 { color: #fff; font-size: clamp(1.9rem, 5vw, 3.1rem); font-weight: 800; letter-spacing: -1px; line-height: 1.12; margin-bottom: 14px; text-shadow: 0 2px 20px rgba(0,0,0,0.35); }
+  .hero h1 span { color: #5eead4; }
+  .hero p { color: rgba(255,255,255,0.85); font-size: 1.04rem; max-width: 660px; margin: 0 auto 30px; }
+
+  .search-panel {
+    max-width: 900px; margin: 0 auto; background: #fff; padding: 10px;
+    border-radius: 14px; box-shadow: var(--shadow-lg);
+    display: grid; grid-template-columns: 1.3fr 1fr auto auto auto; gap: 8px; align-items: center;
+  }
+  .clear-btn {
+    background: #fff; border: 1.5px solid var(--border); color: var(--muted);
+    border-radius: 10px; padding: 12px 16px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap;
+  }
+  .clear-btn:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+  .search-panel input[type=text] {
+    border: 1px solid var(--border); border-radius: 10px; outline: none;
+    font-size: 0.95rem; padding: 12px 13px; color: var(--ink); font-family: inherit; background: #fff;
+    width: 100%;
+  }
+  .search-panel input::placeholder { color: #98a2b3; }
+  .remote-toggle { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--muted); padding: 0 6px; white-space: nowrap; }
+  .remote-toggle input { width: 16px; height: 16px; accent-color: var(--accent); }
+  .search-panel button.find {
+    background: var(--accent); color: #fff; border: none; border-radius: 10px;
+    padding: 12px 22px; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: inherit;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .search-panel button.find:hover { background: var(--accent-deep); }
+
+  .role-row { margin-top: 18px; }
+  .role-row span {
+    display: inline-block; margin: 4px; padding: 7px 16px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 30px; color: #fff; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; backdrop-filter: blur(4px);
+  }
+  .role-row span:hover { background: rgba(255,255,255,0.25); }
+
+  /* why section */
+  .why { padding: 44px 0 10px; }
+  .why h2 { text-align: center; font-size: 1.5rem; margin-bottom: 8px; color: #eef7f5; }
+  .why .lead { text-align: center; color: rgba(238,247,245,0.62); font-size: 0.95rem; max-width: 680px; margin: 0 auto 28px; }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .why-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+  .why-card .wicon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 12px; background: #ccfbf1; }
+  .why-card h3 { font-size: 0.98rem; margin-bottom: 6px; }
+  .why-card p { color: var(--muted); font-size: 0.85rem; line-height: 1.55; }
+
+  #results {
+    position: relative; overflow: hidden;
+    margin: 26px 0 60px; padding: 46px 32px 60px;
+    border-radius: 28px;
+    background: linear-gradient(165deg, var(--panel-bg-1) 0%, var(--panel-bg-2) 72%);
+    box-shadow: 0 30px 70px -24px rgba(0,0,0,0.55);
+    display: none;
+  }
+  #results::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(45,212,191,0.16), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(45,212,191,0.08), transparent 50%);
+  }
+  #results > * { position: relative; z-index: 1; }
+  .status { text-align: center; color: var(--panel-muted); padding: 26px 0; font-size: 1rem; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  .results-head h2 { font-size: 1.22rem; color: var(--panel-text); }
+  .freshness { font-size: 0.78rem; font-weight: 600; color: var(--panel-muted); background: rgba(255,255,255,0.06); border: 1px solid var(--panel-border); padding: 5px 12px; border-radius: 20px; }
+  .freshness.live { color: #5eead4; background: rgba(20,184,166,0.14); border-color: rgba(45,212,191,0.3); }
+
+  .job-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+  .j-card {
+    background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid var(--panel-border); border-radius: 20px;
+    overflow: hidden; display: flex; flex-direction: column;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    padding: 18px 20px;
+  }
+  .j-card:hover { transform: translateY(-5px); box-shadow: 0 20px 45px rgba(0,0,0,0.5); border-color: rgba(45,212,191,0.4); }
+  .j-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .j-score {
+    width: 54px; height: 54px; border-radius: 50%; flex: 0 0 54px;
+    background: #fff; border: 3px solid #2dd4bf;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Sora'; font-weight: 800; font-size: 0.95rem; line-height: 1;
+    box-shadow: var(--shadow-lg);
+  }
+  .j-score small { font-size: 0.45rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .j-title { font-size: 1.02rem; color: var(--panel-text); margin-bottom: 2px; }
+  .j-company { color: var(--panel-muted); font-size: 0.85rem; font-weight: 600; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .badge { font-size: 0.68rem; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
+  .badge.new { color: #5eead4; background: rgba(20,184,166,0.16); border: 1px solid rgba(94,234,212,0.35); }
+  .badge.remote { color: #93c5fd; background: rgba(37,99,235,0.16); border: 1px solid rgba(147,197,253,0.3); }
+  .badge.tag { color: rgba(238,247,245,0.7); background: rgba(255,255,255,0.07); border: 1px solid var(--panel-border); }
+  .j-location { color: var(--panel-muted); font-size: 0.82rem; margin-bottom: 8px; }
+  .j-desc { color: var(--panel-muted); font-size: 0.82rem; line-height: 1.5; margin-bottom: 12px; flex: 1; }
+  .j-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--panel-border); }
+  .src-chip { font-size: 0.72rem; font-weight: 700; color: #93c5fd; background: rgba(37,99,235,0.16); border: 1px solid rgba(147,197,253,0.25); padding: 3px 10px; border-radius: 20px; }
+  a.apply {
+    font-size: 0.83rem; font-weight: 700; color: #fff; background: var(--accent);
+    text-decoration: none; padding: 7px 16px; border-radius: 20px; transition: background 0.15s;
+  }
+  a.apply:hover { background: var(--accent-deep); }
+
+  .method { background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border); border-radius: var(--radius); padding: 20px 24px; margin-top: 30px; color: var(--panel-muted); font-size: 0.87rem; line-height: 1.6; }
+  .method b { color: var(--panel-text); }
+
+  footer { background: #05080a; color: #94a3b8; padding: 32px 0; font-size: 0.84rem; margin-top: 20px; }
+  .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  footer .flogo { font-family: 'Sora'; font-weight: 800; color: #fff; font-size: 1.05rem; }
+  footer .flogo b { color: #5eead4; }
+  footer .fversion { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; color: #ccfbf1; margin-left: 10px; }
+
+  @media (max-width: 760px) {
+    .search-panel { grid-template-columns: 1fr 1fr; }
+    .search-panel input#q { grid-column: 1 / -1; }
+    .search-panel button.find { grid-column: 1 / -1; }
+    #results { padding: 34px 16px 44px; border-radius: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="brand">
+      <div class="logo">Job<b>Scout</b></div>
+      <span class="version-chip" id="verChip">v1.0.0</span>
+    </div>
+    <span class="no-ads-chip">No sponsored placement</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Real openings,<br>ranked by <span>freshness &amp; fit.</span></h1>
+    <p>No promoted listings, no pay-to-rank. Pulled straight from employer ATS systems, scored by how new the posting is and how well it matches what you searched. Germany, Austria &amp; Switzerland + remote-Europe, to start.</p>
+    <div class="search-panel">
+      <input type="text" id="q" placeholder="Role or keyword — e.g. developer, marketing">
+      <input type="text" id="location" placeholder="City (optional)">
+      <label class="remote-toggle"><input type="checkbox" id="remoteOnly"> Remote only</label>
+      <button class="find" onclick="search()">Find Opportunities</button>
+      <button class="clear-btn" id="clearBtn" style="display:none" onclick="clearResults(true)">✕ Clear</button>
+    </div>
+    <div class="role-row" id="roles"></div>
+  </div>
+</section>
+
+<section class="why container" id="why">
+  <h2>What JobScout does differently</h2>
+  <p class="lead">Big boards show you everything and make you dig — with paid listings shoved to the top regardless of fit. We rank a short list by two things we can actually measure honestly: how fresh a posting is, and how well it matches you.</p>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="wicon">🚫</div>
+      <h3>Zero pay-to-rank</h3>
+      <p>No listing can buy its way up. Every posting is scored by the same formula — freshness and match quality, nothing else.</p>
+    </div>
+    <div class="why-card">
+      <div class="wicon">🕒</div>
+      <h3>Freshness over noise</h3>
+      <p>Pulled directly from employer ATS systems rather than scraped boards, so stale reposts and abandoned "ghost" listings are far less common to begin with.</p>
+    </div>
+    <div class="why-card">
+      <div class="wicon">🔍</div>
+      <h3>Honest about what we don't know</h3>
+      <p>We don't have real applicant-count data, so we don't fake a "low competition" score. What you see is what we can actually measure — nothing invented.</p>
+    </div>
+    <div class="why-card">
+      <div class="wicon">🧭</div>
+      <h3>A short list, not a firehose</h3>
+      <p>A ranked top 24, not infinite scroll. Find something worth applying to, then go apply — not stay on the site.</p>
+    </div>
+  </div>
+</section>
+
+<main class="container">
+  <section id="results">
+    <div class="status" id="status"></div>
+    <div class="results-head" id="resultsHead" style="display:none">
+      <h2 id="headTitle"></h2>
+      <span class="freshness" id="freshness"></span>
+    </div>
+    <div class="job-list" id="list"></div>
+    <div class="method" id="method" style="display:none">
+      <b>How ranking works:</b> opportunity score = 55% freshness (100 at day 0, decaying to 0 by day 21) + 45% relevance (title match scores highest, then tag match, then description match). No applicant-count or "competition" data exists in any free source we use, so we don't estimate or claim one — only the "New" badge (posted within 48 hours) is shown, since that's something we can verify directly.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div><span class="flogo">Job<b>Scout</b></span><span class="fversion" id="verFoot">v1.0.0</span></div>
+    <div>Listings via Arbeitnow (free, direct-from-ATS) <span id="adzunaFoot"></span></div>
+  </div>
+</footer>
+
+<script>
+  let hasSearched = false, locationChangedSinceSearch = false, VERSION = "1.0.0";
+
+  const ROLES = ["Software Engineer", "Data Analyst", "Marketing", "Sales", "Customer Support", "Product Manager", "DevOps", "UX Designer", "HR", "Finance", "Project Manager", "Content Writer"];
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m])); }
+
+  function ago(ts) {
+    const m = Math.round((Date.now() - ts) / 60000);
+    if (m < 2) return "just now";
+    if (m < 60) return m + " min ago";
+    const h = Math.round(m / 60);
+    if (h < 24) return h + "h ago";
+    return Math.round(h / 24) + " day(s) ago";
+  }
+
+  function renderRoles() {
+    const el = document.getElementById("roles");
+    el.innerHTML = ROLES.map(r => `<span>${esc(r)}</span>`).join("");
+    el.querySelectorAll("span").forEach(s => s.addEventListener("click", () => {
+      document.getElementById("q").value = s.textContent;
+      search();
+    }));
+  }
+
+  function updateClearBtn() {
+    const q = document.getElementById("q").value.trim();
+    const show = hasSearched && (locationChangedSinceSearch || q === "");
+    document.getElementById("clearBtn").style.display = show ? "inline-block" : "none";
+  }
+
+  function clearResults(resetFilters) {
+    document.getElementById("results").style.display = "none";
+    document.getElementById("resultsHead").style.display = "none";
+    document.getElementById("method").style.display = "none";
+    document.getElementById("list").innerHTML = "";
+    document.getElementById("status").innerHTML = "";
+    document.getElementById("why").style.display = "block";
+    if (resetFilters) document.getElementById("q").value = "";
+    hasSearched = false;
+    locationChangedSinceSearch = false;
+    updateClearBtn();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function init() {
+    try {
+      const r = await fetch("/api/meta");
+      const j = await r.json();
+      VERSION = j.version || VERSION;
+      document.getElementById("verChip").textContent = "v" + VERSION;
+      document.getElementById("verFoot").textContent = "v" + VERSION;
+      document.getElementById("adzunaFoot").textContent = j.adzunaEnabled ? "+ Adzuna" : "";
+    } catch (e) { /* meta is best-effort */ }
+    renderRoles();
+    document.getElementById("location").addEventListener("input", () => {
+      if (hasSearched) { locationChangedSinceSearch = true; updateClearBtn(); }
+    });
+    document.getElementById("q").addEventListener("input", updateClearBtn);
+    document.getElementById("q").addEventListener("keydown", e => { if (e.key === "Enter") search(); });
+    document.getElementById("location").addEventListener("keydown", e => { if (e.key === "Enter") search(); });
+  }
+
+  async function search() {
+    const q = document.getElementById("q").value.trim();
+    const location = document.getElementById("location").value.trim();
+    const remoteOnly = document.getElementById("remoteOnly").checked;
+    const results = document.getElementById("results");
+    const status = document.getElementById("status");
+    hasSearched = true;
+    locationChangedSinceSearch = false;
+    updateClearBtn();
+    results.style.display = "block";
+    document.getElementById("why").style.display = "none";
+    document.getElementById("list").innerHTML = "";
+    document.getElementById("resultsHead").style.display = "none";
+    document.getElementById("method").style.display = "none";
+    status.innerHTML = `<span class="spinner"></span> Scanning open roles${location ? " in <strong>" + esc(location) + "</strong>" : ""}…`;
+    results.scrollIntoView({ behavior: "smooth" });
+
+    try {
+      const params = new URLSearchParams({ q, location, remote: remoteOnly ? "1" : "0" });
+      const r = await fetch(`/api/search?${params.toString()}`);
+      const data = await r.json();
+      if (data.error) { status.textContent = "⚠ " + data.error; return; }
+
+      status.textContent = "";
+      if (data.results.length === 0) {
+        status.textContent = "No matches yet — try a broader keyword or clear the location filter.";
+        return;
+      }
+      document.getElementById("resultsHead").style.display = "flex";
+      document.getElementById("headTitle").textContent =
+        `Top ${data.results.length} ${data.query ? '"' + data.query + '" ' : ""}opportunities${data.location ? " — " + data.location : ""}`;
+
+      const f = document.getElementById("freshness");
+      if (data.stale) { f.className = "freshness"; f.textContent = "⚠ Cached · updated " + ago(data.updatedAt); }
+      else if (data.cached) { f.className = "freshness live"; f.textContent = "⚡ Instant · updated " + ago(data.updatedAt); }
+      else { f.className = "freshness live"; f.textContent = "● Live · updated just now"; }
+
+      document.getElementById("method").style.display = "block";
+
+      document.getElementById("list").innerHTML = data.results.map(d => `
+        <div class="j-card">
+          <div class="j-top">
+            <div>
+              <div class="j-title">${esc(d.title)}</div>
+              <div class="j-company">${esc(d.company)}</div>
+            </div>
+            <div class="j-score">${d.score}<small>match</small></div>
+          </div>
+          <div class="badges">
+            ${d.isNew ? '<span class="badge new">🆕 New</span>' : ""}
+            ${d.remote ? '<span class="badge remote">🌍 Remote</span>' : ""}
+            ${d.tags.slice(0, 3).map(t => `<span class="badge tag">${esc(t)}</span>`).join("")}
+          </div>
+          <div class="j-location">${esc(d.location || (d.remote ? "Remote" : ""))} · posted ${ago(d.postedAt)}</div>
+          <div class="j-desc">${esc(d.description || "")}${d.description && d.description.length >= 400 ? "…" : ""}</div>
+          <div class="j-foot">
+            <span class="src-chip">${esc(d.source)}</span>
+            <a class="apply" href="${esc(d.url)}" target="_blank" rel="noopener">Apply →</a>
+          </div>
+        </div>`).join("");
+    } catch (e) {
+      status.textContent = "⚠ Could not reach the JobScout server. Is it running? (npm start)";
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>

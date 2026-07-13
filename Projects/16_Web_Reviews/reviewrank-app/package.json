@@ -1,10 +1,11 @@
 {
   "name": "reviewrank",
-  "version": "1.0.0",
-  "description": "ReviewRank - rank restaurants, gadgets and more by real user reviews",
+  "version": "2.3.0",
+  "description": "ReviewRank - best restaurants ranked by real user reviews (India & Malaysia trial)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "refresh": "node refresh.js"
   },
   "engines": { "node": ">=18" },
   "dependencies": {
