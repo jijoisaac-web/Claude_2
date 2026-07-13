@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.19.0] — 2026-07-13 · IV vs Realized Volatility Screener
+
+- New **IV vs realized volatility** scanner on the Options tab: scans the same ~30 liquid F&O names as the momentum scanner and ranks them by live ATM implied volatility against their own realized volatility (annualized close-to-close, 20d and 60d)
+- IV/RV ≥1.3x flagged as rich (favor selling premium — credit spreads, strangles); ≤0.8x flagged as cheap (favor buying — long straddle/strangle); a relative read, not a directional or timing signal
+- Realized-vol math (log-return stdev × √252) verified against a synthetic price series with known volatility — recovered the expected annualized figure within sampling noise
+
 ## [2.18.0] — 2026-07-13 · More Strategies + Live 1-Lot Risk Profile
 
 - Strategy recommendations expanded from 3 to 8: short strangle, iron condor (new, defined-risk version of the strangle), bear call spread, bull put spread, bull call spread (new, mirrors bear put via a new rally-probability function), bear put spread, plus explicit short/long ATM straddle callouts

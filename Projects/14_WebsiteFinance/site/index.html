@@ -401,6 +401,16 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="omResults"></div>
   <div class="muted" style="font-size:11px;margin-top:6px">OI reads are strongest near expiry and for liquid names. Writers (sellers) drive OI walls: heavy put OI = a level someone is paid to defend; heavy call OI = a ceiling someone is paid to cap. Data ~3-min delayed during market hours; stale after close. Not investment advice.</div>
+
+  <h2 style="margin-top:24px">IV vs realized volatility <span class="muted" style="text-transform:none;font-weight:400">· who's priced rich vs cheap</span></h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Scans the same ~30 liquid F&O names and compares each one's live ATM implied volatility (what the option chain is currently pricing) against its own realized volatility (how much it has actually moved, annualized from the last 20/60 trading days). IV running well above realized = the market is pricing in more movement than has actually been happening — historically the more favorable side to be selling premium (credit spreads, strangles). IV well below realized = premium looks cheap relative to actual movement — more favorable for buying it (long straddle/strangle). This is a relative read, not a timing signal, and says nothing about direction.</div>
+  <div class="controls">
+    <button class="btn" onclick="scanIvRv()">▶ Scan IV vs RV</button>
+    <progress id="ivrvProgress" style="display:none"></progress>
+    <span class="muted" id="ivrvMeta"></span>
+  </div>
+  <div id="ivrvResults"></div>
+  <div class="muted" style="font-size:11px;margin-top:6px">IV is the chain's live ATM figure (avg of call/put where both exist); realized vol uses close-to-close log returns, no overnight-gap or intraday adjustment. Neither is forecasting the other — a rich reading can stay rich (or get richer) around known events (earnings, budget, RBI policy). Not investment advice.</div>
 </section>
 
 <!-- PLAYBOOK: daily discipline checklist -->
@@ -2581,6 +2591,60 @@ async function scanOptionsMomentum(){
       <td style="text-align:left"><span class="signal-detail" style="font-size:12px">${reads.join("; ")||"—"}${trade}</span></td></tr>`;
     }).join("") + `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its full chain above. Flow scores describe positioning, not guarantees — cross-check the stock's own chart (Ideas/Charts tabs) before acting; the strongest setups have price momentum AND supportive flow.</div>`;
+}
+
+/* ---- IV vs realized volatility screener ---- */
+function ospYahooTicker(bare){ return bare==="NIFTY"?"^NSEI": bare==="BANKNIFTY"?"^NSEBANK": bare+".NS"; }
+function realizedVolPct(candles, lookback){
+  if(!candles || candles.length < lookback+1) return null;
+  const closes = candles.slice(-lookback-1).map(c=>c.close);
+  const rets = [];
+  for(let i=1;i<closes.length;i++){ if(closes[i-1]) rets.push(Math.log(closes[i]/closes[i-1])); }
+  if(rets.length < lookback*0.8) return null;
+  const mean = rets.reduce((s,v)=>s+v,0)/rets.length;
+  const variance = rets.reduce((s,v)=>s+(v-mean)**2,0)/rets.length;
+  return Math.sqrt(variance)*Math.sqrt(252)*100;
+}
+function ivrvColor(ratio){ return ratio>=1.3 ? "var(--blue)" : ratio<=0.8 ? "var(--amber)" : "var(--muted)"; }
+function ivrvLabel(ratio){ return ratio>=1.3 ? "IV rich — favor selling premium" : ratio<=0.8 ? "IV cheap — favor buying premium" : "Fair value — no strong edge"; }
+async function scanIvRv(){
+  const prog = $("ivrvProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=OM_SYMBOLS.length;
+  $("ivrvMeta").textContent = "Scanning IV vs realized volatility…";
+  const rows = (await pmap(OM_SYMBOLS, async bare=>{
+    try{
+      const [chainD, chartRes] = await Promise.all([
+        fetch(`/api/optionchain?symbol=${encodeURIComponent(bare)}`).then(r=>r.json()),
+        fetchChart(ospYahooTicker(bare), "3mo", "1d"),
+      ]);
+      if(chainD.error || !chainD.strikes || !chainD.strikes.length) return null;
+      const candles = toCandles(chartRes);
+      const rv20 = realizedVolPct(candles, 20), rv60 = realizedVolPct(candles, 60);
+      if(rv20==null) return null;
+      const atm = ospNearestStrike(chainD.strikes, chainD.spot);
+      const ivCv = atm.ce&&atm.ce.iv!=null?atm.ce.iv:null, ivPv = atm.pe&&atm.pe.iv!=null?atm.pe.iv:null;
+      const iv = (ivCv!=null && ivPv!=null) ? (ivCv+ivPv)/2 : (ivCv!=null?ivCv:ivPv);
+      if(iv==null) return null;
+      return {symbol:bare, spot:chainD.spot, expiry:chainD.expiry, iv, rv20, rv60, ratio: iv/rv20};
+    }catch(e){ return null; }
+  }, 3, ()=>prog.value++)).filter(Boolean);
+  prog.style.display="none";
+  rows.sort((a,b)=>b.ratio-a.ratio);
+  $("ivrvMeta").textContent = `${rows.length}/${OM_SYMBOLS.length} scanned`;
+  if(!rows.length){ $("ivrvResults").innerHTML = '<div class="loading">Nothing came back — likely off-hours throttling; try again shortly.</div>'; return; }
+  $("ivrvResults").innerHTML = `<table><thead><tr><th style="text-align:left">Symbol</th><th>Spot</th><th>ATM IV</th>
+    <th title="Annualized, from the last 20 trading days">Realized vol (20d)</th>
+    <th title="Annualized, from the last 60 trading days">Realized vol (60d)</th>
+    <th>IV / RV(20d)</th><th style="text-align:left">Read</th></tr></thead><tbody>` +
+    rows.map(r=>`<tr style="cursor:pointer" onclick="$('optSymbol').value='${r.symbol}';loadOptions();window.scrollTo({top:0,behavior:'smooth'})">
+      <td style="text-align:left"><span class="sym">${r.symbol}</span><br><span class="subname">${r.expiry||""}</span></td>
+      <td>${fmt(r.spot,0)}</td>
+      <td>${fmt(r.iv,1)}%</td>
+      <td>${fmt(r.rv20,1)}%</td>
+      <td>${r.rv60!=null?fmt(r.rv60,1)+"%":"—"}</td>
+      <td><span style="color:${ivrvColor(r.ratio)};font-weight:700">${fmt(r.ratio,2)}x</span></td>
+      <td style="text-align:left" class="muted">${ivrvLabel(r.ratio)}</td></tr>`).join("") +
+    `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its full chain above. Sorted richest-first (highest IV/RV). Thresholds (≥1.3x rich, ≤0.8x cheap) are rules of thumb, not calibrated against this app's own historical data — cross-check with the spread-probability panel (Backtest tab) for that symbol before sizing a trade.</div>`;
 }
 
 /* ================= playbook: daily discipline checklist ================= */
