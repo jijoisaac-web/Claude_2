@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.20.0] — 2026-07-13 · Morning Brief Tab
+
+- New **Brief** tab: one page combining the market gate (breadth + FII/DII combined into a GREEN/AMBER/RED read with sizing guidance), an options-edge summary (top long-flow names, IV-rich and IV-cheap shortlists from the two Options-tab scanners), and today's top technical BUY setups (score ≥60) — the exact checks the Playbook's daily "market gate" step already asked for, now automated instead of manual
+- Gate falls back to a breadth-only read when FII/DII hasn't published yet (normal before ~6pm IST) instead of blocking on it
+- Reuses scans already run elsewhere in the session (Options momentum scanner, IV vs RV screener, FII/DII) instead of re-fetching; a manual refresh button forces all of them fresh
+- Playbook's "Market gate" checklist step now links to the Brief tab instead of Dashboard
+- Fixed a display bug where a negative FII/DII net would show with no minus sign in plain (non-color-coded) text
+
 ## [2.19.0] — 2026-07-13 · IV vs Realized Volatility Screener
 
 - New **IV vs realized volatility** scanner on the Options tab: scans the same ~30 liquid F&O names as the momentum scanner and ranks them by live ATM implied volatility against their own realized volatility (annualized close-to-close, 20d and 60d)

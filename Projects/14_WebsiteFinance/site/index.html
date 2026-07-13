@@ -194,6 +194,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
     <button data-tab="playbook">Playbook</button>
+    <button data-tab="brief">Brief</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -550,6 +551,24 @@ progress{accent-color:var(--violet);}
   <div id="peerView"></div>
 </section>
 
+<!-- MORNING BRIEF -->
+<section id="brief" class="tab">
+  <h2>Morning brief <span class="muted" id="briefMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="muted" style="font-size:11px;margin-bottom:10px">One page instead of five tabs: today's market gate, institutional flow, where options premium looks mispriced, and the day's top technical setups — the same checks the Playbook's daily checklist asks you to do by hand, pulled together automatically.</div>
+  <div id="briefGate"><div class="loading">Reading market breadth + institutional flow…</div></div>
+
+  <h2 style="margin-top:20px">Where the edge is today <span class="muted" style="text-transform:none;font-weight:400">· options flow + IV mispricing across ~30 F&amp;O names</span></h2>
+  <div id="briefEdge"><div class="loading">Scanning option chains (can take a bit — full results also land on the Options tab)…</div></div>
+
+  <h2 style="margin-top:20px">Today's shortlist <span class="muted" style="text-transform:none;font-weight:400">· top technical BUY setups, score ≥60</span></h2>
+  <div id="briefIdeas"><div class="loading">…</div></div>
+
+  <div class="controls" style="margin-top:14px">
+    <button class="btn ghost" onclick="loadBrief(true)">↻ Refresh everything</button>
+    <span class="muted" id="briefRefreshMeta">Reuses scans already run on other tabs this session where available.</span>
+  </div>
+</section>
+
 <div class="disclaimer"><span id="versionTag"></span> · Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
 </main>
 
@@ -686,6 +705,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="playbook") renderPlaybook();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
+  if(b.dataset.tab==="brief" && !window._briefLoaded){ window._briefLoaded=true; loadBrief(); }
 });
 
 /* ================= watchlist (localStorage) ================= */
@@ -699,6 +719,7 @@ async function loadFiiDii(){
     const r = await fetch("/api/fiidii");
     const d = await r.json();
     if(!r.ok || (!d.fii && !d.dii)) throw new Error(d.error || "no data");
+    window._fiidii = d; // cached so the Brief tab can reuse it without a second fetch
     $("fiidiiMeta").textContent = `· ${d.date || ""} · provisional, cash market, ₹ Cr`;
     const card = (label, x) => {
       if(!x) return "";
@@ -2565,6 +2586,7 @@ async function scanOptionsMomentum(){
   }, 3, ()=>prog.value++)).filter(Boolean);
   prog.style.display="none";
   rows.sort((a,b)=>b.score-a.score);
+  window._omRows = rows; // cached so the Brief tab can reuse this scan without re-running it
   $("omMeta").textContent = `${rows.length}/${OM_SYMBOLS.length} scanned`;
   if(!rows.length){ $("omResults").innerHTML = '<div class="loading">NSE served nothing — likely off-hours throttling; try again shortly.</div>'; return; }
   const verdict = s => s>=65 ? ["bullish","LONG FLOW"] : s<=35 ? ["bearish","BEARISH FLOW"] : ["neutral","MIXED"];
@@ -2629,6 +2651,7 @@ async function scanIvRv(){
   }, 3, ()=>prog.value++)).filter(Boolean);
   prog.style.display="none";
   rows.sort((a,b)=>b.ratio-a.ratio);
+  window._ivrvRows = rows; // cached so the Brief tab can reuse this scan without re-running it
   $("ivrvMeta").textContent = `${rows.length}/${OM_SYMBOLS.length} scanned`;
   if(!rows.length){ $("ivrvResults").innerHTML = '<div class="loading">Nothing came back — likely off-hours throttling; try again shortly.</div>'; return; }
   $("ivrvResults").innerHTML = `<table><thead><tr><th style="text-align:left">Symbol</th><th>Spot</th><th>ATM IV</th>
@@ -2647,9 +2670,112 @@ async function scanIvRv(){
     <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its full chain above. Sorted richest-first (highest IV/RV). Thresholds (≥1.3x rich, ≤0.8x cheap) are rules of thumb, not calibrated against this app's own historical data — cross-check with the spread-probability panel (Backtest tab) for that symbol before sizing a trade.</div>`;
 }
 
+/* ================= morning brief: one-page daily summary ================= */
+async function loadBrief(force){
+  if(force){ window._omRows=null; window._ivrvRows=null; window._fiidii=null; }
+  $("briefMeta").textContent = "· " + new Date().toLocaleString("en-IN",{dateStyle:"medium", timeStyle:"short"});
+
+  // breadth + shortlist need the latest scan
+  if(!screenerData){ $("briefGate").innerHTML = '<div class="loading">Scanning market…</div>'; try{ await loadScreener(); }catch(e){} }
+  renderBriefGate(); renderBriefIdeas();
+
+  // FII/DII (reuse if another tab already fetched it this session)
+  if(!window._fiidii){ await loadFiiDii(); }
+  renderBriefGate(); // re-render now the institutional read is in
+
+  // options flow + IV/RV (reuse if the Options tab already scanned this session)
+  $("briefEdge").innerHTML = '<div class="loading">Scanning option chains for flow + IV mispricing…</div>';
+  await Promise.all([
+    window._omRows ? Promise.resolve() : scanOptionsMomentum(),
+    window._ivrvRows ? Promise.resolve() : scanIvRv(),
+  ]);
+  renderBriefEdge();
+}
+function renderBriefGate(){
+  const st = screenerData && screenerData.stocks;
+  let breadthMood = null, advPct = null;
+  if(st && st.length){
+    const adv = st.filter(s=>s.change_pct>0).length, dec = st.filter(s=>s.change_pct<0).length;
+    advPct = adv/(adv+dec||1)*100;
+    breadthMood = advPct>=60 ? "up" : advPct<=40 ? "down" : "mixed";
+  }
+  const fd = window._fiidii;
+  let fdMood = null, fdLine = "Not loaded yet";
+  if(fd && fd.fii && fd.dii){
+    const f=fd.fii.net, di=fd.dii.net;
+    fdMood = (f>=0&&di>=0) ? "up" : (f<0&&di<0) ? "down" : "mixed";
+    const signed = v => (v>=0?"+":"−") + "₹" + fmtInt(Math.round(Math.abs(v))) + " Cr";
+    fdLine = `FII ${signed(f)} · DII ${signed(di)}`;
+  } else if(fd){ fdLine = "FII/DII not published yet today (usually ~6pm IST)."; }
+
+  let verdict, color, advice;
+  if(breadthMood==null){
+    verdict="…"; color="var(--muted)"; advice="Waiting on today's scan.";
+  } else if(fdMood==null){
+    // FII/DII usually publishes only after ~6pm IST — don't block the gate on it during market hours
+    verdict = breadthMood==="up" ? "GREEN (breadth only)" : breadthMood==="down" ? "RED (breadth only)" : "AMBER (breadth only)";
+    color = breadthMood==="up" ? "var(--green)" : breadthMood==="down" ? "var(--red)" : "var(--amber)";
+    advice = "FII/DII isn't published yet today (usually ~6pm IST) — this read is breadth-only for now; check back later for the full gate.";
+  } else if(breadthMood==="up" && fdMood!=="down"){
+    verdict="GREEN — full size"; color="var(--green)"; advice="Breadth strong and institutions not both selling. Confluence setups get normal size.";
+  } else if(breadthMood==="down" && fdMood==="down"){
+    verdict="RED — watch, don't chase"; color="var(--red)"; advice="Weak breadth and both FII+DII selling. Smaller size or cash; missing a rally costs nothing, catching a falling market costs compounding.";
+  } else {
+    verdict="AMBER — half size"; color="var(--amber)"; advice="Mixed signals between breadth and institutional flow. Be selective — trade only the clearest setups.";
+  }
+  $("briefGate").innerHTML = `
+    <div class="card">
+      <div class="name">Market gate</div>
+      <div class="price" style="color:${color};font-size:22px">${verdict}</div>
+      <div class="chg muted" style="margin-top:4px">${advice}</div>
+      <div class="muted" style="font-size:12px;margin-top:8px">
+        Breadth: ${advPct!=null?fmt(advPct,0)+"% advancing":"—"} ·
+        ${fdLine}
+      </div>
+    </div>`;
+}
+function renderBriefIdeas(){
+  const st = screenerData && screenerData.stocks;
+  if(!st){ $("briefIdeas").innerHTML = '<div class="loading">Waiting on the scan…</div>'; return; }
+  const {shortT, medT} = buildIdeas(st);
+  const top = [...shortT, ...medT].filter(s=>s.action==="BUY" && s.score>=60).sort((a,b)=>b.score-a.score).slice(0,5);
+  $("briefIdeas").innerHTML = top.length ? `<table><thead><tr><th>Stock</th><th>Score</th><th style="text-align:left">Setup</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th></tr></thead><tbody>` +
+    top.map(s=>`<tr onclick="document.querySelector('nav button[data-tab=ideas]').click()">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name||""}</span></td>
+      <td><span class="${scoreCls(s.score)}" style="font-weight:700">${s.score}</span></td>
+      <td style="text-align:left"><span class="signal-detail" style="font-size:12px">${s.why}</span></td>
+      <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${fmt(s.target)}</td></tr>`).join("") +
+    `</tbody></table><div class="muted" style="font-size:11px;margin-top:4px">Open the Ideas tab for the full list, decision briefs and position sizing.</div>`
+    : '<div class="loading">No setups scoring 60+ right now — patience is a position too.</div>';
+}
+function renderBriefEdge(){
+  const om = window._omRows || [], iv = window._ivrvRows || [];
+  const flow = om.filter(r=>r.score>=65).slice(0,3);
+  const rich = iv.filter(r=>r.ratio>=1.3).slice(0,3);
+  const cheap = [...iv].sort((a,b)=>a.ratio-b.ratio).filter(r=>r.ratio<=0.8).slice(0,3);
+  const jump = sym => `$('optSymbol').value='${sym}';loadOptions();document.querySelector('nav button[data-tab=options]').click();window.scrollTo({top:0,behavior:'smooth'})`;
+  const miniTable = (rows, cols) => rows.length ? `<table><tbody>` +
+    rows.map(r=>`<tr style="cursor:pointer" onclick="${jump(r.symbol)}">
+      <td><span class="sym">${r.symbol}</span></td>${cols(r)}</tr>`).join("") + `</tbody></table>`
+    : '<div class="muted" style="font-size:12px">None right now.</div>';
+  $("briefEdge").innerHTML = `
+    <div class="pulse-grid">
+      <div><h2 style="margin-top:0">Long flow leaders</h2>
+        ${miniTable(flow, r=>`<td><span class="${r.score>=65?'up':'muted'}" style="font-weight:700">${r.score}</span></td><td class="muted" style="font-size:11px;text-align:left">${fmt(r.spot,0)}</td>`)}
+      </div>
+      <div><h2 style="margin-top:0">IV rich <span class="muted" style="text-transform:none;font-weight:400">(favor selling)</span></h2>
+        ${miniTable(rich, r=>`<td style="color:var(--blue);font-weight:700">${fmt(r.ratio,2)}x</td><td class="muted" style="font-size:11px;text-align:left">IV ${fmt(r.iv,1)}% vs RV ${fmt(r.rv20,1)}%</td>`)}
+      </div>
+      <div><h2 style="margin-top:0">IV cheap <span class="muted" style="text-transform:none;font-weight:400">(favor buying)</span></h2>
+        ${miniTable(cheap, r=>`<td style="color:var(--amber);font-weight:700">${fmt(r.ratio,2)}x</td><td class="muted" style="font-size:11px;text-align:left">IV ${fmt(r.iv,1)}% vs RV ${fmt(r.rv20,1)}%</td>`)}
+      </div>
+    </div>
+    <div class="muted" style="font-size:11px;margin-top:8px">Click a row to open its full chain on the Options tab. Full scanners (all ~30 names, with reads) live there too.</div>`;
+}
+
 /* ================= playbook: daily discipline checklist ================= */
 const PB_DAILY = [
-  ["gate","Market gate — should I be aggressive today?","Dashboard: breadth bar risk-on? FII/DII both buying? Green = full size. Mixed = half size. Red = watch, don't chase.","dashboard"],
+  ["gate","Market gate — should I be aggressive today?","Brief tab: breadth + FII/DII combined into one GREEN/AMBER/RED read. Green = full size. Amber = half size. Red = watch, don't chase.","brief"],
   ["scan","Scan & shortlist","Ideas tab: consider only Setup Score ≥ 60. Read the decision briefs — they tell you which game each name is (TRADE ONLY vs INVESTABLE).","ideas"],
   ["flow","Confirm with options flow","Options scanner: an idea that also shows LONG FLOW is your A+ setup. Fresh call-writing into a breakout = downgrade it.","options"],
   ["biz","Business check (investments only)","Fundamentals: Quality ≥ 60, Value-Trap low, in line or stronger vs peers, and reverse-DCF implied growth the company has actually delivered.","fundamentals"],
@@ -2694,7 +2820,7 @@ function renderPlaybook(){
 }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti","options","playbook"];
+const TAB_ORDER = ["dashboard","screener","ideas","fscreener","charts","fundamentals","portfolio","track","insti","options","playbook","brief"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
