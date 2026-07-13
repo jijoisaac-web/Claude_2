@@ -2151,6 +2151,18 @@ function ospPercentile(sortedAbs, p){
   const idx = Math.min(sortedAbs.length-1, Math.floor(p/100*sortedAbs.length));
   return sortedAbs[idx];
 }
+// scan width 0..maxAbs for the first width where fn(width) crosses target
+// dir "up": fn rises with width (inside/callSafe/putSafe) — find first width where fn>=target
+// dir "down": fn falls with width (probability of a decline of at least width) — find first width where fn<=target
+function ospTierWidth(fn, target, maxAbs, dir){
+  const step = Math.max(0.02, maxAbs/500);
+  for(let w=0; w<=maxAbs; w+=step){
+    const v = fn(w);
+    if(dir==="up" && v>=target) return w;
+    if(dir==="down" && v<=target) return w;
+  }
+  return maxAbs;
+}
 async function runOptionsSpread(){
   const sym = $("ospSymbol").value, period = +$("ospPeriod").value, range = $("ospLookback").value;
   $("ospMeta").textContent = "Fetching…"; $("ospResults").innerHTML = '<div class="loading">Loading…</div>';
@@ -2173,12 +2185,18 @@ function renderOptionsSpread(sym, period, range, windows, spot){
   const maxAbs = absPct[absPct.length-1] || 1;
   const widthPcts = [0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,15].filter(w=>w<=maxAbs*1.05);
   const hitColor = v => v>=70 ? "var(--green)" : v>=50 ? "var(--amber)" : "var(--red)";
+  const insideFn = w => windows.filter(x=>Math.abs(x.pct)<=w).length/n*100;
+  const callSafeFn = w => windows.filter(x=>x.pct<=w).length/n*100;
+  const putSafeFn = w => windows.filter(x=>x.pct>=-w).length/n*100;
+  const declineFn = w => windows.filter(x=>x.pct<=-w).length/n*100;
+  const rangeTiers = [{label:"Conservative",target:85},{label:"Balanced",target:70},{label:"Aggressive",target:55}];
+  const dipTiers = [{label:"Shallow dip",target:45},{label:"Moderate decline",target:30},{label:"Sharp decline",target:15}];
   const rows = widthPcts.map(w=>{
     const pts = Math.round(spot*w/100);
     return {w, pts,
-      inside: windows.filter(x=>Math.abs(x.pct)<=w).length/n*100,
-      callSafe: windows.filter(x=>x.pct<=w).length/n*100,
-      putSafe: windows.filter(x=>x.pct>=-w).length/n*100};
+      inside: insideFn(w),
+      callSafe: callSafeFn(w),
+      putSafe: putSafeFn(w)};
   });
   $("ospMeta").textContent = `${n} ${periodLabel} windows · ${symName} · spot ${fmt(spot,0)} · lookback ${range}`;
   $("ospResults").innerHTML = `
@@ -2197,7 +2215,35 @@ function renderOptionsSpread(sym, period, range, windows, spot){
       <td><span style="color:${hitColor(r.callSafe)}">${fmt(r.callSafe,0)}%</span></td>
       <td><span style="color:${hitColor(r.putSafe)}">${fmt(r.putSafe,0)}%</span></td></tr>`).join("")}
     </tbody></table>
-    <div class="controls" style="margin-top:10px">
+
+    <h2>Strategy recommendations</h2>
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Strike levels implied by the same ${n} historical ${periodLabel} windows, at three probability tiers. These are historical hit-rates for the underlying finishing on the right side of the strike — not a premium or reward calculation, since real option premiums aren't part of this data. Cross-check the live chain (Options tab) for actual premium before sizing anything.</div>
+    <div style="font-weight:600;margin:4px 0 6px">Premium-selling / range strategies <span class="muted" style="font-weight:400">— you want price to stay inside the strikes</span></div>
+    <table><thead><tr><th style="text-align:left">Strategy</th><th>Conservative (~85%)</th><th>Balanced (~70%)</th><th>Aggressive (~55%)</th></tr></thead><tbody>
+    <tr><td style="text-align:left">Short straddle / strangle<br><span class="muted" style="font-size:11px">sell put + call, both sides</span></td>
+      ${rangeTiers.map(t=>{ const w=ospTierWidth(insideFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100);
+        return `<td>±${fmt(w,2)}%<br><span class="muted" style="font-size:11px">${pts?fmtInt(Math.round(spot-pts))+" / "+fmtInt(Math.round(spot+pts)):"ATM both legs"}</span></td>`; }).join("")}
+    </tr>
+    <tr><td style="text-align:left">Bear call spread<br><span class="muted" style="font-size:11px">sell call, buy further OTM call</span></td>
+      ${rangeTiers.map(t=>{ const w=ospTierWidth(callSafeFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100);
+        return `<td>+${fmt(w,2)}%<br><span class="muted" style="font-size:11px">sell ${pts?fmtInt(Math.round(spot+pts)):"ATM"}${pts?", buy ~"+fmtInt(Math.round(spot+pts*1.6)):""}</span></td>`; }).join("")}
+    </tr>
+    <tr><td style="text-align:left">Bull put spread<br><span class="muted" style="font-size:11px">sell put, buy further OTM put</span></td>
+      ${rangeTiers.map(t=>{ const w=ospTierWidth(putSafeFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100);
+        return `<td>−${fmt(w,2)}%<br><span class="muted" style="font-size:11px">sell ${pts?fmtInt(Math.round(spot-pts)):"ATM"}${pts?", buy ~"+fmtInt(Math.round(spot-pts*1.6)):""}</span></td>`; }).join("")}
+    </tr>
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin:6px 0 16px">A true ATM straddle (strikes at spot) collects the most premium but only wins if price stays inside roughly ±${fmt(meanAbsPct,1)}% (the average move) — the widened strikes above trade some premium for a materially better historical hit rate. Long-leg (protective) distances on the credit spreads are a ~1.6x rule-of-thumb buffer, not separately optimized against this data.</div>
+
+    <div style="font-weight:600;margin:14px 0 6px">Directional bet <span class="muted" style="font-weight:400">— bear put spread, betting on a decline</span></div>
+    <table><thead><tr><th style="text-align:left">Scenario</th><th>Historical odds</th><th>Sell (short put)</th><th>Buy (long put)</th></tr></thead><tbody>
+    ${dipTiers.map(t=>{ const w=ospTierWidth(declineFn,t.target,maxAbs,"down"), pts=Math.round(spot*w/100);
+      return `<tr><td style="text-align:left">${t.label}</td><td>~${t.target}% of ${periodLabel}s fell ≥${fmt(w,2)}%</td>
+        <td>${pts?fmtInt(Math.round(spot-pts))+" (−"+fmt(w,2)+"%)":"ATM"}</td><td>~${fmtInt(spot)} (ATM)</td></tr>`; }).join("")}
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px">Directional bets don't get theta working for them the way range strategies do: a bigger decline pays more but happens less often, which is why the odds fall as the short strike moves further from spot. The long (ATM) leg above is a starting point for cost reduction, not separately optimized.</div>
+
+    <div class="controls" style="margin-top:14px">
       <span class="muted">Custom width (points from spot):</span>
       <input type="number" id="ospCustomPts" placeholder="e.g. 250" style="width:110px" oninput="ospCustom()">
       <span class="muted" id="ospCustomOut"></span>
