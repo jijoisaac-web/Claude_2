@@ -486,7 +486,7 @@ progress{accent-color:var(--violet);}
   <div id="btResults"></div>
 
   <h2 style="margin-top:28px">Options spread probability — indices &amp; F&amp;O stocks</h2>
-  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the underlying actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only). Stock options in India don't have weekly expiries at all, so weekly is disabled for the ~30 liquid F&O names below — monthly only.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the underlying actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only). Stock options in India don't have weekly expiries at all, so weekly is disabled for the ~30 liquid F&O names below — monthly only. Below the historical tables, a live risk-profile panel pulls the real NSE option chain to show actual ₹ max profit/loss and breakeven for 1 lot of each strategy.</div>
   <div class="controls">
     <select id="ospSymbol" onchange="ospSymbolChanged()">
       <optgroup label="Indices">
@@ -2140,6 +2140,48 @@ function renderBacktest(trades, uni, lookback){
 }
 
 /* ================= options: spread width probability ================= */
+// NSE F&O lot sizes (units/lot). Revised periodically by NSE (last broad revision Jan 2026) — verify current
+// values on the exchange/broker before sizing a real trade.
+const OSP_LOT_SIZES = {
+  "NIFTY":65, "BANKNIFTY":30,
+  "RELIANCE":500,"HDFCBANK":650,"ICICIBANK":700,"AXISBANK":625,"SBIN":750,"KOTAKBANK":2000,
+  "INFY":400,"TCS":225,"HCLTECH":400,"TECHM":600,"LT":175,"TITAN":175,"BAJFINANCE":750,"MARUTI":50,
+  "M&M":200,"TATASTEEL":2750,"JSWSTEEL":675,"HINDALCO":700,"ADANIENT":309,"ADANIPORTS":475,
+  "BHARTIARTL":475,"ITC":1725,"HINDUNILVR":300,"SUNPHARMA":350,"CIPLA":425,"NTPC":1500,
+  "POWERGRID":1900,"ONGC":2250,"DLF":950,"TRENT":225,
+};
+function ospBareSymbol(sym){ return sym==="^NSEI"?"NIFTY": sym==="^NSEBANK"?"BANKNIFTY": sym.replace(".NS","").toUpperCase(); }
+// group NSE's returned expiries by calendar month and take the last (monthly) date in each — used to pick a
+// true monthly contract even though NSE lists every Tuesday together with no weekly/monthly flag.
+function ospPickExpiry(expiries, period){
+  if(!expiries || !expiries.length) return null;
+  if(period===5) return expiries[0];
+  const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const parse = s=>{ const m=/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(s||""); return m?new Date(+m[3],MONTHS[m[2]]??0,+m[1]):null; };
+  const groups = {};
+  expiries.forEach(e=>{ const d=parse(e); if(!d) return; const key=d.getFullYear()+"-"+d.getMonth();
+    if(!groups[key] || parse(groups[key])<d) groups[key]=e; });
+  const monthlies = Object.values(groups).sort((a,b)=>parse(a)-parse(b));
+  return monthlies[0] || expiries[0];
+}
+function ospNearestStrike(strikes, target){
+  return strikes.reduce((best,s)=> (best==null || Math.abs(s.k-target)<Math.abs(best.k-target)) ? s : best, null);
+}
+function ospPrem(strikeObj, side){
+  const leg = strikeObj && strikeObj[side];
+  return leg && leg.ltp!=null ? leg.ltp : null;
+}
+// probability functions derived from the historical move windows, shared between the historical tables and
+// the live risk-profile strike selection
+function ospFns(windows, n){
+  return {
+    insideFn: w => windows.filter(x=>Math.abs(x.pct)<=w).length/n*100,
+    callSafeFn: w => windows.filter(x=>x.pct<=w).length/n*100,
+    putSafeFn: w => windows.filter(x=>x.pct>=-w).length/n*100,
+    declineFn: w => windows.filter(x=>x.pct<=-w).length/n*100,
+    rallyFn: w => windows.filter(x=>x.pct>=w).length/n*100,
+  };
+}
 function ospWindows(candles, period){
   const out = [];
   for(let i=0; i+period<candles.length; i+=period){
@@ -2179,7 +2221,9 @@ async function runOptionsSpread(){
   try{ candles = toCandles(await fetchChart(sym, range, "1d")); }
   catch(e){ $("ospMeta").textContent = "Failed to load data."; $("ospResults").innerHTML = ""; return; }
   if(candles.length < period*10){ $("ospMeta").textContent = "Not enough history for this window."; $("ospResults").innerHTML = ""; return; }
-  renderOptionsSpread(sym, period, range, ospWindows(candles, period), candles[candles.length-1].close);
+  const windows = ospWindows(candles, period), spot = candles[candles.length-1].close;
+  renderOptionsSpread(sym, period, range, windows, spot);
+  loadOspRisk(sym, period, spot, windows); // fire-and-forget: fills in #ospRisk once live premiums arrive
 }
 function renderOptionsSpread(sym, period, range, windows, spot){
   window._osp = {spot, windows};
@@ -2194,12 +2238,10 @@ function renderOptionsSpread(sym, period, range, windows, spot){
   const maxAbs = absPct[absPct.length-1] || 1;
   const widthPcts = [0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,15].filter(w=>w<=maxAbs*1.05);
   const hitColor = v => v>=70 ? "var(--green)" : v>=50 ? "var(--amber)" : "var(--red)";
-  const insideFn = w => windows.filter(x=>Math.abs(x.pct)<=w).length/n*100;
-  const callSafeFn = w => windows.filter(x=>x.pct<=w).length/n*100;
-  const putSafeFn = w => windows.filter(x=>x.pct>=-w).length/n*100;
-  const declineFn = w => windows.filter(x=>x.pct<=-w).length/n*100;
+  const {insideFn, callSafeFn, putSafeFn, declineFn, rallyFn} = ospFns(windows, n);
   const rangeTiers = [{label:"Conservative",target:85},{label:"Balanced",target:70},{label:"Aggressive",target:55}];
   const dipTiers = [{label:"Shallow dip",target:45},{label:"Moderate decline",target:30},{label:"Sharp decline",target:15}];
+  const rallyTiers = [{label:"Shallow rally",target:45},{label:"Moderate rally",target:30},{label:"Sharp rally",target:15}];
   const rows = widthPcts.map(w=>{
     const pts = Math.round(spot*w/100);
     return {w, pts,
@@ -2226,12 +2268,17 @@ function renderOptionsSpread(sym, period, range, windows, spot){
     </tbody></table>
 
     <h2>Strategy recommendations</h2>
-    <div class="muted" style="font-size:11px;margin-bottom:8px">Strike levels implied by the same ${n} historical ${periodLabel} windows, at three probability tiers. These are historical hit-rates for the underlying finishing on the right side of the strike — not a premium or reward calculation, since real option premiums aren't part of this data. Cross-check the live chain (Options tab) for actual premium before sizing anything.</div>
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Strike levels implied by the same ${n} historical ${periodLabel} windows, at three probability tiers. These are historical hit-rates for the underlying finishing on the right side of the strike — not a premium or reward calculation, since real option premiums aren't part of this data (see the live risk profile further down for that). Cross-check the live chain (Options tab) for actual premium before sizing anything.</div>
+    <div class="muted" style="font-size:12px;margin-bottom:8px">True ATM straddle (both legs sold/bought at spot, ${fmtInt(spot)}): historically stays inside roughly ±${fmt(meanAbsPct,1)}% (the average move) before counting premium — narrowest, highest-premium version of the range trade below; see the live risk profile for its exact ₹ numbers.</div>
     <div style="font-weight:600;margin:4px 0 6px">Premium-selling / range strategies <span class="muted" style="font-weight:400">— you want price to stay inside the strikes</span></div>
     <table><thead><tr><th style="text-align:left">Strategy</th><th>Conservative (~85%)</th><th>Balanced (~70%)</th><th>Aggressive (~55%)</th></tr></thead><tbody>
-    <tr><td style="text-align:left">Short straddle / strangle<br><span class="muted" style="font-size:11px">sell put + call, both sides</span></td>
+    <tr><td style="text-align:left">Short strangle<br><span class="muted" style="font-size:11px">sell put + call, both sides, undefined risk</span></td>
       ${rangeTiers.map(t=>{ const w=ospTierWidth(insideFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100);
         return `<td>±${fmt(w,2)}%<br><span class="muted" style="font-size:11px">${pts?fmtInt(Math.round(spot-pts))+" / "+fmtInt(Math.round(spot+pts)):"ATM both legs"}</span></td>`; }).join("")}
+    </tr>
+    <tr><td style="text-align:left">Iron condor<br><span class="muted" style="font-size:11px">strangle + protective wings, defined risk</span></td>
+      ${rangeTiers.map(t=>{ const w=ospTierWidth(insideFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100), wing=Math.round(pts*1.6);
+        return `<td>±${fmt(w,2)}%<br><span class="muted" style="font-size:11px">${pts?`sell ${fmtInt(Math.round(spot-pts))}/${fmtInt(Math.round(spot+pts))}, buy ~${fmtInt(Math.round(spot-wing))}/${fmtInt(Math.round(spot+wing))}`:"ATM (add wings)"}</span></td>`; }).join("")}
     </tr>
     <tr><td style="text-align:left">Bear call spread<br><span class="muted" style="font-size:11px">sell call, buy further OTM call</span></td>
       ${rangeTiers.map(t=>{ const w=ospTierWidth(callSafeFn,t.target,maxAbs,"up"), pts=Math.round(spot*w/100);
@@ -2242,15 +2289,20 @@ function renderOptionsSpread(sym, period, range, windows, spot){
         return `<td>−${fmt(w,2)}%<br><span class="muted" style="font-size:11px">sell ${pts?fmtInt(Math.round(spot-pts)):"ATM"}${pts?", buy ~"+fmtInt(Math.round(spot-pts*1.6)):""}</span></td>`; }).join("")}
     </tr>
     </tbody></table>
-    <div class="muted" style="font-size:11px;margin:6px 0 16px">A true ATM straddle (strikes at spot) collects the most premium but only wins if price stays inside roughly ±${fmt(meanAbsPct,1)}% (the average move) — the widened strikes above trade some premium for a materially better historical hit rate. Long-leg (protective) distances on the credit spreads are a ~1.6x rule-of-thumb buffer, not separately optimized against this data.</div>
+    <div class="muted" style="font-size:11px;margin:6px 0 16px">Long-leg (protective) distances on the credit spreads/condor are a ~1.6x rule-of-thumb buffer, not separately optimized against this data.</div>
 
-    <div style="font-weight:600;margin:14px 0 6px">Directional bet <span class="muted" style="font-weight:400">— bear put spread, betting on a decline</span></div>
-    <table><thead><tr><th style="text-align:left">Scenario</th><th>Historical odds</th><th>Sell (short put)</th><th>Buy (long put)</th></tr></thead><tbody>
-    ${dipTiers.map(t=>{ const w=ospTierWidth(declineFn,t.target,maxAbs,"down"), pts=Math.round(spot*w/100);
-      return `<tr><td style="text-align:left">${t.label}</td><td>~${t.target}% of ${periodLabel}s fell ≥${fmt(w,2)}%</td>
-        <td>${pts?fmtInt(Math.round(spot-pts))+" (−"+fmt(w,2)+"%)":"ATM"}</td><td>~${fmtInt(spot)} (ATM)</td></tr>`; }).join("")}
+    <div style="font-weight:600;margin:14px 0 6px">Directional bets <span class="muted" style="font-weight:400">— betting on a move in one direction; odds fall as the target strike moves further from spot</span></div>
+    <table><thead><tr><th style="text-align:left">Scenario</th><th>Historical odds</th><th>Bear put spread <span class="muted" style="font-weight:400">(sell / buy≈ATM)</span></th><th>Bull call spread <span class="muted" style="font-weight:400">(sell / buy≈ATM)</span></th></tr></thead><tbody>
+    ${dipTiers.map((t,i)=>{ const wD=ospTierWidth(declineFn,t.target,maxAbs,"down"), ptsD=Math.round(spot*wD/100);
+      const rt=rallyTiers[i], wR=ospTierWidth(rallyFn,rt.target,maxAbs,"down"), ptsR=Math.round(spot*wR/100);
+      return `<tr><td style="text-align:left">${t.label} / ${rt.label}</td>
+        <td>~${t.target}% fell ≥${fmt(wD,2)}% · ~${rt.target}% rallied ≥${fmt(wR,2)}%</td>
+        <td>${ptsD?fmtInt(Math.round(spot-ptsD))+" (−"+fmt(wD,2)+"%) / ~"+fmtInt(spot):"ATM"}</td>
+        <td>${ptsR?fmtInt(Math.round(spot+ptsR))+" (+"+fmt(wR,2)+"%) / ~"+fmtInt(spot):"ATM"}</td></tr>`; }).join("")}
     </tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:6px">Directional bets don't get theta working for them the way range strategies do: a bigger decline pays more but happens less often, which is why the odds fall as the short strike moves further from spot. The long (ATM) leg above is a starting point for cost reduction, not separately optimized.</div>
+    <div class="muted" style="font-size:11px;margin-top:6px">Directional bets don't get theta working for them the way range strategies do — a bigger move pays more but happens less often. The ATM leg in each pair is a starting point for cost reduction, not separately optimized.</div>
+
+    <div id="ospRisk" style="margin-top:16px"><div class="loading">Loading live premiums for the 1-lot risk profile…</div></div>
 
     <div class="controls" style="margin-top:14px">
       <span class="muted">Custom width (points from spot):</span>
@@ -2268,6 +2320,100 @@ function ospCustom(){
   const callSafe = o.windows.filter(x=>x.pct<=w).length/n*100;
   const putSafe = o.windows.filter(x=>x.pct>=-w).length/n*100;
   $("ospCustomOut").textContent = `±${fmtInt(pts)} pts (${fmt(w,2)}%) → inside both ${fmt(inside,0)}% · call side safe ${fmt(callSafe,0)}% · put side safe ${fmt(putSafe,0)}%`;
+}
+async function loadOspRisk(sym, period, spot, windows){
+  const el = $("ospRisk"); if(!el) return;
+  const bare = ospBareSymbol(sym), lot = OSP_LOT_SIZES[bare];
+  if(!lot){ el.innerHTML = '<div class="muted" style="font-size:11px">No lot size on file for this symbol — skipping the live risk profile.</div>'; return; }
+  const n = windows.length;
+  const {insideFn, callSafeFn, putSafeFn, declineFn, rallyFn} = ospFns(windows, n);
+  const maxAbs = Math.max(...windows.map(w=>Math.abs(w.pct))) || 1;
+  try{
+    let r = await fetch(`/api/optionchain?symbol=${encodeURIComponent(bare)}`);
+    let d = await r.json();
+    if(!r.ok || d.error) throw new Error(d.error || "chain unavailable");
+    const wantExpiry = ospPickExpiry(d.expiries, period);
+    if(wantExpiry && wantExpiry !== d.expiry){
+      r = await fetch(`/api/optionchain?symbol=${encodeURIComponent(bare)}&expiry=${encodeURIComponent(wantExpiry)}`);
+      d = await r.json();
+      if(!r.ok || d.error) throw new Error(d.error || "chain unavailable");
+    }
+    const strikes = d.strikes, live = d.spot || spot;
+    if(!strikes || !strikes.length) throw new Error("empty chain");
+    const pw = w => Math.round(live*w/100);
+    const K = t => ospNearestStrike(strikes, t).k;
+    const CE = k => ospPrem(ospNearestStrike(strikes,k), "ce"), PE = k => ospPrem(ospNearestStrike(strikes,k), "pe");
+
+    const ptsInside = pw(ospTierWidth(insideFn,70,maxAbs,"up"));
+    const ptsCall = pw(ospTierWidth(callSafeFn,70,maxAbs,"up"));
+    const ptsPut = pw(ospTierWidth(putSafeFn,70,maxAbs,"up"));
+    const ptsRally = pw(ospTierWidth(rallyFn,30,maxAbs,"down"));
+    const ptsDecline = pw(ospTierWidth(declineFn,30,maxAbs,"down"));
+
+    const rows = [];
+    const atmK = K(live), atmC = CE(atmK), atmP = PE(atmK);
+    if(atmC!=null && atmP!=null){
+      const credit = atmC+atmP;
+      rows.push({name:"Short Straddle", tier:"ATM", legs:`sell ${fmtInt(atmK)}CE + ${fmtInt(atmK)}PE`,
+        maxProfit:credit*lot, maxLoss:"Unlimited (upside) / large (downside)",
+        be:`${fmtInt(Math.round(atmK+credit))} / ${fmtInt(Math.round(atmK-credit))}`});
+      rows.push({name:"Long Straddle", tier:"ATM", legs:`buy ${fmtInt(atmK)}CE + ${fmtInt(atmK)}PE`,
+        maxProfit:"Unlimited (upside) / large (downside)", maxLoss:credit*lot,
+        be:`${fmtInt(Math.round(atmK+credit))} / ${fmtInt(Math.round(atmK-credit))}`});
+    }
+    if(ptsInside){
+      const callK=K(live+ptsInside), putK=K(live-ptsInside), cp=CE(callK), pp=PE(putK);
+      if(cp!=null && pp!=null){ const credit=cp+pp;
+        rows.push({name:"Short Strangle", tier:"Balanced ~70%", legs:`sell ${fmtInt(callK)}CE + ${fmtInt(putK)}PE`,
+          maxProfit:credit*lot, maxLoss:"Unlimited (upside) / large (downside)",
+          be:`${fmtInt(Math.round(callK+credit))} / ${fmtInt(Math.round(putK-credit))}`}); }
+      const clK=K(live+ptsInside*1.6), plK=K(live-ptsInside*1.6);
+      const csP=CE(callK), clP=CE(clK), psP=PE(putK), plP=PE(plK);
+      if([csP,clP,psP,plP].every(v=>v!=null)){
+        const credit=(csP-clP)+(psP-plP), width=Math.max(clK-callK, putK-plK);
+        rows.push({name:"Iron Condor", tier:"Balanced ~70%", legs:`sell ${fmtInt(callK)}CE/buy ${fmtInt(clK)}CE, sell ${fmtInt(putK)}PE/buy ${fmtInt(plK)}PE`,
+          maxProfit:credit*lot, maxLoss:(width-credit)*lot,
+          be:`${fmtInt(Math.round(callK+credit))} / ${fmtInt(Math.round(putK-credit))}`}); }
+    }
+    if(ptsCall){
+      const sK=K(live+ptsCall), lK=K(live+ptsCall*1.6), sP=CE(sK), lP=CE(lK);
+      if(sP!=null && lP!=null){ const credit=sP-lP, width=lK-sK;
+        rows.push({name:"Bear Call Spread", tier:"Balanced ~70%", legs:`sell ${fmtInt(sK)}CE / buy ${fmtInt(lK)}CE`,
+          maxProfit:credit*lot, maxLoss:(width-credit)*lot, be:fmtInt(Math.round(sK+credit))}); }
+    }
+    if(ptsPut){
+      const sK=K(live-ptsPut), lK=K(live-ptsPut*1.6), sP=PE(sK), lP=PE(lK);
+      if(sP!=null && lP!=null){ const credit=sP-lP, width=sK-lK;
+        rows.push({name:"Bull Put Spread", tier:"Balanced ~70%", legs:`sell ${fmtInt(sK)}PE / buy ${fmtInt(lK)}PE`,
+          maxProfit:credit*lot, maxLoss:(width-credit)*lot, be:fmtInt(Math.round(sK-credit))}); }
+    }
+    if(ptsRally){
+      const fK=K(live+ptsRally), nP=CE(atmK), fP=CE(fK);
+      if(nP!=null && fP!=null){ const debit=nP-fP, width=fK-atmK;
+        rows.push({name:"Bull Call Spread", tier:"Moderate rally ~30%", legs:`buy ${fmtInt(atmK)}CE / sell ${fmtInt(fK)}CE`,
+          maxProfit:(width-debit)*lot, maxLoss:debit*lot, be:fmtInt(Math.round(atmK+debit))}); }
+    }
+    if(ptsDecline){
+      const fK=K(live-ptsDecline), nP=PE(atmK), fP=PE(fK);
+      if(nP!=null && fP!=null){ const debit=nP-fP, width=atmK-fK;
+        rows.push({name:"Bear Put Spread", tier:"Moderate decline ~30%", legs:`buy ${fmtInt(atmK)}PE / sell ${fmtInt(fK)}PE`,
+          maxProfit:(width-debit)*lot, maxLoss:debit*lot, be:fmtInt(Math.round(atmK-debit))}); }
+    }
+
+    if(!rows.length){ el.innerHTML = '<div class="muted" style="font-size:11px">Live premiums unavailable right now (off-hours or thin liquidity) — try again during market hours.</div>'; return; }
+    const money = v => typeof v==="number" ? "₹"+fmtInt(Math.round(v)) : v;
+    el.innerHTML = `
+      <h2>Risk profile — 1 lot, live premiums</h2>
+      <div class="muted" style="font-size:11px;margin-bottom:6px">Lot size ${lot} · expiry ${d.expiry} · live spot ${fmt(live,0)}. Each row uses that strategy's Balanced (~70%) or Moderate (~30%) tier strikes from above, or ATM for the straddles — snapped to the nearest strike NSE actually lists. Premiums are live last-traded prices and can move before you place the order.</div>
+      <table><thead><tr><th style="text-align:left">Strategy</th><th style="text-align:left">Tier</th><th style="text-align:left">Legs</th><th>Max profit</th><th>Max loss</th><th>Breakeven</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td style="text-align:left">${r.name}</td><td style="text-align:left" class="muted">${r.tier}</td>
+        <td style="text-align:left;font-size:11px" class="muted">${r.legs}</td>
+        <td>${money(r.maxProfit)}</td><td>${money(r.maxLoss)}</td><td>${r.be}</td></tr>`).join("")}
+      </tbody></table>
+      <div class="muted" style="font-size:11px;margin-top:6px">Lot sizes are revised periodically by NSE — verify the current lot size before sizing a real trade. "Unlimited" legs (naked short straddle/strangle, and the profit side of a long straddle) carry margin/risk beyond a single number — check your broker's margin calculator. Ignores brokerage, taxes and slippage.</div>`;
+  }catch(e){
+    el.innerHTML = `<div class="muted" style="font-size:11px">Live risk profile unavailable: ${e.message}.</div>`;
+  }
 }
 
 /* ================= options: chain analysis ================= */

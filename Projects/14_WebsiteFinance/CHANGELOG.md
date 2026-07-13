@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.18.0] — 2026-07-13 · More Strategies + Live 1-Lot Risk Profile
+
+- Strategy recommendations expanded from 3 to 8: short strangle, iron condor (new, defined-risk version of the strangle), bear call spread, bull put spread, bull call spread (new, mirrors bear put via a new rally-probability function), bear put spread, plus explicit short/long ATM straddle callouts
+- New **Risk profile — 1 lot, live premiums** panel: fetches the live NSE option chain for the selected symbol at the matching weekly/monthly expiry (auto-picks the true monthly contract from NSE's undifferentiated expiry list) and computes real max profit, max loss and breakeven in ₹ for one lot of each strategy, using each strategy's Balanced/Moderate tier strikes snapped to actual listed strikes
+- Added an NSE F&O lot-size table (NIFTY, BANKNIFTY, and the 28 stocks) so the risk profile can convert points into ₹; loads asynchronously after the historical tables so a slow/failed chain fetch never blocks the rest of the panel
+- Payoff formulas (credit/debit spread max profit & loss, straddle breakevens, iron condor worst-wing loss) verified against a synthetic option chain with 16 sanity checks
+
 ## [2.17.0] — 2026-07-13 · F&O Stocks + Strategy Recommendations
 
 - Options spread probability panel now covers the ~30 most liquid F&O stocks (same list as the Options momentum scanner), not just NIFTY/BANKNIFTY — monthly windows only, since Indian stock options don't have weekly expiries; the symbol picker auto-switches off Weekly when a stock is selected
