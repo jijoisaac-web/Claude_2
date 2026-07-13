@@ -485,15 +485,18 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="btResults"></div>
 
-  <h2 style="margin-top:28px">Options spread probability — NIFTY / BankNifty</h2>
-  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the index actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE index options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only).</div>
+  <h2 style="margin-top:28px">Options spread probability — indices &amp; F&amp;O stocks</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the underlying actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only). Stock options in India don't have weekly expiries at all, so weekly is disabled for the ~30 liquid F&O names below — monthly only.</div>
   <div class="controls">
-    <select id="ospSymbol">
-      <option value="^NSEI">NIFTY</option>
-      <option value="^NSEBANK">BANKNIFTY</option>
+    <select id="ospSymbol" onchange="ospSymbolChanged()">
+      <optgroup label="Indices">
+        <option value="^NSEI">NIFTY</option>
+        <option value="^NSEBANK">BANKNIFTY</option>
+      </optgroup>
+      <optgroup label="F&amp;O Stocks (monthly only)" id="ospStockGroup"></optgroup>
     </select>
     <select id="ospPeriod">
-      <option value="5">Weekly (~5 trading days)</option>
+      <option value="5" id="ospWeeklyOpt">Weekly (~5 trading days)</option>
       <option value="21" selected>Monthly (~21 trading days)</option>
     </select>
     <select id="ospLookback">
@@ -2163,6 +2166,12 @@ function ospTierWidth(fn, target, maxAbs, dir){
   }
   return maxAbs;
 }
+function ospSymbolChanged(){
+  const isStock = $("ospSymbol").value.endsWith(".NS");
+  const weeklyOpt = $("ospWeeklyOpt"), periodSel = $("ospPeriod");
+  weeklyOpt.disabled = isStock;
+  if(isStock && periodSel.value==="5") periodSel.value = "21";
+}
 async function runOptionsSpread(){
   const sym = $("ospSymbol").value, period = +$("ospPeriod").value, range = $("ospLookback").value;
   $("ospMeta").textContent = "Fetching…"; $("ospResults").innerHTML = '<div class="loading">Loading…</div>';
@@ -2181,7 +2190,7 @@ function renderOptionsSpread(sym, period, range, windows, spot){
   const stdPct = Math.sqrt(windows.reduce((s,w)=>s+(w.pct-meanPct)**2,0)/n);
   const medAbsPct = absPct[Math.floor(n/2)];
   const p68 = ospPercentile(absPct,68), p90 = ospPercentile(absPct,90), p95 = ospPercentile(absPct,95);
-  const symName = sym==="^NSEI" ? "NIFTY" : "BANKNIFTY", periodLabel = period===5?"weekly":"monthly";
+  const symName = nameOf(sym), periodLabel = period===5?"weekly":"monthly";
   const maxAbs = absPct[absPct.length-1] || 1;
   const widthPcts = [0.5,0.75,1,1.5,2,2.5,3,4,5,6,8,10,12,15].filter(w=>w<=maxAbs*1.05);
   const hitColor = v => v>=70 ? "var(--green)" : v>=50 ? "var(--amber)" : "var(--red)";
@@ -2527,6 +2536,8 @@ document.addEventListener("click", e=>{ if(!e.target.closest("#searchWrap")) $("
   $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts; $("pfAddSym").innerHTML = opts;
   $("optStockGroup").innerHTML = Object.entries(ALL_STOCKS).sort((a,b)=>a[1].localeCompare(b[1]))
     .map(([s,n])=>`<option value="${s.replace(".NS","")}">${n} (${s.replace(".NS","")})</option>`).join("");
+  const ospStocks = OM_SYMBOLS.filter(s=>s!=="NIFTY"&&s!=="BANKNIFTY").map(s=>s+".NS");
+  $("ospStockGroup").innerHTML = ospStocks.map(t=>`<option value="${t}">${nameOf(t)} (${t.replace(".NS","")})</option>`).join("");
   $("chartSymbol").value = "RELIANCE.NS"; $("fundSymbol").value = "RELIANCE.NS";
   $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
   $("verBadge").textContent = "v" + APP_VERSION;

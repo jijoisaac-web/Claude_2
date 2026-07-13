@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.17.0] — 2026-07-13 · F&O Stocks + Strategy Recommendations
+
+- Options spread probability panel now covers the ~30 most liquid F&O stocks (same list as the Options momentum scanner), not just NIFTY/BANKNIFTY — monthly windows only, since Indian stock options don't have weekly expiries; the symbol picker auto-switches off Weekly when a stock is selected
+- New **Strategy recommendations** block under the hit-rate table: at three probability tiers (Conservative ~85%, Balanced ~70%, Aggressive ~55%), shows implied strikes for a short straddle/strangle, bear call spread, and bull put spread; a separate table sizes a bear put spread (Shallow/Moderate/Sharp decline tiers) since directional bets read the odds in the opposite direction from range strategies
+- App version display was stuck on 2.15.0 despite two feature releases — now correctly shows the current version
+
 ## [2.16.0] — 2026-07-13 · Options Spread Probability
 
 - New **Options spread probability** panel on the Backtest tab: for NIFTY and BANKNIFTY, measures how far the index actually moved between past weekly (~5 trading day) and monthly (~21 trading day) windows using existing price history, and turns that into a historical "closed inside the range" hit rate for a spread width you pick
