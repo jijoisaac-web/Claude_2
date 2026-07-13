@@ -77,7 +77,7 @@ button.btn.ghost{background:#21262d;color:var(--text);border:1px solid var(--bor
 button.btn.danger{background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:0 6px;}
 .rangebtns button{background:#21262d;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;}
 .rangebtns button.active{color:var(--text);border-color:var(--blue);}
-#chart,#rsiChart,#macdChart{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;}
+#chart,#rsiChart,#macdChart,#smcChart{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;}
 .fund-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
 .fund-grid .card .price{font-size:18px;}
 .muted{color:var(--muted);}
@@ -122,24 +122,22 @@ progress{width:180px;accent-color:var(--blue);}
   .badge{font-size:10px;padding:1px 6px;}
   .fund-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
   .fund-grid .card .price{font-size:15px;}
-  #chart{height:320px;}
+  #chart,#smcChart{height:320px;}
   .disclaimer{font-size:10px;}
 }
 /* ===================== visual refresh (v2.14) — override layer ===================== */
 :root{--bg:#0a0e17;--panel:#111827;--border:#26314a;--text:#e8edf7;--muted:#93a0bd;
 --green:#34d399;--red:#fb7185;--blue:#60a5fa;--amber:#fbbf24;--violet:#a78bfa;}
 body{font-family:'Inter','Segoe UI',system-ui,sans-serif;position:relative;
-  background:radial-gradient(1100px 480px at 50% -8%, rgba(96,110,250,.13), transparent 60%),
-             radial-gradient(800px 400px at 90% 10%, rgba(167,139,250,.06), transparent 55%),
-             radial-gradient(circle, rgba(96,165,250,.22) 1.4px, transparent 1.6px) 0 0/34px 34px,
+  background:radial-gradient(1000px 620px at 6% -12%, rgba(96,165,250,.20), transparent 62%),
+             radial-gradient(820px 560px at 100% -6%, rgba(167,139,250,.18), transparent 58%),
+             radial-gradient(900px 620px at 46% 112%, rgba(52,211,153,.10), transparent 60%),
+             radial-gradient(620px 460px at 104% 104%, rgba(251,113,133,.09), transparent 58%),
              var(--bg);
   background-attachment:fixed;}
-/* faint chart-motif watermark, fixed to the viewport, sits behind all content */
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='300' viewBox='0 0 520 300'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cline x1='20' y1='40' x2='20' y2='120' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='12' y='60' width='16' height='40' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='60' y1='20' x2='60' y2='150' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='52' y='55' width='16' height='55' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cline x1='100' y1='70' x2='100' y2='180' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='92' y='90' width='16' height='60' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='140' y1='30' x2='140' y2='130' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='132' y='45' width='16' height='50' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='180' y1='90' x2='180' y2='220' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='172' y='120' width='16' height='65' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cline x1='220' y1='50' x2='220' y2='160' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='212' y='70' width='16' height='55' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='260' y1='100' x2='260' y2='240' stroke='%2334d399' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='252' y='130' width='16' height='70' fill='%2334d399' fill-opacity='0.45'/%3E%3Cline x1='300' y1='60' x2='300' y2='170' stroke='%23fb7185' stroke-opacity='0.55' stroke-width='2'/%3E%3Crect x='292' y='85' width='16' height='55' fill='%23fb7185' fill-opacity='0.45'/%3E%3Cpath d='M20 80 L60 90 L100 130 L140 70 L180 150 L220 100 L260 165 L300 110' stroke='%2360a5fa' stroke-opacity='0.5' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:bottom -10px right -20px;background-size:min(46vw,520px) auto;
-  opacity:.16;}
-@media(max-width:900px){body::before{display:none;}}
+/* soft grain over the mesh gradient — fixed to the viewport, sits behind all content */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
 header{background:rgba(11,16,28,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}
 header h1{font-weight:800;letter-spacing:-.3px;}
 header h1 span{background:linear-gradient(90deg,var(--blue),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;}
@@ -196,6 +194,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="track">Backtest</button>
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
+    <button data-tab="smc">Smart Money</button>
     <button data-tab="playbook">Playbook</button>
     <button data-tab="brief">Brief</button>
   </nav>
@@ -209,7 +208,7 @@ progress{accent-color:var(--violet);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Brief)</td></tr>
+      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Playbook)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -359,6 +358,32 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="ivrvResults"></div>
   <div class="muted" style="font-size:11px;margin-top:6px">IV is the chain's live ATM figure (avg of call/put where both exist); realized vol uses close-to-close log returns, no overnight-gap or intraday adjustment. Neither is forecasting the other — a rich reading can stay rich (or get richer) around known events (earnings, budget, RBI policy). Not investment advice.</div>
+</section>
+
+<!-- SMART MONEY: order blocks + volume profile -->
+<section id="smc" class="tab">
+  <h2>Smart money — order blocks &amp; volume profile</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">No exchange publishes who placed a trade, so this isn't a view into actual institutional order flow — it's a structural read of price and volume that approximates it. An <b>order block</b> is the last opposing candle before a sharp break of structure (a "bullish" block is the last red candle before a rally that clears a recent swing high; "bearish" is the mirror on the downside) — the classic retail-facing proxy for "this is roughly where a large position was likely built." <b>Volume profile</b> shows how much trading actually happened at each price level over the window regardless of when, with its Point of Control (POC) and Value Area marking where the most participation agreed on. Combining the two: a block sitting inside a high-volume zone has real participation behind it; one in a thin, low-volume gap is a weaker signal — that comparison is the "Vol confirmation" column below.</div>
+  <div class="controls">
+    <select id="smcSymbol"></select>
+    <select id="smcRange">
+      <option value="3mo">3M</option>
+      <option value="6mo" selected>6M</option>
+      <option value="1y">1Y</option>
+      <option value="2y">2Y</option>
+    </select>
+    <label class="muted">Volume profile <select id="smcVPBars"><option value="60">last 60 bars</option><option value="90" selected>last 90 bars</option><option value="150">last 150 bars</option></select></label>
+    <button class="btn" onclick="loadSmc()">▶ Analyze</button>
+    <span class="muted" id="smcMeta"></span>
+  </div>
+  <div class="cards" id="smcCards"></div>
+  <div id="smcChart"></div>
+  <div class="muted" style="font-size:11px;margin-bottom:10px">Dashed lines mark unmitigated (still-fresh) order block zones — green above/below for bullish, red for bearish. A block is "mitigated" once price has traded back into its range; mitigated zones stop acting as the original support/resistance idea and are shown in the table below but not on the chart.</div>
+  <h2 style="margin-top:12px">Volume profile <span class="muted" id="smcVPMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="card" id="smcVPLadder"></div>
+  <h2 style="margin-top:20px">Order blocks <span class="muted" style="text-transform:none;font-weight:400">· most recent first</span></h2>
+  <div id="smcOBTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
+  <div class="muted" style="font-size:11px;margin-top:6px">"Vol confirmation" compares how much of the window's volume traded inside a block's price range to what its width alone would predict if volume were spread evenly — above 1.0x means the zone saw more participation than an average slice of the range (volume-backed); below 1.0x means it's thinner than average (a possible low-liquidity air-pocket, more likely to be sliced through than to hold). This is a heuristic read of price/volume structure, not investment advice.</div>
 </section>
 
 <!-- PLAYBOOK: daily discipline checklist -->
@@ -650,6 +675,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="playbook") renderPlaybook();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
+  if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
   if(b.dataset.tab==="brief" && !window._briefLoaded){ window._briefLoaded=true; loadBrief(); }
 });
 
@@ -1328,6 +1354,182 @@ async function loadChart(){
     }));
     main.timeScale().fitContent();
   }catch(e){ $("chart").innerHTML = `<div class="loading">Chart failed: ${e.message}</div>`; }
+}
+
+/* ================= smart money: order blocks + volume profile ================= */
+// fractal swing points: a swing high/low needs k lower/higher neighbours on each side
+function smcSwings(c, k){
+  const swings = [];
+  for(let i=k;i<c.length-k;i++){
+    let isHigh=true, isLow=true;
+    for(let j=1;j<=k;j++){
+      if(c[i].high < c[i-j].high || c[i].high < c[i+j].high) isHigh=false;
+      if(c[i].low > c[i-j].low || c[i].low > c[i+j].low) isLow=false;
+    }
+    if(isHigh) swings.push({i, price:c[i].high, type:"high"});
+    if(isLow) swings.push({i, price:c[i].low, type:"low"});
+  }
+  return swings;
+}
+// order block = last opposing candle before a break-of-structure move that clears a recent swing point
+function detectOrderBlocks(c, opts){
+  opts = opts || {};
+  const k = opts.swingK || 2, minMovePct = opts.minMovePct!=null?opts.minMovePct:1.5, searchBack = opts.searchBack || 15;
+  const swings = smcSwings(c, k);
+  const swingByIdx = {}; swings.forEach(s=>swingByIdx[s.i]=s);
+  let lastSwingHigh=null, lastSwingLow=null;
+  const obs = [];
+  for(let i=k;i<c.length;i++){
+    if(swingByIdx[i]){ if(swingByIdx[i].type==="high") lastSwingHigh=swingByIdx[i]; else lastSwingLow=swingByIdx[i]; }
+    if(lastSwingHigh && c[i].close > lastSwingHigh.price && i > lastSwingHigh.i){
+      let obIdx=null;
+      for(let j=i-1;j>=Math.max(lastSwingHigh.i, i-searchBack);j--){ if(c[j].close<c[j].open){ obIdx=j; break; } }
+      if(obIdx!=null){
+        const movePct = (c[i].close-c[obIdx].close)/c[obIdx].close*100;
+        if(movePct>=minMovePct) obs.push({type:"bullish", idx:obIdx, date:c[obIdx].time, low:c[obIdx].low, high:c[obIdx].high,
+          bosIdx:i, bosDate:c[i].time, mitigated:false, mitigatedDate:null});
+      }
+      lastSwingHigh=null;
+    }
+    if(lastSwingLow && c[i].close < lastSwingLow.price && i > lastSwingLow.i){
+      let obIdx=null;
+      for(let j=i-1;j>=Math.max(lastSwingLow.i, i-searchBack);j--){ if(c[j].close>c[j].open){ obIdx=j; break; } }
+      if(obIdx!=null){
+        const movePct = (c[obIdx].close-c[i].close)/c[obIdx].close*100;
+        if(movePct>=minMovePct) obs.push({type:"bearish", idx:obIdx, date:c[obIdx].time, low:c[obIdx].low, high:c[obIdx].high,
+          bosIdx:i, bosDate:c[i].time, mitigated:false, mitigatedDate:null});
+      }
+      lastSwingLow=null;
+    }
+  }
+  const seen=new Set(), deduped=[];
+  obs.forEach(ob=>{ const key=ob.type+":"+ob.idx; if(!seen.has(key)){ seen.add(key); deduped.push(ob); } });
+  deduped.forEach(ob=>{
+    for(let j=ob.bosIdx+1;j<c.length;j++){ if(c[j].low<=ob.high && c[j].high>=ob.low){ ob.mitigated=true; ob.mitigatedDate=c[j].time; break; } }
+  });
+  return deduped;
+}
+// volume-at-price distribution over the last N bars: POC (highest-volume price) + 70% Value Area
+function buildVolumeProfile(c, opts){
+  opts = opts || {};
+  const bars = opts.bars || 90, numBins = opts.numBins || 30;
+  const slice = c.slice(-bars);
+  if(!slice.length) return null;
+  const lo = Math.min(...slice.map(d=>d.low)), hi = Math.max(...slice.map(d=>d.high));
+  if(!(hi>lo)) return null;
+  const binSize = (hi-lo)/numBins;
+  const bins = Array.from({length:numBins}, (_,i)=>({lo:lo+i*binSize, hi:lo+(i+1)*binSize, vol:0}));
+  slice.forEach(d=>{
+    const range = d.high-d.low || binSize*0.01;
+    bins.forEach(b=>{ const overlap = Math.min(d.high,b.hi)-Math.max(d.low,b.lo); if(overlap>0) b.vol += (d.volume||0)*(overlap/range); });
+  });
+  const totalVol = bins.reduce((s,b)=>s+b.vol,0);
+  let pocIdx=0; bins.forEach((b,i)=>{ if(b.vol>bins[pocIdx].vol) pocIdx=i; });
+  let cum=bins[pocIdx].vol, loI=pocIdx, hiI=pocIdx;
+  while(cum<totalVol*0.70 && (loI>0||hiI<numBins-1)){
+    const nextLo = loI>0?bins[loI-1].vol:-1, nextHi = hiI<numBins-1?bins[hiI+1].vol:-1;
+    if(nextHi>=nextLo){ hiI++; cum+=bins[hiI].vol; } else { loI--; cum+=bins[loI].vol; }
+  }
+  return {bins, totalVol, poc:(bins[pocIdx].lo+bins[pocIdx].hi)/2, vah:bins[hiI].hi, val:bins[loI].lo, pocIdx, lo, hi};
+}
+// how much of the window's volume traded inside this block, relative to what its width alone would predict
+function obVolumeConfirmation(ob, profile){
+  if(!profile || !profile.totalVol) return null;
+  const overlapping = profile.bins.filter(b=>b.hi>ob.low && b.lo<ob.high);
+  const obVolPct = overlapping.reduce((s,b)=>s+b.vol,0)/profile.totalVol*100;
+  const zoneWidthPct = (ob.high-ob.low)/(profile.hi-profile.lo)*100;
+  return {obVolPct, zoneWidthPct, ratio: zoneWidthPct>0 ? obVolPct/zoneWidthPct : null};
+}
+async function loadSmc(){
+  window._smcLoaded = true;
+  const sym = $("smcSymbol").value, range = $("smcRange").value, vpBars = +$("smcVPBars").value;
+  $("smcMeta").textContent = "Loading…"; $("smcOBTable").innerHTML = '<div class="loading">Analyzing…</div>';
+  try{
+    await ensureChartsLib();
+    const c = toCandles(await fetchChart(sym, range, "1d"));
+    if(c.length < 40) throw new Error("not enough history for this range");
+    const obs = detectOrderBlocks(c, {swingK:2, minMovePct:1.5, searchBack:15});
+    const profile = buildVolumeProfile(c, {bars:vpBars, numBins:30});
+    obs.forEach(ob=>{ ob.conf = obVolumeConfirmation(ob, profile); });
+    obs.sort((a,b)=>b.idx-a.idx);
+    renderSmcChart(c, obs, profile);
+    renderSmcCards(c, obs, profile);
+    renderSmcVP(profile);
+    renderSmcOBTable(obs, c);
+    $("smcMeta").textContent = `${nameOf(sym)} · ${c.length} bars · ${obs.length} order block${obs.length===1?"":"s"} found`;
+  }catch(e){
+    $("smcMeta").textContent = "Failed to load.";
+    $("smcOBTable").innerHTML = `<div class="loading">${e.message}</div>`;
+  }
+}
+function renderSmcChart(c, obs, profile){
+  Object.values(window._smcCharts||{}).forEach(ch=>{ try{ ch.remove(); }catch(e){} });
+  const ch = mkChart($("smcChart"), 420);
+  window._smcCharts = {main: ch};
+  const cs = ch.addCandlestickSeries({upColor:"#3fb950",downColor:"#f85149",borderVisible:false,wickUpColor:"#3fb950",wickDownColor:"#f85149"});
+  cs.setData(c.map(d=>({time:d.time,open:d.open,high:d.high,low:d.low,close:d.close})));
+  const LS = LightweightCharts.LineStyle;
+  const fresh = obs.filter(o=>!o.mitigated);
+  const freshBull = fresh.filter(o=>o.type==="bullish").sort((a,b)=>b.idx-a.idx).slice(0,5);
+  const freshBear = fresh.filter(o=>o.type==="bearish").sort((a,b)=>b.idx-a.idx).slice(0,5);
+  [...freshBull, ...freshBear].forEach(ob=>{
+    const color = ob.type==="bullish" ? "#3fb950" : "#f85149", label = ob.type==="bullish"?"Bull OB":"Bear OB";
+    cs.createPriceLine({price:ob.high, color, lineWidth:1, lineStyle:LS.Dashed, axisLabelVisible:true, title:label+" top"});
+    cs.createPriceLine({price:ob.low, color, lineWidth:1, lineStyle:LS.Dashed, axisLabelVisible:true, title:label+" bot"});
+  });
+  if(profile){
+    cs.createPriceLine({price:profile.poc, color:"#d29922", lineWidth:2, lineStyle:LS.Solid, axisLabelVisible:true, title:"POC"});
+    cs.createPriceLine({price:profile.vah, color:"rgba(210,153,34,.55)", lineWidth:1, lineStyle:LS.Dotted, axisLabelVisible:true, title:"VAH"});
+    cs.createPriceLine({price:profile.val, color:"rgba(210,153,34,.55)", lineWidth:1, lineStyle:LS.Dotted, axisLabelVisible:true, title:"VAL"});
+  }
+  ch.timeScale().fitContent();
+}
+function renderSmcCards(c, obs, profile){
+  const spot = c[c.length-1].close;
+  const fresh = obs.filter(o=>!o.mitigated);
+  const nearest = type => fresh.filter(o=>o.type===type).sort((a,b)=>
+    Math.abs(spot-(a.low+a.high)/2)-Math.abs(spot-(b.low+b.high)/2))[0];
+  const nb = nearest("bullish"), nr = nearest("bearish");
+  const vaPos = profile ? (spot>profile.vah?"above Value Area":spot<profile.val?"below Value Area":"inside Value Area") : "—";
+  $("smcCards").innerHTML = `
+    <div class="card"><div class="name">Spot</div><div class="price">${fmt(spot,2)}</div><div class="chg muted">${vaPos}</div></div>
+    <div class="card"><div class="name">Nearest bullish OB (fresh)</div><div class="price up">${nb?fmt((nb.low+nb.high)/2,2):"—"}</div>
+      <div class="chg muted">${nb?`zone ${fmt(nb.low,2)}–${fmt(nb.high,2)}`:"none unmitigated"}</div></div>
+    <div class="card"><div class="name">Nearest bearish OB (fresh)</div><div class="price down">${nr?fmt((nr.low+nr.high)/2,2):"—"}</div>
+      <div class="chg muted">${nr?`zone ${fmt(nr.low,2)}–${fmt(nr.high,2)}`:"none unmitigated"}</div></div>
+    <div class="card"><div class="name">Point of Control</div><div class="price" style="color:var(--amber)">${profile?fmt(profile.poc,2):"—"}</div>
+      <div class="chg muted">${profile?`Value Area ${fmt(profile.val,2)}–${fmt(profile.vah,2)}`:""}</div></div>`;
+}
+function renderSmcVP(profile){
+  if(!profile){ $("smcVPLadder").innerHTML = '<div class="loading">No data</div>'; $("smcVPMeta").textContent=""; return; }
+  $("smcVPMeta").textContent = `· POC ${fmt(profile.poc,2)} · Value Area ${fmt(profile.val,2)}–${fmt(profile.vah,2)} (70% of volume)`;
+  const maxVol = Math.max(...profile.bins.map(b=>b.vol)) || 1;
+  const rowsDesc = [...profile.bins].reverse();
+  $("smcVPLadder").innerHTML = rowsDesc.map((b,i)=>{
+    const idxOrig = profile.bins.length-1-i;
+    const w = b.vol/maxVol*260, isPOC = idxOrig===profile.pocIdx, inVA = b.hi>profile.val && b.lo<profile.vah;
+    const color = isPOC ? "var(--amber)" : inVA ? "var(--blue)" : "rgba(139,148,158,.5)";
+    return `<div style="display:flex;align-items:center;gap:6px;margin:1px 0;font-size:11px">
+      <div style="width:90px;text-align:right;${isPOC?"color:var(--amber);font-weight:700":""}">${fmt((b.lo+b.hi)/2,2)}</div>
+      <div style="height:11px;width:${w}px;background:${color};border-radius:2px;opacity:.85"></div>
+    </div>`;
+  }).join("") + `<div class="muted" style="font-size:10px;margin-top:4px">Amber = Point of Control · Blue = inside Value Area (70% of volume) · Grey = outside</div>`;
+}
+function renderSmcOBTable(obs, c){
+  if(!obs.length){ $("smcOBTable").innerHTML = '<div class="loading">No qualifying order blocks in this window — try a longer range.</div>'; return; }
+  const spot = c[c.length-1].close;
+  $("smcOBTable").innerHTML = `<table><thead><tr><th style="text-align:left">Date</th><th>Type</th><th>Zone</th><th>Status</th><th>Vol confirmation</th><th>Distance</th></tr></thead><tbody>` +
+    obs.slice(0,25).map(ob=>{
+      const mid=(ob.low+ob.high)/2, distPct=(mid-spot)/spot*100;
+      const confTxt = ob.conf&&ob.conf.ratio!=null ? `${fmt(ob.conf.ratio,2)}x` : "—";
+      const confColor = ob.conf&&ob.conf.ratio!=null ? (ob.conf.ratio>=1.5?"var(--green)":ob.conf.ratio>=0.8?"var(--amber)":"var(--red)") : "var(--muted)";
+      return `<tr><td style="text-align:left">${ob.date}</td>
+        <td><span class="badge ${ob.type==="bullish"?"bullish":"bearish"}">${ob.type.toUpperCase()}</span></td>
+        <td>${fmt(ob.low,2)} – ${fmt(ob.high,2)}</td>
+        <td>${ob.mitigated?`<span class="muted">Mitigated ${ob.mitigatedDate}</span>`:'<span class="up">Fresh</span>'}</td>
+        <td><span style="color:${confColor};font-weight:600">${confTxt}</span></td>
+        <td class="muted">${distPct>=0?"+":""}${fmt(distPct,1)}% (${distPct>=0?"above":"below"})</td></tr>`;
+    }).join("") + `</tbody></table>`;
 }
 
 /* ================= fundamentals ================= */
@@ -2480,7 +2682,7 @@ function renderPlaybook(){
 }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","playbook","brief"];
+const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","playbook","brief"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
@@ -2530,6 +2732,8 @@ document.addEventListener("click", e=>{ if(!e.target.closest("#searchWrap")) $("
       .map(([s,n])=>`<option value="${s}">${n} (${s.replace(".NS","")})</option>`).join("") +
     `</optgroup>`).join("");
   $("addSelect").innerHTML = opts; $("chartSymbol").innerHTML = opts; $("fundSymbol").innerHTML = opts;
+  $("smcSymbol").innerHTML = '<optgroup label="Indices"><option value="^NSEI">NIFTY 50</option><option value="^NSEBANK">NIFTY BANK</option></optgroup>' + opts;
+  $("smcSymbol").value = "^NSEI";
   $("optStockGroup").innerHTML = Object.entries(ALL_STOCKS).sort((a,b)=>a[1].localeCompare(b[1]))
     .map(([s,n])=>`<option value="${s.replace(".NS","")}">${n} (${s.replace(".NS","")})</option>`).join("");
   const ospStocks = OM_SYMBOLS.filter(s=>s!=="NIFTY"&&s!=="BANKNIFTY").map(s=>s+".NS");

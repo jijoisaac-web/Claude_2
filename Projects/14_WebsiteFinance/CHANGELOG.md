@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.22.0] — 2026-07-13 · Smart Money Tab + Modern Background
+
+- New **Smart Money** tab: detects institutional-style order blocks (Smart Money Concepts / ICT method) on NIFTY, BANKNIFTY and liquid F&O stocks — the last opposing candle before a break-of-structure move, marked fresh or mitigated once price retests the zone
+- Combines order blocks with a volume profile of the same window (Point of Control, 70% Value Area, volume-at-price ladder) into a **volume confirmation ratio** per block: how much of the window's volume actually traded inside that price zone versus what its width alone would predict — >1.5x means the level is volume-backed, <0.8x means it's a thin "air pocket" the price likely moves through fast. This is the retail edge the tab targets: order-flow footprints large players tend to leave and defend, inferred from public OHLCV since raw institutional order data isn't publicly available
+- Chart overlays fresh order block zones as dashed price lines alongside POC/Value Area lines; a summary table lists every detected block with zone, status, confirmation ratio and distance from spot
+- Order block detection, volume profile binning, and the confirmation ratio verified against hand-built synthetic price data with unambiguous structure (9 checks passed); render pipeline separately smoke-tested end-to-end against a mocked DOM/chart library to confirm no runtime errors
+- Replaced the candlestick-watermark background from 2.21.0 with a modern mesh-gradient (multi-blob radial gradients) plus a subtle grain texture overlay — purely decorative, no functional change
+
 ## [2.21.0] — 2026-07-13 · Tab Cleanup + Background Art
 
 - Removed the **Value Screener** and **Portfolio** tabs and all their dedicated code (fundamental filter builder, saved screens, CSV import/export, P&L and allocation analysis) — cleaned up every reference: nav, keyboard-shortcut tab order, the init routine that was populating a portfolio-add dropdown, and the Playbook's weekly "Portfolio health" checklist item (removed, since its underlying tool is gone)
