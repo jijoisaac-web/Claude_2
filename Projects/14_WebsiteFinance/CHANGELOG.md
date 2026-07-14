@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.25.0] — 2026-07-14 · AI News Briefs
+
+- Fundamentals tab: new **News & AI brief** section (between the verdict panel and the metric cards) — recent headlines for the stock from Google News, with an AI-generated neutral summary, bull case, bear case, sentiment (−5…+5) and watch-items
+- Runs on Cloudflare Workers AI (llama-3.1-8b, free daily quota — no external API key). One-time setup: add a **Workers AI binding named `AI`** to the Pages project (Settings → Bindings); until then, headlines still display with setup instructions shown in place of the AI brief
+- New `/api/news` function: Google News RSS parse + AI synthesis, 30-min edge cache; the model is instructed to use headlines only and never invent facts — and the UI says so
+
 ## [2.24.0] — 2026-07-14 · Microcap 250 + Searchable Dropdowns
 
 - Added the **Nifty Microcap 250** tier from NSE's official list (ranks ~501–750: Pricol, Relaxo, GNFC, Happiest Minds, Praj, MOIL…) — 250 real entries (NSE's own "Dummy" placeholder excluded). Universe now spans ~750 stocks with a MICRO cap tag, full sector mapping for peer comparison, and its own option in the screener and backtest universe pickers

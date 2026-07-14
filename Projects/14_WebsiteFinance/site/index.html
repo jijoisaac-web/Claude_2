@@ -520,6 +520,7 @@ progress{accent-color:var(--violet);}
     <input type="text" id="fundSymbol" list="allStocksDL" placeholder="Search any share…" size="24" autocomplete="off" onchange="loadFundamentals()">
   </div>
   <div id="verdictView"></div>
+  <div id="newsView"></div>
   <div id="fundView"><div class="loading">Select a stock</div></div>
   <div id="valView"></div>
   <div id="scoreView"></div>
@@ -1564,7 +1565,7 @@ async function loadFundamentals(){
   const sym = comboSym("fundSymbol");
   if(!sym){ $("fundView").innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
-  $("verdictView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
+  $("verdictView").innerHTML = ""; $("newsView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -1588,7 +1589,44 @@ async function loadFundamentals(){
     renderScores(f);
     loadPeerComparison(sym, f);
     renderVerdictPanel(sym, f);
+    renderNewsBrief(sym, f.name || nameOf(sym));
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---- AI news brief (Workers AI + Google News RSS) ---- */
+async function renderNewsBrief(sym, name){
+  const el = $("newsView");
+  el.innerHTML = '<div class="card" style="margin-bottom:12px"><div class="loading">Fetching news & AI brief…</div></div>';
+  try{
+    const r = await fetch(`/api/news?symbol=${encodeURIComponent(sym)}&name=${encodeURIComponent(name)}`);
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || r.status);
+    if(comboSym("fundSymbol") !== sym) return;   // user moved on
+    if(!d.items || !d.items.length){ el.innerHTML = ""; return; }
+    const senti = d.ai && typeof d.ai.sentiment === "number" ? d.ai.sentiment : null;
+    const sentiBadge = senti==null ? "" :
+      `<span class="badge ${senti>=2?"bullish":senti<=-2?"bearish":"neutral"}">sentiment ${senti>0?"+":""}${senti}/5</span>`;
+    const aiBlock = d.ai && d.ai.summary ? `
+      <div style="font-size:13px;line-height:1.6;margin:6px 0">${d.ai.summary}</div>
+      <div class="pulse-grid" style="grid-template-columns:1fr 1fr;margin:6px 0">
+        <div class="card" style="border-color:rgba(52,211,153,.3)"><div class="name">Bull case</div><div style="font-size:12.5px;line-height:1.5;margin-top:3px">${d.ai.bull||"—"}</div></div>
+        <div class="card" style="border-color:rgba(251,113,133,.3)"><div class="name">Bear case</div><div style="font-size:12.5px;line-height:1.5;margin-top:3px">${d.ai.bear||"—"}</div></div>
+      </div>
+      ${Array.isArray(d.ai.catalysts)&&d.ai.catalysts.length?`<div class="muted" style="font-size:12px">Watch: ${d.ai.catalysts.map(c=>`<span class="badge neutral">${c}</span>`).join(" ")}</div>`:""}` :
+      d.aiConfigured ? `<div class="muted" style="font-size:12px">AI brief unavailable right now${d.ai&&d.ai.error?` (${d.ai.error})`:""} — headlines below.</div>` :
+      `<div class="muted" style="font-size:12px">⚙️ AI brief not enabled yet — one-time setup: Cloudflare dashboard → Workers &amp; Pages → your project → Settings → Bindings → <b>Add → Workers AI</b>, variable name <b>AI</b>, then redeploy. Headlines below work regardless.</div>`;
+    el.innerHTML = `<div class="card" style="margin-bottom:12px">
+      <div class="name" style="margin-bottom:4px">News &amp; AI brief — ${sym.replace(".NS","")} ${sentiBadge}</div>
+      ${aiBlock}
+      <div style="margin-top:8px">${d.items.slice(0,6).map(i=>`
+        <div style="font-size:12.5px;margin:4px 0;line-height:1.45">• <a href="${i.link}" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:none">${i.title}</a>
+        <span class="muted" style="font-size:11px">${i.source?"· "+i.source:""} ${i.date?"· "+i.date.slice(0,16):""}</span></div>`).join("")}
+      </div>
+      <div class="muted" style="font-size:10px;margin-top:6px">AI summary is generated from headlines only — it can miss context and should never be the sole basis for a decision. Click through to sources for anything that matters.</div>
+    </div>`;
+  }catch(e){
+    el.innerHTML = `<div class="card" style="margin-bottom:12px"><div class="muted" style="font-size:12px">News unavailable: ${e.message}</div></div>`;
+  }
 }
 
 /* ---- consolidated verdict: one view, both questions ---- */
