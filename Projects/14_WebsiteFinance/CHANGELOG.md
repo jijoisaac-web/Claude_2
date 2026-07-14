@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.26.0] — 2026-07-14 · Search Everywhere + Cleanup
+
+- Removed the Playbook tab (its market-gate logic lives on in the Brief tab)
+- Smart Money and Options tabs: search box next to the dropdown — type any of the ~750 shares by symbol or name
+- Backtest: "…or backtest one share" search box — runs the full simulation on a single stock instead of a universe
+- Ideas rows gained two more one-click buttons: 🧠 Smart Money (order blocks + volume profile) and 🎯 Options (chain + flow), joining 📐 📊 📈 — every angle on a candidate is now one click from its idea row
+
 ## [2.25.0] — 2026-07-14 · AI News Briefs
 
 - Fundamentals tab: new **News & AI brief** section (between the verdict panel and the metric cards) — recent headlines for the stock from Google News, with an AI-generated neutral summary, bull case, bear case, sentiment (−5…+5) and watch-items

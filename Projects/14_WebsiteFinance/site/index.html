@@ -195,7 +195,6 @@ progress{accent-color:var(--violet);}
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
     <button data-tab="smc">Smart Money</button>
-    <button data-tab="playbook">Playbook</button>
     <button data-tab="brief">Brief</button>
   </nav>
   <div id="searchWrap">
@@ -208,7 +207,7 @@ progress{accent-color:var(--violet);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Playbook)</td></tr>
+      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Brief)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -329,6 +328,7 @@ progress{accent-color:var(--violet);}
       </optgroup>
       <optgroup label="Stocks (F&O only)" id="optStockGroup"></optgroup>
     </select>
+    <input type="text" id="optSearch" list="allStocksDL" placeholder="…or search any share" size="20" autocomplete="off" onchange="optSearchGo()">
     <select id="optExpiry" onchange="loadOptions($('optExpiry').value)"></select>
     <button class="btn ghost" onclick="loadOptions()">↻ Refresh</button>
     <span class="muted" id="optMeta"></span>
@@ -367,6 +367,7 @@ progress{accent-color:var(--violet);}
   <div class="muted" style="font-size:11px;margin-bottom:8px">No exchange publishes who placed a trade, so this isn't a view into actual institutional order flow — it's a structural read of price and volume that approximates it. An <b>order block</b> is the last opposing candle before a sharp break of structure (a "bullish" block is the last red candle before a rally that clears a recent swing high; "bearish" is the mirror on the downside) — the classic retail-facing proxy for "this is roughly where a large position was likely built." <b>Volume profile</b> shows how much trading actually happened at each price level over the window regardless of when, with its Point of Control (POC) and Value Area marking where the most participation agreed on. Combining the two: a block sitting inside a high-volume zone has real participation behind it; one in a thin, low-volume gap is a weaker signal — that comparison is the "Vol confirmation" column below.</div>
   <div class="controls">
     <select id="smcSymbol"></select>
+    <input type="text" id="smcSearch" list="allStocksDL" placeholder="…or search any share" size="20" autocomplete="off" onchange="smcSearchGo()">
     <select id="smcRange">
       <option value="3mo">3M</option>
       <option value="6mo" selected>6M</option>
@@ -385,23 +386,6 @@ progress{accent-color:var(--violet);}
   <h2 style="margin-top:20px">Order blocks <span class="muted" style="text-transform:none;font-weight:400">· most recent first</span></h2>
   <div id="smcOBTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
   <div class="muted" style="font-size:11px;margin-top:6px">"Vol confirmation" compares how much of the window's volume traded inside a block's price range to what its width alone would predict if volume were spread evenly — above 1.0x means the zone saw more participation than an average slice of the range (volume-backed); below 1.0x means it's thinner than average (a possible low-liquidity air-pocket, more likely to be sliced through than to hold). This is a heuristic read of price/volume structure, not investment advice.</div>
-</section>
-
-<!-- PLAYBOOK: daily discipline checklist -->
-<section id="playbook" class="tab">
-  <h2>Daily playbook <span class="muted" id="pbMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="muted" style="font-size:12px;margin-bottom:10px">The edge isn't any single signal — it's confluence plus damage control. Work top to bottom; checkboxes reset each trading day.</div>
-  <div id="pbDaily"></div>
-  <h2 style="margin-top:20px">Weekly maintenance <span class="muted" id="pbWeekMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div id="pbWeekly"></div>
-  <h2 style="margin-top:20px">Rules that save you</h2>
-  <div class="card" style="font-size:13px;line-height:1.7">
-    <b>1. Confluence over quantity.</b> Trade the few names where the technical score (70+), options flow (LONG FLOW) and market gate all agree — not every idea on the list. A+ setups appear a few times a week, not a few times a day.<br>
-    <b>2. The stop is the decision.</b> Size every position so the stop costs ≤1% of capital, and honor it mechanically. A stopped-out trade never becomes an "investment" — that's how traders become bagholders.<br>
-    <b>3. Decide the game before entry.</b> The decision brief tells you: TRADING ONLY names are rented, not owned. INVESTABLE names may be accumulated. Never let one morph into the other mid-trade.<br>
-    <b>4. Distrust your own backtests.</b> A combination you tuned until it looked great is curve-fit. Trust rules that work across universes and periods — and kill signals your own data shows don't pay (your smallcap test: gap-ups earned their keep, RSI-oversold didn't).<br>
-    <b>5. When the gate is red, do less.</b> Weak breadth + institutions selling = smaller size or cash. Missing a rally costs nothing; catching a falling market costs compounding.
-  </div>
 </section>
 
 <!-- BACKTEST -->
@@ -459,6 +443,7 @@ progress{accent-color:var(--violet);}
       <option value="SMALLCAP 250">SMALLCAP 250</option>
       <option value="MICROCAP 250">MICROCAP 250</option>
     </select>
+    <input type="text" id="btStock" list="allStocksDL" placeholder="…or backtest one share" size="20" autocomplete="off">
     <select id="btLookback">
       <option value="63">Last 3 months</option>
       <option value="126" selected>Last 6 months</option>
@@ -530,7 +515,7 @@ progress{accent-color:var(--violet);}
 <!-- MORNING BRIEF -->
 <section id="brief" class="tab">
   <h2>Morning brief <span class="muted" id="briefMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="muted" style="font-size:11px;margin-bottom:10px">One page instead of five tabs: today's market gate, institutional flow, where options premium looks mispriced, and the day's top technical setups — the same checks the Playbook's daily checklist asks you to do by hand, pulled together automatically.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:10px">One page instead of five tabs: today's market gate, institutional flow, where options premium looks mispriced, and the day's top technical setups — the daily pre-trade checks, pulled together automatically.</div>
   <div id="briefGate"><div class="loading">Reading market breadth + institutional flow…</div></div>
 
   <h2 style="margin-top:20px">Where the edge is today <span class="muted" style="text-transform:none;font-weight:400">· options flow + IV mispricing across ~30 F&amp;O names</span></h2>
@@ -676,7 +661,6 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
   if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
-  if(b.dataset.tab==="playbook") renderPlaybook();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
@@ -1173,7 +1157,9 @@ function ideaTable(rows){
       <td>${rr ? rr+":1" : "—"}</td>
       <td style="white-space:nowrap">${s.entry&&s.stop?`<button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();prefillCalc(${s.entry},${s.stop})" title="Position size">📐</button>`:""}
       <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openFundamentals('${s.symbol}')" title="Fundamentals & peer comparison">📊</button>
-      <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openChart('${s.symbol}')" title="Full chart with RSI/MACD">📈</button></td>
+      <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openChart('${s.symbol}')" title="Full chart with RSI/MACD">📈</button>
+      <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openSmartMoney('${s.symbol}')" title="Smart Money: order blocks & volume profile">🧠</button>
+      <button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openOptions('${s.symbol}')" title="Options chain & flow (F&O stocks only)">🎯</button></td>
       </tr>`;}).join("") + "</tbody></table>";
 }
 
@@ -2056,7 +2042,8 @@ async function runBacktest(){
   const uni = $("btUniverse").value, lookback = +$("btLookback").value;
   const cfg = btConfig();
   if(!cfg.sigs.size){ $("btMeta").textContent = "Pick at least one trigger."; return; }
-  const syms = Object.keys(UNIVERSES[uni]);
+  const single = comboSym("btStock");
+  const syms = single ? [single] : Object.keys(UNIVERSES[uni]);
   const prog = $("btProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
   $("btMeta").textContent = "Fetching & simulating…";
   const trades = [];
@@ -2089,7 +2076,7 @@ async function runBacktest(){
   }, 6, ()=>prog.value++);
   prog.style.display="none";
   trades.sort((a,b)=> a.date<b.date ? -1 : a.date>b.date ? 1 : a.sym<b.sym ? -1 : 1);
-  renderBacktest(trades, uni, lookback);
+  renderBacktest(trades, single ? single.replace(".NS","") : uni, lookback);
 }
 const avg = a => { const v=a.filter(x=>x!=null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : null; };
 function btFilterSig(sig){
@@ -2757,53 +2744,30 @@ function renderBriefEdge(){
     <div class="muted" style="font-size:11px;margin-top:8px">Click a row to open its full chain on the Options tab. Full scanners (all ~30 names, with reads) live there too.</div>`;
 }
 
-/* ================= playbook: daily discipline checklist ================= */
-const PB_DAILY = [
-  ["gate","Market gate — should I be aggressive today?","Brief tab: breadth + FII/DII combined into one GREEN/AMBER/RED read. Green = full size. Amber = half size. Red = watch, don't chase.","brief"],
-  ["scan","Scan & shortlist","Ideas tab: consider only Setup Score ≥ 60. Read the decision briefs — they tell you which game each name is (TRADE ONLY vs INVESTABLE).","ideas"],
-  ["flow","Confirm with options flow","Options scanner: an idea that also shows LONG FLOW is your A+ setup. Fresh call-writing into a breakout = downgrade it.","options"],
-  ["biz","Business check (investments only)","Fundamentals: Quality ≥ 60, Value-Trap low, in line or stronger vs peers, and reverse-DCF implied growth the company has actually delivered.","fundamentals"],
-  ["size","Size the position","📐 on the idea row: risk ≤ 1% of capital to the stop. If the quantity feels too small, the stop is too far — not the risk too low.","ideas"],
-  ["log","Write the plan down","Entry, stop, target, and WHY — before entering. If you can't state the exit, you don't have a trade.",null],
-];
-const PB_WEEKLY = [
-  ["bt","Revalidate the rules","Backtest your active signal combos on your traded universes. Kill what stopped paying.","track"],
-  ["insti","Institutional context","FII/DII weekly direction + any bulk-deal accumulation in names you hold or stalk.","insti"],
-];
-function pbKey(){ return "ist_pb:" + new Date().toISOString().slice(0,10); }
-function pbWeekKey(){ const d=new Date(); const onejan=new Date(d.getFullYear(),0,1);
-  const wk=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7); return `ist_pbw:${d.getFullYear()}-${wk}`; }
-function pbState(key){ try{ return JSON.parse(localStorage.getItem(key))||{}; }catch(e){ return {}; } }
-function pbToggle(key, id){ const s=pbState(key); s[id]=!s[id]; localStorage.setItem(key,JSON.stringify(s)); renderPlaybook(); }
-function pbList(items, key, doneLabelEl){
-  const s = pbState(key);
-  const done = items.filter(([id])=>s[id]).length;
-  $(doneLabelEl).textContent = `· ${done}/${items.length} done`;
-  return items.map(([id,title,desc,tab])=>`
-    <div class="card" style="margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;${s[id]?"opacity:.55":""}">
-      <input type="checkbox" ${s[id]?"checked":""} onchange="pbToggle('${key}','${id}')" style="margin-top:4px;width:16px;height:16px;accent-color:var(--green);cursor:pointer">
-      <div style="flex:1">
-        <div style="font-weight:600;${s[id]?"text-decoration:line-through":""}">${title}</div>
-        <div class="muted" style="font-size:12px;margin-top:2px;line-height:1.5">${desc}</div>
-      </div>
-      ${tab?`<button class="btn ghost" style="padding:4px 10px;flex:0 0 auto" onclick="document.querySelector('nav button[data-tab=${tab}]').click()">Open ↗</button>`:""}
-    </div>`).join("");
+/* ================= cross-tab openers ================= */
+function openSmartMoney(sym){
+  $("smcSymbol").value = sym;
+  document.querySelector('nav button[data-tab="smc"]').click();
+  loadSmc();
 }
-function renderPlaybook(){
-  window._pbLoaded = true;
-  let gateHint = "";
-  if(screenerData){
-    const st = screenerData.stocks;
-    const adv = st.filter(s=>s.change_pct>0).length, dec = st.filter(s=>s.change_pct<0).length;
-    const pct = adv/(adv+dec||1)*100;
-    gateHint = `<div class="muted" style="font-size:12px;margin-bottom:8px">Latest scan (${$("universeSelect").value}): ${adv} advancing / ${dec} declining — ${pct>=60?'<span class="up">risk-on</span>':pct<=40?'<span class="down">risk-off</span>':'<span class="muted">mixed</span>'}.</div>`;
-  }
-  $("pbDaily").innerHTML = gateHint + pbList(PB_DAILY, pbKey(), "pbMeta");
-  $("pbWeekly").innerHTML = pbList(PB_WEEKLY, pbWeekKey(), "pbWeekMeta");
+function openOptions(sym){
+  $("optSymbol").value = sym.replace(".NS","");
+  document.querySelector('nav button[data-tab="options"]').click();
+  loadOptions();
+}
+function smcSearchGo(){
+  const s = comboSym("smcSearch"); if(!s) return;
+  $("smcSymbol").value = s; $("smcSearch").value = "";
+  loadSmc();
+}
+function optSearchGo(){
+  const s = comboSym("optSearch"); if(!s) return;
+  $("optSymbol").value = s.replace(".NS",""); $("optSearch").value = "";
+  loadOptions();
 }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","playbook","brief"];
+const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","brief"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
