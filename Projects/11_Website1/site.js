@@ -1,4 +1,4 @@
-/* v7.35 */
+/* v7.36 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -840,11 +840,47 @@ function setCity(tier,btn){
   const p=CITY_PRESETS[tier];
   ['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'].forEach(k=>document.getElementById('exp-'+k).value=p[k]);
   updateExpTotal();
+  // Auto-open Step 2 after city selection
+  var hint=document.getElementById('rp-step1-hint');
+  if(hint) hint.textContent=btn.textContent.trim();
+  rpOpenStep(2);
+}
+function rpOpenStep(n){
+  var body=document.getElementById('rp-step-body-'+n);
+  var chev=document.getElementById('rp-chev-'+n);
+  if(!body) return;
+  body.style.display='block';
+  if(chev) chev.classList.remove('rp-chev-closed');
+  // scroll step into view
+  var step=document.getElementById('rp-step-'+n);
+  if(step) setTimeout(function(){step.scrollIntoView({behavior:'smooth',block:'nearest'});},120);
+}
+function rpToggleStep(n){
+  var body=document.getElementById('rp-step-body-'+n);
+  var chev=document.getElementById('rp-chev-'+n);
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(chev){ if(open) chev.classList.add('rp-chev-closed'); else chev.classList.remove('rp-chev-closed'); }
+}
+function rpToggleResult(){
+  var body=document.getElementById('rp-result-body');
+  var btn=document.getElementById('rp-result-toggle');
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(btn) btn.innerHTML=open?'&#9658; Expand':'&#9660; Collapse';
 }
 function updateExpTotal(){
   const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
   const total=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
   document.getElementById('exp-total-display').textContent='₹'+Math.round(total).toLocaleString('en-IN');
+  // Show local currency equivalent in Step 2
+  var loc=document.getElementById('exp-total-local');
+  if(loc) loc.textContent=midRate>0?'≈ '+baseCur+' '+Math.round(total/midRate).toLocaleString('en-IN',{maximumFractionDigits:0})+'/mo':'';
+  // Update Step 2 hint with total
+  var h2=document.getElementById('rp-step2-hint');
+  if(h2&&total>0) h2.textContent='Total: ₹'+Math.round(total).toLocaleString('en-IN')+(midRate>0?' · ≈ '+baseCur+' '+Math.round(total/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'');
   return total;
 }
 document.addEventListener('input',e=>{if(e.target.id&&e.target.id.startsWith('exp-'))updateExpTotal();});
@@ -929,7 +965,17 @@ function calcReturn(){
   document.getElementById('rp-verdict').innerHTML=onTrack
     ?`<div class="box-green">✅ <strong>You're on track!</strong> Projected corpus of ₹${(projCorpus/100000).toFixed(1)}L${projLocal} covers your inflation-adjusted lifestyle. Ensure you are invested in equity mutual funds + NPS + NRE FDs for the optimal return mix.</div>`
     :`<div class="box-red">⚠️ <strong>Gap of ~₹${(gapInr/100000).toFixed(1)}L${gapLocal}.</strong> Options: stay longer abroad · increase monthly savings · reduce expenses by switching to Tier 2 city · consult a SEBI-RIA for a personalised plan.</div>`;
-  document.getElementById('rp-result').style.display='block';
+  // Update currency badge in results header
+  var badge=document.getElementById('rp-result-cur-badge');
+  if(badge&&baseCur) badge.textContent='₹ INR + '+baseCur;
+  // Ensure result body is visible (not collapsed)
+  var rb=document.getElementById('rp-result-body');
+  var rt=document.getElementById('rp-result-toggle');
+  if(rb) rb.style.display='block';
+  if(rt) rt.innerHTML='&#9660; Collapse';
+  var res=document.getElementById('rp-result');
+  res.style.display='block';
+  setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'start'});},80);
 }
 function toggleRpTable(){
   const wrap=document.getElementById('rp-table-wrap');
@@ -1444,8 +1490,11 @@ function updateRpLocal(){
   if(!midRate)return;
   const sl=document.getElementById('rp-savings-local');
   const ml=document.getElementById('rp-monthly-local');
+  const il=document.getElementById('rp-income-local');
+  const inc=parseFloat(document.getElementById('rp-income').value)||0;
   if(sl)sl.textContent=sav>0?'≈ '+baseCur+' '+(sav*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'';
   if(ml)ml.textContent=mon>0?'≈ '+baseCur+' '+(mon*100000/midRate).toLocaleString('en-IN',{maximumFractionDigits:0})+'/mo':'';
+  if(il)il.textContent=inc>0?'≈ '+baseCur+' '+Math.round(inc/midRate).toLocaleString('en-IN',{maximumFractionDigits:0})+'/mo':'';
 }
 
 // ── RETURN CHECKLIST ──────────────────────────────────────────────────────────

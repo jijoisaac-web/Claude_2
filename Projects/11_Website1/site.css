@@ -1,4 +1,4 @@
-/* v7.35 */
+/* v7.36 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2329,3 +2329,23 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .fl-ai-chip{font-size:11px;padding:4px 10px;}
 }
 
+
+/* ── Return Plan Accordion (v7.36) ─────────────────────────── */
+.rp-accordion{padding:0!important;overflow:hidden;}
+.rp-step{border-bottom:1px solid var(--border);}
+.rp-step:last-child{border-bottom:none;}
+.rp-step-hd{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;transition:background .18s;}
+.rp-step-hd:hover{background:rgba(20,184,166,0.05);}
+.rp-step-badge{width:28px;height:28px;border-radius:50%;background:var(--teal);color:#000;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rp-step-info{flex:1;min-width:0;}
+.rp-step-title{font-size:14px;font-weight:700;color:var(--text);}
+.rp-step-hint{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-step-chev{width:18px;height:18px;color:var(--muted);flex-shrink:0;transition:transform .2s;}
+.rp-chev-closed{transform:rotate(-90deg);}
+.rp-step-body{padding:4px 18px 18px;}
+.rp-next-btn{margin-top:14px;width:100%;justify-content:center;}
+/* Result card */
+.rp-result-card{margin-top:12px;padding:0!important;overflow:hidden;}
+.rp-result-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(20,184,166,0.06);}
+.rp-collapse-btn{padding:5px 14px!important;font-size:12px!important;}
+#rp-result-body{padding:16px 18px;}
