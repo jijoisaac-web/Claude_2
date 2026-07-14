@@ -1123,6 +1123,37 @@ tbody tr.income-row td:first-child{
 .mi-cell-empty{color:var(--text3);}
 .mi-total-row td{background:var(--surface2);font-weight:700;color:var(--text1);}
 
+/* ══════════════ INSIGHTS — EXTRA ANALYTICS ══════════════ */
+.ia-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.ia-title{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px;}
+.sr-bar-wrap{height:22px;border-radius:8px;display:flex;overflow:hidden;gap:2px;margin-bottom:8px;}
+.sr-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:6px;transition:width .5s ease;}
+.sr-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
+.sr-leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.sr-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.ia-chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.ia-chart-row{grid-template-columns:1fr;}}
+.ia-chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.ia-chart-canvas{position:relative;height:160px;}
+.trends-chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.trends-chart-canvas{position:relative;height:200px;}
+.wf-row{display:grid;grid-template-columns:150px 1fr 90px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.wf-row:last-child{border-bottom:none;}
+.wf-lbl{font-size:12px;font-weight:600;color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.wf-bar-wrap{background:var(--surface2);border-radius:4px;height:14px;overflow:hidden;}
+.wf-bar{height:100%;border-radius:4px;transition:width .4s;}
+.wf-amt{font-size:11px;font-weight:700;text-align:right;}
+.rec-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.rec-chip{display:inline-flex;align-items:center;gap:5px;background:var(--purple-s);border:1px solid rgba(192,132,252,.2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--purple);}
+.rec-chip-amt{opacity:.75;font-weight:400;font-size:10px;}
+.qw-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.qw-item:last-child{border-bottom:none;}
+.qw-rank{width:22px;height:22px;border-radius:50%;background:var(--accent-s);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.qw-body{flex:1;}
+.qw-cat{font-size:12px;font-weight:700;color:var(--text1);}
+.qw-detail{font-size:11px;color:var(--text2);margin-top:2px;}
+.qw-save{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;align-self:center;}
+
 </style>
 </head>
 <body>
@@ -1547,9 +1578,15 @@ tbody tr.income-row td:first-child{
       </div>
     </div>
     <div id="insightsMetrics" class="insights-metrics"></div>
-    <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px">Recommendations</div>
+    <div id="insights5030" style="margin-top:18px"></div>
+    <div id="insightsQuickWins" style="margin-top:18px"></div>
+    <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin:18px 0 10px">Recommendations</div>
     <div id="insightsCards" class="insights-cards"></div>
+    <div id="insightsCharts" style="margin-top:18px"></div>
+    <div id="insightsTrends" style="margin-top:18px"></div>
+    <div id="insightsWaterfall" style="margin-top:18px"></div>
     <div id="insightsMerchants"></div>
+    <div id="insightsRecurring" style="margin-top:16px"></div>
     <div id="insightsMonthlyTable" style="margin-top:24px"></div>
   </div>
 </div>
@@ -4788,6 +4825,7 @@ function renderInsights(){
     document.getElementById('insightsMetrics').innerHTML='<div style="color:var(--text3);font-size:13px">No data for '+year+'.</div>';
     document.getElementById('insightsCards').innerHTML='';
     document.getElementById('insightsMerchants').innerHTML='';
+    ['insights5030','insightsQuickWins','insightsCharts','insightsTrends','insightsWaterfall','insightsRecurring'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='';});
     return;
   }
 
@@ -5003,6 +5041,12 @@ function renderInsights(){
     document.getElementById('insightsMerchants').innerHTML='<div style="color:var(--text3);font-size:12px;margin-top:8px">No transaction data yet. Import bank statements to see merchant breakdown.</div>';
   }
   renderInsightsMonthlyTable(st, year);
+  renderInsights5030(totalInc, totalExp, totalBal);
+  renderInsightsQuickWins(catStats, totalExp);
+  renderInsightsCharts(activeMos);
+  renderInsightsCategoryTrends(st, cats, activeMos);
+  renderInsightsWaterfall(catStats, totalInc);
+  renderInsightsRecurring(st, cats);
 }
 
 function renderInsightsMonthlyTable(st, year){
@@ -5057,6 +5101,168 @@ function renderInsightsMonthlyTable(st, year){
   </div></div>`;
   el.innerHTML=html;
 }
+/* ══════════════════════════════════════════════
+   EXTRA ANALYTICS — v3.10.0
+   ══════════════════════════════════════════════ */
+
+function renderInsights5030(totalInc,totalExp,totalBal){
+  const el=document.getElementById('insights5030');
+  if(!el||totalInc<=0){if(el)el.innerHTML='';return;}
+  const savePct=Math.max(0,Math.round(totalBal/totalInc*100));
+  const expPct=Math.round(totalExp/totalInc*100);
+  const saveColor=savePct>=20?'var(--accent)':savePct>=10?'var(--yellow)':'var(--red)';
+  const expW=Math.min(expPct,100);
+  const savW=Math.max(0,100-expW);
+  const t50=Math.round(totalInc*.5),t30=Math.round(totalInc*.3),t20=Math.round(totalInc*.2);
+  const savIcon=savePct>=20?'✓':savePct>=10?'↑':'↑↑';
+  el.innerHTML=`<div class="ia-section">
+<div class="ia-title">💰 Savings Health — 50/30/20 Benchmark</div>
+<div class="sr-bar-wrap">
+${expW>0?`<div class="sr-seg" style="width:${expW}%;background:rgba(248,113,113,.6);color:#fff">${expW>8?expPct+'%':''}</div>`:''}
+${savW>0?`<div class="sr-seg" style="width:${savW}%;background:var(--blue);color:#fff">${savW>5?savePct+'%':''}</div>`:''}
+</div>
+<div class="sr-legend">
+<div class="sr-leg-item"><div class="sr-leg-dot" style="background:rgba(248,113,113,.65)"></div>Expenses ${expPct}% — MYR ${Math.round(totalExp).toLocaleString()}</div>
+<div class="sr-leg-item"><div class="sr-leg-dot" style="background:var(--blue)"></div>Savings <span style="color:${saveColor};font-weight:700">${savePct}%</span> — MYR ${Math.abs(Math.round(totalBal)).toLocaleString()}</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">50% Needs target</div><div style="font-size:13px;font-weight:700;color:var(--text1)">MYR ${t50.toLocaleString()}</div></div>
+<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">30% Wants target</div><div style="font-size:13px;font-weight:700;color:var(--text1)">MYR ${t30.toLocaleString()}</div></div>
+<div style="background:var(--surface2);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">20% Savings target</div><div style="font-size:13px;font-weight:700;color:${saveColor}">${savIcon} MYR ${t20.toLocaleString()}</div></div>
+</div>
+</div>`;
+}
+
+function renderInsightsQuickWins(catStats,totalExp){
+  const el=document.getElementById('insightsQuickWins');
+  if(!el||!catStats.length||totalExp<=0){if(el)el.innerHTML='';return;}
+  const sorted=catStats.slice().sort((a,b)=>b.totalActual-a.totalActual).filter(s=>s.totalActual>0).slice(0,3);
+  if(!sorted.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="ia-section">
+<div class="ia-title">⚡ Quick Wins — Cutting 15% saves you most here</div>
+${sorted.map((s,i)=>{
+  const saving=Math.round(s.totalActual*.15);
+  const pct=Math.round(s.totalActual/totalExp*100);
+  return `<div class="qw-item">
+<div class="qw-rank">${i+1}</div>
+<div class="qw-body">
+<div class="qw-cat">${s.cat.name}</div>
+<div class="qw-detail">${pct}% of total spend · MYR ${Math.round(s.totalActual).toLocaleString()} YTD</div>
+</div>
+<div class="qw-save">Save MYR ${saving.toLocaleString()}</div>
+</div>`;
+}).join('')}
+</div>`;
+}
+
+function renderInsightsCharts(activeMos){
+  const el=document.getElementById('insightsCharts');
+  if(!el||activeMos.length<2){if(el)el.innerHTML='';return;}
+  const labels=activeMos.map(m=>MONTHS[m.mi].slice(0,3));
+  const incData=activeMos.map(m=>m.inc);
+  const expData=activeMos.map(m=>m.exp);
+  let cum=0;
+  const cumData=activeMos.map(m=>{cum+=m.bal;return Math.round(cum);});
+  const lastCum=cumData[cumData.length-1];
+  const cumColor=lastCum>=0?'#5cb87a':'#f87171';
+  const cumBg=lastCum>=0?'rgba(92,184,122,.1)':'rgba(248,113,113,.08)';
+  const scaleOpts={x:{ticks:{color:'#3d5c42',font:{size:9}},grid:{color:'rgba(92,184,122,.05)'}},y:{ticks:{color:'#3d5c42',font:{size:9},callback:v=>'MYR '+(v>=1000?(v/1000).toFixed(1)+'k':Math.round(v).toLocaleString())},grid:{color:'rgba(92,184,122,.05)'}}};
+  el.innerHTML=`<div class="ia-chart-row">
+<div class="ia-chart-box"><div class="ia-title" style="margin-bottom:8px">📊 Income vs Expenses</div><div class="ia-chart-canvas"><canvas id="incExpChartCanvas"></canvas></div></div>
+<div class="ia-chart-box"><div class="ia-title" style="margin-bottom:8px">📈 Cumulative Savings</div><div class="ia-chart-canvas"><canvas id="cumSavChartCanvas"></canvas></div></div>
+</div>`;
+  requestAnimationFrame(()=>{
+    const c1=document.getElementById('incExpChartCanvas');
+    const c2=document.getElementById('cumSavChartCanvas');
+    if(!c1||!c2) return;
+    if(window.__incExpChart){try{window.__incExpChart.destroy();}catch(e){}}
+    if(window.__cumSavChart){try{window.__cumSavChart.destroy();}catch(e){}}
+    window.__incExpChart=new Chart(c1,{type:'line',data:{labels,datasets:[
+      {label:'Income',data:incData,borderColor:'#5cb87a',backgroundColor:'rgba(92,184,122,.08)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#5cb87a'},
+      {label:'Expenses',data:expData,borderColor:'#f87171',backgroundColor:'rgba(248,113,113,.06)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:'#f87171'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#7aaa80',font:{size:10},boxWidth:12,padding:8}}},scales:scaleOpts}});
+    window.__cumSavChart=new Chart(c2,{type:'line',data:{labels,datasets:[
+      {label:'Net savings',data:cumData,borderColor:cumColor,backgroundColor:cumBg,fill:true,tension:.35,pointRadius:3,pointBackgroundColor:cumColor}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#7aaa80',font:{size:10},boxWidth:12,padding:8}}},scales:scaleOpts}});
+  });
+}
+
+function renderInsightsCategoryTrends(st,cats,activeMos){
+  const el=document.getElementById('insightsTrends');
+  if(!el||activeMos.length<2){if(el)el.innerHTML='';return;}
+  const expCats=cats.filter(cat=>cat.type==='expense');
+  const catTotals=expCats.map(cat=>{
+    const total=activeMos.reduce((s,m)=>s+(st.months?.[m.mi]?.[cat.id]?.actual||0),0);
+    return {cat,total};
+  }).filter(x=>x.total>0).sort((a,b)=>b.total-a.total).slice(0,5);
+  if(!catTotals.length){el.innerHTML='';return;}
+  const COLORS=['#5cb87a','#60a5fa','#fbbf24','#c084fc','#f87171'];
+  const labels=activeMos.map(m=>MONTHS[m.mi].slice(0,3));
+  el.innerHTML=`<div class="trends-chart-box"><div class="ia-title" style="margin-bottom:8px">📉 Category Trends — Top ${catTotals.length} by YTD spend</div><div class="trends-chart-canvas"><canvas id="trendsChartCanvas"></canvas></div></div>`;
+  requestAnimationFrame(()=>{
+    const cv=document.getElementById('trendsChartCanvas');
+    if(!cv) return;
+    if(window.__trendsChart){try{window.__trendsChart.destroy();}catch(e){}}
+    window.__trendsChart=new Chart(cv,{type:'line',data:{labels,datasets:catTotals.map(({cat},i)=>({
+      label:cat.name,
+      data:activeMos.map(m=>Math.round((st.months?.[m.mi]?.[cat.id]?.actual||0)*10)/10),
+      borderColor:COLORS[i],backgroundColor:'transparent',tension:.35,pointRadius:3,pointBackgroundColor:COLORS[i],borderWidth:2
+    }))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#7aaa80',font:{size:10},boxWidth:12,padding:6}}},scales:{x:{ticks:{color:'#3d5c42',font:{size:9}},grid:{color:'rgba(92,184,122,.05)'}},y:{ticks:{color:'#3d5c42',font:{size:9},callback:v=>'MYR '+(v>=1000?(v/1000).toFixed(1)+'k':Math.round(v).toLocaleString())},grid:{color:'rgba(92,184,122,.05)'}}}}});
+  });
+}
+
+function renderInsightsWaterfall(catStats,totalInc){
+  const el=document.getElementById('insightsWaterfall');
+  if(!el||totalInc<=0||!catStats.length){if(el)el.innerHTML='';return;}
+  const top=catStats.slice().sort((a,b)=>b.totalActual-a.totalActual).slice(0,8);
+  const totalExpTop=top.reduce((s,x)=>s+x.totalActual,0);
+  const net=totalInc-totalExpTop;
+  const fmt=n=>'MYR '+(n>=1000?(n/1000).toFixed(1)+'k':Math.round(Math.abs(n)).toLocaleString());
+  const netCol=net>=0?'var(--accent)':'var(--red)';
+  el.innerHTML=`<div class="ia-section">
+<div class="ia-title">🌊 Cashflow Waterfall — Where the money goes</div>
+<div class="wf-row"><div class="wf-lbl" style="color:var(--accent)">💵 Total Income</div><div class="wf-bar-wrap"><div class="wf-bar" style="width:100%;background:var(--accent)"></div></div><div class="wf-amt" style="color:var(--accent)">${fmt(totalInc)}</div></div>
+${top.map(s=>{const pct=Math.round(s.totalActual/totalInc*100);return `<div class="wf-row"><div class="wf-lbl" title="${s.cat.name}">${s.cat.name.length>18?s.cat.name.slice(0,16)+'…':s.cat.name}</div><div class="wf-bar-wrap"><div class="wf-bar" style="width:${pct}%;background:rgba(248,113,113,.55)"></div></div><div class="wf-amt" style="color:var(--red)">-${fmt(s.totalActual)}</div></div>`;}).join('')}
+<div class="wf-row" style="border-top:2px solid var(--border);padding-top:8px;margin-top:4px"><div class="wf-lbl" style="color:${netCol};font-weight:800">🏦 Net Savings</div><div class="wf-bar-wrap"><div class="wf-bar" style="width:${Math.max(0,Math.round(net/totalInc*100))}%;background:${netCol}"></div></div><div class="wf-amt" style="color:${netCol};font-weight:800">${net>=0?'+':''}${fmt(net)}</div></div>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">Top ${top.length} expense categories shown · YTD totals</div>
+</div>`;
+}
+
+function renderInsightsRecurring(st,cats){
+  const el=document.getElementById('insightsRecurring');
+  if(!el){return;}
+  const recurMap={};
+  cats.forEach(cat=>{
+    MONTHS.forEach((_,mi)=>{
+      const d=((st.months||{})[mi]||{})[cat.id]||{};
+      (d.transactions||[]).filter(t=>t.type==='expense').forEach(t=>{
+        const mk=extractMerchantKey(t.desc||'').slice(0,30);
+        if(!mk||mk.length<3) return;
+        const amtKey=Math.round(t.amount*100);
+        if(!recurMap[mk]) recurMap[mk]={};
+        if(!recurMap[mk][amtKey]) recurMap[mk][amtKey]=new Set();
+        recurMap[mk][amtKey].add(mi);
+      });
+    });
+  });
+  const found=[];
+  Object.entries(recurMap).forEach(([merchant,amtMap])=>{
+    Object.entries(amtMap).forEach(([amtCents,monthSet])=>{
+      if(monthSet.size>=2) found.push({merchant,amount:parseInt(amtCents)/100,months:monthSet.size});
+    });
+  });
+  found.sort((a,b)=>b.amount-a.amount);
+  if(!found.length){el.innerHTML='';return;}
+  const totalRec=found.reduce((s,r)=>s+r.amount,0);
+  el.innerHTML=`<div class="ia-section">
+<div class="ia-title">🔁 Recurring Costs — ${found.length} pattern${found.length>1?'s':''} · MYR ${Math.round(totalRec).toLocaleString()} per recurrence</div>
+<div class="rec-list">
+${found.slice(0,18).map(r=>`<div class="rec-chip">${r.merchant.slice(0,22)}${r.merchant.length>22?'…':''} <span class="rec-chip-amt">MYR ${r.amount.toLocaleString()} ×${r.months}mo</span></div>`).join('')}
+</div>
+<div style="font-size:10px;color:var(--text3);margin-top:10px">Same merchant + same amount in 2+ months. Check for unused subscriptions or standing orders.</div>
+</div>`;
+}
+
 </script>
 </body>
 </html>
