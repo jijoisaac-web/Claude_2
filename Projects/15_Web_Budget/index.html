@@ -1626,6 +1626,12 @@ tbody tr.income-row td:first-child{
     </div>
 
     <div class="data-card">
+      <h3>🔍 Remove Duplicate Transactions</h3>
+      <p>Scans all months and years for transactions with the same date, amount, and description — and removes the extras. Use this if you accidentally imported a statement twice.</p>
+      <button class="btn btn-primary" onclick="dedupAllTransactions()">🧹 Remove Duplicates</button>
+    </div>
+
+    <div class="data-card">
       <h3>🗑 Reset Data</h3>
       <p>Clear actual amounts, transactions, and paid status — by month, all actuals for the year, or full year wipe.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -4649,15 +4655,23 @@ function importBiTxns(){
     if(!txnsByMonth[key][t.catId]) txnsByMonth[key][t.catId]=[];
     txnsByMonth[key][t.catId].push({date:t.date,desc:t.desc,amount:t.amount,type:t.type});
   });
-  Object.values(byMonth).forEach(({year,month,grouped})=>{
+  let totalSkipped=0;
+  Object.values(byMonth).forEach(({year,month})=>{
     let tState=state; if(year!==currentYear) tState=loadState(year);
     if(!tState.months[month]) tState.months[month]={};
     const mkey=year+'-'+month;
-    Object.entries(grouped).forEach(([catId,total])=>{
+    Object.entries(txnsByMonth[mkey]||{}).forEach(([catId,txns])=>{
       if(!tState.months[month][catId]) tState.months[month][catId]={actual:0,paid:false,note:'',transactions:[]};
-      tState.months[month][catId].actual=Math.round(((tState.months[month][catId].actual||0)+total)*100)/100;
       if(!tState.months[month][catId].transactions) tState.months[month][catId].transactions=[];
-      tState.months[month][catId].transactions.push(...((txnsByMonth[mkey]||{})[catId]||[]));
+      const existing=new Set(tState.months[month][catId].transactions.map(e=>`${e.date}|${e.amount}|${e.desc}`));
+      const newTxns=txns.filter(t=>{
+        const key=`${t.date}|${t.amount}|${t.desc}`;
+        if(existing.has(key)){totalSkipped++;return false;}
+        return true;
+      });
+      const newTotal=newTxns.reduce((s,t)=>s+t.amount,0);
+      tState.months[month][catId].actual=Math.round(((tState.months[month][catId].actual||0)+newTotal)*100)/100;
+      tState.months[month][catId].transactions.push(...newTxns);
     });
     if(year!==currentYear) localStorage.setItem(sKey(year),JSON.stringify(tState));
     monthsUpdated.push(MONTHS[month]+' '+year);
@@ -4667,7 +4681,9 @@ function importBiTxns(){
   toImport.forEach(t=>{ const mk=extractMerchantKey(t.desc); if(mk&&t.catId) mmap[mk]=t.catId; });
   saveMerchantMap(mmap);
   closeBankImport(); renderMonthly();
-  alert('✅ Imported '+toImport.length+' transactions into: '+[...new Set(monthsUpdated)].join(', '));
+  const imported=toImport.length-totalSkipped;
+  const skipMsg=totalSkipped?` (${totalSkipped} duplicate${totalSkipped>1?'s':''} skipped)`:'';
+  alert('✅ Imported '+imported+' transaction'+(imported!==1?'s':'')+' into: '+[...new Set(monthsUpdated)].join(', ')+skipMsg);
 }
 
 /* ── GitHub Gist Cloud Sync ── */
@@ -5261,6 +5277,49 @@ ${found.slice(0,18).map(r=>`<div class="rec-chip">${r.merchant.slice(0,22)}${r.m
 </div>
 <div style="font-size:10px;color:var(--text3);margin-top:10px">Same merchant + same amount in 2+ months. Check for unused subscriptions or standing orders.</div>
 </div>`;
+}
+
+function dedupAllTransactions(){
+  let totalRemoved=0;
+  const years=[];
+  for(let y=currentYear-3;y<=currentYear+1;y++) years.push(y);
+  years.forEach(year=>{
+    let tState;
+    if(year===currentYear){ tState=state; }
+    else {
+      const raw=localStorage.getItem('budget_'+year);
+      if(!raw) return;
+      try{tState=JSON.parse(raw);}catch(e){return;}
+    }
+    let changed=false;
+    (tState.categories||[]).forEach(cat=>{
+      for(let mi=0;mi<12;mi++){
+        const d=(tState.months||{})[mi]?.[cat.id];
+        if(!d||!d.transactions||d.transactions.length<2) continue;
+        const seen=new Set();
+        const deduped=d.transactions.filter(t=>{
+          const key=`${t.date}|${t.amount}|${t.desc}`;
+          if(seen.has(key)){totalRemoved++;return false;}
+          seen.add(key); return true;
+        });
+        if(deduped.length<d.transactions.length){
+          d.transactions=deduped;
+          d.actual=Math.round(deduped.reduce((s,t)=>s+(t.amount||0),0)*100)/100;
+          changed=true;
+        }
+      }
+    });
+    if(changed){
+      if(year===currentYear){saveState();}
+      else localStorage.setItem('budget_'+year,JSON.stringify(tState));
+    }
+  });
+  if(totalRemoved>0){
+    renderMonthly();
+    alert('✅ Removed '+totalRemoved+' duplicate transaction'+(totalRemoved>1?'s':'')+' across all months. Your data is now clean.');
+  } else {
+    alert('✔ No duplicates found — your data is already clean!');
+  }
 }
 
 </script>
