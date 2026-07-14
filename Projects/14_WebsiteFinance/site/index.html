@@ -380,12 +380,29 @@ progress{accent-color:var(--violet);}
   </div>
   <div class="cards" id="smcCards"></div>
   <div id="smcChart"></div>
-  <div class="muted" style="font-size:11px;margin-bottom:10px">Dashed lines mark unmitigated (still-fresh) order block zones — green above/below for bullish, red for bearish. A block is "mitigated" once price has traded back into its range; mitigated zones stop acting as the original support/resistance idea and are shown in the table below but not on the chart.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:10px">Dashed lines mark unmitigated (still-fresh) order block zones — green above/below for bullish, red for bearish. A block is <b>"mitigated"</b> once price has traded back into its range: whoever built the position there has had their chance to act (fill remaining orders, defend the level, or exit), so the zone is considered "used up" and loses its predictive edge. Unmitigated = price hasn't returned yet — the pending-interest idea is still live. Mitigated zones are shown in the table below but not on the chart.</div>
   <h2 style="margin-top:12px">Volume profile <span class="muted" id="smcVPMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="card" id="smcVPLadder"></div>
   <h2 style="margin-top:20px">Order blocks <span class="muted" style="text-transform:none;font-weight:400">· most recent first</span></h2>
   <div id="smcOBTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
   <div class="muted" style="font-size:11px;margin-top:6px">"Vol confirmation" compares how much of the window's volume traded inside a block's price range to what its width alone would predict if volume were spread evenly — above 1.0x means the zone saw more participation than an average slice of the range (volume-backed); below 1.0x means it's thinner than average (a possible low-liquidity air-pocket, more likely to be sliced through than to hold). This is a heuristic read of price/volume structure, not investment advice.</div>
+
+  <h2 style="margin-top:24px">Fresh block scanner <span class="muted" style="text-transform:none;font-weight:400">· new order blocks from the last 7 days, still unmitigated</span></h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Sweeps a whole universe for order blocks whose break-of-structure fired within the last 7 days and where price hasn't yet returned to the zone — the watchlist-worthy ones. A fresh <b>bullish</b> block below price is a candidate buy-the-retest level; a fresh <b>bearish</b> block above price is a ceiling to respect. "To zone" shows how far price is from the block — small numbers mean the retest (and the decision) is near.</div>
+  <div class="controls">
+    <select id="smcScanUniverse">
+      <option value="NIFTY 50" selected>NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+      <option value="MICROCAP 250">MICROCAP 250</option>
+      <option value="ALL">All (~750)</option>
+    </select>
+    <button class="btn" onclick="scanFreshBlocks()">▶ Scan fresh blocks</button>
+    <progress id="smcScanProgress" style="display:none"></progress>
+    <span class="muted" id="smcScanMeta"></span>
+  </div>
+  <div id="smcScanResults"></div>
 </section>
 
 <!-- BACKTEST -->
@@ -2742,6 +2759,57 @@ function renderBriefEdge(){
       </div>
     </div>
     <div class="muted" style="font-size:11px;margin-top:8px">Click a row to open its full chain on the Options tab. Full scanners (all ~30 names, with reads) live there too.</div>`;
+}
+
+/* ---- fresh order-block scanner: universe sweep, last 7 days, unmitigated only ---- */
+async function scanFreshBlocks(){
+  const uni = $("smcScanUniverse").value;
+  const syms = uni==="ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni]);
+  const prog = $("smcScanProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
+  $("smcScanMeta").textContent = "Scanning…";
+  const cutoff = Date.now() - 7*86400000;
+  const rows = [];
+  await pmap(syms, async sym=>{
+    try{
+      const c = toCandles(await fetchChart(sym,"6mo","1d"));
+      if(c.length < 60) return;
+      const close = c[c.length-1].close;
+      for(const ob of detectOrderBlocks(c)){
+        if(ob.mitigated) continue;
+        const bosT = new Date(ob.bosDate).getTime();
+        if(isNaN(bosT) || bosT < cutoff) continue;
+        const movePct = ob.type==="bullish"
+          ? (c[ob.bosIdx].close - c[ob.idx].close)/c[ob.idx].close*100
+          : (c[ob.idx].close - c[ob.bosIdx].close)/c[ob.idx].close*100;
+        // distance from current price to the nearest edge of the zone (0 = touching)
+        const toZone = close > ob.high ? (close-ob.high)/close*100
+                     : close < ob.low ? (ob.low-close)/close*100 : 0;
+        rows.push({sym, name:nameOf(sym), type:ob.type, low:ob.low, high:ob.high,
+          obDate:ob.date, bosDate:ob.bosDate, movePct, toZone, close});
+      }
+    }catch(e){}
+  }, 8, ()=>prog.value++);
+  prog.style.display="none";
+  rows.sort((a,b)=> a.toZone-b.toZone || b.movePct-a.movePct);
+  $("smcScanMeta").textContent = `${rows.length} fresh block${rows.length===1?"":"s"} · ${uni} · last 7 days`;
+  const cls2 = t => t==="bullish" ? "bullish" : "bearish";
+  $("smcScanResults").innerHTML = rows.length ? `<table><thead><tr>
+    <th>Stock</th><th>Block</th><th>Zone ₹</th><th>Price ₹</th>
+    <th title="Distance from current price to the nearest edge of the zone — 0% means price is at the zone now">To zone</th>
+    <th title="Size of the break-of-structure move that created the block — bigger = more conviction behind it">Move</th>
+    <th>BOS date</th><th></th></tr></thead><tbody>` +
+    rows.slice(0,40).map(r=>{
+      const cap = capOf(r.sym), cc = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+      return `<tr style="cursor:pointer" onclick="openSmartMoney('${r.sym}')">
+      <td><span class="sym">${r.sym.replace(".NS","")}</span> <span class="badge ${cc}">${cap}</span><br><span class="subname">${r.name}</span></td>
+      <td><span class="badge ${cls2(r.type)}">${r.type.toUpperCase()}</span></td>
+      <td>${fmt(r.low)}–${fmt(r.high)}</td><td>${fmt(r.close)}</td>
+      <td><span class="${r.toZone<=1?"up":"muted"}" style="font-weight:600">${r.toZone===0?"AT ZONE":fmt(r.toZone,1)+"%"}</span></td>
+      <td>${fmt(r.movePct,1)}%</td><td>${r.bosDate}</td>
+      <td><button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openChart('${r.sym}')">📈</button></td></tr>`;
+    }).join("") + `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">Showing nearest-to-zone first (top 40). Click a row to open the full Smart Money view with volume confirmation — a fresh block inside a high-volume node is the strong version of this signal; one in a thin zone is decoration.</div>`
+    : '<div class="loading">No unmitigated blocks formed in the last 7 days in this universe.</div>';
 }
 
 /* ================= cross-tab openers ================= */

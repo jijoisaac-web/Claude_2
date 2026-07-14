@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.27.0] — 2026-07-14 · Fresh Block Scanner
+
+- Smart Money tab: new **fresh block scanner** — sweeps any universe (up to all ~750) for order blocks whose break-of-structure fired within the last 7 days and are still unmitigated. Table sorted nearest-to-zone first with zone range, current price, distance to zone (AT ZONE highlighted), move size and BOS date; row click opens the full Smart Money view, 📈 opens the chart
+- Clearer in-app explanation of "mitigated": a block is mitigated once price trades back into its zone — the pending-interest idea has been "used up" and the level loses its edge
+
 ## [2.26.0] — 2026-07-14 · Search Everywhere + Cleanup
 
 - Removed the Playbook tab (its market-gate logic lives on in the Brief tab)
