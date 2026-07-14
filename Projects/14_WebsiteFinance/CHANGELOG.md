@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.23.0] — 2026-07-14 · Consolidated Verdict
+
+- Fundamentals tab now opens with a **consolidated verdict panel** — one view answering both questions for the selected stock:
+  - **Short-term trade (1–4 wks)**: live technical scan of the stock (trend, signals for/against, RSI) with a setup score and label (STRONG SETUP / DECENT / WEAK / NO SETUP / AVOID LONGS if below SMA200)
+  - **Investment (1+ yr)**: composite score from Quality (40%), Value-Trap risk (20%) and valuation (40%, margin-of-safety based), with implied-vs-delivered growth and the analyst target gap
+  - **Bottom line**: a matrix verdict combining both clocks — from "rare alignment, buy and trade" through "trade only, rent with a stop" and "invest on dips, no entry yet" to "avoid"
+- Details for every input remain in the sections below the panel
+
 ## [2.22.0] — 2026-07-13 · Smart Money Tab + Modern Background
 
 - New **Smart Money** tab: detects institutional-style order blocks (Smart Money Concepts / ICT method) on NIFTY, BANKNIFTY and liquid F&O stocks — the last opposing candle before a break-of-structure move, marked fresh or mitigated once price retests the zone

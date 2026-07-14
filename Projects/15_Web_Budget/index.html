@@ -4886,7 +4886,14 @@ function renderInsights(){
 
   document.getElementById('insightsCards').innerHTML=cards.map(card=>`
     <div class="insight-card ${card.type}">
-      <div class="ic-title">${card.icon} ${card.ti    document.getElementById('insightsMerchants').innerHTML=`
+      <div class="ic-title">${card.icon} ${card.title}</div>
+      <div class="ic-body">${card.body}</div>
+    </div>`).join('');
+
+  // ── Top merchants list ──
+  if(topMerchants.length>0){
+    const maxAmt=topMerchants[0].amt;
+    document.getElementById('insightsMerchants').innerHTML=`
       <div class="insights-merchants-wrap">
         <div class="insights-section-label">🏪 Top Merchants — ${year}</div>`+
       topMerchants.map(m=>`

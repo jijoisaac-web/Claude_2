@@ -517,6 +517,7 @@ progress{accent-color:var(--violet);}
   <div class="controls">
     <select id="fundSymbol" onchange="loadFundamentals()"></select>
   </div>
+  <div id="verdictView"></div>
   <div id="fundView"><div class="loading">Select a stock</div></div>
   <div id="valView"></div>
   <div id="scoreView"></div>
@@ -1552,7 +1553,7 @@ async function loadFundamentals(){
   window._fundLoaded = true;
   const sym = $("fundSymbol").value;
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
-  $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
+  $("verdictView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -1575,7 +1576,78 @@ async function loadFundamentals(){
     renderValuation(sym, f);
     renderScores(f);
     loadPeerComparison(sym, f);
+    renderVerdictPanel(sym, f);
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---- consolidated verdict: one view, both questions ---- */
+async function renderVerdictPanel(sym, f){
+  const el = $("verdictView");
+  el.innerHTML = '<div class="card" style="margin-bottom:12px"><div class="loading">Building consolidated verdict…</div></div>';
+  // --- technical side: fresh scan of this one stock ---
+  let tech = null, ts = null;
+  try{
+    let bench63 = null;
+    try{ const b = toCandles(await fetchChart("^NSEI","1y","1d")); if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1; }catch(e){}
+    tech = scanStock(sym, toCandles(await fetchChart(sym,"2y","1d")), bench63);
+    if(tech) ts = setupScore({...tech, action:"BUY"});
+  }catch(e){}
+  // --- investment side ---
+  const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
+  const iv = (f.eps>0 || f.fcf>0) ? computeIntrinsic(f, {g:defG, r:0.12, tg:0.04, y:7.5}) : null;
+  const q = scoreQuality(f).score, vt = scoreValueTrap(f).score;
+  const mos = iv ? iv.mos : null, impl = iv && iv.implied!=null ? iv.implied*100 : null;
+  const revG = f.revenue_growth!=null ? f.revenue_growth*100 : null;
+  const earnG = f.earnings_growth!=null ? f.earnings_growth*100 : null;
+  const tgtGap = f.target_price!=null && f.price ? (f.target_price-f.price)/f.price*100 : null;
+  // invest score 0-100: quality 40% + trap 20% + valuation 40%
+  const valPart = mos==null ? 50 : mos>=25 ? 100 : mos>=0 ? 60+mos*1.6 : mos>=-50 ? 60+mos : Math.max(5, 10+ (mos+100)*0.1);
+  const invScore = Math.round(((q??50)*0.4) + ((100-(vt??50))*0.2) + valPart*0.4);
+  // labels
+  const tLbl = ts==null ? ["muted","NO DATA"] : !tech.above_sma200 ? ["bearish","AVOID LONGS"] :
+    ts>=70 ? ["bullish","STRONG SETUP"] : ts>=55 ? ["bullish","DECENT SETUP"] : ts>=40 ? ["neutral","WEAK"] : ["bearish","NO SETUP"];
+  const iLbl = invScore>=70 ? ["bullish","INVESTABLE"] : invScore>=55 ? ["neutral","FAIR"] : invScore>=40 ? ["neutral","STRETCHED"] : ["bearish","AVOID"];
+  // reasons
+  const tReasons = [];
+  if(tech){
+    tReasons.push(tech.above_sma200 ? "in a long-term uptrend (above SMA200)" : "below its 200-day average — longs are swimming upstream");
+    const bulls = tech.signals.filter(s=>s.side==="bullish").slice(0,2).map(s=>s.type.replaceAll("_"," ").toLowerCase());
+    const bears = tech.signals.filter(s=>s.side==="bearish").slice(0,2).map(s=>s.type.replaceAll("_"," ").toLowerCase());
+    if(bulls.length) tReasons.push("for: " + bulls.join(", "));
+    if(bears.length) tReasons.push("against: " + bears.join(", "));
+    if(tech.rsi!=null) tReasons.push(`RSI ${tech.rsi.toFixed(0)}`);
+  } else tReasons.push("chart data unavailable");
+  const iReasons = [];
+  iReasons.push(`quality ${q??"—"}/100, value-trap risk ${vt??"—"}/100`);
+  if(mos!=null) iReasons.push(`margin of safety ${fmt(mos,0)}%`);
+  if(impl!=null) iReasons.push(`price implies ${fmt(impl,0)}% growth vs delivered ${revG!=null?fmt(revG,0)+"%":"—"} sales / ${earnG!=null?fmt(earnG,0)+"%":"—"} earnings`);
+  if(tgtGap!=null) iReasons.push(`analyst target ${sign(tgtGap)}${fmt(tgtGap,0)}% vs price`);
+  // overall one-liner (trade × invest matrix)
+  const tGood = ts!=null && tech && tech.above_sma200 && ts>=55, iGood = invScore>=70, iFair = invScore>=55;
+  const overall =
+    tGood && iGood ? ["bullish","Rare alignment: sound business, sane price, live technical setup — can be bought to hold AND traded. Size the trade off the stop; stage the investment in tranches."] :
+    tGood && iFair ? ["bullish","Trade it with the setup's stop/target; a longer hold is defensible but demand the growth keeps printing."] :
+    tGood ? ["neutral","TRADE ONLY — the chart works but the price already assumes heroics. Rent it with a hard stop; never convert to a holding."] :
+    iGood ? ["neutral","INVEST ON DIPS — good business at an acceptable price but no technical entry right now. Watchlist it; let a setup come to you."] :
+    iFair ? ["muted","WAIT — nothing compelling on either clock. There's no cost to standing aside."] :
+    ["bearish","AVOID — neither the business case nor the chart earns your capital today."];
+  el.innerHTML = `<div class="card" style="margin-bottom:12px;border-color:#3d4d75">
+    <div class="name" style="margin-bottom:8px">Consolidated verdict — ${sym.replace(".NS","")}</div>
+    <div class="pulse-grid" style="grid-template-columns:1fr 1fr;margin-bottom:8px">
+      <div>
+        <div style="font-weight:600;margin-bottom:2px">Short-term trade (1–4 wks)
+          <span class="badge ${tLbl[0]}">${tLbl[1]}</span> ${ts!=null?`<span class="${scoreCls(ts)}" style="font-weight:700">${ts}</span><span class="muted" style="font-size:10px">/100</span>`:""}</div>
+        <div class="muted" style="font-size:12px;line-height:1.6">${tReasons.join(" · ")}</div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:2px">Investment (1+ yr)
+          <span class="badge ${iLbl[0]}">${iLbl[1]}</span> <span class="${scoreCls(invScore)}" style="font-weight:700">${invScore}</span><span class="muted" style="font-size:10px">/100</span></div>
+        <div class="muted" style="font-size:12px;line-height:1.6">${iReasons.join(" · ")}</div>
+      </div>
+    </div>
+    <div style="font-size:13px;line-height:1.6"><span class="badge ${overall[0]}">BOTTOM LINE</span> ${overall[1]}</div>
+    <div class="muted" style="font-size:10px;margin-top:6px">Synthesized from the technical scan, intrinsic value (default assumptions), quality/value-trap scores and analyst data below — details in each section. Rule-based, not advice; cyclicals distort trailing-data models.</div>
+  </div>`;
 }
 
 /* ---- intrinsic value engine ---- */
