@@ -1239,7 +1239,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.12
+        <span class="ver-dot"></span>v3.9.13
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -2471,20 +2471,43 @@ function moveTxnCategory(sel){
   if(!toCatId) return;
   const md=state.months[currentMonth];
   if(!md||!md[fromCatId]) return;
-  // Remove from source
-  const txns=md[fromCatId].transactions||[];
-  const txn=txns.splice(idx,1)[0];
-  if(!txn){ sel.value=''; return; }
-  md[fromCatId].transactions=txns;
-  md[fromCatId].actual=Math.max(0,(md[fromCatId].actual||0)-txn.amount);
-  // Add to destination
+
+  const allTxns=md[fromCatId].transactions||[];
+  const thisTxn=allTxns[idx];
+  if(!thisTxn){ sel.value=''; return; }
+
+  // Find all transactions in this category with the same merchant key
+  const thisMk=extractMerchantKey(thisTxn.desc);
+  const toMove=allTxns.filter(t=>extractMerchantKey(t.desc)===thisMk);
+  const toKeep=allTxns.filter(t=>extractMerchantKey(t.desc)!==thisMk);
+
+  // Move all matching to destination
   if(!md[toCatId]) md[toCatId]={actual:0,paid:false,note:'',transactions:[]};
   if(!md[toCatId].transactions) md[toCatId].transactions=[];
-  md[toCatId].transactions.push(txn);
-  md[toCatId].actual=(md[toCatId].actual||0)+txn.amount;
+  md[toCatId].transactions.push(...toMove);
+  md[toCatId].actual=(md[toCatId].actual||0)+toMove.reduce((s,t)=>s+t.amount,0);
+
+  // Update source
+  md[fromCatId].transactions=toKeep;
+  md[fromCatId].actual=toKeep.reduce((s,t)=>s+t.amount,0);
+
+  // Save merchant mapping so future imports go straight here
+  const mmap=getMerchantMap();
+  if(thisMk) mmap[thisMk]=toCatId;
+  saveMerchantMap(mmap);
+
   saveState();
   renderMonthly();
-  openCatDetail(fromCatId); // stay on source category, refreshed
+  openCatDetail(fromCatId); // refresh modal
+
+  if(toMove.length>1){
+    const toCat=state.categories.find(c=>c.id===toCatId);
+    const toast=document.createElement('div');
+    toast.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+    toast.textContent=`Moved ${toMove.length} "${thisMk}" transactions → ${toCat?.name||'category'}`;
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(),3000);
+  }
 }
 
 /* Summary cards */
@@ -4987,21 +5010,16 @@ function renderInsightsMonthlyTable(st, year){
   if(!el) return;
   const cats=(st.categories||[]).filter(c=>c.type==='expense');
   if(!cats.length){ el.innerHTML=''; return; }
-
-  // Find active months (any spend data)
   const activeMis=MONTHS.map((_,mi)=>{
     return cats.some(cat=>(st.months?.[mi]?.[cat.id]?.actual||0)>0) ? mi : null;
   }).filter(mi=>mi!==null);
   if(!activeMis.length){ el.innerHTML=''; return; }
-
-  // Rank categories by total annual spend
   const catTotals=cats.map(cat=>{
     const total=activeMis.reduce((s,mi)=>s+(st.months?.[mi]?.[cat.id]?.actual||0),0);
     return {cat,total};
   }).filter(x=>x.total>0).sort((a,b)=>b.total-a.total).slice(0,10);
-
-  // Build table
   const shortMons=activeMis.map(mi=>MONTHS[mi].slice(0,3));
+  const fmt2=n=>n>=1000?(n/1000).toFixed(1)+'k':n.toFixed(0);
   let html=`<div class="insights-merchants-wrap" style="margin-top:0">
     <div class="insights-section-label">📅 Monthly Category Breakdown — ${year}</div>
     <div style="overflow-x:auto">
@@ -5012,40 +5030,31 @@ function renderInsightsMonthlyTable(st, year){
         <th style="color:var(--text1)">Total</th>
       </tr></thead>
       <tbody>`;
-
   catTotals.forEach(({cat,total})=>{
     html+=`<tr><td title="${cat.name}">${cat.name.length>18?cat.name.slice(0,16)+'…':cat.name}</td>`;
     activeMis.forEach(mi=>{
       const act=st.months?.[mi]?.[cat.id]?.actual||0;
       const exp=cat.expected||0;
-      let cls='mi-cell-empty', disp=act>0?fmt(act):'—';
-      if(act>0&&exp>0){
-        const r=act/exp;
-        cls=r<=0.9?'mi-cell-good':r<=1.1?'mi-cell-warn':'mi-cell-over';
-      } else if(act>0){ cls=''; }
+      let cls='mi-cell-empty', disp=act>0?fmt2(act):'—';
+      if(act>0&&exp>0){ const r=act/exp; cls=r<=0.9?'mi-cell-good':r<=1.1?'mi-cell-warn':'mi-cell-over'; }
+      else if(act>0){ cls=''; }
       html+=`<td class="${cls}">${disp}</td>`;
     });
-    html+=`<td style="font-weight:700;color:var(--text1)">MYR ${fmt(total)}</td></tr>`;
+    html+=`<td style="font-weight:700;color:var(--text1)">MYR ${total.toFixed(0)}</td></tr>`;
   });
-
-  // Totals row
   html+='<tr class="mi-total-row"><td>Monthly Total</td>';
   activeMis.forEach(mi=>{
-    const monthTotal=cats.reduce((s,cat)=>s+(st.months?.[mi]?.[cat.id]?.actual||0),0);
-    html+=`<td>MYR ${fmt(monthTotal)}</td>`;
+    const t=cats.reduce((s,cat)=>s+(st.months?.[mi]?.[cat.id]?.actual||0),0);
+    html+=`<td>MYR ${t.toFixed(0)}</td>`;
   });
-  const grandTotal=catTotals.reduce((s,x)=>s+x.total,0);
-  html+=`<td>MYR ${fmt(grandTotal)}</td></tr>`;
-  html+='</tbody></table></div>';
-
-  // Legend
-  html+=`<div style="display:flex;gap:14px;margin-top:10px;font-size:10px;color:var(--text3)">
+  html+=`<td>MYR ${catTotals.reduce((s,x)=>s+x.total,0).toFixed(0)}</td></tr>`;
+  html+=`</tbody></table></div>
+  <div style="display:flex;gap:14px;margin-top:10px;font-size:10px;color:var(--text3)">
     <span><span style="color:var(--accent)">●</span> Under budget</span>
-    <span><span style="color:var(--yellow)">●</span> Near budget</span>
+    <span><span style="color:var(--yellow)">●</span> Near budget (±10%)</span>
     <span><span style="color:var(--red)">●</span> Over budget</span>
-    <span>— No spend</span>
+    <span style="margin-left:4px">— No spend</span>
   </div></div>`;
-
   el.innerHTML=html;
 }
 </script>

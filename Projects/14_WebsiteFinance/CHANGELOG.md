@@ -4,7 +4,7 @@ All notable changes to India Shares Tracker.
 
 ## [2.24.0] — 2026-07-14 · Microcap 250 + Searchable Dropdowns
 
-- Added the **Nifty Microcap 250** tier from NSE's official list (ranks ~501–750: Pricol, Relaxo, GNFC, Happiest Minds, Praj, MOIL…) — 249 real entries (NSE's own "Dummy" placeholder excluded). Universe now spans ~750 stocks with a MICRO cap tag, full sector mapping for peer comparison, and its own option in the screener and backtest universe pickers
+- Added the **Nifty Microcap 250** tier from NSE's official list (ranks ~501–750: Pricol, Relaxo, GNFC, Happiest Minds, Praj, MOIL…) — 250 real entries (NSE's own "Dummy" placeholder excluded). Universe now spans ~750 stocks with a MICRO cap tag, full sector mapping for peer comparison, and its own option in the screener and backtest universe pickers
 - Stock dropdowns (watchlist add, Charts, Fundamentals) are now **searchable comboboxes** — type any part of a symbol or company name and pick from suggestions, across all ~750 shares
 - Honest caveat: microcaps have patchier Yahoo fundamentals, thinner liquidity (technical signals less reliable), and "ALL" scans now make ~750 requests
 
