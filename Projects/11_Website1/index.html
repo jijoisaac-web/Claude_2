@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=7.36"/>
+<link rel="stylesheet" href="/site.css?v=8.1"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v7.36</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.1</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1797,32 +1797,38 @@ document.addEventListener('DOMContentLoaded',function(){
         <div class="rp-step-hd" onclick="rpToggleStep(2)">
           <div class="rp-step-badge">2</div>
           <div class="rp-step-info"><div class="rp-step-title">Monthly Expense Breakdown</div><div class="rp-step-hint" id="rp-step2-hint">All amounts in &#8377; per month</div></div>
-          <svg class="rp-step-chev rp-chev-closed" id="rp-chev-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          <svg class="rp-step-chev" id="rp-chev-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <div class="rp-step-body" id="rp-step-body-2" style="display:none">
-          <div class="card-sub">All amounts in Indian Rupees (&#8377;) per month</div>
-      <div class="expense-grid">
-        <div class="expense-item"><div class="ei-icon">&#128722;</div><label class="ei-label">Food &amp; Groceries</label><input type="number" id="exp-food" value="20000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127968;</div><label class="ei-label">Rent / Housing</label><input type="number" id="exp-rent" value="25000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128663;</div><label class="ei-label">Transport &amp; Travel</label><input type="number" id="exp-transport" value="8000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128161;</div><label class="ei-label">Utilities (electric, internet&hellip;)</label><input type="number" id="exp-util" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128737;</div><label class="ei-label">Life &amp; Term Insurance</label><input type="number" id="exp-lifeins" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127973;</div><label class="ei-label">Health Insurance</label><input type="number" id="exp-healthins" value="4000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128138;</div><label class="ei-label">Medical &amp; Healthcare</label><input type="number" id="exp-medical" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127891;</div><label class="ei-label">Kids Education</label><input type="number" id="exp-edu" value="15000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127881;</div><label class="ei-label">Entertainment &amp; Dining Out</label><input type="number" id="exp-ent" value="8000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#9992;&#65039;</div><label class="ei-label">Annual Holidays (&divide;12)</label><input type="number" id="exp-travel" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128085;</div><label class="ei-label">Clothing &amp; Personal Care</label><input type="number" id="exp-clothing" value="4000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128230;</div><label class="ei-label">Miscellaneous</label><input type="number" id="exp-misc" value="5000"/></div>
-      </div>
-          <div class="expense-total-strip">
+        <div class="rp-step-body" id="rp-step-body-2">
+          <!-- Total always visible -->
+          <div class="expense-total-strip" style="margin-bottom:10px">
             <div><div class="exp-total-lbl">Total Monthly Expenses</div><div style="font-size:12px;color:var(--muted)">Updates live as you edit</div></div>
             <div style="text-align:right">
-              <div class="exp-total-val" id="exp-total-display">&#8377;0</div>
+              <div class="exp-total-val" id="exp-total-display">&#8377;1,09,000</div>
               <div id="exp-total-local" style="font-size:12px;color:var(--teal);font-weight:600;margin-top:2px"></div>
             </div>
           </div>
-          <button class="btn btn-outline rp-next-btn" onclick="rpOpenStep(3)">Next: Planning Parameters &#8594;</button>
+          <!-- Collapsible expense grid -->
+          <button class="btn btn-outline rp-exp-toggle" id="rp-exp-toggle-btn" onclick="rpToggleExpenses()">&#9998; Edit Expense Categories &#9660;</button>
+          <div id="rp-exp-grid-wrap" style="display:none;margin-top:12px">
+            <div class="card-sub" style="margin-bottom:8px">All amounts in Indian Rupees (&#8377;) per month</div>
+            <div class="expense-grid">
+              <div class="expense-item"><div class="ei-icon">&#128722;</div><label class="ei-label">Food &amp; Groceries</label><input type="number" id="exp-food" value="20000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127968;</div><label class="ei-label">Rent / Housing</label><input type="number" id="exp-rent" value="25000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128663;</div><label class="ei-label">Transport &amp; Travel</label><input type="number" id="exp-transport" value="8000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128161;</div><label class="ei-label">Utilities (electric, internet&hellip;)</label><input type="number" id="exp-util" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128737;</div><label class="ei-label">Life &amp; Term Insurance</label><input type="number" id="exp-lifeins" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127973;</div><label class="ei-label">Health Insurance</label><input type="number" id="exp-healthins" value="4000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128138;</div><label class="ei-label">Medical &amp; Healthcare</label><input type="number" id="exp-medical" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127891;</div><label class="ei-label">Kids Education</label><input type="number" id="exp-edu" value="15000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127881;</div><label class="ei-label">Entertainment &amp; Dining Out</label><input type="number" id="exp-ent" value="8000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#9992;&#65039;</div><label class="ei-label">Annual Holidays (&divide;12)</label><input type="number" id="exp-travel" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128085;</div><label class="ei-label">Clothing &amp; Personal Care</label><input type="number" id="exp-clothing" value="4000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128230;</div><label class="ei-label">Miscellaneous</label><input type="number" id="exp-misc" value="5000"/></div>
+            </div>
+            <button class="btn btn-outline rp-exp-toggle" style="margin-top:10px" onclick="rpToggleExpenses()">&#9650; Collapse Expenses</button>
+          </div>
+          <button class="btn btn-outline rp-next-btn" onclick="rpOpenStep(3)" style="margin-top:12px">Next: Planning Parameters &#8594;</button>
         </div>
       </div>
       <!-- ── STEP 3 ── -->
@@ -2938,14 +2944,14 @@ document.addEventListener('DOMContentLoaded',function(){
         Questions or feedback? &nbsp;&#9993;&nbsp;
         <a href="mailto:nrifinancehub3@gmail.com" style="color:var(--teal);font-weight:600;">nrifinancehub3@gmail.com</a>
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v7.36 · Jul 2026</p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v8.1 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js?v=7.36"></script>
+<script src="/site.js?v=8.1"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

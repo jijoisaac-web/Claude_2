@@ -1270,7 +1270,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.9.13
+        <span class="ver-dot"></span>v3.10.2
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1333,6 +1333,14 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.10.2 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Category move now applies to all months — reassigning a merchant in one month moves it everywhere in the year</div>
+    <div class="cl-item">Duplicate transaction guard — import skips entries already present (same date + amount + description)</div>
+    <div class="cl-item">Data → Remove Duplicates — one-click cleanup for existing duplicate transactions</div>
+    <div class="cl-item">8 new Insights analytics: 50/30/20, Quick Wins, Income vs Expenses, Cumulative Savings, Category Trends, Cashflow Waterfall, Recurring Costs</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v3.3 <span class="cl-ver-date">Jul 2026</span></div>
@@ -2508,49 +2516,51 @@ function rematchAllOthers(){
 }
 
 function moveTxnCategory(sel){
-  const fromCatId=sel.dataset.cid;
-  const idx=parseInt(sel.dataset.ti);
-  const toCatId=sel.value;
+  const fromCatId=sel.dataset.cid, idx=parseInt(sel.dataset.ti), toCatId=sel.value;
   if(!toCatId) return;
   const md=state.months[currentMonth];
   if(!md||!md[fromCatId]) return;
 
-  const allTxns=md[fromCatId].transactions||[];
-  const thisTxn=allTxns[idx];
+  const thisTxn=(md[fromCatId].transactions||[])[idx];
   if(!thisTxn){ sel.value=''; return; }
-
-  // Find all transactions in this category with the same merchant key
   const thisMk=extractMerchantKey(thisTxn.desc);
-  const toMove=allTxns.filter(t=>extractMerchantKey(t.desc)===thisMk);
-  const toKeep=allTxns.filter(t=>extractMerchantKey(t.desc)!==thisMk);
 
-  // Move all matching to destination
-  if(!md[toCatId]) md[toCatId]={actual:0,paid:false,note:'',transactions:[]};
-  if(!md[toCatId].transactions) md[toCatId].transactions=[];
-  md[toCatId].transactions.push(...toMove);
-  md[toCatId].actual=(md[toCatId].actual||0)+toMove.reduce((s,t)=>s+t.amount,0);
+  // Move matching transactions across ALL months in the year
+  let totalMoved=0;
+  const cats=state.categories||[];
+  for(let mi=0;mi<12;mi++){
+    const mdata=state.months[mi];
+    if(!mdata) continue;
+    cats.forEach(cat=>{
+      if(cat.id===toCatId) return; // already in destination — skip
+      const cd=mdata[cat.id];
+      if(!cd||!cd.transactions||!cd.transactions.length) return;
+      const toMove=cd.transactions.filter(t=>extractMerchantKey(t.desc)===thisMk);
+      if(!toMove.length) return;
+      const toKeep=cd.transactions.filter(t=>extractMerchantKey(t.desc)!==thisMk);
+      cd.transactions=toKeep;
+      cd.actual=Math.round(toKeep.reduce((s,t)=>s+t.amount,0)*100)/100;
+      if(!mdata[toCatId]) mdata[toCatId]={actual:0,paid:false,note:'',transactions:[]};
+      if(!mdata[toCatId].transactions) mdata[toCatId].transactions=[];
+      mdata[toCatId].transactions.push(...toMove);
+      mdata[toCatId].actual=Math.round(((mdata[toCatId].actual||0)+toMove.reduce((s,t)=>s+t.amount,0))*100)/100;
+      totalMoved+=toMove.length;
+    });
+  }
 
-  // Update source
-  md[fromCatId].transactions=toKeep;
-  md[fromCatId].actual=toKeep.reduce((s,t)=>s+t.amount,0);
-
-  // Save merchant mapping so future imports go straight here
+  // Save merchant mapping so future imports use this category directly
   const mmap=getMerchantMap();
   if(thisMk) mmap[thisMk]=toCatId;
   saveMerchantMap(mmap);
 
-  saveState();
-  renderMonthly();
-  openCatDetail(fromCatId); // refresh modal
+  saveState(); renderMonthly(); openCatDetail(fromCatId);
 
-  if(toMove.length>1){
-    const toCat=state.categories.find(c=>c.id===toCatId);
-    const toast=document.createElement('div');
-    toast.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
-    toast.textContent=`Moved ${toMove.length} "${thisMk}" transactions → ${toCat?.name||'category'}`;
-    document.body.appendChild(toast);
-    setTimeout(()=>toast.remove(),3000);
-  }
+  const toCat=state.categories.find(c=>c.id===toCatId);
+  const toast=document.createElement('div');
+  toast.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+  toast.textContent=`Moved ${totalMoved} "${thisMk.slice(0,24)}${thisMk.length>24?'…':''}" txn${totalMoved!==1?'s':''} → ${toCat?.name||'category'} across all months`;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3500);
 }
 
 /* Summary cards */

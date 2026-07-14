@@ -1,4 +1,4 @@
-/* v7.36 */
+/* v8.1 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -840,10 +840,16 @@ function setCity(tier,btn){
   const p=CITY_PRESETS[tier];
   ['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'].forEach(k=>document.getElementById('exp-'+k).value=p[k]);
   updateExpTotal();
-  // Auto-open Step 2 after city selection
+  // Update Step 1 hint with chosen city
   var hint=document.getElementById('rp-step1-hint');
   if(hint) hint.textContent=btn.textContent.trim();
-  rpOpenStep(2);
+  // Auto-expand expense grid so user can review pre-filled values
+  var grid=document.getElementById('rp-exp-grid-wrap');
+  var tb=document.getElementById('rp-exp-toggle-btn');
+  if(grid&&grid.style.display==='none'){
+    grid.style.display='block';
+    if(tb) tb.innerHTML='&#9650; Collapse Expense Categories';
+  }
 }
 function rpOpenStep(n){
   var body=document.getElementById('rp-step-body-'+n);
@@ -871,6 +877,14 @@ function rpToggleResult(){
   body.style.display=open?'none':'block';
   if(btn) btn.innerHTML=open?'&#9658; Expand':'&#9660; Collapse';
 }
+function rpToggleExpenses(){
+  var grid=document.getElementById('rp-exp-grid-wrap');
+  var btn=document.getElementById('rp-exp-toggle-btn');
+  if(!grid) return;
+  var open=grid.style.display!=='none';
+  grid.style.display=open?'none':'block';
+  if(btn) btn.innerHTML=open?'&#9998; Edit Expense Categories &#9660;':'&#9650; Collapse Expense Categories';
+}
 function updateExpTotal(){
   const ids=['food','rent','transport','util','lifeins','healthins','medical','edu','ent','travel','clothing','misc'];
   const total=ids.reduce((s,id)=>s+(parseFloat(document.getElementById('exp-'+id).value)||0),0);
@@ -883,6 +897,8 @@ function updateExpTotal(){
   if(h2&&total>0) h2.textContent='Total: ₹'+Math.round(total).toLocaleString('en-IN')+(midRate>0?' · ≈ '+baseCur+' '+Math.round(total/midRate).toLocaleString('en-IN',{maximumFractionDigits:0}):'');
   return total;
 }
+// ── Init expense total on page load ──────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',function(){updateExpTotal();});
 document.addEventListener('input',e=>{if(e.target.id&&e.target.id.startsWith('exp-'))updateExpTotal();});
 
 // ── RETURN PLANNER ──────────────────────────────
@@ -922,12 +938,14 @@ function calcReturn(){
     const colr=close<=0?'var(--red)':pct>0.5?'var(--green)':pct>0.15?'var(--amber)':'var(--red)';
     const status=close<=0?'✘ Depleted':pct>0.5?'✔ Healthy':pct>0.15?'⚠ Low':'⚠ Critical';
     const rowStyle=close<=0?' style="opacity:0.5"':'';
-    const lcClose=midRate>0&&close>0?`<div class="rp-local">${baseCur} ${(close/midRate/100000).toFixed(1)}L</div>`:'';
+    // Dual currency helpers for table cells
+    const lcFmt=(v)=>midRate>0&&v>0?`<div class="rp-local">${baseCur} ${(v/midRate/100000).toFixed(1)}L</div>`:'';
+    const lcClose=lcFmt(close);
     tbody+=`<tr${rowStyle}><td>${y}</td>`;
-    tbody+=`<td>₹${(open/100000).toFixed(1)}L</td>`;
-    tbody+=`<td style="color:var(--red)">₹${(annExp/100000).toFixed(1)}L</td>`;
-    tbody+=`<td style="color:var(--muted)">₹${(annIncome/100000).toFixed(1)}L</td>`;
-    tbody+=`<td style="color:var(--green)">₹${(returns/100000).toFixed(1)}L</td>`;
+    tbody+=`<td>₹${(open/100000).toFixed(1)}L${lcFmt(open)}</td>`;
+    tbody+=`<td style="color:var(--red)">₹${(annExp/100000).toFixed(1)}L${lcFmt(annExp)}</td>`;
+    tbody+=`<td style="color:var(--muted)">₹${(annIncome/100000).toFixed(1)}L${lcFmt(annIncome)}</td>`;
+    tbody+=`<td style="color:var(--green)">₹${(returns/100000).toFixed(1)}L${lcFmt(returns)}</td>`;
     tbody+=`<td><strong style="color:${colr}">₹${(close/100000).toFixed(1)}L</strong>${lcClose}</td>`;
     tbody+=`<td style="color:${colr};font-weight:700">${status}</td></tr>`;
     expM*=(1+inflation);

@@ -1,4 +1,4 @@
-/* v7.36 */
+/* v8.1 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2349,3 +2349,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rp-result-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(20,184,166,0.06);}
 .rp-collapse-btn{padding:5px 14px!important;font-size:12px!important;}
 #rp-result-body{padding:16px 18px;}
+
+/* ── v8.1 additions ─────────────────────────────────────────── */
+.rp-exp-toggle{width:100%;justify-content:center;font-size:13px!important;padding:9px 16px!important;border-style:dashed!important;color:var(--muted)!important;}
+.rp-exp-toggle:hover{color:var(--teal)!important;border-color:var(--teal)!important;}
+.year-table td .rp-local{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;line-height:1.2;}
