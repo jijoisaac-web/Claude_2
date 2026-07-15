@@ -460,7 +460,8 @@ progress{accent-color:var(--violet);}
       <option value="SMALLCAP 250">SMALLCAP 250</option>
       <option value="MICROCAP 250">MICROCAP 250</option>
     </select>
-    <input type="text" id="btStock" list="allStocksDL" placeholder="…or backtest one share" size="20" autocomplete="off">
+    <select id="btStockSel" onchange="$('btStock').value = this.value ? this.value.replace('.NS','') : ''"></select>
+    <input type="text" id="btStock" list="allStocksDL" placeholder="…or type to search" size="18" autocomplete="off">
     <select id="btLookback">
       <option value="63">Last 3 months</option>
       <option value="126" selected>Last 6 months</option>
@@ -502,7 +503,8 @@ progress{accent-color:var(--violet);}
 <!-- CHARTS -->
 <section id="charts" class="tab">
   <div class="controls">
-    <input type="text" id="chartSymbol" list="allStocksDL" placeholder="Search any share…" size="24" autocomplete="off" onchange="loadChart()">
+    <select id="chartSelect" onchange="if(this.value){setCombo('chartSymbol',this.value);loadChart();}"></select>
+    <input type="text" id="chartSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadChart()">
     <div class="rangebtns" id="rangeBtns">
       <button data-r="1mo">1M</button><button data-r="3mo">3M</button>
       <button data-r="6mo">6M</button><button data-r="1y" class="active">1Y</button>
@@ -519,7 +521,8 @@ progress{accent-color:var(--violet);}
 <!-- FUNDAMENTALS -->
 <section id="fundamentals" class="tab">
   <div class="controls">
-    <input type="text" id="fundSymbol" list="allStocksDL" placeholder="Search any share…" size="24" autocomplete="off" onchange="loadFundamentals()">
+    <select id="fundSelect" onchange="if(this.value){setCombo('fundSymbol',this.value);loadFundamentals();}"></select>
+    <input type="text" id="fundSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadFundamentals()">
   </div>
   <div id="verdictView"></div>
   <div id="newsView"></div>
@@ -2911,6 +2914,10 @@ function setCombo(id, sym){ $(id).value = sym.replace(".NS","") + " — " + (ALL
     .map(([s,n])=>`<option value="${s.replace(".NS","")}">${n} (${s.replace(".NS","")})</option>`).join("");
   const ospStocks = OM_SYMBOLS.filter(s=>s!=="NIFTY"&&s!=="BANKNIFTY").map(s=>s+".NS");
   $("ospStockGroup").innerHTML = ospStocks.map(t=>`<option value="${t}">${nameOf(t)} (${t.replace(".NS","")})</option>`).join("");
+  const browse = '<option value="">Browse all shares…</option>' + opts;
+  $("chartSelect").innerHTML = browse;
+  $("fundSelect").innerHTML = browse;
+  $("btStockSel").innerHTML = '<option value="">Whole universe (no single share)</option>' + opts;
   setCombo("chartSymbol", "RELIANCE.NS"); setCombo("fundSymbol", "RELIANCE.NS");
   $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
   $("verBadge").textContent = "v" + APP_VERSION;

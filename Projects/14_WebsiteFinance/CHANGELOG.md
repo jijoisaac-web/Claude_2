@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.27.2] — 2026-07-15
+
+- Charts, Fundamentals and Backtest now show BOTH a browsable dropdown (all ~750 shares grouped by universe) and the type-to-search box — matching the Smart Money/Options pattern. The search-only inputs weren't discoverable as searchable
+
 ## [2.27.1] — 2026-07-14
 
 - Fixed "News unavailable: news feed 503": Google News rejects Cloudflare's datacenter IPs at times. `/api/news` now tries three feeds in order — Yahoo Finance per-symbol RSS, Bing News RSS, then Google News — using the first that returns items, and reports which one served
