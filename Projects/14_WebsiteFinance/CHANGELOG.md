@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.27.1] — 2026-07-14
+
+- Fixed "News unavailable: news feed 503": Google News rejects Cloudflare's datacenter IPs at times. `/api/news` now tries three feeds in order — Yahoo Finance per-symbol RSS, Bing News RSS, then Google News — using the first that returns items, and reports which one served
+
 ## [2.27.0] — 2026-07-14 · Fresh Block Scanner
 
 - Smart Money tab: new **fresh block scanner** — sweeps any universe (up to all ~750) for order blocks whose break-of-structure fired within the last 7 days and are still unmitigated. Table sorted nearest-to-zone first with zone range, current price, distance to zone (AT ZONE highlighted), move size and BOS date; row click opens the full Smart Money view, 📈 opens the chart

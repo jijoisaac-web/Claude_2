@@ -19,15 +19,29 @@ export async function onRequestGet({ request, env }) {
   if(hit) return hit;
   try{
     const q = encodeURIComponent(`"${name}" stock India`);
-    const rss = await fetch(`https://news.google.com/rss/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en`, { headers: { "user-agent": UA } });
-    if(!rss.ok) throw new Error(`news feed ${rss.status}`);
-    const xml = await rss.text();
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 10).map(m => ({
-      title: tag(m[1], "title"),
-      link: tag(m[1], "link"),
-      date: tag(m[1], "pubDate"),
-      source: tag(m[1], "source"),
-    })).filter(x => x.title);
+    // multiple feed sources — first one that yields items wins (Google blocks datacenter IPs with 503 at times)
+    const FEEDS = [
+      { src: "Yahoo Finance", url: `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(symbol)}.NS&region=IN&lang=en-IN` },
+      { src: "Bing News",     url: `https://www.bing.com/news/search?q=${q}&format=rss` },
+      { src: "Google News",   url: `https://news.google.com/rss/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en` },
+    ];
+    let items = [], feedUsed = null, lastErr = null;
+    for(const f of FEEDS){
+      try{
+        const rss = await fetch(f.url, { headers: { "user-agent": UA, accept: "application/rss+xml, application/xml, text/xml, */*" } });
+        if(!rss.ok){ lastErr = `${f.src} ${rss.status}`; continue; }
+        const xml = await rss.text();
+        const got = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 10).map(m => ({
+          title: tag(m[1], "title"),
+          link: tag(m[1], "link"),
+          date: tag(m[1], "pubDate"),
+          source: tag(m[1], "source") || f.src,
+        })).filter(x => x.title && x.title.length > 5);
+        if(got.length){ items = got; feedUsed = f.src; break; }
+        lastErr = `${f.src} empty`;
+      }catch(e){ lastErr = `${f.src}: ${e.message}`; }
+    }
+    if(!items.length) throw new Error(lastErr || "all news feeds unavailable");
 
     let ai = null;
     if(env.AI && items.length){
@@ -51,7 +65,7 @@ export async function onRequestGet({ request, env }) {
         }
       }catch(e){ ai = { error: String(e.message || e) }; }
     }
-    const out = { symbol, name, aiConfigured: !!env.AI, items: items.slice(0, 8), ai };
+    const out = { symbol, name, aiConfigured: !!env.AI, feed: feedUsed, items: items.slice(0, 8), ai };
     const res = new Response(JSON.stringify(out), {
       headers: {
         "content-type": "application/json",
