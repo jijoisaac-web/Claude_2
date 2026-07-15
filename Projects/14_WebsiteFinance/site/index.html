@@ -308,6 +308,10 @@ progress{accent-color:var(--violet);}
 <!-- INSTITUTIONS: FII/DII + large deals -->
 <section id="insti" class="tab">
   <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="controls">
+    <button class="btn ghost" onclick="loadFiiDii(true);loadDeals(true)">↻ Refresh flows &amp; deals</button>
+    <span class="muted" style="font-size:11px">NSE publishes provisional figures after ~6pm IST — during market hours the previous session shows (check the date).</span>
+  </div>
   <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
   <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="controls">
@@ -694,7 +698,9 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   b.classList.add("active"); $(b.dataset.tab).classList.add("visible");
   if(b.dataset.tab==="screener" && !screenerData) loadScreener();
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
-  if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); loadDelivery(); }
+  if(b.dataset.tab==="insti" && (!window._instiTs || Date.now()-window._instiTs > 15*60*1000)){
+    window._instiTs = Date.now(); loadFiiDii(); loadDeals(); loadDelivery();
+  }
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
@@ -708,9 +714,9 @@ const WL_DEFAULT = ["RELIANCE.NS","HDFCBANK.NS","INFY.NS","TCS.NS","TMPV.NS"];
 function getWL(){ try{ const v = JSON.parse(localStorage.getItem(WL_KEY)); return Array.isArray(v)&&v.length?v:WL_DEFAULT; }catch(e){ return WL_DEFAULT; } }
 function setWL(v){ localStorage.setItem(WL_KEY, JSON.stringify(v)); }
 /* ---- FII / DII provisional daily activity (NSE) ---- */
-async function loadFiiDii(){
+async function loadFiiDii(force){
   try{
-    const r = await fetch("/api/fiidii");
+    const r = await fetch("/api/fiidii" + (force===true ? "?t="+Date.now() : ""));
     const d = await r.json();
     if(!r.ok || (!d.fii && !d.dii)) throw new Error(d.error || "no data");
     window._fiidii = d; // cached so the Brief tab can reuse it without a second fetch
@@ -742,9 +748,9 @@ async function loadFiiDii(){
 
 /* ---- bulk & block deals (NSE) ---- */
 let dealsData = null;
-async function loadDeals(){
+async function loadDeals(force){
   try{
-    const r = await fetch("/api/largedeals");
+    const r = await fetch("/api/largedeals" + (force===true ? "?t="+Date.now() : ""));
     const d = await r.json();
     if(!r.ok || !d.deals) throw new Error(d.error || "no data");
     dealsData = d.deals;

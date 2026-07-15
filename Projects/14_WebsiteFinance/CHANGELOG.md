@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.28.2] — 2026-07-15
+
+- FII/DII staleness fixes: the tab now auto-refetches when reopened after 15+ minutes (was once per page-load); added a "↻ Refresh flows & deals" button that busts the edge cache; the server function detects when NSE serves stale payloads to cookie-less clients (>5 days old) and retries with a fresh cookie handshake, keeping whichever response is fresher; edge cache lowered to 15 min. Note kept in UI: NSE publishes provisional figures ~6pm IST
+
 ## [2.28.1] — 2026-07-15
 
 - News fix (all RSS feeds were blocked from Cloudflare's IPs): primary source is now Yahoo Finance's news-search API on query1.finance.yahoo.com — the same host that already serves the chart proxy — with GDELT as second source and Bing/Google RSS as last resorts
