@@ -19,29 +19,66 @@ export async function onRequestGet({ request, env }) {
   if(hit) return hit;
   try{
     const q = encodeURIComponent(`"${name}" stock India`);
-    // multiple feed sources — first one that yields items wins (Google blocks datacenter IPs with 503 at times)
-    const FEEDS = [
-      { src: "Yahoo Finance", url: `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(symbol)}.NS&region=IN&lang=en-IN` },
-      { src: "Bing News",     url: `https://www.bing.com/news/search?q=${q}&format=rss` },
-      { src: "Google News",   url: `https://news.google.com/rss/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en` },
-    ];
     let items = [], feedUsed = null, lastErr = null;
-    for(const f of FEEDS){
+
+    // 1) Yahoo Finance search API — same host that already serves our chart proxy, so it reaches Cloudflare fine
+    try{
+      const r = await fetch(`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}.NS&newsCount=10&quotesCount=0`,
+        { headers: { "user-agent": UA, accept: "application/json" } });
+      if(r.ok){
+        const j = await r.json();
+        const got = (j.news || []).map(n => ({
+          title: n.title,
+          link: n.link,
+          date: n.providerPublishTime ? new Date(n.providerPublishTime*1000).toUTCString() : null,
+          source: n.publisher || "Yahoo Finance",
+        })).filter(x => x.title);
+        if(got.length){ items = got; feedUsed = "Yahoo Finance"; }
+        else lastErr = "Yahoo empty";
+      } else lastErr = `Yahoo ${r.status}`;
+    }catch(e){ lastErr = "Yahoo: " + e.message; }
+
+    // 2) GDELT — a public news index built for programmatic access; very datacenter-friendly
+    if(!items.length){
       try{
-        const rss = await fetch(f.url, { headers: { "user-agent": UA, accept: "application/rss+xml, application/xml, text/xml, */*" } });
-        if(!rss.ok){ lastErr = `${f.src} ${rss.status}`; continue; }
-        const xml = await rss.text();
-        const got = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 10).map(m => ({
-          title: tag(m[1], "title"),
-          link: tag(m[1], "link"),
-          date: tag(m[1], "pubDate"),
-          source: tag(m[1], "source") || f.src,
-        })).filter(x => x.title && x.title.length > 5);
-        if(got.length){ items = got; feedUsed = f.src; break; }
-        lastErr = `${f.src} empty`;
-      }catch(e){ lastErr = `${f.src}: ${e.message}`; }
+        const r = await fetch(`https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(`"${name}"`)}&mode=ArtList&format=json&maxrecords=10&sort=DateDesc`,
+          { headers: { "user-agent": UA, accept: "application/json" } });
+        if(r.ok){
+          const j = await r.json();
+          const got = (j.articles || []).map(a => ({
+            title: a.title, link: a.url,
+            date: a.seendate ? a.seendate.replace(/(\d{4})(\d{2})(\d{2}).*/, "$3-$2-$1") : null,
+            source: a.domain || "GDELT",
+          })).filter(x => x.title);
+          if(got.length){ items = got; feedUsed = "GDELT"; }
+          else lastErr = "GDELT empty";
+        } else lastErr = `GDELT ${r.status}`;
+      }catch(e){ lastErr = "GDELT: " + e.message; }
     }
-    if(!items.length) throw new Error(lastErr || "all news feeds unavailable");
+
+    // 3+4) RSS fallbacks
+    if(!items.length){
+      const FEEDS = [
+        { src: "Bing News",   url: `https://www.bing.com/news/search?q=${q}&format=rss` },
+        { src: "Google News", url: `https://news.google.com/rss/search?q=${q}&hl=en-IN&gl=IN&ceid=IN:en` },
+      ];
+      for(const f of FEEDS){
+        try{
+          const rss = await fetch(f.url, { headers: { "user-agent": UA, accept: "application/rss+xml, application/xml, text/xml, */*" } });
+          if(!rss.ok){ lastErr = `${f.src} ${rss.status}`; continue; }
+          const xml = await rss.text();
+          const got = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 10).map(m => ({
+            title: tag(m[1], "title"),
+            link: tag(m[1], "link"),
+            date: tag(m[1], "pubDate"),
+            source: tag(m[1], "source") || f.src,
+          })).filter(x => x.title && x.title.length > 5);
+          if(got.length){ items = got; feedUsed = f.src; break; }
+          lastErr = `${f.src} empty`;
+        }catch(e){ lastErr = `${f.src}: ${e.message}`; }
+      }
+    }
+    if(!items.length) throw new Error(lastErr || "all news sources unavailable");
 
     let ai = null;
     if(env.AI && items.length){

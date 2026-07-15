@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.28.1] — 2026-07-15
+
+- News fix (all RSS feeds were blocked from Cloudflare's IPs): primary source is now Yahoo Finance's news-search API on query1.finance.yahoo.com — the same host that already serves the chart proxy — with GDELT as second source and Bing/Google RSS as last resorts
+
 ## [2.28.0] — 2026-07-15 · Delivery % + Money-Flow Signals
 
 - FII/DII tab: new **Delivery %** section from NSE's daily bhavdata — the share of volume actually delivered to demat vs squared off intraday. Reads per stock: GENUINE ACCUMULATION (≥60% delivery + price up), GENUINE SELLING (≥60% + down), HIGH CONVICTION FLAT, SPECULATIVE CHURN (≤30% delivery on a big move). Universe filter, top-20 by delivery, links to chart/fundamentals. New `/api/delivery` function with 7-day walk-back and 6-hour cache
