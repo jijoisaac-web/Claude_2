@@ -1154,6 +1154,11 @@ tbody tr.income-row td:first-child{
 .qw-detail{font-size:11px;color:var(--text2);margin-top:2px;}
 .qw-save{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;align-self:center;}
 
+/* Transfer category rows */
+.transfer-row td{background:rgba(192,132,252,.04);}
+.transfer-row .cat-name-text{color:var(--purple);}
+.transfer-row .cat-icon-wrap{filter:hue-rotate(200deg);}
+
 </style>
 </head>
 <body>
@@ -1270,7 +1275,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.10.2
+        <span class="ver-dot"></span>v3.10.3
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1333,6 +1338,12 @@ tbody tr.income-row td:first-child{
 <!-- Changelog popup -->
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
+
+  <div class="cl-ver">
+    <div class="cl-ver-num">v3.10.3 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">Transfer category type — tracks credit card payments & inter-account moves without counting them as expenses</div>
+    <div class="cl-item">IBK FUND TFR merchant key now uses the transfer note/purpose (after |) for precise per-transaction categorisation</div>
+  </div>
 
   <div class="cl-ver">
     <div class="cl-ver-num">v3.10.2 <span class="cl-ver-date">Jul 2026</span></div>
@@ -1709,6 +1720,7 @@ tbody tr.income-row td:first-child{
     <select id="mType">
       <option value="income">Income</option>
       <option value="expense" selected>Expense</option>
+      <option value="transfer">Transfer (excluded from totals)</option>
     </select>
     <label>Expected Amount (MYR)</label>
     <input type="number" id="mExpected" placeholder="0" min="0">
@@ -2253,8 +2265,9 @@ function calcMonth(mi){
     if(c.type==='group') return;
     const d=md[c.id]||{actual:c.expected,paid:false,note:''};
     if(c.type==='income'){ income+=d.actual; incExp+=c.expected; }
-    else { expense+=d.actual; expExp+=c.expected;
+    else if(c.type==='expense'){ expense+=d.actual; expExp+=c.expected;
       if(d.paid) paid+=d.actual; else pending+=d.actual; }
+    // transfer: excluded from all totals
   });
   return {income,incExp,expense,expExp,paid,pending,balance:income-expense};
 }
@@ -2718,6 +2731,13 @@ function renderTable(){
   // Ungrouped expenses
   ungrouped.forEach(c=>appendCatRows(c,md,tbody,''));
 
+  // Transfers section — excluded from expense totals
+  const tfrCats=sorted.filter(c=>c.type==='transfer');
+  if(tfrCats.length){
+    tbody.appendChild(makeSection('💳 Transfers — excluded from totals'));
+    tfrCats.forEach(c=>appendCatRows(c,md,tbody,'transfer-row'));
+  }
+
   // Summary rows
   const s=calcMonth(currentMonth);
   [
@@ -2746,9 +2766,10 @@ function makeSection(label){
 function appendCatRows(cat,md,tbody,extraClass){
   const d=md[cat.id]||{actual:cat.expected,paid:false,note:''};
   const isInc=cat.type==='income';
+  const isTfr=cat.type==='transfer';
   const diff=isInc?(d.actual-cat.expected):(cat.expected-d.actual);
   const pct=cat.expected>0?Math.min((d.actual/cat.expected)*100,150):0;
-  const over=!isInc && d.actual>cat.expected;
+  const over=!isInc && !isTfr && d.actual>cat.expected;
   const ytd=calcYtdForCat(cat.id,currentMonth);
   const indent=cat.parentId?'padding-left:22px':'';
 
@@ -2775,7 +2796,7 @@ function appendCatRows(cat,md,tbody,extraClass){
     <td class="r ${ac}"><span class="editable" contenteditable="true" data-id="${cat.id}" data-field="act"
         onblur="onEditAct(this)" onkeydown="blurEnter(event)">${Math.round((d.actual||0)*100)/100}</span></td>
     <td class="c"><input type="checkbox" class="paid-check" ${d.paid?'checked':''} onchange="onPaid('${cat.id}',this.checked)"></td>
-    <td class="r" style="color:${diff>=0?'var(--green)':'var(--red)'}">${fmtDiff(diff)}</td>
+    <td class="r" style="color:${isTfr?'var(--text3)':diff>=0?'var(--green)':'var(--red)'}">${isTfr?'—':fmtDiff(diff)}</td>
     <td class="c">
       <div class="prog-wrap" title="${Math.round(pct)}%">
         <div class="prog-fill ${over?'over':''}" style="width:${Math.min(pct,100)}%"></div>
@@ -2932,7 +2953,7 @@ function openEditCat(id){
   document.getElementById('catModalTitle').textContent='Edit Category';
   document.getElementById('mName').value=cat.name;
   document.getElementById('mExpected').value=cat.expected;
-  document.getElementById('mType').value=cat.type==='income'?'income':'expense';
+  document.getElementById('mType').value=cat.type||'expense';
   populateGroupSel(cat.parentId||'');
   openModal('catOverlay');
   setTimeout(()=>document.getElementById('mName').focus(),60);
@@ -3238,7 +3259,7 @@ function buildYoYChart(gc,tc){
       const cats=st.categories||[];
       const md=st.months?.[mi]||{};
       let inc=0,exp=0;
-      cats.forEach(c=>{const d=md[c.id]||{};const act=d.actual??c.expected;if(c.type==='income')inc+=act;else exp+=act;});
+      cats.forEach(c=>{const d=md[c.id]||{};const act=d.actual??c.expected;if(c.type==='income')inc+=act;else if(c.type==='expense')exp+=act;});
       return inc-exp;
     });
     ds.push({label:`${y}`,data:balances,borderColor:palette[i],backgroundColor:palette[i]+'22',tension:.4,fill:false});
@@ -4465,7 +4486,7 @@ function renderBiReview(txns){
       <td style="white-space:nowrap;color:var(--text2)"><span class="bi-edit" contenteditable="true" onblur="_biTxns[${i}].date=this.textContent.trim()">${t.date}</span></td>
       <td style="word-break:break-word;min-width:140px"><span class="bi-edit" contenteditable="true" onblur="_biTxns[${i}].desc=this.textContent.trim()">${t.desc}</span></td>
       <td style="text-align:right"><span class="bi-edit bi-edit-amt" contenteditable="true" style="color:${amtCol}" onblur="_biTxns[${i}].amount=Math.abs(parseFloat(this.textContent.replace(/[^0-9.]/g,''))||0);this.textContent=_biTxns[${i}].amount">${t.amount}</span></td>
-      <td style="text-align:center"><select class="bi-sel bi-type" data-i="${i}" onchange="biTypeChanged(this)"><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option><option value="income" ${t.type==='income'?'selected':''}>Income</option></select></td>
+      <td style="text-align:center"><select class="bi-sel bi-type" data-i="${i}" onchange="biTypeChanged(this)"><option value="expense" ${t.type==='expense'?'selected':''}>Expense</option><option value="income" ${t.type==='income'?'selected':''}>Income</option><option value="transfer" ${t.type==='transfer'?'selected':''}>Transfer</option></select></td>
       <td><select class="bi-sel bi-cat" data-i="${i}" data-mkey="${extractMerchantKey(t.desc).replace(/"/g,'&quot;')}" style="width:100%" onchange="biCatChanged(this)">${catOpts}</select></td>
     </tr>`;
   });
