@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.28.0] — 2026-07-15 · Delivery % + Money-Flow Signals
+
+- FII/DII tab: new **Delivery %** section from NSE's daily bhavdata — the share of volume actually delivered to demat vs squared off intraday. Reads per stock: GENUINE ACCUMULATION (≥60% delivery + price up), GENUINE SELLING (≥60% + down), HIGH CONVICTION FLAT, SPECULATIVE CHURN (≤30% delivery on a big move). Universe filter, top-20 by delivery, links to chart/fundamentals. New `/api/delivery` function with 7-day walk-back and 6-hour cache
+- Scanner: four **money-flow signals** — QUIET ACCUMULATION / QUIET DISTRIBUTION (price flat over a month while on-balance volume climbs/drains — the classic absorption footprint) and MONEY FLOW IN/OUT (Chaikin money flow ±0.15). All feed the screener filter, Setup Score (participation bucket reworked; bearish flow now penalises) and conviction confirmations
+
 ## [2.27.2] — 2026-07-15
 
 - Charts, Fundamentals and Backtest now show BOTH a browsable dropdown (all ~750 shares grouped by universe) and the type-to-search box — matching the Smart Money/Options pattern. The search-only inputs weren't discoverable as searchable

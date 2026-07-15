@@ -314,6 +314,21 @@ progress{accent-color:var(--violet);}
     <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
+
+  <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
+  <div class="controls">
+    <select id="delivUniverse" onchange="renderDelivery()">
+      <option value="NIFTY 50" selected>NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+      <option value="MICROCAP 250">MICROCAP 250</option>
+      <option value="ALL">All (~750)</option>
+    </select>
+    <button class="btn ghost" onclick="loadDelivery(true)">↻ Refresh</button>
+  </div>
+  <div id="delivTable"><div class="loading">Loading…</div></div>
 </section>
 
 <!-- OPTIONS -->
@@ -679,7 +694,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   b.classList.add("active"); $(b.dataset.tab).classList.add("visible");
   if(b.dataset.tab==="screener" && !screenerData) loadScreener();
   if(b.dataset.tab==="ideas" && !window._ideasLoaded) loadIdeas();
-  if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); }
+  if(b.dataset.tab==="insti" && !window._instiLoaded){ window._instiLoaded=true; loadFiiDii(); loadDeals(); loadDelivery(); }
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
@@ -759,6 +774,53 @@ function renderDeals(){
     `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
     : '<div class="loading">No deals matching the filter.</div>';
+}
+
+/* ---- delivery % (NSE bhavdata): genuine accumulation vs churn ---- */
+let delivData = null;
+async function loadDelivery(force){
+  if(delivData && force!==true){ renderDelivery(); return; }
+  try{
+    const r = await fetch("/api/delivery");
+    const d = await r.json();
+    if(!r.ok || !d.rows) throw new Error(d.error || "no data");
+    delivData = d;
+    renderDelivery();
+  }catch(e){
+    $("delivTable").innerHTML = `<div class="loading">Delivery data unavailable (${e.message}) — NSE publishes it in the evening after each session.</div>`;
+  }
+}
+function renderDelivery(){
+  if(!delivData) return;
+  const uni = $("delivUniverse").value;
+  const universeSyms = new Set((uni==="ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni])).map(s=>s.replace(".NS","")));
+  const rows = delivData.rows
+    .filter(r => universeSyms.has(r.s) && r.c!=null && r.p)
+    .map(r => ({...r, chg: (r.c-r.p)/r.p*100}));
+  $("delivMeta").textContent = `· ${delivData.date} · ${rows.length} stocks matched`;
+  const read = r =>
+    r.d>=60 && r.chg>=0.5 ? ["bullish","GENUINE ACCUMULATION"] :
+    r.d>=60 && r.chg<=-0.5 ? ["bearish","GENUINE SELLING"] :
+    r.d>=60 ? ["neutral","HIGH CONVICTION, FLAT"] :
+    r.d<=30 && Math.abs(r.chg)>=1.5 ? ["neutral","SPECULATIVE CHURN"] : null;
+  const flagged = rows.map(r=>({...r, tag: read(r)})).filter(r=>r.tag)
+    .sort((a,b)=>b.d-a.d).slice(0,20);
+  $("delivTable").innerHTML = flagged.length ? `<table><thead><tr>
+    <th>Stock</th><th>Price ₹</th><th>Chg %</th>
+    <th title="Share of traded volume actually delivered into demat — higher = more conviction">Delivery %</th>
+    <th>Turnover ₹ Cr</th><th style="text-align:left">Read</th><th></th></tr></thead><tbody>` +
+    flagged.map(r=>{
+      const sym = r.s + ".NS", cap = capOf(sym), cc = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
+      return `<tr style="cursor:pointer" onclick="openChart('${sym}')">
+      <td><span class="sym">${r.s}</span> ${cap?`<span class="badge ${cc}">${cap}</span>`:""}<br><span class="subname">${nameOf(sym)}</span></td>
+      <td>${fmt(r.c)}</td><td class="${cls(r.chg)}">${sign(r.chg)}${fmt(r.chg,2)}%</td>
+      <td><b class="${r.d>=60?"up":"muted"}">${fmt(r.d,1)}%</b></td>
+      <td>${r.t!=null?fmtInt(Math.round(r.t/100)):"—"}</td>
+      <td style="text-align:left"><span class="badge ${r.tag[0]}">${r.tag[1]}</span></td>
+      <td><button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openFundamentals('${sym}')">📊</button></td></tr>`;
+    }).join("") + `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">Showing notable readings (delivery ≥60% or churn ≥1.5% move on ≤30% delivery), top 20 by delivery. A multi-day pattern of high-delivery up-days is the strong version — check the chart's volume behaviour before concluding.</div>`
+    : '<div class="loading">No notable delivery readings in this universe today.</div>';
 }
 
 /* ---- market pulse: breadth, sectors, movers — from the latest scan ---- */
@@ -938,6 +1000,34 @@ function scanStock(sym, candles, bench63){
   const last3 = e.slice(-3);
   if(aboveSMA200 && last3.length===3 && last3.every(d=>d.close<d.open) && r>=35 && r<=55)
     signals.push({type:"PULLBACK_DIP",side:"bullish",detail:"Three straight red days within an uptrend, RSI neutral — classic dip-buy zone"});
+  // money-flow reads: OBV trend vs price (quiet accumulation/distribution) + Chaikin Money Flow
+  if(e.length >= 41){
+    let obvNow = 0; const obvArr = [0];
+    for(let i2=1;i2<e.length;i2++){
+      obvNow += e[i2].close>e[i2-1].close ? (e[i2].volume||0) : e[i2].close<e[i2-1].close ? -(e[i2].volume||0) : 0;
+      obvArr.push(obvNow);
+    }
+    const avgVol20 = e.slice(-20).reduce((s2,d2)=>s2+(d2.volume||0),0)/20;
+    if(avgVol20 > 0){
+      const obvShift = (obvArr[obvArr.length-1]-obvArr[obvArr.length-21]) / (20*avgVol20);   // -1..1-ish
+      const px20 = e[e.length-21].close ? (close-e[e.length-21].close)/e[e.length-21].close*100 : null;
+      if(px20!=null && Math.abs(px20) < 3){
+        if(obvShift > 0.18) signals.push({type:"QUIET_ACCUMULATION",side:"bullish",detail:`Price flat over a month but on-balance volume climbing — someone is absorbing supply without moving the price`});
+        else if(obvShift < -0.18) signals.push({type:"QUIET_DISTRIBUTION",side:"bearish",detail:`Price flat but on-balance volume draining — holders are quietly feeding stock into strength`});
+      }
+    }
+    // CMF(20)
+    let mfv=0, volSum=0;
+    for(const d2 of e.slice(-20)){
+      const hl = d2.high-d2.low;
+      if(hl>0 && d2.volume){ mfv += ((d2.close-d2.low)-(d2.high-d2.close))/hl * d2.volume; volSum += d2.volume; }
+    }
+    if(volSum>0){
+      const cmf = mfv/volSum;
+      if(cmf > 0.15) signals.push({type:"MONEY_FLOW_IN",side:"bullish",detail:`Chaikin money flow ${cmf.toFixed(2)} — closes keep landing near the highs on volume; buyers in control`});
+      else if(cmf < -0.15) signals.push({type:"MONEY_FLOW_OUT",side:"bearish",detail:`Chaikin money flow ${cmf.toFixed(2)} — closes keep landing near the lows on volume; sellers in control`});
+    }
+  }
   // 3-month relative strength vs NIFTY
   let ret63 = null;
   if(e.length>63 && e[e.length-64].close){
@@ -1072,10 +1162,10 @@ function setupScore(idea){
   if(idea.action==="ACCUMULATE") trig = Math.max(trig, 15);          // stage-2 base is itself the trigger
   const trend = (idea.above_sma200?10:0) + (has("TREND_ALIGNED")?8:0) + (idea.sma200_rising?7:0);
   const mom = (has("ADX_TREND")?10:0) + (has("REL_STRENGTH")?6:0) + ((has("NEW_52W_HIGH")||has("NEAR_52W_HIGH"))?4:0);
-  const vol = (has("VOLUME_SPIKE")?8:0) + (has("ACCUMULATION")?7:0);
+  const vol = Math.min(15, (has("VOLUME_SPIKE")?7:0) + (has("ACCUMULATION")?4:0) + (has("MONEY_FLOW_IN")?4:0) + (has("QUIET_ACCUMULATION")?4:0));
   const risk = (idea.rsi!=null && idea.rsi>=40 && idea.rsi<=70 ? 7 : idea.rsi!=null && idea.rsi>30 && idea.rsi<75 ? 4 : 0)
              + (has("STRETCHED")?0:8);
-  const bear = ["RSI_BEAR_DIV","BB_UPPER_TOUCH","RSI_OVERBOUGHT","MACD_BEAR_CROSS","ADX_DOWNTREND"].filter(has).length;
+  const bear = ["RSI_BEAR_DIV","BB_UPPER_TOUCH","RSI_OVERBOUGHT","MACD_BEAR_CROSS","ADX_DOWNTREND","MONEY_FLOW_OUT","QUIET_DISTRIBUTION"].filter(has).length;
   return Math.max(0, Math.min(100, trig+trend+mom+vol+risk - bear*8));
 }
 const scoreCls = v => v>=80 ? "up" : v>=60 ? "" : v>=45 ? "muted" : "down";
@@ -1098,7 +1188,7 @@ function buildIdeas(stocks){
       has("RSI_BULL_DIV") ? "Bullish RSI divergence — a reversal clue, speculative until price confirms" :
       has("RSI_OVERSOLD")||has("BB_LOWER_TOUCH") ? "Oversold dip (RSI/lower band)" : null;
     // conviction: independent confirmations stacked on top of the trigger
-    const CONF = ["TREND_ALIGNED","ADX_TREND","VOLUME_SPIKE","REL_STRENGTH","NEW_52W_HIGH","ACCUMULATION"];
+    const CONF = ["TREND_ALIGNED","ADX_TREND","VOLUME_SPIKE","REL_STRENGTH","NEW_52W_HIGH","ACCUMULATION","MONEY_FLOW_IN","QUIET_ACCUMULATION"];
     const conviction = Math.min(5, 1 + CONF.filter(has).length - (has("STRETCHED")?1:0));
     if(s.above_sma200 && shortWhy && !has("STRETCHED")){
       const stop = has("BREAKOUT_20D") && s.h20 ? R(Math.max(s.h20*0.99, s.price-1.5*s.atr)) : R(s.price - 1.5*s.atr);
