@@ -3902,12 +3902,22 @@ function extractMerchantKey(desc){
   function bracketName(s){
     return s.replace(/[*|].*$/,'').replace(/\s+/g,' ').trim();
   }
-  // IBK FUND TFR FR/TO A/C (NAME * | note) → NAME
+  // IBK FUND TFR FR/TO A/C (NAME * | note1 | note2)
+  // → if note present: use first note (transfer PURPOSE) — uniquely identifies what the transfer was for
+  // → if no note: use NAME before * (the recipient)
   const ibk=desc.match(/IBK FUND TFR\s+(?:FR|TO)\s+A\/C\s*\(([^)]+)\)/i);
-  if(ibk) return bracketName(ibk[1]).toUpperCase();
-  // BK FUND TFR FR/TO A/C (NAME * | note) → NAME
+  if(ibk){
+    const note=ibk[1].match(/\|\s*([^|]+)/);
+    if(note) return ('IBK:'+note[1].trim()).toUpperCase().slice(0,40);
+    return bracketName(ibk[1]).toUpperCase();
+  }
+  // BK FUND TFR FR/TO A/C (NAME * | note1 | note2) — same logic
   const bk=desc.match(/BK FUND TFR\s+(?:FR|TO)\s+A\/C\s*\(([^)]+)\)/i);
-  if(bk) return bracketName(bk[1]).toUpperCase();
+  if(bk){
+    const note=bk[1].match(/\|\s*([^|]+)/);
+    if(note) return ('BK:'+note[1].trim()).toUpperCase().slice(0,40);
+    return bracketName(bk[1]).toUpperCase();
+  }
   // TRANSFER FROM A/C (NAME * | note) → NAME  ← key fix: was stripping whole bracket
   const tfr=desc.match(/TRANSFER FROM A\/C\s*\(([^)]+)\)/i);
   if(tfr) return bracketName(tfr[1]).toUpperCase();
