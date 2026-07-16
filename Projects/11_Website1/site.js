@@ -5091,95 +5091,287 @@ function _fmtQ(v){
   var EDAB = {
     USA:{name:'United States',flag:'🇺🇸',fi:'us',cur:'USD',inrRate:84.5,edInflation:5,
       courses:{
-        'UG (4yr)':{dur:4,tuition:[32000,58000],living:[18000,24000]},
-        'MS / MTech':{dur:2,tuition:[28000,55000],living:[20000,26000]},
+        'UG (4yr)':{dur:4,tuition:[32000,62000],living:[18000,24000]},
+        'MS / MTech':{dur:2,tuition:[14000,65000],living:[20000,26000]},
         'MBA':{dur:2,tuition:[65000,90000],living:[24000,30000]},
-        'MBBS / MD':{dur:4,tuition:[55000,80000],living:[22000,28000]},
-        'PhD':{dur:5,tuition:[0,25000],living:[20000,26000]}
+        'MBBS / MD':{dur:4,tuition:[55000,75000],living:[22000,28000]},
+        'PhD':{dur:5,tuition:[0,15000],living:[20000,26000]}
       },
-      unis:[
-        {name:'MIT',city:'Cambridge, MA',rank:'#1 QS',ug:57986,pg:57986,living:21000,schol:'Merit-based — rare for intl'},
-        {name:'Stanford University',city:'Palo Alto, CA',rank:'#5 QS',ug:56169,pg:56169,living:22000,schol:'Need-blind for intl students'},
-        {name:'Carnegie Mellon (CS)',city:'Pittsburgh, PA',rank:'#52 QS',ug:59864,pg:53000,living:19000,schol:'Limited merit aid'},
-        {name:'Univ. of Texas Austin',city:'Austin, TX',rank:'#197 QS',ug:40032,pg:20000,living:18000,schol:'Merit scholarships available'},
-        {name:'Purdue University',city:'West Lafayette, IN',rank:'#109 QS',ug:32192,pg:18000,living:16000,schol:'Strong for Engineering'},
-        {name:'Arizona State Univ.',city:'Tempe, AZ',rank:'#216 QS',ug:30000,pg:18000,living:15000,schol:'Several intl scholarships'}
-      ]},
+      unis:{
+        'UG (4yr)':[
+          {name:'MIT',city:'Cambridge, MA',rank:'#1 QS',tuition:57986,living:21000,schol:'Need-blind for intl students'},
+          {name:'Stanford University',city:'Palo Alto, CA',rank:'#5 QS',tuition:62484,living:22000,schol:'Need-based aid available'},
+          {name:'Princeton University',city:'Princeton, NJ',rank:'#13 QS',tuition:59710,living:20000,schol:'Meets 100% demonstrated need'},
+          {name:'Univ. of Texas Austin',city:'Austin, TX',rank:'#197 QS',tuition:40032,living:18000,schol:'Merit scholarships available'},
+          {name:'Purdue University',city:'West Lafayette, IN',rank:'#109 QS',tuition:32192,living:16000,schol:'Strong for Engineering & CS'},
+          {name:'Arizona State Univ.',city:'Tempe, AZ',rank:'#216 QS',tuition:30000,living:15000,schol:'Several intl merit scholarships'}
+        ],
+        'MS / MTech':[
+          {name:'MIT (EECS / CS)',city:'Cambridge, MA',rank:'#1 QS',tuition:61990,living:21000,schol:'Research assistant fellowships'},
+          {name:'Stanford (CS / EE)',city:'Palo Alto, CA',rank:'#5 QS',tuition:63585,living:22000,schol:'Knight-Hennessy Scholars (full)'},
+          {name:'Carnegie Mellon (MSCS)',city:'Pittsburgh, PA',rank:'#52 QS',tuition:53000,living:19000,schol:'Limited TA/RA positions'},
+          {name:'Georgia Tech (MSCS)',city:'Atlanta, GA',rank:'#89 QS',tuition:13948,living:18000,schol:'Most affordable top-10 CS MS'},
+          {name:'Univ. of Michigan (Eng)',city:'Ann Arbor, MI',rank:'#23 QS',tuition:24546,living:20000,schol:'Rackham Merit Fellowship'},
+          {name:'Purdue (MS Eng)',city:'W. Lafayette, IN',rank:'#109 QS',tuition:17000,living:16000,schol:'RA/TA stipends widely available'}
+        ],
+        'MBA':[
+          {name:'Harvard Business School',city:'Boston, MA',rank:'#5 FT MBA',tuition:73440,living:30000,schol:'Need-based; no merit awards'},
+          {name:'Wharton (Univ. of Penn)',city:'Philadelphia, PA',rank:'#3 FT MBA',tuition:83286,living:28000,schol:'Wharton Fellowship (need-based)'},
+          {name:'Chicago Booth',city:'Chicago, IL',rank:'#2 FT MBA',tuition:79548,living:26000,schol:'Forgivable Loan Program'},
+          {name:'Kellogg (Northwestern)',city:'Evanston, IL',rank:'#9 FT MBA',tuition:80199,living:24000,schol:'Kellogg Merit Fellowships'},
+          {name:'MIT Sloan',city:'Cambridge, MA',rank:'#6 FT MBA',tuition:84000,living:28000,schol:'Sloan Fellowship (partial)'},
+          {name:'Haas (UC Berkeley)',city:'Berkeley, CA',rank:'#7 FT MBA',tuition:67396,living:24000,schol:'Haas Merit Scholarships'}
+        ],
+        'MBBS / MD':[
+          {name:'Harvard Medical School',city:'Boston, MA',rank:'#1 Med',tuition:68370,living:30000,schol:'Need-based aid; limited for intl'},
+          {name:'Johns Hopkins School of Med.',city:'Baltimore, MD',rank:'#2 Med',tuition:63825,living:26000,schol:'Need-blind; limited intl seats'},
+          {name:'Mayo Clinic Sch. of Medicine',city:'Rochester, MN',rank:'#1 US News',tuition:58800,living:22000,schol:'Fully funded MD program'},
+          {name:'UCSF School of Medicine',city:'San Francisco, CA',rank:'#3 US News',tuition:38000,living:28000,schol:'Needs-based grants available'},
+          {name:'Columbia Vagelos P&S',city:'New York, NY',rank:'Top 5 Med',tuition:72000,living:30000,schol:'Full cost of attendance grants'},
+          {name:'Yale School of Medicine',city:'New Haven, CT',rank:'Top 10 Med',tuition:65430,living:28000,schol:'Need-based scholarships'}
+        ],
+        'PhD':[
+          {name:'MIT',city:'Cambridge, MA',rank:'#1 QS',tuition:0,living:21000,schol:'Full tuition waiver + ~$38K stipend'},
+          {name:'Stanford University',city:'Palo Alto, CA',rank:'#5 QS',tuition:0,living:22000,schol:'Full funding + ~$40K stipend'},
+          {name:'Caltech',city:'Pasadena, CA',rank:'#6 QS',tuition:0,living:22000,schol:'Full funding + ~$38K stipend'},
+          {name:'Princeton University',city:'Princeton, NJ',rank:'#13 QS',tuition:0,living:20000,schol:'Full tuition + $35K/yr stipend'},
+          {name:'Univ. of Chicago',city:'Chicago, IL',rank:'#10 QS',tuition:0,living:24000,schol:'Full funding + $33K/yr stipend'},
+          {name:'UC Berkeley',city:'Berkeley, CA',rank:'#32 QS',tuition:0,living:28000,schol:'Full funding + $32K/yr stipend'}
+        ]
+      }},
     UK:{name:'United Kingdom',flag:'🇬🇧',fi:'gb',cur:'GBP',inrRate:107.5,edInflation:4,
       courses:{
         'UG (3yr)':{dur:3,tuition:[22000,38000],living:[12000,18000]},
         'MSc (1yr)':{dur:1,tuition:[22000,40000],living:[13000,18000]},
-        'MBA':{dur:1,tuition:[35000,65000],living:[15000,20000]},
+        'MBA':{dur:1,tuition:[35000,95000],living:[15000,20000]},
         'MBBS (5yr)':{dur:5,tuition:[25000,38000],living:[12000,16000]},
-        'PhD':{dur:4,tuition:[18000,28000],living:[13000,17000]}
+        'PhD':{dur:3,tuition:[18000,28000],living:[13000,17000]}
       },
-      unis:[
-        {name:'University of Oxford',city:'Oxford',rank:'#3 QS',ug:32000,pg:30000,living:16000,schol:'Clarendon — partial funding'},
-        {name:'Imperial College London',city:'London',rank:'#8 QS',ug:35000,pg:36000,living:18000,schol:'President Scholarship'},
-        {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS',ug:24000,pg:26000,living:13000,schol:'Global Scholarship Programme'},
-        {name:'University of Manchester',city:'Manchester',rank:'#32 QS',ug:22000,pg:24000,living:12000,schol:'Merit scholarships available'},
-        {name:'King College London',city:'London',rank:'#40 QS',ug:23000,pg:26000,living:18000,schol:'King Scholarship — 20% off'},
-        {name:'Univ. of Nottingham',city:'Nottingham',rank:'#113 QS',ug:20000,pg:21000,living:11000,schol:'Excellence Scholarship'}
-      ]},
+      unis:{
+        'UG (3yr)':[
+          {name:'University of Oxford',city:'Oxford',rank:'#3 QS',tuition:32000,living:16000,schol:'Clarendon Scholarship (full)'},
+          {name:'University of Cambridge',city:'Cambridge',rank:'#5 QS',tuition:35000,living:15000,schol:'Cambridge Commonwealth Trust'},
+          {name:'Imperial College London',city:'London',rank:'#8 QS',tuition:35000,living:18000,schol:'President Scholarship (partial)'},
+          {name:'UCL',city:'London',rank:'#9 QS',tuition:30000,living:18000,schol:'UCL Global Scholarships'},
+          {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS',tuition:24000,living:13000,schol:'Global Scholarship Programme'},
+          {name:'University of Manchester',city:'Manchester',rank:'#32 QS',tuition:22000,living:12000,schol:'Global Future Leaders'}
+        ],
+        'MSc (1yr)':[
+          {name:'Imperial College London',city:'London',rank:'#8 QS',tuition:36000,living:18000,schol:'President MSc Scholarship'},
+          {name:'UCL',city:'London',rank:'#9 QS',tuition:32000,living:18000,schol:'Denys Holland Scholarship'},
+          {name:'University of Cambridge',city:'Cambridge',rank:'#5 QS',tuition:33000,living:15000,schol:'Gates Cambridge (full)'},
+          {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS',tuition:26000,living:13000,schol:'Principal Career Dev. Scholarship'},
+          {name:'Univ. of Southampton',city:'Southampton',rank:'#100 QS',tuition:22000,living:12000,schol:'Vice-Chancellor Scholarship'},
+          {name:'University of Bristol',city:'Bristol',rank:'#61 QS',tuition:23000,living:12000,schol:'Think Big Postgraduate Award'}
+        ],
+        'MBA':[
+          {name:'London Business School',city:'London',rank:'#7 FT MBA',tuition:62000,living:24000,schol:'Merit & need-based awards'},
+          {name:'Said Business School (Oxford)',city:'Oxford',rank:'#10 FT MBA',tuition:56000,living:18000,schol:'Skoll Scholarship (full)'},
+          {name:'Cambridge Judge Business School',city:'Cambridge',rank:'#16 FT MBA',tuition:62000,living:16000,schol:'Gates Cambridge Scholarship'},
+          {name:'Warwick Business School',city:'Coventry',rank:'#22 FT MBA',tuition:40000,living:12000,schol:'WBS Scholarship — 20% off'},
+          {name:'Imperial College Business School',city:'London',rank:'Top 30 FT',tuition:44000,living:18000,schol:'ICBS Full Scholarship'},
+          {name:'Alliance Manchester BS',city:'Manchester',rank:'Top 40 FT',tuition:34000,living:12000,schol:'Dean Scholarship (30% off)'}
+        ],
+        'MBBS (5yr)':[
+          {name:'University of Oxford',city:'Oxford',rank:'#3 QS Med',tuition:32000,living:16000,schol:'Weidenfeld-Hoffmann Scholarship'},
+          {name:'University of Cambridge',city:'Cambridge',rank:'#5 QS Med',tuition:35000,living:15000,schol:'Cambridge Commonwealth Trust'},
+          {name:'Imperial College London',city:'London',rank:'#8 QS Med',tuition:35000,living:18000,schol:'Intl Medical Scholarship'},
+          {name:'UCL',city:'London',rank:'#9 QS Med',tuition:30000,living:18000,schol:'Global Excellence Scholarship'},
+          {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS Med',tuition:25000,living:13000,schol:'Intl Undergraduate Scholarship'},
+          {name:"King's College London",city:'London',rank:'#40 QS Med',tuition:26000,living:18000,schol:"King's Intl Scholarship"}
+        ],
+        'PhD':[
+          {name:'University of Oxford',city:'Oxford',rank:'#3 QS',tuition:26000,living:16000,schol:'Clarendon Fund (full cost)'},
+          {name:'University of Cambridge',city:'Cambridge',rank:'#5 QS',tuition:26000,living:15000,schol:'Gates Cambridge (full cost)'},
+          {name:'Imperial College London',city:'London',rank:'#8 QS',tuition:28000,living:18000,schol:'Schrödinger Scholarship'},
+          {name:'UCL',city:'London',rank:'#9 QS',tuition:25000,living:18000,schol:'Overseas Research Scholarship'},
+          {name:'University of Edinburgh',city:'Edinburgh',rank:'#27 QS',tuition:20000,living:13000,schol:'Edinburgh Global PhD Scholarship'},
+          {name:'University of Manchester',city:'Manchester',rank:'#32 QS',tuition:19000,living:12000,schol:'President Doctoral Scholarship'}
+        ]
+      }},
     AUS:{name:'Australia',flag:'🇦🇺',fi:'au',cur:'AUD',inrRate:55.2,edInflation:4.5,
       courses:{
         'UG (3yr)':{dur:3,tuition:[32000,48000],living:[20000,28000]},
         'MS (2yr)':{dur:2,tuition:[34000,52000],living:[22000,30000]},
         'MBA':{dur:2,tuition:[38000,65000],living:[24000,30000]},
         'MBBS (5yr)':{dur:5,tuition:[56000,75000],living:[20000,28000]},
-        'PhD':{dur:4,tuition:[26000,40000],living:[22000,28000]}
+        'PhD':{dur:4,tuition:[0,5000],living:[22000,28000]}
       },
-      unis:[
-        {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',ug:44000,pg:48000,living:26000,schol:'Melbourne International Scholarship'},
-        {name:'ANU',city:'Canberra, ACT',rank:'#30 QS',ug:41000,pg:44000,living:22000,schol:'ANU Chancellor Scholarship'},
-        {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',ug:45000,pg:48000,living:28000,schol:'Sydney International Scholarship'},
-        {name:'UNSW Sydney',city:'Sydney, NSW',rank:'#19 QS',ug:44000,pg:46000,living:28000,schol:'UNSW Scientia Scholarship'},
-        {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',ug:38000,pg:40000,living:24000,schol:'Monash International Merit'},
-        {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',ug:36000,pg:40000,living:21000,schol:'UQ Excellence Scholarship'}
-      ]},
+      unis:{
+        'UG (3yr)':[
+          {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',tuition:44000,living:26000,schol:'Melbourne International Scholarship'},
+          {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',tuition:45000,living:28000,schol:'Sydney International Scholarship'},
+          {name:'UNSW Sydney',city:'Sydney, NSW',rank:'#19 QS',tuition:44000,living:28000,schol:'UNSW Scientia Scholarship'},
+          {name:'ANU',city:'Canberra, ACT',rank:'#30 QS',tuition:41000,living:22000,schol:'Chancellor Excellence Scholarship'},
+          {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',tuition:38000,living:24000,schol:'Monash International Merit'},
+          {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',tuition:36000,living:21000,schol:'UQ Excellence Scholarship'}
+        ],
+        'MS (2yr)':[
+          {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',tuition:48000,living:26000,schol:'Melbourne Research Scholarship (PhD+MS)'},
+          {name:'UNSW Sydney',city:'Sydney, NSW',rank:'#19 QS',tuition:46000,living:28000,schol:'UNSW Scientia (research pathway)'},
+          {name:'ANU',city:'Canberra, ACT',rank:'#30 QS',tuition:44000,living:22000,schol:'ANU Vice-Chancellor Scholarship'},
+          {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',tuition:48000,living:28000,schol:'Sydney Achievers Scholarship'},
+          {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',tuition:40000,living:24000,schol:'Monash Graduate Scholarship'},
+          {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',tuition:40000,living:21000,schol:'UQ Graduate Scholarship'}
+        ],
+        'MBA':[
+          {name:'Melbourne Business School',city:'Melbourne, VIC',rank:'#51 FT MBA',tuition:62000,living:28000,schol:'MBS Merit Scholarship'},
+          {name:'AGSM @ UNSW Business',city:'Sydney, NSW',rank:'Top 75 FT',tuition:55000,living:28000,schol:'AGSM Scholarship (partial)'},
+          {name:'Macquarie Graduate School',city:'Sydney, NSW',rank:'Top 100 FT',tuition:45000,living:26000,schol:'MGSM Scholarship (20% off)'},
+          {name:'QUT Business School',city:'Brisbane, QLD',rank:'Top 150 FT',tuition:38000,living:21000,schol:'QUT Postgraduate Excellence'},
+          {name:'Deakin Business School',city:'Melbourne, VIC',rank:'Top 150 FT',tuition:36000,living:22000,schol:'Deakin Vice-Chancellor Award'},
+          {name:'Bond Business School',city:'Gold Coast, QLD',rank:'Top 200 FT',tuition:40000,living:20000,schol:'Bond University Scholarship'}
+        ],
+        'MBBS (5yr)':[
+          {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',tuition:70000,living:26000,schol:'Melbourne Medical Scholarship'},
+          {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',tuition:72000,living:28000,schol:'Sydney Merit Award'},
+          {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',tuition:65000,living:24000,schol:'Monash Medical Excellence Award'},
+          {name:'ANU Medical School',city:'Canberra, ACT',rank:'#30 QS',tuition:62000,living:22000,schol:'ANU Medical Scholarship'},
+          {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',tuition:58000,living:21000,schol:'UQ Medical Scholarship'},
+          {name:'Bond University',city:'Gold Coast, QLD',rank:'Accredited',tuition:56000,living:20000,schol:'Bond Health Sciences Scholarship'}
+        ],
+        'PhD':[
+          {name:'Univ. of Melbourne',city:'Melbourne, VIC',rank:'#13 QS',tuition:0,living:26000,schol:'Full tuition waiver + AUD 32K/yr stipend'},
+          {name:'ANU',city:'Canberra, ACT',rank:'#30 QS',tuition:0,living:22000,schol:'Full tuition waiver + AUD 30K/yr stipend'},
+          {name:'Univ. of Sydney',city:'Sydney, NSW',rank:'#18 QS',tuition:0,living:28000,schol:'RTP Scholarship (full funding)'},
+          {name:'UNSW Sydney',city:'Sydney, NSW',rank:'#19 QS',tuition:0,living:28000,schol:'RTP + UNSW Tuition Fee Scholarship'},
+          {name:'Monash University',city:'Melbourne, VIC',rank:'#42 QS',tuition:0,living:24000,schol:'Monash Graduate Scholarship (full)'},
+          {name:'Univ. of Queensland',city:'Brisbane, QLD',rank:'#40 QS',tuition:0,living:21000,schol:'RTP Scholarship — stipend + fees'}
+        ]
+      }},
     CAN:{name:'Canada',flag:'🇨🇦',fi:'ca',cur:'CAD',inrRate:62.3,edInflation:4,
       courses:{
         'UG (4yr)':{dur:4,tuition:[28000,44000],living:[16000,24000]},
         'MS (2yr)':{dur:2,tuition:[18000,38000],living:[18000,24000]},
         'MBA':{dur:2,tuition:[38000,60000],living:[20000,26000]},
         'MBBS/MD':{dur:4,tuition:[30000,50000],living:[18000,24000]},
-        'PhD':{dur:4,tuition:[8000,22000],living:[18000,24000]}
+        'PhD':{dur:4,tuition:[0,10000],living:[18000,24000]}
       },
-      unis:[
-        {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS',ug:44000,pg:32000,living:22000,schol:'Lester B. Pearson Scholarship'},
-        {name:'UBC',city:'Vancouver, BC',rank:'#34 QS',ug:38000,pg:28000,living:24000,schol:'International Leader of Tomorrow'},
-        {name:'McGill University',city:'Montreal, QC',rank:'#46 QS',ug:28000,pg:22000,living:16000,schol:'McGill Entrance Scholarship'},
-        {name:'Univ. of Waterloo',city:'Waterloo, ON',rank:'#112 QS',ug:38000,pg:24000,living:18000,schol:'President International Experience'},
-        {name:'Univ. of Alberta',city:'Edmonton, AB',rank:'#111 QS',ug:28000,pg:18000,living:16000,schol:'International Entrance Scholarship'},
-        {name:'Simon Fraser Univ.',city:'Vancouver, BC',rank:'#308 QS',ug:24000,pg:16000,living:22000,schol:'SFU Graduate Fellowship'}
-      ]},
+      unis:{
+        'UG (4yr)':[
+          {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS',tuition:44000,living:22000,schol:'Lester B. Pearson Scholarship (full)'},
+          {name:'UBC',city:'Vancouver, BC',rank:'#34 QS',tuition:38000,living:24000,schol:'Intl Leader of Tomorrow Award'},
+          {name:'McGill University',city:'Montreal, QC',rank:'#46 QS',tuition:28000,living:16000,schol:'McGill Entrance Scholarship'},
+          {name:'Univ. of Waterloo',city:'Waterloo, ON',rank:'#112 QS',tuition:38000,living:18000,schol:'Pres. Intl Experience Award'},
+          {name:'Univ. of Alberta',city:'Edmonton, AB',rank:'#111 QS',tuition:28000,living:16000,schol:'Intl Entrance Scholarship'},
+          {name:'Queen University',city:'Kingston, ON',rank:'#209 QS',tuition:32000,living:18000,schol:'Chancellor Scholarship'}
+        ],
+        'MS (2yr)':[
+          {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS',tuition:28000,living:22000,schol:'Fellowship + TA/RA positions'},
+          {name:'UBC',city:'Vancouver, BC',rank:'#34 QS',tuition:24000,living:24000,schol:'Four Year Doctoral Fellowship'},
+          {name:'Univ. of Waterloo (CS/Eng)',city:'Waterloo, ON',rank:'#112 QS',tuition:22000,living:18000,schol:'Waterloo Graduate Scholarship'},
+          {name:'McGill University',city:'Montreal, QC',rank:'#46 QS',tuition:20000,living:16000,schol:'FRQNT/NSERC scholarships'},
+          {name:'Univ. of Alberta',city:'Edmonton, AB',rank:'#111 QS',tuition:18000,living:16000,schol:'Alberta Graduate Excellence Scholarship'},
+          {name:'Simon Fraser Univ.',city:'Vancouver, BC',rank:'#308 QS',tuition:14000,living:22000,schol:'SFU Graduate Fellowship'}
+        ],
+        'MBA':[
+          {name:'Rotman (Univ. of Toronto)',city:'Toronto, ON',rank:'#41 FT MBA',tuition:58000,living:22000,schol:'Rotman Excellence Scholarship'},
+          {name:'Sauder (UBC)',city:'Vancouver, BC',rank:'#55 FT MBA',tuition:47000,living:24000,schol:'Sauder MBA Scholarship'},
+          {name:'Ivey (Western University)',city:'London, ON',rank:'#65 FT MBA',tuition:48000,living:16000,schol:'Ivey Emerging Leaders Award'},
+          {name:'Smith (Queen University)',city:'Kingston, ON',rank:'#78 FT MBA',tuition:36000,living:16000,schol:'Smith MBA Scholarship'},
+          {name:'HEC Montreal',city:'Montreal, QC',rank:'Top 100 FT',tuition:28000,living:16000,schol:'HEC Excellence Scholarship'},
+          {name:'Schulich (York University)',city:'Toronto, ON',rank:'Top 75 FT',tuition:55000,living:22000,schol:'Schulich Leaders Scholarship'}
+        ],
+        'MBBS/MD':[
+          {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS Med',tuition:40000,living:22000,schol:'Intl Student Award (limited)'},
+          {name:'McGill University',city:'Montreal, QC',rank:'#46 QS Med',tuition:30000,living:16000,schol:'McCall MacBain Scholarship'},
+          {name:'UBC Faculty of Medicine',city:'Vancouver, BC',rank:'#34 QS Med',tuition:35000,living:24000,schol:'Need-based award only'},
+          {name:'McMaster (PBL Method)',city:'Hamilton, ON',rank:'#189 QS Med',tuition:32000,living:18000,schol:'McMaster Medical Award'},
+          {name:'Western University',city:'London, ON',rank:'#170 QS Med',tuition:32000,living:16000,schol:'Western Scholarship of Distinction'},
+          {name:"Queen's University",city:'Kingston, ON',rank:'#209 QS Med',tuition:28000,living:16000,schol:"Queen's Health Sciences Award"}
+        ],
+        'PhD':[
+          {name:'Univ. of Toronto',city:'Toronto, ON',rank:'#25 QS',tuition:0,living:22000,schol:'Full funding + CAD 27K/yr stipend'},
+          {name:'UBC',city:'Vancouver, BC',rank:'#34 QS',tuition:0,living:24000,schol:'Full funding + CAD 26K/yr stipend'},
+          {name:'McGill University',city:'Montreal, QC',rank:'#46 QS',tuition:0,living:16000,schol:'FRQNT Doctoral (full + stipend)'},
+          {name:'Univ. of Waterloo',city:'Waterloo, ON',rank:'#112 QS',tuition:0,living:18000,schol:'Graduate Research Studentship'},
+          {name:'Univ. of Alberta',city:'Edmonton, AB',rank:'#111 QS',tuition:0,living:16000,schol:'Alberta Innovates Scholarship'},
+          {name:'McMaster University',city:'Hamilton, ON',rank:'#189 QS',tuition:0,living:18000,schol:'Vanier Canada Graduate Scholarship'}
+        ]
+      }},
     SGP:{name:'Singapore',flag:'🇸🇬',fi:'sg',cur:'SGD',inrRate:63.7,edInflation:3.5,
       courses:{
         'UG (4yr)':{dur:4,tuition:[28000,38000],living:[16000,22000]},
         'MS (1-2yr)':{dur:2,tuition:[30000,48000],living:[18000,24000]},
         'MBA':{dur:1,tuition:[60000,80000],living:[20000,26000]},
-        'PhD':{dur:4,tuition:[18000,28000],living:[18000,24000]}
+        'PhD':{dur:4,tuition:[0,8000],living:[18000,24000]}
       },
-      unis:[
-        {name:'NUS',city:'Singapore',rank:'#8 QS',ug:34400,pg:38000,living:20000,schol:'ASEAN Undergraduate Scholarship'},
-        {name:'NTU',city:'Singapore',rank:'#15 QS',ug:32000,pg:34000,living:19000,schol:'Nanyang Scholarship'},
-        {name:'SMU',city:'Singapore',rank:'#511 QS',ug:30000,pg:38000,living:20000,schol:'SMU Merit Scholarship'},
-        {name:'SUTD',city:'Singapore',rank:'n/a',ug:28000,pg:32000,living:18000,schol:'SUTD Merit Award'}
-      ]},
+      unis:{
+        'UG (4yr)':[
+          {name:'NUS',city:'Singapore',rank:'#8 QS',tuition:34400,living:20000,schol:'ASEAN Undergraduate Scholarship (full)'},
+          {name:'NTU',city:'Singapore',rank:'#15 QS',tuition:32000,living:19000,schol:'Nanyang Scholarship (full)'},
+          {name:'SMU',city:'Singapore',rank:'#500 QS',tuition:30000,living:20000,schol:'SMU Merit Scholarship'},
+          {name:'SUTD',city:'Singapore',rank:'Specialty',tuition:28000,living:18000,schol:'SUTD Merit Award (40% off)'}
+        ],
+        'MS (1-2yr)':[
+          {name:'NUS School of Computing',city:'Singapore',rank:'#8 QS',tuition:40000,living:20000,schol:'NUS Graduate Scholarship'},
+          {name:'NTU SCSE / MAE',city:'Singapore',rank:'#15 QS',tuition:36000,living:19000,schol:'Nanyang President Graduate Scholarship'},
+          {name:'NUS Business Analytics',city:'Singapore',rank:'#8 QS',tuition:44000,living:20000,schol:'Limited merit scholarships'},
+          {name:'SMU Postgraduate',city:'Singapore',rank:'#500 QS',tuition:30000,living:20000,schol:'SMU Postgraduate Scholarship'}
+        ],
+        'MBA':[
+          {name:'NUS Business School (MBA)',city:'Singapore',rank:'#22 FT MBA',tuition:68000,living:22000,schol:'MBA Merit Scholarship'},
+          {name:'NTU Nanyang Business School',city:'Singapore',rank:'#38 FT MBA',tuition:62000,living:20000,schol:'NTU MBA Scholarship'},
+          {name:'SMU Lee Kong Chian School',city:'Singapore',rank:'Top 100 FT',tuition:60000,living:20000,schol:'SMU MBA Scholarship'},
+          {name:'INSEAD (Asia Campus)',city:'Singapore',rank:'#3 FT MBA',tuition:90000,living:24000,schol:'INSEAD Scholarship (competitive)'}
+        ],
+        'PhD':[
+          {name:'NUS',city:'Singapore',rank:'#8 QS',tuition:0,living:20000,schol:'Full tuition + SGD 24K/yr stipend'},
+          {name:'NTU',city:'Singapore',rank:'#15 QS',tuition:0,living:19000,schol:'Full tuition + SGD 24K/yr stipend'},
+          {name:'SMU',city:'Singapore',rank:'#500 QS',tuition:0,living:20000,schol:'SMU PhD Fellowship (partial)'},
+          {name:'SUTD',city:'Singapore',rank:'Specialty',tuition:0,living:18000,schol:'SUTD Research Scholarship'}
+        ]
+      }},
     GER:{name:'Germany',flag:'🇩🇪',fi:'de',cur:'EUR',inrRate:91.5,edInflation:3,
       courses:{
         'UG (3yr)':{dur:3,tuition:[500,3000],living:[10000,14000]},
         'MS (2yr)':{dur:2,tuition:[500,5000],living:[10000,14000]},
         'MBA':{dur:2,tuition:[15000,35000],living:[11000,15000]},
-        'PhD':{dur:4,tuition:[0,2000],living:[10000,14000]}
+        'Medicine (6yr)':{dur:6,tuition:[500,3000],living:[10000,14000]},
+        'PhD':{dur:3,tuition:[0,1500],living:[10000,14000]}
       },
-      unis:[
-        {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',ug:144,pg:144,living:12000,schol:'Almost free — admin fee only'},
-        {name:'LMU Munich',city:'Munich',rank:'#59 QS',ug:144,pg:144,living:12000,schol:'DAAD Scholarship available'},
-        {name:'Heidelberg University',city:'Heidelberg',rank:'#87 QS',ug:1500,pg:3000,living:11000,schol:'Heidelberg Scholarships'},
-        {name:'TU Berlin',city:'Berlin',rank:'#154 QS',ug:307,pg:307,living:12000,schol:'DAAD — up to €1000/month'},
-        {name:'RWTH Aachen',city:'Aachen',rank:'#106 QS',ug:650,pg:2000,living:10000,schol:'RWTH Excellence Scholarship'}
-      ]}
+      unis:{
+        'UG (3yr)':[
+          {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',tuition:144,living:12000,schol:'Nearly free — admin fee only'},
+          {name:'LMU Munich',city:'Munich',rank:'#59 QS',tuition:144,living:12000,schol:'DAAD Scholarship available'},
+          {name:'Heidelberg University',city:'Heidelberg',rank:'#87 QS',tuition:1500,living:11000,schol:'Heidelberg Excellence Scholarship'},
+          {name:'RWTH Aachen',city:'Aachen',rank:'#106 QS',tuition:650,living:10000,schol:'DAAD — up to €1,200/month'},
+          {name:'TU Berlin',city:'Berlin',rank:'#154 QS',tuition:307,living:12000,schol:'Deutschlandstipendium'},
+          {name:'Freiburg University',city:'Freiburg',rank:'#172 QS',tuition:1500,living:10000,schol:'Baden-Württemberg Scholarship'}
+        ],
+        'MS (2yr)':[
+          {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',tuition:144,living:12000,schol:'TUM Graduate School + DAAD'},
+          {name:'RWTH Aachen',city:'Aachen',rank:'#106 QS',tuition:2000,living:10000,schol:'RWTH Excellence Scholarship'},
+          {name:'KIT Karlsruhe',city:'Karlsruhe',rank:'#131 QS',tuition:1500,living:11000,schol:'KIT Graduate Scholarship'},
+          {name:'TU Berlin',city:'Berlin',rank:'#154 QS',tuition:307,living:12000,schol:'Deutschlandstipendium'},
+          {name:'TU Dresden',city:'Dresden',rank:'#200 QS',tuition:600,living:10000,schol:'DAAD STIBET Scholarship'},
+          {name:'Univ. of Stuttgart',city:'Stuttgart',rank:'#292 QS',tuition:1500,living:11000,schol:'Landesstipendium BW'}
+        ],
+        'MBA':[
+          {name:'WHU Otto Beisheim',city:'Koblenz / Düsseldorf',rank:'#54 FT MBA',tuition:30000,living:12000,schol:'WHU Scholarship (competitive)'},
+          {name:'Mannheim Business School',city:'Mannheim',rank:'#37 FT MBA',tuition:28000,living:10000,schol:'MBS Scholarship (partial)'},
+          {name:'Frankfurt School of Finance',city:'Frankfurt',rank:'Top 50 FT',tuition:32000,living:14000,schol:'Frankfurt School Scholarship'},
+          {name:'HHL Leipzig Grad School',city:'Leipzig',rank:'Top 75 FT',tuition:25000,living:10000,schol:'HHL Merit Scholarship'},
+          {name:'ESMT Berlin',city:'Berlin',rank:'Top 75 FT',tuition:28000,living:12000,schol:'ESMT Scholarship (20% off)'},
+          {name:'TUM School of Management',city:'Munich',rank:'Top 100 FT',tuition:15000,living:12000,schol:'TUM MBA Scholarship'}
+        ],
+        'Medicine (6yr)':[
+          {name:'Heidelberg University',city:'Heidelberg',rank:'#87 QS',tuition:1500,living:11000,schol:'DAAD Medical Scholarship'},
+          {name:'LMU Munich',city:'Munich',rank:'#59 QS',tuition:144,living:12000,schol:'Deutschlandstipendium'},
+          {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',tuition:144,living:12000,schol:'Freistaat Bayern Scholarship'},
+          {name:'Charité Berlin',city:'Berlin',rank:'Top Medical DE',tuition:307,living:12000,schol:'Charité Foundation Scholarship'},
+          {name:'Univ. Freiburg (Medicine)',city:'Freiburg',rank:'#172 QS',tuition:1500,living:10000,schol:'Baden-Württemberg Scholarship'},
+          {name:'Univ. Hamburg-Eppendorf',city:'Hamburg',rank:'Top Medical DE',tuition:500,living:12000,schol:'Hamburg State Scholarship'}
+        ],
+        'PhD':[
+          {name:'TU Munich (TUM)',city:'Munich',rank:'#37 QS',tuition:0,living:12000,schol:'Full funding + €2,400/month stipend'},
+          {name:'LMU Munich',city:'Munich',rank:'#59 QS',tuition:0,living:12000,schol:'DAAD Research Grant (full)'},
+          {name:'Heidelberg University',city:'Heidelberg',rank:'#87 QS',tuition:0,living:11000,schol:'Heidelberg Postdoctoral Fellowship'},
+          {name:'RWTH Aachen',city:'Aachen',rank:'#106 QS',tuition:0,living:10000,schol:'RWTH Research Scholarship'},
+          {name:'TU Berlin',city:'Berlin',rank:'#154 QS',tuition:0,living:12000,schol:'Einstein Foundation Fellowship'},
+          {name:'Univ. of Bonn',city:'Bonn',rank:'#180 QS',tuition:0,living:11000,schol:'Hausdorff Center Scholarship'}
+        ]
+      }}
   };
 
   var _edCountry = 'USA';
@@ -5208,38 +5400,37 @@ function _fmtQ(v){
     var minFee = c.tuition[0], maxFee = c.tuition[1];
     var minLiv = c.living[0],  maxLiv = c.living[1];
     var dur    = c.dur;
+    var rate   = d.inrRate;
 
     /* Cost overview cards */
-    var rate = d.inrRate;
     var totalLow  = (minFee + minLiv) * dur;
     var totalHigh = (maxFee + maxLiv) * dur;
-
     var s = document.getElementById('edab-cost-tuition'); if(s) s.textContent = _edFmt(minFee,d.cur)+'–'+_edFmt(maxFee,d.cur)+'/yr';
     var l = document.getElementById('edab-cost-living');  if(l) l.textContent = _edFmt(minLiv,d.cur)+'–'+_edFmt(maxLiv,d.cur)+'/yr';
     var t = document.getElementById('edab-cost-total');   if(t) t.textContent = _edFmt(totalLow,d.cur)+'–'+_edFmt(totalHigh,d.cur);
     var r = document.getElementById('edab-cost-inr');     if(r) r.textContent = '₹'+Math.round(totalLow*rate/100000).toFixed(0)+'L–₹'+Math.round(totalHigh*rate/100000).toFixed(0)+'L';
 
-    /* University table */
+    /* Course-specific university table */
     var tbody = document.getElementById('edab-tbody');
     if(!tbody) return;
+    /* Pick unis for current course; fall back to first available */
+    var uniMap = d.unis;
+    var uniList = uniMap[_edCourse] || uniMap[Object.keys(uniMap)[0]] || [];
     var rows = '';
-    d.unis.forEach(function(u){
-      var fee = _edCourse.indexOf('MBA') > -1 ? u.pg*1.5 :
-                _edCourse.indexOf('MS') > -1 || _edCourse.indexOf('MTech') > -1 ? u.pg :
-                _edCourse.indexOf('PhD') > -1 ? Math.round(u.pg*0.4) : u.ug;
-      var totalCost = (fee + u.living) * dur;
+    uniList.forEach(function(u){
+      var totalCost = (u.tuition + u.living) * dur;
       rows += '<tr>'
         +'<td><div class="edab-uni-name">'+u.name+'</div><div class="edab-uni-city">'+u.city+'</div></td>'
         +'<td><span class="edab-rank-badge">'+u.rank+'</span></td>'
-        +'<td class="edab-fee-hi">'+_edFmt(fee,d.cur)+'<span class="edab-fee-inr">'+_edFmtINR(fee,rate)+'/yr</span></td>'
+        +'<td class="edab-fee-hi">'+_edFmt(u.tuition,d.cur)+'<span class="edab-fee-inr">'+_edFmtINR(u.tuition,rate)+'/yr</span></td>'
         +'<td>'+_edFmt(u.living,d.cur)+'<span class="edab-fee-inr">'+_edFmtINR(u.living,rate)+'/yr</span></td>'
         +'<td><span class="edab-total-badge">'+_edFmt(totalCost,d.cur)+'</span><span class="edab-fee-inr">'+_edFmtINR(totalCost,rate)+'</span></td>'
         +'<td style="font-size:.72rem;color:var(--muted)">'+u.schol+'</td>'
         +'</tr>';
     });
-    tbody.innerHTML = rows;
+    tbody.innerHTML = rows || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No data for this combination</td></tr>';
 
-    /* Update duration in course selector sub-label */
+    /* Update duration sub-label */
     var dl = document.getElementById('edab-dur-lbl');
     if(dl) dl.textContent = dur+'-year programme · '+d.cur;
   }
