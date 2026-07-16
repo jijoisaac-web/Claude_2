@@ -1,4 +1,4 @@
-/* v8.2 */
+/* v8.3 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -860,7 +860,7 @@ function heroPickCountry(btn, cur){
   if(items.length>0) selectCurrency(items[0]);
 }
 // Fixed pill currencies in hero strip
-var HERO_STRIP_CURS=['AED','GBP','USD','SGD','AUD','CAD','SAR','EUR'];
+var HERO_STRIP_CURS=['AED','GBP','USD','SGD','AUD','CAD','SAR','MYR','NZD','JPY'];
 function updateHeroStrip(cur){
   if(!cur) return;
   var pills=document.querySelectorAll('.hero-cpill[data-cur]');
