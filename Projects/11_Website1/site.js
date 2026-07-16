@@ -1,4 +1,4 @@
-/* v8.4 */
+/* v8.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4244,7 +4244,7 @@ function closeNavDD(){
       var tDate2=new Date(tYear,travelM,1);
       var wks=Math.max(0,Math.round((tDate2-now)/604800000));
       var windows=_dateWindows(travelM,tripDays);
-      var fromCode=flData.origins[0]?flData.origins[0].code:'DXB';
+      var fromCode=_flOrigin||(flData.origins[0]?flData.origins[0].code:'DXB');
 
       // ── Buy Now signal (always visible) ──────────────────────────────────
       var sig=_getBuySignal(travelM,wks,mIdx,cur);
@@ -5319,3 +5319,318 @@ function _fmtQ(v){
   };
 
 })();
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EDUCATION TAB — EXTRA TOOLS  v8.5
+   1. Country Comparison
+   2. Degree ROI / Payback
+   3. Education Loan EMI
+   4. Scholarship Finder
+══════════════════════════════════════════════════════════════════════════ */
+
+(function(){
+
+/* ── DATA ───────────────────────────────────────────────────────────────── */
+
+var ED_DATA={
+  USA:{name:'United States',cur:'USD',sym:'$',inrRate:84.5,
+    courses:{
+      'UG (4yr)':{tuition:[32000,90000],living:[15000,22000],yrs:4},
+      'MS / MTech':{tuition:[28000,70000],living:[14000,20000],yrs:2},
+      'MBA':{tuition:[55000,120000],living:[18000,28000],yrs:2},
+      'PhD':{tuition:[0,10000],living:[20000,28000],yrs:5},
+      'MBBS / MD':{tuition:[40000,85000],living:[16000,24000],yrs:4}
+    },
+    workRights:'OPT 1-3 yrs post-study',
+    prPath:'H-1B lottery, EB-2/3 green card (5-10 yrs)',
+    salaries:{
+      tech:{'UG (4yr)':[65000,90000],'MS / MTech':[105000,140000],'MBA':[120000,160000],'PhD':[90000,120000],'MBBS / MD':[60000,80000]},
+      business:{'UG (4yr)':[52000,72000],'MS / MTech':[80000,110000],'MBA':[130000,180000],'PhD':[75000,100000],'MBBS / MD':[55000,70000]},
+      health:{'UG (4yr)':[50000,70000],'MS / MTech':[85000,110000],'MBA':[90000,120000],'PhD':[70000,95000],'MBBS / MD':[70000,90000]},
+      arts:{'UG (4yr)':[38000,55000],'MS / MTech':[55000,75000],'MBA':[70000,100000],'PhD':[50000,70000],'MBBS / MD':[45000,60000]}
+    }
+  },
+  UK:{name:'United Kingdom',cur:'GBP',sym:'£',inrRate:108,
+    courses:{
+      'UG (4yr)':{tuition:[20000,42000],living:[12000,18000],yrs:3},
+      'MS / MTech':{tuition:[18000,45000],living:[12000,18000],yrs:1},
+      'MBA':{tuition:[35000,95000],living:[15000,22000],yrs:1},
+      'PhD':{tuition:[5000,15000],living:[14000,20000],yrs:3},
+      'MBBS / MD':{tuition:[25000,50000],living:[13000,18000],yrs:5}
+    },
+    workRights:'Graduate visa 2-3 yrs post-study',
+    prPath:'Skilled Worker visa, ILR after 5 yrs',
+    salaries:{
+      tech:{'UG (4yr)':[32000,45000],'MS / MTech':[42000,65000],'MBA':[60000,90000],'PhD':[45000,65000],'MBBS / MD':[35000,50000]},
+      business:{'UG (4yr)':[28000,40000],'MS / MTech':[38000,55000],'MBA':[65000,100000],'PhD':[40000,60000],'MBBS / MD':[30000,45000]},
+      health:{'UG (4yr)':[27000,38000],'MS / MTech':[38000,52000],'MBA':[45000,70000],'PhD':[38000,55000],'MBBS / MD':[32000,52000]},
+      arts:{'UG (4yr)':[22000,32000],'MS / MTech':[30000,45000],'MBA':[40000,65000],'PhD':[28000,42000],'MBBS / MD':[22000,32000]}
+    }
+  },
+  AUS:{name:'Australia',cur:'AUD',sym:'A$',inrRate:55,
+    courses:{
+      'UG (4yr)':{tuition:[32000,65000],living:[18000,28000],yrs:3},
+      'MS / MTech':{tuition:[32000,60000],living:[18000,26000],yrs:2},
+      'MBA':{tuition:[40000,80000],living:[20000,30000],yrs:2},
+      'PhD':{tuition:[20000,35000],living:[22000,30000],yrs:3},
+      'MBBS / MD':{tuition:[40000,70000],living:[20000,28000],yrs:4}
+    },
+    workRights:'485 Temp Graduate visa 2-4 yrs',
+    prPath:'Skilled Nominated/Independent visa (PR in 3-4 yrs)',
+    salaries:{
+      tech:{'UG (4yr)':[75000,95000],'MS / MTech':[95000,130000],'MBA':[105000,145000],'PhD':[85000,115000],'MBBS / MD':[80000,110000]},
+      business:{'UG (4yr)':[62000,82000],'MS / MTech':[78000,105000],'MBA':[110000,150000],'PhD':[70000,95000],'MBBS / MD':[65000,90000]},
+      health:{'UG (4yr)':[60000,80000],'MS / MTech':[80000,105000],'MBA':[90000,125000],'PhD':[75000,100000],'MBBS / MD':[85000,115000]},
+      arts:{'UG (4yr)':[50000,68000],'MS / MTech':[62000,82000],'MBA':[72000,100000],'PhD':[55000,75000],'MBBS / MD':[52000,70000]}
+    }
+  },
+  CAN:{name:'Canada',cur:'CAD',sym:'C$',inrRate:62,
+    courses:{
+      'UG (4yr)':{tuition:[24000,55000],living:[12000,18000],yrs:4},
+      'MS / MTech':{tuition:[18000,40000],living:[12000,18000],yrs:2},
+      'MBA':{tuition:[30000,75000],living:[15000,22000],yrs:2},
+      'PhD':{tuition:[6000,18000],living:[14000,20000],yrs:4},
+      'MBBS / MD':{tuition:[30000,60000],living:[14000,20000],yrs:4}
+    },
+    workRights:'PGWP up to 3 yrs post-study',
+    prPath:'Express Entry (fastest path, 6-12 months)',
+    salaries:{
+      tech:{'UG (4yr)':[65000,88000],'MS / MTech':[88000,120000],'MBA':[100000,138000],'PhD':[80000,108000],'MBBS / MD':[75000,100000]},
+      business:{'UG (4yr)':[52000,72000],'MS / MTech':[70000,95000],'MBA':[105000,145000],'PhD':[65000,88000],'MBBS / MD':[60000,82000]},
+      health:{'UG (4yr)':[52000,70000],'MS / MTech':[72000,95000],'MBA':[82000,112000],'PhD':[68000,92000],'MBBS / MD':[78000,105000]},
+      arts:{'UG (4yr)':[42000,58000],'MS / MTech':[55000,75000],'MBA':[65000,90000],'PhD':[50000,68000],'MBBS / MD':[45000,62000]}
+    }
+  },
+  SGP:{name:'Singapore',cur:'SGD',sym:'S$',inrRate:63,
+    courses:{
+      'UG (4yr)':{tuition:[28000,65000],living:[12000,18000],yrs:4},
+      'MS / MTech':{tuition:[25000,55000],living:[12000,18000],yrs:1},
+      'MBA':{tuition:[40000,90000],living:[15000,22000],yrs:1},
+      'PhD':{tuition:[8000,20000],living:[14000,20000],yrs:4},
+      'MBBS / MD':{tuition:[35000,70000],living:[14000,20000],yrs:5}
+    },
+    workRights:'Employment Pass (no cap)',
+    prPath:'PR application after 2 yrs employment',
+    salaries:{
+      tech:{'UG (4yr)':[55000,75000],'MS / MTech':[75000,105000],'MBA':[95000,135000],'PhD':[72000,98000],'MBBS / MD':[65000,90000]},
+      business:{'UG (4yr)':[48000,65000],'MS / MTech':[65000,88000],'MBA':[100000,145000],'PhD':[60000,82000],'MBBS / MD':[55000,78000]},
+      health:{'UG (4yr)':[46000,62000],'MS / MTech':[65000,88000],'MBA':[78000,110000],'PhD':[62000,85000],'MBBS / MD':[68000,95000]},
+      arts:{'UG (4yr)':[38000,52000],'MS / MTech':[50000,68000],'MBA':[65000,90000],'PhD':[45000,62000],'MBBS / MD':[40000,55000]}
+    }
+  },
+  GER:{name:'Germany',cur:'EUR',sym:'€',inrRate:91,
+    courses:{
+      'UG (4yr)':{tuition:[500,3000],living:[10000,14000],yrs:3},
+      'MS / MTech':{tuition:[500,3000],living:[10000,14000],yrs:2},
+      'MBA':{tuition:[12000,30000],living:[10000,14000],yrs:2},
+      'PhD':{tuition:[0,2000],living:[10000,14000],yrs:3},
+      'MBBS / MD':{tuition:[500,3000],living:[10000,14000],yrs:6}
+    },
+    workRights:'Job seeker visa 18 months post-study',
+    prPath:'Permanent residency after 5 yrs',
+    salaries:{
+      tech:{'UG (4yr)':[42000,58000],'MS / MTech':[58000,78000],'MBA':[68000,95000],'PhD':[55000,75000],'MBBS / MD':[50000,70000]},
+      business:{'UG (4yr)':[36000,50000],'MS / MTech':[50000,68000],'MBA':[72000,100000],'PhD':[48000,65000],'MBBS / MD':[42000,60000]},
+      health:{'UG (4yr)':[36000,48000],'MS / MTech':[50000,68000],'MBA':[60000,82000],'PhD':[48000,65000],'MBBS / MD':[55000,78000]},
+      arts:{'UG (4yr)':[30000,42000],'MS / MTech':[40000,55000],'MBA':[50000,70000],'PhD':[38000,52000],'MBBS / MD':[35000,50000]}
+    }
+  }
+};
+
+var ED_LOANS=[
+  {name:'SBI Student Loan',bank:'State Bank of India',rate:10.75,max:2000000,tenure:15,note:'No collateral up to ₹7.5L · Subsidy scheme for EWS'},
+  {name:'HDFC Credila',bank:'HDFC Credila',rate:12.25,max:15000000,tenure:12,note:'Fastest processing · covers tuition + living + laptop'},
+  {name:'Avanse Education Loans',bank:'Avanse',rate:11.75,max:7500000,tenure:12,note:'100% cost coverage · study abroad specialist'},
+  {name:'ICICI Bank Education Loan',bank:'ICICI Bank',rate:11.25,max:5000000,tenure:10,note:'Online application · quick disbursals'},
+  {name:'Axis Bank Education Loan',bank:'Axis Bank',rate:13.7,max:2000000,tenure:15,note:'No collateral up to ₹7.5L'}
+];
+
+var SCHOLARSHIPS=[
+  {name:'Inlaks Shivdasani Foundation',amt:'Up to $100,000',country:'ALL',course:['MS / MTech','MBA','UG (4yr)'],deadline:'February',link:'https://inlaksfoundation.org',note:'One of India\'s most prestigious private scholarships'},
+  {name:'JN Tata Endowment',amt:'₹10L–₹20L',country:'ALL',course:['MS / MTech','MBA','PhD'],deadline:'December',link:'https://www.jntataendowment.org',note:'Indian nationals pursuing higher education abroad'},
+  {name:'Narotam Sekhsaria Foundation',amt:'₹12L–₹20L',country:'ALL',course:['MS / MTech','MBA','PhD'],deadline:'December',link:'https://www.nsfoundation.co.in',note:'Merit + need based; one of the largest private scholarships'},
+  {name:'DAAD Scholarship (Germany)',amt:'€1,200/month stipend',country:'GER',course:['MS / MTech','PhD'],deadline:'October',link:'https://www.daad.de/en',note:'German Academic Exchange Service; top for research'},
+  {name:'Commonwealth Scholarship (UK)',amt:'Full tuition + stipend',country:'UK',course:['MS / MTech','PhD'],deadline:'October',link:'https://cscuk.fcdo.gov.uk',note:'UK FCDO funded; highly competitive'},
+  {name:'Australia Awards',amt:'Full scholarship',country:'AUS',course:['MS / MTech','UG (4yr)'],deadline:'April',link:'https://www.australiaawards.gov.au',note:'Australian Government; covers all costs'},
+  {name:'Vanier Canada Graduate Scholarships',amt:'CAD 50,000/yr',country:'CAN',course:['PhD'],deadline:'November',link:'https://vanier.gc.ca',note:'Top Canadian PhD scholarship; 3 year award'},
+  {name:'NUS Merit Scholarship (Singapore)',amt:'Full tuition + SGD 6,000 living',country:'SGP',course:['UG (4yr)','MS / MTech'],deadline:'January',link:'https://nus.edu.sg/oam/scholarships',note:'National University of Singapore merit award'},
+  {name:'Gates Cambridge Scholarship',amt:'Full cost + stipend',country:'UK',course:['MS / MTech','PhD'],deadline:'December',link:'https://www.gatescambridge.org',note:'University of Cambridge only; extremely competitive'},
+  {name:'Erasmus+ (Europe)',amt:'€500–€700/month',country:'GER',course:['MS / MTech','UG (4yr)'],deadline:'Varies',link:'https://erasmus-plus.ec.europa.eu',note:'EU exchange programme; partial funding'},
+  {name:'Aga Khan Foundation International Scholarship',amt:'50% grant + 50% loan',country:'ALL',course:['MS / MTech','MBA'],deadline:'March',link:'https://www.akdn.org',note:'Need-based; exceptional academic merit required'},
+  {name:'Rotary Foundation Global Grant',amt:'$30,000+',country:'ALL',course:['MS / MTech','UG (4yr)'],deadline:'Varies',link:'https://www.rotary.org/en/our-programs/scholarships',note:'Must align with Rotary\'s areas of focus'}
+];
+
+/* ── UTILITY ─────────────────────────────────────────────────────────────── */
+function _edFmt(n,sym){return sym+(Math.round(n/1000))+'K';}
+function _edFmtINR(n){
+  if(n>=10000000) return '&#8377;'+(n/10000000).toFixed(1)+'Cr';
+  if(n>=100000) return '&#8377;'+(n/100000).toFixed(1)+'L';
+  return '&#8377;'+Math.round(n).toLocaleString();
+}
+function _edTotalCostINR(ctry,course){
+  var d=ED_DATA[ctry];if(!d)return 0;
+  var c=d.courses[course];if(!c)return 0;
+  var tuAvg=(c.tuition[0]+c.tuition[1])/2;
+  var livAvg=(c.living[0]+c.living[1])/2;
+  return (tuAvg+livAvg)*c.yrs*d.inrRate;
+}
+function _edEmi(principal,annualRate,months){
+  var r=annualRate/100/12;
+  if(r===0) return principal/months;
+  return principal*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);
+}
+
+/* ── 1. COUNTRY COMPARISON ──────────────────────────────────────────────── */
+window.edabCompare=function(){
+  var a=document.getElementById('edab-cmp-a').value;
+  var b=document.getElementById('edab-cmp-b').value;
+  var course=document.getElementById('edab-cmp-course').value;
+  var res=document.getElementById('edab-cmp-result');
+  if(!res)return;
+  if(a===b){res.innerHTML='<div class="edab-cmp-warn">Please select two different countries.</div>';return;}
+
+  function colHTML(ctry,course,side){
+    var d=ED_DATA[ctry];if(!d)return '';
+    var c=d.courses[course]||d.courses['MS / MTech'];
+    var tu=(c.tuition[0]+c.tuition[1])/2;
+    var lv=(c.living[0]+c.living[1])/2;
+    var tot=(tu+lv)*c.yrs;
+    var totINR=tot*d.inrRate;
+    return '<div class="edab-cmp-panel edab-cmp-'+side+'">'
+      +'<div class="edab-cmp-ctry">'+d.name+'</div>'
+      +'<div class="edab-cmp-row"><span>Tuition / yr</span><strong>'+_edFmt(tu,d.sym)+'</strong></div>'
+      +'<div class="edab-cmp-row"><span>Living / yr</span><strong>'+_edFmt(lv,d.sym)+'</strong></div>'
+      +'<div class="edab-cmp-row"><span>Duration</span><strong>'+c.yrs+' yrs</strong></div>'
+      +'<div class="edab-cmp-row edab-cmp-total"><span>Total cost</span><strong>'+_edFmt(tot,d.sym)+'</strong></div>'
+      +'<div class="edab-cmp-row edab-cmp-inr"><span>In INR</span><strong>'+_edFmtINR(totINR)+'</strong></div>'
+      +'<div class="edab-cmp-row"><span>Work rights</span><span class="edab-cmp-info">'+d.workRights+'</span></div>'
+      +'<div class="edab-cmp-row"><span>PR pathway</span><span class="edab-cmp-info">'+d.prPath+'</span></div>'
+      +'</div>';
+  }
+
+  var da=ED_DATA[a],db=ED_DATA[b];
+  var ca=da.courses[course]||da.courses['MS / MTech'];
+  var cb=db.courses[course]||db.courses['MS / MTech'];
+  var totA=((ca.tuition[0]+ca.tuition[1])/2+(ca.living[0]+ca.living[1])/2)*ca.yrs*da.inrRate;
+  var totB=((cb.tuition[0]+cb.tuition[1])/2+(cb.living[0]+cb.living[1])/2)*cb.yrs*db.inrRate;
+  var cheaper=totA<totB?da.name:db.name;
+  var saving=Math.abs(totA-totB);
+  var verdict='<div class="edab-cmp-verdict">&#128198; <strong>'+cheaper+'</strong> is cheaper by <strong>'+_edFmtINR(saving)+'</strong> for '+course+'</div>';
+
+  res.innerHTML='<div class="edab-cmp-panels">'+colHTML(a,course,'left')+colHTML(b,course,'right')+'</div>'+verdict;
+};
+
+/* ── 2. DEGREE ROI / PAYBACK ─────────────────────────────────────────────── */
+window.edabRoi=function(){
+  var ctry=document.getElementById('edab-roi-country').value;
+  var course=document.getElementById('edab-roi-course').value;
+  var field=document.getElementById('edab-roi-field').value;
+  var res=document.getElementById('edab-roi-result');
+  if(!res)return;
+  var d=ED_DATA[ctry];if(!d){res.innerHTML='';return;}
+  var c=d.courses[course]||d.courses['MS / MTech'];
+  var sal=d.salaries[field]&&d.salaries[field][course]?d.salaries[field][course]:[50000,80000];
+  var tu=(c.tuition[0]+c.tuition[1])/2;
+  var lv=(c.living[0]+c.living[1])/2;
+  var totalFx=(tu+lv)*c.yrs;
+  var totalINR=totalFx*d.inrRate;
+  var salMid=(sal[0]+sal[1])/2;
+  var salINR=salMid*d.inrRate;
+  var annualINR=salINR*12;
+  // Payback: assume 30% of annual income goes to repayment
+  var repayINR=annualINR*0.30;
+  var paybackYrs=(repayINR>0)?totalINR/repayINR:99;
+  // 10yr wealth: cumulative salary - total cost
+  var tenYrGross=annualINR*10;
+  var netWealth=tenYrGross-totalINR;
+  var pb=Math.ceil(paybackYrs);
+  var pbColor=pb<=3?'var(--green)':pb<=6?'var(--amber)':'var(--red)';
+  res.innerHTML='<div class="edab-roi-grid">'
+    +'<div class="edab-roi-card"><div class="edab-roi-label">Total investment</div><div class="edab-roi-val">'+_edFmtINR(totalINR)+'</div><div class="edab-roi-sub">'+d.sym+Math.round(totalFx/1000)+'K total</div></div>'
+    +'<div class="edab-roi-card"><div class="edab-roi-label">Avg starting salary</div><div class="edab-roi-val">'+d.sym+Math.round(salMid/1000)+'K/yr</div><div class="edab-roi-sub">'+_edFmtINR(salINR*12)+' p.a.</div></div>'
+    +'<div class="edab-roi-card" style="border-color:'+pbColor+'"><div class="edab-roi-label">Payback period</div><div class="edab-roi-val" style="color:'+pbColor+'">'+pb+' yrs</div><div class="edab-roi-sub">at 30% income to repayment</div></div>'
+    +'<div class="edab-roi-card" style="border-color:var(--green)"><div class="edab-roi-label">10-yr net earnings</div><div class="edab-roi-val" style="color:var(--green)">'+_edFmtINR(netWealth)+'</div><div class="edab-roi-sub">after recovering full cost</div></div>'
+    +'</div>'
+    +'<div class="edab-roi-range">Salary range: '+d.sym+sal[0].toLocaleString()+' – '+d.sym+sal[1].toLocaleString()+'/yr &nbsp;·&nbsp; Based on '+field.replace('tech','Tech/Engineering').replace('business','Business/Finance').replace('health','Healthcare').replace('arts','Arts/Humanities')+' roles in '+d.name+'</div>';
+};
+
+/* ── 3. EDUCATION LOAN EMI ───────────────────────────────────────────────── */
+window.edabLoan=function(){
+  var principal=parseFloat(document.getElementById('edab-loan-amt').value)||4000000;
+  var tenure=parseInt(document.getElementById('edab-loan-tenure').value)||10;
+  var morat=parseInt(document.getElementById('edab-loan-morat').value)||12;
+  var res=document.getElementById('edab-loan-result');
+  if(!res)return;
+  var rows='';
+  ED_LOANS.forEach(function(l){
+    var emi=_edEmi(principal,l.rate,tenure*12);
+    var totalRepay=emi*tenure*12;
+    var totalInt=totalRepay-principal;
+    rows+='<div class="edab-loan-card">'
+      +'<div class="edab-loan-top">'
+      +'<div><div class="edab-loan-name">'+l.name+'</div><div class="edab-loan-note">'+l.note+'</div></div>'
+      +'<div class="edab-loan-rate">'+l.rate+'% p.a.</div>'
+      +'</div>'
+      +'<div class="edab-loan-nums">'
+      +'<div class="edab-loan-num"><span>EMI / month</span><strong>'+_edFmtINR(emi)+'</strong></div>'
+      +'<div class="edab-loan-num"><span>Total interest</span><strong style="color:var(--red)">'+_edFmtINR(totalInt)+'</strong></div>'
+      +'<div class="edab-loan-num"><span>Total repayment</span><strong>'+_edFmtINR(totalRepay)+'</strong></div>'
+      +'<div class="edab-loan-num"><span>Moratorium</span><strong>'+morat+' months</strong></div>'
+      +'</div>'
+      +'</div>';
+  });
+  res.innerHTML=rows+'<div class="edab-loan-tip">&#128161; Section 80E: Education loan interest is fully deductible from India taxable income for 8 years — saving you tax if you have India earnings.</div>';
+};
+
+/* ── 4. SCHOLARSHIP FINDER ───────────────────────────────────────────────── */
+window.edabScholar=function(){
+  var ctry=document.getElementById('edab-sch-country').value;
+  var course=document.getElementById('edab-sch-course').value;
+  var res=document.getElementById('edab-sch-result');
+  if(!res)return;
+  var filtered=SCHOLARSHIPS.filter(function(s){
+    var cMatch=ctry==='ALL'||s.country==='ALL'||s.country===ctry;
+    var crMatch=course==='ALL'||s.course.indexOf(course)>=0;
+    return cMatch&&crMatch;
+  });
+  if(!filtered.length){res.innerHTML='<div class="edab-sch-empty">No scholarships match this filter. Try "All Countries".</div>';return;}
+  var rows=filtered.map(function(s){
+    return '<div class="edab-sch-card">'
+      +'<div class="edab-sch-top">'
+      +'<div class="edab-sch-name">'+s.name+'</div>'
+      +'<div class="edab-sch-amt">'+s.amt+'</div>'
+      +'</div>'
+      +'<div class="edab-sch-note">'+s.note+'</div>'
+      +'<div class="edab-sch-meta">'
+      +'<span class="edab-sch-tag">'+s.country+'</span>'
+      +'<span class="edab-sch-tag">'+s.course.join(', ')+'</span>'
+      +'<span class="edab-sch-tag edab-sch-dl">Deadline: '+s.deadline+'</span>'
+      +'<a class="edab-sch-link" href="'+s.link+'" target="_blank" rel="noopener">Apply &#8599;</a>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  res.innerHTML=rows;
+};
+
+/* ── AUTO-INIT ────────────────────────────────────────────────────────────── */
+window.initEdExtraTools=function(){
+  if(document.getElementById('edab-cmp-result')) edabCompare();
+  if(document.getElementById('edab-roi-result')) edabRoi();
+  if(document.getElementById('edab-loan-result')) edabLoan();
+  if(document.getElementById('edab-sch-result')) edabScholar();
+};
+
+document.addEventListener('DOMContentLoaded',function(){
+  // Hook into existing showTab to init extra tools when education tab opens
+  var _origShow=window.showTab;
+  if(typeof _origShow==='function'){
+    window.showTab=function(tab,el){
+      _origShow(tab,el);
+      if(tab==='edabroad') setTimeout(window.initEdExtraTools,100);
+    };
+  }
+});
+
+})();
+/* ── END EDUCATION EXTRA TOOLS ─────────────────────────────────────────── */
+

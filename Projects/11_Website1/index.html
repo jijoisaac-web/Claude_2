@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=8.4"/>
+<link rel="stylesheet" href="/site.css?v=8.5"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.4</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.5</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded',function(){
       </div>
     </div>
     <a onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏠 Return Plan</a>
-    <a onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</a>
+    <a onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();if(typeof initEdExtraTools==='function')initEdExtraTools();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</a>
     <a onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📈 Invest</a>
     <a onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">✈ Flights</a>
     <div class="nav-dropdown-wrap">
@@ -1159,6 +1159,147 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="edab-inflation-note" id="edab-infl-note">Calculation includes education inflation and INR depreciation. Adjust return % for equity vs debt SIP.</div>
     </div>
 
+
+    <!-- ══ EXTRA EDUCATION TOOLS ═════════════════════════════════════════ -->
+    <div class="edab-extra-tools">
+
+      <!-- 1. Country Comparison -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127760; Compare Two Countries</div>
+        <div class="edab-tool-sub">Same course, different country — which gives better value?</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country A</label>
+            <select id="edab-cmp-a" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-vs">vs</div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country B</label>
+            <select id="edab-cmp-b" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="USA">United States</option>
+              <option value="UK" selected>United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-cmp-course" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="MS / MTech" selected>MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-cmp-result" class="edab-cmp-result"></div>
+      </div>
+
+      <!-- 2. ROI / Payback Calculator -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#128200; Is It Worth It? Degree ROI</div>
+        <div class="edab-tool-sub">Total investment vs typical post-degree salary &#8594; years to break even</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country</label>
+            <select id="edab-roi-country" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-roi-course" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="MS / MTech">MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Field</label>
+            <select id="edab-roi-field" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="tech">Tech / Engineering</option>
+              <option value="business">Business / Finance</option>
+              <option value="health">Healthcare</option>
+              <option value="arts">Arts / Humanities</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-roi-result" class="edab-roi-result"></div>
+      </div>
+
+      <!-- 3. Education Loan EMI -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127968; Education Loan Calculator</div>
+        <div class="edab-tool-sub">Compare Indian bank loans — SBI, HDFC Credila, Avanse, ICICI</div>
+        <div class="edab-loan-grid">
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Loan Amount (&#8377;)</label>
+            <input class="edab-calc-input" id="edab-loan-amt" type="number" value="4000000" step="100000" oninput="edabLoan()"/>
+          </div>
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Repayment Tenure (years)</label>
+            <input class="edab-calc-input" id="edab-loan-tenure" type="number" value="10" min="5" max="15" oninput="edabLoan()"/>
+          </div>
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Moratorium period</label>
+            <select id="edab-loan-morat" class="fl-opt-sel" onchange="edabLoan()">
+              <option value="12">Course + 12 months</option>
+              <option value="6">Course + 6 months</option>
+              <option value="0">No moratorium</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-loan-result" class="edab-loan-result"></div>
+      </div>
+
+      <!-- 4. Scholarship Finder -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127942; Scholarships for Indian Students</div>
+        <div class="edab-tool-sub">Major scholarships available to Indians — filter by country and course</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country</label>
+            <select id="edab-sch-country" class="fl-opt-sel" onchange="edabScholar()">
+              <option value="ALL">All Countries</option>
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-sch-course" class="fl-opt-sel" onchange="edabScholar()">
+              <option value="ALL">All Courses</option>
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="MS / MTech">MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-sch-result" class="edab-sch-result"></div>
+      </div>
+
+    </div>
+    <!-- ══ END EXTRA EDUCATION TOOLS ══════════════════════════════════════ -->
     <div class="deals-disclaimer">Fee data sourced from university websites (2024–25 published rates). Exchange rates are indicative. Actual costs vary — verify at official university admissions portals. <a href="nri-education-planning.html">Read full NRI Education Planning Guide →</a></div>
   </div>
 
@@ -2972,7 +3113,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=8.4"></script>
+<script src="/site.js?v=8.5"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
@@ -2984,7 +3125,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <span class="mob-bnav-icon">🏠</span>
     <span class="mob-bnav-lbl">Return Plan</span>
   </button>
-  <button class="mob-bnav-btn" id="mbn-edabroad" onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();setMobBnav('edabroad')" aria-label="Study Abroad">
+  <button class="mob-bnav-btn" id="mbn-edabroad" onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();if(typeof initEdExtraTools==='function')initEdExtraTools();setMobBnav('edabroad')" aria-label="Study Abroad">
     <span class="mob-bnav-icon">🎓</span>
     <span class="mob-bnav-lbl">Education</span>
   </button>

@@ -1,4 +1,4 @@
-/* v8.4 */
+/* v8.5 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2372,3 +2372,65 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hero-cpill-more{border-style:dashed!important;color:var(--teal)!important;border-color:rgba(20,184,166,0.45)!important;background:transparent!important;}
 .hero-cpill-more:hover{background:rgba(20,184,166,0.1)!important;}
 @media(max-width:640px){.hero-cstrip{gap:8px;}.hero-cstrip-lbl{font-size:11px;}.hero-cpill{font-size:11px;padding:4px 9px;}}
+
+/* ══ EDUCATION EXTRA TOOLS v8.5 ═══════════════════════════════════════════ */
+.edab-extra-tools{margin-top:24px;display:flex;flex-direction:column;gap:20px;}
+.edab-tool-block{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.edab-tool-hd{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.edab-tool-sub{font-size:.78rem;color:var(--muted);margin-bottom:14px;}
+
+/* Country Comparison */
+.edab-cmp-selrow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;}
+.edab-cmp-col{flex:1;min-width:130px;}
+.edab-cmp-vs{font-size:1.1rem;font-weight:800;color:var(--muted);padding-bottom:8px;flex-shrink:0;}
+.edab-cmp-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.edab-cmp-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.edab-cmp-left{border-color:rgba(0,212,170,.35);}
+.edab-cmp-right{border-color:rgba(240,165,32,.35);}
+.edab-cmp-ctry{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.edab-cmp-row{display:flex;justify-content:space-between;align-items:flex-start;font-size:.78rem;padding:4px 0;gap:8px;}
+.edab-cmp-row span:first-child{color:var(--muted);}
+.edab-cmp-total{border-top:1px solid var(--border);margin-top:4px;padding-top:8px;}
+.edab-cmp-total strong{color:var(--text);font-size:.9rem;}
+.edab-cmp-inr strong{color:var(--teal);}
+.edab-cmp-info{color:var(--text2);font-size:.73rem;text-align:right;max-width:55%;}
+.edab-cmp-verdict{margin-top:12px;padding:10px 14px;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:8px;font-size:.82rem;color:var(--text2);}
+.edab-cmp-warn{color:var(--muted);font-size:.82rem;padding:8px 0;}
+@media(max-width:580px){.edab-cmp-panels{grid-template-columns:1fr;}.edab-cmp-selrow{gap:8px;}}
+
+/* ROI Calculator */
+.edab-roi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.edab-roi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.edab-roi-label{font-size:.72rem;color:var(--muted);margin-bottom:4px;}
+.edab-roi-val{font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:2px;}
+.edab-roi-sub{font-size:.7rem;color:var(--muted);}
+.edab-roi-range{font-size:.73rem;color:var(--muted);padding:8px 12px;background:rgba(255,255,255,.03);border-radius:8px;}
+@media(max-width:620px){.edab-roi-grid{grid-template-columns:1fr 1fr;}}
+
+/* Education Loan */
+.edab-loan-grid{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.edab-loan-grid .edab-calc-field{flex:1;min-width:150px;}
+.edab-loan-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.edab-loan-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
+.edab-loan-name{font-size:.85rem;font-weight:700;color:var(--text);}
+.edab-loan-note{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.edab-loan-rate{font-size:.95rem;font-weight:800;color:var(--amber);white-space:nowrap;}
+.edab-loan-nums{display:flex;gap:10px;flex-wrap:wrap;}
+.edab-loan-num{background:rgba(255,255,255,.04);border-radius:8px;padding:8px 12px;min-width:110px;flex:1;}
+.edab-loan-num span{display:block;font-size:.69rem;color:var(--muted);margin-bottom:3px;}
+.edab-loan-num strong{font-size:.88rem;color:var(--text);}
+.edab-loan-tip{margin-top:8px;font-size:.75rem;color:var(--muted);padding:10px 12px;background:rgba(0,212,170,.06);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;}
+
+/* Scholarship Finder */
+.edab-sch-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.edab-sch-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;}
+.edab-sch-name{font-size:.85rem;font-weight:700;color:var(--text);}
+.edab-sch-amt{font-size:.82rem;font-weight:700;color:var(--teal);white-space:nowrap;}
+.edab-sch-note{font-size:.75rem;color:var(--muted);margin-bottom:8px;}
+.edab-sch-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.edab-sch-tag{font-size:.7rem;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);}
+.edab-sch-dl{border-color:rgba(240,165,32,.3);color:var(--amber);}
+.edab-sch-link{font-size:.75rem;font-weight:700;color:var(--teal);margin-left:auto;text-decoration:none;}
+.edab-sch-link:hover{text-decoration:underline;}
+.edab-sch-empty{color:var(--muted);font-size:.82rem;padding:12px 0;}
+/* ══ END EDUCATION EXTRA TOOLS ═════════════════════════════════════════════ */
