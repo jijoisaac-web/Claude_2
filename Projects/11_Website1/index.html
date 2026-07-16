@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <button class="hero-cpill" data-cur="CAD" onclick="heroPickCountry(this,'CAD')"><img src="https://flagcdn.com/20x15/ca.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="CA"/> Canada</button>
         <button class="hero-cpill" data-cur="SAR" onclick="heroPickCountry(this,'SAR')"><img src="https://flagcdn.com/20x15/sa.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="SA"/> Saudi</button>
         <button class="hero-cpill" data-cur="EUR" onclick="heroPickCountry(this,'EUR')"><img src="https://flagcdn.com/20x15/eu.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="EU"/> Europe</button>
-        <button class="hero-cpill hero-cpill-more" onclick="document.getElementById('curBtn').click()">+13 more &#8595;</button>
+        <button class="hero-cpill hero-cpill-more" onclick="var p=document.getElementById('curPanel');p.classList.add('open');event.stopPropagation();window.scrollTo({top:0,behavior:'smooth'});">+13 more &#8595;</button>
       </div>
     </div>
     <h1 class="hero-h1">

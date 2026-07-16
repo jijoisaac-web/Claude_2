@@ -2356,7 +2356,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .year-table td .rp-local{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;line-height:1.2;}
 
 /* ── Hero Country Strip (v8.2) ──────────────────────────────── */
-.hero-cstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.22);border-radius:10px;padding:9px 14px;margin-bottom:18px;}
+.hero-cstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 0 16px;margin-bottom:2px;}
 .hero-cstrip-lbl{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.04em;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;}
 .hero-cpills{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .hero-cpill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--muted);transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;}
