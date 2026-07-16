@@ -1,7 +1,7 @@
 // Stock universes — generated from official NSE constituent lists (nsearchives.nseindia.com), July 2026.
 // Yahoo Finance symbols: NSE symbol + ".NS"
 
-const APP_VERSION = "2.28.2";
+const APP_VERSION = "2.29.0";
 
 const INDICES = {
   "^NSEI": "NIFTY 50",
@@ -14,13 +14,20 @@ const INDICES = {
 // global markets & macro (Yahoo symbols)
 const GLOBAL = {
   "^GSPC": "S&P 500",
+  "^DJI": "Dow Jones",
   "^IXIC": "NASDAQ",
   "^N225": "Nikkei 225",
   "^HSI": "Hang Seng",
+  "000001.SS": "Shanghai",
+  "^KS11": "KOSPI",
   "^FTSE": "FTSE 100",
+  "^GDAXI": "DAX",
   "GC=F": "Gold",
+  "SI=F": "Silver",
   "BZ=F": "Brent Crude",
   "INR=X": "USD/INR",
+  "DX-Y.NYB": "Dollar Index",
+  "BTC-USD": "Bitcoin",
   "^INDIAVIX": "India VIX",
   "^TNX": "US 10Y Yield",
 };

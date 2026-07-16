@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [2.29.0] — 2026-07-15 · Global Markets Upgrade
+
+- Seven more global instruments: Dow Jones, DAX, Shanghai Composite, KOSPI, Dollar Index (the FII-flow driver), Silver, Bitcoin (risk-appetite gauge) — 17 cards total
+- Timeframe selector for the global section: 1 day / 1 week / 1 month / 3 months change
+- Every card now prints its own "as of" quote date, so closed-market staleness is visible instead of ambiguous
+
 ## [2.28.2] — 2026-07-15
 
 - FII/DII staleness fixes: the tab now auto-refetches when reopened after 15+ minutes (was once per page-load); added a "↻ Refresh flows & deals" button that busts the edge cache; the server function detects when NSE serves stale payloads to cookie-less clients (>5 days old) and retries with a fresh cookie handshake, keeping whichever response is fresher; edge cache lowered to 15 min. Note kept in UI: NSE publishes provisional figures ~6pm IST

@@ -220,6 +220,16 @@ progress{accent-color:var(--violet);}
   <h2>Indices</h2>
   <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
   <h2>Global markets &amp; macro</h2>
+  <div class="controls">
+    <select id="globalTF" onchange="loadGlobal()">
+      <option value="1" selected>1 day</option>
+      <option value="5">1 week</option>
+      <option value="21">1 month</option>
+      <option value="63">3 months</option>
+    </select>
+    <button class="btn ghost" onclick="loadGlobal()">↻</button>
+    <span class="muted" style="font-size:11px">Each card shows its own last-quote date — foreign markets show their latest session (closed markets = previous close).</span>
+  </div>
   <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
   <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div id="pulseView"><div class="loading">Analysing market…</div></div>
@@ -782,6 +792,29 @@ function renderDeals(){
     : '<div class="loading">No deals matching the filter.</div>';
 }
 
+/* ---- global markets with selectable timeframe ---- */
+async function loadGlobal(){
+  const n = +($("globalTF")?.value || 1);   // trading sessions back
+  const g = await pmap(Object.keys(GLOBAL), async sym=>{
+    try{
+      const c = toCandles(await fetchChart(sym, n>21 ? "6mo" : "3mo", "1d"));
+      if(c.length < n+1) return null;
+      const last = c[c.length-1], base = c[c.length-1-n];
+      let price = last.close, change = last.close - base.close;
+      if(sym === "^TNX"){ price /= 10; change /= 10; }   // ^TNX quotes 10x the yield
+      return { symbol:sym, name:nameOf(sym), price, change,
+        change_pct: base.close ? (last.close-base.close)/base.close*100 : 0, date: last.time };
+    }catch(e){ return null; }
+  }, 6);
+  const rows = g.filter(Boolean);
+  $("globalCards").innerHTML = rows.length ? rows.map(q=>`
+    <div class="card"><div class="name">${q.name}</div>
+    <div class="price">${fmt(q.price)}</div>
+    <div class="chg ${cls(q.change)}">${sign(q.change)}${fmt(q.change)} (${sign(q.change_pct)}${fmt(q.change_pct)}%)</div>
+    <div class="muted" style="font-size:10px;margin-top:2px">as of ${q.date}</div></div>`).join("")
+    : '<div class="loading">No data</div>';
+}
+
 /* ---- delivery % (NSE bhavdata): genuine accumulation vs churn ---- */
 let delivData = null;
 async function loadDelivery(force){
@@ -916,10 +949,7 @@ async function loadDashboard(){
   pmap(Object.keys(INDICES), getQuote, 4).then(idx=>{
     $("indexCards").innerHTML = idx.filter(Boolean).map(cardHTML).join("") || '<div class="loading">No index data</div>';
   });
-  pmap(Object.keys(GLOBAL), getQuote, 5).then(g=>{
-    g = g.filter(Boolean).map(q => q.symbol==="^TNX" ? {...q, price:q.price/10, change:q.change/10} : q);  // ^TNX is 10x the yield
-    $("globalCards").innerHTML = g.map(cardHTML).join("") || '<div class="loading">No data</div>';
-  });
+  loadGlobal();
   loadPulse();
   const wl = await pmap(getWL(), getQuote, 6);
   const rows = wl.filter(Boolean);
