@@ -2,6 +2,16 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.0.0] — 2026-07-16 · Mutual Funds
+
+- New **Mutual Funds** tab (Cloudflare site only): track your actual mutual fund folio alongside the equity tools
+- Add holdings via a fund-house → scheme cascading picker (~40 curated AMCs, everything else lands under "Other fund houses") or free-text search across the full AMFI-registered scheme list; folio (units, invested amount, invested date) stays in the browser only, never sent anywhere but the AMFI NAV lookup itself
+- Two new edge functions: `/api/mf/schemes` (full scheme list from AMFI's daily file via mfapi.in, tagged with fund house, cached 24h) and `/api/mf/nav/:code` (latest NAV + AMFI scheme category for one scheme, cached ~6h)
+- Holdings table: plan, units, invested ₹, live NAV, current value, gain/loss (₹ and %), weight — plus summary cards for total invested/current value/gain-loss
+- Asset allocation panel: each holding bucketed into Equity/Debt/Gold/Hybrid/Other from AMFI's own scheme category (falling back to a name-based guess for index/gold/FoF schemes AMFI files under "Other Scheme"); pick a Growth/Balanced/Conservative preset or set a custom target mix; current-vs-target table with buy/sell ₹ actions to close the gap
+- Rebalancing recommendations: flags Regular-plan holdings and finds their Direct-plan twin (lower expense ratio, same portfolio) via a normalized-name index; flags multiple funds held in the same category as overlap risk; calls out the single biggest allocation drift versus target
+- Bumped major version to 3.0.0 for this first non-equity asset class in the tracker
+
 ## [2.29.0] — 2026-07-15 · Global Markets Upgrade
 
 - Seven more global instruments: Dow Jones, DAX, Shanghai Composite, KOSPI, Dollar Index (the FII-flow driver), Silver, Bitcoin (risk-appetite gauge) — 17 cards total

@@ -1,4 +1,4 @@
-/* v8.1 */
+/* v8.2 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2354,3 +2354,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rp-exp-toggle{width:100%;justify-content:center;font-size:13px!important;padding:9px 16px!important;border-style:dashed!important;color:var(--muted)!important;}
 .rp-exp-toggle:hover{color:var(--teal)!important;border-color:var(--teal)!important;}
 .year-table td .rp-local{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;line-height:1.2;}
+
+/* ── Hero Country Strip (v8.2) ──────────────────────────────── */
+.hero-cstrip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.22);border-radius:10px;padding:9px 14px;margin-bottom:18px;}
+.hero-cstrip-lbl{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.04em;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;}
+.hero-cpills{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.hero-cpill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--muted);transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;}
+.hero-cpill:hover{border-color:var(--teal);color:var(--teal);}
+.hero-cpill.active{background:var(--teal);border-color:var(--teal);color:#000;font-weight:700;}
+.hero-cpill-more{border-style:dashed!important;color:var(--teal)!important;border-color:rgba(20,184,166,0.45)!important;background:transparent!important;}
+.hero-cpill-more:hover{background:rgba(20,184,166,0.1)!important;}
+@media(max-width:640px){.hero-cstrip{gap:8px;}.hero-cstrip-lbl{font-size:11px;}.hero-cpill{font-size:11px;padding:4px 9px;}}

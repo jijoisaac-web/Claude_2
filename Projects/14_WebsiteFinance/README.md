@@ -31,6 +31,8 @@ Requires Python 3.10+ and internet access (data comes from Yahoo Finance, ~15 mi
 
 **Ideas** — rule-based trade candidates by horizon (short/medium/long) with entry/stop/target, inline chart previews, and a position-size calculator.
 
+**Mutual Funds** (Cloudflare site only) — track your actual mutual fund folio: add holdings via a fund-house → scheme picker or free-text search over the full AMFI-registered scheme list, live NAVs from AMFI (via mfapi.in), holdings table with value/gain-loss/weight, asset-allocation (Equity/Debt/Gold/Hybrid) vs a target mix with buy/sell ₹ actions, and rebalancing flags: Regular→Direct plan cost savings, same-category overlap, and biggest allocation drift. Folio stays in the browser only (`localStorage`).
+
 **UX** — global search (`/`), keyboard shortcuts (`?` for help), mobile-friendly layout. The Cloudflare version (`site/`) is the full-featured one; the local Python app is a simpler subset.
 
 ## Structure

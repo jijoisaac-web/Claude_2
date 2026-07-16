@@ -1,4 +1,4 @@
-/* v8.1 */
+/* v8.2 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -70,6 +70,8 @@ function selectCurrency(el){
   if(flTab&&flTab.classList.contains('active')&&typeof window.initFlights==='function'){
     window.initFlights();
   }
+  // Sync hero country strip
+  if(typeof updateHeroStrip==='function') updateHeroStrip(val);
 }
 // Close dropdown on outside click
 document.addEventListener('click',function(e){
@@ -851,6 +853,49 @@ function setCity(tier,btn){
     if(tb) tb.innerHTML='&#9650; Collapse Expense Categories';
   }
 }
+// ── Hero country strip ───────────────────────────────────────────────────────
+function heroPickCountry(btn, cur){
+  // Find matching cur-item in the currency panel and call selectCurrency
+  var items=document.querySelectorAll('.cur-item[data-val="'+cur+'"]');
+  if(items.length>0) selectCurrency(items[0]);
+}
+// Fixed pill currencies in hero strip
+var HERO_STRIP_CURS=['AED','GBP','USD','SGD','AUD','CAD','SAR','EUR'];
+function updateHeroStrip(cur){
+  if(!cur) return;
+  var pills=document.querySelectorAll('.hero-cpill[data-cur]');
+  var found=false;
+  pills.forEach(function(p){
+    var match=p.dataset.cur===cur;
+    p.classList.toggle('active',match);
+    if(match) found=true;
+  });
+  // If country not in the 8 pills, inject a dynamic "current country" pill
+  var wrap=document.getElementById('hero-cpills');
+  var dynPill=document.getElementById('hero-cpill-dyn');
+  if(!found&&wrap){
+    var meta=CUR_META[cur]||{flag:'🌐',name:cur};
+    var cc=(cur==='EUR'?'eu':cur.toLowerCase().slice(0,2));
+    var imgHtml='<img src="https://flagcdn.com/20x15/'+cc+'.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="'+cur+'"/> ';
+    if(!dynPill){
+      dynPill=document.createElement('button');
+      dynPill.id='hero-cpill-dyn';
+      dynPill.className='hero-cpill active';
+      dynPill.dataset.cur=cur;
+      dynPill.setAttribute('onclick','heroPickCountry(this,this.dataset.cur)');
+      // Insert before the "+more" pill
+      var morePill=wrap.querySelector('.hero-cpill-more');
+      if(morePill) wrap.insertBefore(dynPill,morePill);
+      else wrap.appendChild(dynPill);
+    }
+    dynPill.dataset.cur=cur;
+    dynPill.innerHTML=imgHtml+(meta.name||cur);
+    dynPill.classList.add('active');
+  } else if(dynPill){
+    // Country is in the 8 — remove dynamic pill
+    dynPill.remove();
+  }
+}
 function rpOpenStep(n){
   var body=document.getElementById('rp-step-body-'+n);
   var chev=document.getElementById('rp-chev-'+n);
@@ -898,7 +943,10 @@ function updateExpTotal(){
   return total;
 }
 // ── Init expense total on page load ──────────────────────────────────────────
-window.addEventListener('DOMContentLoaded',function(){updateExpTotal();});
+window.addEventListener('DOMContentLoaded',function(){
+  updateExpTotal();
+  if(typeof updateHeroStrip==='function') updateHeroStrip(baseCur||'AED');
+});
 document.addEventListener('input',e=>{if(e.target.id&&e.target.id.startsWith('exp-'))updateExpTotal();});
 
 // ── RETURN PLANNER ──────────────────────────────

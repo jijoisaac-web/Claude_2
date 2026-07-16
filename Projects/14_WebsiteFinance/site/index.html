@@ -196,6 +196,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="options">Options</button>
     <button data-tab="smc">Smart Money</button>
     <button data-tab="brief">Brief</button>
+    <button data-tab="mf">Mutual Funds</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -579,6 +580,60 @@ progress{accent-color:var(--violet);}
   </div>
 </section>
 
+<!-- MUTUAL FUNDS -->
+<section id="mf" class="tab">
+  <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
+    <span class="muted">⚠️ Your folio, stored only in this browser (never sent anywhere except the AMFI NAV lookups below). NAVs come from AMFI's daily file via mfapi.in, refreshed once per day after markets close. Category/asset-class tagging is automated from AMFI's own scheme classification plus the scheme name — always check your CAS/factsheet before acting. Educational tool, not investment advice; switching plans can trigger exit load and capital gains tax, so check both first.</span>
+  </div>
+
+  <h2>Add a fund to your folio</h2>
+  <div class="controls" style="flex-wrap:wrap">
+    <select id="mfHouse" onchange="mfHouseChanged()"><option value="">Loading fund houses…</option></select>
+    <select id="mfSchemeSel" onchange="mfSchemeSelChanged()" style="min-width:260px" disabled><option value="">Pick a fund house first</option></select>
+    <input type="text" id="mfSchemeSearch" list="mfAllSchemesDL" placeholder="…or search any scheme by name" size="30" autocomplete="off" onchange="mfSearchGo()">
+  </div>
+  <div class="controls" style="flex-wrap:wrap;display:none" id="mfAddRow">
+    <span class="muted" id="mfPicked">No scheme selected</span>
+    <label class="muted">Units <input type="text" id="mfUnits" size="10" placeholder="e.g. 152.436"></label>
+    <label class="muted">Invested ₹ <input type="text" id="mfInvested" size="10" placeholder="total cost"></label>
+    <label class="muted">Invested on <input type="date" id="mfInvestedDate"></label>
+    <button class="btn" onclick="mfAddHolding()">+ Add to folio</button>
+  </div>
+  <div class="muted" id="mfAddMeta" style="font-size:11px;margin:4px 0 14px"></div>
+
+  <h2>Your folio <span class="muted" id="mfFolioMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="controls">
+    <button class="btn ghost" onclick="mfRefreshNavs()">↻ Refresh NAVs</button>
+    <span class="muted" style="font-size:11px">Weight, gain/loss and allocation below all update from these current values.</span>
+  </div>
+  <div class="cards" id="mfSummaryCards"></div>
+  <div id="mfHoldingsTable"><div class="loading">Add a fund above to start your folio</div></div>
+
+  <h2 style="margin-top:24px">Asset allocation vs target</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Each holding is bucketed into a broad asset class from AMFI's scheme category (falling back to a name-based guess for index/gold/FoF schemes, which AMFI files under "Other Scheme"). Pick a preset or set your own target mix.</div>
+  <div class="controls">
+    <span class="muted">Target preset:</span>
+    <select id="mfPreset" onchange="mfApplyPreset()">
+      <option value="">Custom (set below)</option>
+      <option value="growth">Growth — 75E / 15D / 5G / 5H</option>
+      <option value="balanced">Balanced — 55E / 30D / 5G / 10H</option>
+      <option value="conservative">Conservative — 30E / 55D / 5G / 10H</option>
+    </select>
+  </div>
+  <div class="controls" style="flex-wrap:wrap">
+    <label class="muted">Equity % <input type="text" id="mfTgtEquity" size="4" value="60" oninput="mfRenderAllocation();mfRenderRecs()"></label>
+    <label class="muted">Debt % <input type="text" id="mfTgtDebt" size="4" value="25" oninput="mfRenderAllocation();mfRenderRecs()"></label>
+    <label class="muted">Gold/Commodity % <input type="text" id="mfTgtGold" size="4" value="10" oninput="mfRenderAllocation();mfRenderRecs()"></label>
+    <label class="muted">Hybrid % <input type="text" id="mfTgtHybrid" size="4" value="5" oninput="mfRenderAllocation();mfRenderRecs()"></label>
+    <span class="muted" id="mfTgtSum"></span>
+  </div>
+  <div id="mfAllocBar" class="breadthBar" style="margin:10px 0"></div>
+  <div id="mfAllocTable"></div>
+
+  <h2 style="margin-top:24px">Rebalancing recommendations</h2>
+  <div id="mfRecs"><div class="loading">Add holdings above to see recommendations</div></div>
+</section>
+
 <div class="disclaimer"><span id="versionTag"></span> · Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>
 </main>
 
@@ -716,6 +771,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
   if(b.dataset.tab==="brief" && !window._briefLoaded){ window._briefLoaded=true; loadBrief(); }
+  if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); }
 });
 
 /* ================= watchlist (localStorage) ================= */
@@ -2963,8 +3019,289 @@ function optSearchGo(){
   loadOptions();
 }
 
+/* ================= mutual funds ================= */
+const MF_KEY = "ist_mf_folio";               // holdings, client-only
+const MF_SCHEMES_CACHE = "ist_mf_schemes_v1"; // cached AMFI scheme list (~28k rows), refreshed daily
+let mfSchemes = [];        // [{code, name, house}]
+let mfPicked = null;       // scheme currently selected in the add-holding form
+let mfDirectIndex = null;  // Map<normalizedNameNoPlan, directPlanScheme> — for the Regular→Direct finder
+
+function getMfFolio(){ try{ const v = JSON.parse(localStorage.getItem(MF_KEY)); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function setMfFolio(v){ localStorage.setItem(MF_KEY, JSON.stringify(v)); }
+
+function mfPlanOf(name){
+  if(/\bdirect\b/i.test(name||"")) return "Direct";
+  if(/\bregular\b/i.test(name||"")) return "Regular";
+  return "—";
+}
+function mfCategoryShort(cat){
+  if(!cat) return "—";
+  return cat.replace(/^(Equity|Debt|Hybrid|Solution Oriented|Other) Scheme\s*-\s*/i, "");
+}
+function mfAssetClass(h){
+  const cat = (h.category||"").toLowerCase(), name = (h.name||"").toLowerCase();
+  if(/\bgold\b|\bsilver\b|commodit/.test(name)) return "Gold";
+  if(cat.startsWith("equity scheme")) return "Equity";
+  if(cat.startsWith("debt scheme")) return "Debt";
+  if(cat.startsWith("hybrid scheme")) return "Hybrid";
+  if(cat.startsWith("solution oriented")) return "Hybrid";
+  if(cat.includes("index") || cat.includes("etf") || cat.includes("fund of fund")){
+    if(/gilt|g-?sec|\bbond\b|\bdebt\b|liquid|money market/.test(name)) return "Debt";
+    if(/\bgold\b|\bsilver\b/.test(name)) return "Gold";
+    return "Equity"; // most Indian index funds/ETFs/FoFs on offer track equity indices
+  }
+  return "Other";
+}
+function mfNormalizeForMatch(name){
+  return (name||"").toLowerCase()
+    .replace(/\bdirect\b/g,"")
+    .replace(/\bregular\b/g,"")
+    .replace(/[^a-z0-9]+/g," ")
+    .trim();
+}
+
+/* ---- scheme list (AMC vendor → scheme cascading picker) ---- */
+async function mfLoadSchemes(){
+  try{
+    const c = JSON.parse(localStorage.getItem(MF_SCHEMES_CACHE));
+    if(c && Date.now()-c.ts < 24*3600*1000 && Array.isArray(c.data) && c.data.length){
+      mfSchemes = c.data; mfBuildDirectIndex(); mfPopulateHouses(); mfRenderRecs(); return;
+    }
+  }catch(e){}
+  try{
+    const r = await fetch("/api/mf/schemes");
+    const j = await r.json();
+    if(!Array.isArray(j) || !j.length) throw new Error((j&&j.error) || "bad response");
+    mfSchemes = j;
+    try{ localStorage.setItem(MF_SCHEMES_CACHE, JSON.stringify({ts:Date.now(), data:j})); }catch(e){}
+    mfBuildDirectIndex(); mfPopulateHouses(); mfRenderRecs();
+  }catch(e){
+    $("mfHouse").innerHTML = '<option value="">Failed to load — reopen tab to retry</option>';
+    $("mfAddMeta").textContent = "Couldn't load the AMFI scheme list: " + e.message;
+  }
+}
+function mfBuildDirectIndex(){
+  mfDirectIndex = new Map();
+  mfSchemes.forEach(s=>{
+    if(mfPlanOf(s.name)==="Direct"){
+      const key = mfNormalizeForMatch(s.name);
+      if(!mfDirectIndex.has(key)) mfDirectIndex.set(key, s);
+    }
+  });
+}
+function mfFindDirectTwin(h){
+  if(mfPlanOf(h.name)!=="Regular" || !mfDirectIndex) return null;
+  return mfDirectIndex.get(mfNormalizeForMatch(h.name)) || null;
+}
+function mfPopulateHouses(){
+  const houses = [...new Set(mfSchemes.map(s=>s.house))]
+    .sort((a,b)=> (a==="Other fund houses") - (b==="Other fund houses") || a.localeCompare(b));
+  $("mfHouse").innerHTML = '<option value="">Select fund house…</option>' +
+    houses.map(h=>`<option value="${h}">${h}</option>`).join("");
+  let dl = document.getElementById("mfAllSchemesDL");
+  if(!dl){ dl = document.createElement("datalist"); dl.id = "mfAllSchemesDL"; document.body.appendChild(dl); }
+  dl.innerHTML = mfSchemes.map(s=>`<option value="${s.name.replace(/"/g,"&quot;")} (#${s.code})"></option>`).join("");
+}
+function mfHouseChanged(){
+  const house = $("mfHouse").value, sel = $("mfSchemeSel");
+  if(!house){ sel.innerHTML = '<option value="">Pick a fund house first</option>'; sel.disabled = true; return; }
+  const schemes = mfSchemes.filter(s=>s.house===house).sort((a,b)=>a.name.localeCompare(b.name));
+  sel.disabled = false;
+  sel.innerHTML = `<option value="">Select scheme… (${schemes.length})</option>` +
+    schemes.map(s=>`<option value="${s.code}">${s.name}</option>`).join("");
+}
+function mfSchemeSelChanged(){
+  const code = +$("mfSchemeSel").value; if(!code) return;
+  const s = mfSchemes.find(x=>x.code===code); if(s) mfPickScheme(s);
+}
+function mfSearchGo(){
+  const m = /\(#(\d+)\)\s*$/.exec($("mfSchemeSearch").value||""); if(!m) return;
+  const s = mfSchemes.find(x=>x.code===+m[1]); if(s) mfPickScheme(s);
+}
+function mfPickScheme(s){
+  mfPicked = s;
+  $("mfAddRow").style.display = "flex";
+  $("mfPicked").textContent = s.name + " (" + s.house + ")";
+  $("mfSchemeSearch").value = "";
+}
+
+async function mfAddHolding(){
+  if(!mfPicked){ alert("Pick a scheme first (fund house → scheme, or search by name)."); return; }
+  const units = parseFloat($("mfUnits").value), invested = parseFloat($("mfInvested").value);
+  if(!units || units<=0 || !invested || invested<=0){ alert("Enter units and invested amount."); return; }
+  const investedDate = $("mfInvestedDate").value || null;
+  $("mfAddMeta").textContent = "Fetching latest NAV…";
+  try{
+    const r = await fetch(`/api/mf/nav/${mfPicked.code}`);
+    const j = await r.json();
+    if(j.error) throw new Error(j.error);
+    const folio = getMfFolio();
+    folio.push({
+      code: mfPicked.code, name: j.name || mfPicked.name, house: j.house || mfPicked.house,
+      category: j.category || null, type: j.type || null,
+      units, invested, investedDate, nav: j.nav, navDate: j.date,
+    });
+    setMfFolio(folio);
+    mfPicked = null; $("mfAddRow").style.display = "none";
+    $("mfUnits").value=""; $("mfInvested").value=""; $("mfInvestedDate").value="";
+    $("mfHouse").value=""; mfHouseChanged();
+    $("mfAddMeta").textContent = "";
+    mfRenderAll();
+  }catch(e){
+    $("mfAddMeta").textContent = "Couldn't fetch NAV: " + e.message + " — not added, try again.";
+  }
+}
+function mfRemoveHolding(idx){ const folio = getMfFolio(); folio.splice(idx,1); setMfFolio(folio); mfRenderAll(); }
+
+async function mfRefreshNavs(){
+  const folio = getMfFolio();
+  if(!folio.length) return;
+  $("mfFolioMeta").textContent = "Refreshing NAVs…";
+  await pmap(folio, async (h)=>{
+    try{
+      const r = await fetch(`/api/mf/nav/${h.code}`);
+      const j = await r.json();
+      if(!j.error){ h.nav=j.nav; h.navDate=j.date; h.category=j.category||h.category; }
+    }catch(e){}
+  }, 6);
+  setMfFolio(folio);
+  mfRenderAll();
+}
+
+/* ---- rendering: holdings table + summary cards ---- */
+function mfRenderHoldings(){
+  const folio = getMfFolio();
+  if(!folio.length){
+    $("mfHoldingsTable").innerHTML = '<div class="loading">Add a fund above to start your folio</div>';
+    $("mfSummaryCards").innerHTML = ""; $("mfFolioMeta").textContent = "";
+    return;
+  }
+  let totalInv=0, totalCur=0;
+  const rows = folio.map((h,i)=>{
+    const value = h.nav!=null ? h.nav*h.units : null;
+    totalInv += h.invested; if(value!=null) totalCur += value;
+    return {h, i, value};
+  });
+  rows.forEach(r=>{
+    r.gain = r.value!=null ? r.value - r.h.invested : null;
+    r.gainPct = r.value!=null && r.h.invested ? r.gain/r.h.invested*100 : null;
+    r.weight = totalCur ? (r.value||0)/totalCur*100 : 0;
+  });
+  const totalGain = totalCur - totalInv, totalGainPct = totalInv ? totalGain/totalInv*100 : 0;
+  const signedRupee = v => (v<0?"-":"+") + "₹" + fmtInt(Math.round(Math.abs(v)));
+  $("mfSummaryCards").innerHTML = [
+    {name:"Invested", v:"₹"+fmtInt(Math.round(totalInv))},
+    {name:"Current value", v:"₹"+fmtInt(Math.round(totalCur))},
+    {name:"Gain/Loss", v:signedRupee(totalGain), cls:cls(totalGain)},
+    {name:"Gain/Loss %", v:sign(totalGainPct)+fmt(totalGainPct)+"%", cls:cls(totalGainPct)},
+    {name:"Holdings", v:folio.length},
+  ].map(c=>`<div class="card"><div class="name">${c.name}</div><div class="price ${c.cls||""}">${c.v}</div></div>`).join("");
+
+  $("mfHoldingsTable").innerHTML = `<table><thead><tr>
+    <th>Scheme</th><th>Plan</th><th>Units</th><th>Invested ₹</th><th>NAV</th><th>Value ₹</th><th>Gain/Loss</th><th>Weight</th><th></th>
+    </tr></thead><tbody>` + rows.map(r=>{
+      const h = r.h;
+      return `<tr>
+        <td><span class="sym">${h.name}</span><br><span class="subname">${h.house||""} · ${mfCategoryShort(h.category)}${h.navDate?" · NAV "+h.navDate:""}</span></td>
+        <td>${mfPlanOf(h.name)}</td>
+        <td>${fmt(h.units,3)}</td>
+        <td>₹${fmtInt(Math.round(h.invested))}</td>
+        <td>${h.nav!=null?fmt(h.nav):"—"}</td>
+        <td>${r.value!=null?"₹"+fmtInt(Math.round(r.value)):"—"}</td>
+        <td class="${cls(r.gain||0)}">${r.gain!=null?(signedRupee(r.gain)+" ("+sign(r.gainPct)+fmt(r.gainPct)+"%)"):"—"}</td>
+        <td>${fmt(r.weight,1)}%</td>
+        <td><button class="btn danger" onclick="mfRemoveHolding(${r.i})">✕</button></td>
+      </tr>`;
+    }).join("") + "</tbody></table>";
+  $("mfFolioMeta").textContent = folio.length + " holding" + (folio.length===1?"":"s");
+}
+
+/* ---- allocation vs target (shared calc used by both the table and the recs panel) ---- */
+const MF_PRESETS = {
+  growth: {equity:75, debt:15, gold:5, hybrid:5},
+  balanced: {equity:55, debt:30, gold:5, hybrid:10},
+  conservative: {equity:30, debt:55, gold:5, hybrid:10},
+};
+function mfApplyPreset(){
+  const p = MF_PRESETS[$("mfPreset").value]; if(!p) return;
+  $("mfTgtEquity").value=p.equity; $("mfTgtDebt").value=p.debt; $("mfTgtGold").value=p.gold; $("mfTgtHybrid").value=p.hybrid;
+  mfRenderAllocation(); mfRenderRecs();
+}
+function mfComputeAllocation(){
+  const folio = getMfFolio();
+  const order = ["Equity","Debt","Gold","Hybrid","Other"];
+  const buckets = {Equity:0,Debt:0,Gold:0,Hybrid:0,Other:0};
+  let total = 0;
+  folio.forEach(h=>{
+    if(h.nav==null) return;
+    const value = h.nav*h.units;
+    buckets[mfAssetClass(h)] += value; total += value;
+  });
+  const tgt = {
+    Equity: parseFloat($("mfTgtEquity").value)||0,
+    Debt: parseFloat($("mfTgtDebt").value)||0,
+    Gold: parseFloat($("mfTgtGold").value)||0,
+    Hybrid: parseFloat($("mfTgtHybrid").value)||0,
+    Other: 0,
+  };
+  const rows = order.map(k=>{
+    const cur = buckets[k], curPct = total ? cur/total*100 : 0, tgtPct = tgt[k];
+    const tgtVal = tgtPct/100*total, diff = tgtVal - cur;
+    return {cls:k, cur, curPct, tgtPct, diff};
+  });
+  return {total, order, buckets, tgt, rows};
+}
+function mfRenderAllocation(){
+  const {total, order, buckets, tgt, rows} = mfComputeAllocation();
+  const tgtSum = tgt.Equity+tgt.Debt+tgt.Gold+tgt.Hybrid;
+  $("mfTgtSum").textContent = Math.round(tgtSum)===100 ? "✓ sums to 100%" : `sums to ${fmt(tgtSum,0)}% — adjust to 100%`;
+  const colors = {Equity:"#60a5fa", Debt:"#34d399", Gold:"#fbbf24", Hybrid:"#a78bfa", Other:"#8b949e"};
+  $("mfAllocBar").innerHTML = total ? order.filter(k=>buckets[k]>0).map(k=>
+    `<div style="width:${(buckets[k]/total*100).toFixed(2)}%;background:${colors[k]}" title="${k} ${(buckets[k]/total*100).toFixed(1)}%"></div>`).join("") : "";
+  $("mfAllocTable").innerHTML = !total ? '<div class="muted">Add holdings with live NAVs to see allocation.</div>' :
+    `<table><thead><tr><th>Asset class</th><th>Current ₹</th><th>Current %</th><th>Target %</th><th>Action</th></tr></thead><tbody>` +
+    rows.filter(r=>r.cur>0 || r.tgtPct>0).map(r=>{
+      const action = r.cls==="Other" ? (r.cur>0?"Review — unclassified":"—")
+        : Math.abs(r.diff) < total*0.015 ? "On target"
+        : r.diff>0 ? `Buy ~₹${fmtInt(Math.round(r.diff))}` : `Trim ~₹${fmtInt(Math.round(-r.diff))}`;
+      return `<tr><td>${r.cls}</td><td>₹${fmtInt(Math.round(r.cur))}</td><td>${fmt(r.curPct,1)}%</td><td>${r.cls==="Other"?"—":fmt(r.tgtPct,1)+"%"}</td><td>${action}</td></tr>`;
+    }).join("") + "</tbody></table>";
+}
+
+/* ---- rebalancing recommendations: cost (regular→direct), overlap, allocation drift ---- */
+function mfRenderRecs(){
+  const folio = getMfFolio();
+  if(!folio.length){ $("mfRecs").innerHTML = '<div class="loading">Add holdings above to see recommendations</div>'; return; }
+  const recs = [];
+  folio.forEach(h=>{
+    if(mfPlanOf(h.name)!=="Regular") return;
+    const twin = mfDirectIndex ? mfFindDirectTwin(h) : null;
+    if(twin) recs.push({c:"#7a5a12", html:`💰 <b>${h.name}</b> is a Regular plan. The Direct plan of the same fund — <b>${twin.name}</b> — carries a lower expense ratio for an otherwise identical portfolio, and the gap compounds over holding periods of years. Worth switching, after checking exit load and capital-gains tax on the redemption.`});
+    else if(mfDirectIndex) recs.push({c:"#7a5a12", html:`💰 <b>${h.name}</b> is a Regular plan — its Direct-plan twin wasn't matched automatically, but Direct plans of the same scheme are typically 0.5–1%+ cheaper a year. Check the AMC's site or your RTA (CAMS/KFintech) statement.`});
+  });
+  const byCat = {};
+  folio.forEach(h=>{ const c = mfCategoryShort(h.category); (byCat[c]=byCat[c]||[]).push(h); });
+  Object.entries(byCat).forEach(([cat, hs])=>{
+    if(cat!=="—" && hs.length>1) recs.push({c:"#3d4d75", html:`📊 You hold <b>${hs.length}</b> funds in <b>${cat}</b>: ${hs.map(h=>h.name).join(", ")}. Funds in the same category usually overlap heavily in top holdings — consider consolidating into your highest-conviction pick.`});
+  });
+  const {total, rows} = mfComputeAllocation();
+  if(total){
+    const biggest = rows.filter(r=>r.cls!=="Other").sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff))[0];
+    if(biggest && Math.abs(biggest.diff) > total*0.03){
+      recs.push({c:"#238636", html: biggest.diff>0
+        ? `📈 <b>${biggest.cls}</b> is under target (${fmt(biggest.curPct,1)}% vs ${fmt(biggest.tgtPct,1)}%) — direct new investments (~₹${fmtInt(Math.round(biggest.diff))}) here to rebalance.`
+        : `📉 <b>${biggest.cls}</b> is over target (${fmt(biggest.curPct,1)}% vs ${fmt(biggest.tgtPct,1)}%) — consider trimming ~₹${fmtInt(Math.round(-biggest.diff))} and redirecting toward underweight classes.`});
+    }
+  }
+  $("mfRecs").innerHTML = recs.length
+    ? recs.map(r=>`<div class="card" style="margin-bottom:8px;border-color:${r.c}">${r.html}</div>`).join("")
+    : '<div class="muted">No red flags found — folio looks reasonably clean on cost and overlap. Check the allocation table above for drift.</div>';
+}
+
+function mfRenderAll(){ mfRenderHoldings(); mfRenderAllocation(); mfRenderRecs(); }
+
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","brief"];
+const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","brief","mf"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
