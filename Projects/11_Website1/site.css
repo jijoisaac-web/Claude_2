@@ -1,4 +1,4 @@
-/* v8.3 */
+/* v8.4 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2269,6 +2269,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   background:var(--surface2);border:1px solid var(--border);
   border-radius:12px;padding:14px 16px;margin-top:12px;
 }
+/* Departure airport inline inside hero card */
+.fl-origin-inline{
+  margin:12px 0 8px;padding:10px 14px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:10px;
+}
+.fl-origin-inline .fl-cur-label-txt{margin-top:6px;margin-bottom:0;}
 .fl-cur-label-txt{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
 .fl-origin-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
 

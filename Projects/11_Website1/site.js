@@ -1,4 +1,4 @@
-/* v8.3 */
+/* v8.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3010,6 +3010,9 @@ function closeNavDD(){
     el.classList.add('active');
     var cur=baseCur||'AED';
     renderDests(cur,FL[cur]||FL['AED']);
+    // Re-run plan if city already selected
+    var inp=document.getElementById('fl-planner-input');
+    if(inp&&inp.value.trim()&&typeof flPlanTrip==='function') setTimeout(flPlanTrip,50);
   };
 
   // ── CARD CLICK → PLANNER ────────────────────────────────────────────────
@@ -3102,17 +3105,11 @@ function closeNavDD(){
   window.flFillChip=function(el){
     var city=el.getAttribute('data-city');
     var inp=document.getElementById('fl-planner-input');
-    var res=document.getElementById('fl-planner-result');
-    if(inp){
-      inp.value=city;
-      inp.focus();
-      var len=inp.value.length;
-      inp.setSelectionRange(len,len);
-    }
-    if(res){res.style.display='none';res.innerHTML='';}
+    if(inp) inp.value=city;
     document.querySelectorAll('.fl-ai-chip').forEach(function(c){c.classList.remove('active');});
     el.classList.add('active');
-    inp&&inp.scrollIntoView({behavior:'smooth',block:'center'});
+    // Auto-run plan immediately on city selection
+    if(typeof flPlanTrip==='function') flPlanTrip();
   };
 
   // Reset result panel (called by selector changes)
@@ -4407,6 +4404,8 @@ function closeNavDD(){
     html+='</div>';
     res.innerHTML=html;
     res.style.display='block';
+    // Scroll to results so user sees "Best Travel Dates" immediately
+    setTimeout(function(){res.scrollIntoView({behavior:'smooth',block:'start'});},120);
   };
 
   // Hook showTab — init flights when tab is opened

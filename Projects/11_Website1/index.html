@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=8.3"/>
+<link rel="stylesheet" href="/site.css?v=8.4"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.3</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.4</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -2896,17 +2896,18 @@ document.addEventListener('DOMContentLoaded',function(){
           </select>
         </div>
       </div>
+      <!-- Departure airport — moved up for visibility -->
+      <div class="fl-origin-inline">
+        <div class="fl-origin-lbl">&#9992; Departing from</div>
+        <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
+        <p id="fl-cur-label" class="fl-cur-label-txt"></p>
+      </div>
       <div class="fl-ai-chips-lbl">Choose a destination:</div>
       <div class="fl-ai-chips" id="fl-ai-chips"><!-- JS renders all 22 city chips --></div>
       <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
     </div>
 
-    <!-- Departure airport -->
-    <div class="fl-origin-card">
-      <p id="fl-cur-label" class="fl-cur-label-txt">Loading&hellip;</p>
-      <div class="fl-origin-lbl">&#9992; Departure airport</div>
-      <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
-    </div>
+
     <!-- Hidden JS anchors -->
     <div id="fl-festival-banner" style="display:none"></div>
     <div id="fl-deal-strip" style="display:none"></div>
@@ -2971,7 +2972,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=8.3"></script>
+<script src="/site.js?v=8.4"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
