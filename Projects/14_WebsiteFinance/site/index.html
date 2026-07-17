@@ -326,7 +326,8 @@ progress{accent-color:var(--violet);}
   <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
   <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="controls">
-    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe (Nifty 500)</label>
+    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe</label>
+    <label class="muted"><input type="checkbox" id="dealsAllDays" onchange="renderDeals()"> Include older days in NSE's window</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
 
@@ -827,19 +828,23 @@ async function loadDeals(force){
 }
 function renderDeals(){
   if(!dealsData) return;
-  let deals = [...dealsData];
-  if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
-  deals.sort((a,b)=>(b.valueCr||0)-(a.valueCr||0));
-  const shown = deals.slice(0,15);
   const MABBR = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
   const dealTs = d => { const m=/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(d.date||""); return m? new Date(+m[3],MABBR[m[2]]??0,+m[1]).getTime():0; };
-  const newest = dealsData.reduce((best,d)=> dealTs(d)>dealTs(best)?d:best, dealsData[0]||{});
-  $("dealsMeta").textContent = `· latest: ${newest?.date||""} · ${deals.length} deals · showing top ${shown.length} by value`;
+  const newestTs = Math.max(...dealsData.map(dealTs));
+  let deals = [...dealsData];
+  if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
+  // default: latest session only (bulk/block can differ by a day → 1-day tolerance)
+  if(!$("dealsAllDays").checked) deals = deals.filter(d=>dealTs(d) >= newestTs - 86400000);
+  deals.sort((a,b)=> dealTs(b)-dealTs(a) || (b.valueCr||0)-(a.valueCr||0));
+  const shown = deals.slice(0,15);
+  const newestStr = dealsData.find(d=>dealTs(d)===newestTs)?.date || "";
+  $("dealsMeta").textContent = `· latest: ${newestStr} · ${deals.length} deal${deals.length===1?"":"s"} ${$("dealsAllDays").checked?"(all days in window)":"(latest session)"} · top ${shown.length}`;
   $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
-    <th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
+    <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
       const inUni = ALL_STOCKS[d.symbol+".NS"];
       return `<tr ${inUni?`onclick="openChart('${d.symbol}.NS')" style="cursor:pointer"`:'style="cursor:default"'}>
+      <td style="white-space:nowrap">${d.date||"—"}</td>
       <td style="text-align:left;max-width:280px">${d.client}</td>
       <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
       <td><span class="sym">${d.symbol}</span><br><span class="subname">${d.name||""}</span></td>

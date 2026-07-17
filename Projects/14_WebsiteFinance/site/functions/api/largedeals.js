@@ -9,7 +9,7 @@ const HDRS = {
 const API = "https://www.nseindia.com/api/snapshot-capital-market-largedeal";
 
 const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-function newestAgeDays(j){
+function newestDealTs(j){
   // newest deal date across bulk+block, in days from now (null if unparseable)
   let newest = null;
   for(const arr of [j.BULK_DEALS_DATA, j.BLOCK_DEALS_DATA]){
@@ -20,8 +20,16 @@ function newestAgeDays(j){
       if(newest == null || t > newest) newest = t;
     }
   }
-  return newest == null ? null : (Date.now() - newest) / 86400000;
+  return newest;
 }
+function expectedLatestTs(){
+  // the most recent completed weekday (deals publish post-close), rolled back over weekends
+  let d = new Date(Date.now() - 86400000);
+  while(d.getDay()===0 || d.getDay()===6) d = new Date(d.getTime() - 86400000);
+  d.setHours(0,0,0,0);
+  return d.getTime();
+}
+const isFresh = ts => ts != null && ts >= expectedLatestTs() - 86400000;   // one day of publication grace
 async function fetchNSE(){
   // attempt 1: direct
   let j = null;
@@ -29,10 +37,10 @@ async function fetchNSE(){
   if(r.ok){
     try{ const t = await r.json(); if(t && (t.BULK_DEALS_DATA || t.BLOCK_DEALS_DATA)) j = t; }catch(e){}
   }
-  // NSE serves stale snapshots to cookie-less datacenter clients — if the newest deal is
-  // older than ~2 days (weekend-tolerant ~3.5), retry with a fresh cookie handshake.
-  const age = j ? newestAgeDays(j) : null;
-  if(j && age != null && age <= 3.5) return j;
+  // NSE serves stale snapshots to cookie-less datacenter clients — if the newest deal
+  // predates the last completed trading day (with 1 day grace), retry with fresh cookies.
+  const ts = j ? newestDealTs(j) : null;
+  if(j && isFresh(ts)) return j;
   const home = await fetch("https://www.nseindia.com/", { headers: { "user-agent": UA, accept: "text/html" } });
   const cookies = [];
   home.headers.forEach((v, k) => { if(k.toLowerCase()==="set-cookie") cookies.push(v.split(";")[0]); });
@@ -41,8 +49,8 @@ async function fetchNSE(){
     try{
       const j2 = await r.json();
       if(j2 && (j2.BULK_DEALS_DATA || j2.BLOCK_DEALS_DATA)){
-        const age2 = newestAgeDays(j2);
-        if(!j || age2 == null || age == null || age2 <= age) return j2;   // prefer fresher
+        const ts2 = newestDealTs(j2);
+        if(!j || ts2 == null || ts == null || ts2 >= ts) return j2;   // prefer fresher (newer timestamp)
       }
     }catch(e){}
   }

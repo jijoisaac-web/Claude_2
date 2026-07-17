@@ -1,4 +1,4 @@
-/* v8.6 */
+/* v8.7 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -548,14 +548,63 @@ function renderRatePreview(){
   if(rpcFooter)rpcFooter.innerHTML=`<span class="rpc-live-tag"><div class="live-dot" style="display:inline-block"></div> ${rateIsLive?'Live':'Approx'} · 1 ${baseCur} = ₹${midRate.toFixed(4)}</span> · Estimates only — promotions may apply · <strong>Verify live rate on provider site before sending</strong>`;
 }
 
+
+var RT_COLORS={
+  'Wise':['#0e3a5e','#9cdcfe'],
+  'DBS Remit':['#cc0001','#fff'],
+  'Emirates NBD DirectRemit':['#005a9c','#fff'],
+  'ADCB Money Transfer':['#b5001f','#fff'],
+  'FAB India Transfers':['#003087','#fff'],
+  'LuluMoney':['#1b5e20','#fff'],
+  'InstaReM':['#1a1f71','#fff'],
+  'Al Ansari Exchange':['#005792','#fff'],
+  'GCC Exchange':['#c8a400','#000'],
+  'Wall Street Exchange':['#1c2951','#fff'],
+  'UAE Exchange':['#006341','#fff'],
+  'Al Fardan Exchange':['#7b0000','#fff'],
+  'Sharaf Exchange':['#d4a017','#000'],
+  'Remitly':['#1a1a2e','#4fc3f7'],
+  'Ria Money Transfer':['#e65100','#fff'],
+  'MoneyGram':['#cc0000','#fff'],
+  'Western Union':['#ffdd00','#000'],
+  'STC Pay':['#7b00d4','#fff'],
+  'UrPay':['#00695c','#fff'],
+  'Enjaz':['#1565c0','#fff'],
+  'eRemit':['#2e7d32','#fff'],
+  'Merchantrade Money':['#880e4f','#fff'],
+  'EzyRemit':['#0277bd','#fff'],
+  'Lotus Remit':['#e65100','#fff'],
+  'WorldRemit':['#7b1fa2','#fff'],
+  'Wise (via NRE)':['#0e3a5e','#9cdcfe'],
+  'InstaReM (SGD)':['#1a1f71','#fff'],
+  'YouTrip':['#1a1f71','#fff'],
+  'CurrencyFair':['#00695c','#fff'],
+  'OFX':['#1565c0','#fff'],
+  'TorFX':['#4a148c','#fff'],
+  'XE Money Transfer':['#005792','#fff'],
+  'Vaiour':['#2e7d32','#fff'],
+};
+function rtBadge(name){
+  var c=RT_COLORS[name]||['#263238','#90a4ae'];
+  var ini=name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+  return '<div class="rt-badge" style="background:'+c[0]+';color:'+c[1]+'">'+ini+'</div>';
+}
+
 var _rateViewMode='tile';
+
 function setRateView(mode){
   _rateViewMode=mode;
   var wrap=document.getElementById('rates-container');
-  if(wrap){wrap.classList.toggle('tile-mode',mode==='tile');wrap.classList.toggle('list-mode',mode==='list');}
-  document.querySelectorAll('.rate-view-btn').forEach(function(b){b.classList.toggle('active',b.dataset.view===mode);});
+  if(wrap){
+    wrap.classList.remove('rt-tile','rt-list');
+    wrap.classList.add(mode==='tile'?'rt-tile':'rt-list');
+  }
+  document.querySelectorAll('.rate-view-btn').forEach(function(b){
+    b.classList.toggle('active',b.dataset.view===mode);
+  });
   renderRates();
 }
+
 function renderRates(){
   if(!midRate)return;
   var amt=parseFloat(document.getElementById('sendAmount').value)||1000;
@@ -565,78 +614,107 @@ function renderRates(){
     var inr=Math.max(0,amt-p.fee)*rate;
     return Object.assign({},p,{rate:rate,inr:inr});
   }).sort(function(a,b){return b.inr-a.inr;});
-  var best=rows[0].inr,worst=rows[rows.length-1].inr;
+
+  var best=rows[0].inr, worst=rows[rows.length-1].inr;
+  var saving=Math.round(best-worst);
   var wrap=document.getElementById('rates-container');
 
-  /* ── toggle bar ── */
-  var at='active',tile=_rateViewMode==='tile',list=_rateViewMode==='list';
+  /* ── view toggle ── */
+  var isTile=_rateViewMode==='tile';
   var toggleHtml='<div class="rate-view-toggle">'+
-    '<button class="rate-view-btn'+(tile?' '+at:'')+'" data-view="tile" onclick="setRateView(this.dataset.view)">&#9632;&#9632; Tile</button>'+
-    '<button class="rate-view-btn'+(list?' '+at:'')+'" data-view="list" onclick="setRateView(this.dataset.view)">&#9776; List</button>'+
-    '<span class="rate-view-lbl">'+rows.length+' providers compared</span>'+
+    '<span style="font-size:12px;font-weight:700;color:var(--muted)">View:</span>'+
+    '<button class="rate-view-btn'+(isTile?' active':'')+'" data-view="tile" onclick="setRateView(this.dataset.view)">&#9707; Tiles</button>'+
+    '<button class="rate-view-btn'+(!isTile?' active':'')+'" data-view="list" onclick="setRateView(this.dataset.view)">&#9776; List</button>'+
+    '<span class="rate-view-lbl">'+rows.length+' providers &middot; Best saves &#8377;'+saving.toLocaleString('en-IN')+' vs worst</span>'+
+  '</div>';
+
+  /* ── summary strip ── */
+  var bestRow=rows[0], worstRow=rows[rows.length-1];
+  var summaryHtml='<div class="rate-summary-strip">'+
+    '<div class="rate-summary-cell">'+
+      '<div class="rate-summary-label">Best Rate Today</div>'+
+      '<div class="rate-summary-val" style="color:var(--green)">&#8377;'+Math.round(best).toLocaleString('en-IN')+'</div>'+
+      '<div class="rate-summary-sub">via '+bestRow.name+'</div>'+
+    '</div>'+
+    '<div class="rate-summary-cell">'+
+      '<div class="rate-summary-label">Max You Can Save</div>'+
+      '<div class="rate-summary-val" style="color:var(--amber)">&#8377;'+saving.toLocaleString('en-IN')+'</div>'+
+      '<div class="rate-summary-sub">vs worst provider on same amount</div>'+
+    '</div>'+
+    '<div class="rate-summary-cell">'+
+      '<div class="rate-summary-label">Mid-Market Rate</div>'+
+      '<div class="rate-summary-val" style="color:var(--text2)">&#8377;'+midRate.toFixed(2)+'</div>'+
+      '<div class="rate-summary-sub">per '+baseCur+' (XE.com live)</div>'+
+    '</div>'+
   '</div>';
 
   /* ── tile cards ── */
+  var RANK_LABELS=['#1 Best','#2','#3','#4','#5','#6','#7','#8','#9','#10','#11','#12','#13','#14','#15','#16'];
+  var RANK_COLORS=['var(--green)','var(--amber)','var(--amber)'];
   var tilesHtml='<div class="rate-tiles-grid">'+rows.map(function(p,i){
-    var isBest=i===0,isWorst=i===rows.length-1;
-    var pct=worst===best?100:Math.round(60+(p.inr-worst)/(best-worst)*40);
-    var barCol=isBest?'var(--green)':isWorst?'var(--red)':'var(--amber)';
-    var amtCls=isBest?' best-amt':isWorst?' worst-amt':'';
-    var diff=isBest?'<span style="font-size:10px;color:var(--green);font-weight:800">BEST</span>':
-              '<span class="rate-tile-diff">-&#8377;'+Math.round(best-p.inr).toLocaleString('en-IN')+'</span>';
-    return'<div class="rate-tile'+(isBest?' best':isWorst?' worst':'')+'">'+
-      '<div class="rate-tile-header">'+
-        '<div class="rate-tile-badge" style="background:'+badgeColor(p.name)+'">'+initials(p.name)+'</div>'+
-        '<div class="rate-tile-name">'+p.name+'</div>'+
+    var isBest=i===0, isWorst=i===rows.length-1;
+    var pct=worst===best?100:Math.round(55+(p.inr-worst)/(best-worst)*45);
+    var barCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--amber)';
+    var tileCls=isBest?' rt-best':isWorst?' rt-worst':i<3?' rt-good':'';
+    var amtCls=isBest?' rt-best-amt':isWorst?' rt-worst-amt':'';
+    var rankCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--muted)';
+    var diffAmt=Math.round(best-p.inr);
+    var diffHtml=isBest
+      ?'<span class="rt-diff pos">Best today</span>'
+      :'<span class="rt-diff neg">-&#8377;'+diffAmt.toLocaleString('en-IN')+'</span>';
+    return '<div class="rate-tile'+tileCls+'">'+
+      '<div class="rt-header">'+
+        rtBadge(p.name)+
+        '<div class="rt-info">'+
+          '<div class="rt-name" title="'+p.name+'">'+p.name+'</div>'+
+          '<div class="rt-rank" style="color:'+rankCol+'">'+RANK_LABELS[i]+'</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="rate-tile-amount'+amtCls+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
-      '<div class="rate-tile-per">&#8377;'+p.rate.toFixed(2)+' per '+baseCur+'</div>'+
-      '<div class="rate-tile-bar"><div class="rate-tile-bar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
-      '<div class="rate-tile-meta">'+(p.fee>0?baseCur+' '+p.fee+' fee':'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
-      '<div class="rate-tile-footer">'+
-        diff+
-        '<a class="rate-tile-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &#8594;</a>'+
+      '<div class="rt-amount'+amtCls+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
+      '<div class="rt-per">&#8377;'+p.rate.toFixed(4)+' per '+baseCur+'</div>'+
+      '<div class="rt-bar"><div class="rt-bar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
+      '<div class="rt-meta">'+(p.fee>0?baseCur+' '+p.fee+' fee':'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin &middot; '+p.note+'</div>'+
+      '<div class="rt-footer">'+
+        diffHtml+
+        '<a class="rt-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
       '</div>'+
     '</div>';
   }).join('')+'</div>';
 
-  /* ── list rows (original) ── */
+  /* ── list rows (compact, no broken images) ── */
   var listHtml=rows.map(function(p,i){
-    var isBest=i===0;
-    var pct=worst===best?100:Math.round(70+(p.inr-worst)/(best-worst)*30);
-    var barColor=isBest?'var(--green)':i===rows.length-1?'var(--red)':'var(--amber)';
-    var diff=isBest?'':'<span style="font-size:12px;color:var(--red);font-weight:700"> -&#8377;'+Math.round(best-p.inr).toLocaleString('en-IN')+'</span>';
-    return'<div class="rate-row'+(isBest?' best':'')+'">'+
-      badge(p.name,p.link)+
-      '<div class="pinfo"><div class="pname">'+p.name+(isBest?'<span class="best-tag">BEST TODAY</span>':'')+
-      '</div><div class="pmeta">'+p.note+' &middot; '+(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div></div>'+
-      '<div class="pbar-col">'+
-        '<div class="pamount" style="color:'+(isBest?'var(--green)':'var(--text)')+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+diff+'</div>'+
-        '<div class="pamount-sub">&#8377;'+p.rate.toFixed(2)+' per '+baseCur+'</div>'+
-        '<div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>'+
+    var isBest=i===0, isWorst=i===rows.length-1;
+    var pct=worst===best?100:Math.round(55+(p.inr-worst)/(best-worst)*45);
+    var barCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--amber)';
+    var diff=isBest?'<span class="best-tag">BEST TODAY</span>':
+      '<span style="font-size:11px;color:rgba(239,68,68,.9);font-weight:700">-&#8377;'+Math.round(best-p.inr).toLocaleString('en-IN')+'</span>';
+    return '<div class="rate-row'+(isBest?' best':'')+'">'+
+      rtBadge(p.name)+
+      '<div class="pinfo">'+
+        '<div class="pname">'+p.name+' '+diff+'</div>'+
+        '<div class="pmeta">'+p.note+' &middot; '+(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
       '</div>'+
-      '<a class="rate-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send Now &#8594;</a>'+
+      '<div class="pbar-col">'+
+        '<div class="pamount" style="color:'+(isBest?'var(--green)':'var(--text)')+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
+        '<div class="pamount-sub">&#8377;'+p.rate.toFixed(2)+' per '+baseCur+'</div>'+
+        '<div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
+      '</div>'+
+      '<a class="rate-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send Now &rarr;</a>'+
       '<div class="rate-row-mobile-cta">'+
         '<span style="font-size:11px;color:var(--muted)">'+p.note+'</span>'+
-        '<a class="rate-cta-sm'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send Now &#8594;</a>'+
+        '<a class="rate-cta-sm'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
       '</div>'+
     '</div>';
   }).join('');
 
-  wrap.className='rates-wrap '+(_rateViewMode==='tile'?'tile-mode':'list-mode');
-  wrap.innerHTML=toggleHtml+tilesHtml+listHtml;
+  wrap.innerHTML=toggleHtml+summaryHtml+tilesHtml+listHtml;
+  wrap.classList.remove('rt-tile','rt-list');
+  wrap.classList.add(isTile?'rt-tile':'rt-list');
+  wrap.style.display='block';
 
-  document.getElementById('rate-note-text').innerHTML='<strong>&#8505;&#65039; These are estimates only.</strong> Rates shown = today mid-market rate (1 '+baseCur+' = &#8377;'+midRate.toFixed(4)+') minus each provider typical margin & fee. <strong>Actual rates change every few minutes</strong> and providers may run promotions not reflected here. <span style="color:var(--amber);font-weight:700">Always confirm live rate on provider site before sending.</span>';
+  document.getElementById('rate-note-text').innerHTML='<strong>&#8505;&#65039; Estimates only.</strong> Rates = live mid-market (1 '+baseCur+' = &#8377;'+midRate.toFixed(4)+') minus provider margin &amp; fee. Rates change in real time — <span style="color:var(--amber);font-weight:700">always confirm on provider site before sending.</span>';
   renderRatePreview();
   renderMarketRate();
-}
-function badgeColor(name){
-  var h=0;for(var i=0;i<name.length;i++){h=(h*31+name.charCodeAt(i))&0xffffff;}
-  var colors=['#0070c9','#00875a','#6b47dc','#c97c0a','#c0392b','#2980b9','#16a085','#8e44ad','#d35400','#1abc9c'];
-  return colors[name.charCodeAt(0)%colors.length];
-}
-function initials(name){
-  return name.split(' ').slice(0,2).map(function(w){return w[0];}).join('').toUpperCase();
 }
 
 // ── SIP ─────────────────────────────────────────
@@ -5564,7 +5642,7 @@ function _fmtQ(v){
 })();
 
 /* ══════════════════════════════════════════════════════════════════════════
-   EDUCATION TAB — EXTRA TOOLS  v8.6
+   EDUCATION TAB — EXTRA TOOLS  v8.7
    1. Country Comparison
    2. Degree ROI / Payback
    3. Education Loan EMI

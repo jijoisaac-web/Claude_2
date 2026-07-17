@@ -2,10 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.0.2] — 2026-07-17
+
+- Deals table root-cause fix for "same old data": NSE's snapshot is a multi-day window and the table sorted purely by value, so huge old blocks stayed pinned on top. Now defaults to the **latest session only** (1-day bulk/block tolerance), sorts date-then-value, shows a Date column per deal, and offers an "include older days" checkbox
+
 ## [3.0.1] — 2026-07-17
 
 - Bulk & block deals staleness fix (was showing 14-Jul on the 17th): the same NSE stale-payload-to-cookie-less-clients issue fixed for FII/DII in v2.28.2 — the deals function now checks the newest deal date in the payload, retries with a fresh cookie handshake when it's >3.5 days old, and keeps the fresher response; edge cache lowered to 15 min
 - Deals header now shows the newest date across bulk+block (was the first block deal's date, which could understate freshness)
+- Freshness checks upgraded to trading-day aware (both deals and FII/DII): data must be from the last completed weekday (±1 day publication grace) — a fixed N-day threshold couldn't distinguish "Tuesday's data on Friday" (stale) from "Friday's data on Monday" (fine)
 
 ## [3.0.0] — 2026-07-16 · Mutual Funds
 
