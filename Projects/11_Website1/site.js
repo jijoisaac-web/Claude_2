@@ -1,4 +1,4 @@
-/* v8.8 */
+/* v8.9 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -146,10 +146,15 @@ const BADGE={
   'default':       {bg:'#1a2a3b',color:'#94a3b8',text:'?'},
 };
 function badgeFail(img,bg,color,txt){
-  const p=img.closest('.pbadge');
+  const p=img.closest('.pbadge,.rt-badge');
   if(!p)return;
-  p.style.background=bg;p.style.padding='0';
-  p.innerHTML=`<span style="color:${color};font-weight:900;font-size:11px">${txt}</span>`;
+  p.style.background=bg;p.style.padding='0';p.style.overflow='hidden';
+  p.innerHTML='<span style="color:'+color+';font-weight:900;font-size:11px">'+txt+'</span>';
+}
+function rtBadgeFail(img){
+  var b=img.parentElement;if(!b)return;
+  b.style.background=b.dataset.bg;b.style.padding='0';b.style.overflow='hidden';
+  b.innerHTML='<span style="color:'+b.dataset.fg+';font-weight:900;font-size:11px">'+b.dataset.ini+'</span>';
 }
 function badge(name,link){
   const s=BADGE[name]||BADGE['default'];
@@ -527,7 +532,7 @@ function renderRatePreview(){
   const rpcRows=document.getElementById('rpc-rows');
   if(!rpcRows)return;
   rpcRows.innerHTML=rows.map((p,i)=>{
-    const rpcBadge=rtBadge(p.name);
+    const rpcBadge=rtBadge(p.name,p.link);
     return`<div class="rpc-row">
       ${rpcBadge}
       <div class="rpc-info">
@@ -580,9 +585,15 @@ var RT_COLORS={
   'XE Money Transfer':['#005792','#fff'],
   'Vaiour':['#2e7d32','#fff'],
 };
-function rtBadge(name){
+function rtBadge(name,link){
   var c=RT_COLORS[name]||['#263238','#90a4ae'];
   var ini=name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+  if(link&&link!=='#'){
+    try{
+      var dom=new URL(link).hostname.replace('www.','');
+      return '<div class="rt-badge" style="background:#1a1f2e;padding:3px;overflow:hidden" data-bg="'+c[0]+'" data-fg="'+c[1]+'" data-ini="'+ini+'"><img src="https://www.google.com/s2/favicons?domain='+dom+'&sz=64" width="30" height="30" style="object-fit:contain;border-radius:5px;display:block" onerror="rtBadgeFail(this)" loading="lazy"></div>';
+    }catch(e){}
+  }
   return '<div class="rt-badge" style="background:'+c[0]+';color:'+c[1]+'">'+ini+'</div>';
 }
 
@@ -660,7 +671,7 @@ function renderRates(){
       :'<span class="rt-diff neg">-&#8377;'+diffAmt.toLocaleString('en-IN')+'</span>';
     return '<div class="rate-tile'+tileCls+'">'+
       '<div class="rt-header">'+
-        rtBadge(p.name)+
+        rtBadge(p.name,p.link)+
         '<div class="rt-info">'+
           '<div class="rt-name" title="'+p.name+'">'+p.name+'</div>'+
           '<div class="rt-rank" style="color:'+rankCol+'">'+RANK_LABELS[i]+'</div>'+
@@ -685,7 +696,7 @@ function renderRates(){
     var diff=isBest?'<span class="best-tag">BEST TODAY</span>':
       '<span style="font-size:11px;color:rgba(239,68,68,.9);font-weight:700">-&#8377;'+Math.round(best-p.inr).toLocaleString('en-IN')+'</span>';
     return '<div class="rate-row'+(isBest?' best':'')+'">'+
-      rtBadge(p.name)+
+      rtBadge(p.name,p.link)+
       '<div class="pinfo">'+
         '<div class="pname">'+p.name+' '+diff+'</div>'+
         '<div class="pmeta">'+p.note+' &middot; '+(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
