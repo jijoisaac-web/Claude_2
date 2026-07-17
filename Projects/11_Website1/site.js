@@ -1,4 +1,4 @@
-/* v8.7 */
+/* v8.8 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -527,11 +527,7 @@ function renderRatePreview(){
   const rpcRows=document.getElementById('rpc-rows');
   if(!rpcRows)return;
   rpcRows.innerHTML=rows.map((p,i)=>{
-    const s=BADGE[p.name]||BADGE['default'];
-    const dom2=p.link&&p.link!=='#'?new URL(p.link).hostname.replace('www.',''):null;
-    const rpcBadge=dom2
-      ?`<div class="rpc-badge" style="background:#fff;padding:2px;overflow:hidden;border:1px solid rgba(200,200,200,0.15)"><img src="https://www.google.com/s2/favicons?domain=${dom2}&sz=64" width="32" height="32" style="object-fit:contain;border-radius:4px;display:block" onerror="badgeFail(this,'${s.bg}','${s.color}','${s.text}')" loading="lazy"></div>`
-      :`<div class="rpc-badge" style="background:${s.bg};color:${s.color}">${s.text}</div>`;
+    const rpcBadge=rtBadge(p.name);
     return`<div class="rpc-row">
       ${rpcBadge}
       <div class="rpc-info">
@@ -707,7 +703,9 @@ function renderRates(){
     '</div>';
   }).join('');
 
-  wrap.innerHTML=toggleHtml+summaryHtml+tilesHtml+listHtml;
+  wrap.innerHTML=isTile
+    ?toggleHtml+summaryHtml+tilesHtml
+    :toggleHtml+listHtml;
   wrap.classList.remove('rt-tile','rt-list');
   wrap.classList.add(isTile?'rt-tile':'rt-list');
   wrap.style.display='block';
