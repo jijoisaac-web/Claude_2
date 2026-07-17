@@ -1,4 +1,4 @@
-/* v8.9 */
+/* v9.0 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -92,6 +92,8 @@ function renderMarketRate(){
   // Mid-market values
   const midReceive=amt*midRate;
   document.getElementById('mktRateVal').innerHTML=`1 ${baseCur} = <strong style="color:var(--teal)">&#8377;${midRate.toFixed(4)}</strong>`;
+  const _badge=document.getElementById('mktRateValBadge');
+  if(_badge)_badge.textContent='1 '+baseCur+' = ₹'+midRate.toFixed(2);
   document.getElementById('mktSendAmt').textContent=amt.toLocaleString('en-IN');
   document.getElementById('mktSendCur').textContent=baseCur;
   document.getElementById('mktReceiveVal').textContent='₹'+Math.round(midReceive).toLocaleString('en-IN');

@@ -1,4 +1,4 @@
-/* v8.9 */
+/* v9.0 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2538,3 +2538,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .edab-sch-link:hover{text-decoration:underline;}
 .edab-sch-empty{color:var(--muted);font-size:.82rem;padding:12px 0;}
 /* ══ END EDUCATION EXTRA TOOLS ═════════════════════════════════════════════ */
+
+/* ── Rate Methodology Accordion (v9.0) ──────────────────────────── */
+.rate-methodology{margin-top:12px;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.rate-methodology-summary{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;font-size:12px;font-weight:700;color:var(--muted);list-style:none;user-select:none;gap:12px;}
+.rate-methodology-summary::-webkit-details-marker{display:none;}
+.rate-methodology-summary::after{content:"\25BE";font-size:14px;transition:transform .2s;}
+.rate-methodology[open] .rate-methodology-summary::after{transform:rotate(-180deg);}
+.rate-meth-badge{background:var(--elevated);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:12px;font-weight:800;color:var(--green);letter-spacing:-.3px;}
+.rate-methodology .mkt-rate-card{border-radius:0;border:none;border-top:1px solid var(--border);margin:0;}
+.rate-methodology .rate-crosscheck{border-radius:0;border:none;border-top:1px solid var(--border);}
+

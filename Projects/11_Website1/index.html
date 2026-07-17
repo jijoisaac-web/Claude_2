@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=8.9"/>
+<link rel="stylesheet" href="/site.css?v=9.0"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v8.9</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v9.0</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1546,28 +1546,34 @@ document.addEventListener('DOMContentLoaded',function(){
       <span class="cur-tag" id="curTag">AED</span>
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
       <span style="font-size:13px;font-weight:600;color:var(--text2)">Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
-      <button class="compare-btn" onclick="renderRates();renderMarketRate()">Compare Rates ↗</button>
     </div>
-    <div class="mkt-rate-card" id="mktRateCard">
-      <div>
-        <div class="mkt-rate-label">
-          <span>Mid-Market Rate</span>
-          <span class="mkt-xe-badge">XE.COM</span>
-        </div>
-        <div class="mkt-rate-val" id="mktRateVal">1 AED = &#8377;&#8212;</div>
-        <div class="mkt-rate-sub">The real interbank rate &middot; Live from currency API &middot; Updated <span id="mktRateTime">&mdash;</span></div>
-        <div class="mkt-vs-bar" id="mktVsBar"></div>
-      </div>
-      <div class="mkt-right">
-        <div class="mkt-receive-label">You send <span id="mktSendAmt">1,000</span> <span id="mktSendCur">AED</span> &rarr; at mid-market:</div>
-        <div class="mkt-receive-val" id="mktReceiveVal">&#8377;&mdash;</div>
-        <div class="mkt-receive-note">Providers typically give <strong id="mktMarginNote">&mdash;</strong> less due to their margin</div>
-      </div>
-    </div>
-    <div id="rate-crosscheck" class="rate-crosscheck" style="display:none"></div>
     <div id="rates-loading" class="rates-loading" style="display:none"></div>
     <div id="rates-container" class="rates-wrap" style="display:none"></div>
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
+    <!-- Rate methodology accordion -->
+    <details class="rate-methodology" id="rateMethodologyDetails">
+      <summary class="rate-methodology-summary">
+        <span>&#8505; Rate methodology &amp; cross-check</span>
+        <span class="rate-meth-badge" id="mktRateValBadge">1 AED = &#8377;&mdash;</span>
+      </summary>
+      <div class="mkt-rate-card" id="mktRateCard">
+        <div>
+          <div class="mkt-rate-label">
+            <span>Mid-Market Rate</span>
+            <span class="mkt-xe-badge">XE.COM</span>
+          </div>
+          <div class="mkt-rate-val" id="mktRateVal">1 AED = &#8377;&#8212;</div>
+          <div class="mkt-rate-sub">The real interbank rate &middot; Live from currency API &middot; Updated <span id="mktRateTime">&mdash;</span></div>
+          <div class="mkt-vs-bar" id="mktVsBar"></div>
+        </div>
+        <div class="mkt-right">
+          <div class="mkt-receive-label">You send <span id="mktSendAmt">1,000</span> <span id="mktSendCur">AED</span> &rarr; at mid-market:</div>
+          <div class="mkt-receive-val" id="mktReceiveVal">&#8377;&mdash;</div>
+          <div class="mkt-receive-note">Providers typically give <strong id="mktMarginNote">&mdash;</strong> less due to their margin</div>
+        </div>
+      </div>
+      <div id="rate-crosscheck" class="rate-crosscheck"></div>
+    </details>
 
     <div class="info" style="margin-top:16px;border-left:3px solid rgba(99,102,241,0.5)"><strong>How to read this:</strong> INR shown = today&apos;s mid-market rate minus each provider&apos;s <em>typical</em> margin &amp; fee. Visual bars show relative value — longer bar = more rupees received. <strong>Providers run promotions and change rates in real time</strong> — always click a provider to confirm the live rate before transferring. Promos (like zero-fee first transfers) will make the actual rate better than shown here.</div>
 
@@ -3113,7 +3119,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=8.9"></script>
+<script src="/site.js?v=9.0"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
