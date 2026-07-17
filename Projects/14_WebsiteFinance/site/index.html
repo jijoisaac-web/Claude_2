@@ -831,7 +831,10 @@ function renderDeals(){
   if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
   deals.sort((a,b)=>(b.valueCr||0)-(a.valueCr||0));
   const shown = deals.slice(0,15);
-  $("dealsMeta").textContent = `· ${dealsData[0]?.date||""} · ${deals.length} deals · showing top ${shown.length} by value`;
+  const MABBR = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const dealTs = d => { const m=/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(d.date||""); return m? new Date(+m[3],MABBR[m[2]]??0,+m[1]).getTime():0; };
+  const newest = dealsData.reduce((best,d)=> dealTs(d)>dealTs(best)?d:best, dealsData[0]||{});
+  $("dealsMeta").textContent = `· latest: ${newest?.date||""} · ${deals.length} deals · showing top ${shown.length} by value`;
   $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
     <th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{

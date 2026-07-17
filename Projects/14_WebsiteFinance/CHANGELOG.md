@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.0.1] — 2026-07-17
+
+- Bulk & block deals staleness fix (was showing 14-Jul on the 17th): the same NSE stale-payload-to-cookie-less-clients issue fixed for FII/DII in v2.28.2 — the deals function now checks the newest deal date in the payload, retries with a fresh cookie handshake when it's >3.5 days old, and keeps the fresher response; edge cache lowered to 15 min
+- Deals header now shows the newest date across bulk+block (was the first block deal's date, which could understate freshness)
+
 ## [3.0.0] — 2026-07-16 · Mutual Funds
 
 - New **Mutual Funds** tab (Cloudflare site only): track your actual mutual fund folio alongside the equity tools

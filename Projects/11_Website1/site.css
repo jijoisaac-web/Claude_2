@@ -1,4 +1,4 @@
-/* v8.5 */
+/* v8.6 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -247,6 +247,42 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .rates-wrap{display:flex;flex-direction:column;gap:8px;}
 .rates-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px;color:var(--muted);gap:16px;font-size:14px;}
 .spin{width:28px;height:28px;border:3px solid rgba(240,165,32,.15);border-top-color:var(--amber);border-radius:50%;animation:rot .7s linear infinite;}
+
+/* ── Rate Tile Grid (v8.6) ──────────────────────────────────────────── */
+.rate-view-toggle{display:flex;gap:8px;margin-bottom:16px;align-items:center;}
+.rate-view-btn{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.rate-view-btn.active{background:var(--amber);border-color:var(--amber);color:#000;}
+.rate-view-btn:hover:not(.active){border-color:var(--border2);color:var(--text);}
+.rate-view-lbl{font-size:12px;color:var(--muted);margin-left:4px;}
+.rate-tiles-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:900px){.rate-tiles-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.rate-tiles-grid{grid-template-columns:1fr 1fr;gap:8px;}}
+.rate-tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,transform .15s;position:relative;overflow:hidden;}
+.rate-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;border-radius:14px 14px 0 0;transition:background .2s;}
+.rate-tile.best::before{background:var(--green);}
+.rate-tile.worst::before{background:var(--red);}
+.rate-tile:hover{border-color:var(--border2);transform:translateY(-2px);}
+.rate-tile.best{border-color:rgba(34,211,154,.28);}
+.rate-tile-header{display:flex;align-items:center;gap:8px;}
+.rate-tile-badge{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;border:1px solid rgba(255,255,255,.08);}
+.rate-tile-name{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.25;flex:1;}
+.rate-tile-amount{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1.1;}
+.rate-tile-amount.best-amt{color:var(--green);}
+.rate-tile-amount.worst-amt{color:var(--red);}
+.rate-tile-per{font-size:11px;color:var(--muted);margin-top:1px;}
+.rate-tile-diff{font-size:11px;color:var(--red);font-weight:700;}
+.rate-tile-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.rate-tile-bar-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.34,1.56,.64,1);}
+.rate-tile-meta{font-size:11px;color:var(--muted);line-height:1.4;}
+.rate-tile-footer{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.rate-tile-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;transition:transform .15s;}
+.rate-tile-cta:hover{transform:translateY(-1px);}
+.rate-tile-cta.disabled{opacity:.3;pointer-events:none;}
+.rate-tile-rank{font-size:10px;font-weight:800;color:var(--muted);}
+/* List mode keeps old .rate-row styles */
+.rates-wrap.tile-mode .rate-row{display:none;}
+.rates-wrap.list-mode .rate-tiles-grid{display:none;}
+
 .rate-row{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:16px;transition:border-color .15s,transform .15s;position:relative;overflow:hidden;}
 .rate-row::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:transparent;border-radius:0 3px 3px 0;transition:background .2s;}
 .rate-row.best::before{background:var(--green);}
@@ -634,7 +670,43 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .f input,[data-theme="light"] .f select{background:var(--elevated);border-color:var(--border2);color:var(--text);}
 [data-theme="light"] .f select option{background:var(--surface);color:var(--text);}
 [data-theme="light"] .ri{background:var(--elevated);}
-[data-theme="light"] .rate-row{background:var(--card);}
+[data-theme="light"] 
+/* ── Rate Tile Grid (v8.6) ──────────────────────────────────────────── */
+.rate-view-toggle{display:flex;gap:8px;margin-bottom:16px;align-items:center;}
+.rate-view-btn{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.rate-view-btn.active{background:var(--amber);border-color:var(--amber);color:#000;}
+.rate-view-btn:hover:not(.active){border-color:var(--border2);color:var(--text);}
+.rate-view-lbl{font-size:12px;color:var(--muted);margin-left:4px;}
+.rate-tiles-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:900px){.rate-tiles-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.rate-tiles-grid{grid-template-columns:1fr 1fr;gap:8px;}}
+.rate-tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s,transform .15s;position:relative;overflow:hidden;}
+.rate-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;border-radius:14px 14px 0 0;transition:background .2s;}
+.rate-tile.best::before{background:var(--green);}
+.rate-tile.worst::before{background:var(--red);}
+.rate-tile:hover{border-color:var(--border2);transform:translateY(-2px);}
+.rate-tile.best{border-color:rgba(34,211,154,.28);}
+.rate-tile-header{display:flex;align-items:center;gap:8px;}
+.rate-tile-badge{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;border:1px solid rgba(255,255,255,.08);}
+.rate-tile-name{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.25;flex:1;}
+.rate-tile-amount{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1.1;}
+.rate-tile-amount.best-amt{color:var(--green);}
+.rate-tile-amount.worst-amt{color:var(--red);}
+.rate-tile-per{font-size:11px;color:var(--muted);margin-top:1px;}
+.rate-tile-diff{font-size:11px;color:var(--red);font-weight:700;}
+.rate-tile-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.rate-tile-bar-fill{height:100%;border-radius:2px;transition:width .7s cubic-bezier(.34,1.56,.64,1);}
+.rate-tile-meta{font-size:11px;color:var(--muted);line-height:1.4;}
+.rate-tile-footer{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.rate-tile-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;transition:transform .15s;}
+.rate-tile-cta:hover{transform:translateY(-1px);}
+.rate-tile-cta.disabled{opacity:.3;pointer-events:none;}
+.rate-tile-rank{font-size:10px;font-weight:800;color:var(--muted);}
+/* List mode keeps old .rate-row styles */
+.rates-wrap.tile-mode .rate-row{display:none;}
+.rates-wrap.list-mode .rate-tiles-grid{display:none;}
+
+.rate-row{background:var(--card);}
 [data-theme="light"] .mkt-rate-card{background:var(--elevated);}
 [data-theme="light"] .bank-row{background:var(--elevated);}
 [data-theme="light"] .tab-nav-shell{background:var(--surface);}
@@ -2373,7 +2445,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hero-cpill-more:hover{background:rgba(20,184,166,0.1)!important;}
 @media(max-width:640px){.hero-cstrip{gap:8px;}.hero-cstrip-lbl{font-size:11px;}.hero-cpill{font-size:11px;padding:4px 9px;}}
 
-/* ══ EDUCATION EXTRA TOOLS v8.5 ═══════════════════════════════════════════ */
+/* ══ EDUCATION EXTRA TOOLS v8.6 ═══════════════════════════════════════════ */
 .edab-extra-tools{margin-top:24px;display:flex;flex-direction:column;gap:20px;}
 .edab-tool-block{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
 .edab-tool-hd{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:4px;}
