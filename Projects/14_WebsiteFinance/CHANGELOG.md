@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.2.0] — 2026-07-19 · Mutual Funds: CAGR + market-cap tilt
+
+- Holdings table gets a **CAGR** column — lump-sum annualised return since the holding's own invested date (the optional field already on the add-holding form). Shows "—" with a tooltip if no invested date was entered
+- New **Folio XIRR** summary card — money-weighted return across every holding that has an invested date, solved by bisection over the combined cashflows (each holding's invested amount on its own date, current value today). Card label notes how many of your holdings are dated if it's not all of them
+- New **Market-cap tilt** panel: buckets equity holdings into Large/Mid/Small from AMFI's scheme category (Large & Mid Cap funds split 50/50 across both). Multi Cap, Flexi Cap, ELSS, Focused, Value, Contra and Sectoral/Thematic funds carry no fixed cap mandate — shown separately as "Flexible" rather than guessed at, and excluded from the target math. Aggressive/Balanced/Conservative presets or custom targets, with buy/trim ₹ actions same as the asset-class panel
+- Rebalancing recommendations now also flag the single biggest market-cap drift within equity (alongside the existing asset-class drift, cost, and overlap flags)
+
 ## [3.1.2] — 2026-07-19
 
 - Conviction Scan was requiring all four gates from the raw universe scan in one pass — technical (setup≥55) AND money-flow AND delivery AND fundamentals(≥60), all independently rare — so it came back empty most runs. Restructured into a funnel: score every scanned stock on the 3 market-data gates (technical/money-flow/delivery) first, only fetch fundamentals for names already agreeing on 2 of those 3 (bounded to top 20, so a real 4/4 candidate is never silently skipped), then apply the fundamentals gate last

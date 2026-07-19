@@ -92,7 +92,7 @@ progress{width:180px;accent-color:var(--blue);}
 #searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
 #kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,#mfCapTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -115,6 +115,7 @@ progress{width:180px;accent-color:var(--blue);}
   button.btn{padding:7px 10px;font-size:12px;}
   /* wide tables: scroll inside their container */
   #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table,#convResults table,#mfHoldingsTable table{min-width:640px;}
+  #mfCapTable table{min-width:480px;}
   #watchTable table,#peerView table{min-width:420px;}
   .sectorRow .sname{width:96px;font-size:11px;}
   .sectorRow .bar{max-width:34vw;}
@@ -632,6 +633,26 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="mfAllocBar" class="breadthBar" style="margin:10px 0"></div>
   <div id="mfAllocTable"></div>
+
+  <h2 style="margin-top:24px">Market-cap tilt (within equity)</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Large/Mid/Small tilt comes from AMFI's scheme category (Large & Mid Cap funds split 50/50 across both). Multi Cap, Flexi Cap, ELSS, Focused, Value, Contra and Sectoral/Thematic funds have no fixed mandate — shown separately as "Flexible", excluded from the target math since we can't know their actual cap mix.</div>
+  <div class="controls">
+    <span class="muted">Target preset:</span>
+    <select id="mfCapPreset" onchange="mfApplyCapPreset()">
+      <option value="">Custom (set below)</option>
+      <option value="aggressive">Aggressive — 30L / 35M / 35S</option>
+      <option value="balanced">Balanced — 50L / 30M / 20S</option>
+      <option value="conservative">Conservative — 70L / 20M / 10S</option>
+    </select>
+  </div>
+  <div class="controls" style="flex-wrap:wrap">
+    <label class="muted">Large % <input type="text" id="mfCapLarge" size="4" value="50" oninput="mfRenderCapAllocation();mfRenderRecs()"></label>
+    <label class="muted">Mid % <input type="text" id="mfCapMid" size="4" value="30" oninput="mfRenderCapAllocation();mfRenderRecs()"></label>
+    <label class="muted">Small % <input type="text" id="mfCapSmall" size="4" value="20" oninput="mfRenderCapAllocation();mfRenderRecs()"></label>
+    <span class="muted" id="mfCapTgtSum"></span>
+  </div>
+  <div id="mfCapBar" class="breadthBar" style="margin:10px 0"></div>
+  <div id="mfCapTable"></div>
 
   <h2 style="margin-top:24px">Rebalancing recommendations</h2>
   <div id="mfRecs"><div class="loading">Add holdings above to see recommendations</div></div>
@@ -3089,6 +3110,56 @@ function mfAssetClass(h){
   }
   return "Other";
 }
+// Market-cap tilt — only meaningful for equity holdings. AMFI's scheme category names the mandate
+// directly for Large/Mid/Small/Large&Mid/Multi Cap; Flexi Cap, ELSS, Focused, Value, Contra and
+// Sectoral/Thematic funds carry no fixed cap mandate, so they're left null ("Flexible") on purpose
+// rather than guessed at. Equity index/ETF schemes fall back to a name-based guess (Nifty50/Sensex
+// etc.) since AMFI files them all under "Other Scheme - Index Funds" regardless of the index tracked.
+function mfCapTilt(h){
+  if(mfAssetClass(h)!=="Equity") return null;
+  const cat = (h.category||"").toLowerCase(), name = (h.name||"").toLowerCase();
+  if(cat.includes("large & mid cap")) return "Large & Mid";
+  if(cat.includes("large cap")) return "Large";
+  if(cat.includes("mid cap")) return "Mid";
+  if(cat.includes("small cap")) return "Small";
+  if(cat.includes("multi cap") || cat.includes("flexi cap")) return null;
+  if(cat.includes("index") || cat.includes("etf") || cat.includes("fund of fund")){
+    if(/nifty ?50\b|sensex|nifty ?next ?50|bse ?100\b/.test(name)) return "Large";
+    if(/midcap|mid cap/.test(name)) return "Mid";
+    if(/smallcap|small cap/.test(name)) return "Small";
+    if(/nifty ?500|multicap|multi cap|total market/.test(name)) return null;
+    return "Large"; // most single-index equity ETFs/index funds on offer track large-cap indices
+  }
+  return null; // ELSS, Focused, Value, Contra, Dividend Yield, Sectoral/Thematic — no fixed mandate
+}
+// Lump-sum CAGR for one holding, using its own invested date. Needs the optional "invested on" date.
+function mfCagr(h){
+  if(!h.investedDate || h.nav==null || !h.invested || h.invested<=0) return null;
+  const days = (Date.now() - new Date(h.investedDate).getTime()) / 86400000;
+  if(days < 30) return null; // too short to annualise meaningfully
+  const value = h.nav * h.units;
+  if(value<=0) return null;
+  return (Math.pow(value/h.invested, 365/days) - 1) * 100;
+}
+// Folio-level money-weighted return (XIRR) across every holding that has an invested date — each
+// holding's invested amount is a cashflow on its own date, current value is one combined cashflow
+// today. Solved by bisection since there's no closed form. Returns null if too few dated holdings
+// or the equation doesn't bracket a root within a sane -99%..+500% annualised range.
+function mfPortfolioXirr(folio){
+  const dated = folio.filter(h=>h.investedDate && h.nav!=null && h.invested>0);
+  if(!dated.length) return null;
+  const now = Date.now();
+  const flows = dated.map(h=>({inv:h.invested, yrs:(now-new Date(h.investedDate).getTime())/86400000/365}));
+  const totalValue = dated.reduce((s,h)=>s+h.nav*h.units,0);
+  const npv = r => totalValue - flows.reduce((s,f)=>s+f.inv*Math.pow(1+r, f.yrs), 0);
+  let lo=-0.99, hi=5, fLo=npv(lo), fHi=npv(hi);
+  if(isNaN(fLo) || isNaN(fHi) || fLo*fHi>0) return null;
+  for(let i=0;i<100;i++){
+    const mid=(lo+hi)/2, fMid=npv(mid);
+    if((fLo<0)===(fMid<0)){ lo=mid; fLo=fMid; } else hi=mid;
+  }
+  return (lo+hi)/2*100;
+}
 function mfNormalizeForMatch(name){
   return (name||"").toLowerCase()
     .replace(/\bdirect\b/g,"")
@@ -3226,18 +3297,23 @@ function mfRenderHoldings(){
   });
   const totalGain = totalCur - totalInv, totalGainPct = totalInv ? totalGain/totalInv*100 : 0;
   const signedRupee = v => (v<0?"-":"+") + "₹" + fmtInt(Math.round(Math.abs(v)));
+  const xirr = mfPortfolioXirr(folio);
+  const datedCount = folio.filter(h=>h.investedDate).length;
   $("mfSummaryCards").innerHTML = [
     {name:"Invested", v:"₹"+fmtInt(Math.round(totalInv))},
     {name:"Current value", v:"₹"+fmtInt(Math.round(totalCur))},
     {name:"Gain/Loss", v:signedRupee(totalGain), cls:cls(totalGain)},
     {name:"Gain/Loss %", v:sign(totalGainPct)+fmt(totalGainPct)+"%", cls:cls(totalGainPct)},
     {name:"Holdings", v:folio.length},
+    {name:`Folio XIRR${datedCount<folio.length?` (${datedCount}/${folio.length} dated)`:""}`,
+     v: xirr!=null ? sign(xirr)+fmt(xirr,1)+"%" : "—", cls: xirr!=null?cls(xirr):""},
   ].map(c=>`<div class="card"><div class="name">${c.name}</div><div class="price ${c.cls||""}">${c.v}</div></div>`).join("");
 
   $("mfHoldingsTable").innerHTML = `<table><thead><tr>
-    <th>Scheme</th><th>Plan</th><th>Units</th><th>Invested ₹</th><th>NAV</th><th>Value ₹</th><th>Gain/Loss</th><th>Weight</th><th></th>
+    <th>Scheme</th><th>Plan</th><th>Units</th><th>Invested ₹</th><th>NAV</th><th>Value ₹</th><th>Gain/Loss</th>
+    <th title="Annualised return since your invested date — add that date when adding a holding to see this">CAGR</th><th>Weight</th><th></th>
     </tr></thead><tbody>` + rows.map(r=>{
-      const h = r.h;
+      const h = r.h, cagr = mfCagr(h);
       return `<tr>
         <td><span class="sym">${h.name}</span><br><span class="subname">${h.house||""} · ${mfCategoryShort(h.category)}${h.navDate?" · NAV "+h.navDate:""}</span></td>
         <td>${mfPlanOf(h.name)}</td>
@@ -3246,6 +3322,7 @@ function mfRenderHoldings(){
         <td>${h.nav!=null?fmt(h.nav):"—"}</td>
         <td>${r.value!=null?"₹"+fmtInt(Math.round(r.value)):"—"}</td>
         <td class="${cls(r.gain||0)}">${r.gain!=null?(signedRupee(r.gain)+" ("+sign(r.gainPct)+fmt(r.gainPct)+"%)"):"—"}</td>
+        <td class="${cagr!=null?cls(cagr):""}">${cagr!=null?sign(cagr)+fmt(cagr,1)+"%":'<span class="muted" title="Add an invested date to see CAGR">—</span>'}</td>
         <td>${fmt(r.weight,1)}%</td>
         <td><button class="btn danger" onclick="mfRemoveHolding(${r.i})">✕</button></td>
       </tr>`;
@@ -3305,6 +3382,67 @@ function mfRenderAllocation(){
     }).join("") + "</tbody></table>";
 }
 
+/* ---- market-cap tilt within equity: Large/Mid/Small vs target (shared calc, like the asset-class one) ---- */
+const MF_CAP_PRESETS = {
+  aggressive: {large:30, mid:35, small:35},
+  balanced: {large:50, mid:30, small:20},
+  conservative: {large:70, mid:20, small:10},
+};
+function mfApplyCapPreset(){
+  const p = MF_CAP_PRESETS[$("mfCapPreset").value]; if(!p) return;
+  $("mfCapLarge").value=p.large; $("mfCapMid").value=p.mid; $("mfCapSmall").value=p.small;
+  mfRenderCapAllocation(); mfRenderRecs();
+}
+function mfComputeCapAllocation(){
+  const folio = getMfFolio();
+  const buckets = {Large:0, Mid:0, Small:0, Flexible:0};
+  let equityTotal = 0;
+  folio.forEach(h=>{
+    if(h.nav==null || mfAssetClass(h)!=="Equity") return;
+    const value = h.nav*h.units;
+    equityTotal += value;
+    const tilt = mfCapTilt(h);
+    if(tilt==="Large") buckets.Large += value;
+    else if(tilt==="Mid") buckets.Mid += value;
+    else if(tilt==="Small") buckets.Small += value;
+    else if(tilt==="Large & Mid"){ buckets.Large += value/2; buckets.Mid += value/2; }
+    else buckets.Flexible += value; // Multi/Flexi Cap, ELSS, Focused, Value, Contra, Sectoral/Thematic
+  });
+  const targetable = equityTotal - buckets.Flexible; // target math excludes no-mandate funds
+  const tgt = {
+    Large: parseFloat($("mfCapLarge").value)||0,
+    Mid: parseFloat($("mfCapMid").value)||0,
+    Small: parseFloat($("mfCapSmall").value)||0,
+  };
+  const rows = ["Large","Mid","Small"].map(k=>{
+    const cur = buckets[k], curPct = targetable>0 ? cur/targetable*100 : 0, tgtPct = tgt[k];
+    const tgtVal = tgtPct/100*targetable, diff = tgtVal - cur;
+    return {cls:k, cur, curPct, tgtPct, diff};
+  });
+  return {equityTotal, targetable, buckets, tgt, rows};
+}
+function mfRenderCapAllocation(){
+  const {equityTotal, targetable, buckets, tgt, rows} = mfComputeCapAllocation();
+  if(!equityTotal){
+    $("mfCapBar").innerHTML = ""; $("mfCapTgtSum").textContent = "";
+    $("mfCapTable").innerHTML = '<div class="muted">No equity holdings with live NAVs yet.</div>';
+    return;
+  }
+  const tgtSum = tgt.Large+tgt.Mid+tgt.Small;
+  $("mfCapTgtSum").textContent = Math.round(tgtSum)===100 ? "✓ sums to 100%" : `sums to ${fmt(tgtSum,0)}% — adjust to 100%`;
+  const colors = {Large:"#60a5fa", Mid:"#fbbf24", Small:"#fb7185", Flexible:"#8b949e"};
+  $("mfCapBar").innerHTML = ["Large","Mid","Small","Flexible"].filter(k=>buckets[k]>0).map(k=>
+    `<div style="width:${(buckets[k]/equityTotal*100).toFixed(2)}%;background:${colors[k]}" title="${k} ${(buckets[k]/equityTotal*100).toFixed(1)}% of equity"></div>`).join("");
+  $("mfCapTable").innerHTML = `<table><thead><tr><th>Market cap</th><th>Current ₹</th><th>Current %</th><th>Target %</th><th>Action</th></tr></thead><tbody>` +
+    rows.map(r=>{
+      const action = targetable<=0 ? "—" : Math.abs(r.diff) < targetable*0.02 ? "On target"
+        : r.diff>0 ? `Buy ~₹${fmtInt(Math.round(r.diff))}` : `Trim ~₹${fmtInt(Math.round(-r.diff))}`;
+      return `<tr><td>${r.cls} Cap</td><td>₹${fmtInt(Math.round(r.cur))}</td><td>${fmt(r.curPct,1)}%<span class="muted" style="font-size:10px"> of tilted equity</span></td><td>${fmt(r.tgtPct,1)}%</td><td>${action}</td></tr>`;
+    }).join("") +
+    (buckets.Flexible>0 ? `<tr><td>Flexible mandate<span class="muted" style="font-size:10px;display:block">Multi/Flexi Cap, ELSS, Focused, Value, Contra, Sectoral — manager's discretion</span></td><td>₹${fmtInt(Math.round(buckets.Flexible))}</td><td>${fmt(buckets.Flexible/equityTotal*100,1)}%<span class="muted" style="font-size:10px"> of all equity</span></td><td>—</td><td>—</td></tr>` : "") +
+    "</tbody></table>";
+}
+
 /* ---- rebalancing recommendations: cost (regular→direct), overlap, allocation drift ---- */
 function mfRenderRecs(){
   const folio = getMfFolio();
@@ -3330,12 +3468,21 @@ function mfRenderRecs(){
         : `📉 <b>${biggest.cls}</b> is over target (${fmt(biggest.curPct,1)}% vs ${fmt(biggest.tgtPct,1)}%) — consider trimming ~₹${fmtInt(Math.round(-biggest.diff))} and redirecting toward underweight classes.`});
     }
   }
+  const {targetable, rows:capRows} = mfComputeCapAllocation();
+  if(targetable > 0){
+    const biggestCap = capRows.sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff))[0];
+    if(biggestCap && Math.abs(biggestCap.diff) > targetable*0.05){
+      recs.push({c:"#a78bfa", html: biggestCap.diff>0
+        ? `🎯 Within equity, <b>${biggestCap.cls} Cap</b> is under target (${fmt(biggestCap.curPct,1)}% vs ${fmt(biggestCap.tgtPct,1)}%) — tilt new equity investments (~₹${fmtInt(Math.round(biggestCap.diff))}) toward ${biggestCap.cls.toLowerCase()} cap.`
+        : `🎯 Within equity, <b>${biggestCap.cls} Cap</b> is over target (${fmt(biggestCap.curPct,1)}% vs ${fmt(biggestCap.tgtPct,1)}%) — consider trimming ~₹${fmtInt(Math.round(-biggestCap.diff))} of ${biggestCap.cls.toLowerCase()}-cap exposure.`});
+    }
+  }
   $("mfRecs").innerHTML = recs.length
     ? recs.map(r=>`<div class="card" style="margin-bottom:8px;border-color:${r.c}">${r.html}</div>`).join("")
     : '<div class="muted">No red flags found — folio looks reasonably clean on cost and overlap. Check the allocation table above for drift.</div>';
 }
 
-function mfRenderAll(){ mfRenderHoldings(); mfRenderAllocation(); mfRenderRecs(); }
+function mfRenderAll(){ mfRenderHoldings(); mfRenderAllocation(); mfRenderCapAllocation(); mfRenderRecs(); }
 
 /* ================= global search + keyboard shortcuts ================= */
 const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","conv","mf"];
