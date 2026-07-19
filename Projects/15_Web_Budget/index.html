@@ -3721,21 +3721,44 @@ renderAll();
 
 /* Mobile swipe gesture */
 (function(){
-  let tx=0, ty=0, swiping=false;
+  let tx=0, ty=0, swiping=false, lockedOut=false;
   const THRESHOLD=55, VERT_LOCK=60;
+
+  function isInScrollable(el){
+    // Walk up the DOM; if any ancestor can scroll horizontally, block tab swipe
+    while(el && el!==document.body){
+      const st=window.getComputedStyle(el);
+      const ox=st.overflowX;
+      if((ox==='auto'||ox==='scroll') && el.scrollWidth>el.clientWidth+4) return true;
+      el=el.parentElement;
+    }
+    return false;
+  }
+
   document.addEventListener('touchstart',e=>{
-    if(e.touches.length!==1) return;
-    tx=e.touches[0].clientX; ty=e.touches[0].clientY; swiping=true;
+    if(e.touches.length!==1){swiping=false;return;}
+    tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+    lockedOut=isInScrollable(e.target);
+    swiping=!lockedOut;
   },{passive:true});
+
+  document.addEventListener('touchmove',e=>{
+    if(!swiping) return;
+    const dx=Math.abs(e.touches[0].clientX-tx);
+    const dy=Math.abs(e.touches[0].clientY-ty);
+    // If motion is more vertical than horizontal early on, cancel tab swipe
+    if(dy>dx && dy>10) swiping=false;
+  },{passive:true});
+
   document.addEventListener('touchend',e=>{
     if(!swiping) return; swiping=false;
     const dx=e.changedTouches[0].clientX-tx;
     const dy=e.changedTouches[0].clientY-ty;
-    if(Math.abs(dy)>VERT_LOCK) return; // mostly vertical — ignore
+    if(Math.abs(dy)>VERT_LOCK) return;
     if(Math.abs(dx)<THRESHOLD) return;
     const cur=MOB_VIEWS.indexOf(document.querySelector('.mob-tab.active')?.id.replace('mobt-',''));
     if(cur<0) return;
-    const next=dx<0?Math.min(cur+1,4):Math.max(cur-1,0);
+    const next=dx<0?Math.min(cur+1,MOB_VIEWS.length-1):Math.max(cur-1,0);
     if(next===cur) return;
     const tab=document.getElementById('mobt-'+MOB_VIEWS[next]);
     if(tab) switchViewMob(MOB_VIEWS[next],tab);
