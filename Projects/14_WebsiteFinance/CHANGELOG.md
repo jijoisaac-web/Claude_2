@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.2.1] — 2026-07-19
+
+- Holdings can now be **edited** in place — a ✎ button per row loads units/invested amount/invested date back into the add-holding form (scheme itself is locked; remove and re-add to change which fund it is), with Save/Cancel
+- Added **Export**/**Import** for the folio (JSON download/upload, includes target allocation settings) — the folio lives in `localStorage` only and does not sync across devices or browsers automatically; this is the manual workaround for moving it or keeping a backup. Import offers Replace or Merge when you already have holdings saved
+- Disclaimer card now states the no-sync behavior explicitly (clearing browser data or using private/incognito mode loses the folio) rather than leaving it implicit
+
 ## [3.2.0] — 2026-07-19 · Mutual Funds: CAGR + market-cap tilt
 
 - Holdings table gets a **CAGR** column — lump-sum annualised return since the holding's own invested date (the optional field already on the add-holding form). Shows "—" with a tooltip if no invested date was entered

@@ -587,7 +587,7 @@ progress{accent-color:var(--violet);}
 <!-- MUTUAL FUNDS -->
 <section id="mf" class="tab">
   <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
-    <span class="muted">⚠️ Your folio, stored only in this browser (never sent anywhere except the AMFI NAV lookups below). NAVs come from AMFI's daily file via mfapi.in, refreshed once per day after markets close. Category/asset-class tagging is automated from AMFI's own scheme classification plus the scheme name — always check your CAS/factsheet before acting. Educational tool, not investment advice; switching plans can trigger exit load and capital gains tax, so check both first.</span>
+    <span class="muted">⚠️ Your folio is stored only in this browser's local storage (never sent anywhere except the AMFI NAV lookups below) — it does <b>not</b> sync across devices or browsers automatically, and clearing browser data or using private/incognito mode will lose it. Use Export/Import below to move it to another device or keep a backup. NAVs come from AMFI's daily file via mfapi.in, refreshed once per day after markets close. Category/asset-class tagging is automated from AMFI's own scheme classification plus the scheme name — always check your CAS/factsheet before acting. Educational tool, not investment advice; switching plans can trigger exit load and capital gains tax, so check both first.</span>
   </div>
 
   <h2>Add a fund to your folio</h2>
@@ -601,14 +601,17 @@ progress{accent-color:var(--violet);}
     <label class="muted">Units <input type="text" id="mfUnits" size="10" placeholder="e.g. 152.436"></label>
     <label class="muted">Invested ₹ <input type="text" id="mfInvested" size="10" placeholder="total cost"></label>
     <label class="muted">Invested on <input type="date" id="mfInvestedDate"></label>
-    <button class="btn" onclick="mfAddHolding()">+ Add to folio</button>
+    <button class="btn" id="mfSaveBtn" onclick="mfAddHolding()">+ Add to folio</button>
+    <button class="btn ghost" id="mfCancelBtn" style="display:none" onclick="mfCancelEdit()">Cancel</button>
   </div>
   <div class="muted" id="mfAddMeta" style="font-size:11px;margin:4px 0 14px"></div>
 
   <h2>Your folio <span class="muted" id="mfFolioMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="controls">
+  <div class="controls" style="flex-wrap:wrap">
     <button class="btn ghost" onclick="mfRefreshNavs()">↻ Refresh NAVs</button>
-    <span class="muted" style="font-size:11px">Weight, gain/loss and allocation below all update from these current values.</span>
+    <button class="btn ghost" onclick="mfExportFolio()">⬇ Export</button>
+    <label class="btn ghost" style="cursor:pointer;display:inline-block">⬆ Import<input type="file" accept="application/json" id="mfImportFile" style="display:none" onchange="mfImportFolio(this.files[0])"></label>
+    <span class="muted" style="font-size:11px">Weight, gain/loss and allocation below all update from these current values. Export/Import moves your folio between devices — nothing syncs automatically (see disclaimer above).</span>
   </div>
   <div class="cards" id="mfSummaryCards"></div>
   <div id="mfHoldingsTable"><div class="loading">Add a fund above to start your folio</div></div>
@@ -3082,6 +3085,7 @@ const MF_KEY = "ist_mf_folio";               // holdings, client-only
 const MF_SCHEMES_CACHE = "ist_mf_schemes_v1"; // cached AMFI scheme list (~28k rows), refreshed daily
 let mfSchemes = [];        // [{code, name, house}]
 let mfPicked = null;       // scheme currently selected in the add-holding form
+let mfEditIdx = null;      // index into the folio currently being edited, or null when adding fresh
 let mfDirectIndex = null;  // Map<normalizedNameNoPlan, directPlanScheme> — for the Regular→Direct finder
 
 function getMfFolio(){ try{ const v = JSON.parse(localStorage.getItem(MF_KEY)); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
@@ -3238,28 +3242,102 @@ async function mfAddHolding(){
   const units = parseFloat($("mfUnits").value), invested = parseFloat($("mfInvested").value);
   if(!units || units<=0 || !invested || invested<=0){ alert("Enter units and invested amount."); return; }
   const investedDate = $("mfInvestedDate").value || null;
-  $("mfAddMeta").textContent = "Fetching latest NAV…";
+  $("mfAddMeta").textContent = mfEditIdx!=null ? "Saving…" : "Fetching latest NAV…";
   try{
     const r = await fetch(`/api/mf/nav/${mfPicked.code}`);
     const j = await r.json();
     if(j.error) throw new Error(j.error);
     const folio = getMfFolio();
-    folio.push({
+    const entry = {
       code: mfPicked.code, name: j.name || mfPicked.name, house: j.house || mfPicked.house,
       category: j.category || null, type: j.type || null,
       units, invested, investedDate, nav: j.nav, navDate: j.date,
-    });
+    };
+    if(mfEditIdx!=null && folio[mfEditIdx]!=null) folio[mfEditIdx] = entry;
+    else folio.push(entry);
     setMfFolio(folio);
-    mfPicked = null; $("mfAddRow").style.display = "none";
-    $("mfUnits").value=""; $("mfInvested").value=""; $("mfInvestedDate").value="";
-    $("mfHouse").value=""; mfHouseChanged();
-    $("mfAddMeta").textContent = "";
+    mfResetForm();
     mfRenderAll();
   }catch(e){
-    $("mfAddMeta").textContent = "Couldn't fetch NAV: " + e.message + " — not added, try again.";
+    $("mfAddMeta").textContent = "Couldn't fetch NAV: " + e.message + " — not saved, try again.";
   }
 }
-function mfRemoveHolding(idx){ const folio = getMfFolio(); folio.splice(idx,1); setMfFolio(folio); mfRenderAll(); }
+function mfRemoveHolding(idx){
+  const folio = getMfFolio(); folio.splice(idx,1); setMfFolio(folio);
+  if(mfEditIdx===idx) mfResetForm(); // was editing the row that just got removed
+  mfRenderAll();
+}
+// Loads an existing holding's units/invested/date back into the add-holding form for in-place
+// editing. The scheme itself is locked — remove and re-add if you want to change which fund it is.
+function mfEditHolding(idx){
+  const folio = getMfFolio(), h = folio[idx]; if(!h) return;
+  mfEditIdx = idx;
+  mfPicked = {code:h.code, name:h.name, house:h.house};
+  $("mfAddRow").style.display = "flex";
+  $("mfPicked").textContent = h.name + " (" + (h.house||"") + ") — editing, scheme locked";
+  $("mfUnits").value = h.units;
+  $("mfInvested").value = h.invested;
+  $("mfInvestedDate").value = h.investedDate || "";
+  $("mfHouse").disabled = true; $("mfSchemeSel").disabled = true; $("mfSchemeSearch").disabled = true;
+  $("mfSaveBtn").textContent = "💾 Save changes";
+  $("mfCancelBtn").style.display = "inline-block";
+  $("mfAddMeta").textContent = "";
+  $("mfAddRow").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function mfCancelEdit(){ mfResetForm(); }
+function mfResetForm(){
+  mfEditIdx = null; mfPicked = null;
+  $("mfAddRow").style.display = "none";
+  $("mfUnits").value=""; $("mfInvested").value=""; $("mfInvestedDate").value="";
+  $("mfHouse").disabled = false; $("mfSchemeSel").disabled = false; $("mfSchemeSearch").disabled = false;
+  $("mfHouse").value = ""; mfHouseChanged(); $("mfSchemeSearch").value = "";
+  $("mfSaveBtn").textContent = "+ Add to folio";
+  $("mfCancelBtn").style.display = "none";
+  $("mfAddMeta").textContent = "";
+}
+
+/* ---- export/import: folio lives in localStorage only (no account, no server sync) — this is the
+   manual workaround for moving it to another device/browser or keeping a backup. ---- */
+function mfExportFolio(){
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    folio: getMfFolio(),
+    targets: {
+      asset: {equity:$("mfTgtEquity").value, debt:$("mfTgtDebt").value, gold:$("mfTgtGold").value, hybrid:$("mfTgtHybrid").value},
+      cap: {large:$("mfCapLarge").value, mid:$("mfCapMid").value, small:$("mfCapSmall").value},
+    },
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `mutual-fund-folio-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+async function mfImportFolio(file){
+  if(!file) return;
+  try{
+    const data = JSON.parse(await file.text());
+    const folio = Array.isArray(data) ? data : Array.isArray(data.folio) ? data.folio : null;
+    if(!folio) throw new Error("file doesn't look like a folio export");
+    const existing = getMfFolio();
+    const doReplace = existing.length
+      ? confirm(`You already have ${existing.length} holding(s) saved. OK = REPLACE them with the ${folio.length} in this file. Cancel = MERGE (append) instead.`)
+      : true;
+    setMfFolio(doReplace ? folio : existing.concat(folio));
+    if(data.targets){
+      const a = data.targets.asset || {}, c = data.targets.cap || {};
+      if(a.equity!=null) $("mfTgtEquity").value=a.equity; if(a.debt!=null) $("mfTgtDebt").value=a.debt;
+      if(a.gold!=null) $("mfTgtGold").value=a.gold; if(a.hybrid!=null) $("mfTgtHybrid").value=a.hybrid;
+      if(c.large!=null) $("mfCapLarge").value=c.large; if(c.mid!=null) $("mfCapMid").value=c.mid; if(c.small!=null) $("mfCapSmall").value=c.small;
+    }
+    $("mfImportFile").value = "";
+    $("mfAddMeta").textContent = `Imported ${folio.length} holding(s).`;
+    mfRenderAll();
+  }catch(e){
+    $("mfAddMeta").textContent = "Import failed: " + e.message + " — expecting a file previously saved via Export.";
+  }
+}
 
 async function mfRefreshNavs(){
   const folio = getMfFolio();
@@ -3324,7 +3402,7 @@ function mfRenderHoldings(){
         <td class="${cls(r.gain||0)}">${r.gain!=null?(signedRupee(r.gain)+" ("+sign(r.gainPct)+fmt(r.gainPct)+"%)"):"—"}</td>
         <td class="${cagr!=null?cls(cagr):""}">${cagr!=null?sign(cagr)+fmt(cagr,1)+"%":'<span class="muted" title="Add an invested date to see CAGR">—</span>'}</td>
         <td>${fmt(r.weight,1)}%</td>
-        <td><button class="btn danger" onclick="mfRemoveHolding(${r.i})">✕</button></td>
+        <td><button class="btn ghost" style="padding:3px 8px" onclick="mfEditHolding(${r.i})">✎</button> <button class="btn danger" onclick="mfRemoveHolding(${r.i})">✕</button></td>
       </tr>`;
     }).join("") + "</tbody></table>";
   $("mfFolioMeta").textContent = folio.length + " holding" + (folio.length===1?"":"s");
