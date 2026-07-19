@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.1.2] — 2026-07-19
+
+- Conviction Scan was requiring all four gates from the raw universe scan in one pass — technical (setup≥55) AND money-flow AND delivery AND fundamentals(≥60), all independently rare — so it came back empty most runs. Restructured into a funnel: score every scanned stock on the 3 market-data gates (technical/money-flow/delivery) first, only fetch fundamentals for names already agreeing on 2 of those 3 (bounded to top 20, so a real 4/4 candidate is never silently skipped), then apply the fundamentals gate last
+- Thresholds nudged down slightly (setup score ≥50, was 55; invest score ≥55, was 60) — CEMPRO-style names (setup 49, invest 46) are still correctly excluded, but the bar isn't so high it's structurally near-impossible to clear on an average day
+- When nothing clears all four, the tab now shows the closest calls instead of a blank screen — top candidates ranked by gates agreed, each with a ✓/✕ per gate so it's clear exactly what's missing, rather than "0 results" with no diagnostic value
+
 ## [3.1.1] — 2026-07-19
 
 - Conviction Scan fundamentals gate was too weak: it only checked Quality Score ≥60, which ignores valuation entirely — a stock trading well above its DCF/Graham fair value (or riding an overbought RSI) could still clear all four gates. Caught live: CEMPRO cleared the scan with 7 footprints, but its own Fundamentals-tab verdict said AVOID (RSI 82 overbought, margin of safety -153%, analyst target -17% below price)

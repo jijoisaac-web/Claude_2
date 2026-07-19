@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NRI Finance Hub — X Post Manager</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+
+.hdr{background:#0f1728;border-bottom:1px solid #1e293b;padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.hdr-logo{width:40px;height:40px;background:#ffb300;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#0a0e1a}
+.hdr-title{font-size:17px;font-weight:800}
+.hdr-sub{font-size:12px;color:#64748b;margin-top:2px}
+.hdr-badge{margin-left:auto;background:#0f2a1a;border:1px solid #166534;color:#22c55e;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px}
+
+.tabs{background:#0f1728;border-bottom:1px solid #1e293b;display:flex;padding:0 28px}
+.tab-btn{padding:13px 22px;background:none;border:none;color:#64748b;font-size:14px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab-btn.active{color:#ffb300;border-bottom-color:#ffb300}
+.tab-btn:hover:not(.active){color:#fff}
+.tab-count{background:#1e293b;color:#94a3b8;font-size:11px;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:6px}
+
+.page{padding:24px 28px;max-width:880px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat{background:#141f38;border:1px solid #1e293b;border-radius:12px;padding:16px;text-align:center}
+.stat-n{font-size:32px;font-weight:900;color:#ffb300}
+.stat-l{font-size:12px;color:#64748b;margin-top:3px}
+
+.sec-lbl{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+
+.card{background:#111827;border:1px solid #1e293b;border-radius:14px;margin-bottom:16px;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:#334155}
+.card.is-done{border-color:#166534;opacity:.65}
+
+.card-head{display:flex;align-items:center;gap:10px;padding:14px 18px 0;flex-wrap:wrap}
+.num-badge{background:#1e293b;color:#94a3b8;font-size:11px;font-weight:800;padding:3px 8px;border-radius:5px}
+.cat-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.file-name{font-size:11px;color:#334155;margin-left:auto}
+
+.poster-wrap{padding:12px 18px 0}
+.poster-img{width:100%;max-height:190px;object-fit:cover;object-position:top;border-radius:8px;border:1px solid #1e293b;display:block}
+.poster-miss{width:100%;height:80px;background:#0d1424;border:1px dashed #1e293b;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#334155;font-size:12px}
+
+.post-body{margin:12px 18px;background:#0d1424;border:1px solid #1e293b;border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:#e2e8f0;white-space:pre-wrap;font-family:inherit}
+
+.orig-block{margin:12px 18px 0;background:#080f1e;border-left:3px solid #334155;border-radius:0 8px 8px 0;padding:10px 14px}
+.orig-lbl{font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.orig-author{font-size:13px;font-weight:700;color:#60a5fa;margin-bottom:4px}
+.orig-text{font-size:13px;color:#64748b;line-height:1.55}
+
+.card-foot{display:flex;align-items:center;gap:8px;padding:12px 18px 14px;flex-wrap:wrap}
+
+.cc{font-size:12px;font-weight:800;padding:4px 10px;border-radius:20px}
+.cc-ok{background:#0f2a1a;color:#22c55e;border:1px solid #166534}
+.cc-warn{background:#2a1a00;color:#f59e0b;border:1px solid #92400e}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .15s;white-space:nowrap}
+.btn-copy{background:#1e293b;color:#94a3b8}
+.btn-copy:hover{background:#334155;color:#fff}
+.btn-copy.copied{background:#0f2a1a;color:#22c55e}
+.btn-mark{background:transparent;color:#475569;border:1px solid #334155}
+.btn-mark:hover{background:#0f2a1a;color:#22c55e;border-color:#166534}
+.btn-mark.is-done{background:#0f2a1a;color:#22c55e;border-color:#166534}
+.btn-post{background:#111;color:#fff;margin-left:auto}
+.btn-post:hover{background:#222}
+.btn-reply{background:#1d4ed8;color:#fff;margin-left:auto}
+.btn-reply:hover{background:#2563eb}
+
+.search-bar{display:flex;gap:10px;margin-bottom:20px}
+.search-bar input{flex:1;background:#141f38;border:1px solid #1e293b;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:14px;outline:none}
+.search-bar input:focus{border-color:#ffb300}
+.search-bar input::placeholder{color:#475569}
+
+.filter-tags{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.ftag{padding:6px 14px;border-radius:20px;border:1px solid #1e293b;background:transparent;color:#64748b;cursor:pointer;font-size:12px;font-weight:700;transition:all .15s}
+.ftag.on,.ftag:hover{border-color:currentColor}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">₹</div>
+  <div>
+    <div class="hdr-title">NRI Finance Hub — X Post Manager</div>
+    <div class="hdr-sub">@NRIFinanceHub · Click "Post on ✕" → X opens pre-filled → hit Post</div>
+  </div>
+  <div class="hdr-badge">✓ Ready</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="posts">
+    Campaign Posts <span class="tab-count">12</span>
+  </button>
+  <button class="tab-btn" data-tab="replies">
+    Reply Templates <span class="tab-count">11</span>
+  </button>
+</div>
+
+<div class="page">
+
+  <div class="tab-panel active" id="tab-posts">
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="s-total">12</div><div class="stat-l">Total Posts</div></div>
+      <div class="stat"><div class="stat-n" id="s-done">0</div><div class="stat-l">Posted</div></div>
+      <div class="stat"><div class="stat-n" id="s-left">12</div><div class="stat-l">Remaining</div></div>
+    </div>
+    <div class="sec-lbl">Attach the matching poster image before posting on X</div>
+    <div id="posts-list"></div>
+  </div>
+
+  <div class="tab-panel" id="tab-replies">
+    <div class="sec-lbl">Click "Reply on ✕" — X opens the thread with your reply pre-filled</div>
+    <div id="replies-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+const POSTS = [
+  { id:'100', cat:'Remittance', cc:'#ffb300', cb:'#2a1e00',
+    poster:'Images/100_remittance_rate_gap.png',
+    text:`Sending AED to India?
+
+Best vs worst provider today: Rs 672 gap on AED 1,000.
+
+That is real money — every transfer.
+
+Check who pays you most:
+nrifinancehub.com
+
+#NRI #AEDtoINR #RemittanceRates #UAEIndians` },
+
+  { id:'101', cat:'Remittance', cc:'#ffb300', cb:'#2a1e00',
+    poster:'Images/101_rate_habit.png',
+    text:`Most NRIs use the same app for years.
+
+Never check if it is actually the best rate.
+
+A 5-second comparison saves Rs 800+ per transfer.
+
+Live rates. All providers. No login:
+nrifinancehub.com
+
+#NRI #MoneyTransfer #AEDtoINR` },
+
+  { id:'102', cat:'Myth Bust', cc:'#ef4444', cb:'#2a0e0e',
+    poster:'Images/102_bank_myth.png',
+    text:`"My bank gives the best rate."
+
+Banks are 1-3% worse than specialist apps.
+
+On AED 5,000 that is Rs 3,500 lost per transfer.
+
+Stop losing money. Compare free:
+nrifinancehub.com
+
+#NRI #RemittanceRates #MoneyTransfer` },
+
+  { id:'103', cat:'Tax / DTAA', cc:'#a855f7', cb:'#1a0f2a',
+    poster:'Images/103_dtaa_tax.png',
+    text:`India taxing your NRI income?
+
+The DTAA says you likely do not owe tax in both countries.
+
+Most NRIs never claim it — and overpay every year.
+
+Check your benefit free:
+nrifinancehub.com
+
+#NRI #DTAA #NRITax #IncomeTax` },
+
+  { id:'104', cat:'Home Loans', cc:'#22c55e', cb:'#0f2a1a',
+    poster:'Images/104_home_loans.png',
+    text:`NRI home loan rates right now:
+
+SBI 8.50% | HDFC 8.75% | ICICI 8.80% | Axis 8.85%
+
+Even 0.25% difference = lakhs over the loan term.
+
+Calculate your EMI:
+nrifinancehub.com
+
+#NRI #NRIHomeLoan #IndiaRealEstate` },
+
+  { id:'105', cat:'Return Plan', cc:'#14b8a6', cb:'#0a1f1e',
+    poster:'Images/105_return_planning.png',
+    text:`Returning to India? Real numbers (family of 4, Bengaluru):
+
+Rent: Rs 50K/month
+School: Rs 1.5L/year per child
+Monthly burn: Rs 1.2L
+Emergency fund: Rs 5L+
+
+40% of NRIs budget short. Plan yours:
+nrifinancehub.com
+
+#NRI #ReturnToIndia #NRIReturn` },
+
+  { id:'106', cat:'EPF / PF', cc:'#f59e0b', cb:'#2a1a00',
+    poster:'Images/106_epf_withdrawal.png',
+    text:`Left India years ago but still have PF in EPFO?
+
+You can withdraw it — but TDS applies if under 5 years of service.
+
+Know your payout first:
+nrifinancehub.com
+
+#NRI #EPF #PFWithdrawal #EPFO` },
+
+  { id:'107', cat:'Property', cc:'#ef4444', cb:'#2a0e0e',
+    poster:'Images/107_property_tds.png',
+    text:`Buying property from an NRI seller?
+
+The BUYER must deduct TDS — not the seller.
+
+Miss this and you pay the penalty.
+
+Calculate exact TDS before you pay:
+nrifinancehub.com
+
+#NRI #TDS #NRIProperty #IndiaRealEstate` },
+
+  { id:'108', cat:'Education', cc:'#3b82f6', cb:'#0f1a2a',
+    poster:'Images/108_study_abroad.png',
+    text:`Sending your child to study abroad?
+
+UK Rs 1.2Cr | USA Rs 1.5Cr | Australia Rs 90L | Canada Rs 80L
+
+4-year total. Plan the finances early.
+
+Free planner:
+nrifinancehub.com
+
+#NRI #StudyAbroad #EducationCost` },
+
+  { id:'109', cat:'Engagement', cc:'#14b8a6', cb:'#0a1f1e',
+    poster:'Images/109_poll.png',
+    text:`Quick poll for NRIs:
+
+What is your biggest financial worry right now?
+
+- Remittance rates
+- Tax on India income
+- Buying property
+- Planning return
+
+Vote below. All 4 covered free at nrifinancehub.com
+
+#NRI #NRIFinance` },
+
+  { id:'110', cat:'Community', cc:'#22c55e', cb:'#0f2a1a',
+    poster:'Images/110_community_question.png',
+    text:`NRIs — what is the one financial mistake you wish you had not made?
+
+Mine: not comparing remittance rates for years.
+
+Drop yours below. Let us help others avoid the same.
+
+#NRI #PersonalFinance #NRILife` },
+
+  { id:'111', cat:'Stat', cc:'#f59e0b', cb:'#2a1a00',
+    poster:'Images/111_nri_stat.png',
+    text:`35 million+ NRIs worldwide.
+
+Most leaving money on the table through bad remittance rates, unclaimed DTAA benefits and forgotten EPF balances.
+
+All fixable. All free:
+nrifinancehub.com
+
+#NRI #NRIFinance` }
+];
+
+const REPLIES = [
+  { handle:'@ArpitDesai9', tid:'2078511807338344519', topic:'NRI ITR Pricing',
+    orig:'NRI client: "In US I get 12 ITRs done for $100. Why are you charging Rs 20,000 for Capital Gains ITR?" Client wanted it for Rs 2,000.',
+    text:`NRI Capital Gains ITR = DTAA analysis + Schedule FA + foreign asset disclosure + surcharge slabs.
+
+The "$100 for 12 US returns" is W-2 software. Employer does the work.
+
+Not comparable. Rs 20,000 is justified.` },
+
+  { handle:'@SaptashwaTV', tid:'2078008805590434240', topic:'Workplace Habits',
+    orig:'Six Workplace Habits an NRI Says Hold Back Indian Offices.',
+    text:`Hierarchy over merit and avoiding direct feedback hit hardest.
+
+NRIs who return say the workplace culture shock delays major life decisions — property, business, even staying back long term.
+
+Which habit tops your list?` },
+
+  { handle:'@Channeliam', tid:'2076996656902631688', topic:'FCNR / NRI Deposits',
+    orig:'Finance Minister Sitharaman — PSBs, NRI deposits, FCNR, overseas borrowing swap facility, RBI forex reserves.',
+    text:`Translation for NRIs: if PSBs raise FCNR rates to attract overseas deposits, your USD or AED savings could earn more in an FCNR account than sitting in a foreign bank.
+
+Watch for rate announcements closely.` },
+
+  { handle:'@EaselevyInsight', tid:'2078041479155761389', topic:'NRI ITR Myth',
+    orig:'Think NRIs never need to file an ITR in India? That is a myth. Save this myth-buster for AY 2026-27.',
+    text:`Key triggers most NRIs miss:
+
+Rental income, capital gains or NRO interest above Rs 2.5L = mandatory filing.
+
+Even below the limit — file to claim TDS refunds on property sales or NRO accounts.
+
+DTAA exempts tax. Not the return.` },
+
+  { handle:'@sunilgurjar01', tid:null, topic:'Daily vs Monthly SIP',
+    orig:'DAILY SIP vs MONTHLY SIP — same Rs 3,000. Monthly SIP: Rs 32.46L. Daily SIP: Rs 36.54L. Difference: Rs 4.08L.',
+    text:`Daily SIP wins because more entry points = better rupee cost averaging.
+
+For NRIs investing from abroad — it also smooths AED or USD to INR conversion timing.
+
+Market averaging + currency averaging. Double benefit.` },
+
+  { handle:'@growth_edge_', tid:'2078361167878336761', topic:'MF Claims Delay',
+    orig:'25 years building a mutual fund portfolio. Family needs the money. A tiny document mismatch delays the claim.',
+    text:`NRI checklist to avoid this:
+
+1. Update nominee in all MF folios
+2. Link PAN-Aadhaar
+3. Refresh KYC with current address
+4. Add a will or POA for India assets
+
+Your family should not fight paperwork to access what you built.` },
+
+  { handle:'@shubh19', tid:'2078495256241394148', topic:'9 Money Milestones',
+    orig:'9 Money Milestones — 1L bank, 10L portfolio, first car, first house, passive income > expenses, 1Cr assets, 10Cr net worth.',
+    text:`NRI Milestone 10: The day your Indian passive income covers your parents' expenses — without sending a single dirham from abroad.
+
+That is the one that makes 25 years of transfers worth it.
+
+#NRI #NRILife #PassiveIncome #MoneyMilestones` },
+
+  { handle:'@avijeet_writes', tid:'2078442285856076211', topic:'Spend 10% on Yourself',
+    orig:'Whatever you earn, make sure to waste 10% of it on yourself... irrationally!',
+    text:`NRI version: spend 10% on yourself AFTER justifying it to your parents, spouse, and inner CA.
+
+The guilt is irrational. The spending is not.
+
+Earn it. Spend it. Repeat.` },
+
+  { handle:'@ThetaVegaCap', tid:'2078469866902946042', topic:'Marriage Spending',
+    orig:"Don't spend 30-40L to impress relatives. Marriage is not a show-off stage.",
+    text:`NRI version: family assumes you are flying in 200 guests business class and booking a 5-star resort because you "live abroad".
+
+That 30-40L invested at 12% for 20 years = Rs 3-4 Cr.
+
+Impress your future self, not your relatives.
+
+#NRI #Investing #NRILife` },
+
+  { handle:'@Pratham_Shnkr24', tid:'2078386797898584128', topic:'Gurgaon Monthly Spend',
+    orig:'Monthly spend in Gurgaon: Rent 23K + Food 10K + Commute 4K + Weekend 10K + Gym 5K = Rs 52K. Am I overspending?',
+    text:`For NRIs planning to return to Gurgaon — Rs 52K/month is the floor for single living.
+
+That Rs 10K weekend spend alone as a monthly SIP at 12% = Rs 23L in 10 years.
+
+Balance is key.
+
+#NRI #ReturnToIndia #PersonalFinance` },
+
+  { handle:'@iamankitpande', tid:'2078153362206552134', topic:'Quit Job & Move Hometown',
+    orig:'Friend quit Rs 1.5L/month Mumbai job. Sold flat for 3Cr. Built house in hometown. Restaurants + FDs. Now earns Rs 4L/month.',
+    text:`This is the NRI return story most people do not post.
+
+Sell the flat. Invest the corpus. Build in a tier-2 city. Let interest and business work.
+
+Rs 4L/month > Rs 1.5L salary. Every time.
+
+#NRI #ReturnToIndia #NRIFinance` }
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+const doneSet = new Set(JSON.parse(localStorage.getItem('nfh_done')||'[]'));
+
+function saveDone(){
+  localStorage.setItem('nfh_done', JSON.stringify([...doneSet]));
+  updateStats();
+}
+
+function updateStats(){
+  const n = doneSet.size;
+  document.getElementById('s-done').textContent = n;
+  document.getElementById('s-left').textContent = 12 - n;
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function ccBadge(text){
+  const n = text.trim().length;
+  const ok = n <= 250;
+  return `<span class="cc ${ok?'cc-ok':'cc-warn'}">${ok?'✓':'⚠'} ${n}/250</span>`;
+}
+
+function copyBtn(){ return `<button class="btn btn-copy">⎘ Copy</button>`; }
+
+function openX(text, tid){
+  const base = tid
+    ? `https://twitter.com/intent/tweet?in_reply_to=${tid}&text=`
+    : 'https://twitter.com/intent/tweet?text=';
+  window.open(base + encodeURIComponent(text), '_blank');
+}
+
+function markDone(id, btn, card){
+  if(doneSet.has(id)){ doneSet.delete(id); } else { doneSet.add(id); }
+  saveDone();
+  const on = doneSet.has(id);
+  card.classList.toggle('is-done', on);
+  btn.classList.toggle('is-done', on);
+  btn.textContent = on ? '✓ Posted' : 'Mark Posted';
+}
+
+// ── RENDER POSTS ─────────────────────────────────────────────────────────────
+function renderPosts(){
+  const list = document.getElementById('posts-list');
+  POSTS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card' + (doneSet.has(p.id) ? ' is-done' : '');
+
+    // poster image
+    const img = document.createElement('img');
+    img.className = 'poster-img';
+    img.src = p.poster;
+    img.alt = p.id;
+
+    const posterWrap = document.createElement('div');
+    posterWrap.className = 'poster-wrap';
+    img.onerror = () => {
+      posterWrap.innerHTML = `<div class="poster-miss">🖼 ${p.poster.split('/')[1]}</div>`;
+    };
+    posterWrap.appendChild(img);
+
+    const body = document.createElement('div');
+    body.className = 'post-body';
+    body.textContent = p.text;
+
+    const foot = document.createElement('div');
+    foot.className = 'card-foot';
+    foot.innerHTML = ccBadge(p.text) + copyBtn() +
+      `<button class="btn btn-mark ${doneSet.has(p.id)?'is-done':''}">${doneSet.has(p.id)?'✓ Posted':'Mark Posted'}</button>` +
+      `<button class="btn btn-post">Post on ✕</button>`;
+
+    // head
+    const head = document.createElement('div');
+    head.className = 'card-head';
+    head.innerHTML = `<span class="num-badge">${p.id}</span>
+      <span class="cat-badge" style="color:${p.cc};background:${p.cb}">${p.cat}</span>
+      <span class="file-name">${p.poster.split('/')[1]}</span>`;
+
+    card.appendChild(head);
+    card.appendChild(posterWrap);
+    card.appendChild(body);
+    card.appendChild(foot);
+
+    // events
+    foot.querySelector('.btn-copy').addEventListener('click', function(){
+      navigator.clipboard.writeText(p.text).then(()=>{
+        this.textContent='✓ Copied!'; this.classList.add('copied');
+        setTimeout(()=>{ this.textContent='⎘ Copy'; this.classList.remove('copied'); },2000);
+      });
+    });
+    const markBtn = foot.querySelector('.btn-mark');
+    markBtn.addEventListener('click', () => markDone(p.id, markBtn, card));
+    foot.querySelector('.btn-post').addEventListener('click', () => openX(p.text, null));
+
+    list.appendChild(card);
+  });
+}
+
+// ── RENDER REPLIES ───────────────────────────────────────────────────────────
+function renderReplies(){
+  const list = document.getElementById('replies-list');
+  REPLIES.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const head = document.createElement('div');
+    head.className = 'card-head';
+    head.innerHTML = `<span class="num-badge">#${i+1}</span>
+      <span style="font-size:14px;font-weight:800;color:#60a5fa">${r.handle}</span>
+      <span class="cat-badge" style="color:#94a3b8;background:#1e293b">${r.topic}</span>`;
+
+    const orig = document.createElement('div');
+    orig.className = 'orig-block';
+    orig.innerHTML = `<div class="orig-lbl">Original Post</div>
+      <div class="orig-text">${r.orig}</div>`;
+
+    const body = document.createElement('div');
+    body.className = 'post-body';
+    body.textContent = r.text;
+
+    const foot = document.createElement('div');
+    foot.className = 'card-foot';
+    const isReply = !!r.tid;
+    foot.innerHTML = ccBadge(r.text) + copyBtn() +
+      `<button class="btn ${isReply?'btn-reply':'btn-post'}" style="margin-left:auto">
+        ${isReply ? '↩ Reply on ✕' : 'Post on ✕'}
+      </button>`;
+
+    card.appendChild(head);
+    card.appendChild(orig);
+    card.appendChild(body);
+    card.appendChild(foot);
+
+    foot.querySelector('.btn-copy').addEventListener('click', function(){
+      navigator.clipboard.writeText(r.text).then(()=>{
+        this.textContent='✓ Copied!'; this.classList.add('copied');
+        setTimeout(()=>{ this.textContent='⎘ Copy'; this.classList.remove('copied'); },2000);
+      });
+    });
+    foot.querySelector('button:last-child').addEventListener('click', () => openX(r.text, r.tid));
+
+    list.appendChild(card);
+  });
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderPosts();
+renderReplies();
+updateStats();
+</script>
+</body>
+</html>
