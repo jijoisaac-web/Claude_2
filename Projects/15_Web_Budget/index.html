@@ -252,6 +252,9 @@ header .subtitle{font-size:11px;color:var(--text2);font-weight:400;}
   transition:left .28s cubic-bezier(.4,0,.2,1);
   left:0;
 }
+/* Settings moved to header on mobile */
+.mob-settings-btn{display:none;}
+@media(max-width:640px){.mob-settings-btn{display:inline-flex;}}
 .mob-tab{
   flex:1;display:flex;flex-direction:column;align-items:center;
   gap:3px;padding:7px 2px 4px;cursor:pointer;border-radius:12px;
@@ -1285,6 +1288,9 @@ tbody tr.income-row td:first-child{
     <button class="icon-btn" onclick="toggleDark()" id="darkBtn">🌙 <span class="btn-label">Theme</span></button>
     <button class="icon-btn" onclick="openPinSetup()">🔐 <span class="btn-label">PIN</span></button>
     <button class="icon-btn" onclick="exportCSV()">⬇ <span class="btn-label">CSV</span></button>
+    <button class="icon-btn mob-settings-btn" onclick="switchViewMob('data',document.getElementById('mobt-data'))" title="Settings">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
   </div>
 </header>
 
@@ -1322,8 +1328,8 @@ tbody tr.income-row td:first-child{
     <div class="mob-label">Insights</div>
     <div class="mob-dot"></div>
   </div>
-  <div class="mob-tab" id="mobt-data" onclick="switchViewMob('data',this)">
-    <div class="mob-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+  <div class="mob-tab" id="mobt-data" onclick="switchViewMob('data',this)" style="display:none">
+    <div class="mob-icon"></div>
     <div class="mob-label">Settings</div><div class="mob-dot"></div>
   </div>
 </div>
@@ -2362,7 +2368,7 @@ function renderMonthTabs(){
 }
 
 /* Mobile nav sync */
-const MOB_VIEWS=['monthly','annual','budget','analytics','insights','data'];
+const MOB_VIEWS=['monthly','annual','budget','analytics','insights'];
 function moveMobPill(idx){
   const pill=document.getElementById('mobPillBg');
   if(pill) pill.style.left=(idx*20)+'%';
