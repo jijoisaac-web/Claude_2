@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.1.0] — 2026-07-19 · Conviction Scan
+
+- Removed the **Brief** tab and all its dedicated code (`loadBrief`/`renderBriefGate`/`renderBriefIdeas`/`renderBriefEdge`) — replaced by Conviction Scan in the same nav slot. (Unrelated same-named features kept: the Ideas tab's "decision briefs" and the Fundamentals tab's AI news brief.)
+- New **Conviction Scan** tab: one button that cross-references four independent footprints and shows only stocks clearing all of them — technical setup (Screener's own bullish signals), money-flow (OBV/Chaikin, computed in that same scan — no separate pass needed), delivery-based accumulation (NSE bhavdata, ≥60% delivery + price up ≥0.5%), and business quality (Fundamentals composite Quality Score ≥60, fetched only for the shortlist that already cleared the first three gates, to keep it fast)
+- Results ranked by **footprint count** — total confirming signals across all four gates — so agreement, not just a pass/fail, differentiates the (usually short) list. Deliberately shows nothing on quiet days rather than padding the list
+- Universe picker (NIFTY 50 default up to All ~750 stocks) with a 3-stage progress readout
+- Mobile: added `#convResults`, `#mfHoldingsTable`, `#mfAllocTable` to the horizontal-scroll/min-width table rules (the last two were missed when the Mutual Funds tab shipped in v3.0.0)
+
 ## [3.0.2] — 2026-07-17
 
 - Deals table root-cause fix for "same old data": NSE's snapshot is a multi-day window and the table sorted purely by value, so huge old blocks stayed pinned on top. Now defaults to the **latest session only** (1-day bulk/block tolerance), sorts date-then-value, shows a Date column per deal, and offers an "include older days" checkbox

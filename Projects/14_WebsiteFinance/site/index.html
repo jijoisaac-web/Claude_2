@@ -92,7 +92,7 @@ progress{width:180px;accent-color:var(--blue);}
 #searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
 #kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -114,7 +114,7 @@ progress{width:180px;accent-color:var(--blue);}
   select,input[type=text]{padding:7px 8px;font-size:13px;max-width:46vw;}
   button.btn{padding:7px 10px;font-size:12px;}
   /* wide tables: scroll inside their container */
-  #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table{min-width:640px;}
+  #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table,#convResults table,#mfHoldingsTable table{min-width:640px;}
   #watchTable table,#peerView table{min-width:420px;}
   .sectorRow .sname{width:96px;font-size:11px;}
   .sectorRow .bar{max-width:34vw;}
@@ -195,7 +195,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="insti">FII/DII</button>
     <button data-tab="options">Options</button>
     <button data-tab="smc">Smart Money</button>
-    <button data-tab="brief">Brief</button>
+    <button data-tab="conv">Conviction Scan</button>
     <button data-tab="mf">Mutual Funds</button>
   </nav>
   <div id="searchWrap">
@@ -208,7 +208,7 @@ progress{accent-color:var(--violet);}
     <h2 style="margin-top:0">Keyboard shortcuts</h2>
     <table><tbody>
       <tr><td><b>/</b></td><td>Focus search</td></tr>
-      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Brief)</td></tr>
+      <tr><td><b>1–9, 0</b></td><td>Switch tabs (Dashboard → Conviction Scan)</td></tr>
       <tr><td><b>?</b></td><td>Toggle this help</td></tr>
       <tr><td><b>Esc</b></td><td>Close search / help</td></tr>
     </tbody></table>
@@ -563,22 +563,24 @@ progress{accent-color:var(--violet);}
   <div id="peerView"></div>
 </section>
 
-<!-- MORNING BRIEF -->
-<section id="brief" class="tab">
-  <h2>Morning brief <span class="muted" id="briefMeta" style="text-transform:none;font-weight:400"></span></h2>
-  <div class="muted" style="font-size:11px;margin-bottom:10px">One page instead of five tabs: today's market gate, institutional flow, where options premium looks mispriced, and the day's top technical setups — the daily pre-trade checks, pulled together automatically.</div>
-  <div id="briefGate"><div class="loading">Reading market breadth + institutional flow…</div></div>
-
-  <h2 style="margin-top:20px">Where the edge is today <span class="muted" style="text-transform:none;font-weight:400">· options flow + IV mispricing across ~30 F&amp;O names</span></h2>
-  <div id="briefEdge"><div class="loading">Scanning option chains (can take a bit — full results also land on the Options tab)…</div></div>
-
-  <h2 style="margin-top:20px">Today's shortlist <span class="muted" style="text-transform:none;font-weight:400">· top technical BUY setups, score ≥60</span></h2>
-  <div id="briefIdeas"><div class="loading">…</div></div>
-
-  <div class="controls" style="margin-top:14px">
-    <button class="btn ghost" onclick="loadBrief(true)">↻ Refresh everything</button>
-    <span class="muted" id="briefRefreshMeta">Reuses scans already run on other tabs this session where available.</span>
+<!-- CONVICTION SCAN -->
+<section id="conv" class="tab">
+  <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
+    <span class="muted">⚠️ One button, four independent footprints: technical setup (Screener signals), money-flow (OBV/Chaikin — computed in the same scan), delivery-based accumulation (NSE bhavdata), and business quality (Fundamentals composite score). Only stocks clearing <b>all four</b> gates are shown — deliberately a short, high-bar list, often empty. Multiple signals agreeing isn't proof of anything; this is a filter, not a recommendation.</span>
   </div>
+  <div class="controls" style="flex-wrap:wrap">
+    <select id="convUniverse">
+      <option value="NIFTY 50" selected>NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+      <option value="ALL">All (~750 stocks, slower)</option>
+    </select>
+    <button class="btn" onclick="runConvictionScan()">▶ Run Conviction Scan</button>
+    <progress id="convProgress" style="display:none"></progress>
+    <span class="muted" id="convMeta"></span>
+  </div>
+  <div id="convResults"><div class="loading">Pick a universe and hit Run — one button, four gates.</div></div>
 </section>
 
 <!-- MUTUAL FUNDS -->
@@ -771,7 +773,6 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="charts" && !window._chartLoaded) loadChart();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
-  if(b.dataset.tab==="brief" && !window._briefLoaded){ window._briefLoaded=true; loadBrief(); }
   if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); }
 });
 
@@ -786,7 +787,7 @@ async function loadFiiDii(force){
     const r = await fetch("/api/fiidii" + (force===true ? "?t="+Date.now() : ""));
     const d = await r.json();
     if(!r.ok || (!d.fii && !d.dii)) throw new Error(d.error || "no data");
-    window._fiidii = d; // cached so the Brief tab can reuse it without a second fetch
+    window._fiidii = d; // cached on window so other tabs can reuse it without a second fetch
     $("fiidiiMeta").textContent = `· ${d.date || ""} · provisional, cash market, ₹ Cr`;
     const card = (label, x) => {
       if(!x) return "";
@@ -2767,7 +2768,7 @@ async function scanOptionsMomentum(){
   }, 3, ()=>prog.value++)).filter(Boolean);
   prog.style.display="none";
   rows.sort((a,b)=>b.score-a.score);
-  window._omRows = rows; // cached so the Brief tab can reuse this scan without re-running it
+  window._omRows = rows; // cached on window so other tabs can reuse this scan without re-running it
   $("omMeta").textContent = `${rows.length}/${OM_SYMBOLS.length} scanned`;
   if(!rows.length){ $("omResults").innerHTML = '<div class="loading">NSE served nothing — likely off-hours throttling; try again shortly.</div>'; return; }
   const verdict = s => s>=65 ? ["bullish","LONG FLOW"] : s<=35 ? ["bearish","BEARISH FLOW"] : ["neutral","MIXED"];
@@ -2832,7 +2833,7 @@ async function scanIvRv(){
   }, 3, ()=>prog.value++)).filter(Boolean);
   prog.style.display="none";
   rows.sort((a,b)=>b.ratio-a.ratio);
-  window._ivrvRows = rows; // cached so the Brief tab can reuse this scan without re-running it
+  window._ivrvRows = rows; // cached on window so other tabs can reuse this scan without re-running it
   $("ivrvMeta").textContent = `${rows.length}/${OM_SYMBOLS.length} scanned`;
   if(!rows.length){ $("ivrvResults").innerHTML = '<div class="loading">Nothing came back — likely off-hours throttling; try again shortly.</div>'; return; }
   $("ivrvResults").innerHTML = `<table><thead><tr><th style="text-align:left">Symbol</th><th>Spot</th><th>ATM IV</th>
@@ -2851,107 +2852,91 @@ async function scanIvRv(){
     <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its full chain above. Sorted richest-first (highest IV/RV). Thresholds (≥1.3x rich, ≤0.8x cheap) are rules of thumb, not calibrated against this app's own historical data — cross-check with the spread-probability panel (Backtest tab) for that symbol before sizing a trade.</div>`;
 }
 
-/* ================= morning brief: one-page daily summary ================= */
-async function loadBrief(force){
-  if(force){ window._omRows=null; window._ivrvRows=null; window._fiidii=null; }
-  $("briefMeta").textContent = "· " + new Date().toLocaleString("en-IN",{dateStyle:"medium", timeStyle:"short"});
+/* ================= conviction scan: technical + money-flow + delivery + fundamentals, cross-referenced ================= */
+// Technical signal types (from the same scanStock() the Screener uses) counted as "confirming" for this scan.
+const CONV_TECH = new Set(["BREAKOUT_20D","GOLDEN_CROSS","MACD_BULL_CROSS","NEW_52W_HIGH","NEAR_52W_HIGH",
+  "TREND_ALIGNED","DOUBLE_BOTTOM","HAMMER_REVERSAL","BB_LOWER_TOUCH","RSI_OVERSOLD","RSI_BULL_DIV",
+  "PULLBACK_DIP","VOL_DRYUP","ADX_TREND","REL_STRENGTH","BB_SQUEEZE"]);
+// Money-flow signal types — computed inside the very same scan, not a separate pass.
+const CONV_FLOW = new Set(["QUIET_ACCUMULATION","MONEY_FLOW_IN","ACCUMULATION"]);
 
-  // breadth + shortlist need the latest scan
-  if(!screenerData){ $("briefGate").innerHTML = '<div class="loading">Scanning market…</div>'; try{ await loadScreener(); }catch(e){} }
-  renderBriefGate(); renderBriefIdeas();
+async function runConvictionScan(){
+  const uni = $("convUniverse").value;
+  const syms = uni === "ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni]);
+  const prog = $("convProgress"); prog.style.display = "inline-block"; prog.value = 0; prog.max = syms.length;
+  $("convResults").innerHTML = '<div class="loading">Scanning…</div>';
+  $("convMeta").textContent = `Stage 1/3 — technicals + money flow across ${syms.length} stocks…`;
 
-  // FII/DII (reuse if another tab already fetched it this session)
-  if(!window._fiidii){ await loadFiiDii(); }
-  renderBriefGate(); // re-render now the institutional read is in
+  let bench63 = null;
+  try{
+    const b = toCandles(await fetchChart("^NSEI","1y","1d"));
+    if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1;
+  }catch(e){}
+  const scanned = (await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d")), bench63), 8, ()=>prog.value++)).filter(Boolean);
 
-  // options flow + IV/RV (reuse if the Options tab already scanned this session)
-  $("briefEdge").innerHTML = '<div class="loading">Scanning option chains for flow + IV mispricing…</div>';
-  await Promise.all([
-    window._omRows ? Promise.resolve() : scanOptionsMomentum(),
-    window._ivrvRows ? Promise.resolve() : scanIvRv(),
-  ]);
-  renderBriefEdge();
-}
-function renderBriefGate(){
-  const st = screenerData && screenerData.stocks;
-  let breadthMood = null, advPct = null;
-  if(st && st.length){
-    const adv = st.filter(s=>s.change_pct>0).length, dec = st.filter(s=>s.change_pct<0).length;
-    advPct = adv/(adv+dec||1)*100;
-    breadthMood = advPct>=60 ? "up" : advPct<=40 ? "down" : "mixed";
+  $("convMeta").textContent = "Stage 2/3 — checking delivery data…";
+  if(!delivData){ try{ await loadDelivery(); }catch(e){} }
+  const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
+
+  const stage1 = scanned.map(s=>{
+    const techSignals = s.signals.filter(x=>CONV_TECH.has(x.type));
+    const flowSignals = s.signals.filter(x=>CONV_FLOW.has(x.type));
+    const dr = delivBySymbol.get(s.symbol.replace(".NS",""));
+    const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
+    const deliveryOk = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
+    return {...s, techSignals, flowSignals, deliveryRow:dr, deliveryChgPct:chgPct, deliveryOk};
+  }).filter(s=>s.techSignals.length>0 && s.flowSignals.length>0 && s.deliveryOk);
+
+  if(!stage1.length){
+    prog.style.display = "none";
+    $("convMeta").textContent = `${scanned.length} scanned · 0 cleared technical + money-flow + delivery`;
+    $("convResults").innerHTML = '<div class="loading">Nothing cleared the first three gates today — a quiet day, or try a broader universe.</div>';
+    return;
   }
-  const fd = window._fiidii;
-  let fdMood = null, fdLine = "Not loaded yet";
-  if(fd && fd.fii && fd.dii){
-    const f=fd.fii.net, di=fd.dii.net;
-    fdMood = (f>=0&&di>=0) ? "up" : (f<0&&di<0) ? "down" : "mixed";
-    const signed = v => (v>=0?"+":"−") + "₹" + fmtInt(Math.round(Math.abs(v))) + " Cr";
-    fdLine = `FII ${signed(f)} · DII ${signed(di)}`;
-  } else if(fd){ fdLine = "FII/DII not published yet today (usually ~6pm IST)."; }
 
-  let verdict, color, advice;
-  if(breadthMood==null){
-    verdict="…"; color="var(--muted)"; advice="Waiting on today's scan.";
-  } else if(fdMood==null){
-    // FII/DII usually publishes only after ~6pm IST — don't block the gate on it during market hours
-    verdict = breadthMood==="up" ? "GREEN (breadth only)" : breadthMood==="down" ? "RED (breadth only)" : "AMBER (breadth only)";
-    color = breadthMood==="up" ? "var(--green)" : breadthMood==="down" ? "var(--red)" : "var(--amber)";
-    advice = "FII/DII isn't published yet today (usually ~6pm IST) — this read is breadth-only for now; check back later for the full gate.";
-  } else if(breadthMood==="up" && fdMood!=="down"){
-    verdict="GREEN — full size"; color="var(--green)"; advice="Breadth strong and institutions not both selling. Confluence setups get normal size.";
-  } else if(breadthMood==="down" && fdMood==="down"){
-    verdict="RED — watch, don't chase"; color="var(--red)"; advice="Weak breadth and both FII+DII selling. Smaller size or cash; missing a rally costs nothing, catching a falling market costs compounding.";
-  } else {
-    verdict="AMBER — half size"; color="var(--amber)"; advice="Mixed signals between breadth and institutional flow. Be selective — trade only the clearest setups.";
+  $("convMeta").textContent = `Stage 3/3 — fundamentals check on ${stage1.length} candidate${stage1.length>1?"s":""}…`;
+  const withFund = await pmap(stage1, async s=>{
+    try{
+      const r = await fetch(`/api/fundamentals/${encodeURIComponent(s.symbol)}`);
+      const f = await r.json();
+      if(f.error) return {...s, qScore:null, vScore:null};
+      return {...s, qScore: scoreQuality(f).score, vScore: scoreValue(f).score};
+    }catch(e){ return {...s, qScore:null, vScore:null}; }
+  }, 6);
+
+  const final = withFund.filter(s=>s.qScore!=null && s.qScore>=60)
+    .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1}))
+    .sort((a,b)=> b.footprints-a.footprints || (b.qScore-a.qScore));
+
+  prog.style.display = "none";
+  $("convMeta").textContent = `${scanned.length} scanned · ${stage1.length} cleared technical+flow+delivery · ${final.length} cleared all 4 gates`;
+  renderConvictionResults(final);
+}
+
+function renderConvictionResults(rows){
+  if(!rows.length){
+    $("convResults").innerHTML = '<div class="loading">No names cleared all four gates today — that\'s by design, this list is meant to be short (often empty). Widen the universe or check back tomorrow.</div>';
+    return;
   }
-  $("briefGate").innerHTML = `
-    <div class="card">
-      <div class="name">Market gate</div>
-      <div class="price" style="color:${color};font-size:22px">${verdict}</div>
-      <div class="chg muted" style="margin-top:4px">${advice}</div>
-      <div class="muted" style="font-size:12px;margin-top:8px">
-        Breadth: ${advPct!=null?fmt(advPct,0)+"% advancing":"—"} ·
-        ${fdLine}
-      </div>
-    </div>`;
-}
-function renderBriefIdeas(){
-  const st = screenerData && screenerData.stocks;
-  if(!st){ $("briefIdeas").innerHTML = '<div class="loading">Waiting on the scan…</div>'; return; }
-  const {shortT, medT} = buildIdeas(st);
-  const top = [...shortT, ...medT].filter(s=>s.action==="BUY" && s.score>=60).sort((a,b)=>b.score-a.score).slice(0,5);
-  $("briefIdeas").innerHTML = top.length ? `<table><thead><tr><th>Stock</th><th>Score</th><th style="text-align:left">Setup</th><th>Entry ₹</th><th>Stop ₹</th><th>Target ₹</th></tr></thead><tbody>` +
-    top.map(s=>`<tr onclick="document.querySelector('nav button[data-tab=ideas]').click()">
-      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name||""}</span></td>
-      <td><span class="${scoreCls(s.score)}" style="font-weight:700">${s.score}</span></td>
-      <td style="text-align:left"><span class="signal-detail" style="font-size:12px">${s.why}</span></td>
-      <td>${fmt(s.entry)}</td><td>${fmt(s.stop)}</td><td>${fmt(s.target)}</td></tr>`).join("") +
-    `</tbody></table><div class="muted" style="font-size:11px;margin-top:4px">Open the Ideas tab for the full list, decision briefs and position sizing.</div>`
-    : '<div class="loading">No setups scoring 60+ right now — patience is a position too.</div>';
-}
-function renderBriefEdge(){
-  const om = window._omRows || [], iv = window._ivrvRows || [];
-  const flow = om.filter(r=>r.score>=65).slice(0,3);
-  const rich = iv.filter(r=>r.ratio>=1.3).slice(0,3);
-  const cheap = [...iv].sort((a,b)=>a.ratio-b.ratio).filter(r=>r.ratio<=0.8).slice(0,3);
-  const jump = sym => `$('optSymbol').value='${sym}';loadOptions();document.querySelector('nav button[data-tab=options]').click();window.scrollTo({top:0,behavior:'smooth'})`;
-  const miniTable = (rows, cols) => rows.length ? `<table><tbody>` +
-    rows.map(r=>`<tr style="cursor:pointer" onclick="${jump(r.symbol)}">
-      <td><span class="sym">${r.symbol}</span></td>${cols(r)}</tr>`).join("") + `</tbody></table>`
-    : '<div class="muted" style="font-size:12px">None right now.</div>';
-  $("briefEdge").innerHTML = `
-    <div class="pulse-grid">
-      <div><h2 style="margin-top:0">Long flow leaders</h2>
-        ${miniTable(flow, r=>`<td><span class="${r.score>=65?'up':'muted'}" style="font-weight:700">${r.score}</span></td><td class="muted" style="font-size:11px;text-align:left">${fmt(r.spot,0)}</td>`)}
-      </div>
-      <div><h2 style="margin-top:0">IV rich <span class="muted" style="text-transform:none;font-weight:400">(favor selling)</span></h2>
-        ${miniTable(rich, r=>`<td style="color:var(--blue);font-weight:700">${fmt(r.ratio,2)}x</td><td class="muted" style="font-size:11px;text-align:left">IV ${fmt(r.iv,1)}% vs RV ${fmt(r.rv20,1)}%</td>`)}
-      </div>
-      <div><h2 style="margin-top:0">IV cheap <span class="muted" style="text-transform:none;font-weight:400">(favor buying)</span></h2>
-        ${miniTable(cheap, r=>`<td style="color:var(--amber);font-weight:700">${fmt(r.ratio,2)}x</td><td class="muted" style="font-size:11px;text-align:left">IV ${fmt(r.iv,1)}% vs RV ${fmt(r.rv20,1)}%</td>`)}
-      </div>
-    </div>
-    <div class="muted" style="font-size:11px;margin-top:8px">Click a row to open its full chain on the Options tab. Full scanners (all ~30 names, with reads) live there too.</div>`;
+  $("convResults").innerHTML = `<table><thead><tr>
+    <th>Stock</th><th>Price ₹</th><th>Chg %</th><th title="Total confirming signals across all four gates">Footprints</th>
+    <th>Delivery %</th><th>Quality</th><th>Value</th><th style="text-align:left">Confirming signals</th>
+    </tr></thead><tbody>` + rows.map(s=>{
+      const badges = [...s.techSignals, ...s.flowSignals].map(x=>`<span class="badge bullish" title="${x.detail}">${x.type.replaceAll("_"," ")}</span>`).join("")
+        + `<span class="badge bullish" title="Delivery ${fmt(s.deliveryRow.d,1)}%, price +${fmt(s.deliveryChgPct,1)}%">GENUINE ACCUMULATION</span>`
+        + `<span class="badge bullish" title="Fundamentals Quality Score">QUALITY ${s.qScore}+</span>`;
+      return `<tr onclick="openChart('${s.symbol}')">
+      <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
+      <td>${fmt(s.price)}</td>
+      <td class="${cls(s.change_pct)}">${sign(s.change_pct)}${fmt(s.change_pct)}%</td>
+      <td><b class="up">${s.footprints}</b></td>
+      <td>${fmt(s.deliveryRow.d,1)}%</td>
+      <td><span class="${scoreCls(s.qScore)}" style="font-weight:700">${s.qScore}</span></td>
+      <td>${s.vScore!=null?s.vScore:"—"}</td>
+      <td style="text-align:left">${badges}</td>
+    </tr>`;
+    }).join("") + `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart. "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates — more agreement, not a guarantee. Not investment advice.</div>`;
 }
 
 /* ---- fresh order-block scanner: universe sweep, last 7 days, unmitigated only ---- */
@@ -3309,7 +3294,7 @@ function mfRenderRecs(){
 function mfRenderAll(){ mfRenderHoldings(); mfRenderAllocation(); mfRenderRecs(); }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","brief","mf"];
+const TAB_ORDER = ["dashboard","screener","ideas","charts","fundamentals","track","insti","options","smc","conv","mf"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
