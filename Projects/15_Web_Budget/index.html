@@ -1685,12 +1685,12 @@ tbody tr.income-row td:first-child{
           <input type="text" id="ghGistId" class="modal-input" placeholder="Leave blank to create new" style="width:100%;box-sizing:border-box;font-family:monospace" oninput="ghSaveConfig()">
         </div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="syncSaveToGist()">☁️ Save to Cloud</button>
         <button class="btn btn-gray" onclick="syncLoadFromGist()">⬇️ Load from Cloud</button>
-        <span id="syncStatus" style="font-size:12px;color:var(--text2)"></span>
       </div>
-      <div id="syncLastTime" style="font-size:11px;color:var(--text3);margin-top:8px"></div>
+      <div id="syncStatus" style="font-size:12px;color:var(--text1);margin-top:10px;min-height:18px;font-weight:500"></div>
+      <div id="syncLastTime" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
     </div>
 
   </div>
