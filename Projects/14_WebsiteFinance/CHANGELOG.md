@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.1.1] — 2026-07-19
+
+- Conviction Scan fundamentals gate was too weak: it only checked Quality Score ≥60, which ignores valuation entirely — a stock trading well above its DCF/Graham fair value (or riding an overbought RSI) could still clear all four gates. Caught live: CEMPRO cleared the scan with 7 footprints, but its own Fundamentals-tab verdict said AVOID (RSI 82 overbought, margin of safety -153%, analyst target -17% below price)
+- Both gates now reuse the Fundamentals tab's own scoring instead of a separate, weaker check: technical gate is `setupScore()` ≥55 + above SMA200 (the same trade-quality score the Ideas engine uses, which already penalises overbought/stretched/bearish conditions); fundamentals gate is a new shared `computeInvestScore()` — quality 40% + (100-value-trap risk) 20% + DCF/Graham margin-of-safety 40%, extracted out of the consolidated verdict panel so both places compute it identically. A name the Fundamentals tab would call AVOID or STRETCHED can no longer clear Conviction Scan
+- Results table swaps the old Quality/Value columns for Setup score, Invest score and Margin of Safety %, so the reasoning is visible inline instead of requiring a click-through
+
 ## [3.1.0] — 2026-07-19 · Conviction Scan
 
 - Removed the **Brief** tab and all its dedicated code (`loadBrief`/`renderBriefGate`/`renderBriefIdeas`/`renderBriefEdge`) — replaced by Conviction Scan in the same nav slot. (Unrelated same-named features kept: the Ideas tab's "decision briefs" and the Fundamentals tab's AI news brief.)

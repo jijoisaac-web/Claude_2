@@ -566,7 +566,7 @@ progress{accent-color:var(--violet);}
 <!-- CONVICTION SCAN -->
 <section id="conv" class="tab">
   <div class="card" style="margin-bottom:14px;border-color:#7a5a12;">
-    <span class="muted">⚠️ One button, four independent footprints: technical setup (Screener signals), money-flow (OBV/Chaikin — computed in the same scan), delivery-based accumulation (NSE bhavdata), and business quality (Fundamentals composite score). Only stocks clearing <b>all four</b> gates are shown — deliberately a short, high-bar list, often empty. Multiple signals agreeing isn't proof of anything; this is a filter, not a recommendation.</span>
+    <span class="muted">⚠️ One button, four independent footprints — each a real gate, not just a signal count: technical trade quality (setup score ≥55, above SMA200, penalises overbought/stretched charts), money-flow (OBV/Chaikin, computed in that same scan), delivery-based accumulation (NSE bhavdata, ≥60% delivery on a ≥0.5% up day), and an investment score (≥60) blending business quality, value-trap risk and DCF/Graham margin of safety — the same scoring the Fundamentals tab's own consolidated verdict uses, so nothing that tab would call AVOID or STRETCHED can clear this scan. Only stocks passing <b>all four</b> are shown — deliberately short, often empty. Agreement across signals isn't proof of anything; this is a filter, not a recommendation.</span>
   </div>
   <div class="controls" style="flex-wrap:wrap">
     <select id="convUniverse">
@@ -1839,16 +1839,10 @@ async function renderVerdictPanel(sym, f){
     if(tech) ts = setupScore({...tech, action:"BUY"});
   }catch(e){}
   // --- investment side ---
-  const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
-  const iv = (f.eps>0 || f.fcf>0) ? computeIntrinsic(f, {g:defG, r:0.12, tg:0.04, y:7.5}) : null;
-  const q = scoreQuality(f).score, vt = scoreValueTrap(f).score;
-  const mos = iv ? iv.mos : null, impl = iv && iv.implied!=null ? iv.implied*100 : null;
+  const {score:invScore, q, vt, mos, impl} = computeInvestScore(f);
   const revG = f.revenue_growth!=null ? f.revenue_growth*100 : null;
   const earnG = f.earnings_growth!=null ? f.earnings_growth*100 : null;
   const tgtGap = f.target_price!=null && f.price ? (f.target_price-f.price)/f.price*100 : null;
-  // invest score 0-100: quality 40% + trap 20% + valuation 40%
-  const valPart = mos==null ? 50 : mos>=25 ? 100 : mos>=0 ? 60+mos*1.6 : mos>=-50 ? 60+mos : Math.max(5, 10+ (mos+100)*0.1);
-  const invScore = Math.round(((q??50)*0.4) + ((100-(vt??50))*0.2) + valPart*0.4);
   // labels
   const tLbl = ts==null ? ["muted","NO DATA"] : !tech.above_sma200 ? ["bearish","AVOID LONGS"] :
     ts>=70 ? ["bullish","STRONG SETUP"] : ts>=55 ? ["bullish","DECENT SETUP"] : ts>=40 ? ["neutral","WEAK"] : ["bearish","NO SETUP"];
@@ -1937,6 +1931,18 @@ function computeIntrinsic(f, a){   // a = {r, g, tg, y} as decimals; y = Graham 
   }
   return {methods, fair, lo:vals[0], hi:vals[vals.length-1],
     mos:(fair-f.price)/fair*100, upside:(fair-f.price)/f.price*100, implied};
+}
+// Investment score 0-100: quality 40% + (100 - value-trap risk) 20% + valuation (margin of safety) 40%.
+// Shared by the Fundamentals tab's consolidated verdict and the Conviction Scan's fundamentals gate —
+// one formula, so a stock flagged AVOID here can't quietly pass there.
+function computeInvestScore(f){
+  const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
+  const iv = (f.eps>0 || f.fcf>0) ? computeIntrinsic(f, {g:defG, r:0.12, tg:0.04, y:7.5}) : null;
+  const q = scoreQuality(f).score, vt = scoreValueTrap(f).score;
+  const mos = iv ? iv.mos : null, impl = iv && iv.implied!=null ? iv.implied*100 : null;
+  const valPart = mos==null ? 50 : mos>=25 ? 100 : mos>=0 ? 60+mos*1.6 : mos>=-50 ? 60+mos : Math.max(5, 10+ (mos+100)*0.1);
+  const score = Math.round(((q??50)*0.4) + ((100-(vt??50))*0.2) + valPart*0.4);
+  return {score, q, vt, mos, impl};
 }
 function renderValuation(sym, f){
   const el = $("valView");
@@ -2878,14 +2884,19 @@ async function runConvictionScan(){
   if(!delivData){ try{ await loadDelivery(); }catch(e){} }
   const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
 
+  // Technical gate reuses setupScore() — the same trade-quality score the Ideas engine and the
+  // Fundamentals tab's consolidated verdict use. It already rewards the bullish signals below AND
+  // penalises overbought/stretched/bearish conditions (RSI>70, BB upper touch, MACD bear cross,
+  // "STRETCHED" tag, etc.) — so a name chasing an extended move can't sneak through on signal count alone.
   const stage1 = scanned.map(s=>{
     const techSignals = s.signals.filter(x=>CONV_TECH.has(x.type));
     const flowSignals = s.signals.filter(x=>CONV_FLOW.has(x.type));
+    const ts = setupScore({...s, action:"BUY"});
     const dr = delivBySymbol.get(s.symbol.replace(".NS",""));
     const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
     const deliveryOk = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
-    return {...s, techSignals, flowSignals, deliveryRow:dr, deliveryChgPct:chgPct, deliveryOk};
-  }).filter(s=>s.techSignals.length>0 && s.flowSignals.length>0 && s.deliveryOk);
+    return {...s, techSignals, flowSignals, ts, deliveryRow:dr, deliveryChgPct:chgPct, deliveryOk};
+  }).filter(s=>s.techSignals.length>0 && s.flowSignals.length>0 && s.deliveryOk && s.above_sma200 && s.ts>=55);
 
   if(!stage1.length){
     prog.style.display = "none";
@@ -2894,19 +2905,23 @@ async function runConvictionScan(){
     return;
   }
 
+  // Fundamentals gate reuses computeInvestScore() — same quality (40%) + value-trap (20%) +
+  // margin-of-safety valuation (40%) blend as the Fundamentals tab's own verdict, so a name that tab
+  // would call AVOID/STRETCHED can't clear this scan just for having a decent Quality Score alone.
   $("convMeta").textContent = `Stage 3/3 — fundamentals check on ${stage1.length} candidate${stage1.length>1?"s":""}…`;
   const withFund = await pmap(stage1, async s=>{
     try{
       const r = await fetch(`/api/fundamentals/${encodeURIComponent(s.symbol)}`);
       const f = await r.json();
-      if(f.error) return {...s, qScore:null, vScore:null};
-      return {...s, qScore: scoreQuality(f).score, vScore: scoreValue(f).score};
-    }catch(e){ return {...s, qScore:null, vScore:null}; }
+      if(f.error) return {...s, invScore:null, qScore:null, mos:null};
+      const inv = computeInvestScore(f);
+      return {...s, invScore:inv.score, qScore:inv.q, mos:inv.mos};
+    }catch(e){ return {...s, invScore:null, qScore:null, mos:null}; }
   }, 6);
 
-  const final = withFund.filter(s=>s.qScore!=null && s.qScore>=60)
+  const final = withFund.filter(s=>s.invScore!=null && s.invScore>=60)
     .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1}))
-    .sort((a,b)=> b.footprints-a.footprints || (b.qScore-a.qScore));
+    .sort((a,b)=> b.footprints-a.footprints || (b.invScore-a.invScore));
 
   prog.style.display = "none";
   $("convMeta").textContent = `${scanned.length} scanned · ${stage1.length} cleared technical+flow+delivery · ${final.length} cleared all 4 gates`;
@@ -2920,23 +2935,27 @@ function renderConvictionResults(rows){
   }
   $("convResults").innerHTML = `<table><thead><tr>
     <th>Stock</th><th>Price ₹</th><th>Chg %</th><th title="Total confirming signals across all four gates">Footprints</th>
-    <th>Delivery %</th><th>Quality</th><th>Value</th><th style="text-align:left">Confirming signals</th>
+    <th>Delivery %</th><th title="Trade-quality score (technicals) — same one the Ideas engine uses">Setup</th>
+    <th title="Quality 40% + (100-value-trap risk) 20% + margin-of-safety valuation 40% — same score the Fundamentals tab's verdict uses">Invest</th>
+    <th title="Discounted-cash-flow/Graham margin of safety, default assumptions">MOS</th>
+    <th style="text-align:left">Confirming signals</th>
     </tr></thead><tbody>` + rows.map(s=>{
       const badges = [...s.techSignals, ...s.flowSignals].map(x=>`<span class="badge bullish" title="${x.detail}">${x.type.replaceAll("_"," ")}</span>`).join("")
         + `<span class="badge bullish" title="Delivery ${fmt(s.deliveryRow.d,1)}%, price +${fmt(s.deliveryChgPct,1)}%">GENUINE ACCUMULATION</span>`
-        + `<span class="badge bullish" title="Fundamentals Quality Score">QUALITY ${s.qScore}+</span>`;
+        + `<span class="badge bullish" title="Invest score ${s.invScore} — quality + value-trap + margin of safety">INVEST ${s.invScore}+</span>`;
       return `<tr onclick="openChart('${s.symbol}')">
       <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
       <td>${fmt(s.price)}</td>
       <td class="${cls(s.change_pct)}">${sign(s.change_pct)}${fmt(s.change_pct)}%</td>
       <td><b class="up">${s.footprints}</b></td>
       <td>${fmt(s.deliveryRow.d,1)}%</td>
-      <td><span class="${scoreCls(s.qScore)}" style="font-weight:700">${s.qScore}</span></td>
-      <td>${s.vScore!=null?s.vScore:"—"}</td>
+      <td><span class="${scoreCls(s.ts)}" style="font-weight:700">${s.ts}</span></td>
+      <td><span class="${scoreCls(s.invScore)}" style="font-weight:700">${s.invScore}</span></td>
+      <td class="${s.mos!=null?cls(s.mos):""}">${s.mos!=null?sign(s.mos)+fmt(s.mos,0)+"%":"—"}</td>
       <td style="text-align:left">${badges}</td>
     </tr>`;
     }).join("") + `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart. "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates — more agreement, not a guarantee. Not investment advice.</div>`;
+    <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart (open the Fundamentals tab there for the full consolidated verdict). "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates — more agreement, not a guarantee. Not investment advice.</div>`;
 }
 
 /* ---- fresh order-block scanner: universe sweep, last 7 days, unmitigated only ---- */
