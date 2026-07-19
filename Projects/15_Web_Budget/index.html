@@ -1162,6 +1162,28 @@ tbody tr.income-row td:first-child{
 .transfer-row .cat-name-text{color:var(--purple);}
 .transfer-row .cat-icon-wrap{filter:hue-rotate(200deg);}
 
+
+/* ── Row context menu ── */
+#rowCtxMenu{
+  position:fixed;z-index:9999;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.45);
+  padding:6px;min-width:210px;display:none;
+}
+#rowCtxMenu .ctx-label{
+  font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--text3);padding:4px 10px 6px;
+}
+#rowCtxMenu button{
+  display:flex;align-items:center;gap:9px;width:100%;
+  background:none;border:none;color:var(--text1);
+  font-size:13px;font-family:var(--font);
+  padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;
+  transition:background .12s;
+}
+#rowCtxMenu button:hover{background:var(--surface2);}
+#rowCtxMenu button.ctx-active{color:var(--accent);font-weight:600;}
+#rowCtxMenu .ctx-sep{height:1px;background:var(--border);margin:4px 0;}
 </style>
 </head>
 <body>
@@ -1562,11 +1584,12 @@ tbody tr.income-row td:first-child{
 </div>
 
 <div id="view-annual" class="view">
-  <div style="padding:12px 16px 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+  <div style="padding:12px 16px 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
     <span style="font-size:13px;font-weight:600;color:var(--text2)">Annual Summary — <span id="annualYear"></span></span>
     <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px;">
-      <input type="checkbox" id="annShowPaid" checked onchange="renderAnnual()"> Show paid status
+      <input type="checkbox" id="annShowPaid" checked onchange="renderAnnual()"> Show paid
     </label>
+    <button id="annHideEmptyBtn" class="btn btn-gray" style="font-size:11px;padding:4px 10px;" onclick="toggleAnnHideEmpty()">👁 Show all</button>
   </div>
   <div class="annual-wrap">
     <table class="annual-table" id="annualTable"></table>
@@ -2821,6 +2844,17 @@ function appendCatRows(cat,md,tbody,extraClass){
     <td class="c"><button class="del-btn" onclick="deleteCat('${cat.id}')">✕</button></td>
   `;
 
+  // Context menu — right-click (desktop) + long-press (mobile)
+  let _ctxTimer=null;
+  tr.addEventListener('contextmenu',e=>{ e.preventDefault(); showRowCtx(e.clientX,e.clientY,cat.id); });
+  tr.addEventListener('pointerdown',e=>{
+    if(e.button!==0) return;
+    _ctxTimer=setTimeout(()=>showRowCtx(e.clientX,e.clientY,cat.id),600);
+  });
+  tr.addEventListener('pointerup',   ()=>clearTimeout(_ctxTimer));
+  tr.addEventListener('pointermove', ()=>clearTimeout(_ctxTimer));
+  tr.addEventListener('pointercancel',()=>clearTimeout(_ctxTimer));
+
   // Drag events
   tr.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain',cat.id); tr.style.opacity='.4'; });
   tr.addEventListener('dragend',  ()=>{ tr.style.opacity='1'; });
@@ -3120,13 +3154,22 @@ function exportCSV(){
 /* --------------------------------------------
    ANNUAL VIEW
    -------------------------------------------- */
+let _annHideEmpty=true;
+function toggleAnnHideEmpty(){
+  _annHideEmpty=!_annHideEmpty;
+  renderAnnual();
+}
+function hasCatValue(cat){
+  return MONTHS.some((_,mi)=>{ const d=getMonthData(mi,cat.id); return (d.actual||0)!==0; });
+}
 function renderAnnual(){
   document.getElementById('annualYear').textContent=currentYear;
+  const btn=document.getElementById('annHideEmptyBtn'); if(btn) btn.textContent=_annHideEmpty?'\ud83d\udc41 Show all':'\ud83d\ude48 Hide empty';
   const showPaid=document.getElementById('annShowPaid').checked;
   const table=document.getElementById('annualTable');
   const cats=state.categories.filter(c=>c.type!=='group').sort((a,b)=>(a.order||0)-(b.order||0));
-  const incCats=cats.filter(c=>c.type==='income');
-  const expCats=cats.filter(c=>c.type==='expense');
+  const incCats=cats.filter(c=>c.type==='income'  && (!_annHideEmpty||hasCatValue(c)));
+  const expCats=cats.filter(c=>c.type==='expense' && (!_annHideEmpty||hasCatValue(c)));
 
   let html='<thead><tr><th>Category</th>';
   MONTHS.forEach((m,i)=>html+=`<th>${m.slice(0,3)}</th>`);
@@ -5558,6 +5601,49 @@ ${found.slice(0,18).map(r=>`<div class="rec-chip">${r.merchant.slice(0,22)}${r.m
 <div style="font-size:10px;color:var(--text3);margin-top:10px">Same merchant + same amount in 2+ months. Check for unused subscriptions or standing orders.</div>
 </div>`;
 }
+/* ── Row context menu ── */
+let _ctxCatId=null;
+function showRowCtx(x,y,catId){
+  _ctxCatId=catId;
+  const cat=state.categories.find(c=>c.id===catId);
+  if(!cat) return;
+  const m=document.getElementById('rowCtxMenu');
+  document.getElementById('ctxCatName').textContent=cat.name;
+  document.getElementById('ctxSetExpense').className= cat.type==='expense'?'ctx-active':'';
+  document.getElementById('ctxSetIncome').className=  cat.type==='income' ?'ctx-active':'';
+  document.getElementById('ctxSetTransfer').className=cat.type==='transfer'?'ctx-active':'';
+  m.style.display='block';
+  const mw=m.offsetWidth||210, mh=m.offsetHeight||180;
+  m.style.left=Math.min(x,window.innerWidth-mw-8)+'px';
+  m.style.top =Math.min(y,window.innerHeight-mh-8)+'px';
+}
+function hideRowCtx(){ document.getElementById('rowCtxMenu').style.display='none'; _ctxCatId=null; }
+document.addEventListener('pointerdown',e=>{ if(!document.getElementById('rowCtxMenu').contains(e.target)) hideRowCtx(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideRowCtx(); });
+function ctxSetType(type){
+  if(!_ctxCatId) return;
+  const cat=state.categories.find(c=>c.id===_ctxCatId);
+  if(!cat) return;
+  cat.type=type;
+  saveState(); renderMonthly();
+  showToast('\u2713 '+cat.name+' \u2192 '+(type==='transfer'?'Transfer (excluded from totals)':type.charAt(0).toUpperCase()+type.slice(1)));
+  hideRowCtx();
+}
+function ctxEdit(){   if(_ctxCatId){ hideRowCtx(); openEditCat(_ctxCatId); } }
+function ctxDetail(){ if(_ctxCatId){ hideRowCtx(); openCatDetail(_ctxCatId); } }
+
 </script>
+
+<!-- Row context menu -->
+<div id="rowCtxMenu">
+  <div class="ctx-label" id="ctxCatName">Category</div>
+  <div class="ctx-sep"></div>
+  <button id="ctxSetExpense"  onclick="ctxSetType('expense')">📉 Set as Expense</button>
+  <button id="ctxSetIncome"   onclick="ctxSetType('income')">📈 Set as Income</button>
+  <button id="ctxSetTransfer" onclick="ctxSetType('transfer')">💳 Set as Transfer <span style="font-size:10px;color:var(--text3)">(excluded from totals)</span></button>
+  <div class="ctx-sep"></div>
+  <button onclick="ctxEdit()">✏️ Edit Category</button>
+  <button onclick="ctxDetail()">🔍 View Transactions</button>
+</div>
 </body>
 </html>
