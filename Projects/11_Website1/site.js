@@ -1,4 +1,4 @@
-/* v9.6 */
+/* v9.7 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -296,10 +296,10 @@ const P={
     {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   SGD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com/sg/',note:'Mid-market rate · MAS licensed · arrives in seconds'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:4,link:'https://wise.com/sg/',note:'Mid-market rate · ~SGD 4 fee deducted · MAS licensed · arrives in seconds'},
     {name:'Revolut',spread:.008,fee:0,link:'https://www.revolut.com/en-SG/',note:'Premium plan: zero fee at mid-market · Standard: 0.5% markup over S$200/month'},
     {name:'DBS Remit',spread:.009,fee:0,link:'https://www.dbs.com.sg/',note:'Zero fee for DBS/POSB customers · instant to major Indian banks'},
-    {name:'InstaReM',spread:.010,fee:0,link:'https://www.instarem.com/en-sg/',note:'Singapore-founded · MAS licensed · earns InstaPoints loyalty rewards'},
+    {name:'InstaReM',spread:.001,fee:0,feeType:'incl',feePercent:0.0055,link:'https://www.instarem.com/en-sg/',note:'0.55% fee included · Singapore-founded · MAS licensed · earns InstaPoints loyalty rewards'},
     {name:'OCBC Global Transfer',spread:.010,fee:0,link:'https://www.ocbc.com/personal-banking/international-transfers',note:'Low fee for OCBC account holders'},
     {name:'Standard Chartered Online',spread:.010,fee:0,link:'https://www.sc.com/sg/',note:'SC Bank transfer · fast'},
     {name:'SingX',spread:.011,fee:0,link:'https://www.singx.co/',note:'SG–India specialist · good large-transfer rates · MAS licensed'},
@@ -310,68 +310,68 @@ const P={
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/sg/en/home.html',note:'Cash pickup at thousands of India locations'},
   ],
   AUD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate · ASIC licensed'},
-    {name:'InstaReM',spread:.008,fee:0,link:'https://instarem.com/en-au/',note:'SG fintech · ASIC licensed'},
-    {name:'OFX',spread:.010,fee:0,link:'https://www.ofx.com/',note:'Australia-founded FX specialist · very popular'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:6,link:'https://wise.com',note:'Mid-market rate · ~AUD 6 fee deducted · ASIC licensed'},
+    {name:'InstaReM',spread:.001,fee:0,feeType:'incl',feeAdd:6,link:'https://instarem.com/en-au/',note:'Flat AUD 6 fee included · SG fintech · ASIC licensed'},
+    {name:'OFX',spread:.030,fee:0,feeType:'add',feeAdd:15,link:'https://www.ofx.com/',note:'Australia-founded FX specialist · AUD 15 fee extra'},
     {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
-    {name:'Remitly',spread:.012,fee:0,link:'https://www.remitly.com/',note:'Popular AU–India'},
+    {name:'Remitly',spread:.003,fee:0,link:'https://www.remitly.com/',note:'Popular AU–India'},
     {name:'TorFX',spread:.013,fee:0,link:'https://www.torfx.com/',note:'No transfer fees · personal dealer'},
     {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in AU'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'AU agent network'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   NZD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
-    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'NZ registered'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:5,link:'https://wise.com',note:'Mid-market rate · ~NZD 5 fee deducted'},
+    {name:'Remitly',spread:.003,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
+    {name:'OFX',spread:.032,fee:0,feeType:'add',feeAdd:12,link:'https://www.ofx.com/',note:'NZ registered · NZD 12 fee extra'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
   ],
   USD:[
-    {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · FinCEN licensed'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:11,link:'https://wise.com',note:'Mid-market rate · ~USD 11 fee deducted (varies) · FinCEN licensed'},
     {name:'Revolut',spread:.006,fee:0,link:'https://www.revolut.com/',note:'US app users · free on standard (limits apply)'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular US–India · Express & Economy options'},
-    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · very popular with Indian Americans'},
-    {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-us/',note:'Digital · fast'},
-    {name:'OFX',spread:.014,fee:0,link:'https://www.ofx.com/',note:'No fee · good for large amounts'},
+    {name:'Remitly',spread:.004,fee:0,link:'https://www.remitly.com/',note:'Popular US–India · Express & Economy options'},
+    {name:'Xoom (PayPal)',spread:.004,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · very popular with Indian Americans'},
+    {name:'InstaReM',spread:.007,fee:0,link:'https://instarem.com/en-us/',note:'Digital · fast'},
+    {name:'OFX',spread:.033,fee:0,feeType:'add',feeAdd:5,link:'https://www.ofx.com/',note:'USD 5 fee extra · good for large amounts'},
     {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
-    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'WorldRemit',spread:.006,fee:0,feeType:'add',feeAdd:3,link:'https://www.worldremit.com/',note:'App-based · popular · ~USD 3 fee extra'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Large US agent network'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   CAD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Popular Canada–India corridor'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:8,link:'https://wise.com',note:'Mid-market rate · ~CAD 8 fee deducted'},
+    {name:'Remitly',spread:.005,fee:0,link:'https://www.remitly.com/',note:'Popular Canada–India corridor'},
     {name:'Simplii Global Money Transfer',spread:.012,fee:0,link:'https://simplii.com',note:'CIBC-owned · popular with Indian Canadians'},
-    {name:'InstaReM',spread:.012,fee:0,link:'https://instarem.com/en-ca/',note:'Digital · fast'},
-    {name:'Xoom (PayPal)',spread:.015,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · popular app'},
+    {name:'InstaReM',spread:.007,fee:0,link:'https://instarem.com/en-ca/',note:'Digital · fast'},
+    {name:'Xoom (PayPal)',spread:.016,fee:0,link:'https://www.xoom.com/',note:'PayPal-backed · popular app'},
     {name:'TD Global Transfer',spread:.018,fee:5,link:'https://td.com',note:'TD Bank customers · convenient'},
     {name:'RBC International Transfer',spread:.019,fee:6,link:'https://rbc.com',note:'RBC account holders'},
     {name:'Xe.com',spread:.014,fee:0,link:'https://www.xe.com/',note:'No fee transfers'},
-    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
+    {name:'WorldRemit',spread:.006,fee:0,feeType:'add',feeAdd:3,link:'https://www.worldremit.com/',note:'App-based · popular · ~USD 3 fee extra'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Canada-wide agent network'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+    {name:'Western Union',spread:.006,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
   ],
   EUR:[
-    {name:'Wise',spread:.005,fee:3,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:7,link:'https://wise.com',note:'Mid-market rate · ~EUR 7 fee deducted'},
     {name:'Remitly',spread:.011,fee:0,link:'https://www.remitly.com/',note:'Fast digital'},
-    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-eu/',note:'EU licensed · digital'},
+    {name:'InstaReM',spread:.006,fee:0,link:'https://instarem.com/en-eu/',note:'EU licensed · digital'},
     {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'EU-wide agents'},
+    {name:'Western Union',spread:.007,fee:0,link:'https://www.westernunion.com/',note:'EU-wide agents'},
   ],
   GBP:[
-    {name:'Wise',spread:.005,fee:2,link:'https://wise.com',note:'Mid-market rate · FCA regulated'},
+    {name:'Wise',spread:.000,fee:0,feeType:'incl',feeAdd:5,link:'https://wise.com',note:'Mid-market rate · ~GBP 5 fee deducted · FCA regulated'},
     {name:'Revolut',spread:.005,fee:0,link:'https://www.revolut.com/',note:'App-based · free on standard plan (limits apply)'},
-    {name:'Remitly',spread:.010,fee:0,link:'https://www.remitly.com/',note:'Popular UK–India corridor'},
-    {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-gb/',note:'FCA regulated · digital'},
+    {name:'Remitly',spread:.002,fee:0,feeType:'add',feeAdd:2,link:'https://www.remitly.com/',note:'Popular UK–India corridor · GBP 1.99 fee extra'},
+    {name:'InstaReM',spread:.006,fee:0,link:'https://instarem.com/en-gb/',note:'FCA regulated · digital'},
     {name:'CurrencyFair',spread:.008,fee:3,link:'https://www.currencyfair.com/',note:'Peer exchange · low spread'},
     {name:'Xe.com',spread:.013,fee:0,link:'https://www.xe.com/',note:'No transfer fee · large transfers'},
-    {name:'WorldRemit',spread:.015,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in UK'},
+    {name:'WorldRemit',spread:.009,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular in UK'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Post Office & agents'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Post Office & agents'},
+    {name:'Western Union',spread:.006,fee:0,feeType:'add',feeAdd:2,link:'https://www.westernunion.com/',note:'Post Office & agents · ~GBP 2 fee extra'},
   ],
 };
 
@@ -383,7 +383,7 @@ function getDynFee(p,amt){
   return p.feeAdd||p.fee||0;
 }
 
-const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.58,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
+const FB={AED:26.28,SAR:25.74,QAR:26.52,KWD:314.9,BHD:256.6,OMR:250.8,SGD:74.77,MYR:23.58,AUD:67.45,NZD:56.47,USD:96.52,CAD:68.91,EUR:110.40,GBP:129.96};
 let rateIsLive=false;
 const CACHE_TTL=10*60*1000; // 10 minutes
 
