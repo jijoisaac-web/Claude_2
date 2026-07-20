@@ -1,4 +1,4 @@
-/* v9.1 */
+/* v9.2 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -296,16 +296,18 @@ const P={
     {name:'MoneyGram',spread:.022,fee:1,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   SGD:[
-    {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'InstaReM',spread:.010,fee:0,link:'https://instarem.com',note:'Singapore-founded fintech · MAS licensed'},
-    {name:'DBS Remit',spread:.009,fee:0,link:'https://dbs.com.sg',note:'Zero fee for DBS/POSB customers'},
-    {name:'OCBC Global Transfer',spread:.010,fee:0,link:'https://ocbc.com',note:'Low fee for OCBC account holders'},
-    {name:'Standard Chartered Online',spread:.010,fee:0,link:'https://sc.com/sg',note:'SC Bank transfer · fast'},
-    {name:'SingX',spread:.011,fee:0,link:'https://singx.co/',note:'SG–India specialist · good large-transfer rates'},
+    {name:'Wise',spread:.006,fee:4,link:'https://wise.com/sg/',note:'Mid-market rate · MAS licensed · arrives in seconds'},
+    {name:'Revolut',spread:.008,fee:0,link:'https://www.revolut.com/en-SG/',note:'Premium plan: zero fee at mid-market · Standard: 0.5% markup over S$200/month'},
+    {name:'DBS Remit',spread:.009,fee:0,link:'https://www.dbs.com.sg/',note:'Zero fee for DBS/POSB customers · instant to major Indian banks'},
+    {name:'InstaReM',spread:.010,fee:0,link:'https://www.instarem.com/en-sg/',note:'Singapore-founded · MAS licensed · earns InstaPoints loyalty rewards'},
+    {name:'OCBC Global Transfer',spread:.010,fee:0,link:'https://www.ocbc.com/personal-banking/international-transfers',note:'Low fee for OCBC account holders'},
+    {name:'Standard Chartered Online',spread:.010,fee:0,link:'https://www.sc.com/sg/',note:'SC Bank transfer · fast'},
+    {name:'SingX',spread:.011,fee:0,link:'https://www.singx.co/',note:'SG–India specialist · good large-transfer rates · MAS licensed'},
+    {name:'SBI Singapore',spread:.012,fee:0,link:'https://sbisingapore.com/',note:'Direct SBI-to-SBI · high security · best for SBI account holders'},
     {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
     {name:'WorldRemit',spread:.014,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India coverage'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/sg/en/home.html',note:'Cash pickup at thousands of India locations'},
   ],
   AUD:[
     {name:'Wise',spread:.006,fee:4,link:'https://wise.com',note:'Mid-market rate · ASIC licensed'},
