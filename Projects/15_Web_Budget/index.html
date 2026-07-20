@@ -3170,6 +3170,7 @@ function renderAnnual(){
   const cats=state.categories.filter(c=>c.type!=='group').sort((a,b)=>(a.order||0)-(b.order||0));
   const incCats=cats.filter(c=>c.type==='income'  && (!_annHideEmpty||hasCatValue(c)));
   const expCats=cats.filter(c=>c.type==='expense' && (!_annHideEmpty||hasCatValue(c)));
+  const tfrCats=cats.filter(c=>c.type==='transfer' && (!_annHideEmpty||hasCatValue(c)));
 
   let html='<thead><tr><th>Category</th>';
   MONTHS.forEach((m,i)=>html+=`<th>${m.slice(0,3)}</th>`);
@@ -3197,6 +3198,12 @@ function renderAnnual(){
   // Expenses
   html+=`<tr class="group-hdr"><td colspan="${MONTHS.length+2}">📉 Expenses</td></tr>`;
   expCats.forEach(c=>html+=catRow(c,''));
+
+  // Transfers
+  if(tfrCats.length){
+    html+=`<tr class="group-hdr"><td colspan="${MONTHS.length+2}">💳 Transfers (excluded from totals)</td></tr>`;
+    tfrCats.forEach(c=>html+=catRow(c,'transfer-row'));
+  }
 
   // Summary rows
   const sumLabels=['MYR Income','MYR Expenses','MYR Balance','MYR Paid','MYR Pending'];
