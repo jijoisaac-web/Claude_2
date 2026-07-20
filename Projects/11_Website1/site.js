@@ -1,4 +1,4 @@
-/* v9.7 */
+/* v9.8 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -648,6 +648,8 @@ function renderRates(){
 
   /* ── summary strip ── */
   var bestRow=rows[0], worstRow=rows[rows.length-1];
+  var mmUpd=getLastUpdatedStr();
+  var mmTip='The mid-market rate is the real exchange rate banks trade at, with no markup. It\'s the benchmark — every provider below applies its own margin/fee on top, so you always receive slightly less than this.';
   var summaryHtml='<div class="rate-summary-strip">'+
     '<div class="rate-summary-cell">'+
       '<div class="rate-summary-label">Best Rate Today</div>'+
@@ -660,9 +662,14 @@ function renderRates(){
       '<div class="rate-summary-sub">vs worst provider on same amount</div>'+
     '</div>'+
     '<div class="rate-summary-cell">'+
-      '<div class="rate-summary-label">Mid-Market Rate</div>'+
+      '<div class="rate-summary-label" style="display:flex;align-items:center;gap:4px">Mid-Market Rate'+
+        '<span title="'+mmTip+'" style="cursor:help;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border);color:var(--muted);font-size:9px;font-weight:900;font-style:normal;flex-shrink:0">?</span>'+
+      '</div>'+
       '<div class="rate-summary-val" style="color:var(--text2)">&#8377;'+midRate.toFixed(2)+'</div>'+
-      '<div class="rate-summary-sub">per '+baseCur+' (XE.com live)</div>'+
+      '<div class="rate-summary-sub" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+
+        '<img src="https://www.google.com/s2/favicons?domain=xe.com&sz=32" width="12" height="12" style="border-radius:3px;flex-shrink:0" alt="" onerror="this.style.display=\'none\'">'+
+        '<span>per '+baseCur+' &middot; XE.com'+(mmUpd?' &middot; '+mmUpd:'')+'</span>'+
+      '</div>'+
     '</div>'+
   '</div>';
 

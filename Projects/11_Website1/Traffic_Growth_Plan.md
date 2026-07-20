@@ -15,16 +15,42 @@ The X strategy leaned on cold outbound posts to build an audience from zero. Red
 ### Target subreddits
 | Subreddit | Why | Notes |
 |---|---|---|
-| r/NRI | Direct audience match | Check pinned rules — many finance subs require a minimum account age/karma before linking |
-| r/IndiaInvestments | High-intent, finance-literate | Mod team is strict about self-promo; answer first, link second |
-| r/developeconomies / r/IndiaTax | Tax-specific questions (DTAA, RNOR, TDS) | Good fit for calculator pages |
-| Country subs: r/dubai, r/AskMiddleEast, r/AskUK, r/canada | Remittance & return-to-India questions surface here often | Lower NRI-density, so be selective |
+| r/NRI | Direct audience match | Read the sidebar/rules wiki on the sub itself before posting — rules aren't reliably searchable from outside and change over time |
+| r/IndiaInvestments | High-intent, finance-literate | Same — check current rules directly; large finance subs often restrict or ban outright promotional links regardless of quality |
+| r/IndiaTax | Tax-specific questions (DTAA, RNOR, TDS) | Good fit for calculator pages |
+| Country subs: r/dubai, r/AskMiddleEast, r/AskUK, r/canada | Remittance & return-to-India questions surface here occasionally | These are general Q&A subs, not finance-focused — treat as lower priority and higher risk for unsolicited links; only drop a link when directly and obviously responsive to the question asked |
+
+*Correction: r/developeconomies (previously listed) doesn't appear to exist — dropped from this table.*
 
 ### How to post without getting banned
+- Reddit retired its old official "90/10" self-promotion guideline; enforcement is now entirely per-subreddit. Read each target sub's rules/wiki directly before posting — don't rely on general Reddit advice or on this document.
 - Search each sub for "remittance," "NRE," "RNOR," "DTAA," "return to India" before posting — reply to existing threads first for 1–2 weeks to build karma and mod trust.
 - Never lead with the link. Answer the actual question in 3–5 sentences, then: "I built a free calculator for this if it helps — [link]." Let the tool speak for itself.
 - One high-effort post/week beats five drive-by link-drops. Best format: "I compared X so you don't have to" using real numbers pulled from your own calculators (mirrors Thread Idea #2 and #3 from the old X plan — those translate well to Reddit).
-- Disclose you built the tool. Undisclosed self-promo is the #1 reason NRI/finance subs remove posts or ban accounts.
+- Disclose you built the tool. Undisclosed self-promo is the top reason finance subs remove posts or ban accounts — and you can't afford a second platform suspension right now.
+
+### Day-by-day starter checklist
+
+**Day 1 — Account setup**
+- If you have any existing Reddit account with real history, use it — brand-new accounts trigger Reddit's spam filter far more aggressively, and links from them get auto-removed even in subs that otherwise allow self-promo.
+- If starting fresh: fill in a profile picture and a couple of genuine comments in unrelated subs first (e.g. r/india, r/personalfinance) before touching your target subs. Don't put the site link in your username or bio yet — that alone reads as spam signal to some subs' automod.
+
+**Days 1–3 — Recon**
+- Join r/NRI, r/IndiaInvestments, r/IndiaTax, and the country subs. Read each sub's rules (sidebar + "wiki" link if present) and note anything about minimum karma/account age to post — this is set per-sub and automod will simply remove your post silently if you're under it, so check rather than assume.
+
+**Days 1–14 — Warm-up (no links yet)**
+- Comment genuinely on ~15–20 existing threads across your target subs and adjacent ones (r/india, r/personalfinanceindia). Answer questions you actually know the answer to — RNOR, NRE vs NRO, remittance timing, DTAA. This builds karma and, more importantly, account age with activity, which is what automod actually checks.
+- Skip the link entirely during this phase, even in replies. The payoff is trust, not clicks.
+
+**First post (end of week 2)**
+- Pick the lowest-friction sub first — r/IndiaTax or r/NRI tend to be smaller and less strict than r/IndiaInvestments.
+- Use the "I compared X so you don't have to" format with real numbers pulled from your calculators.
+- If the sub's culture is link-averse, put the tool link in your first reply to your own post rather than the post body — check how other posts in that sub handle outbound links before copying the pattern.
+- Don't post the same content to multiple subs on the same day — identical cross-posting reads as bot behavior and can get a new account site-wide shadow-limited, not just removed from one sub.
+- Stay active in the comments for the first couple of hours after posting — early replies signal a real person, not a drop-and-run.
+
+**After posting**
+- Once GA4 is installed (see Technical SEO section), tag the Reddit link with a UTM (`?utm_source=reddit&utm_medium=social`) so you can see which subreddit and post actually sent traffic, not just upvotes.
 
 ### Starter post ideas (adapt from existing content strategy)
 1. "I compared 7 NRI remittance services with live data — here's what actually saves money" (r/NRI, r/IndiaInvestments)
