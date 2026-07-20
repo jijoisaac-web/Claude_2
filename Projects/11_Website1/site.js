@@ -1,4 +1,4 @@
-/* v9.0 */
+/* v9.1 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -218,18 +218,14 @@ function updateHeroBg(cur){
 const P={
   MYR:[
     {name:'eRemit',spread:0.001,fee:0,link:'https://eremit.com.my/home',note:'1 MYR = 23.55 INR · +MYR 13 fee extra · bank account'},
-    {name:'LuluMoney',spread:0.001,fee:0,link:'https://www.lulumoney.com/',note:'1 MYR = 23.55 INR · +MYR 10 fee extra · app exclusive'},
-    {name:'InstaReM',spread:0.002,fee:0,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · new users use WELCOME for 0 fee · +MYR 5.5 normal'},
+    {name:'LuluMoney',spread:0.001,fee:0,link:'https://www.lulumoney.com/',note:'1 MYR = 23.55 INR · fee: MYR 10 (small) to MYR 25 (large) · app exclusive'},
+    {name:'Western Union',spread:0.001,fee:0,link:'https://www.westernunion.com/my/en/home.html',note:'1 MYR = 23.55 INR · +MYR 11.20 fee extra · first online transfer free'},
     {name:'Wise',spread:0.001,fee:12,link:'https://wise.com/my/',note:'MYR 11.83 fee deducted from send amount · arrives in seconds'},
-    {name:'MoneyMatch',spread:0.005,fee:0,link:'https://moneymatch.com/',note:'Malaysia fintech · competitive rates · no extra fee'},
+    {name:'InstaReM',spread:0.002,fee:0,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · new users use WELCOME for 0 fee · +MYR 5.5 normal'},
+    {name:'Lotus Remit',spread:0.003,fee:0,link:'https://lotusremit.com',note:'1 MYR = 23.50 INR · flat MYR 5 fee extra · same-day India credit'},
     {name:'Merchantrade Money',spread:0.007,fee:0,link:'https://merchantrademoney.com',note:'Malaysia largest remittance network · +MYR 3 fee extra'},
     {name:'EzyRemit',spread:0.009,fee:0,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY · +MYR 5 fee extra'},
-    {name:'Lotus Remit',spread:0.010,fee:0,link:'https://lotusremit.com',note:'Strong South Asian corridor · +MYR 5 fee extra'},
-    {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular · no fee'},
-    {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates · no fee'},
-    {name:'Ria Money Transfer',spread:0.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
     {name:'Maybank',spread:0.020,fee:0,link:'https://www.maybank2u.com.my/',note:'Maybank M2U · best for existing Maybank customers'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash and digital'},
   ],
   AED:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
