@@ -217,18 +217,19 @@ function updateHeroBg(cur){
 // ── PROVIDERS ──────────────────────────────────
 const P={
   MYR:[
-    {name:'Wise',spread:0.001,fee:12,link:'https://wise.com',note:'Mid-market rate · ~12 MYR fee'},
-    {name:'InstaReM',spread:0.003,fee:6,link:'https://instarem.com/en-my/',note:'FPX transfer · 2hr delivery'},
-    {name:'eRemit',spread:0.002,fee:13,link:'https://eremit.com.my/home',note:'eRemit Malaysia · MYR 13 fee'},
-    {name:'Merchantrade Money',spread:0.008,fee:3,link:'https://merchantrademoney.com',note:'Malaysia\'s largest remittance player'},
-    {name:'EzyRemit',spread:0.009,fee:5,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY'},
-    {name:'Lotus Remit',spread:0.010,fee:5,link:'https://lotusremit.com',note:'Strong South Asian corridor'},
-    {name:'Remitly',spread:0.012,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
-    {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular'},
-    {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates'},
+    {name:'eRemit',spread:0.001,fee:0,link:'https://eremit.com.my/home',note:'1 MYR = 23.55 INR · +MYR 13 fee extra · bank account'},
+    {name:'LuluMoney',spread:0.001,fee:0,link:'https://www.lulumoney.com/',note:'1 MYR = 23.55 INR · +MYR 10 fee extra · app exclusive'},
+    {name:'InstaReM',spread:0.002,fee:0,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · new users use WELCOME for 0 fee · +MYR 5.5 normal'},
+    {name:'Wise',spread:0.001,fee:12,link:'https://wise.com/my/',note:'MYR 11.83 fee deducted from send amount · arrives in seconds'},
+    {name:'MoneyMatch',spread:0.005,fee:0,link:'https://moneymatch.com/',note:'Malaysia fintech · competitive rates · no extra fee'},
+    {name:'Merchantrade Money',spread:0.007,fee:0,link:'https://merchantrademoney.com',note:'Malaysia largest remittance network · +MYR 3 fee extra'},
+    {name:'EzyRemit',spread:0.009,fee:0,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY · +MYR 5 fee extra'},
+    {name:'Lotus Remit',spread:0.010,fee:0,link:'https://lotusremit.com',note:'Strong South Asian corridor · +MYR 5 fee extra'},
+    {name:'WorldRemit',spread:0.013,fee:0,link:'https://www.worldremit.com/',note:'App-based · popular · no fee'},
+    {name:'ACE Money Transfer',spread:0.014,fee:0,link:'https://acemoneytransfer.com',note:'Competitive flat rates · no fee'},
     {name:'Ria Money Transfer',spread:0.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
-    {name:'LuluMoney',spread:0.012,fee:0,link:'https://www.lulumoney.com/',note:'Lulu Exchange outlets · Malaysia'},
-    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+    {name:'Maybank',spread:0.020,fee:0,link:'https://www.maybank2u.com.my/',note:'Maybank M2U · best for existing Maybank customers'},
+    {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash and digital'},
   ],
   AED:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
@@ -376,7 +377,7 @@ const P={
   ],
 };
 
-const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.34,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
+const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.58,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
 let rateIsLive=false;
 const CACHE_TTL=10*60*1000; // 10 minutes
 
@@ -5169,7 +5170,7 @@ function _fmtQ(v){
 
       if (!currentRate) {
         /* Fallback sample rates if API fails */
-        var FALLBACK = {AED:23.02,SAR:22.53,QAR:23.20,KWD:275.1,BHD:224.5,OMR:219.8,USD:84.5,GBP:107.2,EUR:91.4,CAD:62.1,AUD:55.3,NZD:50.2,CHF:95.8,SEK:8.42,NOK:8.15,DKK:12.25,SGD:63.8,MYR:19.2,JPY:0.555,HKD:10.85};
+        var FALLBACK = {AED:23.02,SAR:22.53,QAR:23.20,KWD:275.1,BHD:224.5,OMR:219.8,USD:84.5,GBP:107.2,EUR:91.4,CAD:62.1,AUD:55.3,NZD:50.2,CHF:95.8,SEK:8.42,NOK:8.15,DKK:12.25,SGD:63.8,MYR:23.58,JPY:0.555,HKD:10.85};
         currentRate = FALLBACK[_rtPair.id] || 84.5;
       }
 
