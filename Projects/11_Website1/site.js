@@ -1,4 +1,4 @@
-/* v9.5 */
+/* v9.6 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -221,8 +221,8 @@ const P={
     {name:'LuluMoney',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:5000,fee:10},{max:10000,fee:15},{max:1e9,fee:25}],link:'https://www.lulumoney.com/',note:'App exclusive · best for Lulu customers'},
     {name:'Western Union',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:2500,fee:11.20},{max:7500,fee:30},{max:12500,fee:50},{max:1e9,fee:16}],link:'https://www.westernunion.com/my/en/home.html',note:'First online transfer free · instant delivery'},
     {name:'Wise',spread:0.001,fee:12,feeType:'incl',feeWise:true,link:'https://wise.com/my/',note:'Fee deducted from send amount · arrives in seconds'},
-    {name:'InstaReM',spread:0.002,fee:0,feeType:'add',feeAdd:5.5,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · use WELCOME for 0 fee (new users)'},
-    {name:'Lotus Remit',spread:0.003,fee:0,feeType:'add',feeAdd:5,link:'https://lotusremit.com',note:'Same-day India credit'},
+    {name:'InstaReM',spread:0.001,fee:0,feeType:'incl',feePercent:0.0055,link:'https://instarem.com/en-my/',note:'0.55% fee included · FPX · 2hr delivery · first transfer free'},
+    {name:'Lotus Remit',spread:0.0016,fee:0,feeType:'add',feeAdd:5,link:'https://lotusremit.com',note:'Same-day India credit · flat MYR 5 fee extra'},
     {name:'Merchantrade Money',spread:0.007,fee:0,feeType:'add',feeAdd:3,link:'https://merchantrademoney.com',note:'Malaysia largest remittance network'},
     {name:'EzyRemit',spread:0.009,fee:0,feeType:'add',feeAdd:5,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY'},
     {name:'Maybank',spread:0.020,fee:0,link:'https://www.maybank2u.com.my/',note:'Maybank M2U · best for existing Maybank customers'},
@@ -378,6 +378,7 @@ const P={
 // ── TIERED FEE HELPER ──────────────────────────────────
 function getDynFee(p,amt){
   if(p.feeWise)return parseFloat((4.58+0.00725*amt).toFixed(2));
+  if(p.feePercent)return parseFloat((p.feePercent*amt).toFixed(2));
   if(p.feeTiers){for(var _i=0;_i<p.feeTiers.length;_i++){if(amt<=p.feeTiers[_i].max)return p.feeTiers[_i].fee;}}
   return p.feeAdd||p.fee||0;
 }
