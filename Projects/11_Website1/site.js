@@ -1,4 +1,4 @@
-/* v9.2 */
+/* v9.3 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -217,14 +217,14 @@ function updateHeroBg(cur){
 // ── PROVIDERS ──────────────────────────────────
 const P={
   MYR:[
-    {name:'eRemit',spread:0.001,fee:0,link:'https://eremit.com.my/home',note:'1 MYR = 23.55 INR · +MYR 13 fee extra · bank account'},
-    {name:'LuluMoney',spread:0.001,fee:0,link:'https://www.lulumoney.com/',note:'1 MYR = 23.55 INR · fee: MYR 10 (small) to MYR 25 (large) · app exclusive'},
-    {name:'Western Union',spread:0.001,fee:0,link:'https://www.westernunion.com/my/en/home.html',note:'1 MYR = 23.55 INR · +MYR 11.20 fee extra · first online transfer free'},
-    {name:'Wise',spread:0.001,fee:12,link:'https://wise.com/my/',note:'MYR 11.83 fee deducted from send amount · arrives in seconds'},
-    {name:'InstaReM',spread:0.002,fee:0,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · new users use WELCOME for 0 fee · +MYR 5.5 normal'},
-    {name:'Lotus Remit',spread:0.003,fee:0,link:'https://lotusremit.com',note:'1 MYR = 23.50 INR · flat MYR 5 fee extra · same-day India credit'},
-    {name:'Merchantrade Money',spread:0.007,fee:0,link:'https://merchantrademoney.com',note:'Malaysia largest remittance network · +MYR 3 fee extra'},
-    {name:'EzyRemit',spread:0.009,fee:0,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY · +MYR 5 fee extra'},
+    {name:'eRemit',spread:0.001,fee:0,feeType:'add',feeAdd:13,link:'https://eremit.com.my/home',note:'Bank account only · same-day India credit'},
+    {name:'LuluMoney',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:5000,fee:10},{max:1e9,fee:25}],link:'https://www.lulumoney.com/',note:'App exclusive · best for Lulu customers'},
+    {name:'Western Union',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:2500,fee:11.20},{max:7500,fee:30},{max:12500,fee:50},{max:1e9,fee:16}],link:'https://www.westernunion.com/my/en/home.html',note:'First online transfer free · instant delivery'},
+    {name:'Wise',spread:0.001,fee:12,feeType:'incl',feeWise:true,link:'https://wise.com/my/',note:'Fee deducted from send amount · arrives in seconds'},
+    {name:'InstaReM',spread:0.002,fee:0,feeType:'add',feeAdd:5.5,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · use WELCOME for 0 fee (new users)'},
+    {name:'Lotus Remit',spread:0.003,fee:0,feeType:'add',feeAdd:5,link:'https://lotusremit.com',note:'Same-day India credit'},
+    {name:'Merchantrade Money',spread:0.007,fee:0,feeType:'add',feeAdd:3,link:'https://merchantrademoney.com',note:'Malaysia largest remittance network'},
+    {name:'EzyRemit',spread:0.009,fee:0,feeType:'add',feeAdd:5,link:'https://ezyremit.com.my',note:'Popular among Indian workers in MY'},
     {name:'Maybank',spread:0.020,fee:0,link:'https://www.maybank2u.com.my/',note:'Maybank M2U · best for existing Maybank customers'},
   ],
   AED:[
@@ -374,6 +374,13 @@ const P={
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Post Office & agents'},
   ],
 };
+
+// ── TIERED FEE HELPER ──────────────────────────────────
+function getDynFee(p,amt){
+  if(p.feeWise)return parseFloat((4.58+0.00725*amt).toFixed(2));
+  if(p.feeTiers){for(var _i=0;_i<p.feeTiers.length;_i++){if(amt<=p.feeTiers[_i].max)return p.feeTiers[_i].fee;}}
+  return p.feeAdd||p.fee||0;
+}
 
 const FB={AED:22.50,SAR:22.20,QAR:22.80,KWD:270.0,BHD:220.0,OMR:215.0,SGD:62.5,MYR:23.58,AUD:54.5,NZD:49.5,USD:83.5,CAD:61.5,EUR:90.5,GBP:106.0};
 let rateIsLive=false;
@@ -527,8 +534,9 @@ function renderRatePreview(){
   const providers=P[baseCur]||P['USD'];
   const rows=providers.map(p=>{
     const rate=midRate*(1-p.spread);
-    const inr=Math.max(0,amt-p.fee)*rate;
-    return{...p,rate,inr};
+    const _dynFee=p.feeType==='incl'?getDynFee(p,amt):(p.fee||0);
+    const inr=Math.max(0,amt-_dynFee)*rate;
+    return{...p,rate,inr,_dynFee};
   }).sort((a,b)=>b.inr-a.inr).slice(0,3);
   const rpcRows=document.getElementById('rpc-rows');
   if(!rpcRows)return;
@@ -619,8 +627,9 @@ function renderRates(){
   var providers=P[baseCur]||P['USD'];
   var rows=providers.map(function(p){
     var rate=midRate*(1-p.spread);
-    var inr=Math.max(0,amt-p.fee)*rate;
-    return Object.assign({},p,{rate:rate,inr:inr});
+    var _dynFee=p.feeType==='incl'?getDynFee(p,amt):(p.fee||0);
+    var inr=Math.max(0,amt-_dynFee)*rate;
+    return Object.assign({},p,{rate:rate,inr:inr,_dynFee:_dynFee});
   }).sort(function(a,b){return b.inr-a.inr;});
 
   var best=rows[0].inr, worst=rows[rows.length-1].inr;
@@ -681,7 +690,7 @@ function renderRates(){
       '<div class="rt-amount'+amtCls+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
       '<div class="rt-per">&#8377;'+p.rate.toFixed(4)+' per '+baseCur+'</div>'+
       '<div class="rt-bar"><div class="rt-bar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
-      '<div class="rt-meta">'+(p.fee>0?baseCur+' '+p.fee+' fee':'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin &middot; '+p.note+'</div>'+
+      '<div class="rt-meta">'+((p.feeType==='incl')?baseCur+' '+p._dynFee.toFixed(2)+' fee (incl)':(p.feeType==='add')?'+'+baseCur+' '+p._dynFee.toFixed(2)+' fee extra':(p.fee>0?baseCur+' '+p.fee+' fee':'No fee'))+' &middot; '+(p.spread*100).toFixed(1)+'% margin &middot; '+p.note+'</div>'+
       '<div class="rt-footer">'+
         diffHtml+
         '<a class="rt-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
@@ -700,7 +709,7 @@ function renderRates(){
       rtBadge(p.name,p.link)+
       '<div class="pinfo">'+
         '<div class="pname">'+p.name+' '+diff+'</div>'+
-        '<div class="pmeta">'+p.note+' &middot; '+(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee')+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
+        '<div class="pmeta">'+p.note+' &middot; '+((p.feeType==='incl')?'Fee: '+baseCur+' '+p._dynFee.toFixed(2)+' (incl)':(p.feeType==='add')?'Fee: +'+baseCur+' '+p._dynFee.toFixed(2)+' extra':(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee'))+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
       '</div>'+
       '<div class="pbar-col">'+
         '<div class="pamount" style="color:'+(isBest?'var(--green)':'var(--text)')+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
