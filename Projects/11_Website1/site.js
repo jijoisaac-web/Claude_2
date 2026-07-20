@@ -1,4 +1,4 @@
-/* v9.4 */
+/* v9.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -218,7 +218,7 @@ function updateHeroBg(cur){
 const P={
   MYR:[
     {name:'eRemit',spread:0.001,fee:0,feeType:'add',feeAdd:13,link:'https://eremit.com.my/home',note:'Bank account only · same-day India credit'},
-    {name:'LuluMoney',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:5000,fee:10},{max:1e9,fee:25}],link:'https://www.lulumoney.com/',note:'App exclusive · best for Lulu customers'},
+    {name:'LuluMoney',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:5000,fee:10},{max:10000,fee:15},{max:1e9,fee:25}],link:'https://www.lulumoney.com/',note:'App exclusive · best for Lulu customers'},
     {name:'Western Union',spread:0.001,fee:0,feeType:'add',feeTiers:[{max:2500,fee:11.20},{max:7500,fee:30},{max:12500,fee:50},{max:1e9,fee:16}],link:'https://www.westernunion.com/my/en/home.html',note:'First online transfer free · instant delivery'},
     {name:'Wise',spread:0.001,fee:12,feeType:'incl',feeWise:true,link:'https://wise.com/my/',note:'Fee deducted from send amount · arrives in seconds'},
     {name:'InstaReM',spread:0.002,fee:0,feeType:'add',feeAdd:5.5,link:'https://instarem.com/en-my/',note:'FPX · 2hr delivery · use WELCOME for 0 fee (new users)'},
