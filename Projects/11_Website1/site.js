@@ -534,7 +534,7 @@ function renderRatePreview(){
   const providers=P[baseCur]||P['USD'];
   const rows=providers.map(p=>{
     const rate=midRate*(1-p.spread);
-    const _dynFee=p.feeType==='incl'?getDynFee(p,amt):(p.fee||0);
+    const _dynFee=getDynFee(p,amt);
     const inr=Math.max(0,amt-_dynFee)*rate;
     return{...p,rate,inr,_dynFee};
   }).sort((a,b)=>b.inr-a.inr).slice(0,3);
@@ -627,7 +627,7 @@ function renderRates(){
   var providers=P[baseCur]||P['USD'];
   var rows=providers.map(function(p){
     var rate=midRate*(1-p.spread);
-    var _dynFee=p.feeType==='incl'?getDynFee(p,amt):(p.fee||0);
+    var _dynFee=getDynFee(p,amt);
     var inr=Math.max(0,amt-_dynFee)*rate;
     return Object.assign({},p,{rate:rate,inr:inr,_dynFee:_dynFee});
   }).sort(function(a,b){return b.inr-a.inr;});
