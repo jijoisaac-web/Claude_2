@@ -1229,6 +1229,7 @@ const TOOL_META={
   dtaa:{icon:'💰',name:'Tax & DTAA'},
   return:{icon:'✈️',name:'Return Planner'},
   edplan:{icon:'🎓',name:'Education Planner'},
+  cards:{icon:'💳',name:'NRI Credit Cards'},
 };
 function openDrawer(){
   document.getElementById('navDrawer').classList.add('open');
