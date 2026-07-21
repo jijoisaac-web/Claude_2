@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=9.9"/>
+<link rel="stylesheet" href="/site.css?v=10.0"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v9.9</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v10.0</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -3263,6 +3263,48 @@ document.addEventListener('DOMContentLoaded',function(){
        s1l:'Annual Fee',s1v:'Free',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'None',
        feats:['Zero annual fee - best free Indian NRI credit card','Basic reward points on all India spending','Secured against NRE FD - no credit history needed','No lounge access - purely for spending convenience'],
        note:'Best option if you want an Indian credit card without paying any annual fee',
+      {id:'hdfc-infinia',name:'HDFC Infinia Metal',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:12500,feeL:'₹12,500/yr',
+       s1l:'Annual Fee',s1v:'₹12,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited (Dreamfolks)',
+       feats:['Annual fee ₹12,500 - waived on ₹10L annual spend','5 reward points per ₹150 on all spend categories','Unlimited domestic and international lounge access via Dreamfolks','Premium metal card - top HDFC card for high-income NRI professionals'],
+       note:'Top-tier HDFC card with no category restrictions on rewards - best for NRIs with high India spend',
+       badge:'HDFC Top Card',bc:'#0f4c81',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/infinia-credit-card',stars:4.6},
+      {id:'hdfc-millennia',name:'HDFC Millennia',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:1000,feeL:'₹1,000/yr',
+       s1l:'Annual Fee',s1v:'₹1,000/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'None',
+       feats:['Annual fee ₹1,000 - waived on ₹1L spend in a year','5% cashback on Amazon, Flipkart, Myntra and other online platforms','1% cashback on all other India purchases','Best entry-level cashback card for NRI online shopping in India'],
+       note:'Best for NRIs who shop online in India frequently - 5% back on top e-commerce sites',
+       badge:'Cashback Card',bc:'#0284c7',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/millennia-credit-card',stars:4.1},
+      {id:'icici-sapphiro',name:'ICICI Sapphiro NRI',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:3500,feeL:'₹3,500/yr',
+       s1l:'Annual Fee',s1v:'₹3,500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Domestic + International',
+       feats:['Annual fee ₹3,500 - premium ICICI NRI offering','2 PAYBACK points per ₹100 on domestic spend, 4 points on international','Domestic and international lounge access included','Golf privileges and dining benefits across India'],
+       note:'Premium step-up from the basic ICICI NRI card - better rewards and international lounge access',
+       badge:'ICICI Premium',bc:'#b45309',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:4.1},
+      {id:'icici-coral',name:'ICICI Coral NRI',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:500,feeL:'₹500/yr',
+       s1l:'Annual Fee',s1v:'₹500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'1 domestic/quarter',
+       feats:['Very low annual fee of ₹500','2 PAYBACK points per ₹100 on all spends','1 complimentary domestic lounge visit per quarter','Ideal first NRI credit card for ICICI banking customers'],
+       note:'Best entry-level ICICI NRI card - low cost with basic lounge access',
+       badge:'ICICI Entry',bc:'#0ea5e9',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:3.8},
+      {id:'sbi-prime',name:'SBI Card Prime',issuer:'SBI Card',ctype:'Credit Card (FD-backed)',
+       fee:2999,feeL:'₹2,999/yr',
+       s1l:'Annual Fee',s1v:'₹2,999/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'SBI NRE FD (YONO)',s4l:'Lounge Access',s4v:'8 domestic visits',
+       feats:['Annual fee ₹2,999 - waived on ₹3L annual spend','10X reward points on dining, grocery and department store spends','8 complimentary domestic lounge visits per year','Apply via YONO SBI NRI app - fully digital process'],
+       note:'Best mid-range SBI card for NRIs who spend on dining and groceries during India visits',
+       badge:'SBI Mid-Tier',bc:'#be123c',link:'https://www.sbicard.com/en/personal/credit-cards/rewards/sbi-card-prime.page',stars:4.0},
+      {id:'indusind-pinnacle',name:'IndusInd Pinnacle NRI',issuer:'IndusInd Bank',ctype:'Credit Card (FD-backed)',
+       fee:6999,feeL:'₹6,999/yr',
+       s1l:'Annual Fee',s1v:'₹6,999/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited domestic',
+       feats:['Annual fee ₹6,999 - waived on ₹6L annual spend','1.5 reward points per ₹100 on all spends','Unlimited complimentary domestic lounge access','Lower forex surcharge of 2% - good for frequent India visitors'],
+       note:'Good premium option if you bank with IndusInd - unlimited domestic lounges and low forex fee',
+       badge:'IndusInd Premium',bc:'#7c3aed',link:'https://www.indusind.com/in/en/personal/cards/credit-card.html',stars:3.9},
+      {id:'yes-first',name:'YES First Preferred',issuer:'YES Bank',ctype:'Credit Card (FD-backed)',
+       fee:2500,feeL:'₹2,500/yr',
+       s1l:'Annual Fee',s1v:'₹2,500/yr',s2l:'Forex on Foreign Txns',s2v:'3% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'Yes (domestic)',
+       feats:['Annual fee ₹2,500 - waived on ₹3L annual spend','4 YES reward points per ₹100 on all purchases','Complimentary domestic airport lounge access','Secured against NRE FD - available to all NRIs'],
+       note:'Solid mid-range card from YES Bank - good rewards rate and reasonable annual fee',
+       badge:'YES Bank NRI',bc:'#0369a1',link:'https://www.yesbank.in/personal-banking/yes-individual/cards/credit-cards',stars:3.8},
        badge:'No Annual Fee',bc:'#10b981',link:'https://www.kotak.com/en/personal-banking/cards/credit-cards.html',stars:3.7},
     ];
 
@@ -3421,7 +3463,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=9.9"></script>
+<script src="/site.js?v=10.0"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
