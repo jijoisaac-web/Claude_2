@@ -1,0 +1,46 @@
+{
+  "_note": "Static approximate FX rates, base = USD, as of mid-2026. Good enough for display purposes on a free/indie build -- swap in a live FX API (e.g. exchangerate.host, open.er-api.com) for production accuracy.",
+  "base": "USD",
+  "rates": {
+    "USD": 1,
+    "EUR": 0.92,
+    "GBP": 0.79,
+    "INR": 87,
+    "AED": 3.67,
+    "SGD": 1.35,
+    "CAD": 1.37,
+    "AUD": 1.53,
+    "CHF": 0.88,
+    "JPY": 157,
+    "SAR": 3.75,
+    "QAR": 3.64
+  },
+  "symbols": {
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "INR": "₹",
+    "AED": "AED ",
+    "SGD": "S$",
+    "CAD": "C$",
+    "AUD": "A$",
+    "CHF": "CHF ",
+    "JPY": "¥",
+    "SAR": "SAR ",
+    "QAR": "QAR "
+  },
+  "labels": {
+    "USD": "US Dollar",
+    "EUR": "Euro",
+    "GBP": "British Pound",
+    "INR": "Indian Rupee",
+    "AED": "UAE Dirham",
+    "SGD": "Singapore Dollar",
+    "CAD": "Canadian Dollar",
+    "AUD": "Australian Dollar",
+    "CHF": "Swiss Franc",
+    "JPY": "Japanese Yen",
+    "SAR": "Saudi Riyal",
+    "QAR": "Qatari Riyal"
+  }
+}

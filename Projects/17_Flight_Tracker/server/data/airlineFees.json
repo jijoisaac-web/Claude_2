@@ -1,0 +1,60 @@
+{
+  "_note": "Approximate domestic-India ancillary fees, one-way, economy, as of mid-2026. Airlines change these often -- always verify at booking. Amounts in INR.",
+  "airlines": [
+    {
+      "code": "6E",
+      "name": "IndiGo",
+      "style": "low-cost",
+      "checkedBag15kg": 1800,
+      "checkedBag20kg": 2500,
+      "seatStandard": 400,
+      "seatXL": 999,
+      "meal": 350,
+      "includedByDefault": { "bag": false, "seat": false, "meal": false }
+    },
+    {
+      "code": "AI",
+      "name": "Air India",
+      "style": "full-service",
+      "checkedBag15kg": 0,
+      "checkedBag20kg": 0,
+      "seatStandard": 0,
+      "seatXL": 1200,
+      "meal": 0,
+      "includedByDefault": { "bag": true, "seat": true, "meal": true }
+    },
+    {
+      "code": "SG",
+      "name": "SpiceJet",
+      "style": "low-cost",
+      "checkedBag15kg": 1700,
+      "checkedBag20kg": 2400,
+      "seatStandard": 350,
+      "seatXL": 900,
+      "meal": 300,
+      "includedByDefault": { "bag": false, "seat": false, "meal": false }
+    },
+    {
+      "code": "QP",
+      "name": "Akasa Air",
+      "style": "low-cost",
+      "checkedBag15kg": 1600,
+      "checkedBag20kg": 2300,
+      "seatStandard": 350,
+      "seatXL": 850,
+      "meal": 300,
+      "includedByDefault": { "bag": false, "seat": false, "meal": false }
+    },
+    {
+      "code": "IX",
+      "name": "Air India Express",
+      "style": "low-cost",
+      "checkedBag15kg": 1500,
+      "checkedBag20kg": 2100,
+      "seatStandard": 300,
+      "seatXL": 750,
+      "meal": 300,
+      "includedByDefault": { "bag": false, "seat": false, "meal": false }
+    }
+  ]
+}

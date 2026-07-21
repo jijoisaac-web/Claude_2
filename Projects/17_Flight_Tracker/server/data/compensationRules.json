@@ -1,0 +1,51 @@
+{
+  "_disclaimer": "Informational estimate, not legal advice. Compensation eligibility depends on exact circumstances (extraordinary-circumstance exemptions, rerouting offered, notice given, etc). Verify with the airline or regulator before filing.",
+  "regimes": {
+    "EU261": {
+      "label": "EU261/2004 (European Union)",
+      "currency": "EUR",
+      "appliesWhen": "Departure from an EU/EEA airport on any airline, OR arrival into the EU/EEA on an EU-based airline.",
+      "distanceBands": [
+        { "maxKm": 1500, "amount": 250 },
+        { "maxKm": 3500, "amount": 400 },
+        { "maxKm": null, "amount": 600 }
+      ],
+      "minDelayHoursForBand": { "default": 3, "longHaulOver3500km": 4 },
+      "reductionRule": "For flights over 3500km with a delay of 3-4h (rerouted), compensation may be reduced by 50% to 300 EUR.",
+      "exemptions": "Extraordinary circumstances (severe weather, air-traffic control strikes, security risks, political instability) release the airline from paying compensation, though care (meals, hotel) is still owed."
+    },
+    "UK261": {
+      "label": "UK261 (Regulation (EC) 261/2004 as retained in UK law)",
+      "currency": "GBP",
+      "appliesWhen": "Departure from a UK airport on any airline, OR arrival into the UK on a UK-based airline.",
+      "distanceBands": [
+        { "maxKm": 1500, "amount": 220 },
+        { "maxKm": 3500, "amount": 350 },
+        { "maxKm": null, "amount": 520 }
+      ],
+      "minDelayHoursForBand": { "default": 3, "longHaulOver3500km": 4 },
+      "reductionRule": "Same 50% reduction rule as EU261 for long-haul flights delayed 3-4h.",
+      "exemptions": "Same extraordinary-circumstances exemptions as EU261."
+    },
+    "DGCA": {
+      "label": "DGCA CAR Section 3, Series M, Part IV (India)",
+      "currency": "INR",
+      "appliesWhen": "Domestic Indian flights, or international flights operated by an Indian carrier or departing India.",
+      "notes": "India does not have a flat cash-for-delay rule like EU261. Compensation is mainly for denied boarding and cancellation; pure delay entitles passengers to refreshments/meals (>2h) and hotel + rebooking or full refund (>24h, or overnight delay).",
+      "deniedBoarding": {
+        "altWithin1Hour": { "amount": "200% of one-way fare + fuel surcharge", "cap": 10000 },
+        "altAfter1Hour": { "amount": "400% of one-way fare + fuel surcharge", "cap": 20000 },
+        "noAltOffered": { "amount": "refund of fare + 400% compensation", "cap": 20000 }
+      },
+      "cancellation": {
+        "moreThan2WeeksNotice": "No compensation required, refund only.",
+        "between2WeeksAnd24Hours": "Alternate flight within 2h of original OR refund + compensation equal to denied-boarding amount above.",
+        "lessThan24Hours": "Alternate flight or refund + compensation equal to denied-boarding amount above."
+      },
+      "delay": {
+        "over2Hours": "Airline must provide refreshments/meals.",
+        "over24HoursOrOvernight": "Airline must provide hotel accommodation and either rebook or fully refund."
+      }
+    }
+  }
+}

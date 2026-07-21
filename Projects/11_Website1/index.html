@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=9.8"/>
+<link rel="stylesheet" href="/site.css?v=9.9"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v9.8</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v9.9</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -297,6 +297,7 @@ document.addEventListener('DOMContentLoaded',function(){
           <a onclick="closeNavDD();showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📡 Live Remittance Rates</a>
           <a onclick="closeNavDD();showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">⏱ Send Now or Wait?</a>
           <a onclick="closeNavDD();showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🏦 NRE / NRO Banking</a>
+          <a onclick="closeNavDD();showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">&#128179; NRI Credit Cards</a>
           <a onclick="closeNavDD();showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📈 SIP &amp; SWP Calculator</a>
         </div>
         <div class="nav-dd-col">
@@ -391,6 +392,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <span class="jn-link" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏗 Home Loan</span>
     <span class="jn-link" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</span>
     <span class="jn-link" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📋 Tax Status</span>
+    <span class="jn-link" onclick="showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">&#128179; Cards</span>
     <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📖 Guides</span>
   </div>
 </nav>
@@ -1013,6 +1015,11 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-item" data-tab="budget" onclick="showTab('budget',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M16 21H8M12 17v4"/><path d="M6 8h4M6 11h2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Budget Tracker</div><div class="drawer-desc">Overseas &amp; India expenses monthly</div></div>
+    </div>
+    <div class="drawer-section-lbl">&#128179; Cards</div>
+    <div class="drawer-item" data-tab="cards" onclick="showTab('cards',this);initCards()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">NRI Credit Cards</div><div class="drawer-desc">Compare international &amp; Indian NRI cards</div></div>
     </div>
     <div class="drawer-section-lbl">Guides</div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
@@ -3061,6 +3068,301 @@ document.addEventListener('DOMContentLoaded',function(){
     <div id="fl-dest-grid" style="display:none"></div>
   </div>
 
+
+  <!-- TAB: NRI CREDIT CARDS -->
+  <div class="tool-section" id="tab-cards" style="display:none">
+    <div class="tool-hd">
+      <h2 class="tool-title">&#128179; NRI Credit Card Comparison</h2>
+      <p class="tool-sub">Compare multi-currency international cards and Indian bank NRI credit cards &mdash; filter by where you live and what matters most to you.</p>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="cc-bar">
+      <div class="cc-type-row">
+        <button class="cc-type active" onclick="ccType('all',this)">All Cards</button>
+        <button class="cc-type" onclick="ccType('intl',this)">&#127758; International</button>
+        <button class="cc-type" onclick="ccType('india',this)">&#127470;&#127475; Indian Bank</button>
+      </div>
+      <div class="cc-filter-row">
+        <span class="cc-filter-lbl">Your country:</span>
+        <div class="cc-chips" id="cc-country-chips">
+          <button class="cc-chip active" onclick="ccCountry('all',this)">All</button>
+          <button class="cc-chip" onclick="ccCountry('UAE',this)">UAE / Gulf</button>
+          <button class="cc-chip" onclick="ccCountry('US',this)">US</button>
+          <button class="cc-chip" onclick="ccCountry('UK',this)">UK</button>
+          <button class="cc-chip" onclick="ccCountry('SG',this)">Singapore</button>
+          <button class="cc-chip" onclick="ccCountry('AU',this)">Australia</button>
+        </div>
+      </div>
+      <div class="cc-filter-row">
+        <span class="cc-filter-lbl">Annual fee:</span>
+        <div class="cc-chips" id="cc-fee-chips">
+          <button class="cc-chip active" onclick="ccFee('all',this)">All fees</button>
+          <button class="cc-chip" onclick="ccFee('free',this)">Free only</button>
+          <button class="cc-chip" onclick="ccFee('paid',this)">Paid cards</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- International Cards Section -->
+    <div class="cc-section" id="cc-sec-intl">
+      <div class="cc-sec-hd">
+        <div class="cc-sec-icon">&#127758;</div>
+        <div>
+          <div class="cc-sec-title">Multi-Currency International Cards</div>
+          <div class="cc-sec-sub">Zero or near-zero forex fees for daily spending abroad and ATM withdrawals. These cards are issued in the country where you live.</div>
+        </div>
+      </div>
+      <div class="cc-grid" id="cc-grid-intl"></div>
+      <p class="cc-no-results" id="cc-no-intl" style="display:none">No international cards match your filters. Try selecting "All" to reset.</p>
+    </div>
+
+    <!-- Indian Bank Cards Section -->
+    <div class="cc-section" id="cc-sec-india">
+      <div class="cc-sec-hd">
+        <div class="cc-sec-icon">&#127470;&#127475;</div>
+        <div>
+          <div class="cc-sec-title">Indian Bank NRI Credit Cards</div>
+          <div class="cc-sec-sub">Issued by Indian banks and secured against your NRE or NRO fixed deposit. Use for India spending, lounge access during visits, and earning rewards in INR.</div>
+        </div>
+      </div>
+      <div class="cc-grid" id="cc-grid-india"></div>
+      <p class="cc-no-results" id="cc-no-india" style="display:none">No Indian bank cards match your current filters.</p>
+    </div>
+
+    <p class="cc-disclaimer">&#8505;&#65039; Card fees and features change frequently &mdash; verify on the issuer website before applying. Indian NRI cards are typically secured against an NRE/NRO fixed deposit (no Indian credit history required). This is not financial advice.</p>
+
+  <style>
+  /* ── NRI Credit Cards Tab ──────────────────────────────── */
+  .tool-hd{margin-bottom:1.25rem}
+  .tool-title{font-size:1.3rem;font-weight:700;color:#e2e8f0;margin:0 0 .35rem}
+  .tool-sub{font-size:.82rem;color:#8892b0;margin:0;line-height:1.5}
+  .cc-bar{background:rgba(13,22,50,0.7);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.7rem}
+  .cc-type-row{display:flex;gap:.5rem;flex-wrap:wrap}
+  .cc-type{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;color:#8892b0;font-size:.8rem;font-weight:600;padding:.42rem .85rem;cursor:pointer;transition:all .2s}
+  .cc-type:hover,.cc-type.active{background:rgba(99,102,241,0.25);border-color:rgba(99,102,241,0.5);color:#c7d2fe}
+  .cc-filter-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+  .cc-filter-lbl{font-size:.72rem;color:#8892b0;font-weight:600;min-width:95px;white-space:nowrap}
+  .cc-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+  .cc-chip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#8892b0;font-size:.72rem;padding:.28rem .72rem;cursor:pointer;transition:all .2s}
+  .cc-chip:hover,.cc-chip.active{background:rgba(99,102,241,0.2);border-color:#6366f1;color:#a5b4fc}
+  .cc-section{margin-bottom:2rem}
+  .cc-sec-hd{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.1rem;padding:.85rem 1rem;background:rgba(13,22,50,0.5);border-radius:10px;border-left:3px solid rgba(99,102,241,0.5)}
+  .cc-sec-icon{font-size:1.4rem;line-height:1;flex-shrink:0}
+  .cc-sec-title{font-size:.92rem;font-weight:700;color:#e2e8f0;margin-bottom:.18rem}
+  .cc-sec-sub{font-size:.76rem;color:#8892b0;line-height:1.45}
+  .cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
+  .cc-card{background:rgba(13,22,50,0.8);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;transition:border-color .2s,transform .2s}
+  .cc-card:hover{border-color:rgba(99,102,241,0.4);transform:translateY(-2px)}
+  .cc-badge{display:inline-block;font-size:.62rem;font-weight:700;padding:.18rem .55rem;border-radius:12px;color:#fff;letter-spacing:.04em;margin-bottom:.3rem}
+  .cc-name{font-size:.98rem;font-weight:700;color:#e2e8f0;line-height:1.2}
+  .cc-issuer{font-size:.72rem;color:#8892b0;margin-top:.12rem}
+  .cc-ctype{font-size:.67rem;color:#818cf8;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:4px;padding:.12rem .45rem;display:inline-block;margin-top:.28rem}
+  .cc-specs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;background:rgba(0,0,0,0.2);border-radius:8px;padding:.7rem}
+  .cc-spec{display:flex;flex-direction:column;gap:.12rem}
+  .cc-spec-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:#475569;font-weight:600}
+  .cc-spec-v{font-size:.78rem;color:#c7d2fe;font-weight:600}
+  .cc-feats{margin:0;padding:0 0 0 1rem;display:flex;flex-direction:column;gap:.3rem}
+  .cc-feats li{font-size:.76rem;color:#94a3b8;line-height:1.4}
+  .cc-note{font-size:.73rem;color:#a5b4fc;background:rgba(99,102,241,0.08);border-left:2px solid rgba(99,102,241,0.4);padding:.45rem .7rem;border-radius:0 6px 6px 0;line-height:1.4}
+  .cc-stars{font-size:.74rem;color:#fbbf24;letter-spacing:.04em}
+  .cc-stars span{color:#64748b;margin-left:.25rem;font-size:.72rem}
+  .cc-apply{display:block;text-align:center;padding:.6rem 1rem;background:rgba(99,102,241,0.13);border:1px solid rgba(99,102,241,0.3);border-radius:8px;color:#a5b4fc;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s;margin-top:auto}
+  .cc-apply:hover{background:rgba(99,102,241,0.28);border-color:#6366f1;color:#c7d2fe}
+  .cc-no-results{font-size:.83rem;color:#8892b0;text-align:center;padding:1.75rem;background:rgba(0,0,0,0.1);border-radius:8px;border:1px dashed rgba(100,130,220,0.15);margin:0}
+  .cc-disclaimer{font-size:.73rem;color:#475569;text-align:center;padding:.8rem;line-height:1.5;border-top:1px solid rgba(100,130,220,0.1);margin-top:.5rem}
+  @media(max-width:600px){.cc-grid{grid-template-columns:1fr}.cc-filter-row{flex-direction:column;align-items:flex-start}.cc-filter-lbl{min-width:unset}}
+  </style>
+
+  <script>
+  (function(){
+    var INTL=[
+      {id:'wise',name:'Wise Card',issuer:'Wise',ctype:'Prepaid Debit',
+       ctry:['UAE','US','UK','SG','AU'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0.35 - 1.7%',s3l:'ATM',s3v:'Free up to $200/mo',s4l:'Best For',s4v:'Best overall',
+       feats:['Holds 40+ currencies at mid-market rate','0.35-1.7% conversion fee depending on currency pair','ATM free up to $200/mo then 1.75% + $1.50','Works in 150+ countries with physical and virtual card'],
+       note:'Mid-market rate - often 3-5% better than your bank',
+       badge:'Most Popular',bc:'#6366f1',link:'https://wise.com/us/card/',stars:4.8},
+      {id:'revolut',name:'Revolut Standard',issuer:'Revolut',ctype:'Prepaid Debit',
+       ctry:['UK','SG','AU','US'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (weekdays)',s3l:'ATM',s3v:'Free up to £200/mo',s4l:'Best For',s4v:'UK and Europe NRIs',
+       feats:['0% forex fee on weekdays within monthly allowance','+1% on weekends and 0.5% over your monthly limit','Free ATM up to £200/month then 2%','Available in UK, EU, US, Singapore and Australia'],
+       note:'Upgrade to Premium (£9.99/mo) to remove all currency limits',
+       badge:'UK Favourite',bc:'#0ea5e9',link:'https://www.revolut.com/',stars:4.5},
+      {id:'niyo',name:'Niyo Global',issuer:'Niyo (SBM Bank India)',ctype:'Prepaid Debit (Visa)',
+       ctry:['UAE','US','UK','SG','AU'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Visa rate)',s3l:'ATM',s3v:'Free at select ATMs',s4l:'Best For',s4v:'Indian travelers',
+       feats:['Zero forex markup at Visa network rates worldwide','Load in INR from Indian account - spend in local currency','Free ATM withdrawals at select international ATMs','Best for Indians visiting abroad - issued from India'],
+       note:'Ideal for NRIs who travel back and forth and need an India-issued card',
+       badge:'India Issued',bc:'#f97316',link:'https://niyo.co/global',stars:4.3},
+      {id:'schwab',name:'Schwab Investor Checking',issuer:'Charles Schwab (US)',ctype:'Debit Card',
+       ctry:['US'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'Unlimited rebates worldwide',s4l:'Best For',s4v:'US NRIs - ATM use',
+       feats:['Zero foreign transaction fees on all purchases','Unlimited ATM fee reimbursement at any ATM in the world','No monthly fee and no minimum balance required','Requires a free Schwab brokerage account to open'],
+       note:'The #1 pick for US-based NRIs - withdraw INR in India at zero cost',
+       badge:'Best ATM Card',bc:'#10b981',link:'https://www.schwab.com/checking',stars:4.9},
+      {id:'starling',name:'Starling Bank',issuer:'Starling Bank (UK)',ctype:'Current Account Debit',
+       ctry:['UK'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Mastercard)',s3l:'ATM',s3v:'Free globally',s4l:'Best For',s4v:'UK NRIs - daily use',
+       feats:['0% foreign transaction fee at Mastercard wholesale rates','Free ATM withdrawals anywhere in the world','UK current account with no monthly fee','Instant spending alerts and excellent budgeting tools'],
+       note:'UK equivalent of Charles Schwab - the go-to debit card for UK-based NRIs',
+       badge:'UK Best Debit',bc:'#8b5cf6',link:'https://www.starlingbank.com/',stars:4.7},
+      {id:'halifax',name:'Halifax Clarity',issuer:'Halifax (UK)',ctype:'Credit Card',
+       ctry:['UK'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Mastercard)',s3l:'ATM',s3v:'Cash advance fee applies',s4l:'Best For',s4v:'UK NRIs - backup CC',
+       feats:['0% foreign transaction fee on all purchases','No annual fee - good as a backup card','Mastercard rates are close to mid-market','Apply online - straightforward credit card'],
+       note:'Good no-fee credit card for UK NRIs spending in India during visits',
+       badge:'No-Fee UK CC',bc:'#0ea5e9',link:'https://www.halifax.co.uk/creditcards/clarity-card.html',stars:4.2},
+      {id:'chase-sp',name:'Chase Sapphire Preferred',issuer:'Chase (US)',ctype:'Travel Credit Card',
+       ctry:['US'],fee:95,feeL:'$95/yr',
+       s1l:'Annual Fee',s1v:'$95/yr',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'N/A (credit card)',s4l:'Best For',s4v:'US NRIs - travel rewards',
+       feats:['0% foreign transaction fee on all international purchases','3X points on dining and 2X on all travel spend','Valuable sign-up bonus - check current offer on Chase website','Transfer to Air India, United, Hyatt and 12+ airline and hotel partners'],
+       note:'Best rewards card for US-based NRIs who travel between US and India',
+       badge:'Top Rewards',bc:'#6366f1',link:'https://creditcards.chase.com/travel-credit-cards/sapphire/preferred',stars:4.6},
+      {id:'cap1',name:'Capital One Venture',issuer:'Capital One (US)',ctype:'Travel Credit Card',
+       ctry:['US'],fee:95,feeL:'$95/yr',
+       s1l:'Annual Fee',s1v:'$95/yr',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'N/A (credit card)',s4l:'Best For',s4v:'US NRIs - simple rewards',
+       feats:['0% foreign transaction fee on all purchases','2X miles on every single purchase - no category tracking','Sign-up bonus available - check current offer','Simple flat-rate rewards - ideal as a single everyday card'],
+       note:'Simpler than Chase Sapphire - perfect if you want one card for everything',
+       badge:'2X on All Spend',bc:'#d97706',link:'https://www.capitalone.com/credit-cards/venture/',stars:4.4},
+    ];
+
+    var INDIA=[
+      {id:'hdfc-reg',name:'HDFC Regalia',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:2500,feeL:'₹2,500/yr',
+       s1l:'Annual Fee',s1v:'₹2,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'12 domestic + 6 intl',
+       feats:['Annual fee ₹2,500 - waived if you spend ₹3L in a year','4 reward points per ₹150 on dining and travel','12 domestic and 6 international lounge visits per year','Secured against NRE or NRO fixed deposit - no India credit score needed'],
+       note:'Most popular NRI credit card - best all-round option for India visits',
+       badge:'Most Popular',bc:'#6366f1',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/nri-credit-card',stars:4.5},
+      {id:'axis-mag',name:'Axis Magnus',issuer:'Axis Bank',ctype:'Credit Card (FD-backed)',
+       fee:12500,feeL:'₹12,500/yr',
+       s1l:'Annual Fee',s1v:'₹12,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited domestic + intl',
+       feats:['Annual fee ₹12,500 - waived if you spend ₹15L in a year','12 EDGE Miles per ₹200 spend - best rewards rate in India','Unlimited domestic and international lounge access','Transfer miles to Air India, Singapore Airlines, Marriott and more'],
+       note:'Best rewards rate of any Indian NRI card - worth it for frequent premium travelers',
+       badge:'Best Rewards',bc:'#a855f7',link:'https://www.axisbank.com/retail/cards/credit-card/magnus-credit-card',stars:4.7},
+      {id:'sbi-elite',name:'SBI Card Elite',issuer:'SBI Card',ctype:'Credit Card (FD-backed)',
+       fee:4999,feeL:'₹4,999/yr',
+       s1l:'Annual Fee',s1v:'₹4,999/yr',s2l:'Forex on Foreign Txns',s2v:'1.99% + GST',s3l:'Security',s3v:'SBI NRE FD (YONO)',s4l:'Lounge Access',s4v:'6 domestic + 6 intl',
+       feats:['Annual fee ₹4,999 - waived on ₹10L annual spend','5X reward points on dining, groceries and departmental stores','6 domestic and 6 international lounge visits','Lowest forex surcharge (1.99%) among all Indian NRI cards'],
+       note:'Best for NRIs who spend heavily in India - lowest forex fee of the lot',
+       badge:'Lowest Forex Fee',bc:'#dc2626',link:'https://www.sbicard.com/en/personal/credit-cards/travel/sbi-card-elite.page',stars:4.1},
+      {id:'icici-nri',name:'ICICI Bank NRI Card',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:1500,feeL:'₹1,500/yr',
+       s1l:'Annual Fee',s1v:'₹1,500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Domestic lounges',
+       feats:['Annual fee ₹1,500 - affordable entry-level NRI card','Reward points on all India purchases','Domestic lounge access at select airports','FD-backed - no Indian credit history required to apply'],
+       note:'Good starter NRI card if you already hold an ICICI NRI savings account',
+       badge:'ICICI NRI',bc:'#0ea5e9',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:3.9},
+      {id:'federal',name:'Federal Bank Celesta',issuer:'Federal Bank',ctype:'Credit Card (FD-backed)',
+       fee:500,feeL:'₹500/yr',
+       s1l:'Annual Fee',s1v:'₹500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'Yes (select airports)',
+       feats:['Very low annual fee of just ₹500','Reward points on all transactions','Lounge access at select Indian airports','Very popular among UAE and Gulf-based Kerala NRIs'],
+       note:'Federal Bank is widely used by Kerala/UAE NRIs. Lowest entry cost to an Indian NRI card.',
+       badge:'Lowest Annual Fee',bc:'#10b981',link:'https://www.federalbank.co.in/credit-cards',stars:4.0},
+      {id:'kotak-nri',name:'Kotak 811 NRI Card',issuer:'Kotak Mahindra Bank',ctype:'Credit Card (FD-backed)',
+       fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'None',
+       feats:['Zero annual fee - best free Indian NRI credit card','Basic reward points on all India spending','Secured against NRE FD - no credit history needed','No lounge access - purely for spending convenience'],
+       note:'Best option if you want an Indian credit card without paying any annual fee',
+       badge:'No Annual Fee',bc:'#10b981',link:'https://www.kotak.com/en/personal-banking/cards/credit-cards.html',stars:3.7},
+    ];
+
+    var _type='all', _ctry='all', _fee='all';
+
+    function starsHTML(n){
+      var s='';
+      for(var i=1;i<=5;i++) s+=(i<=Math.floor(n))?'&#9733;':'&#9734;';
+      return s+'<span>'+n+'</span>';
+    }
+
+    function cardHTML(c){
+      var featsHtml='';
+      for(var i=0;i<c.feats.length;i++) featsHtml+='<li>'+c.feats[i]+'</li>';
+      return '<div class="cc-card">'+
+        '<div>'+
+          '<div class="cc-badge" style="background:'+c.bc+'">'+c.badge+'</div>'+
+          '<div class="cc-name">'+c.name+'</div>'+
+          '<div class="cc-issuer">'+c.issuer+'</div>'+
+          '<div class="cc-ctype">'+c.ctype+'</div>'+
+        '</div>'+
+        '<div class="cc-specs">'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s1l+'</span><span class="cc-spec-v">'+c.s1v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s2l+'</span><span class="cc-spec-v">'+c.s2v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s3l+'</span><span class="cc-spec-v">'+c.s3v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s4l+'</span><span class="cc-spec-v">'+c.s4v+'</span></div>'+
+        '</div>'+
+        '<ul class="cc-feats">'+featsHtml+'</ul>'+
+        '<div class="cc-note">'+c.note+'</div>'+
+        '<div class="cc-stars">'+starsHTML(c.stars)+'</div>'+
+        '<a class="cc-apply" href="'+c.link+'" target="_blank" rel="noopener">Learn More &amp; Apply &#8594;</a>'+
+      '</div>';
+    }
+
+    function render(){
+      var ig=document.getElementById('cc-grid-intl');
+      var dg=document.getElementById('cc-grid-india');
+      var is=document.getElementById('cc-sec-intl');
+      var ds=document.getElementById('cc-sec-india');
+      var noI=document.getElementById('cc-no-intl');
+      var noD=document.getElementById('cc-no-india');
+
+      // Section visibility
+      is.style.display=(_type==='india')?'none':'';
+      ds.style.display=(_type==='intl')?'none':'';
+
+      // Render intl
+      if(_type!=='india'){
+        var h='',cnt=0;
+        for(var i=0;i<INTL.length;i++){
+          var c=INTL[i];
+          var showC=(_ctry==='all'||(c.ctry.indexOf(_ctry)>-1));
+          var showF=(_fee==='all')||(_fee==='free'&&c.fee===0)||(_fee==='paid'&&c.fee>0);
+          if(showC&&showF){h+=cardHTML(c);cnt++;}
+        }
+        ig.innerHTML=h;
+        noI.style.display=cnt===0?'':'none';
+      }
+
+      // Render india
+      if(_type!=='intl'){
+        var h2='',cnt2=0;
+        for(var j=0;j<INDIA.length;j++){
+          var c2=INDIA[j];
+          var showF2=(_fee==='all')||(_fee==='free'&&c2.fee===0)||(_fee==='paid'&&c2.fee>0);
+          if(showF2){h2+=cardHTML(c2);cnt2++;}
+        }
+        dg.innerHTML=h2;
+        noD.style.display=cnt2===0?'':'none';
+      }
+    }
+
+    window.ccType=function(t,el){
+      _type=t;
+      var btns=document.querySelectorAll('.cc-type');
+      for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.ccCountry=function(c,el){
+      _ctry=c;
+      var chips=document.querySelectorAll('#cc-country-chips .cc-chip');
+      for(var i=0;i<chips.length;i++) chips[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.ccFee=function(f,el){
+      _fee=f;
+      var chips=document.querySelectorAll('#cc-fee-chips .cc-chip');
+      for(var i=0;i<chips.length;i++) chips[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.initCards=function(){
+      if(!document.getElementById('cc-grid-intl').innerHTML) render();
+    };
+  })();
+  </script>
+  </div>
+
 </div><!-- /.main -->
 
 <!-- FOOTER -->
@@ -3119,7 +3421,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=9.8"></script>
+<script src="/site.js?v=9.9"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

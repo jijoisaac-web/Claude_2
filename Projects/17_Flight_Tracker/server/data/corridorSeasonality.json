@@ -1,0 +1,49 @@
+{
+  "_note": "Illustrative seasonality guidance based on general diaspora travel patterns (Diwali/Christmas/summer peaks, monsoon lull). Not a substitute for live fare data -- the Price Calendar tool overlays this with a live 12-month Amadeus fare snapshot when API keys are configured.",
+  "corridors": [
+    {
+      "id": "DXB-BOM",
+      "label": "Dubai -> Mumbai",
+      "origin": "DXB",
+      "destination": "BOM",
+      "cheapestMonths": ["February", "June", "September"],
+      "priciestMonths": ["October", "November", "December"],
+      "cheapestDaysOfWeek": ["Tuesday", "Wednesday"],
+      "bookingWindow": "5-8 weeks ahead for regular travel; 3-4 months ahead for Diwali/Christmas.",
+      "notes": "Extremely dense route (multiple daily flights on IndiGo, Air India Express, Emirates, flydubai) -- fares are volatile day to day but the route rarely spikes as hard as thinner corridors."
+    },
+    {
+      "id": "LON-DEL",
+      "label": "London -> Delhi",
+      "origin": "LHR",
+      "destination": "DEL",
+      "cheapestMonths": ["January", "February", "September"],
+      "priciestMonths": ["June", "July", "December"],
+      "cheapestDaysOfWeek": ["Tuesday", "Saturday"],
+      "bookingWindow": "3-4 months ahead for summer and Christmas; 6-8 weeks for off-peak.",
+      "notes": "Summer school-holiday travel and Christmas/New Year both spike hard; mid-week January/February departures are consistently the cheapest window."
+    },
+    {
+      "id": "SIN-MAA",
+      "label": "Singapore -> Chennai",
+      "origin": "SIN",
+      "destination": "MAA",
+      "cheapestMonths": ["May", "June", "September"],
+      "priciestMonths": ["December", "January", "August"],
+      "cheapestDaysOfWeek": ["Monday", "Thursday"],
+      "bookingWindow": "6-10 weeks ahead typically; 3+ months for Pongal/December.",
+      "notes": "Thinner capacity than Dubai-Mumbai, so Pongal (mid-January) and December school holidays cause sharper spikes relative to average fare."
+    },
+    {
+      "id": "YYZ-HYD",
+      "label": "Toronto -> Hyderabad",
+      "origin": "YYZ",
+      "destination": "HYD",
+      "cheapestMonths": ["February", "May", "September"],
+      "priciestMonths": ["June", "July", "December"],
+      "cheapestDaysOfWeek": ["Tuesday", "Wednesday"],
+      "bookingWindow": "3-5 months ahead -- this is a thin long-haul corridor (mostly one-stop via Gulf carriers or Air India), so late booking gets punished hard.",
+      "notes": "Least flight capacity of the four corridors; summer break and Christmas both sell out early, pushing last-minute fares very high."
+    }
+  ]
+}

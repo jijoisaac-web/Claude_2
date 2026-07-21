@@ -1,0 +1,43 @@
+{
+  "_note": "Approximate one-way economy ancillary fees in USD, as of mid-2026 -- airlines change these often, verify at booking. 'regions' marks which broad region-pairs an airline is plausible for when we're picking a comparison set without real live data; real Travelpayouts-returned carriers are always shown regardless of this tag.",
+  "airlines": [
+    { "code": "6E", "name": "IndiGo", "style": "low-cost", "regions": ["south_asia"], "checkedBagUSD": 21, "seatStandardUSD": 5, "seatXLUSD": 11, "mealUSD": 4, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "AI", "name": "Air India", "style": "full-service", "regions": ["south_asia"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 14, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "SG", "name": "SpiceJet", "style": "low-cost", "regions": ["south_asia"], "checkedBagUSD": 20, "seatStandardUSD": 4, "seatXLUSD": 10, "mealUSD": 3.5, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "QP", "name": "Akasa Air", "style": "low-cost", "regions": ["south_asia"], "checkedBagUSD": 18, "seatStandardUSD": 4, "seatXLUSD": 10, "mealUSD": 3.5, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "IX", "name": "Air India Express", "style": "low-cost", "regions": ["south_asia"], "checkedBagUSD": 17, "seatStandardUSD": 3.5, "seatXLUSD": 9, "mealUSD": 3.5, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+
+    { "code": "EK", "name": "Emirates", "style": "full-service", "regions": ["middle_east"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 45, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "QR", "name": "Qatar Airways", "style": "full-service", "regions": ["middle_east"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 40, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "EY", "name": "Etihad Airways", "style": "full-service", "regions": ["middle_east"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 40, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "TK", "name": "Turkish Airlines", "style": "full-service", "regions": ["middle_east", "west"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 35, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+
+    { "code": "BA", "name": "British Airways", "style": "full-service", "regions": ["west"], "checkedBagUSD": 0, "seatStandardUSD": 15, "seatXLUSD": 55, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": false, "meal": true } },
+    { "code": "LH", "name": "Lufthansa", "style": "full-service", "regions": ["west"], "checkedBagUSD": 0, "seatStandardUSD": 15, "seatXLUSD": 50, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": false, "meal": true } },
+    { "code": "AF", "name": "Air France", "style": "full-service", "regions": ["west"], "checkedBagUSD": 0, "seatStandardUSD": 15, "seatXLUSD": 50, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": false, "meal": true } },
+    { "code": "KL", "name": "KLM", "style": "full-service", "regions": ["west"], "checkedBagUSD": 0, "seatStandardUSD": 15, "seatXLUSD": 50, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": false, "meal": true } },
+    { "code": "FR", "name": "Ryanair", "style": "ultra-low-cost", "regions": ["west"], "checkedBagUSD": 28, "seatStandardUSD": 8, "seatXLUSD": 20, "mealUSD": 8, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "U2", "name": "easyJet", "style": "low-cost", "regions": ["west"], "checkedBagUSD": 25, "seatStandardUSD": 7, "seatXLUSD": 18, "mealUSD": 7, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "UA", "name": "United Airlines", "style": "full-service", "regions": ["west"], "checkedBagUSD": 35, "seatStandardUSD": 20, "seatXLUSD": 60, "mealUSD": 0, "includedByDefault": { "bag": false, "seat": false, "meal": true } },
+    { "code": "DL", "name": "Delta Air Lines", "style": "full-service", "regions": ["west"], "checkedBagUSD": 35, "seatStandardUSD": 20, "seatXLUSD": 60, "mealUSD": 0, "includedByDefault": { "bag": false, "seat": false, "meal": true } },
+    { "code": "AA", "name": "American Airlines", "style": "full-service", "regions": ["west"], "checkedBagUSD": 35, "seatStandardUSD": 20, "seatXLUSD": 60, "mealUSD": 0, "includedByDefault": { "bag": false, "seat": false, "meal": true } },
+    { "code": "AC", "name": "Air Canada", "style": "full-service", "regions": ["west"], "checkedBagUSD": 30, "seatStandardUSD": 18, "seatXLUSD": 55, "mealUSD": 0, "includedByDefault": { "bag": false, "seat": false, "meal": true } },
+
+    { "code": "SQ", "name": "Singapore Airlines", "style": "full-service", "regions": ["east_asia"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 45, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "AK", "name": "AirAsia", "style": "ultra-low-cost", "regions": ["east_asia"], "checkedBagUSD": 15, "seatStandardUSD": 4, "seatXLUSD": 12, "mealUSD": 4, "includedByDefault": { "bag": false, "seat": false, "meal": false } },
+    { "code": "MH", "name": "Malaysia Airlines", "style": "full-service", "regions": ["east_asia"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 30, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "CX", "name": "Cathay Pacific", "style": "full-service", "regions": ["east_asia"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 35, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+
+    { "code": "QF", "name": "Qantas", "style": "full-service", "regions": ["oceania"], "checkedBagUSD": 0, "seatStandardUSD": 0, "seatXLUSD": 35, "mealUSD": 0, "includedByDefault": { "bag": true, "seat": true, "meal": true } },
+    { "code": "JQ", "name": "Jetstar", "style": "low-cost", "regions": ["oceania"], "checkedBagUSD": 22, "seatStandardUSD": 6, "seatXLUSD": 15, "mealUSD": 6, "includedByDefault": { "bag": false, "seat": false, "meal": false } }
+  ],
+  "genericFallback": {
+    "name": "Unlisted carrier",
+    "style": "unknown",
+    "checkedBagUSD": 25,
+    "seatStandardUSD": 8,
+    "seatXLUSD": 20,
+    "mealUSD": 6,
+    "includedByDefault": { "bag": false, "seat": false, "meal": false }
+  }
+}

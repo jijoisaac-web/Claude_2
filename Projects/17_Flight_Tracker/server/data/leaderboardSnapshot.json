@@ -1,0 +1,54 @@
+{
+  "updatedAt": "2026-07-20T15:50:50.687Z",
+  "liveData": true,
+  "corridors": [
+    {
+      "id": "YYZ-HYD",
+      "label": "Toronto -> Hyderabad",
+      "origin": "YYZ",
+      "destination": "HYD",
+      "cheapestPriceUSD": 829,
+      "cheapestMonth": "May 2027",
+      "avgPriceUSD": 1285,
+      "dealScore": 35,
+      "liveData": true,
+      "shareText": "Toronto -> Hyderabad is 35% below its usual fare right now (~$829 in May 2027) -- checked on Farewise."
+    },
+    {
+      "id": "LON-DEL",
+      "label": "London -> Delhi",
+      "origin": "LHR",
+      "destination": "DEL",
+      "cheapestPriceUSD": 482,
+      "cheapestMonth": "February 2027",
+      "avgPriceUSD": 717,
+      "dealScore": 33,
+      "liveData": true,
+      "shareText": "London -> Delhi is 33% below its usual fare right now (~$482 in February 2027) -- checked on Farewise."
+    },
+    {
+      "id": "DXB-BOM",
+      "label": "Dubai -> Mumbai",
+      "origin": "DXB",
+      "destination": "BOM",
+      "cheapestPriceUSD": 195,
+      "cheapestMonth": "September 2026",
+      "avgPriceUSD": 288,
+      "dealScore": 32,
+      "liveData": true,
+      "shareText": "Dubai -> Mumbai is 32% below its usual fare right now (~$195 in September 2026) -- checked on Farewise."
+    },
+    {
+      "id": "SIN-MAA",
+      "label": "Singapore -> Chennai",
+      "origin": "SIN",
+      "destination": "MAA",
+      "cheapestPriceUSD": 208,
+      "cheapestMonth": "June 2027",
+      "avgPriceUSD": 290,
+      "dealScore": 28,
+      "liveData": true,
+      "shareText": "Singapore -> Chennai is 28% below its usual fare right now (~$208 in June 2027) -- checked on Farewise."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "_note": "Airline stopover program terms change; confirm current rules and visa requirements before relying on this for trip planning.",
+  "programs": [
+    {
+      "airline": "Qatar Airways",
+      "hub": "Doha (DOH)",
+      "programName": "Qatar Stopover / Discover Qatar",
+      "freeHotelHours": "Available for layovers roughly 4-96 hours; free or discounted hotel packages via Discover Qatar depending on fare class.",
+      "visaNote": "Most nationalities (including Indian passport holders with a valid visa for a country like US/UK/Schengen/etc., and many others outright) get free visa-on-arrival for stays up to 96 hours.",
+      "shortLayover": "8h: Souq Waqif, Museum of Islamic Art, Corniche waterfront walk.",
+      "midLayover": "24h: Add The Pearl-Qatar, desert safari (half-day), Katara Cultural Village.",
+      "longLayover": "48h: Full desert safari + overnight, National Museum of Qatar, Doha Corniche by night.",
+      "airportTransport": "Hamad International Airport to city center: ~20-30 min by taxi/Karwa, metro (Doha Metro Red Line) available."
+    },
+    {
+      "airline": "Turkish Airlines",
+      "hub": "Istanbul (IST)",
+      "programName": "Touristanbul / Free Stopover Hotel",
+      "freeHotelHours": "Free hotel stay for connections of roughly 20-24 hours on eligible international-to-international itineraries (business class often 1-2 nights, economy typically 1 night).",
+      "visaNote": "Indian passport holders generally need a Turkish e-Visa in advance even for a stopover if leaving the airport; check current rules before travel.",
+      "shortLayover": "6h: Touristanbul free guided tour (Sultanahmet area) if offered on your itinerary; otherwise airport lounge + Istanbul Airport shopping.",
+      "midLayover": "24h: Hagia Sophia, Blue Mosque, Grand Bazaar, Bosphorus ferry.",
+      "longLayover": "48h: Add a Bosphorus cruise, Topkapi Palace, and a Turkish hamam experience.",
+      "airportTransport": "Istanbul Airport (IST) to city center: ~35-50 min via Havaist bus or metro (M11) + M2 line."
+    },
+    {
+      "airline": "Emirates",
+      "hub": "Dubai (DXB)",
+      "programName": "My Emirates Pass / Dubai Stopover packages",
+      "freeHotelHours": "No free hotel by default, but discounted stopover hotel + attraction packages can be booked at checkout for layovers of 12h+.",
+      "visaNote": "Indian passport holders (with valid US/UK/EU visa or Green Card) get visa-on-arrival; otherwise a UAE visa can be arranged in advance.",
+      "shortLayover": "8h: Dubai Mall + Burj Khalifa 'At the Top', Dubai Fountain show.",
+      "midLayover": "24h: Add Old Dubai / Al Fahidi + abra ride across Dubai Creek, Gold & Spice Souks.",
+      "longLayover": "48h: Add a desert safari, Palm Jumeirah, Museum of the Future.",
+      "airportTransport": "Dubai International (DXB) to Downtown Dubai: ~20 min via Dubai Metro Red Line or taxi."
+    },
+    {
+      "airline": "Etihad Airways",
+      "hub": "Abu Dhabi (AUH)",
+      "programName": "Abu Dhabi Stopover",
+      "freeHotelHours": "Discounted stopover hotel packages for layovers 12h+; occasional free-night promos for premium fares.",
+      "visaNote": "Similar UAE visa-on-arrival rules as Dubai for eligible passport/visa holders.",
+      "shortLayover": "8h: Sheikh Zayed Grand Mosque, Corniche waterfront.",
+      "midLayover": "24h: Add Louvre Abu Dhabi, Yas Island (Ferrari World or Yas Waterworld).",
+      "longLayover": "48h: Full Yas Island day + Qasr Al Watan palace + mangrove kayaking.",
+      "airportTransport": "Abu Dhabi International (AUH) to city center: ~25-30 min by taxi/bus."
+    },
+    {
+      "airline": "Singapore Airlines",
+      "hub": "Singapore (SIN)",
+      "programName": "Singapore Stopover Holiday",
+      "freeHotelHours": "Paid stopover holiday packages (hotel + tours) bookable for layovers of 6h+; no free-night program currently.",
+      "visaNote": "Indian passport holders can use Singapore's visa-free/e-visa transit provisions for short stays; check current ICA rules.",
+      "shortLayover": "6-8h: Jewel Changi (Rain Vortex), Gardens by the Bay light show.",
+      "midLayover": "24h: Add Marina Bay Sands SkyPark, Chinatown, hawker food trail.",
+      "longLayover": "48h: Add Sentosa Island, Universal Studios Singapore.",
+      "airportTransport": "Changi Airport to Marina Bay: ~20-25 min via MRT or taxi."
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balance Transfer Savings Calculator | CardCompass</title>
+<meta name="description" content="Estimate how much a 0% balance transfer offer could save you compared to staying on your current card.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="../index.html" class="brand"><span class="mark">◆</span> CardCompass</a>
+    <nav class="main-nav">
+      <a href="/index.html" class="">Home</a>
+      <a href="/quiz.html" class="">Card Quiz</a>
+      <a href="/calculators/index.html" class="active">Calculators</a>
+    </nav>
+    
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+  </div>
+</header>
+
+<section class="tight" style="background:var(--navy); color:#fff; padding-top:40px; padding-bottom:28px;">
+  <div class="container">
+    <div class="breadcrumb" style="color:#b9c3d4;"><a href="index.html" style="color:#cdd6e4;">Calculators</a> / Balance Transfer Savings</div>
+    <h1 style="margin:0 0 8px; font-size:1.8rem;">Balance Transfer Savings Calculator</h1>
+    <p style="color:#d7deea; max-width:640px; margin:0;">Estimate whether transferring a balance actually saves money once the transfer fee is included.</p>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <form class="tool-card" id="bt-form">
+      <div class="field-row"><label>Currency</label><select id="bt-currency"><option value="$">🇺🇸 $ (USD)</option><option value="₹">🇮🇳 ₹ (INR)</option><option value="RM">🇲🇾 RM (MYR)</option></select></div>
+      <div class="field-grid">
+        <div class="field-row"><label>Current balance</label><input type="number" id="bt-balance" value="3000" step="any" required></div>
+        <div class="field-row"><label>Current card's APR (%)</label><input type="number" id="bt-current-apr" value="24" step="any" required></div>
+        <div class="field-row"><label>Balance transfer fee (%)</label><input type="number" id="bt-fee-pct" value="3" step="any" required></div>
+        <div class="field-row"><label>0% intro period (months)</label><input type="number" id="bt-intro-months" value="15" step="any" required></div>
+        <div class="field-row"><label>Monthly payment you'll make</label><input type="number" id="bt-payment" value="250" step="any" required></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="background:var(--gold);">Calculate</button>
+      <div class="result-box" id="bt-result"></div>
+    </form>
+    <div class="callout">This is an estimate assuming a fixed monthly payment, no new spending, and rates staying constant — actual results vary by issuer terms.</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <h4>CardCompass</h4>
+        <p style="max-width:280px;">Independent, plain-language credit card information for the US, India, and Malaysia — with no issuer-paid rankings.</p>
+      </div>
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="/quiz.html">Card matching quiz</a></li>
+          <li><a href="/calculators/index.html">Calculators</a></li>
+          <li><a href="/index.html">Choose your country</a></li>
+        </ul>
+      </div>
+      
+    </div>
+    <p class="foot-disclaimer">CardCompass is an independent, informational website. Card details, rates, and offers are summarized from publicly available issuer information and third-party reporting, are subject to change without notice, and should always be verified on the issuer's official site before applying. This site does not constitute financial advice, and CardCompass is not compensated by any issuer featured here.</p>
+    <p class="foot-disclaimer">Card details last verified July 2026. © 2026 CardCompass. All card and issuer names are trademarks of their respective owners.</p>
+  </div>
+</footer>
+<script src="../assets/script.js"></script>
+<script src="../assets/calculators.js"></script>
+</body>
+</html>

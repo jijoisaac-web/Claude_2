@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Matching Quiz | CardCompass</title>
+<meta name="description" content="Answer five quick questions to get matched with credit cards that fit your country, goals, and spending.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand"><span class="mark">◆</span> CardCompass</a>
+    <nav class="main-nav">
+      <a href="/index.html" class="">Home</a>
+      <a href="/quiz.html" class="active">Card Quiz</a>
+      <a href="/calculators/index.html" class="">Calculators</a>
+    </nav>
+    
+    <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
+  </div>
+</header>
+
+<section class="tight" style="background:var(--navy); color:#fff; padding-top:40px; padding-bottom:28px;">
+  <div class="container">
+    <h1 style="margin:0 0 8px; font-size:1.9rem;">Find Your Card in 30 Seconds</h1>
+    <p style="color:#d7deea; max-width:640px; margin:0;">Answer five quick questions. No email required, no data leaves your browser.</p>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="tool-card" style="max-width:680px;">
+      <div class="quiz-progress" id="quiz-progress">Step 1 of 5</div>
+
+      <div class="quiz-step active" id="step-country">
+        <h3>Which country are you in?</h3>
+        <button type="button" class="quiz-option" onclick="quizSelect('country','us',this)">🇺🇸 United States</button><button type="button" class="quiz-option" onclick="quizSelect('country','in',this)">🇮🇳 India</button><button type="button" class="quiz-option" onclick="quizSelect('country','my',this)">🇲🇾 Malaysia</button>
+      </div>
+
+      <div class="quiz-step" id="step-goal">
+        <button class="quiz-back" onclick="quizBack()">← Back</button>
+        <h3>What's your main goal?</h3>
+        <button type="button" class="quiz-option" onclick="quizSelect('goal','cashback',this)">Earn cash back on everyday spending</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('goal','travel',this)">Earn points/miles for travel</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('goal','credit',this)">Build credit for the first time</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('goal','business',this)">Manage business spending</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('goal','debt',this)">Pay down existing debt at lower interest</button>
+      </div>
+
+      <div class="quiz-step" id="step-spend">
+        <button class="quiz-back" onclick="quizBack()">← Back</button>
+        <h3>Roughly how much do you spend on cards per month?</h3>
+        <button type="button" class="quiz-option" onclick="quizSelect('spend','low',this)">Under 500 (in your local currency, roughly)</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('spend','mid',this)">500–2,000</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('spend','high',this)">Over 2,000</button>
+      </div>
+
+      <div class="quiz-step" id="step-fee">
+        <button class="quiz-back" onclick="quizBack()">← Back</button>
+        <h3>How do you feel about annual fees?</h3>
+        <button type="button" class="quiz-option" onclick="quizSelect('fee','none',this)">Prefer $0 / fee-free only</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('fee','low',this)">Okay with a modest fee if it pays for itself</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('fee','any',this)">Fee doesn't matter if the value is there</button>
+      </div>
+
+      <div class="quiz-step" id="step-profile">
+        <button class="quiz-back" onclick="quizBack()">← Back</button>
+        <h3>How would you describe your credit profile?</h3>
+        <button type="button" class="quiz-option" onclick="quizSelect('profile','new',this)">New to credit / no history yet</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('profile','good',this)">Established, good standing</button>
+        <button type="button" class="quiz-option" onclick="quizSelect('profile','excellent',this)">Excellent / high income</button>
+      </div>
+
+      <div class="quiz-step" id="step-results">
+        <h3>Your top matches</h3>
+        <div id="quiz-results-list"></div>
+        <button type="button" class="btn btn-outline" style="color:var(--navy); border-color:var(--navy); margin-top:14px;" onclick="quizRestart()">Start over</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <h4>CardCompass</h4>
+        <p style="max-width:280px;">Independent, plain-language credit card information for the US, India, and Malaysia — with no issuer-paid rankings.</p>
+      </div>
+      <div>
+        <h4>Tools</h4>
+        <ul>
+          <li><a href="/quiz.html">Card matching quiz</a></li>
+          <li><a href="/calculators/index.html">Calculators</a></li>
+          <li><a href="/index.html">Choose your country</a></li>
+        </ul>
+      </div>
+      
+    </div>
+    <p class="foot-disclaimer">CardCompass is an independent, informational website. Card details, rates, and offers are summarized from publicly available issuer information and third-party reporting, are subject to change without notice, and should always be verified on the issuer's official site before applying. This site does not constitute financial advice, and CardCompass is not compensated by any issuer featured here.</p>
+    <p class="foot-disclaimer">Card details last verified July 2026. © 2026 CardCompass. All card and issuer names are trademarks of their respective owners.</p>
+  </div>
+</footer>
+<script src="assets/script.js"></script>
+<script src="assets/cards-data.js"></script>
+<script src="assets/quiz.js"></script>
+</body>
+</html>

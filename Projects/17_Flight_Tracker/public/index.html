@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Farewise — the flight tools Google Flights doesn't build</title>
+<link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark">✈</span> Farewise</div>
+    <div class="tagline">Real cost. Real timing. Real compensation.</div>
+    <select id="currencySelect" class="currency-select" aria-label="Display currency"></select>
+    <div class="mode-pill" id="modePill">checking data mode…</div>
+  </div>
+</header>
+
+<nav class="tool-nav">
+  <div class="wrap tabs">
+    <button class="tab active" data-tab="leaderboard">🔥 This Week's Best Deals</button>
+    <button class="tab" data-tab="true-cost">True Cost Calculator</button>
+    <button class="tab" data-tab="price-calendar">Price Calendar</button>
+    <button class="tab" data-tab="compensation">Compensation Claim</button>
+    <button class="tab" data-tab="stopover">Stopover Planner</button>
+    <button class="tab" data-tab="group">Group Convergence</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- LEADERBOARD -->
+  <section class="panel active" id="panel-leaderboard">
+    <h1>This Week's Best Deals</h1>
+    <p class="lede">Every diaspora corridor has its own normal price. This ranks them by how far below <em>their own</em> usual fare each one is running right now — refreshed weekly from real cached fares.</p>
+    <div id="result-leaderboard" class="results"><p class="hint">Loading this week's rankings…</p></div>
+  </section>
+
+  <!-- TRUE COST -->
+  <section class="panel" id="panel-true-cost">
+    <h1>Flight True Cost Calculator</h1>
+    <p class="lede">The price on the listing page rarely means that's what you'll pay. Add bags, seat, and meal, then compare airlines on any route worldwide on what you'll actually pay.</p>
+    <form id="form-true-cost" class="tool-form">
+      <div class="grid">
+        <label>Origin (IATA) <input required maxlength="3" placeholder="BOM" name="origin"></label>
+        <label>Destination (IATA) <input required maxlength="3" placeholder="DXB" name="destination"></label>
+        <label>Date <input required type="date" name="date"></label>
+        <label>Checked bags <input type="number" min="0" max="4" value="1" name="bags"></label>
+        <label>Seat preference
+          <select name="seatPref">
+            <option value="none">No preference</option>
+            <option value="standard" selected>Standard</option>
+            <option value="xl">Extra legroom / XL</option>
+          </select>
+        </label>
+        <label class="checkbox"><input type="checkbox" name="meal"> Meal included</label>
+      </div>
+      <button type="submit">Calculate true cost</button>
+    </form>
+    <div id="result-true-cost" class="results"></div>
+  </section>
+
+  <!-- PRICE CALENDAR -->
+  <section class="panel" id="panel-price-calendar">
+    <h1>India Flight Price Calendar</h1>
+    <p class="lede">"Book 3 months early" is generic advice. Here's the actual cheapest months, days, and booking windows for top diaspora corridors.</p>
+    <form id="form-price-calendar" class="tool-form">
+      <div class="grid">
+        <label>Corridor
+          <select name="corridorId" id="corridorSelect">
+            <option value="DXB-BOM">Dubai → Mumbai</option>
+            <option value="LON-DEL">London → Delhi</option>
+            <option value="SIN-MAA">Singapore → Chennai</option>
+            <option value="YYZ-HYD">Toronto → Hyderabad</option>
+            <option value="custom">Custom route…</option>
+          </select>
+        </label>
+        <label>Origin (IATA) <input maxlength="3" placeholder="DXB" name="origin" id="calOrigin"></label>
+        <label>Destination (IATA) <input maxlength="3" placeholder="BOM" name="destination" id="calDestination"></label>
+      </div>
+      <button type="submit">Show price calendar</button>
+    </form>
+    <div id="result-price-calendar" class="results"></div>
+  </section>
+
+  <!-- COMPENSATION -->
+  <section class="panel" id="panel-compensation">
+    <h1>Flight Compensation Calculator</h1>
+    <p class="lede">EU261, UK261, and DGCA rules entitle delayed, cancelled, or bumped passengers to compensation most people never claim. Check eligibility and generate a claim letter.</p>
+    <form id="form-compensation" class="tool-form">
+      <div class="grid">
+        <label>Departure airport (IATA) <input required maxlength="3" placeholder="LHR" name="departure"></label>
+        <label>Arrival airport (IATA) <input required maxlength="3" placeholder="DEL" name="arrival"></label>
+        <label>Airline code <input required maxlength="2" placeholder="BA" name="airlineCode"></label>
+        <label>What happened?
+          <select name="scenario" id="scenarioSelect">
+            <option value="delay">Delay</option>
+            <option value="cancellation">Cancellation</option>
+            <option value="deniedBoarding">Denied boarding</option>
+          </select>
+        </label>
+        <label id="delayHoursLabel">Delay at arrival (hours) <input type="number" min="0" step="0.5" value="4" name="delayHours"></label>
+        <label id="noticeDaysLabel" style="display:none">Notice given before departure (days) <input type="number" min="0" value="5" name="noticeDays"></label>
+        <label id="altOfferedLabel" class="checkbox" style="display:none"><input type="checkbox" name="altOfferedWithinHour"> Alternate flight offered within 1 hour</label>
+        <label id="fareLabel" style="display:none">Fare paid (INR, for DGCA calc) <input type="number" min="0" value="6000" name="fareAmountINR"></label>
+        <label>Flight number <input placeholder="BA257" name="flightNumber"></label>
+        <label>Flight date <input type="date" name="flightDate"></label>
+        <label>Your name <input placeholder="Jijo Isaac" name="passengerName"></label>
+      </div>
+      <button type="submit">Check eligibility</button>
+    </form>
+    <div id="result-compensation" class="results"></div>
+  </section>
+
+  <!-- STOPOVER -->
+  <section class="panel" id="panel-stopover">
+    <h1>Stopover Trip Planner</h1>
+    <p class="lede">Qatar Airways, Turkish Airlines, Emirates, Etihad, and Singapore Airlines all let you turn a layover into a free (or cheap) mini-holiday. See what fits your route and layover length.</p>
+    <form id="form-stopover" class="tool-form">
+      <div class="grid">
+        <label>Origin (IATA) <input required maxlength="3" placeholder="YYZ" name="origin"></label>
+        <label>Destination (IATA) <input required maxlength="3" placeholder="BOM" name="destination"></label>
+        <label>Layover length (hours) <input type="number" min="1" max="96" value="24" name="layoverHours"></label>
+      </div>
+      <button type="submit">Find stopover options</button>
+    </form>
+    <div id="result-stopover" class="results"></div>
+  </section>
+
+  <!-- GROUP CONVERGENCE -->
+  <section class="panel" id="panel-group">
+    <h1>Group Flight Convergence Tool</h1>
+    <p class="lede">Friends and family scattered across cities, all trying to land in the same place at the same time for the lowest combined cost. Enter everyone's origin, we'll find the best combination.</p>
+    <form id="form-group" class="tool-form">
+      <div class="grid">
+        <label>Destination (IATA) <input required maxlength="3" placeholder="GOI" name="destination"></label>
+        <label>Date <input required type="date" name="date"></label>
+        <label>Arrival window (hours apart) <input type="number" min="1" max="48" value="6" name="windowHours"></label>
+      </div>
+      <div id="originRows" class="origin-rows">
+        <div class="origin-row"><input maxlength="3" placeholder="DXB" class="origin-input"></div>
+        <div class="origin-row"><input maxlength="3" placeholder="LHR" class="origin-input"></div>
+        <div class="origin-row"><input maxlength="3" placeholder="SIN" class="origin-input"></div>
+      </div>
+      <button type="button" id="addOriginBtn" class="secondary">+ Add another traveler</button>
+      <button type="submit">Find best combination</button>
+    </form>
+    <div id="result-group" class="results"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    Farewise is an independent tool. Fee/rule data is estimated and may change — verify before booking or filing a claim.
+  </div>
+</footer>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
