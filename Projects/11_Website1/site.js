@@ -1,4 +1,4 @@
-/* v10.7 */
+/* v10.8 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -261,6 +261,10 @@ const P={
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across KSA'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-sa/',note:'Digital · fast transfers'},
     {name:'Al Rajhi Bank',spread:.014,fee:0,link:'https://alrajhibank.com.sa',note:'Most widely used bank KSA'},
+    {name:'Saudi National Bank (SNB)',spread:.012,fee:0,link:'https://www.alahli.com',note:'Largest KSA bank · SNB Pay app'},
+    {name:'Riyad Bank',spread:.013,fee:0,link:'https://www.riyadbank.com',note:'Major KSA bank · wide branches'},
+    {name:'Arab National Bank',spread:.013,fee:0,link:'https://www.anb.com.sa',note:'Popular bank for expat transfers'},
+    {name:'National Exchange Center',spread:.012,fee:0,link:'https://www.nec.com.sa',note:'Walk-in exchange KSA'},
     {name:'Remitly',spread:.013,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Large agent network'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via KSA agents'},
@@ -268,15 +272,25 @@ const P={
   QAR:[
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
     {name:'LuluMoney',spread:.011,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Qatar'},
+    {name:'Al Fardan Exchange',spread:.011,fee:0,link:'https://alfardanexchange.com',note:'Qatar leading exchange · wide branches'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Branches across Qatar'},
-    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-qa/',note:'Digital · fast transfers'},
     {name:'Al Zaman Exchange',spread:.012,fee:0,link:'https://alzamanexchange.com',note:'Popular in Doha'},
+    {name:'Orient Exchange Qatar',spread:.012,fee:0,link:'https://orientexchange.qa',note:'Qatar exchange house'},
+    {name:'QNB (Qatar National Bank)',spread:.013,fee:0,link:'https://www.qnb.com/sites/qnb/qnbqatar/en_gb/',note:'Largest Qatar bank'},
+    {name:'Doha Bank',spread:.013,fee:0,link:'https://www.dohabank.com.qa',note:'Popular bank transfer'},
+    {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-qa/',note:'Digital · fast transfers'},
+    {name:'Commercial Bank Qatar',spread:.014,fee:0,link:'https://www.cbq.qa',note:'Major Qatar bank'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Nationwide agents'},
   ],
   KWD:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Al Muzaini Exchange',spread:.010,fee:0,link:'https://www.muzaini.com',note:"Kuwait's largest exchange · 64+ branches"},
+    {name:'Kuwait Finance House (KFH)',spread:.011,fee:0,link:'https://www.kfh.com',note:'Leading Islamic bank Kuwait'},
+    {name:'National Bank of Kuwait (NBK)',spread:.012,fee:0,link:'https://www.nbk.com',note:'Most popular Kuwait bank'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Kuwait branches'},
+    {name:'Al Mulla Exchange',spread:.012,fee:0,link:'https://almullaexchange.com',note:'Popular walk-in exchange Kuwait'},
+    {name:'Gulf Bank',spread:.013,fee:0,link:'https://www.gulfbank.com.kw',note:'Kuwait bank transfer'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-kw/',note:'Digital · fast transfers'},
     {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
@@ -284,8 +298,12 @@ const P={
   ],
   BHD:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
-    {name:'BFC Exchange',spread:.013,fee:0,link:'https://bfcgroup.com',note:"Bahrain's top exchange"},
+    {name:'BFC Exchange',spread:.011,fee:0,link:'https://bfcgroup.com',note:"Bahrain's largest exchange house"},
+    {name:'Zenj Exchange',spread:.012,fee:0,link:'https://www.zenjexchange.com',note:'Popular Bahrain exchange'},
+    {name:'National Bank of Bahrain (NBB)',spread:.012,fee:0,link:'https://www.nbbonline.com',note:'Largest Bahrain bank'},
+    {name:'Ahli United Bank',spread:.013,fee:0,link:'https://www.ahliunitedbank.com/bh',note:'Popular Bahrain bank'},
     {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Bahrain branches'},
+    {name:'Habib Exchange Bahrain',spread:.013,fee:0,link:'https://www.habibexchange.com',note:'Expat-focused exchange house'},
     {name:'InstaReM',spread:.014,fee:0,link:'https://instarem.com/en-bh/',note:'Digital · fast transfers'},
     {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
@@ -293,7 +311,13 @@ const P={
   ],
   OMR:[
     {name:'Wise',spread:.006,fee:1,link:'https://wise.com',note:'Mid-market rate'},
+    {name:'Mustafa Sultan Exchange',spread:.010,fee:0,link:'https://mustafasultanexchange.om',note:'SBI-managed · 150+ Oman branches · India specialist'},
+    {name:'Majan Exchange',spread:.011,fee:0,link:'https://majanexchange.com',note:'Popular Oman exchange house'},
+    {name:'Unimoni Exchange',spread:.012,fee:0,link:'https://unimoni.com/om',note:'Oman-wide exchange · was UAE Exchange'},
     {name:'UAE Exchange',spread:.012,fee:0,link:'https://uaeexchange.com',note:'Oman branches'},
+    {name:'Bank Muscat',spread:.013,fee:0,link:'https://www.bankmuscat.com',note:'Largest Oman bank · Maisarah app'},
+    {name:'National Bank of Oman (NBO)',spread:.013,fee:0,link:'https://www.nbo.om',note:'Popular bank transfer'},
+    {name:'Oman Arab Bank',spread:.013,fee:0,link:'https://www.oman-arabbank.com',note:'Expat-friendly Oman bank'},
     {name:'InstaReM',spread:.013,fee:0,link:'https://instarem.com/en-om/',note:'Digital · fast transfers'},
     {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital, fast'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Via agents'},
