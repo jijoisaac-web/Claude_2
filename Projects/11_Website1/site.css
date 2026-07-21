@@ -1,4 +1,4 @@
-/* v10.0 */
+/* v10.1 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1883,6 +1883,26 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
    ══════════════════════════════════════════════════════ */
 
 /* ── Hamburger button (hidden on desktop) ── */
+/* ── Nav tightening: 14" laptops (1024–1380px) ─────────── */
+@media(max-width:1380px){
+  nav.site-nav{padding:0 20px;}
+  .hide-1380{display:none!important;}
+  .nav-links-center{gap:0;}
+  .nav-links-center a{font-size:12px;padding:5px 8px;}
+  .nav-live-badge{display:none;}
+  .nav-right{gap:6px;}
+  nav.site-nav .nav-logo-text span{display:none;}
+}
+@media(max-width:1180px){
+  .nav-links-center a{font-size:11.5px;padding:4px 6px;}
+  .nav-cta{padding:7px 12px;font-size:12px;}
+}
+@media(max-width:1060px){
+  /* Hide lower-priority center nav links; keep dropdowns */
+  .nav-links-center .hide-1060{display:none;}
+}
+/* ── end nav tightening ────────────────────────────────── */
+
 .nav-hamburger{
   display:none;
   align-items:center;
