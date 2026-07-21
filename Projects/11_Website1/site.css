@@ -1,4 +1,4 @@
-/* v10.6 */
+/* v10.7 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1662,14 +1662,20 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-win-fare-sep{border-top:1px solid var(--border);margin:6px 0;}
 .fl-win-fare-muted .fl-win-fare-val{color:var(--muted);font-size:.78rem;}
 /* ── Date window provider buttons ── */
-.fl-win-search-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 5px;}
-.fl-win-providers{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
-.fl-wprov{display:flex;align-items:center;justify-content:center;padding:7px 6px;border-radius:8px;font-size:.74rem;font-weight:700;text-decoration:none;text-align:center;transition:transform .15s,opacity .15s;white-space:nowrap;}
+.fl-win-search-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin:10px 0 6px;border-top:1px solid var(--border);padding-top:10px;}
+.fl-win-providers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:2px;}
+@media(max-width:580px){.fl-win-providers{grid-template-columns:1fr 1fr;}}
+.fl-wprov{display:flex;align-items:center;justify-content:center;padding:9px 6px;border-radius:8px;font-size:.74rem;font-weight:700;text-decoration:none;text-align:center;transition:transform .15s,opacity .15s;white-space:nowrap;}
 .fl-wprov:hover{transform:translateY(-1px);opacity:.9;}
 .fl-wprov-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;}
 .fl-wprov-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;}
 .fl-wprov-sky{background:linear-gradient(135deg,#0770e3,#3b9eff);color:#fff;}
 .fl-wprov-gf{background:var(--elevated);border:1px solid var(--border);color:var(--text2);}
+.fl-win-fare-details{margin-top:10px;}
+.fl-win-fare-summary{font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;padding:5px 0;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;}
+.fl-win-fare-summary::-webkit-details-marker{display:none;}
+.fl-win-fare-summary::before{content:'\25B6';font-size:.55rem;transition:transform .2s;display:inline-block;}
+details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(90deg);}
 
 .fl-win-conn{font-size:.78rem;color:var(--teal);margin-bottom:10px;padding:6px 10px;background:color-mix(in srgb,var(--teal) 8%,transparent);border-radius:8px;}
 .fl-win-btns{display:flex;gap:8px;flex-wrap:wrap;}
