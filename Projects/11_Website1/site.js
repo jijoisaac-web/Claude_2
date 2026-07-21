@@ -1,4 +1,4 @@
-/* v10.4 */
+/* v10.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4503,7 +4503,7 @@ function closeNavDD(){
           +'<div class="fl-win-arrow">&#9992; '+tripDays+'n &rarr;</div>'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">RETURN</div><div class="fl-win-dt">'+_fmtLong(retDate)+'</div></div>'
           +'</div>'
-          +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on Kiwi.com</div>'
+          +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on booking sites</div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+outMin.toLocaleString()+'&ndash;'+outMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+retMin.toLocaleString()+'&ndash;'+retMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-sep"></div>'
@@ -4512,10 +4512,12 @@ function closeNavDD(){
           +'</div>'
           +(economyOnly&&cabinClass==='business'?'<div class="fl-win-economy-note">&#9888;&#65039; Most flights on this route ('+route.airlines+') are <strong>economy-only</strong>. Check Air India or Emirates for business class.</div>':'')
           +connTip
-          +'<div class="fl-win-btns">'
-          +'<a class="fl-win-btn fl-win-btn-main" href="'+skRT+'" target="_blank" rel="noopener">Round-trip &#8599;</a>'
-          +'<a class="fl-win-btn" href="'+skOut+'" target="_blank" rel="noopener">Outbound only &#8599;</a>'
-          +'<a class="fl-win-btn" href="'+skRet+'" target="_blank" rel="noopener">Return only &#8599;</a>'
+          +'<div class="fl-win-search-lbl">Search on:</div>'
+          +'<div class="fl-win-providers">'
+          +'<a class="fl-wprov fl-wprov-kiwi" href="'+skRT+'" target="_blank" rel="noopener sponsored">&#9992; Kiwi.com</a>'
+          +'<a class="fl-wprov fl-wprov-avi" href="'+skRet+'" target="_blank" rel="noopener sponsored">&#9992; Aviasales</a>'
+          +'<a class="fl-wprov fl-wprov-sky" href="https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/" target="_blank" rel="noopener">&#9992; Skyscanner</a>'
+          +'<a class="fl-wprov fl-wprov-gf" href="https://www.google.com/travel/flights?q=flights+'+fromCode+'+to+'+destCode+'" target="_blank" rel="noopener">&#128269; Google</a>'
           +'</div>'
           +'</div>';
       }

@@ -1,4 +1,4 @@
-/* v10.4 */
+/* v10.5 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1661,6 +1661,16 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-win-fare-val{color:var(--fg);}
 .fl-win-fare-sep{border-top:1px solid var(--border);margin:6px 0;}
 .fl-win-fare-muted .fl-win-fare-val{color:var(--muted);font-size:.78rem;}
+/* ── Date window provider buttons ── */
+.fl-win-search-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 5px;}
+.fl-win-providers{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
+.fl-wprov{display:flex;align-items:center;justify-content:center;padding:7px 6px;border-radius:8px;font-size:.74rem;font-weight:700;text-decoration:none;text-align:center;transition:transform .15s,opacity .15s;white-space:nowrap;}
+.fl-wprov:hover{transform:translateY(-1px);opacity:.9;}
+.fl-wprov-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;}
+.fl-wprov-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;}
+.fl-wprov-sky{background:linear-gradient(135deg,#0770e3,#3b9eff);color:#fff;}
+.fl-wprov-gf{background:var(--elevated);border:1px solid var(--border);color:var(--text2);}
+
 .fl-win-conn{font-size:.78rem;color:var(--teal);margin-bottom:10px;padding:6px 10px;background:color-mix(in srgb,var(--teal) 8%,transparent);border-radius:8px;}
 .fl-win-btns{display:flex;gap:8px;flex-wrap:wrap;}
 .fl-win-btn{display:inline-block;padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:600;text-decoration:none;border:1.5px solid var(--border);color:var(--muted);transition:all .2s;cursor:pointer;}
