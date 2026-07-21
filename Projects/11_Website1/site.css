@@ -1530,6 +1530,17 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .fl-btn{display:block;padding:7px 8px;border-radius:7px;font-size:11px;font-weight:600;text-align:center;text-decoration:none;transition:opacity .15s;cursor:pointer;}
 .fl-btn:hover{opacity:.82;}
+/* ── Flight provider multi-search row ── */
+.fl-dcd-search-lbl{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.fl-dcd-providers{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.fl-prov-btn{flex:1;min-width:110px;text-align:center;padding:8px 10px;border-radius:9px;font-size:.76rem;font-weight:700;text-decoration:none;transition:transform .15s,box-shadow .15s;white-space:nowrap;border:1.5px solid transparent;}
+.fl-prov-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.25);}
+.fl-prov-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;}
+.fl-prov-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;}
+.fl-prov-sky{background:linear-gradient(135deg,#0770e3,#3b9eff);color:#fff;}
+.fl-prov-gf{background:var(--elevated);border-color:var(--border);color:var(--text2);}
+@media(max-width:500px){.fl-prov-btn{min-width:calc(50% - 4px);flex:none;}}
+/* legacy - keep for any remaining refs */
 .fl-btn-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;border:none;}
 .fl-btn-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;border:none;}
 [data-theme="light"] .fl-btn-gf{background:rgba(0,0,0,0.05);color:#374151;border-color:#d1d5db;}
