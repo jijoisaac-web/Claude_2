@@ -1,4 +1,4 @@
-/* v10.3 */
+/* v10.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3222,12 +3222,12 @@ function closeNavDD(){
     if(!panel) return;
     var d=DEST[code];
     if(!d){panel.innerHTML='';return;}
-    var r=data.routes[code]||{min:null,max:null,dur:'varies',airlines:'Check Skyscanner'};
+    var r=data.routes[code]||{min:null,max:null,dur:'varies',airlines:'Compare on Kiwi.com'};
     var price=typeof r.min==='number'
       ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
       : '—';
-    var skUrl='https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/?currency='+cur;
-    var gfUrl='https://www.google.com/travel/flights?q=flights+from+'+from+'+to+'+d.name.replace(/ /g,'+')+'%2C+India';
+    var kiwiUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var aviUrl='https://aviasales.tpx.gr/o76pMR9j?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
     panel.innerHTML='<div class="fl-dest-card-detail">'
       +'<div class="fl-dcd-top">'
       +'<span class="fl-dcd-icon">'+d.icon+'</span>'
@@ -3247,8 +3247,8 @@ function closeNavDD(){
       +'<span class="fl-dcd-trend" style="color:'+trend.color+'">'+trend.arrow+' '+trend.label+'</span>'
       +'</div>'
       +'<div class="fl-dcd-actions">'
-      +'<a class="fl-dcd-btn fl-btn-sky" href="'+skUrl+'" target="_blank" rel="noopener">&#9992; Skyscanner</a>'
-      +'<a class="fl-dcd-btn fl-btn-gf" href="'+gfUrl+'" target="_blank" rel="noopener">Google Flights</a>'
+      +'<a class="fl-dcd-btn fl-btn-kiwi" href="'+kiwiUrl+'" target="_blank" rel="noopener sponsored">&#9992; Kiwi.com</a>'
+      +'<a class="fl-dcd-btn fl-btn-avi" href="'+aviUrl+'" target="_blank" rel="noopener sponsored">&#9992; Aviasales</a>'
       +'<button class="fl-dcd-btn fl-dcd-plan" onclick="window.flChip(\''
       +d.name+' next month, 2 people\')">✶ Plan with AI</button>'
       +'</div>'
@@ -3735,7 +3735,7 @@ function closeNavDD(){
       var isBest=ap.diff===Math.min.apply(null,airports.map(function(a){return a.diff;}));
       var isMost=ai===0;
       var diffLabel=ap.diff===0?'Base':ap.diff<0?'Save '+cur+' '+Math.abs(ap.diff):'+ '+cur+' '+ap.diff;
-      var skUrl='https://www.skyscanner.net/transport/flights/'+ap.code+'/'+(destCode||'BOM')+'/?currency='+cur;
+      var skUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+ap.code.toLowerCase()+'-'+(destCode||'BOM').toLowerCase();
 
       html+='<div class="fl-apt-row'+(isBest?' fl-apt-best':'')+'">'
         +'<div class="fl-apt-left">'
@@ -4195,7 +4195,7 @@ function closeNavDD(){
       }
       return {cls:'signal-soon',icon:'🟡',label:'Book Within 2 Weeks',
         reason:'Good availability still exists but fares are rising as departure approaches.',
-        tip:'Set a price alert on Skyscanner. If fares rise 10%, book immediately.'};
+        tip:'Set a price alert on Kiwi.com. If fares rise 10%, book immediately.'};
     }
     if(wksAway<=10){
       if(hasFestival){
@@ -4219,7 +4219,7 @@ function closeNavDD(){
     }
     return {cls:'signal-early',icon:'⬜',label:'Too Early to Book',
       reason:'More than 4 months out. Initial fares are rarely the cheapest.',
-      tip:'Set a Skyscanner alert now and revisit in '+(wksAway-12)+' weeks.'};
+      tip:'Set a Kiwi.com alert and revisit in '+(wksAway-12)+' weeks.'};
   }
 
 
@@ -4467,9 +4467,9 @@ function closeNavDD(){
         var depSK=_fmtSK(depDate);
         var retSK=_fmtSK(retDate);
         var _skCabin=cabinClass==='business'?'?cabin=business&currency='+cur:'?cabin=economy&currency='+cur;
-        var skRT='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/'+_skCabin;
-        var skOut='https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+_skCabin;
-        var skRet='https://www.skyscanner.net/transport/flights/'+destCode+'/'+fromCode+'/'+retSK+'/'+_skCabin;
+        var skRT='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt';
+        var skOut='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out';
+        var skRet='https://aviasales.tpx.gr/o76pMR9j?sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret';
 
         var gMult=groupN>1?' (&times;'+groupN+')':'';
         var grpRtMin=Math.round(rtMin*groupN);
@@ -4498,7 +4498,7 @@ function closeNavDD(){
           +'<div class="fl-win-arrow">&#9992; '+tripDays+'n &rarr;</div>'
           +'<div class="fl-win-date-blk"><div class="fl-win-dt-label">RETURN</div><div class="fl-win-dt">'+_fmtLong(retDate)+'</div></div>'
           +'</div>'
-          +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on Skyscanner</div>'
+          +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on Kiwi.com</div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+outMin.toLocaleString()+'&ndash;'+outMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+retMin.toLocaleString()+'&ndash;'+retMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-sep"></div>'

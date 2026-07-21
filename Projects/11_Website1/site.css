@@ -1,4 +1,4 @@
-/* v10.3 */
+/* v10.4 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1530,8 +1530,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .fl-btn{display:block;padding:7px 8px;border-radius:7px;font-size:11px;font-weight:600;text-align:center;text-decoration:none;transition:opacity .15s;cursor:pointer;}
 .fl-btn:hover{opacity:.82;}
-.fl-btn-sky{background:#0770e3;color:#fff;}
-.fl-btn-gf{background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text2);}
+.fl-btn-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;border:none;}
+.fl-btn-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;border:none;}
 [data-theme="light"] .fl-btn-gf{background:rgba(0,0,0,0.05);color:#374151;border-color:#d1d5db;}
 [data-theme="light"] .fl-dest-card{background:#f8fafc;}
 
@@ -2446,7 +2446,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   border:none;font-family:inherit;white-space:nowrap;
 }
 .fl-dcd-btn:hover{opacity:.82;}
-.fl-btn-sky{background:#0770e3;color:#fff;}
+.fl-btn-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;border:none;}
 .fl-btn-gf{background:#4285f4;color:#fff;}
 .fl-dcd-plan{background:var(--teal);color:#000;}
 
