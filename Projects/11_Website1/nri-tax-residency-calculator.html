@@ -10,14 +10,13 @@
 <link rel="apple-touch-icon" href="/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>NRI Tax Residency Calculator 2026 — NRI vs RNOR vs Resident Status | NRI Finance Hub</title>
-<meta name="description" content="Determine your Indian tax residency status (NRI, RNOR or Resident) based on days spent in India over the past years. Essential for income tax planning."/>
-<meta name="keywords" content="NRI tax residency calculator, NRI vs RNOR vs Resident India, days in India calculator, FEMA residency status, NRI income tax status"/>
+<meta name="description" content="Determine your Indian tax residency status based on days spent in India."/>
 <link rel="canonical" href="https://nrifinancehub.com/nri-tax-residency-calculator"/>
 <meta property="og:url" content="https://nrifinancehub.com/nri-tax-residency-calculator"/>
 <meta property="og:title" content="NRI Tax Residency Calculator 2026 — NRI vs RNOR vs Resident Status | NRI Finance Hub"/>
-<meta property="og:description" content="Determine your Indian tax residency status (NRI, RNOR or Resident) based on days spent in India over the past years. Essential for income tax planning."/>
+<meta property="og:description" content="Determine your Indian tax residency status based on days spent in India."/>
 <meta name="twitter:title" content="NRI Tax Residency Calculator 2026 — NRI vs RNOR vs Resident Status | NRI Finance Hub"/>
-<meta name="twitter:description" content="Determine your Indian tax residency status (NRI, RNOR or Resident) based on days spent in India over the past years. Essential for income tax planning."/>
+<meta name="twitter:description" content="Determine your Indian tax residency status based on days spent in India."/>
 <meta name="author" content="NRI Finance Hub"/>
 <meta name="robots" content="index, follow"/>
 <meta property="og:type" content="website"/>
@@ -27,13 +26,11 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:site" content="@NRIFinanceHub"/>
 <meta name="twitter:image" content="https://nrifinancehub.com/og-image.png"/>
-<!-- Flag icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
-<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=10.2"/>
+<link rel="stylesheet" href="/site.css?v=10.3"/>
 <script>window._defaultTab='taxres';</script>
 </head>
 <body>
@@ -51,7 +48,7 @@
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v10.1</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v10.3</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -2913,42 +2910,42 @@
   <style>
   /* ── NRI Credit Cards Tab ──────────────────────────────── */
   .tool-hd{margin-bottom:1.25rem}
-  .tool-title{font-size:1.3rem;font-weight:700;color:#e2e8f0;margin:0 0 .35rem}
-  .tool-sub{font-size:.82rem;color:#8892b0;margin:0;line-height:1.5}
-  .cc-bar{background:rgba(13,22,50,0.7);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.7rem}
+  .tool-title{font-size:1.3rem;font-weight:700;color:var(--text);margin:0 0 .35rem}
+  .tool-sub{font-size:.82rem;color:var(--muted);margin:0;line-height:1.5}
+  .cc-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.7rem}
   .cc-type-row{display:flex;gap:.5rem;flex-wrap:wrap}
-  .cc-type{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;color:#8892b0;font-size:.8rem;font-weight:600;padding:.42rem .85rem;cursor:pointer;transition:all .2s}
-  .cc-type:hover,.cc-type.active{background:rgba(99,102,241,0.25);border-color:rgba(99,102,241,0.5);color:#c7d2fe}
+  .cc-type{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;color:var(--muted);font-size:.8rem;font-weight:600;padding:.42rem .85rem;cursor:pointer;transition:all .2s}
+  .cc-type:hover,.cc-type.active{background:rgba(99,102,241,0.22);border-color:rgba(99,102,241,0.55);color:var(--text)}
   .cc-filter-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-  .cc-filter-lbl{font-size:.72rem;color:#8892b0;font-weight:600;min-width:95px;white-space:nowrap}
+  .cc-filter-lbl{font-size:.72rem;color:var(--muted);font-weight:600;min-width:95px;white-space:nowrap}
   .cc-chips{display:flex;gap:.4rem;flex-wrap:wrap}
-  .cc-chip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#8892b0;font-size:.72rem;padding:.28rem .72rem;cursor:pointer;transition:all .2s}
-  .cc-chip:hover,.cc-chip.active{background:rgba(99,102,241,0.2);border-color:#6366f1;color:#a5b4fc}
+  .cc-chip{background:var(--elevated);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:.72rem;padding:.28rem .72rem;cursor:pointer;transition:all .2s}
+  .cc-chip:hover,.cc-chip.active{background:rgba(99,102,241,0.18);border-color:#6366f1;color:var(--text)}
   .cc-section{margin-bottom:2rem}
-  .cc-sec-hd{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.1rem;padding:.85rem 1rem;background:rgba(13,22,50,0.5);border-radius:10px;border-left:3px solid rgba(99,102,241,0.5)}
+  .cc-sec-hd{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.1rem;padding:.85rem 1rem;background:var(--elevated);border-radius:10px;border-left:3px solid rgba(99,102,241,0.5)}
   .cc-sec-icon{font-size:1.4rem;line-height:1;flex-shrink:0}
-  .cc-sec-title{font-size:.92rem;font-weight:700;color:#e2e8f0;margin-bottom:.18rem}
-  .cc-sec-sub{font-size:.76rem;color:#8892b0;line-height:1.45}
+  .cc-sec-title{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:.18rem}
+  .cc-sec-sub{font-size:.76rem;color:var(--muted);line-height:1.45}
   .cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
-  .cc-card{background:rgba(13,22,50,0.8);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;transition:border-color .2s,transform .2s}
+  .cc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;transition:border-color .2s,transform .2s}
   .cc-card:hover{border-color:rgba(99,102,241,0.4);transform:translateY(-2px)}
   .cc-badge{display:inline-block;font-size:.62rem;font-weight:700;padding:.18rem .55rem;border-radius:12px;color:#fff;letter-spacing:.04em;margin-bottom:.3rem}
-  .cc-name{font-size:.98rem;font-weight:700;color:#e2e8f0;line-height:1.2}
-  .cc-issuer{font-size:.72rem;color:#8892b0;margin-top:.12rem}
+  .cc-name{font-size:.98rem;font-weight:700;color:var(--text);line-height:1.2}
+  .cc-issuer{font-size:.72rem;color:var(--muted);margin-top:.12rem}
   .cc-ctype{font-size:.67rem;color:#818cf8;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:4px;padding:.12rem .45rem;display:inline-block;margin-top:.28rem}
-  .cc-specs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;background:rgba(0,0,0,0.2);border-radius:8px;padding:.7rem}
+  .cc-specs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;background:var(--elevated);border-radius:8px;padding:.7rem}
   .cc-spec{display:flex;flex-direction:column;gap:.12rem}
-  .cc-spec-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:#475569;font-weight:600}
-  .cc-spec-v{font-size:.78rem;color:#c7d2fe;font-weight:600}
+  .cc-spec-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .cc-spec-v{font-size:.78rem;color:var(--text2);font-weight:600}
   .cc-feats{margin:0;padding:0 0 0 1rem;display:flex;flex-direction:column;gap:.3rem}
-  .cc-feats li{font-size:.76rem;color:#94a3b8;line-height:1.4}
+  .cc-feats li{font-size:.76rem;color:var(--text2);line-height:1.4}
   .cc-note{font-size:.73rem;color:#a5b4fc;background:rgba(99,102,241,0.08);border-left:2px solid rgba(99,102,241,0.4);padding:.45rem .7rem;border-radius:0 6px 6px 0;line-height:1.4}
   .cc-stars{font-size:.74rem;color:#fbbf24;letter-spacing:.04em}
-  .cc-stars span{color:#64748b;margin-left:.25rem;font-size:.72rem}
+  .cc-stars span{color:var(--muted);margin-left:.25rem;font-size:.72rem}
   .cc-apply{display:block;text-align:center;padding:.6rem 1rem;background:rgba(99,102,241,0.13);border:1px solid rgba(99,102,241,0.3);border-radius:8px;color:#a5b4fc;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s;margin-top:auto}
-  .cc-apply:hover{background:rgba(99,102,241,0.28);border-color:#6366f1;color:#c7d2fe}
-  .cc-no-results{font-size:.83rem;color:#8892b0;text-align:center;padding:1.75rem;background:rgba(0,0,0,0.1);border-radius:8px;border:1px dashed rgba(100,130,220,0.15);margin:0}
-  .cc-disclaimer{font-size:.73rem;color:#475569;text-align:center;padding:.8rem;line-height:1.5;border-top:1px solid rgba(100,130,220,0.1);margin-top:.5rem}
+  .cc-apply:hover{background:rgba(99,102,241,0.28);border-color:#6366f1;color:var(--text)}
+  .cc-no-results{font-size:.83rem;color:var(--muted);text-align:center;padding:1.75rem;background:var(--elevated);border-radius:8px;border:1px dashed var(--border);margin:0}
+  .cc-disclaimer{font-size:.73rem;color:var(--muted);text-align:center;padding:.8rem;line-height:1.5;border-top:1px solid var(--border);margin-top:.5rem}
   @media(max-width:600px){.cc-grid{grid-template-columns:1fr}.cc-filter-row{flex-direction:column;align-items:flex-start}.cc-filter-lbl{min-width:unset}}
   </style>
 
@@ -3241,7 +3238,7 @@
 
 
 
-<script src="/site.js?v=10.1"></script>
+<script src="/site.js?v=10.3"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
@@ -3272,5 +3269,5 @@
 </nav>
 
 </body>
-<script src="/site.js?v=10.2"></script>
+<script src="/site.js?v=10.3"></script>
 </html>
