@@ -1,4 +1,4 @@
-/* v10.1 */
+/* v10.2 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -1242,6 +1242,7 @@ function closeDrawer(){
   document.body.style.overflow='';
 }
 function showTab(id,btn){setActiveBottomTab(id);
+  if(history&&history.pushState)history.pushState(null,'','#'+id);
   document.querySelectorAll('.tool-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.drawer-item').forEach(t=>t.classList.remove('active'));
   const tabEl=document.getElementById('tab-'+id);if(!tabEl)return;
@@ -1265,14 +1266,18 @@ function showTab(id,btn){setActiveBottomTab(id);
 
 // ── INIT ─────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
-  // Deep-link: open specific tool tab when arriving from a guide page
+  // Deep-link: open specific tool tab when arriving from a guide page or standalone page
   const hash=location.hash;
-  const TAB_IDS=['rates','invest','nrenro','homeloan','return','dtaa','realty','edplan','taxres','articles','proptds','epf','panaadhaar','budget'];
-  if(hash && TAB_IDS.includes(hash.slice(1))){
-    const tabId=hash.slice(1);
-    const btn=document.querySelector('[data-tab="'+tabId+'"]');
+  const TAB_IDS=['rates','timer','invest','nrenro','homeloan','return','dtaa','realty','edplan','edabroad','taxres','articles','proptds','epf','panaadhaar','budget','flights','deals','cards'];
+  const _startTab=window._defaultTab||(hash&&TAB_IDS.includes(hash.slice(1))?hash.slice(1):null);
+  if(_startTab){
+    const btn=document.querySelector('[data-tab="'+_startTab+'"]');
     if(btn){
-      showTab(tabId,btn);
+      showTab(_startTab,btn);
+      if(_startTab==='timer')initRateTimer();
+      if(_startTab==='edabroad'){initEdAbroad();if(typeof initEdExtraTools==='function')initEdExtraTools();}
+      if(_startTab==='deals')initDeals();
+      if(_startTab==='cards')initCards();
       setTimeout(()=>{const m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});},120);
     }
   }

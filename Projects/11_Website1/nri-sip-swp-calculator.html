@@ -2,183 +2,39 @@
 <html lang="en">
 <head>
 <script>
-// Prevent flash: apply theme before CSS loads
 (function(){var t=localStorage.getItem('nri-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
 </script>
 <meta charset="UTF-8"/>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="/favicon.png">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NRI SIP & SWP Calculator 2026 — Grow & Withdraw Corpus | NRI Finance Hub</title>
-<meta name="description" content="NRI SIP calculator with step-up compounding. SWP calculator: how long your corpus lasts with monthly withdrawals. Free instant results."/>
-<meta name="keywords" content="NRI remittance rates 2026, best way to send money to India, NRE vs NRO account, NRI home loan calculator, NRI tax calculator, DTAA India, NRI return to India planner, NRI SIP calculator, NRE FD rates, NRI tax residency status, send money UAE to India, send money USA to India, Wise vs Remitly India"/>
+<title>NRI SIP & SWP Calculator 2026 — India Mutual Fund Planner | NRI Finance Hub</title>
+<meta name="description" content="Calculate SIP returns, SWP withdrawals and investment corpus for NRI investments in Indian mutual funds. Free calculator with projection charts."/>
+<meta name="keywords" content="NRI SIP calculator, NRI SWP calculator, NRI mutual fund investment, India SIP returns 2026, NRI investment planning"/>
+<link rel="canonical" href="https://nrifinancehub.com/nri-sip-swp-calculator"/>
+<meta property="og:url" content="https://nrifinancehub.com/nri-sip-swp-calculator"/>
+<meta property="og:title" content="NRI SIP & SWP Calculator 2026 — India Mutual Fund Planner | NRI Finance Hub"/>
+<meta property="og:description" content="Calculate SIP returns, SWP withdrawals and investment corpus for NRI investments in Indian mutual funds. Free calculator with projection charts."/>
+<meta name="twitter:title" content="NRI SIP & SWP Calculator 2026 — India Mutual Fund Planner | NRI Finance Hub"/>
+<meta name="twitter:description" content="Calculate SIP returns, SWP withdrawals and investment corpus for NRI investments in Indian mutual funds. Free calculator with projection charts."/>
 <meta name="author" content="NRI Finance Hub"/>
 <meta name="robots" content="index, follow"/>
-
-<link rel="canonical" href="https://nrifinancehub.com/nri-sip-swp-calculator"/>
-<!-- Open Graph / Facebook / WhatsApp -->
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://nrifinancehub.com/nri-sip-swp-calculator"/>
-<meta property="og:title" content="NRI SIP & SWP Calculator 2026 — Grow & Withdraw Corpus | NRI Finance Hub"/>
-<meta property="og:description" content="NRI SIP calculator with step-up compounding. SWP calculator: how long your corpus lasts with monthly withdrawals. Free instant results."/>
 <meta property="og:image" content="https://nrifinancehub.com/og-image.png"/>
 <meta property="og:site_name" content="NRI Finance Hub"/>
 <meta property="og:locale" content="en_IN"/>
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
-<meta name="twitter:description" content="Free NRI tools: compare live remittance rates, NRE/NRO FD rates, home loan EMI, SIP/SWP planner & India return planner."/>
-<!-- JSON-LD: WebSite + SearchAction -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
+<meta name="twitter:site" content="@NRIFinanceHub"/>
+<meta name="twitter:image" content="https://nrifinancehub.com/og-image.png"/>
+<!-- Flag icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css"/>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": "https://nrifinancehub.com/#website",
-      "url": "https://nrifinancehub.com/",
-      "name": "NRI Finance Hub",
-      "alternateName": ["NRI Finance", "NRI Calculator", "NRI Remittance Calculator"],
-      "description": "Free financial tools for NRIs: compare live remittance rates, NRE/NRO FD rates, home loan EMI calculator, SIP planner, DTAA tax calculator and India return planner.",
-      "inLanguage": "en-IN",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://nrifinancehub.com/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
-      "@type": "FinancialService",
-      "@id": "https://nrifinancehub.com/#service",
-      "name": "NRI Finance Hub",
-      "url": "https://nrifinancehub.com/",
-      "description": "Free NRI financial tools: live remittance rate comparison across 50+ providers, NRE/NRO FD rates, home loan EMI, SIP/SWP calculator, DTAA tax guide, tax residency checker, education corpus planner and India return planner.",
-      "serviceType": ["Financial Calculator", "Remittance Rate Comparison", "NRI Banking Guide", "Tax Calculator"],
-      "areaServed": ["IN", "AE", "US", "GB", "CA", "AU", "SG", "MY", "KW", "QA", "BH", "OM"],
-      "audience": {
-        "@type": "Audience",
-        "audienceType": "Non-Resident Indians (NRIs)"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR",
-        "description": "Free financial tools and calculators for NRIs"
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://nrifinancehub.com/#app",
-      "name": "NRI Finance Hub",
-      "url": "https://nrifinancehub.com/",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
-      "featureList": [
-        "Live remittance rate comparison — Wise, InstaReM, Remitly, bank transfers",
-        "NRE and NRO fixed deposit rates comparison",
-        "NRI home loan EMI calculator with prepayment analysis",
-        "SIP and SWP calculator for NRI investments",
-        "DTAA tax calculator for India-sourced income",
-        "Tax residency status checker (RNOR, NRI, Resident)",
-        "India return corpus planner",
-        "Education corpus calculator",
-        "Real estate ROI calculator"
-      ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "127",
-        "bestRating": "5"
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://nrifinancehub.com/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is the best way to send money from UAE to India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The best way to send money from UAE to India depends on the amount and speed. Wise (formerly TransferWise) consistently offers mid-market exchange rates with low fees. Emirates NBD DirectRemit offers instant transfers to major Indian banks. For large amounts above AED 50,000, bank-to-bank SWIFT transfers may be competitive. Use NRI Finance Hub's live rate comparison tool to see today's best rates across 15+ UAE providers in real time."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between NRE and NRO accounts?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "NRE (Non-Resident External) accounts hold foreign earnings converted to INR — interest is tax-free in India and funds are fully repatriable. NRO (Non-Resident Ordinary) accounts hold India-sourced income like rent, dividends, or pension — interest is taxable at 30% TDS and repatriation is capped at USD 1 million per year. NRIs typically maintain both: NRE for savings/investments and NRO for India income."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much corpus does an NRI need to retire in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "An NRI planning to retire in a metro city in India typically needs ₹5–10 Cr corpus for comfortable retirement. Using the 4% withdrawal rule adjusted for Indian inflation (6%), a monthly expense of ₹1.2 lakh in today's terms requires approximately ₹3.6–4 Cr corpus at retirement. Use NRI Finance Hub's Return to India Planner to calculate your exact corpus based on your city, lifestyle, and timeline."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is NRE fixed deposit interest taxable?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. Interest earned on NRE fixed deposits is completely tax-free in India for NRIs under Section 10(4) of the Income Tax Act. There is no TDS deducted on NRE FD interest. However, this interest may be taxable in your country of residence depending on the DTAA (Double Taxation Avoidance Agreement) between India and that country. NRO FD interest, by contrast, is taxable at 30% TDS in India."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can NRIs get a home loan in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, NRIs can get home loans in India from banks like HDFC, SBI, ICICI, and Axis. NRI home loan interest rates in 2026 typically range from 8.5% to 9.5% per annum. The maximum loan tenure is 20–30 years. EMI must be repaid from NRE/NRO accounts. Required documents include passport, visa, overseas salary slips, overseas bank statements, and a Power of Attorney. Use NRI Finance Hub's Home Loan EMI calculator to estimate your monthly payments."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is DTAA and how does it benefit NRIs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "DTAA (Double Taxation Avoidance Agreement) is a treaty between India and 90+ countries that prevents NRIs from paying tax on the same income twice. Under DTAA, NRIs can claim tax credits or exemptions on India-sourced income like dividends, rent, and capital gains. For example, UAE-based NRIs pay zero tax on India income since UAE has no personal income tax. US-based NRIs can offset Indian TDS against US tax liability. Use NRI Finance Hub's DTAA calculator to estimate your tax liability."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is NRI tax residency status determined in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "NRI tax residency in India is determined by the number of days spent in India during the financial year (April–March). If you spend less than 182 days in India in a financial year, you are classified as NRI. If you spend 60–182 days and have spent 365+ days in the previous 4 years, you may become Resident but Not Ordinarily Resident (RNOR). The RNOR status gives 2–3 years of transition benefits when returning to India. Use NRI Finance Hub's Tax Residency Status checker to determine your exact status."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much SIP should an NRI do to build a retirement corpus?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The SIP amount depends on your target corpus and investment horizon. As a rough guide: to build ₹1 Cr in 10 years at 12% returns, you need approximately ₹43,000/month SIP. For ₹5 Cr in 15 years, approximately ₹1.1 lakh/month. NRIs can invest in Indian mutual funds from their NRE/NRO accounts. Use NRI Finance Hub's SIP calculator to get personalised projections based on your target amount and timeline."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-<script>
-window.addEventListener('DOMContentLoaded',function(){
-  setTimeout(function(){
-    var el=document.querySelector('[data-tab="invest"]');
-    if(typeof showTab==='function') showTab('invest',el);
-  },80);
-});
-</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/site.css?v=10.2"/>
+<script>window._defaultTab='invest';</script>
 </head>
 <body>
 
@@ -195,16 +51,31 @@ window.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;">v5.0</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v10.1</span>
   <div class="nav-links-center">
-    <a onclick="document.querySelector('.hero-section').scrollIntoView({behavior:'smooth'})">Live Rates</a>
+    <div class="nav-dropdown-wrap">
+      <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
+      <div class="nav-dropdown" id="dd-rates">
+        <div class="nav-dd-col">
+          <div class="nav-dd-heading">Rates &amp; Timing</div>
+          <a onclick="closeNavDD();showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📡 Live Remittance Rates</a>
+          <a onclick="closeNavDD();showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">⏱ Rate Timer — Send Now or Wait?</a>
+        </div>
+      </div>
+    </div>
+    <a onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏠 Return Plan</a>
+    <a onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();if(typeof initEdExtraTools==='function')initEdExtraTools();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</a>
+    <a onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()" class="hide-1060">📈 Invest</a>
+    <a onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">✈ Flights</a>
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-calc')">Calculators ▾</a>
       <div class="nav-dropdown" id="dd-calc">
         <div class="nav-dd-col">
           <div class="nav-dd-heading">Money &amp; Banking</div>
           <a onclick="closeNavDD();showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📡 Live Remittance Rates</a>
+          <a onclick="closeNavDD();showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">⏱ Send Now or Wait?</a>
           <a onclick="closeNavDD();showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🏦 NRE / NRO Banking</a>
+          <a onclick="closeNavDD();showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">&#128179; NRI Credit Cards</a>
           <a onclick="closeNavDD();showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">📈 SIP &amp; SWP Calculator</a>
         </div>
         <div class="nav-dd-col">
@@ -223,16 +94,16 @@ window.addEventListener('DOMContentLoaded',function(){
           <div class="nav-dd-heading">Life Planning</div>
           <a onclick="closeNavDD();showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🏡 Return to India</a>
           <a onclick="closeNavDD();showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🎓 Education Corpus</a>
+          <a onclick="closeNavDD();showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">✈🎓 Study Abroad Planner</a>
           <a onclick="closeNavDD();showTab('panaadhaar',document.querySelector('[data-tab=panaadhaar]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">🪪 PAN &amp; Aadhaar</a>
           <a onclick="closeNavDD();showTab('budget',document.querySelector('[data-tab=budget]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">💰 Budget Tracker</a>
         </div>
       </div>
     </div>
-    <a onclick="document.querySelector('.guides-section') && document.querySelector('.guides-section').scrollIntoView({behavior:'smooth'})">Guides</a>
-    <a onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();">Banking</a>
-    <a onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">Tax</a>
+    <a onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()" class="hide-1060">Guides</a>
   </div>
   <div class="nav-right">
+    <button class="nav-hamburger" onclick="openDrawer()" aria-label="Open navigation menu">&#9776;</button>
     <div class="nav-live-badge"><span class="nav-live-dot"></span>Live Rates</div>
     <div class="cur-dropdown" id="curDropdown">
       <button class="cur-btn" id="curBtn" onclick="toggleCurDropdown(event)">
@@ -246,30 +117,37 @@ window.addEventListener('DOMContentLoaded',function(){
         <svg class="cur-btn-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="cur-panel" id="curPanel">
-        <div class="cur-group-hd">&#127944; Gulf</div>
-        <div class="cur-item active" data-val="AED" data-flag="&#127462;&#127466;" data-name="UAE Dirham" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ae" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">AED</span><span class="ci-name">UAE &mdash; Dirham</span></div><span class="ci-check" id="ck-AED">&#10003;</span></div>
-        <div class="cur-item" data-val="SAR" data-flag="&#127462;&#127464;" data-name="Saudi Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sa" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SAR</span><span class="ci-name">Saudi Arabia &mdash; Riyal</span></div><span class="ci-check" id="ck-SAR"></span></div>
-        <div class="cur-item" data-val="QAR" data-flag="&#127478;&#127462;" data-name="Qatari Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-qa" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">QAR</span><span class="ci-name">Qatar &mdash; Riyal</span></div><span class="ci-check" id="ck-QAR"></span></div>
-        <div class="cur-item" data-val="KWD" data-flag="&#127472;&#127484;" data-name="Kuwaiti Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-kw" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">KWD</span><span class="ci-name">Kuwait &mdash; Dinar</span></div><span class="ci-check" id="ck-KWD"></span></div>
-        <div class="cur-item" data-val="BHD" data-flag="&#127463;&#127469;" data-name="Bahraini Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-bh" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">BHD</span><span class="ci-name">Bahrain &mdash; Dinar</span></div><span class="ci-check" id="ck-BHD"></span></div>
-        <div class="cur-item" data-val="OMR" data-flag="&#127476;&#127474;" data-name="Omani Rial" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-om" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">OMR</span><span class="ci-name">Oman &mdash; Rial</span></div><span class="ci-check" id="ck-OMR"></span></div>
-        <div class="cur-group-hd">&#127758; Western</div>
-        <div class="cur-item" data-val="USD" data-flag="&#127482;&#127480;" data-name="US Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-us" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">USD</span><span class="ci-name">United States &mdash; Dollar</span></div><span class="ci-check" id="ck-USD"></span></div>
-        <div class="cur-item" data-val="GBP" data-flag="&#127468;&#127463;" data-name="British Pound" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-gb" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">GBP</span><span class="ci-name">United Kingdom &mdash; Pound</span></div><span class="ci-check" id="ck-GBP"></span></div>
-        <div class="cur-item" data-val="EUR" data-flag="&#127466;&#127482;" data-name="Euro" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-eu" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Europe &mdash; Euro</span></div><span class="ci-check" id="ck-EUR"></span></div>
-        <div class="cur-item" data-val="CAD" data-flag="&#127464;&#127462;" data-name="Canadian Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ca" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CAD</span><span class="ci-name">Canada &mdash; Dollar</span></div><span class="ci-check" id="ck-CAD"></span></div>
-        <div class="cur-item" data-val="AUD" data-flag="&#127462;&#127482;" data-name="Australian Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-au" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">AUD</span><span class="ci-name">Australia &mdash; Dollar</span></div><span class="ci-check" id="ck-AUD"></span></div>
-        <div class="cur-item" data-val="SGD" data-flag="&#127480;&#127468;" data-name="Singapore Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sg" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SGD</span><span class="ci-name">Singapore &mdash; Dollar</span></div><span class="ci-check" id="ck-SGD"></span></div>
-        <div class="cur-item" data-val="MYR" data-flag="&#127474;&#127486;" data-name="Malaysian Ringgit" data-region="SE Asia" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-my" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">MYR</span><span class="ci-name">Malaysia &mdash; Ringgit</span></div><span class="ci-check" id="ck-MYR"></span></div>
-        <div class="cur-item" data-val="NZD" data-flag="&#127475;&#127487;" data-name="New Zealand Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-nz" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">NZD</span><span class="ci-name">New Zealand &mdash; Dollar</span></div><span class="ci-check" id="ck-NZD"></span></div>
-        <div class="cur-item" data-val="CHF" data-flag="&#127464;&#127469;" data-name="Swiss Franc" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ch" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CHF</span><span class="ci-name">Switzerland &mdash; Franc</span></div><span class="ci-check" id="ck-CHF"></span></div>
-        <div class="cur-item" data-val="JPY" data-flag="&#127471;&#127477;" data-name="Japanese Yen" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-jp" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">JPY</span><span class="ci-name">Japan &mdash; Yen</span></div><span class="ci-check" id="ck-JPY"></span></div>
-        <div class="cur-item" data-val="SEK" data-flag="&#127480;&#127466;" data-name="Swedish Krona" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-se" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SEK</span><span class="ci-name">Sweden &mdash; Krona</span></div><span class="ci-check" id="ck-SEK"></span></div>
-        <div class="cur-item" data-val="NOK" data-flag="&#127475;&#127476;" data-name="Norwegian Krone" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-no" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">NOK</span><span class="ci-name">Norway &mdash; Krone</span></div><span class="ci-check" id="ck-NOK"></span></div>
-        <div class="cur-item" data-val="DKK" data-flag="&#127465;&#127472;" data-name="Danish Krone" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-dk" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">DKK</span><span class="ci-name">Denmark &mdash; Krone</span></div><span class="ci-check" id="ck-DKK"></span></div>
-        <div class="cur-item" data-val="HKD" data-flag="&#127469;&#127472;" data-name="Hong Kong Dollar" data-region="Western" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-hk" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">HKD</span><span class="ci-name">Hong Kong &mdash; Dollar</span></div><span class="ci-check" id="ck-HKD"></span></div>
-      </div>
-    </div>
+        <div class="cur-group-hd">&#127769; Gulf &amp; Middle East</div>
+        <div class="cur-item active" data-val="AED" data-name="UAE &mdash; Dirham" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ae" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">AED</span><span class="ci-name">UAE &mdash; Dirham</span></div><span class="ci-check" id="ck-AED">&#10003;</span></div>
+        <div class="cur-item" data-val="SAR" data-name="Saudi Arabia &mdash; Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sa" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SAR</span><span class="ci-name">Saudi Arabia &mdash; Riyal</span></div><span class="ci-check" id="ck-SAR"></span></div>
+        <div class="cur-item" data-val="QAR" data-name="Qatar &mdash; Riyal" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-qa" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">QAR</span><span class="ci-name">Qatar &mdash; Riyal</span></div><span class="ci-check" id="ck-QAR"></span></div>
+        <div class="cur-item" data-val="KWD" data-name="Kuwait &mdash; Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-kw" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">KWD</span><span class="ci-name">Kuwait &mdash; Dinar</span></div><span class="ci-check" id="ck-KWD"></span></div>
+        <div class="cur-item" data-val="BHD" data-name="Bahrain &mdash; Dinar" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-bh" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">BHD</span><span class="ci-name">Bahrain &mdash; Dinar</span></div><span class="ci-check" id="ck-BHD"></span></div>
+        <div class="cur-item" data-val="OMR" data-name="Oman &mdash; Rial" data-region="Gulf" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-om" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">OMR</span><span class="ci-name">Oman &mdash; Rial</span></div><span class="ci-check" id="ck-OMR"></span></div>
+        <div class="cur-group-hd">&#127757; Europe</div>
+        <div class="cur-item" data-val="GBP" data-name="United Kingdom &mdash; Pound" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-gb" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">GBP</span><span class="ci-name">United Kingdom &mdash; Pound</span></div><span class="ci-check" id="ck-GBP"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Euro Zone &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-eu" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Euro Zone &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-eu"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Germany &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-de" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Germany &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-de"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="France &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-fr" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">France &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-fr"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Netherlands &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-nl" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Netherlands &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-nl"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Ireland &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ie" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Ireland &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-ie"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Italy &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-it" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Italy &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-it"></span></div>
+        <div class="cur-item" data-val="EUR" data-name="Spain &mdash; Euro" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-es" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">EUR</span><span class="ci-name">Spain &mdash; Euro</span></div><span class="ci-check" id="ck-EUR-es"></span></div>
+        <div class="cur-item" data-val="CHF" data-name="Switzerland &mdash; Franc" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ch" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CHF</span><span class="ci-name">Switzerland &mdash; Franc</span></div><span class="ci-check" id="ck-CHF"></span></div>
+        <div class="cur-item" data-val="SEK" data-name="Sweden &mdash; Krona" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-se" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SEK</span><span class="ci-name">Sweden &mdash; Krona</span></div><span class="ci-check" id="ck-SEK"></span></div>
+        <div class="cur-item" data-val="NOK" data-name="Norway &mdash; Krone" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-no" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">NOK</span><span class="ci-name">Norway &mdash; Krone</span></div><span class="ci-check" id="ck-NOK"></span></div>
+        <div class="cur-item" data-val="DKK" data-name="Denmark &mdash; Krone" data-region="Europe" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-dk" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">DKK</span><span class="ci-name">Denmark &mdash; Krone</span></div><span class="ci-check" id="ck-DKK"></span></div>
+        <div class="cur-group-hd">&#127758; Americas</div>
+        <div class="cur-item" data-val="USD" data-name="United States &mdash; Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-us" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">USD</span><span class="ci-name">United States &mdash; Dollar</span></div><span class="ci-check" id="ck-USD"></span></div>
+        <div class="cur-item" data-val="CAD" data-name="Canada &mdash; Dollar" data-region="Americas" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-ca" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">CAD</span><span class="ci-name">Canada &mdash; Dollar</span></div><span class="ci-check" id="ck-CAD"></span></div>
+        <div class="cur-group-hd">&#127759; Asia Pacific</div>
+        <div class="cur-item" data-val="SGD" data-name="Singapore &mdash; Dollar" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-sg" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">SGD</span><span class="ci-name">Singapore &mdash; Dollar</span></div><span class="ci-check" id="ck-SGD"></span></div>
+        <div class="cur-item" data-val="MYR" data-name="Malaysia &mdash; Ringgit" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-my" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">MYR</span><span class="ci-name">Malaysia &mdash; Ringgit</span></div><span class="ci-check" id="ck-MYR"></span></div>
+        <div class="cur-item" data-val="AUD" data-name="Australia &mdash; Dollar" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-au" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">AUD</span><span class="ci-name">Australia &mdash; Dollar</span></div><span class="ci-check" id="ck-AUD"></span></div>
+        <div class="cur-item" data-val="NZD" data-name="New Zealand &mdash; Dollar" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-nz" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">NZD</span><span class="ci-name">New Zealand &mdash; Dollar</span></div><span class="ci-check" id="ck-NZD"></span></div>
+        <div class="cur-item" data-val="JPY" data-name="Japan &mdash; Yen" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-jp" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">JPY</span><span class="ci-name">Japan &mdash; Yen</span></div><span class="ci-check" id="ck-JPY"></span></div>
+        <div class="cur-item" data-val="HKD" data-name="Hong Kong &mdash; Dollar" data-region="Asia Pacific" onclick="selectCurrency(this)"><span class="ci-flag"><span class="fi fi-hk" style="font-size:18px;border-radius:3px;line-height:1;"></span></span><div class="ci-info"><span class="ci-code">HKD</span><span class="ci-name">Hong Kong &mdash; Dollar</span></div><span class="ci-check" id="ck-HKD"></span></div>
+      </div>    </div>
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" aria-label="Toggle theme">
       <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -292,6 +170,7 @@ window.addEventListener('DOMContentLoaded',function(){
     <span class="jn-link" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏗 Home Loan</span>
     <span class="jn-link" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</span>
     <span class="jn-link" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📋 Tax Status</span>
+    <span class="jn-link" onclick="showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">&#128179; Cards</span>
     <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📖 Guides</span>
   </div>
 </nav>
@@ -306,14 +185,33 @@ window.addEventListener('DOMContentLoaded',function(){
       <span class="hero-eyebrow-dot"></span>
       Live data &nbsp;·&nbsp; Free &nbsp;·&nbsp; No sign-up required
     </div>
+    <!-- ── HERO COUNTRY STRIP ── -->
+    <div class="hero-cstrip" id="hero-cstrip">
+      <span class="hero-cstrip-lbl">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        Where are you based?
+      </span>
+      <div class="hero-cpills" id="hero-cpills">
+        <button class="hero-cpill active" data-cur="AED" onclick="heroPickCountry(this,'AED')"><img src="https://flagcdn.com/20x15/ae.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="UAE"/> UAE</button>
+        <button class="hero-cpill" data-cur="GBP" onclick="heroPickCountry(this,'GBP')"><img src="https://flagcdn.com/20x15/gb.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="UK"/> UK</button>
+        <button class="hero-cpill" data-cur="USD" onclick="heroPickCountry(this,'USD')"><img src="https://flagcdn.com/20x15/us.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="USA"/> USA</button>
+        <button class="hero-cpill" data-cur="SGD" onclick="heroPickCountry(this,'SGD')"><img src="https://flagcdn.com/20x15/sg.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="SG"/> Singapore</button>
+        <button class="hero-cpill" data-cur="AUD" onclick="heroPickCountry(this,'AUD')"><img src="https://flagcdn.com/20x15/au.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="AU"/> Australia</button>
+        <button class="hero-cpill" data-cur="CAD" onclick="heroPickCountry(this,'CAD')"><img src="https://flagcdn.com/20x15/ca.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="CA"/> Canada</button>
+        <button class="hero-cpill" data-cur="SAR" onclick="heroPickCountry(this,'SAR')"><img src="https://flagcdn.com/20x15/sa.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="SA"/> Saudi</button>
+        <button class="hero-cpill" data-cur="MYR" onclick="heroPickCountry(this,'MYR')"><img src="https://flagcdn.com/20x15/my.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="MY"/> Malaysia</button>
+        <button class="hero-cpill" data-cur="NZD" onclick="heroPickCountry(this,'NZD')"><img src="https://flagcdn.com/20x15/nz.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="NZ"/> New Zealand</button>
+        <button class="hero-cpill" data-cur="JPY" onclick="heroPickCountry(this,'JPY')"><img src="https://flagcdn.com/20x15/jp.png" width="16" height="12" style="border-radius:2px;vertical-align:middle;margin-right:4px" alt="JP"/> Japan</button>
+        <button class="hero-cpill hero-cpill-more" onclick="var p=document.getElementById('curPanel');p.classList.add('open');event.stopPropagation();window.scrollTo({top:0,behavior:'smooth'});">+10 more &#8595;</button>
+      </div>
+    </div>
     <h1 class="hero-h1">
       <span class="plain">India's Smartest</span><br>
       <span class="grad">NRI Finance Hub</span><br>
       <span class="plain">Built for You</span>
     </h1>
     <p class="hero-sub">
-      Compare live remittance rates from 50+ providers, calculate taxes, plan your return to India, 
-      and access 12 free financial tools — all in one place.
+      Compare live rates across 50+ providers, time your transfer with Rate Timer, plan Study Abroad costs, track investments &amp; return corpus — 20+ free tools built for NRIs, all in one place.
     </p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
@@ -322,7 +220,7 @@ window.addEventListener('DOMContentLoaded',function(){
       </button>
       <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Return to India Planner
+        Return Corpus Plan
       </button>
     </div>
     </div><!-- /hero-text-col -->
@@ -371,9 +269,10 @@ window.addEventListener('DOMContentLoaded',function(){
 
     <!-- Right: Corpus Calculator widget -->
     <div class="hero-corpus-panel">
+      <div class="hcp-heading">How much do I need?</div>
       <!-- Tab bar -->
       <div class="hcp-tabs">
-        <button class="hcp-tab-btn active" onclick="hcpSetTab('corpus',this)">&#127968; Corpus</button>
+        <button class="hcp-tab-btn active" onclick="hcpSetTab('corpus',this)">&#x1F4B0; Retire</button>
         <button class="hcp-tab-btn" onclick="hcpSetTab('homeloan',this)">&#127963;&#65039; Loan</button>
         <button class="hcp-tab-btn" onclick="hcpSetTab('realty',this)">&#127970; Realty</button>
       </div>
@@ -814,7 +713,7 @@ window.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-head">
       <div>
         <div class="drawer-brand">NRI <span>Finance Hub</span></div>
-        <div class="drawer-sub">7 tools for Indians abroad</div>
+        <div class="drawer-sub">20+ free tools for Indians abroad</div>
       </div>
       <button class="drawer-close" onclick="closeDrawer()">✕</button>
     </div>
@@ -822,6 +721,15 @@ window.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-item active" data-tab="rates" onclick="showTab('rates',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Live Rates</div><div class="drawer-desc">Compare 50+ remittance providers</div></div>
+    </div>
+    <div class="drawer-item" data-tab="timer" onclick="showTab('timer',this);initRateTimer()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Send Now or Wait?</div><div class="drawer-desc">Rate timer · USD, AED, GBP &amp; more</div></div>
+    </div>
+    <div class="drawer-section-lbl">✈ Flights</div>
+    <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Flights to India</div><div class="drawer-desc">Fares, date picker &amp; AI trip planner</div></div>
     </div>
     <div class="drawer-section-lbl">Banking & Savings</div>
     <div class="drawer-item" data-tab="nrenro" onclick="showTab('nrenro',this)">
@@ -872,18 +780,529 @@ window.addEventListener('DOMContentLoaded',function(){
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Education Planner</div><div class="drawer-desc">Child's education corpus &amp; SIP</div></div>
     </div>
+    <div class="drawer-item" data-tab="edabroad" onclick="showTab('edabroad',this);initEdAbroad()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M2 20c0-4 4.5-7 10-7s10 3 10 7"/><line x1="18" y1="2" x2="18" y2="8"/><line x1="15" y1="5" x2="21" y2="5"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Study Abroad Planner</div><div class="drawer-desc">University costs &amp; savings plan</div></div>
+    </div>
+    <div class="drawer-section-lbl">Travel</div>
+    <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Flights to India</div><div class="drawer-desc">Fare ranges &amp; best booking sites</div></div>
+    </div>
     <div class="drawer-section-lbl">Budgeting</div>
     <div class="drawer-item" data-tab="budget" onclick="showTab('budget',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M16 21H8M12 17v4"/><path d="M6 8h4M6 11h2"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Budget Tracker</div><div class="drawer-desc">Overseas &amp; India expenses monthly</div></div>
+    </div>
+    <div class="drawer-section-lbl">&#128179; Cards</div>
+    <div class="drawer-item" data-tab="cards" onclick="showTab('cards',this);initCards()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">NRI Credit Cards</div><div class="drawer-desc">Compare international &amp; Indian NRI cards</div></div>
     </div>
     <div class="drawer-section-lbl">Guides</div>
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">NRI Finance Guides</div><div class="drawer-desc">Tax, banking, property &amp; more</div></div>
     </div>
+    <div class="drawer-section-lbl">&#128200; Markets</div>
+    <div class="drawer-item" data-tab="deals" onclick="showTab('deals',this);initDeals()">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">Bulk &amp; Block Deals</div><div class="drawer-desc">Last 7 days · NSE + BSE</div></div>
+    </div>
     <div class="drawer-footer">Free · No signup · Live rates<br>Not financial advice — consult a CA/SEBI-RIA</div>
   </div>
+
+  <!-- TAB: STUDY ABROAD COST PLANNER -->
+  <div class="tool-section" id="tab-edabroad">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(0,212,170,.04));border-color:rgba(0,212,170,.2)">
+      <div style="font-size:1.3rem;font-weight:700;color:var(--teal);margin-bottom:4px">✈ 🎓 Study Abroad Cost Planner</div>
+      <div style="font-size:.82rem;color:var(--muted)">Real university fees across 6 countries · forecast inflation-adjusted cost · calculate monthly SIP to fund it</div>
+    </div>
+
+    <!-- Country selector -->
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em">Select country</div>
+    <div class="edab-country-grid">
+      <div class="edab-country-card edab-active" onclick="edabSetCountry('USA',this)">
+        <div class="edab-country-flag"><span class="fi fi-us" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">United States</div>
+        <div class="edab-country-sub">USD · $32K–$90K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('UK',this)">
+        <div class="edab-country-flag"><span class="fi fi-gb" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">United Kingdom</div>
+        <div class="edab-country-sub">GBP · £20K–£65K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('AUS',this)">
+        <div class="edab-country-flag"><span class="fi fi-au" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Australia</div>
+        <div class="edab-country-sub">AUD · A$32K–$65K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('CAN',this)">
+        <div class="edab-country-flag"><span class="fi fi-ca" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Canada</div>
+        <div class="edab-country-sub">CAD · C$24K–$60K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('SGP',this)">
+        <div class="edab-country-flag"><span class="fi fi-sg" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Singapore</div>
+        <div class="edab-country-sub">SGD · S$28K–$80K/yr</div>
+      </div>
+      <div class="edab-country-card" onclick="edabSetCountry('GER',this)">
+        <div class="edab-country-flag"><span class="fi fi-de" style="font-size:2rem;border-radius:4px;"></span></div>
+        <div class="edab-country-name">Germany</div>
+        <div class="edab-country-sub">EUR · Nearly free tuition</div>
+      </div>
+    </div>
+
+    <!-- Currency note -->
+    <div id="edab-cur-lbl" style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Costs in USD · 1 USD ≈ ₹84.5</div>
+
+    <!-- Course type selector -->
+    <div id="edab-course-row" class="edab-course-row">
+      <button class="edab-course-btn edab-active" onclick="edabSetCourse('UG (4yr)',this)">UG (4yr)</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MS / MTech',this)">MS / MTech</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MBA',this)">MBA</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('MBBS / MD',this)">MBBS / MD</button>
+      <button class="edab-course-btn" onclick="edabSetCourse('PhD',this)">PhD</button>
+    </div>
+    <div id="edab-dur-lbl" style="font-size:.72rem;color:var(--muted);margin-bottom:14px;">4-year programme · USD</div>
+
+    <!-- Cost overview -->
+    <div class="edab-cost-strip">
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Tuition / yr</div>
+        <div class="edab-cost-val" id="edab-cost-tuition">—</div>
+      </div>
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Living / yr</div>
+        <div class="edab-cost-val" id="edab-cost-living">—</div>
+      </div>
+      <div class="edab-cost-card">
+        <div class="edab-cost-label">Total course cost</div>
+        <div class="edab-cost-val" id="edab-cost-total">—</div>
+      </div>
+      <div class="edab-cost-card" style="background:rgba(0,212,170,.06);border-color:rgba(0,212,170,.2)">
+        <div class="edab-cost-label">In Indian Rupees</div>
+        <div class="edab-cost-val" style="color:var(--teal)" id="edab-cost-inr">—</div>
+      </div>
+    </div>
+
+    <!-- University table -->
+    <div style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:10px;">Top universities — actual fee data</div>
+    <div class="edab-table-wrap">
+      <table class="edab-table">
+        <thead>
+          <tr>
+            <th>University</th>
+            <th>QS Rank</th>
+            <th>Tuition / yr</th>
+            <th>Living / yr</th>
+            <th>Total course</th>
+            <th>Scholarship / Aid</th>
+          </tr>
+        </thead>
+        <tbody id="edab-tbody">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Savings calculator -->
+    <div class="edab-calc">
+      <div class="edab-calc-title">🧮 How much to save every month?</div>
+      <div class="edab-calc-grid">
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Child's current age</label>
+          <input class="edab-calc-input" id="edab-age" type="number" value="5" min="0" max="17" oninput="edabCalc()"/>
+        </div>
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Study starts at age</label>
+          <input class="edab-calc-input" id="edab-start-age" type="number" value="18" min="16" max="30" oninput="edabCalc()"/>
+        </div>
+        <div class="edab-calc-field">
+          <label class="edab-calc-label">Expected SIP return (% p.a.)</label>
+          <input class="edab-calc-input" id="edab-return" type="number" value="10" min="4" max="18" step="0.5" oninput="edabCalc()"/>
+        </div>
+      </div>
+      <div class="edab-result-strip">
+        <div class="edab-result-card amber">
+          <div class="edab-result-label">Today's cost (INR)</div>
+          <div class="edab-result-val" id="edab-res-today">—</div>
+          <div class="edab-result-sub">Based on current fees</div>
+        </div>
+        <div class="edab-result-card teal">
+          <div class="edab-result-label">Inflation-adjusted cost</div>
+          <div class="edab-result-val" id="edab-res-future">—</div>
+          <div class="edab-result-sub">When child starts college</div>
+        </div>
+        <div class="edab-result-card green">
+          <div class="edab-result-label">Monthly SIP needed</div>
+          <div class="edab-result-val" id="edab-res-sip">—</div>
+          <div class="edab-result-sub">Start investing today</div>
+        </div>
+      </div>
+      <div class="edab-inflation-note" id="edab-infl-note">Calculation includes education inflation and INR depreciation. Adjust return % for equity vs debt SIP.</div>
+    </div>
+
+
+    <!-- ══ EXTRA EDUCATION TOOLS ═════════════════════════════════════════ -->
+    <div class="edab-extra-tools">
+
+      <!-- 1. Country Comparison -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127760; Compare Two Countries</div>
+        <div class="edab-tool-sub">Same course, different country — which gives better value?</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country A</label>
+            <select id="edab-cmp-a" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-vs">vs</div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country B</label>
+            <select id="edab-cmp-b" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="USA">United States</option>
+              <option value="UK" selected>United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-cmp-course" class="fl-opt-sel" onchange="edabCompare()">
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="MS / MTech" selected>MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-cmp-result" class="edab-cmp-result"></div>
+      </div>
+
+      <!-- 2. ROI / Payback Calculator -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#128200; Is It Worth It? Degree ROI</div>
+        <div class="edab-tool-sub">Total investment vs typical post-degree salary &#8594; years to break even</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country</label>
+            <select id="edab-roi-country" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-roi-course" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="MS / MTech">MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Field</label>
+            <select id="edab-roi-field" class="fl-opt-sel" onchange="edabRoi()">
+              <option value="tech">Tech / Engineering</option>
+              <option value="business">Business / Finance</option>
+              <option value="health">Healthcare</option>
+              <option value="arts">Arts / Humanities</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-roi-result" class="edab-roi-result"></div>
+      </div>
+
+      <!-- 3. Education Loan EMI -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127968; Education Loan Calculator</div>
+        <div class="edab-tool-sub">Compare Indian bank loans — SBI, HDFC Credila, Avanse, ICICI</div>
+        <div class="edab-loan-grid">
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Loan Amount (&#8377;)</label>
+            <input class="edab-calc-input" id="edab-loan-amt" type="number" value="4000000" step="100000" oninput="edabLoan()"/>
+          </div>
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Repayment Tenure (years)</label>
+            <input class="edab-calc-input" id="edab-loan-tenure" type="number" value="10" min="5" max="15" oninput="edabLoan()"/>
+          </div>
+          <div class="edab-calc-field">
+            <label class="edab-calc-label">Moratorium period</label>
+            <select id="edab-loan-morat" class="fl-opt-sel" onchange="edabLoan()">
+              <option value="12">Course + 12 months</option>
+              <option value="6">Course + 6 months</option>
+              <option value="0">No moratorium</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-loan-result" class="edab-loan-result"></div>
+      </div>
+
+      <!-- 4. Scholarship Finder -->
+      <div class="edab-tool-block">
+        <div class="edab-tool-hd">&#127942; Scholarships for Indian Students</div>
+        <div class="edab-tool-sub">Major scholarships available to Indians — filter by country and course</div>
+        <div class="edab-cmp-selrow">
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Country</label>
+            <select id="edab-sch-country" class="fl-opt-sel" onchange="edabScholar()">
+              <option value="ALL">All Countries</option>
+              <option value="USA">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="AUS">Australia</option>
+              <option value="CAN">Canada</option>
+              <option value="SGP">Singapore</option>
+              <option value="GER">Germany</option>
+            </select>
+          </div>
+          <div class="edab-cmp-col">
+            <label class="edab-calc-label">Course</label>
+            <select id="edab-sch-course" class="fl-opt-sel" onchange="edabScholar()">
+              <option value="ALL">All Courses</option>
+              <option value="UG (4yr)">UG (4yr)</option>
+              <option value="MS / MTech">MS / MTech</option>
+              <option value="MBA">MBA</option>
+              <option value="PhD">PhD</option>
+            </select>
+          </div>
+        </div>
+        <div id="edab-sch-result" class="edab-sch-result"></div>
+      </div>
+
+    </div>
+    <!-- ══ END EXTRA EDUCATION TOOLS ══════════════════════════════════════ -->
+    <div class="deals-disclaimer">Fee data sourced from university websites (2024–25 published rates). Exchange rates are indicative. Actual costs vary — verify at official university admissions portals. <a href="nri-education-planning.html">Read full NRI Education Planning Guide →</a></div>
+  </div>
+
+  <!-- TAB: RATE TIMER — SEND NOW OR WAIT? -->
+  <div class="tool-section" id="tab-timer">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(240,165,32,.12),rgba(240,165,32,.04));border-color:rgba(240,165,32,.2)">
+      <div style="font-size:1.3rem;font-weight:700;color:var(--amber);margin-bottom:4px">⏱ Send Now or Wait?</div>
+      <div style="font-size:.82rem;color:var(--muted)">Live exchange rate vs 30, 90 &amp; 180-day history — know when to send</div>
+    </div>
+
+    <!-- Pair selector — all currencies from top flag dropdown -->
+    <div class="rt-pairs-wrap">
+      <div class="rt-pairs-group-lbl">🌙 Gulf</div>
+      <div class="rt-pairs" id="rt-pairs">
+        <button class="rt-pair-btn rt-active" onclick="rtSetPair('AED',this)"><span class="fi fi-ae fis rt-pair-fi"></span>AED</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('SAR',this)"><span class="fi fi-sa fis rt-pair-fi"></span>SAR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('QAR',this)"><span class="fi fi-qa fis rt-pair-fi"></span>QAR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('KWD',this)"><span class="fi fi-kw fis rt-pair-fi"></span>KWD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('BHD',this)"><span class="fi fi-bh fis rt-pair-fi"></span>BHD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('OMR',this)"><span class="fi fi-om fis rt-pair-fi"></span>OMR</button>
+      </div>
+      <div class="rt-pairs-group-lbl">🌍 Western</div>
+      <div class="rt-pairs">
+        <button class="rt-pair-btn" onclick="rtSetPair('USD',this)"><span class="fi fi-us fis rt-pair-fi"></span>USD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('GBP',this)"><span class="fi fi-gb fis rt-pair-fi"></span>GBP</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('EUR',this)"><span class="fi fi-eu fis rt-pair-fi"></span>EUR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('CAD',this)"><span class="fi fi-ca fis rt-pair-fi"></span>CAD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('AUD',this)"><span class="fi fi-au fis rt-pair-fi"></span>AUD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('NZD',this)"><span class="fi fi-nz fis rt-pair-fi"></span>NZD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('CHF',this)"><span class="fi fi-ch fis rt-pair-fi"></span>CHF</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('SEK',this)"><span class="fi fi-se fis rt-pair-fi"></span>SEK</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('NOK',this)"><span class="fi fi-no fis rt-pair-fi"></span>NOK</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('DKK',this)"><span class="fi fi-dk fis rt-pair-fi"></span>DKK</button>
+      </div>
+      <div class="rt-pairs-group-lbl">🌏 Asia-Pacific</div>
+      <div class="rt-pairs">
+        <button class="rt-pair-btn" onclick="rtSetPair('SGD',this)"><span class="fi fi-sg fis rt-pair-fi"></span>SGD</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('MYR',this)"><span class="fi fi-my fis rt-pair-fi"></span>MYR</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('JPY',this)"><span class="fi fi-jp fis rt-pair-fi"></span>JPY</button>
+        <button class="rt-pair-btn" onclick="rtSetPair('HKD',this)"><span class="fi fi-hk fis rt-pair-fi"></span>HKD</button>
+      </div>
+    </div>
+
+    <!-- Loading message -->
+    <div id="rt-skeleton-msg" style="text-align:center;padding:12px;font-size:.8rem;color:var(--muted);">Fetching live rate data…</div>
+
+    <!-- Hero: rate + recommendation -->
+    <div class="rt-hero">
+      <div class="rt-rate-block">
+        <div class="rt-rate-label">Current Rate</div>
+        <div class="rt-rate-value" id="rt-rate-val" data-raw="">—</div>
+        <div class="rt-rate-sub" id="rt-rate-sub">Fetching…</div>
+      </div>
+      <div class="rt-rec-block">
+        <div class="rt-rec-pill rt-rec-neutral" id="rt-rec-pill">⏳ Loading…</div>
+        <div class="rt-rec-sub" id="rt-rec-sub"></div>
+      </div>
+    </div>
+
+    <!-- Percentile bar -->
+    <div class="rt-pct-wrap">
+      <div class="rt-pct-label">
+        <span>Worst rate (period low)</span>
+        <span>Best rate (period high)</span>
+      </div>
+      <div class="rt-pct-track">
+        <div class="rt-pct-fill" id="rt-pct-fill" style="width:50%"></div>
+        <div class="rt-pct-marker" id="rt-pct-marker" style="left:50%"></div>
+      </div>
+      <div class="rt-pct-value" id="rt-pct-val">Calculating…</div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="rt-stats">
+      <div class="rt-stat">
+        <div class="rt-stat-label">30-Day Avg</div>
+        <div class="rt-stat-val" id="rt-stat-30d">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">90-Day Avg</div>
+        <div class="rt-stat-val" id="rt-stat-90d">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">Period High</div>
+        <div class="rt-stat-val up" id="rt-stat-hi">—</div>
+      </div>
+      <div class="rt-stat">
+        <div class="rt-stat-label">Period Low</div>
+        <div class="rt-stat-val dn" id="rt-stat-lo">—</div>
+      </div>
+    </div>
+
+    <!-- Timeframe selector -->
+    <div class="rt-tf-row">
+      <span class="rt-tf-label">Compare vs:</span>
+      <button class="rt-tf-btn" onclick="rtSetTf(30,this)">30 Days</button>
+      <button class="rt-tf-btn rt-tf-active" onclick="rtSetTf(90,this)">90 Days</button>
+      <button class="rt-tf-btn" onclick="rtSetTf(180,this)">180 Days</button>
+      <button class="rt-tf-btn" onclick="rtSetTf(365,this)">1 Year</button>
+    </div>
+
+    <!-- Chart -->
+    <div class="rt-chart-wrap">
+      <div class="rt-chart-title">Rate history — dashed line = average &nbsp;|&nbsp; <span style="color:var(--amber)">●</span> today</div>
+      <canvas id="rt-canvas"></canvas>
+    </div>
+
+    <!-- Amount simulator -->
+    <div class="rt-sim">
+      <div class="rt-sim-title">💡 Simulate your transfer</div>
+      <div class="rt-sim-row">
+        <span style="font-size:.82rem;color:var(--muted)">If I send</span>
+        <input class="rt-sim-input" id="rt-sim-amt" type="number" value="1000" min="1" oninput="rtSimCalc()" />
+        <span class="rt-sim-vs" id="rt-sim-base-cur">USD</span>
+        <span class="rt-sim-result" id="rt-sim-res">—</span>
+      </div>
+    </div>
+
+    <div class="rt-updated" id="rt-updated"></div>
+    <div class="deals-disclaimer">Rate data via <a href="https://github.com/fawazahmed0/exchange-api" target="_blank" rel="noopener">Open Exchange API</a> (ECB/IMF sources). For indicative purposes only — actual transfer rates vary by provider. Use the <span style="color:var(--teal);cursor:pointer" onclick="showTab('rates',null)">Live Rates tab</span> to compare exact provider rates.</div>
+  </div>
+
+  <!-- TAB: BULK & BLOCK DEALS -->
+  <div class="tool-section" id="tab-deals">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(34,211,154,.12),rgba(34,211,154,.04));border-color:rgba(34,211,154,.2)">
+      <div class="tool-banner-icon" style="background:rgba(34,211,154,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="#22d39a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+      <div><div class="tool-banner-title">Bulk &amp; Block Deals</div><div class="tool-banner-desc">Large institutional trades on NSE &amp; BSE · Last 7 trading days</div></div>
+    </div>
+
+    <!-- Header row -->
+    <div class="deals-header">
+      <div>
+        <div class="deals-title">Bulk &amp; Block Deals &#8212; Last 7 Trading Days</div>
+        <div class="deals-subtitle">Bulk deals &gt;0.5% of equity | Block deals &gt;5L shares or &gt;&#8377;5 Cr</div>
+      </div>
+      <div id="deals-data-badge" class="deals-error-badge">&#9203; Loading&hellip;</div>
+    </div>
+
+    <!-- Summary stat cards -->
+    <div class="deals-stats">
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Total Deals</div>
+        <div class="deals-stat-val" id="deals-stat-total">&#8212;</div>
+        <div class="deals-stat-sub">filtered rows</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Buy Value</div>
+        <div class="deals-stat-val buy" id="deals-stat-buy">&#8212;</div>
+        <div class="deals-stat-sub">total purchase value</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Sell Value</div>
+        <div class="deals-stat-val sell" id="deals-stat-sell">&#8212;</div>
+        <div class="deals-stat-sub">total sale value</div>
+      </div>
+      <div class="deals-stat">
+        <div class="deals-stat-lbl">Net Flow</div>
+        <div class="deals-stat-val buy" id="deals-stat-net">&#8212;</div>
+        <div class="deals-stat-sub">buy minus sell</div>
+      </div>
+    </div>
+
+    <!-- Sub-tabs: Bulk / Block -->
+    <div class="deals-subtabs">
+      <div class="deals-stab active" onclick="dealsSetType('bulk',this)">&#128230; Bulk Deals</div>
+      <div class="deals-stab" onclick="dealsSetType('block',this)">&#127381; Block Deals</div>
+    </div>
+
+    <!-- Filters -->
+    <div class="deals-filters">
+      <div class="deals-filter-group exch">
+        <button class="deals-fbtn active" onclick="dealsSetExch('ALL',this)">All</button>
+        <button class="deals-fbtn" onclick="dealsSetExch('NSE',this)">NSE</button>
+        <button class="deals-fbtn" onclick="dealsSetExch('BSE',this)">BSE</button>
+      </div>
+      <div class="deals-filter-group bs">
+        <button class="deals-fbtn active" onclick="dealsSetBS('ALL',this)">Buy + Sell</button>
+        <button class="deals-fbtn" onclick="dealsSetBS('B',this)">Buy Only</button>
+        <button class="deals-fbtn" onclick="dealsSetBS('S',this)">Sell Only</button>
+      </div>
+      <input class="deals-search" type="text" placeholder="&#128269; Search symbol, company, client&#8230;" oninput="dealsSearch(this.value)">
+      <button class="deals-refresh" onclick="dealsRefresh(this)">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="deals-table-wrap">
+      <table class="deals-table">
+        <thead>
+          <tr>
+            <th onclick="dealsSort('date',this)">Date</th>
+            <th onclick="dealsSort('exch',this)">Exch</th>
+            <th onclick="dealsSort('sym',this)">Symbol / Company</th>
+            <th onclick="dealsSort('client',this)">Client Name</th>
+            <th onclick="dealsSort('bs',this)">B/S</th>
+            <th onclick="dealsSort('qty',this)" style="text-align:right">Quantity</th>
+            <th onclick="dealsSort('price',this)" style="text-align:right">Avg Price</th>
+            <th onclick="dealsSort('val',this)" style="text-align:right">Value</th>
+          </tr>
+        </thead>
+        <tbody id="deals-tbody">
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+          <tr class="deals-skeleton"><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td><td><div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="deals-disclaimer">
+      <strong>Data source:</strong> Attempting live fetch from NSE India public API. If blocked by CORS, representative sample data is shown for illustration. For authoritative data, visit
+      <a href="https://www.nseindia.com/market-data/bulk-deals" target="_blank" rel="noopener">NSE Bulk Deals</a> or
+      <a href="https://www.nseindia.com/market-data/block-deals" target="_blank" rel="noopener">NSE Block Deals</a>.
+      Not investment advice.
+    </div>
+  </div>
+
 
   <!-- ACTIVE TOOL BAR (replaces tab nav) -->
   <div class="active-tool-bar" onclick="openDrawer()">
@@ -912,27 +1331,34 @@ window.addEventListener('DOMContentLoaded',function(){
       <span class="cur-tag" id="curTag">AED</span>
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
       <span style="font-size:13px;font-weight:600;color:var(--text2)">Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
-      <button class="compare-btn" onclick="renderRates();renderMarketRate()">Compare Rates ↗</button>
-    </div>
-    <div class="mkt-rate-card" id="mktRateCard">
-      <div>
-        <div class="mkt-rate-label">
-          <span>Mid-Market Rate</span>
-          <span class="mkt-xe-badge">XE.COM</span>
-        </div>
-        <div class="mkt-rate-val" id="mktRateVal">1 AED = &#8377;&#8212;</div>
-        <div class="mkt-rate-sub">The real interbank rate &middot; Live from currency API &middot; Updated <span id="mktRateTime">&mdash;</span></div>
-        <div class="mkt-vs-bar" id="mktVsBar"></div>
-      </div>
-      <div class="mkt-right">
-        <div class="mkt-receive-label">You send <span id="mktSendAmt">1,000</span> <span id="mktSendCur">AED</span> &rarr; at mid-market:</div>
-        <div class="mkt-receive-val" id="mktReceiveVal">&#8377;&mdash;</div>
-        <div class="mkt-receive-note">Providers typically give <strong id="mktMarginNote">&mdash;</strong> less due to their margin</div>
-      </div>
     </div>
     <div id="rates-loading" class="rates-loading" style="display:none"></div>
     <div id="rates-container" class="rates-wrap" style="display:none"></div>
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
+    <!-- Rate methodology accordion -->
+    <details class="rate-methodology" id="rateMethodologyDetails">
+      <summary class="rate-methodology-summary">
+        <span>&#8505; Rate methodology &amp; cross-check</span>
+        <span class="rate-meth-badge" id="mktRateValBadge">1 AED = &#8377;&mdash;</span>
+      </summary>
+      <div class="mkt-rate-card" id="mktRateCard">
+        <div>
+          <div class="mkt-rate-label">
+            <span>Mid-Market Rate</span>
+            <span class="mkt-xe-badge">XE.COM</span>
+          </div>
+          <div class="mkt-rate-val" id="mktRateVal">1 AED = &#8377;&#8212;</div>
+          <div class="mkt-rate-sub">The real interbank rate &middot; Live from currency API &middot; Updated <span id="mktRateTime">&mdash;</span></div>
+          <div class="mkt-vs-bar" id="mktVsBar"></div>
+        </div>
+        <div class="mkt-right">
+          <div class="mkt-receive-label">You send <span id="mktSendAmt">1,000</span> <span id="mktSendCur">AED</span> &rarr; at mid-market:</div>
+          <div class="mkt-receive-val" id="mktReceiveVal">&#8377;&mdash;</div>
+          <div class="mkt-receive-note">Providers typically give <strong id="mktMarginNote">&mdash;</strong> less due to their margin</div>
+        </div>
+      </div>
+      <div id="rate-crosscheck" class="rate-crosscheck"></div>
+    </details>
 
     <div class="info" style="margin-top:16px;border-left:3px solid rgba(99,102,241,0.5)"><strong>How to read this:</strong> INR shown = today&apos;s mid-market rate minus each provider&apos;s <em>typical</em> margin &amp; fee. Visual bars show relative value — longer bar = more rupees received. <strong>Providers run promotions and change rates in real time</strong> — always click a provider to confirm the live rate before transferring. Promos (like zero-fee first transfers) will make the actual rate better than shown here.</div>
 
@@ -940,9 +1366,17 @@ window.addEventListener('DOMContentLoaded',function(){
     <div class="rates-disclaimer">
       <div class="rd-icon">&#9888;&#65039;</div>
       <div class="rd-body">
-        <div class="rd-title">Disclaimer &amp; Important Notice</div>
+        <div class="rd-title">Disclaimer &amp; Data Sources</div>
         <div class="rd-text">
           Rates shown on this page are <strong>indicative estimates only</strong>, calculated using live mid-market exchange rates adjusted by each provider&apos;s <em>typical</em> margin and fee. They are <strong>not guaranteed</strong> and may differ from the actual rate offered at the time of your transfer.
+          <br><br>
+          <strong>Mid-market rate sources (fetched live, cross-checked across 3 APIs):</strong>
+          <ul class="rd-sources">
+            <li><strong>Frankfurter / European Central Bank (ECB)</strong> &mdash; <code>api.frankfurter.app</code> &mdash; Official ECB published rates. Most authoritative for EUR cross-rates.</li>
+            <li><strong>fawazahmed0 Currency API</strong> &mdash; <code>cdn.jsdelivr.net/npm/@fawazahmed0/currency-api</code> &mdash; Free, open-source dataset covering 150+ currencies, updated daily.</li>
+            <li><strong>currency-api.pages.dev</strong> &mdash; Cloudflare-hosted mirror of the above dataset, used as a redundant fallback.</li>
+          </ul>
+          These are <strong>interbank mid-market rates</strong> &mdash; the midpoint between buy and sell prices. Remittance providers add their own margin on top of this rate. The actual rate you receive will always be slightly lower than the mid-market rate shown.
           <br><br>
           Exchange rates fluctuate continuously. Provider margins, fees, and promotions change without notice. NRI Finance Hub is an <strong>independent comparison tool</strong> and has no commercial affiliation with any remittance provider listed. We do not process, facilitate, or guarantee any money transfers.
           <br><br>
@@ -1065,7 +1499,7 @@ window.addEventListener('DOMContentLoaded',function(){
       <div class="rates-thead">
         <span></span><span>Bank</span><span>1 Year</span><span>2 Years</span><span>3 Years</span><span>5 Years</span>
       </div>
-      <div class="bank-rates-grid">
+      <div class="bank-rates-grid" style="max-height:400px;overflow-y:auto;padding-right:4px;">
         <div class="bank-row">
           <div class="bank-logo" style="background:#1a3040;color:#60a5fa">SBI</div>
           <div class="bank-name-col"><div class="bname"><a href="https://sbi.co.in/web/interest-rates/interest-rates/sbi-nri-services-interest-rates/sbi-nri-services-nre-fixed-deposit-interest-rate" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.2)">State Bank of India &#8599;</a></div><div class="btype">Public sector &middot; Govt-backed &middot; Peak: 6.45% (444 days)</div></div>
@@ -1238,7 +1672,7 @@ window.addEventListener('DOMContentLoaded',function(){
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>NRI Home Loan Rates &mdash; Top 10 Banks</div>
       <div class="card-sub">Sorted by starting rate &middot; Click bank name to go to their NRI home loan page &middot; Rates indicative (June 2026, post RBI cuts)</div>
-      <div style="overflow-x:auto">
+      <div style="max-height:400px;overflow-y:auto;"><div style="overflow-x:auto">
         <table class="amort-table" style="font-size:13.5px">
           <thead><tr>
             <th style="text-align:left;border-radius:10px 0 0 0">Bank</th>
@@ -1279,6 +1713,7 @@ window.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
   <div class="aff-disclaimer" style="text-align:center;font-size:9px;color:var(--muted);padding:0 0 4px;">&#9432; Affiliate links — we may earn a small commission at no extra cost to you</div>
+  </div><!-- /tab-homeloan -->
 
 <!-- TAB 5: RETURN PLANNER -->
   <div class="tool-section" id="tab-return">
@@ -1290,56 +1725,104 @@ window.addEventListener('DOMContentLoaded',function(){
         <p>Build your expense profile &middot; Apply real India inflation &middot; See year-by-year projections &middot; Know exactly how much corpus you need</p>
       </div>
     </div>
-    <div class="card">
-      <div class="card-hd"><div class="card-hd-bar"></div>Step 1 &mdash; Choose Your City Tier</div>
-      <div class="card-sub">Pre-fills typical monthly expenses. You can edit every figure below.</div>
-      <div class="city-btn-row">
-        <button class="city-btn active" onclick="setCity('metro',this)">🏙 Metro (Mumbai/Delhi/Bangalore)</button>
-        <button class="city-btn" onclick="setCity('tier2',this)">🏘 Tier 2 (Kochi/Pune/Hyderabad)</button>
-        <button class="city-btn" onclick="setCity('tier3',this)">🏡 Tier 3 (Jaipur/Indore/Nagpur)</button>
-        <button class="city-btn" onclick="setCity('tier4',this)">🌆 Tier 4 (Thrissur/Mysore/Udaipur)</button>
-        <button class="city-btn" onclick="setCity('tier5',this)">🌾 Tier 5 / Village / Rural</button>
+    <div class="card rp-accordion">
+      <!-- ── STEP 1 ── -->
+      <div class="rp-step" id="rp-step-1">
+        <div class="rp-step-hd" onclick="rpToggleStep(1)">
+          <div class="rp-step-badge">1</div>
+          <div class="rp-step-info"><div class="rp-step-title">Choose Your City Tier</div><div class="rp-step-hint" id="rp-step1-hint">Select a city to prefill expenses</div></div>
+          <svg class="rp-step-chev" id="rp-chev-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="rp-step-body" id="rp-step-body-1">
+          <div class="card-sub">Pre-fills typical monthly expenses. You can edit every figure below.</div>
+          <div class="city-btn-row">
+            <button class="city-btn active" onclick="setCity('metro',this)">&#127961; Metro (Mumbai/Delhi/Bangalore)</button>
+            <button class="city-btn" onclick="setCity('tier2',this)">&#127960; Tier 2 (Kochi/Pune/Hyderabad)</button>
+            <button class="city-btn" onclick="setCity('tier3',this)">&#127968; Tier 3 (Jaipur/Indore/Nagpur)</button>
+            <button class="city-btn" onclick="setCity('tier4',this)">&#127750; Tier 4 (Thrissur/Mysore/Udaipur)</button>
+            <button class="city-btn" onclick="setCity('tier5',this)">&#127807; Tier 5 / Village / Rural</button>
+          </div>
+        </div>
       </div>
-      <div class="card-hd" style="margin-bottom:6px"><div class="card-hd-bar"></div>Step 2 &mdash; Your Monthly Expense Breakdown</div>
-      <div class="card-sub">All amounts in Indian Rupees (&#8377;) per month</div>
-      <div class="expense-grid">
-        <div class="expense-item"><div class="ei-icon">&#128722;</div><label class="ei-label">Food &amp; Groceries</label><input type="number" id="exp-food" value="20000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127968;</div><label class="ei-label">Rent / Housing</label><input type="number" id="exp-rent" value="25000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128663;</div><label class="ei-label">Transport &amp; Travel</label><input type="number" id="exp-transport" value="8000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128161;</div><label class="ei-label">Utilities (electric, internet&hellip;)</label><input type="number" id="exp-util" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128737;</div><label class="ei-label">Life &amp; Term Insurance</label><input type="number" id="exp-lifeins" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127973;</div><label class="ei-label">Health Insurance</label><input type="number" id="exp-healthins" value="4000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128138;</div><label class="ei-label">Medical &amp; Healthcare</label><input type="number" id="exp-medical" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127891;</div><label class="ei-label">Kids Education</label><input type="number" id="exp-edu" value="15000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#127881;</div><label class="ei-label">Entertainment &amp; Dining Out</label><input type="number" id="exp-ent" value="8000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#9992;&#65039;</div><label class="ei-label">Annual Holidays (&divide;12)</label><input type="number" id="exp-travel" value="5000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128085;</div><label class="ei-label">Clothing &amp; Personal Care</label><input type="number" id="exp-clothing" value="4000"/></div>
-        <div class="expense-item"><div class="ei-icon">&#128230;</div><label class="ei-label">Miscellaneous</label><input type="number" id="exp-misc" value="5000"/></div>
+      <!-- ── STEP 2 ── -->
+      <div class="rp-step" id="rp-step-2">
+        <div class="rp-step-hd" onclick="rpToggleStep(2)">
+          <div class="rp-step-badge">2</div>
+          <div class="rp-step-info"><div class="rp-step-title">Monthly Expense Breakdown</div><div class="rp-step-hint" id="rp-step2-hint">All amounts in &#8377; per month</div></div>
+          <svg class="rp-step-chev" id="rp-chev-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="rp-step-body" id="rp-step-body-2">
+          <!-- Total always visible -->
+          <div class="expense-total-strip" style="margin-bottom:10px">
+            <div><div class="exp-total-lbl">Total Monthly Expenses</div><div style="font-size:12px;color:var(--muted)">Updates live as you edit</div></div>
+            <div style="text-align:right">
+              <div class="exp-total-val" id="exp-total-display">&#8377;1,09,000</div>
+              <div id="exp-total-local" style="font-size:12px;color:var(--teal);font-weight:600;margin-top:2px"></div>
+            </div>
+          </div>
+          <!-- Collapsible expense grid -->
+          <button class="btn btn-outline rp-exp-toggle" id="rp-exp-toggle-btn" onclick="rpToggleExpenses()">&#9998; Edit Expense Categories &#9660;</button>
+          <div id="rp-exp-grid-wrap" style="display:none;margin-top:12px">
+            <div class="card-sub" style="margin-bottom:8px">All amounts in Indian Rupees (&#8377;) per month</div>
+            <div class="expense-grid">
+              <div class="expense-item"><div class="ei-icon">&#128722;</div><label class="ei-label">Food &amp; Groceries</label><input type="number" id="exp-food" value="20000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127968;</div><label class="ei-label">Rent / Housing</label><input type="number" id="exp-rent" value="25000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128663;</div><label class="ei-label">Transport &amp; Travel</label><input type="number" id="exp-transport" value="8000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128161;</div><label class="ei-label">Utilities (electric, internet&hellip;)</label><input type="number" id="exp-util" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128737;</div><label class="ei-label">Life &amp; Term Insurance</label><input type="number" id="exp-lifeins" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127973;</div><label class="ei-label">Health Insurance</label><input type="number" id="exp-healthins" value="4000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128138;</div><label class="ei-label">Medical &amp; Healthcare</label><input type="number" id="exp-medical" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127891;</div><label class="ei-label">Kids Education</label><input type="number" id="exp-edu" value="15000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#127881;</div><label class="ei-label">Entertainment &amp; Dining Out</label><input type="number" id="exp-ent" value="8000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#9992;&#65039;</div><label class="ei-label">Annual Holidays (&divide;12)</label><input type="number" id="exp-travel" value="5000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128085;</div><label class="ei-label">Clothing &amp; Personal Care</label><input type="number" id="exp-clothing" value="4000"/></div>
+              <div class="expense-item"><div class="ei-icon">&#128230;</div><label class="ei-label">Miscellaneous</label><input type="number" id="exp-misc" value="5000"/></div>
+            </div>
+            <button class="btn btn-outline rp-exp-toggle" style="margin-top:10px" onclick="rpToggleExpenses()">&#9650; Collapse Expenses</button>
+          </div>
+          <button class="btn btn-outline rp-next-btn" onclick="rpOpenStep(3)" style="margin-top:12px">Next: Planning Parameters &#8594;</button>
+        </div>
       </div>
-      <div class="expense-total-strip">
-        <div><div class="exp-total-lbl">Total Monthly Expenses</div><div style="font-size:12px;color:var(--muted)">Tap Calculate to update</div></div>
-        <div class="exp-total-val" id="exp-total-display">&#8377;0</div>
-      </div>
-      <div class="card-hd" style="margin-bottom:14px"><div class="card-hd-bar"></div>Step 3 &mdash; Planning Parameters</div>
-      <div class="fg">
+      <!-- ── STEP 3 ── -->
+      <div class="rp-step" id="rp-step-3">
+        <div class="rp-step-hd" onclick="rpToggleStep(3)">
+          <div class="rp-step-badge">3</div>
+          <div class="rp-step-info"><div class="rp-step-title">Planning Parameters</div><div class="rp-step-hint">Savings, inflation &amp; return targets</div></div>
+          <svg class="rp-step-chev rp-chev-closed" id="rp-chev-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="rp-step-body" id="rp-step-body-3" style="display:none">
+        <div class="fg">
         <div class="f"><label>India Inflation Rate (% p.a.)</label><input type="number" id="rp-inflation" value="6" step="0.5"/></div>
         <div class="f"><label>Investment Return on Corpus (% p.a.)</label><input type="number" id="rp-roi" value="8" step="0.5" oninput="updateRpLocal()"/></div>
-        <div class="f"><label>Expected India Income After Return (&#8377;/mo)</label><input type="number" id="rp-income" value="50000"/></div>
+        <div class="f"><label>Expected India Income After Return (&#8377;/mo)</label><input type="number" id="rp-income" value="50000" oninput="updateRpLocal()"/><div id="rp-income-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
         <div class="f"><label>Years Until You Return</label><input type="number" id="rp-years" value="5" min="1" max="30" oninput="updateRpLocal()"/><div id="rp-years-corpus" style="font-size:12px;color:var(--amber);margin-top:4px;font-weight:600;"></div></div>
         <div class="f"><label>Current Savings Abroad (&#8377; Lakhs)</label><input type="number" id="rp-savings" value="50" oninput="updateRpLocal()"/><div id="rp-savings-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
         <div class="f"><label>Monthly Savings Rate (&#8377; Lakhs/mo)</label><input type="number" id="rp-monthly" value="1.5" step="0.1" oninput="updateRpLocal()"/><div id="rp-monthly-local" style="font-size:12px;color:var(--teal);margin-top:4px;font-weight:600;"></div></div>
       </div>
-      <button class="btn btn-amber" onclick="calcReturn()">Plan My Return &rarr;</button>
-      <div id="rp-result" style="display:none">
+          <button class="btn btn-amber" onclick="calcReturn()" style="margin-top:8px">Plan My Return &#8594;</button>
+        </div>
+      </div>
+    </div>
+    <!-- ── RESULTS ── -->
+    <div id="rp-result" class="card rp-result-card" style="display:none">
+      <div class="rp-result-hd">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">&#128202;</span>
+          <span style="font-weight:700;font-size:15px;color:var(--text)">Your Return Plan</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:600" id="rp-result-cur-badge"></span>
+        </div>
+        <button class="btn btn-outline rp-collapse-btn" id="rp-result-toggle" onclick="rpToggleResult()">&#9660; Collapse</button>
+      </div>
+      <div id="rp-result-body">
         <div class="rg" id="rp-result-grid"></div>
         <div id="rp-verdict"></div>
         <div class="btn-row" style="margin-top:16px">
-          <button class="btn btn-outline" onclick="downloadReturnCSV()">&#11015; Download Projection CSV</button>
+          <button class="btn btn-outline" onclick="downloadReturnCSV()">&#11015; Download CSV</button>
           <button class="btn btn-outline" id="rp-table-toggle" onclick="toggleRpTable()" style="display:flex;align-items:center;gap:6px">&#9660; Year-by-Year Table</button>
         </div>
         <div id="rp-table-wrap" class="year-table-wrap">
           <table class="year-table" id="rp-year-table">
-            <thead><tr><th>Year</th><th>Opening Corpus</th><th>Annual Expenses</th><th>India Income</th><th>Returns Earned</th><th>Closing Corpus</th><th>Status</th></tr></thead>
+            <thead><tr><th>Year</th><th>Opening Corpus</th><th>Annual Expenses (&#8377;)</th><th>India Income (&#8377;)</th><th>Returns (&#8377;)</th><th>Closing Corpus</th><th>Status</th></tr></thead>
             <tbody id="rp-year-body"></tbody>
           </table>
         </div>
@@ -1360,6 +1843,7 @@ window.addEventListener('DOMContentLoaded',function(){
         <div class="cl-progress-bar"><div class="cl-progress-fill" id="cl-fill" style="width:0%"></div></div>
       </div>
 
+      <div style="max-height:420px;overflow-y:auto;padding-right:4px;">
       <!-- Phase 1 -->
       <div class="cl-phase">
         <div class="cl-phase-hd">
@@ -1485,6 +1969,7 @@ window.addEventListener('DOMContentLoaded',function(){
 
     <div class="info">&#128203; <strong>India Inflation Reality:</strong> CPI has averaged 5&ndash;7% p.a. over the last decade. Healthcare and education inflate faster (~8&ndash;10%). Kids education fees in metro schools: &#8377;10K&ndash;40K/month. Family health floater: &#8377;15K&ndash;40K/year. Build in a 20% buffer for unexpected expenses.</div>
   </div>
+  </div><!-- /tab-return -->
   <!-- ══ TAX RESIDENCY CALCULATOR ══════════════════════════════════════════ -->
   <div class="tool-section" id="tab-taxres">
   <div class="calc-cur-bar" id="ccb-taxres"><span class="ccb-flag" id="ccb-flag-taxres"></span><span class="ccb-rate" id="ccb-rate-taxres">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-taxres" type="number" placeholder="Amount" oninput="ccbConvert('taxres')"/><span id="ccb-cur-taxres" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-taxres">₹—</span></div></div>
@@ -1644,7 +2129,6 @@ window.addEventListener('DOMContentLoaded',function(){
       </div>
     </div>
   </div>
-  </div>
   <!-- ══ REAL ESTATE ROI ═══════════════════════════════════════════════════ -->
   <div class="tool-section" id="tab-realty">
   <div class="calc-cur-bar" id="ccb-realty"><span class="ccb-flag" id="ccb-flag-realty"></span><span class="ccb-rate" id="ccb-rate-realty">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-realty" type="number" placeholder="Amount" oninput="ccbConvert('realty')"/><span id="ccb-cur-realty" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-realty">₹—</span></div></div>
@@ -1774,6 +2258,7 @@ window.addEventListener('DOMContentLoaded',function(){
         </div>
     </div>
   </div>
+  </div><!-- /tab-edplan -->
 
 
   <!-- TAB: NRI GUIDES / ARTICLES -->
@@ -1858,6 +2343,89 @@ window.addEventListener('DOMContentLoaded',function(){
           <div class="art-summary">How to legally move money from India to your foreign account. LRS limit, Form 15CA/CB, TCS on remittances above ₹7L, and FEMA compliance.</div>
           <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
         </div>
+        <!-- Country Guides -->
+        <div class="art-card" onclick="window.location.href='uae-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">UAE NRI Finance Guide: AED to INR, Banking &amp; Tax (2026)</div>
+          <div class="art-summary">Complete guide for Indians in UAE — best remittance rates, NRE/NRO accounts, India-UAE DTAA benefits, and KrisFlyer vs Air India miles strategy.</div>
+          <div class="art-meta"><span>&#128337; 9 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='uk-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">UK NRI Finance Guide: GBP to INR, Banking &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in the UK: how to optimise GBP→INR remittance, claim India-UK DTAA relief, manage NRE FDs, and handle NHS pension vs Indian assets.</div>
+          <div class="art-meta"><span>&#128337; 9 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='singapore-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Singapore NRI Guide: SGD to INR, CPF &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Singapore: SGD→INR remittance comparison, CPF vs NRE FD decision, India-Singapore DTAA, and KrisFlyer redemption strategy for India flights.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='australia-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Australia NRI Guide: AUD to INR, Superannuation &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Australia: AUD→INR remittance, Superannuation DASP decision, FITO credits to avoid double taxation, and Qantas miles for India travel.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='canada-nri-guide.html'">
+          <div><span class="art-tag transfer">Country Guide</span></div>
+          <div class="art-title">Canada NRI Guide: CAD to INR, TFSA, RRSP &amp; Tax (2026)</div>
+          <div class="art-summary">Indians in Canada: CAD→INR remittance, TFSA vs RRSP vs NRE FD strategy, PFIC warning on Indian mutual funds, and Aeroplan redemptions.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Estate & Legal -->
+        <div class="art-card" onclick="window.location.href='nri-will-estate-planning.html'">
+          <div><span class="art-tag planning">Estate Planning</span></div>
+          <div class="art-title">NRI Will &amp; Estate Planning: Cross-Border Inheritance Guide (2026)</div>
+          <div class="art-summary">Two-will strategy, succession laws for Hindu/Muslim/Christian NRIs, nominations vs legal heirs, and country-by-country inheritance tax comparison.</div>
+          <div class="art-meta"><span>&#128337; 10 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='power-of-attorney-nri.html'">
+          <div><span class="art-tag planning">Legal</span></div>
+          <div class="art-title">NRI Power of Attorney: Manage Indian Property from Abroad (2026)</div>
+          <div class="art-summary">How to create, apostille, and register a POA to manage Indian property while living abroad. Specific vs General POA, bank POA, and revocation process.</div>
+          <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Education & Life -->
+        <div class="art-card" onclick="window.location.href='nri-education-planning.html'">
+          <div><span class="art-tag planning">Education</span></div>
+          <div class="art-title">NRI Education Planning: Children&apos;s Corpus, Fees &amp; Strategy (2026)</div>
+          <div class="art-summary">IIT vs UK vs US costs, SSY rules for NRIs, PFIC warning on Indian mutual funds, and 529 plan strategy for NRIs in the USA.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='nri-insurance.html'">
+          <div><span class="art-tag banking">Insurance</span></div>
+          <div class="art-title">NRI Insurance Guide: Life &amp; Health Coverage in India (2026)</div>
+          <div class="art-summary">Can NRIs buy Indian term insurance? ULIP rules, claim settlement abroad, LIC for NRIs, and whether you need both Indian and host-country coverage.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Tax deep dives -->
+        <div class="art-card" onclick="window.location.href='capital-gains-nri.html'">
+          <div><span class="art-tag tax">Tax</span></div>
+          <div class="art-title">Capital Gains Tax for NRIs: Stocks, Mutual Funds &amp; Property (2026)</div>
+          <div class="art-summary">NRI TDS on capital gains is higher than for residents. Calculate LTCG/STCG, understand TDS deduction rates, and learn how to claim refunds.</div>
+          <div class="art-meta"><span>&#128337; 8 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='tds-refund-nri.html'">
+          <div><span class="art-tag tax">Tax</span></div>
+          <div class="art-title">TDS Refund for NRIs: How to Claim Back Excess Tax Deducted (2026)</div>
+          <div class="art-summary">Bank FD TDS at 30%, property TDS at 20% — NRIs often overpay. Step-by-step guide to filing ITR and claiming your TDS refund from the Indian government.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <div class="art-card" onclick="window.location.href='nri-pan-card-guide.html'">
+          <div><span class="art-tag tax">Compliance</span></div>
+          <div class="art-title">NRI PAN Card Guide: Apply, Update &amp; Link Aadhaar from Abroad (2026)</div>
+          <div class="art-summary">Form 49AA online application, Aadhaar linking NRI exemption, residential status update via Form CSF, and e-PAN download. All steps with screenshots.</div>
+          <div class="art-meta"><span>&#128337; 7 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
+        <!-- Banking -->
+        <div class="art-card" onclick="window.location.href='fcnr-deposits.html'">
+          <div><span class="art-tag banking">Banking</span></div>
+          <div class="art-title">FCNR Deposits: Earn in USD, GBP, AED Without Currency Risk (2026)</div>
+          <div class="art-summary">FCNR lets you lock foreign currency in an Indian bank FD and earn 4–6% with no forex risk. Break-even vs NRE FD, premature withdrawal rules and best banks.</div>
+          <div class="art-meta"><span>&#128337; 6 min read</span><span class="art-read-btn">Read guide &#8594;</span></div>
+        </div>
       </div>
       <div class="info" style="margin-top:20px">&#9888;&#65039; These guides are for informational purposes only. Consult a SEBI-registered advisor or CA for personalised advice.</div>
     </div>
@@ -1866,7 +2434,6 @@ window.addEventListener('DOMContentLoaded',function(){
       <div id="art-content"></div>
     </div>
   </div>
-</div>
 
   <!-- TAB: PROPERTY TDS CALCULATOR -->
   <div class="tool-section" id="tab-proptds">
@@ -2089,6 +2656,13 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
   <div class="tool-section" id="tab-budget">
+    <div class="tool-banner" style="background:linear-gradient(135deg,rgba(240,165,32,0.12),rgba(129,140,248,0.06));border-color:rgba(240,165,32,0.3);margin-bottom:16px;">
+      <div class="tool-banner-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="12" y1="14" x2="12" y2="17"/><line x1="9" y1="14" x2="9" y2="17"/><line x1="15" y1="14" x2="15" y2="17"/></svg></div>
+      <div class="tool-banner-body">
+        <h2>NRI Monthly Budget Tracker</h2>
+        <p>Track expenses in your country &amp; India &middot; Monitor savings rate &middot; Data saved in your browser</p>
+      </div>
+    </div>
     <!-- Top bar: month nav + currency + rate -->
     <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;padding:10px 14px;background:var(--fg);border:1px solid var(--border2);border-radius:12px;">
       <div class="bgt-month-nav">
@@ -2193,6 +2767,424 @@ window.addEventListener('DOMContentLoaded',function(){
     </div>
   </div>
 
+  <!-- TAB: FLIGHTS TO INDIA -->
+  <div class="tool-section" id="tab-flights">
+  <div class="calc-cur-bar" id="ccb-flights"><span class="ccb-flag" id="ccb-flag-flights"></span><span class="ccb-rate" id="ccb-rate-flights">Showing fares in your currency</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-flights" type="number" placeholder="Amount" oninput="ccbConvert('flights')"/><span id="ccb-cur-flights" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">&rarr;</span><span class="ccb-result" id="ccb-out-flights">&#8377;&mdash;</span></div></div>
+
+    <!-- AI Trip Planner — HERO at top -->
+    <div class="fl-ai-hero">
+      <div class="fl-ai-hero-hd">
+        <span class="fl-planner-icon">✦</span>
+        <div>
+          <div class="fl-ai-hero-title">Plan Your Trip to India</div>
+          <div class="fl-ai-hero-sub">Get fare estimates, best travel dates &amp; budget breakdown — just describe your trip</div>
+        </div>
+      </div>
+      <div class="fl-planner-input-row">
+        <input type="text" id="fl-planner-input" class="fl-planner-input"
+               placeholder="e.g. Goa in October, 2 people, budget AED 5000"
+               onkeydown="if(event.key==='Enter')flPlanTrip()">
+        <button class="fl-planner-btn" onclick="flPlanTrip()">Plan ✦</button>
+      </div>
+      <!-- Trip options row -->
+      <div class="fl-trip-opts">
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Month</label>
+          <select id="fl-opt-month" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="">Any month</option>
+            <option>January</option><option>February</option><option>March</option>
+            <option>April</option><option>May</option><option>June</option>
+            <option>July</option><option>August</option><option>September</option>
+            <option>October</option><option>November</option><option>December</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Trip length</label>
+          <select id="fl-opt-dur" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="">Any</option>
+            <option value="5 nights">5 nights</option>
+            <option value="7 nights" selected>7 nights</option>
+            <option value="10 nights">10 nights</option>
+            <option value="14 nights">14 nights</option>
+            <option value="21 nights">21 nights</option>
+            <option value="1 month">1 month</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Cabin</label>
+          <select id="fl-opt-cabin" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+        <div class="fl-opt-group">
+          <label class="fl-opt-lbl">Travellers</label>
+          <select id="fl-opt-pax" class="fl-opt-sel" onchange="flResetResult()">
+            <option value="1 person">1</option>
+            <option value="2 people" selected>2</option>
+            <option value="3 people">3</option>
+            <option value="4 people">4</option>
+            <option value="family of 5">5+</option>
+          </select>
+        </div>
+      </div>
+      <!-- Departure airport — moved up for visibility -->
+      <div class="fl-origin-inline">
+        <div class="fl-origin-lbl">&#9992; Departing from</div>
+        <div class="fl-pills" id="fl-origins"><!-- JS renders pills --></div>
+        <p id="fl-cur-label" class="fl-cur-label-txt"></p>
+      </div>
+      <div class="fl-ai-chips-lbl">Choose a destination:</div>
+      <div class="fl-ai-chips" id="fl-ai-chips"><!-- JS renders all 22 city chips --></div>
+      <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
+    </div>
+
+
+    <!-- Hidden JS anchors -->
+    <div id="fl-festival-banner" style="display:none"></div>
+    <div id="fl-deal-strip" style="display:none"></div>
+    <div id="fl-dest-grid" style="display:none"></div>
+  </div>
+
+
+  <!-- TAB: NRI CREDIT CARDS -->
+  <div class="tool-section" id="tab-cards">
+    <div class="tool-hd">
+      <h2 class="tool-title">&#128179; NRI Credit Card Comparison</h2>
+      <p class="tool-sub">Compare multi-currency international cards and Indian bank NRI credit cards &mdash; filter by where you live and what matters most to you.</p>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="cc-bar">
+      <div class="cc-type-row">
+        <button class="cc-type active" onclick="ccType('all',this)">All Cards</button>
+        <button class="cc-type" onclick="ccType('intl',this)">&#127758; International</button>
+        <button class="cc-type" onclick="ccType('india',this)">&#127470;&#127475; Indian Bank</button>
+      </div>
+      <div class="cc-filter-row">
+        <span class="cc-filter-lbl">Your country:</span>
+        <div class="cc-chips" id="cc-country-chips">
+          <button class="cc-chip active" onclick="ccCountry('all',this)">All</button>
+          <button class="cc-chip" onclick="ccCountry('UAE',this)">UAE / Gulf</button>
+          <button class="cc-chip" onclick="ccCountry('US',this)">US</button>
+          <button class="cc-chip" onclick="ccCountry('UK',this)">UK</button>
+          <button class="cc-chip" onclick="ccCountry('SG',this)">Singapore</button>
+          <button class="cc-chip" onclick="ccCountry('AU',this)">Australia</button>
+        </div>
+      </div>
+      <div class="cc-filter-row">
+        <span class="cc-filter-lbl">Annual fee:</span>
+        <div class="cc-chips" id="cc-fee-chips">
+          <button class="cc-chip active" onclick="ccFee('all',this)">All fees</button>
+          <button class="cc-chip" onclick="ccFee('free',this)">Free only</button>
+          <button class="cc-chip" onclick="ccFee('paid',this)">Paid cards</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- International Cards Section -->
+    <div class="cc-section" id="cc-sec-intl">
+      <div class="cc-sec-hd">
+        <div class="cc-sec-icon">&#127758;</div>
+        <div>
+          <div class="cc-sec-title">Multi-Currency International Cards</div>
+          <div class="cc-sec-sub">Zero or near-zero forex fees for daily spending abroad and ATM withdrawals. These cards are issued in the country where you live.</div>
+        </div>
+      </div>
+      <div class="cc-grid" id="cc-grid-intl"></div>
+      <p class="cc-no-results" id="cc-no-intl" style="display:none">No international cards match your filters. Try selecting "All" to reset.</p>
+    </div>
+
+    <!-- Indian Bank Cards Section -->
+    <div class="cc-section" id="cc-sec-india">
+      <div class="cc-sec-hd">
+        <div class="cc-sec-icon">&#127470;&#127475;</div>
+        <div>
+          <div class="cc-sec-title">Indian Bank NRI Credit Cards</div>
+          <div class="cc-sec-sub">Issued by Indian banks and secured against your NRE or NRO fixed deposit. Use for India spending, lounge access during visits, and earning rewards in INR.</div>
+        </div>
+      </div>
+      <div class="cc-grid" id="cc-grid-india"></div>
+      <p class="cc-no-results" id="cc-no-india" style="display:none">No Indian bank cards match your current filters.</p>
+    </div>
+
+    <p class="cc-disclaimer">&#8505;&#65039; Card fees and features change frequently &mdash; verify on the issuer website before applying. Indian NRI cards are typically secured against an NRE/NRO fixed deposit (no Indian credit history required). This is not financial advice.</p>
+
+  <style>
+  /* ── NRI Credit Cards Tab ──────────────────────────────── */
+  .tool-hd{margin-bottom:1.25rem}
+  .tool-title{font-size:1.3rem;font-weight:700;color:#e2e8f0;margin:0 0 .35rem}
+  .tool-sub{font-size:.82rem;color:#8892b0;margin:0;line-height:1.5}
+  .cc-bar{background:rgba(13,22,50,0.7);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:.7rem}
+  .cc-type-row{display:flex;gap:.5rem;flex-wrap:wrap}
+  .cc-type{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:8px;color:#8892b0;font-size:.8rem;font-weight:600;padding:.42rem .85rem;cursor:pointer;transition:all .2s}
+  .cc-type:hover,.cc-type.active{background:rgba(99,102,241,0.25);border-color:rgba(99,102,241,0.5);color:#c7d2fe}
+  .cc-filter-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+  .cc-filter-lbl{font-size:.72rem;color:#8892b0;font-weight:600;min-width:95px;white-space:nowrap}
+  .cc-chips{display:flex;gap:.4rem;flex-wrap:wrap}
+  .cc-chip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;color:#8892b0;font-size:.72rem;padding:.28rem .72rem;cursor:pointer;transition:all .2s}
+  .cc-chip:hover,.cc-chip.active{background:rgba(99,102,241,0.2);border-color:#6366f1;color:#a5b4fc}
+  .cc-section{margin-bottom:2rem}
+  .cc-sec-hd{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.1rem;padding:.85rem 1rem;background:rgba(13,22,50,0.5);border-radius:10px;border-left:3px solid rgba(99,102,241,0.5)}
+  .cc-sec-icon{font-size:1.4rem;line-height:1;flex-shrink:0}
+  .cc-sec-title{font-size:.92rem;font-weight:700;color:#e2e8f0;margin-bottom:.18rem}
+  .cc-sec-sub{font-size:.76rem;color:#8892b0;line-height:1.45}
+  .cc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
+  .cc-card{background:rgba(13,22,50,0.8);border:1px solid rgba(100,130,220,0.15);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;transition:border-color .2s,transform .2s}
+  .cc-card:hover{border-color:rgba(99,102,241,0.4);transform:translateY(-2px)}
+  .cc-badge{display:inline-block;font-size:.62rem;font-weight:700;padding:.18rem .55rem;border-radius:12px;color:#fff;letter-spacing:.04em;margin-bottom:.3rem}
+  .cc-name{font-size:.98rem;font-weight:700;color:#e2e8f0;line-height:1.2}
+  .cc-issuer{font-size:.72rem;color:#8892b0;margin-top:.12rem}
+  .cc-ctype{font-size:.67rem;color:#818cf8;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);border-radius:4px;padding:.12rem .45rem;display:inline-block;margin-top:.28rem}
+  .cc-specs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;background:rgba(0,0,0,0.2);border-radius:8px;padding:.7rem}
+  .cc-spec{display:flex;flex-direction:column;gap:.12rem}
+  .cc-spec-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:#475569;font-weight:600}
+  .cc-spec-v{font-size:.78rem;color:#c7d2fe;font-weight:600}
+  .cc-feats{margin:0;padding:0 0 0 1rem;display:flex;flex-direction:column;gap:.3rem}
+  .cc-feats li{font-size:.76rem;color:#94a3b8;line-height:1.4}
+  .cc-note{font-size:.73rem;color:#a5b4fc;background:rgba(99,102,241,0.08);border-left:2px solid rgba(99,102,241,0.4);padding:.45rem .7rem;border-radius:0 6px 6px 0;line-height:1.4}
+  .cc-stars{font-size:.74rem;color:#fbbf24;letter-spacing:.04em}
+  .cc-stars span{color:#64748b;margin-left:.25rem;font-size:.72rem}
+  .cc-apply{display:block;text-align:center;padding:.6rem 1rem;background:rgba(99,102,241,0.13);border:1px solid rgba(99,102,241,0.3);border-radius:8px;color:#a5b4fc;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s;margin-top:auto}
+  .cc-apply:hover{background:rgba(99,102,241,0.28);border-color:#6366f1;color:#c7d2fe}
+  .cc-no-results{font-size:.83rem;color:#8892b0;text-align:center;padding:1.75rem;background:rgba(0,0,0,0.1);border-radius:8px;border:1px dashed rgba(100,130,220,0.15);margin:0}
+  .cc-disclaimer{font-size:.73rem;color:#475569;text-align:center;padding:.8rem;line-height:1.5;border-top:1px solid rgba(100,130,220,0.1);margin-top:.5rem}
+  @media(max-width:600px){.cc-grid{grid-template-columns:1fr}.cc-filter-row{flex-direction:column;align-items:flex-start}.cc-filter-lbl{min-width:unset}}
+  </style>
+
+  <script>
+  (function(){
+    var INTL=[
+      {id:'wise',name:'Wise Card',issuer:'Wise',ctype:'Prepaid Debit',
+       ctry:['UAE','US','UK','SG','AU'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0.35 - 1.7%',s3l:'ATM',s3v:'Free up to $200/mo',s4l:'Best For',s4v:'Best overall',
+       feats:['Holds 40+ currencies at mid-market rate','0.35-1.7% conversion fee depending on currency pair','ATM free up to $200/mo then 1.75% + $1.50','Works in 150+ countries with physical and virtual card'],
+       note:'Mid-market rate - often 3-5% better than your bank',
+       badge:'Most Popular',bc:'#6366f1',link:'https://wise.com/us/card/',stars:4.8},
+      {id:'revolut',name:'Revolut Standard',issuer:'Revolut',ctype:'Prepaid Debit',
+       ctry:['UK','SG','AU','US'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (weekdays)',s3l:'ATM',s3v:'Free up to £200/mo',s4l:'Best For',s4v:'UK and Europe NRIs',
+       feats:['0% forex fee on weekdays within monthly allowance','+1% on weekends and 0.5% over your monthly limit','Free ATM up to £200/month then 2%','Available in UK, EU, US, Singapore and Australia'],
+       note:'Upgrade to Premium (£9.99/mo) to remove all currency limits',
+       badge:'UK Favourite',bc:'#0ea5e9',link:'https://www.revolut.com/',stars:4.5},
+      {id:'niyo',name:'Niyo Global',issuer:'Niyo (SBM Bank India)',ctype:'Prepaid Debit (Visa)',
+       ctry:['UAE','US','UK','SG','AU'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Visa rate)',s3l:'ATM',s3v:'Free at select ATMs',s4l:'Best For',s4v:'Indian travelers',
+       feats:['Zero forex markup at Visa network rates worldwide','Load in INR from Indian account - spend in local currency','Free ATM withdrawals at select international ATMs','Best for Indians visiting abroad - issued from India'],
+       note:'Ideal for NRIs who travel back and forth and need an India-issued card',
+       badge:'India Issued',bc:'#f97316',link:'https://niyo.co/global',stars:4.3},
+      {id:'schwab',name:'Schwab Investor Checking',issuer:'Charles Schwab (US)',ctype:'Debit Card',
+       ctry:['US'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'Unlimited rebates worldwide',s4l:'Best For',s4v:'US NRIs - ATM use',
+       feats:['Zero foreign transaction fees on all purchases','Unlimited ATM fee reimbursement at any ATM in the world','No monthly fee and no minimum balance required','Requires a free Schwab brokerage account to open'],
+       note:'The #1 pick for US-based NRIs - withdraw INR in India at zero cost',
+       badge:'Best ATM Card',bc:'#10b981',link:'https://www.schwab.com/checking',stars:4.9},
+      {id:'starling',name:'Starling Bank',issuer:'Starling Bank (UK)',ctype:'Current Account Debit',
+       ctry:['UK'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Mastercard)',s3l:'ATM',s3v:'Free globally',s4l:'Best For',s4v:'UK NRIs - daily use',
+       feats:['0% foreign transaction fee at Mastercard wholesale rates','Free ATM withdrawals anywhere in the world','UK current account with no monthly fee','Instant spending alerts and excellent budgeting tools'],
+       note:'UK equivalent of Charles Schwab - the go-to debit card for UK-based NRIs',
+       badge:'UK Best Debit',bc:'#8b5cf6',link:'https://www.starlingbank.com/',stars:4.7},
+      {id:'halifax',name:'Halifax Clarity',issuer:'Halifax (UK)',ctype:'Credit Card',
+       ctry:['UK'],fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex Markup',s2v:'0% (Mastercard)',s3l:'ATM',s3v:'Cash advance fee applies',s4l:'Best For',s4v:'UK NRIs - backup CC',
+       feats:['0% foreign transaction fee on all purchases','No annual fee - good as a backup card','Mastercard rates are close to mid-market','Apply online - straightforward credit card'],
+       note:'Good no-fee credit card for UK NRIs spending in India during visits',
+       badge:'No-Fee UK CC',bc:'#0ea5e9',link:'https://www.halifax.co.uk/creditcards/clarity-card.html',stars:4.2},
+      {id:'chase-sp',name:'Chase Sapphire Preferred',issuer:'Chase (US)',ctype:'Travel Credit Card',
+       ctry:['US'],fee:95,feeL:'$95/yr',
+       s1l:'Annual Fee',s1v:'$95/yr',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'N/A (credit card)',s4l:'Best For',s4v:'US NRIs - travel rewards',
+       feats:['0% foreign transaction fee on all international purchases','3X points on dining and 2X on all travel spend','Valuable sign-up bonus - check current offer on Chase website','Transfer to Air India, United, Hyatt and 12+ airline and hotel partners'],
+       note:'Best rewards card for US-based NRIs who travel between US and India',
+       badge:'Top Rewards',bc:'#6366f1',link:'https://creditcards.chase.com/travel-credit-cards/sapphire/preferred',stars:4.6},
+      {id:'cap1',name:'Capital One Venture',issuer:'Capital One (US)',ctype:'Travel Credit Card',
+       ctry:['US'],fee:95,feeL:'$95/yr',
+       s1l:'Annual Fee',s1v:'$95/yr',s2l:'Forex Markup',s2v:'0%',s3l:'ATM',s3v:'N/A (credit card)',s4l:'Best For',s4v:'US NRIs - simple rewards',
+       feats:['0% foreign transaction fee on all purchases','2X miles on every single purchase - no category tracking','Sign-up bonus available - check current offer','Simple flat-rate rewards - ideal as a single everyday card'],
+       note:'Simpler than Chase Sapphire - perfect if you want one card for everything',
+       badge:'2X on All Spend',bc:'#d97706',link:'https://www.capitalone.com/credit-cards/venture/',stars:4.4},
+    ];
+
+    var INDIA=[
+      {id:'hdfc-reg',name:'HDFC Regalia',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:2500,feeL:'₹2,500/yr',
+       s1l:'Annual Fee',s1v:'₹2,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'12 domestic + 6 intl',
+       feats:['Annual fee ₹2,500 - waived if you spend ₹3L in a year','4 reward points per ₹150 on dining and travel','12 domestic and 6 international lounge visits per year','Secured against NRE or NRO fixed deposit - no India credit score needed'],
+       note:'Most popular NRI credit card - best all-round option for India visits',
+       badge:'Most Popular',bc:'#6366f1',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/nri-credit-card',stars:4.5},
+      {id:'axis-mag',name:'Axis Magnus',issuer:'Axis Bank',ctype:'Credit Card (FD-backed)',
+       fee:12500,feeL:'₹12,500/yr',
+       s1l:'Annual Fee',s1v:'₹12,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited domestic + intl',
+       feats:['Annual fee ₹12,500 - waived if you spend ₹15L in a year','12 EDGE Miles per ₹200 spend - best rewards rate in India','Unlimited domestic and international lounge access','Transfer miles to Air India, Singapore Airlines, Marriott and more'],
+       note:'Best rewards rate of any Indian NRI card - worth it for frequent premium travelers',
+       badge:'Best Rewards',bc:'#a855f7',link:'https://www.axisbank.com/retail/cards/credit-card/magnus-credit-card',stars:4.7},
+      {id:'sbi-elite',name:'SBI Card Elite',issuer:'SBI Card',ctype:'Credit Card (FD-backed)',
+       fee:4999,feeL:'₹4,999/yr',
+       s1l:'Annual Fee',s1v:'₹4,999/yr',s2l:'Forex on Foreign Txns',s2v:'1.99% + GST',s3l:'Security',s3v:'SBI NRE FD (YONO)',s4l:'Lounge Access',s4v:'6 domestic + 6 intl',
+       feats:['Annual fee ₹4,999 - waived on ₹10L annual spend','5X reward points on dining, groceries and departmental stores','6 domestic and 6 international lounge visits','Lowest forex surcharge (1.99%) among all Indian NRI cards'],
+       note:'Best for NRIs who spend heavily in India - lowest forex fee of the lot',
+       badge:'Lowest Forex Fee',bc:'#dc2626',link:'https://www.sbicard.com/en/personal/credit-cards/travel/sbi-card-elite.page',stars:4.1},
+      {id:'icici-nri',name:'ICICI Bank NRI Card',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:1500,feeL:'₹1,500/yr',
+       s1l:'Annual Fee',s1v:'₹1,500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Domestic lounges',
+       feats:['Annual fee ₹1,500 - affordable entry-level NRI card','Reward points on all India purchases','Domestic lounge access at select airports','FD-backed - no Indian credit history required to apply'],
+       note:'Good starter NRI card if you already hold an ICICI NRI savings account',
+       badge:'ICICI NRI',bc:'#0ea5e9',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:3.9},
+      {id:'federal',name:'Federal Bank Celesta',issuer:'Federal Bank',ctype:'Credit Card (FD-backed)',
+       fee:500,feeL:'₹500/yr',
+       s1l:'Annual Fee',s1v:'₹500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'Yes (select airports)',
+       feats:['Very low annual fee of just ₹500','Reward points on all transactions','Lounge access at select Indian airports','Very popular among UAE and Gulf-based Kerala NRIs'],
+       note:'Federal Bank is widely used by Kerala/UAE NRIs. Lowest entry cost to an Indian NRI card.',
+       badge:'Lowest Annual Fee',bc:'#10b981',link:'https://www.federalbank.co.in/credit-cards',stars:4.0},
+      {id:'kotak-nri',name:'Kotak 811 NRI Card',issuer:'Kotak Mahindra Bank',ctype:'Credit Card (FD-backed)',
+       fee:0,feeL:'Free',
+       s1l:'Annual Fee',s1v:'Free',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'None',
+       feats:['Zero annual fee - best free Indian NRI credit card','Basic reward points on all India spending','Secured against NRE FD - no credit history needed','No lounge access - purely for spending convenience'],
+       note:'Best option if you want an Indian credit card without paying any annual fee',
+       badge:'No Annual Fee',bc:'#10b981',link:'https://www.kotak.com/en/personal-banking/cards/credit-cards.html',stars:3.7},
+      {id:'hdfc-infinia',name:'HDFC Infinia Metal',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:12500,feeL:'₹12,500/yr',
+       s1l:'Annual Fee',s1v:'₹12,500/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited (Dreamfolks)',
+       feats:['Annual fee ₹12,500 - waived on ₹10L annual spend','5 reward points per ₹150 on all spend categories','Unlimited domestic and international lounge access via Dreamfolks','Premium metal card - top HDFC card for high-income NRI professionals'],
+       note:'Top-tier HDFC card with no category restrictions on rewards - best for NRIs with high India spend',
+       badge:'HDFC Top Card',bc:'#0f4c81',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/infinia-credit-card',stars:4.6},
+      {id:'hdfc-millennia',name:'HDFC Millennia',issuer:'HDFC Bank',ctype:'Credit Card (FD-backed)',
+       fee:1000,feeL:'₹1,000/yr',
+       s1l:'Annual Fee',s1v:'₹1,000/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'None',
+       feats:['Annual fee ₹1,000 - waived on ₹1L spend in a year','5% cashback on Amazon, Flipkart, Myntra and other online platforms','1% cashback on all other India purchases','Best entry-level cashback card for NRI online shopping in India'],
+       note:'Best for NRIs who shop online in India frequently - 5% back on top e-commerce sites',
+       badge:'Cashback Card',bc:'#0284c7',link:'https://www.hdfcbank.com/personal/pay/cards/credit-cards/millennia-credit-card',stars:4.1},
+      {id:'icici-sapphiro',name:'ICICI Sapphiro NRI',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:3500,feeL:'₹3,500/yr',
+       s1l:'Annual Fee',s1v:'₹3,500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Domestic + International',
+       feats:['Annual fee ₹3,500 - premium ICICI NRI offering','2 PAYBACK points per ₹100 on domestic spend, 4 points on international','Domestic and international lounge access included','Golf privileges and dining benefits across India'],
+       note:'Premium step-up from the basic ICICI NRI card - better rewards and international lounge access',
+       badge:'ICICI Premium',bc:'#b45309',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:4.1},
+      {id:'icici-coral',name:'ICICI Coral NRI',issuer:'ICICI Bank',ctype:'Credit Card (FD-backed)',
+       fee:500,feeL:'₹500/yr',
+       s1l:'Annual Fee',s1v:'₹500/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'1 domestic/quarter',
+       feats:['Very low annual fee of ₹500','2 PAYBACK points per ₹100 on all spends','1 complimentary domestic lounge visit per quarter','Ideal first NRI credit card for ICICI banking customers'],
+       note:'Best entry-level ICICI NRI card - low cost with basic lounge access',
+       badge:'ICICI Entry',bc:'#0ea5e9',link:'https://www.icicibank.com/nri/cards/credit-cards',stars:3.8},
+      {id:'sbi-prime',name:'SBI Card Prime',issuer:'SBI Card',ctype:'Credit Card (FD-backed)',
+       fee:2999,feeL:'₹2,999/yr',
+       s1l:'Annual Fee',s1v:'₹2,999/yr',s2l:'Forex on Foreign Txns',s2v:'3.5% + GST',s3l:'Security',s3v:'SBI NRE FD (YONO)',s4l:'Lounge Access',s4v:'8 domestic visits',
+       feats:['Annual fee ₹2,999 - waived on ₹3L annual spend','10X reward points on dining, grocery and department store spends','8 complimentary domestic lounge visits per year','Apply via YONO SBI NRI app - fully digital process'],
+       note:'Best mid-range SBI card for NRIs who spend on dining and groceries during India visits',
+       badge:'SBI Mid-Tier',bc:'#be123c',link:'https://www.sbicard.com/en/personal/credit-cards/rewards/sbi-card-prime.page',stars:4.0},
+      {id:'indusind-pinnacle',name:'IndusInd Pinnacle NRI',issuer:'IndusInd Bank',ctype:'Credit Card (FD-backed)',
+       fee:6999,feeL:'₹6,999/yr',
+       s1l:'Annual Fee',s1v:'₹6,999/yr',s2l:'Forex on Foreign Txns',s2v:'2% + GST',s3l:'Security',s3v:'NRE/NRO FD',s4l:'Lounge Access',s4v:'Unlimited domestic',
+       feats:['Annual fee ₹6,999 - waived on ₹6L annual spend','1.5 reward points per ₹100 on all spends','Unlimited complimentary domestic lounge access','Lower forex surcharge of 2% - good for frequent India visitors'],
+       note:'Good premium option if you bank with IndusInd - unlimited domestic lounges and low forex fee',
+       badge:'IndusInd Premium',bc:'#7c3aed',link:'https://www.indusind.com/in/en/personal/cards/credit-card.html',stars:3.9},
+      {id:'yes-first',name:'YES First Preferred',issuer:'YES Bank',ctype:'Credit Card (FD-backed)',
+       fee:2500,feeL:'₹2,500/yr',
+       s1l:'Annual Fee',s1v:'₹2,500/yr',s2l:'Forex on Foreign Txns',s2v:'3% + GST',s3l:'Security',s3v:'NRE FD',s4l:'Lounge Access',s4v:'Yes (domestic)',
+       feats:['Annual fee ₹2,500 - waived on ₹3L annual spend','4 YES reward points per ₹100 on all purchases','Complimentary domestic airport lounge access','Secured against NRE FD - available to all NRIs'],
+       note:'Solid mid-range card from YES Bank - good rewards rate and reasonable annual fee',
+       badge:'YES Bank NRI',bc:'#0369a1',link:'https://www.yesbank.in/personal-banking/yes-individual/cards/credit-cards',stars:3.8},
+    ];
+
+    var _type='all', _ctry='all', _fee='all';
+
+    function starsHTML(n){
+      var s='';
+      for(var i=1;i<=5;i++) s+=(i<=Math.floor(n))?'&#9733;':'&#9734;';
+      return s+'<span>'+n+'</span>';
+    }
+
+    function cardHTML(c){
+      var featsHtml='';
+      for(var i=0;i<c.feats.length;i++) featsHtml+='<li>'+c.feats[i]+'</li>';
+      return '<div class="cc-card">'+
+        '<div>'+
+          '<div class="cc-badge" style="background:'+c.bc+'">'+c.badge+'</div>'+
+          '<div class="cc-name">'+c.name+'</div>'+
+          '<div class="cc-issuer">'+c.issuer+'</div>'+
+          '<div class="cc-ctype">'+c.ctype+'</div>'+
+        '</div>'+
+        '<div class="cc-specs">'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s1l+'</span><span class="cc-spec-v">'+c.s1v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s2l+'</span><span class="cc-spec-v">'+c.s2v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s3l+'</span><span class="cc-spec-v">'+c.s3v+'</span></div>'+
+          '<div class="cc-spec"><span class="cc-spec-l">'+c.s4l+'</span><span class="cc-spec-v">'+c.s4v+'</span></div>'+
+        '</div>'+
+        '<ul class="cc-feats">'+featsHtml+'</ul>'+
+        '<div class="cc-note">'+c.note+'</div>'+
+        '<div class="cc-stars">'+starsHTML(c.stars)+'</div>'+
+        '<a class="cc-apply" href="'+c.link+'" target="_blank" rel="noopener">Learn More &amp; Apply &#8594;</a>'+
+      '</div>';
+    }
+
+    function render(){
+      var ig=document.getElementById('cc-grid-intl');
+      var dg=document.getElementById('cc-grid-india');
+      var is=document.getElementById('cc-sec-intl');
+      var ds=document.getElementById('cc-sec-india');
+      var noI=document.getElementById('cc-no-intl');
+      var noD=document.getElementById('cc-no-india');
+
+      // Section visibility
+      is.style.display=(_type==='india')?'none':'';
+      ds.style.display=(_type==='intl')?'none':'';
+
+      // Render intl
+      if(_type!=='india'){
+        var h='',cnt=0;
+        for(var i=0;i<INTL.length;i++){
+          var c=INTL[i];
+          var showC=(_ctry==='all'||(c.ctry.indexOf(_ctry)>-1));
+          var showF=(_fee==='all')||(_fee==='free'&&c.fee===0)||(_fee==='paid'&&c.fee>0);
+          if(showC&&showF){h+=cardHTML(c);cnt++;}
+        }
+        ig.innerHTML=h;
+        noI.style.display=cnt===0?'':'none';
+      }
+
+      // Render india
+      if(_type!=='intl'){
+        var h2='',cnt2=0;
+        for(var j=0;j<INDIA.length;j++){
+          var c2=INDIA[j];
+          var showF2=(_fee==='all')||(_fee==='free'&&c2.fee===0)||(_fee==='paid'&&c2.fee>0);
+          if(showF2){h2+=cardHTML(c2);cnt2++;}
+        }
+        dg.innerHTML=h2;
+        noD.style.display=cnt2===0?'':'none';
+      }
+    }
+
+    window.ccType=function(t,el){
+      _type=t;
+      var btns=document.querySelectorAll('.cc-type');
+      for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.ccCountry=function(c,el){
+      _ctry=c;
+      var chips=document.querySelectorAll('#cc-country-chips .cc-chip');
+      for(var i=0;i<chips.length;i++) chips[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.ccFee=function(f,el){
+      _fee=f;
+      var chips=document.querySelectorAll('#cc-fee-chips .cc-chip');
+      for(var i=0;i<chips.length;i++) chips[i].classList.remove('active');
+      el.classList.add('active');
+      render();
+    };
+    window.initCards=function(){
+      if(!document.getElementById('cc-grid-intl').innerHTML) render();
+    };
+  })();
+  </script>
+  </div>
+
+</div><!-- /.main -->
+
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-inner">
@@ -2205,10 +3197,10 @@ window.addEventListener('DOMContentLoaded',function(){
         <h4>Tools</h4>
         <a href="#" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Live Remittance Rates</a>
         <a href="#" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">SIP &amp; SWP Calculator</a>
-        <a href="#" onclick="showTab('mortgage',document.querySelector('[data-tab=mortgage]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">India Mortgage Calculator</a>
-        <a href="#" onclick="showTab('nps',document.querySelector('[data-tab=nps]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">NPS Projector</a>
+
+
         <a href="#" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Return to India Planner</a>
-        <a href="#" onclick="showTab('cgtax',document.querySelector('[data-tab=cgtax]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})();return false;">Capital Gains Calculator</a>
+        <a href="capital-gains-nri.html">Capital Gains Tax Guide</a>
       </div>
       <div class="footer-col">
         <h4>Guides</h4>
@@ -2233,18 +3225,52 @@ window.addEventListener('DOMContentLoaded',function(){
         &copy; 2025 NRI Finance Hub &nbsp;·&nbsp; 
         Rates are indicative. Verify before transacting. &nbsp;·&nbsp;
         Not financial advice. &nbsp;·&nbsp;
-        <a href="mailto:hello@nrifinancehub.com">Contact</a>
+        <a href="mailto:nrifinancehub3@gmail.com">Contact</a>
       </p>
       <p class="footer-copy">
         Data sources: Wise, Remitly, Exchange Rate API, RBI &nbsp;·&nbsp; Updated in real-time
       </p>
-      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v5.0 · Jul 2026</p>
+      <p class="footer-copy" style="margin-top:6px;">
+        Questions or feedback? &nbsp;&#9993;&nbsp;
+        <a href="mailto:nrifinancehub3@gmail.com" style="color:var(--teal);font-weight:600;">nrifinancehub3@gmail.com</a>
+      </p>
+      <p style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;letter-spacing:.04em;">v8.2 · Jul 2026</p>
     </div>
   </div>
 </footer>
 
 
 
-<script src="/site.js"></script>
+<script src="/site.js?v=10.1"></script>
+
+<!-- MOBILE BOTTOM NAVIGATION BAR -->
+<nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
+  <button class="mob-bnav-btn mob-active" id="mbn-rates" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));setMobBnav('rates')" aria-label="Live Rates">
+    <span class="mob-bnav-icon">📡</span>
+    <span class="mob-bnav-lbl">Rates</span>
+  </button>
+  <button class="mob-bnav-btn" id="mbn-return" onclick="showTab('return',document.querySelector('[data-tab=return]'));setMobBnav('return')" aria-label="Return Plan">
+    <span class="mob-bnav-icon">🏠</span>
+    <span class="mob-bnav-lbl">Return Plan</span>
+  </button>
+  <button class="mob-bnav-btn" id="mbn-edabroad" onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();if(typeof initEdExtraTools==='function')initEdExtraTools();setMobBnav('edabroad')" aria-label="Study Abroad">
+    <span class="mob-bnav-icon">🎓</span>
+    <span class="mob-bnav-lbl">Education</span>
+  </button>
+  <button class="mob-bnav-btn" id="mbn-invest" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));setMobBnav('invest')" aria-label="Invest">
+    <span class="mob-bnav-icon">📈</span>
+    <span class="mob-bnav-lbl">Invest</span>
+  </button>
+  <button class="mob-bnav-btn" id="mbn-flights" onclick="showTab('flights',document.querySelector('[data-tab=flights]'));setMobBnav('flights')" aria-label="Flights">
+    <span class="mob-bnav-icon">✈️</span>
+    <span class="mob-bnav-lbl">Flights</span>
+  </button>
+  <button class="mob-bnav-btn" onclick="openDrawer()" aria-label="All tools menu">
+    <span class="mob-bnav-icon">☰</span>
+    <span class="mob-bnav-lbl">All Tools</span>
+  </button>
+</nav>
+
 </body>
+<script src="/site.js?v=10.2"></script>
 </html>
