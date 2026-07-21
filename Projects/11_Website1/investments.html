@@ -1,264 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-// Prevent flash: apply theme before CSS loads
-(function(){var t=localStorage.getItem('nri-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
-</script>
-<meta charset="UTF-8"/>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-192.png" type="image/png" sizes="192x192">
-<link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48">
-<link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
-<link rel="apple-touch-icon" sizes="192x192" href="/favicon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad</title>
-<meta name="description" content="NRI Finance Hub — 20+ free tools for Indians abroad: compare live remittance rates from 50+ providers, time transfers with Rate Timer, plan Study Abroad costs, calculate SIP, DTAA tax, home loan EMI, Return Corpus &amp; more. No sign-up. Trusted by NRIs in UAE, USA, UK, Canada, Singapore &amp; Australia."/>
-<meta name="keywords" content="NRI remittance rates 2026, best way to send money to India, NRE vs NRO account, NRI home loan calculator, NRI tax calculator, DTAA India, NRI return to India planner, NRI SIP calculator, NRE FD rates, NRI tax residency status, send money UAE to India, send money USA to India, Wise vs Remitly India"/>
-<meta name="author" content="NRI Finance Hub"/>
-<meta name="robots" content="index, follow"/>
-<meta name="google-site-verification" content="euTYbfxgdG6BniTeMIIuhT1pMhMqdoonkrAJ1LpsUbc"/>
-<link rel="canonical" href="https://nrifinancehub.com/"/>
-<!-- Open Graph / Facebook / WhatsApp -->
-<meta property="og:type" content="website"/>
-<meta property="og:url" content="https://nrifinancehub.com/"/>
-<meta property="og:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
-<meta property="og:description" content="20+ free NRI tools: live remittance rates from 50+ providers, Rate Timer to time your transfer, Study Abroad Cost Planner, Return Corpus, SIP/SWP, DTAA tax, home loan EMI & bulk deals. No sign-up."/>
-<meta property="og:image" content="https://nrifinancehub.com/og-image.svg"/>
-<meta property="og:site_name" content="NRI Finance Hub"/>
-<meta property="og:locale" content="en_IN"/>
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="NRI Finance Hub — Live Rates, Calculators & Guides"/>
-<meta name="twitter:image" content="https://nrifinancehub.com/og-image.svg"/>
-<meta name="twitter:description" content="20+ free NRI tools: live rates, Rate Timer, Study Abroad Planner, Return Corpus, SIP, DTAA tax, home loan EMI & more. No sign-up needed."/>
-<!-- JSON-LD: WebSite + SearchAction -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=10.6"/>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://nrifinancehub.com/#organization",
-      "name": "NRI Finance Hub",
-      "legalName": "NRI Finance Hub",
-      "url": "https://nrifinancehub.com/",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://nrifinancehub.com/favicon.png",
-        "width": 512,
-        "height": 512
-      },
-      "description": "NRI Finance Hub is a free financial tools platform for Non-Resident Indians, offering live remittance rate comparison, NRE/NRO FD rates, tax calculators, home loan EMI, SIP planner and India return guides.",
-      "foundingDate": "2024",
-      "knowsAbout": [
-        "NRI taxation", "DTAA", "remittance rates", "NRE NRO accounts",
-        "NRI home loans", "FEMA compliance", "India return planning",
-        "NRI investments", "tax residency status", "RNOR"
-      ],
-      "audience": {
-        "@type": "Audience",
-        "audienceType": "Non-Resident Indians (NRIs)"
-      },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "availableLanguage": ["English", "Hindi"]
-      },
-      "sameAs": [
-        "https://nrifinancehub.com/"
-      ]
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://nrifinancehub.com/#website",
-      "url": "https://nrifinancehub.com/",
-      "name": "NRI Finance Hub",
-      "alternateName": ["NRI Finance", "NRI Calculator", "NRI Remittance Calculator"],
-      "description": "Free financial tools for NRIs: compare live remittance rates, NRE/NRO FD rates, home loan EMI calculator, SIP planner, DTAA tax calculator and India return planner.",
-      "inLanguage": "en-IN",
-      "publisher": { "@id": "https://nrifinancehub.com/#organization" },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://nrifinancehub.com/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    },
-    {
-      "@type": "FinancialService",
-      "@id": "https://nrifinancehub.com/#service",
-      "name": "NRI Finance Hub",
-      "url": "https://nrifinancehub.com/",
-      "description": "Free NRI financial tools: live remittance rate comparison across 50+ providers, NRE/NRO FD rates, home loan EMI, SIP/SWP calculator, DTAA tax guide, tax residency checker, education corpus planner and India return planner.",
-      "serviceType": ["Financial Calculator", "Remittance Rate Comparison", "NRI Banking Guide", "Tax Calculator"],
-      "areaServed": ["IN", "AE", "US", "GB", "CA", "AU", "SG", "MY", "KW", "QA", "BH", "OM"],
-      "audience": {
-        "@type": "Audience",
-        "audienceType": "Non-Resident Indians (NRIs)"
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR",
-        "description": "Free financial tools and calculators for NRIs"
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
-      "@id": "https://nrifinancehub.com/#app",
-      "name": "NRI Finance Hub",
-      "url": "https://nrifinancehub.com/",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
-      "featureList": [
-        "Live remittance rate comparison — Wise, InstaReM, Remitly, bank transfers",
-        "NRE and NRO fixed deposit rates comparison",
-        "NRI home loan EMI calculator with prepayment analysis",
-        "SIP and SWP calculator for NRI investments",
-        "DTAA tax calculator for India-sourced income",
-        "Tax residency status checker (RNOR, NRI, Resident)",
-        "India return corpus planner",
-        "Education corpus calculator",
-        "Real estate ROI calculator"
-      ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "127",
-        "bestRating": "5"
-      }
-    },
-    {
-      "@type": "FAQPage",
-      "@id": "https://nrifinancehub.com/#faq",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is the best way to send money from UAE to India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The best way to send money from UAE to India depends on the amount and speed. Wise (formerly TransferWise) consistently offers mid-market exchange rates with low fees. Emirates NBD DirectRemit offers instant transfers to major Indian banks. For large amounts above AED 50,000, bank-to-bank SWIFT transfers may be competitive. Use NRI Finance Hub's live rate comparison tool to see today's best rates across 15+ UAE providers in real time."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the difference between NRE and NRO accounts?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "NRE (Non-Resident External) accounts hold foreign earnings converted to INR — interest is tax-free in India and funds are fully repatriable. NRO (Non-Resident Ordinary) accounts hold India-sourced income like rent, dividends, or pension — interest is taxable at 30% TDS and repatriation is capped at USD 1 million per year. NRIs typically maintain both: NRE for savings/investments and NRO for India income."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much corpus does an NRI need to retire in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "An NRI planning to retire in a metro city in India typically needs ₹5–10 Cr corpus for comfortable retirement. Using the 4% withdrawal rule adjusted for Indian inflation (6%), a monthly expense of ₹1.2 lakh in today's terms requires approximately ₹3.6–4 Cr corpus at retirement. Use NRI Finance Hub's Return to India Planner to calculate your exact corpus based on your city, lifestyle, and timeline."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is NRE fixed deposit interest taxable?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "No. Interest earned on NRE fixed deposits is completely tax-free in India for NRIs under Section 10(4) of the Income Tax Act. There is no TDS deducted on NRE FD interest. However, this interest may be taxable in your country of residence depending on the DTAA (Double Taxation Avoidance Agreement) between India and that country. NRO FD interest, by contrast, is taxable at 30% TDS in India."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can NRIs get a home loan in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes, NRIs can get home loans in India from banks like HDFC, SBI, ICICI, and Axis. NRI home loan interest rates in 2026 typically range from 8.5% to 9.5% per annum. The maximum loan tenure is 20–30 years. EMI must be repaid from NRE/NRO accounts. Required documents include passport, visa, overseas salary slips, overseas bank statements, and a Power of Attorney. Use NRI Finance Hub's Home Loan EMI calculator to estimate your monthly payments."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What is DTAA and how does it benefit NRIs?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "DTAA (Double Taxation Avoidance Agreement) is a treaty between India and 90+ countries that prevents NRIs from paying tax on the same income twice. Under DTAA, NRIs can claim tax credits or exemptions on India-sourced income like dividends, rent, and capital gains. For example, UAE-based NRIs pay zero tax on India income since UAE has no personal income tax. US-based NRIs can offset Indian TDS against US tax liability. Use NRI Finance Hub's DTAA calculator to estimate your tax liability."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How is NRI tax residency status determined in India?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "NRI tax residency in India is determined by the number of days spent in India during the financial year (April–March). If you spend less than 182 days in India in a financial year, you are classified as NRI. If you spend 60–182 days and have spent 365+ days in the previous 4 years, you may become Resident but Not Ordinarily Resident (RNOR). The RNOR status gives 2–3 years of transition benefits when returning to India. Use NRI Finance Hub's Tax Residency Status checker to determine your exact status."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How much SIP should an NRI do to build a retirement corpus?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "The SIP amount depends on your target corpus and investment horizon. As a rough guide: to build ₹1 Cr in 10 years at 12% returns, you need approximately ₹43,000/month SIP. For ₹5 Cr in 15 years, approximately ₹1.1 lakh/month. NRIs can invest in Indian mutual funds from their NRE/NRO accounts. Use NRI Finance Hub's SIP calculator to get personalised projections based on your target amount and timeline."
-          }
-        }
-      ]
-    }
-  ]
-}
-</script>
-<script>
-/* Expose baseCur (let variable) via window — reads live from currency button */
-Object.defineProperty(window,'baseCur',{
-  get:function(){var e=document.getElementById('curBtnCode');return e?e.textContent.trim()||'AED':'AED';},
-  configurable:true
-});
-/* Re-render Flights tab whenever currency changes */
-document.addEventListener('DOMContentLoaded',function(){
-  var btn=document.getElementById('curBtnCode');
-  if(!btn)return;
-  new MutationObserver(function(){
-    var fl=document.getElementById('tab-flights');
-    if(fl&&fl.style.display!=='none'&&typeof window.initFlights==='function'){
-      setTimeout(window.initFlights,60);
-    }
-  }).observe(btn,{characterData:true,childList:true,subtree:true});
-});
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is the best way to send money from UAE to India?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Compare live rates from Wise, InstaReM, Al Ansari, Remitly and 50+ providers at NRI Finance Hub. Rates update daily and include all fees so you see the exact amount your recipient gets."}
-    },
-    {
-      "@type": "Question",
-      "name": "What is the difference between NRE and NRO accounts?",
-      "acceptedAnswer": {"@type": "Answer", "text": "NRE (Non-Resident External) accounts hold foreign earnings converted to INR and are fully repatriable with tax-free interest. NRO (Non-Resident Ordinary) accounts hold Indian income like rent or dividends — interest is taxable at 30% and repatriation requires Form 15CA/CB."}
-    },
-    {
-      "@type": "Question",
-      "name": "How do I calculate NRI home loan EMI?",
-      "acceptedAnswer": {"@type": "Answer", "text": "Use the NRI Home Loan EMI Calculator at NRI Finance Hub. Enter loan amount, interest rate (SBI starts at 8.5%, HDFC at 8.6%) and tenure. The tool shows monthly EMI, total interest and full amortisation schedule."}
-    },
-    {
-      "@type": "Question",
-      "name": "Do NRIs pay tax in India on NRE FD interest?",
-      "acceptedAnswer": {"@type": "Answer", "text": "No. Interest earned on NRE Fixed Deposits is completely tax-free in India for NRIs. However, it may be taxable in your country of residence. NRO FD interest is taxed at 30% plus surcharge in India."}
-    },
-    {
-      "@type": "Question",
-      "name": "What is DTAA and how does it benefit NRIs?",
-      "acceptedAnswer": {"@type": "Answer", "text": "DTAA (Double Taxation Avoidance Agreement) prevents NRIs from paying tax twice on the same income in both India and their country of residence. India has DTAA with 90+ countries including UAE, USA, UK, Singapore and Canada."}
-    }
-  ]
-}
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NRI Investment Options: Mutual Funds, NRE NRO Accounts | NRI Finance Hub</title>
+<meta name="description" content="Explore NRI investment options including mutual funds, NRE/NRO accounts, direct equity, and real estate.">
+<meta name="keywords" content="NRI investment, NRE account, NRO account, NRI mutual funds, NRI stocks">
+<meta property="og:title" content="NRI Investment Options: Mutual Funds, NRE NRO Accounts | NRI Finance Hub">
+<meta property="og:description" content="Explore NRI investment options including mutual funds, NRE/NRO accounts, direct equity, and real estate.">
+<meta property="og:url" content="https://nrifinancehub.com/investments">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://nrifinancehub.com/investments">
+<script>window._defaultTab='invest';</script>
+<link rel="stylesheet" href="site.css?v=10.6">
 </head>
 <body>
+
 
 <!-- ═══════════════════════════════════════════
      NAV
@@ -3493,5 +3250,7 @@ document.addEventListener('DOMContentLoaded',function(){
   </button>
 </nav>
 
+
+<script src="site.js?v=10.6"></script>
 </body>
 </html>

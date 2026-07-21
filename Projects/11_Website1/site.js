@@ -1,4 +1,4 @@
-/* v10.5 */
+/* v10.6 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -228,19 +228,23 @@ const P={
     {name:'Maybank',spread:0.020,fee:0,link:'https://www.maybank2u.com.my/',note:'Maybank M2U · best for existing Maybank customers'},
   ],
   AED:[
+    {name:'Aspora',spread:.003,fee:0,link:'https://www.aspora.com/ae',note:'Google-rate matching · zero fees · NRI app'},
     {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
     {name:'Emirates NBD DirectRemit',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
+    {name:'Careem Pay',spread:.009,fee:0,link:'https://www.careem.com/en-AE/pay/sendmoney/',note:'In-app remittance · zero fees · powered by Lulu Exchange'},
     {name:'ADCB Money Transfer',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank transfer · fast'},
     {name:'FAB India Transfers',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
     {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
     {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
     {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
     {name:'GCC Exchange',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
+    {name:'Joyalukkas Exchange',spread:.012,fee:0,link:'https://joyalukkas.com/exchange',note:'Popular walk-in counters · UAE wide'},
+    {name:'NOW Money',spread:.012,fee:0,link:'https://nowmoney.me',note:'Neobank for UAE workers · app-based'},
     {name:'Wall Street Exchange',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
     {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
     {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium exchange service'},
-    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
     {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+    {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
     {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
     {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
     {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
