@@ -3003,17 +3003,15 @@ document.addEventListener('DOMContentLoaded',function(){
   <div class="calc-cur-bar" id="ccb-flights"><span class="ccb-flag" id="ccb-flag-flights"></span><span class="ccb-rate" id="ccb-rate-flights">Showing fares in your currency</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-flights" type="number" placeholder="Amount" oninput="ccbConvert('flights')"/><span id="ccb-cur-flights" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">&rarr;</span><span class="ccb-result" id="ccb-out-flights">&#8377;&mdash;</span></div></div>
 
 
-    <!-- Flights Section Hero -->
-    <div class="fl-section-hero">
-      <div class="fl-section-hero-overlay"></div>
-      <div class="fl-section-hero-content">
-        <div class="fl-section-hero-badge">&#9992; Flights to India</div>
-        <div class="fl-section-hero-title">Find the Best Time &amp; Price to Fly Home</div>
-        <div class="fl-section-hero-sub">AI trip planner with fare estimates, best travel dates &amp; booking strategy for NRIs worldwide</div>
-      </div>
-    </div>
+    <!-- Flights Background + Planner Card -->
+    <div class="fl-tab-bg">
+      <div class="fl-tab-bg-overlay"></div>
+      <div class="fl-tab-bg-inner">
+        <div class="fl-tab-eyebrow">&#9992; Flights to India</div>
+        <div class="fl-tab-headline">Find the Best Time &amp; Price to Fly Home</div>
+        <div class="fl-tab-tagline">AI-powered planner for NRIs &mdash; fare estimates, best dates &amp; booking strategy</div>
 
-    <!-- AI Trip Planner — HERO at top -->
+    <!-- AI Trip Planner Card -->
     <div class="fl-ai-hero">
       <div class="fl-ai-hero-hd">
         <span class="fl-planner-icon">✦</span>
@@ -3080,6 +3078,8 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="fl-ai-chips" id="fl-ai-chips"><!-- JS renders all 22 city chips --></div>
       <div id="fl-planner-result" class="fl-planner-result" style="display:none"></div>
     </div>
+      </div>
+    </div><!-- /fl-tab-bg -->
 
 
     <!-- Hidden JS anchors -->
