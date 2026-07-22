@@ -1,4 +1,4 @@
-/* v11.8 */
+/* v11.9 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2238,7 +2238,78 @@ const ARTICLES={
         <li>Debt fund gains: Taxed at slab rate regardless of holding period (post-2023)</li>
       </ul>
       <p>Structure your SWP to stay within the &#8377;1.25L LTCG exemption where possible, especially in early retirement years.</</p>
+    `},
+
+  'kids-education-return':{
+    tag:'return',tagLabel:'Return Planning',readTime:'9 min read',
+    metaTitle:'Returning to India with Kids: Schools, JEE/NEET & Education Planning (2026)',
+    metaDesc:'Practical guide for NRI parents planning to return to India — how to navigate CBSE vs IB, competitive exams, international schools, and education costs.',
+    metaKw:'NRI return to India kids education, JEE NEET NRI children, international schools India, CBSE IB IGCSE comparison NRI',
+    title:'Returning to India with Kids: Education, Exams and Your Real Options',
+    content:`
+      <div class="art-callout indigo"><strong>The honest summary:</strong> India has world-class schools and deeply broken exam systems — sometimes in the same city. The good news is NRI families have more options than local parents, and planning 2 years ahead makes the difference between a smooth transition and a stressful one.</div>
+      <h2>Why This Hits Differently for Returning NRIs</h2>
+      <p>When you lived abroad, your children's school was a given — decent teachers, manageable workloads, reasonably fair assessment. Moving back to India introduces a different equation: a school system that ranges from genuinely excellent to overwhelmingly competitive to, in some cases, outright broken.</p>
+      <p>The JEE (engineering) and NEET (medicine) entrance exams are the most competitive in the world by sheer volume — over 1.3 million students appear for NEET each year. Recent paper leak scandals have shaken confidence in the system further. For NRI parents who have spent years building a plan around returning home, discovering this landscape can be jarring.</p>
+      <div class="art-callout green"><strong>Key insight:</strong> The problem is not "India" — it is not choosing the right path for your child specifically. Many NRI families who return do extremely well educationally. What fails them is assuming the system works like it did when they left, or like it works abroad.</div>
+      <h2>The Four School Board Options — What Each Actually Means</h2>
+      <table class="art-table">
+        <thead><tr><th>Board</th><th>Best for</th><th>University pathway</th><th>Annual cost (approx)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>CBSE</strong></td><td>Students targeting IIT, NIT, AIIMS</td><td>JEE / NEET / Indian universities</td><td>&#8377;80K &ndash; &#8377;3L</td></tr>
+          <tr><td><strong>ICSE</strong></td><td>Well-rounded academics, language strength</td><td>Indian universities + some UK/Australia</td><td>&#8377;1L &ndash; &#8377;4L</td></tr>
+          <tr><td><strong>IB (IBDP)</strong></td><td>Students likely heading abroad for university</td><td>US, UK, Canada, Europe — all major systems</td><td>&#8377;6L &ndash; &#8377;18L</td></tr>
+          <tr><td><strong>Cambridge (IGCSE/A-Level)</strong></td><td>UK-oriented or global pathway</td><td>UK, Australia, Singapore, Canada</td><td>&#8377;5L &ndash; &#8377;15L</td></tr>
+        </tbody>
+      </table>
+      <p>The cost difference is significant: a CBSE school might cost &#8377;1L/year, while an IB school in Mumbai or Bangalore can run &#8377;15L+. Over 5 years of senior school, that is a &#8377;50&ndash;70L difference — money that could fund 2 years of a foreign university instead.</p>
+      <h2>The JEE and NEET Reality in 2026</h2>
+      <p>If your child is academically strong and interested in engineering or medicine, the Indian competitive exam route is still viable — and the IITs and AIIMS remain genuinely world-class. But parents should go in with clear eyes:</p>
+      <ul>
+        <li><strong>JEE Advanced cutoffs:</strong> Roughly 1 in 50 JEE Main qualifiers make it to IIT. Only the top 2.5% of JEE Main candidates clear Advanced.</li>
+        <li><strong>NEET:</strong> 1.3 million+ applicants for approximately 110,000 MBBS seats — a 1-in-12 shot even before quality filtering.</li>
+        <li><strong>2-year coaching culture:</strong> Most serious JEE/NEET aspirants do Class 11&ndash;12 in coaching-heavy cities (Kota, Hyderabad, Chennai). This is an enormous lifestyle and psychological commitment.</li>
+        <li><strong>Paper integrity concerns:</strong> The 2024 NEET paper leak scandal was a serious blow to systemic trust. The Supreme Court and NTA are under scrutiny. Reforms are pending, but uncertainty remains.</li>
+      </ul>
+      <div class="art-callout"><strong>Practical note:</strong> NRI children who have studied abroad often find the transition to coaching-oriented CBSE Class 11&ndash;12 genuinely difficult — not due to intelligence, but due to rote-heavy methodology. Factor in at least 6&ndash;12 months for academic adjustment.</div>
+      <h2>The Four Realistic Paths for NRI Families</h2>
+      <p><strong>Path 1 — International school in India, then abroad for university.</strong> Enroll in an IB or Cambridge school in a metro city. Your child gets peer stability, India exposure, and a globally recognized credential. University abroad follows naturally. Cost: &#8377;8&ndash;18L/year for school + &#8377;40&ndash;80L for undergraduate abroad.</p>
+      <p><strong>Path 2 — Top CBSE school, target IIT/NIT/BITS.</strong> Works well if your child adapts to the Indian study style and has the aptitude. Outcome can be excellent — IIT graduates are among the most employable in the world. Requires genuine buy-in from the child, not just the parents.</p>
+      <p><strong>Path 3 — CBSE/ICSE for school, then abroad for university.</strong> A practical middle ground. Lower school fees, normal Indian childhood, then shift abroad at 18. Increasingly chosen by NRI families who want their kids to "grow up Indian" but not be limited to Indian career options.</p>
+      <p><strong>Path 4 — Return to origin country for university, spend school years in India.</strong> Some families use India as a base during the lower and middle school years (ages 6&ndash;15) and return to the UAE, Singapore, or UK for A-levels and university.</p>
+      <h2>Which Cities Have the Best Options?</h2>
+      <table class="art-table">
+        <thead><tr><th>City</th><th>International schools</th><th>Top CBSE options</th><th>NRI family verdict</th></tr></thead>
+        <tbody>
+          <tr><td>Bangalore</td><td>Excellent (Indus, Inventure, Canadian International)</td><td>Strong (DPS, NPS, Greenwood)</td><td>Most popular with tech NRIs</td></tr>
+          <tr><td>Mumbai</td><td>Excellent (Dhirubhai Ambani, ASB, Ecole Mondiale)</td><td>Very good</td><td>High cost of living; best school density</td></tr>
+          <tr><td>Pune</td><td>Good (Symbiosis, Indus International)</td><td>Very good</td><td>Lower cost than Mumbai; growing NRI base</td></tr>
+          <tr><td>Delhi / Gurgaon</td><td>Very good (GD Goenka, The Shri Ram)</td><td>Excellent</td><td>Strong for CBSE; good international options in Gurgaon</td></tr>
+          <tr><td>Hyderabad</td><td>Good (Oakridge, Chirec)</td><td>Excellent (coaching culture strong)</td><td>Good value; strong STEM ecosystem</td></tr>
+          <tr><td>Chennai</td><td>Limited</td><td>Very good</td><td>Strong local academics; less international variety</td></tr>
+          <tr><td>Kochi / Trivandrum</td><td>Limited</td><td>Good</td><td>Good Kerala state options; quieter lifestyle</td></tr>
+        </tbody>
+      </table>
+      <h2>The Financial Planning Angle</h2>
+      <p>Most NRI families underestimate the cost of quality education in India. A 12-year IB school education can cost &#8377;1.5 &ndash; 2 crore in total fees. Add coaching for competitive exams (&#8377;2&ndash;5L/year in Kota-model programs), and education can rival your housing EMI.</p>
+      <ul>
+        <li><strong>Sukanya Samriddhi Yojana (SSY):</strong> If you have a daughter under 10, this scheme offers 8.2% interest tax-free. &#8377;1.5L/year max. Good base layer.</li>
+        <li><strong>NRE FD ladder:</strong> Park 5-year education corpus in NRE FDs now (tax-free interest, 7.5&ndash;8% at major banks) while you still have NRI status.</li>
+        <li><strong>Education loans:</strong> If your child gets into a top IIT or a foreign university, education loans are available and interest is tax-deductible under Section 80E — no cap on deduction amount.</li>
+        <li><strong>Foreign remittance from parents abroad:</strong> If extended family is still abroad, gifts from NRI relatives are tax-free in India — can supplement education costs without gift tax.</li>
+      </ul>
+      <h2>What NRI Parents Who Have Done This Actually Say</h2>
+      <p>Patterns from real returning NRI families across forums and community groups:</p>
+      <ul>
+        <li><strong>Plan 2 years ahead.</strong> Admissions to top IB or CBSE schools in Bangalore, Mumbai, and Gurgaon are oversubscribed. Several schools have 12&ndash;18 month waitlists. Start the application process before you land.</li>
+        <li><strong>Avoid the Class 9 switch.</strong> Changing schools or boards in Class 9&ndash;10 is particularly disruptive — exams and boards solidify at that point. If possible, time your return for Class 1&ndash;6 or post-Class 10.</li>
+        <li><strong>Do not push IIT if the child does not want it.</strong> The coaching burden for JEE is extreme. Families who go down this road without genuine child buy-in report the highest levels of regret.</li>
+        <li><strong>Budget for tutoring.</strong> Even in good schools, the academic gap from overseas education can take 6&ndash;12 months to close. Budget &#8377;5&ndash;15K/month for subject tutoring in the transition year.</li>
+      </ul>
+      <div class="art-callout green"><strong>Bottom line:</strong> Returning to India with children is absolutely doable and often works out beautifully — but it requires researching schools before choosing your city, not after. The school decision should drive the neighbourhood decision, not the other way around.</div>
+      <div class="art-cta"><div><div class="art-cta-text">Plan Your Return to India Financially</div><div class="art-cta-sub">Calculate corpus needed, cost of living, and tax residency timeline</div></div><button class="art-cta-btn" onclick="closeArticle();showTab('return',document.querySelector('[data-tab=return]'))">Open Return Planner &#8594;</button></div>
     `}
+
 };
 function openArticle(key){
   const art=ARTICLES[key];
