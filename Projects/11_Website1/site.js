@@ -1,4 +1,4 @@
-/* v11.4 */
+/* v11.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3254,7 +3254,7 @@ function closeNavDD(){
     var price=typeof r.min==='number'
       ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
       : '—';
-    var kiwiUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var kiwiUrl='https://kiwi.tpx.gr/i3IFxDSh?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
     var aviUrl='https://aviasales.tpx.gr/o76pMR9j?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
     panel.innerHTML='<div class="fl-dest-card-detail">'
       +'<div class="fl-dcd-top">'
@@ -3778,7 +3778,7 @@ function closeNavDD(){
       var isBest=ap.diff===Math.min.apply(null,airports.map(function(a){return a.diff;}));
       var isMost=ai===0;
       var diffLabel=ap.diff===0?'Base':ap.diff<0?'Save '+cur+' '+Math.abs(ap.diff):'+ '+cur+' '+ap.diff;
-      var skUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+ap.code.toLowerCase()+'-'+(destCode||'BOM').toLowerCase();
+      var skUrl='https://kiwi.tpx.gr/i3IFxDSh?sub_id='+ap.code.toLowerCase()+'-'+(destCode||'BOM').toLowerCase();
 
       html+='<div class="fl-apt-row'+(isBest?' fl-apt-best':'')+'">'
         +'<div class="fl-apt-left">'
@@ -4518,8 +4518,8 @@ function closeNavDD(){
         var aviDep=_fmtAvi(depDate);
         var aviRet=_fmtAvi(retDate);
         var _skCabin=cabinClass==='business'?'?cabin=business&currency='+cur:'?cabin=economy&currency='+cur;
-        var skRT='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt-'+kiwiDep;
-        var skOut='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out-'+kiwiDep;
+        var skRT='https://kiwi.tpx.gr/i3IFxDSh?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt-'+kiwiDep;
+        var skOut='https://kiwi.tpx.gr/i3IFxDSh?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out-'+kiwiDep;
         var skRet='https://aviasales.tpx.gr/o76pMR9j?sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret-'+aviDep+'-'+aviRet;
 
         var gMult=groupN>1?' (&times;'+groupN+')':'';
