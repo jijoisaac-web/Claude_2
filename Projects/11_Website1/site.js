@@ -1,4 +1,4 @@
-/* v11.3 */
+/* v11.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3254,8 +3254,8 @@ function closeNavDD(){
     var price=typeof r.min==='number'
       ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
       : '—';
-    var kiwiUrl='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+from+'/'+code)+'&sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
-    var aviUrl='https://tp.media/r?marker=553023&p=100&u='+encodeURIComponent('https://www.aviasales.com/search/'+from+code)+'&sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var kiwiUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var aviUrl='https://aviasales.tpx.gr/o76pMR9j?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
     panel.innerHTML='<div class="fl-dest-card-detail">'
       +'<div class="fl-dcd-top">'
       +'<span class="fl-dcd-icon">'+d.icon+'</span>'
@@ -4518,9 +4518,9 @@ function closeNavDD(){
         var aviDep=_fmtAvi(depDate);
         var aviRet=_fmtAvi(retDate);
         var _skCabin=cabinClass==='business'?'?cabin=business&currency='+cur:'?cabin=economy&currency='+cur;
-        var skRT='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+fromCode+'/'+destCode+'/'+kiwiDep+'/'+kiwiRet)+'&sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt';
-        var skOut='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+fromCode+'/'+destCode+'/'+kiwiDep)+'&sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out';
-        var skRet='https://tp.media/r?marker=553023&p=100&u='+encodeURIComponent('https://www.aviasales.com/search/'+fromCode+aviDep+destCode+aviRet+'1')+'&sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret';
+        var skRT='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt-'+kiwiDep;
+        var skOut='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out-'+kiwiDep;
+        var skRet='https://aviasales.tpx.gr/o76pMR9j?sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret-'+aviDep+'-'+aviRet;
 
         var gMult=groupN>1?' (&times;'+groupN+')':'';
         var grpRtMin=Math.round(rtMin*groupN);
