@@ -1,4 +1,4 @@
-/* v11.0 */
+/* v11.3 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3254,8 +3254,8 @@ function closeNavDD(){
     var price=typeof r.min==='number'
       ? cur+' '+r.min.toLocaleString()+' – '+r.max.toLocaleString()
       : '—';
-    var kiwiUrl='https://kiwi.tpx.gr/LCtd568c?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
-    var aviUrl='https://aviasales.tpx.gr/o76pMR9j?sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var kiwiUrl='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+from+'/'+code)+'&sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
+    var aviUrl='https://tp.media/r?marker=553023&p=100&u='+encodeURIComponent('https://www.aviasales.com/search/'+from+code)+'&sub_id='+from.toLowerCase()+'-'+code.toLowerCase();
     panel.innerHTML='<div class="fl-dest-card-detail">'
       +'<div class="fl-dcd-top">'
       +'<span class="fl-dcd-icon">'+d.icon+'</span>'
@@ -3276,10 +3276,20 @@ function closeNavDD(){
       +'</div>'
       +'<div class="fl-dcd-search-lbl">Search flights on:</div>'
       +'<div class="fl-dcd-providers">'
-      +'<a class="fl-prov-btn fl-prov-kiwi" href="'+kiwiUrl+'" target="_blank" rel="noopener sponsored" title="Best for multi-city &amp; flexible dates">🟠 Kiwi.com</a>'
-      +'<a class="fl-prov-btn fl-prov-avi" href="'+aviUrl+'" target="_blank" rel="noopener sponsored" title="Great for Gulf routes">🔴 Aviasales</a>'
-      +'<a class="fl-prov-btn fl-prov-sky" href="https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/" target="_blank" rel="noopener" title="Best price calendar">🔵 Skyscanner</a>'
-      +'<a class="fl-prov-btn fl-prov-gf" href="https://www.google.com/travel/flights?q=flights+'+from+'+to+'+encodeURIComponent(d.name+', India')+'" target="_blank" rel="noopener" title="Quick overview">🔍 Google Flights</a>'
+      +'<a class="fl-prov-btn fl-prov-kiwi" href="'+kiwiUrl+'" target="_blank" rel="noopener sponsored" title="Best for multi-city &amp; flexible dates"><img src="https://www.google.com/s2/favicons?domain=kiwi.com&sz=32" class="fl-prov-logo"> Kiwi.com</a>'
+      +'<a class="fl-prov-btn fl-prov-avi" href="'+aviUrl+'" target="_blank" rel="noopener sponsored" title="Great for Gulf routes"><img src="https://www.google.com/s2/favicons?domain=aviasales.com&sz=32" class="fl-prov-logo"> Aviasales</a>'
+      +'<a class="fl-prov-btn fl-prov-sky" href="https://www.skyscanner.net/transport/flights/'+from+'/'+code+'/" target="_blank" rel="noopener" title="Best price calendar"><img src="https://www.google.com/s2/favicons?domain=skyscanner.net&sz=32" class="fl-prov-logo"> Skyscanner</a>'
+      +'<a class="fl-prov-btn fl-prov-gf" href="https://www.google.com/travel/flights?q=flights+'+from+'+to+'+encodeURIComponent(d.name+', India')+'" target="_blank" rel="noopener" title="Quick overview"><img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" class="fl-prov-logo"> Google</a>'
+      +'</div>'
+      +'<div class="fl-dcd-section-lbl">Activities &amp; Experiences:</div>'
+      +'<div class="fl-dcd-tours">'
+      +'<a class="fl-dcd-tour-btn fl-tour-kkday" href="https://kkday.tpx.gr/7KJdYsht?sub_id=kkday-'+code.toLowerCase()+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=kkday.com&sz=32" class="fl-prov-logo"> KKday</a>'
+      +'<a class="fl-dcd-tour-btn fl-tour-klook" href="https://klook.tpx.gr/u3SlWr1u?sub_id=klook-'+code.toLowerCase()+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=klook.com&sz=32" class="fl-prov-logo"> Klook</a>'
+      +'</div>'
+      +'<div class="fl-dcd-section-lbl">Get India eSIM:</div>'
+      +'<div class="fl-dcd-esim">'
+      +'<a class="fl-dcd-esim-btn fl-esim-airalo" href="https://airalo.tpx.gr/V7ilOl0Q?sub_id=esim-'+code.toLowerCase()+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=airalo.com&sz=32" class="fl-prov-logo"> Airalo</a>'
+      +'<a class="fl-dcd-esim-btn fl-esim-yesim" href="https://yesim.tpx.gr/hTX1bFGO?sub_id=esim-'+code.toLowerCase()+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=yesim.tech&sz=32" class="fl-prov-logo"> Yesim</a>'
       +'</div>'
       +'<div class="fl-dcd-actions">'
       +'<button class="fl-dcd-btn fl-dcd-plan" onclick="window.flChip(\''
@@ -4141,6 +4151,10 @@ function closeNavDD(){
     // Google Flights YYYY-MM-DD
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
+  function _fmtAvi(d){
+    // Aviasales DDMM
+    return String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0');
+  }
 
   function _nthWeekday(year,month,n,wd){
     // nth (0-based) occurrence of weekday wd (0=Sun…6=Sat) in month
@@ -4479,7 +4493,7 @@ function closeNavDD(){
       html+=_flAcc('&#9992; Booking Strategy',secBook,false);
 
       // ── Best Travel Dates accordion (open by default) ───────────────────────
-      var secDates='';
+      var secDates='<div class="fl-dates-row">';
       for(var wi=0;wi<windows.length;wi++){
         var w=windows[wi];
         var depDate=w.dep;
@@ -4499,10 +4513,14 @@ function closeNavDD(){
 
         var depSK=_fmtSK(depDate);
         var retSK=_fmtSK(retDate);
+        var kiwiDep=_fmtGF(depDate);
+        var kiwiRet=_fmtGF(retDate);
+        var aviDep=_fmtAvi(depDate);
+        var aviRet=_fmtAvi(retDate);
         var _skCabin=cabinClass==='business'?'?cabin=business&currency='+cur:'?cabin=economy&currency='+cur;
-        var skRT='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt';
-        var skOut='https://kiwi.tpx.gr/LCtd568c?sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out';
-        var skRet='https://aviasales.tpx.gr/o76pMR9j?sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret';
+        var skRT='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+fromCode+'/'+destCode+'/'+kiwiDep+'/'+kiwiRet)+'&sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-rt';
+        var skOut='https://tp.media/r?marker=553023&p=111&u='+encodeURIComponent('https://www.kiwi.com/en/search/results/'+fromCode+'/'+destCode+'/'+kiwiDep)+'&sub_id='+fromCode.toLowerCase()+'-'+destCode.toLowerCase()+'-out';
+        var skRet='https://tp.media/r?marker=553023&p=100&u='+encodeURIComponent('https://www.aviasales.com/search/'+fromCode+aviDep+destCode+aviRet+'1')+'&sub_id='+destCode.toLowerCase()+'-'+fromCode.toLowerCase()+'-ret';
 
         var gMult=groupN>1?' (&times;'+groupN+')':'';
         var grpRtMin=Math.round(rtMin*groupN);
@@ -4533,10 +4551,14 @@ function closeNavDD(){
           +'</div>'
           +'<div class="fl-win-search-lbl">Search flights:</div>'
           +'<div class="fl-win-providers">'
-          +'<a class="fl-wprov fl-wprov-kiwi" href="'+skRT+'" target="_blank" rel="noopener sponsored">&#9992; Kiwi.com</a>'
-          +'<a class="fl-wprov fl-wprov-avi" href="'+skRet+'" target="_blank" rel="noopener sponsored">&#9992; Aviasales</a>'
-          +'<a class="fl-wprov fl-wprov-sky" href="https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/" target="_blank" rel="noopener">&#9992; Skyscanner</a>'
-          +'<a class="fl-wprov fl-wprov-gf" href="https://www.google.com/travel/flights?q=flights+'+fromCode+'+to+'+destCode+'" target="_blank" rel="noopener">&#128269; Google</a>'
+          +'<a class="fl-wprov fl-wprov-kiwi" href="'+skRT+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=kiwi.com&sz=32" class="fl-prov-logo"> Kiwi.com</a>'
+          +'<a class="fl-wprov fl-wprov-avi" href="'+skRet+'" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=aviasales.com&sz=32" class="fl-prov-logo"> Aviasales</a>'
+          +'<a class="fl-wprov fl-wprov-sky" href="https://www.skyscanner.net/transport/flights/'+fromCode+'/'+destCode+'/'+depSK+'/'+retSK+'/" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=skyscanner.net&sz=32" class="fl-prov-logo"> Skyscanner</a>'
+          +'<a class="fl-wprov fl-wprov-gf" href="https://www.google.com/travel/flights?q=flights+'+fromCode+'+to+'+destCode+'" target="_blank" rel="noopener"><img src="https://www.google.com/s2/favicons?domain=google.com&sz=32" class="fl-prov-logo"> Google</a>'
+          +'</div>'
+          +'<div class="fl-win-protect">'
+          +'<a class="fl-wprot fl-wprot-ah" href="https://airhelp.tpx.gr/1VvvXbdE" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=airhelp.com&sz=32" class="fl-prov-logo"> Claim delay comp</a>'
+          +'<a class="fl-wprot fl-wprot-ekta" href="https://ektatraveling.tpx.gr/4Gwp3ZwH" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=ektatraveling.com&sz=32" class="fl-prov-logo"> Travel insurance</a>'
           +'</div>'
           +'<details class="fl-win-fare-details"><summary class="fl-win-fare-summary">&#128202; Fare estimates &mdash; click to expand</summary>'
           +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on booking sites</div>'
@@ -4551,6 +4573,7 @@ function closeNavDD(){
           +connTip
           +'</div>';
       }
+      secDates+='</div>';
 
       // Month summary appended to dates section
       // mIdx and wks already computed above
