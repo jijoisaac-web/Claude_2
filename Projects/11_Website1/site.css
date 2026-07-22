@@ -1,4 +1,4 @@
-/* v11.7 */
+/* v11.8 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1669,14 +1669,14 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .fl-win-fare-muted .fl-win-fare-val{color:var(--muted);font-size:.78rem;}
 /* ── Date window provider buttons ── */
 .fl-win-search-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin:10px 0 6px;border-top:1px solid var(--border);padding-top:10px;}
-.fl-win-providers{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:2px;}
+.fl-win-providers{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:2px;}
 @media(max-width:580px){.fl-win-providers{grid-template-columns:1fr 1fr;}}
-.fl-wprov{display:flex;align-items:center;justify-content:center;padding:9px 6px;border-radius:8px;font-size:.74rem;font-weight:700;text-decoration:none;text-align:center;transition:transform .15s,opacity .15s;white-space:nowrap;}
-.fl-wprov:hover{transform:translateY(-1px);opacity:.9;}
-.fl-wprov-kiwi{background:linear-gradient(135deg,#e8472a,#f26d3d);color:#fff;}
-.fl-wprov-avi{background:linear-gradient(135deg,#ff4e00,#ec9f05);color:#fff;}
-.fl-wprov-sky{background:linear-gradient(135deg,#0770e3,#3b9eff);color:#fff;}
-.fl-wprov-gf{background:var(--elevated);border:1px solid var(--border);color:var(--text2);}
+.fl-wprov{display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 6px;border-radius:7px;font-size:.68rem;font-weight:700;text-decoration:none;text-align:center;transition:transform .15s,opacity .15s;white-space:nowrap;border:1px solid transparent;}
+.fl-wprov:hover{transform:translateY(-1px);opacity:.85;}
+.fl-wprov-kiwi{background:rgba(232,71,42,0.13);color:#f26d3d;border-color:rgba(232,71,42,0.3);}
+.fl-wprov-avi{background:rgba(255,78,0,0.13);color:#ff8c42;border-color:rgba(255,78,0,0.3);}
+.fl-wprov-sky{background:rgba(7,112,227,0.13);color:#3b9eff;border-color:rgba(7,112,227,0.3);}
+.fl-wprov-gf{background:rgba(66,133,244,0.10);color:#7ab4ff;border-color:rgba(66,133,244,0.25);}
 .fl-win-protect{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;}
 .fl-wprot{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;border-radius:7px;font-size:.72rem;font-weight:700;text-decoration:none;transition:opacity .15s;}
 .fl-wprot:hover{opacity:.82;}
