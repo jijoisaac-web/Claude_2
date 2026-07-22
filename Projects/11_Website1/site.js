@@ -1,4 +1,4 @@
-/* v11.5 */
+/* v11.6 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -3152,7 +3152,7 @@ function closeNavDD(){
     var sd=document.getElementById('fl-opt-dur');
     var sc=document.getElementById('fl-opt-cabin');
     var sp=document.getElementById('fl-opt-pax');
-    if(sm) sm.selectedIndex=0;
+    if(sm){var _nm=(new Date().getMonth()+1)%12;sm.selectedIndex=_nm+1;}
     if(sd){for(var i=0;i<sd.options.length;i++){if(sd.options[i].value==='7 nights'){sd.selectedIndex=i;break;}}}
     if(sc) sc.selectedIndex=0;
     if(sp){for(var i=0;i<sp.options.length;i++){if(sp.options[i].value==='2 people'){sp.selectedIndex=i;break;}}}
@@ -3174,6 +3174,12 @@ function closeNavDD(){
         return '<button class="fl-ai-chip" data-city="'+d.name+'" onclick="flFillChip(this)">'+d.icon+' '+d.name+'</button>';
       }).join('');
     }
+    // Pre-fill Delhi as default destination (no auto-trigger)
+    var _di=document.getElementById('fl-planner-input');
+    if(_di) _di.value='Delhi';
+    document.querySelectorAll('.fl-ai-chip').forEach(function(c){
+      if(c.getAttribute('data-city')==='Delhi') c.classList.add('active');
+    });
     // Reset result on new input
     var inp=document.getElementById('fl-planner-input');
     if(inp&&!inp._resetBound){
@@ -4456,42 +4462,6 @@ function closeNavDD(){
       var windows=_dateWindows(travelM,tripDays);
       var fromCode=_flOrigin||(flData.origins[0]?flData.origins[0].code:'DXB');
 
-      // ── Buy Now signal (always visible) ──────────────────────────────────
-      var sig=_getBuySignal(travelM,wks,mIdx,cur);
-      html+='<div class="fl-signal fl-signal-'+sig.cls+'">'
-        +'<div class="fl-signal-top">'
-        +'<span class="fl-signal-icon">'+sig.icon+'</span>'
-        +'<span class="fl-signal-label">'+sig.label+'</span>'
-        +'</div>'
-        +'<div class="fl-signal-reason">'+sig.reason+'</div>'
-        +'<div class="fl-signal-tip">&#128161; '+sig.tip+'</div>'
-        +'</div>';
-
-      // ── Fare Trends accordion (closed) ────────────────────────────────────
-      var festHtml='';
-      for(var fi=0;fi<FESTIVALS.length;fi++){
-        if(FESTIVALS[fi].m===travelM){
-          festHtml='<div class="fl-plan-festival">&#9888;&#65039; <strong>'+FESTIVALS[fi].name+'</strong> in '+FL_MONTH_NAMES[travelM]+' &mdash; '+FESTIVALS[fi].note+'. Check dates overlap below.</div>';
-          break;
-        }
-      }
-      var secFare=festHtml+_renderMonthChart(travelM,route,cur,cabinFareMult);
-      html+=_flAcc('&#128202; Monthly Fare Trends',secFare,false);
-
-      // ── Destination Guide accordion (closed) ──────────────────────────────
-      var secDest='';
-      if(destCode) secDest+=_renderWeatherHotel(destCode,travelM,route);
-      if(destCode) secDest+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
-      if(secDest) html+=_flAcc('&#127760; Destination Guide',secDest,false);
-
-      // ── Booking Strategy accordion (closed) ───────────────────────────────
-      var secBook='';
-      secBook+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
-      secBook+=_renderBookCurrency(cur,route);
-      secBook+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
-      secBook+=_renderBookingTips(route,cur,wks,cabinClass);
-      html+=_flAcc('&#9992; Booking Strategy',secBook,false);
-
       // ── Best Travel Dates accordion (open by default) ───────────────────────
       var secDates='<div class="fl-dates-row">';
       for(var wi=0;wi<windows.length;wi++){
@@ -4589,6 +4559,42 @@ function closeNavDD(){
         +'<div class="fl-plan-row"><span>&#9992; Airlines</span><span>'+route.airlines+'</span></div>'
         +'</div>';
       html+=_flAcc('&#128197; Best Travel Dates',secDates,true);
+      // ── Buy Now signal (always visible) ──────────────────────────────────
+      var sig=_getBuySignal(travelM,wks,mIdx,cur);
+      html+='<div class="fl-signal fl-signal-'+sig.cls+'">'
+        +'<div class="fl-signal-top">'
+        +'<span class="fl-signal-icon">'+sig.icon+'</span>'
+        +'<span class="fl-signal-label">'+sig.label+'</span>'
+        +'</div>'
+        +'<div class="fl-signal-reason">'+sig.reason+'</div>'
+        +'<div class="fl-signal-tip">&#128161; '+sig.tip+'</div>'
+        +'</div>';
+
+      // ── Fare Trends accordion (closed) ────────────────────────────────────
+      var festHtml='';
+      for(var fi=0;fi<FESTIVALS.length;fi++){
+        if(FESTIVALS[fi].m===travelM){
+          festHtml='<div class="fl-plan-festival">&#9888;&#65039; <strong>'+FESTIVALS[fi].name+'</strong> in '+FL_MONTH_NAMES[travelM]+' &mdash; '+FESTIVALS[fi].note+'. Check dates overlap below.</div>';
+          break;
+        }
+      }
+      var secFare=festHtml+_renderMonthChart(travelM,route,cur,cabinFareMult);
+      html+=_flAcc('&#128202; Monthly Fare Trends',secFare,false);
+
+      // ── Destination Guide accordion (closed) ──────────────────────────────
+      var secDest='';
+      if(destCode) secDest+=_renderWeatherHotel(destCode,travelM,route);
+      if(destCode) secDest+=_renderCityCosts(destCode,tripDays,groupN,typeof midRate!=='undefined'?midRate:85);
+      if(secDest) html+=_flAcc('&#127760; Destination Guide',secDest,false);
+
+      // ── Booking Strategy accordion (closed) ───────────────────────────────
+      var secBook='';
+      secBook+=_renderAirportCompare(cur,destCode,route,cabinFareMult);
+      secBook+=_renderBookCurrency(cur,route);
+      secBook+=_renderMilesValue(cur,route,cabinFareMult,_flCabinClass);
+      secBook+=_renderBookingTips(route,cur,wks,cabinClass);
+      html+=_flAcc('&#9992; Booking Strategy',secBook,false);
+
     } else if(travelM<0&&route){
       html+='<div class="fl-plan-section">'
         +'<div class="fl-plan-sub">&#128197; Mention a month to get exact date windows with pre-filled booking links.</div>'
