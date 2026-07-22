@@ -1,4 +1,4 @@
-/* v10.8 */
+/* v10.9 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1216,7 +1216,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hrp-providers-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
 .hrp-live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green);}
 .hrp-rows-wrap{padding:0 14px;}
-.hrp-footer-wrap{padding:10px 22px 14px;font-size:11px;color:var(--muted);border-top:1px solid rgba(255,255,255,0.06);margin-top:10px;line-height:1.6;}
+.hrp-cta-btn{display:block;width:calc(100% - 28px);margin:10px 14px 0;padding:10px 16px;background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 16px rgba(240,165,32,.3);}
+.hrp-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(240,165,32,.45);}
+.hrp-footer-wrap{padding:8px 22px 14px;font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6;}
 [data-theme="light"] .hero-rates-panel{background:rgba(255,255,255,0.92);border-color:rgba(0,0,0,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.12);}
 [data-theme="light"] .hrp-flag-block{background:rgba(0,0,0,0.05);}
 [data-theme="light"] .hrp-inp{color:var(--text);}
