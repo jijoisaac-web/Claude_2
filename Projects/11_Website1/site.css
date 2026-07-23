@@ -1,4 +1,4 @@
-/* v12.6 */
+/* v12.7 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -1105,7 +1105,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tb-edplan{background:linear-gradient(160deg,rgba(5,12,25, 0.92) 0%,rgba(10,20,40, 0.92) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* 📖 Guides / Articles — books & knowledge */
-.tb-articles{background:linear-gradient(160deg,rgba(15,10,4, 0.92) 0%,rgba(28,18,5, 0.92) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+.tb-articles{background:linear-gradient(160deg,rgba(15,10,4, 0.92) 0%,rgba(28,18,5, 0.92) 100%),url('https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* Light mode: use a light-tinted overlay so background card look is preserved */
 /* light tb-* use same dark overlay as dark mode */
@@ -1117,7 +1117,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 [data-theme="light"] .tb-dtaa{background:linear-gradient(160deg,rgba(20,8,45, 0.92) 0%,rgba(30,12,60, 0.92) 100%),url('https://images.pexels.com/photos/669619/pexels-photo-669619.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 [data-theme="light"] .tb-realty{background:linear-gradient(160deg,rgba(4,18,35, 0.92) 0%,rgba(8,25,50, 0.92) 100%),url('https://images.pexels.com/photos/1370704/pexels-photo-1370704.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 [data-theme="light"] .tb-edplan{background:linear-gradient(160deg,rgba(5,15,40, 0.92) 0%,rgba(10,22,55, 0.92) 100%),url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
-[data-theme="light"] .tb-articles{background:linear-gradient(160deg,rgba(40,20,5, 0.92) 0%,rgba(55,28,5, 0.92) 100%),url('https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
+[data-theme="light"] .tb-articles{background:linear-gradient(160deg,rgba(40,20,5, 0.92) 0%,rgba(55,28,5, 0.92) 100%),url('https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1920&h=160&fit=crop') center/cover no-repeat;}
 
 /* ══════════════════════════════════════════════════════════════════════════
    HOMEPAGE SECTION BACKGROUND IMAGES
@@ -2368,10 +2368,10 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 @media(max-width:768px){.fl-tab-bg{min-height:auto;}.fl-tab-bg-inner{padding:40px 20px 24px;}.fl-tab-headline{font-size:clamp(22px,6vw,34px);letter-spacing:-0.5px;}.fl-tab-tagline{font-size:13px;margin-bottom:20px;}.fl-tab-eyebrow{margin-bottom:12px;}}
 /* Tab hero banners — Return, Education, Invest, Guides */
 .tab-section-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;display:flex;align-items:flex-start;justify-content:center;background-size:cover;background-position:center;background-color:#05080f;overflow:hidden;padding-bottom:56px;}
-.tab-section-bg--return{background-image:url('https://images.pexels.com/photos/3573351/pexels-photo-3573351.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 30%;}
+.tab-section-bg--return{background-image:url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 30%;}
 .tab-section-bg--edabroad{background-image:url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 20%;}
 .tab-section-bg--invest{background-image:url('https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
-.tab-section-bg--articles{background-image:url('https://images.pexels.com/photos/159711/pexels-photo-159711.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
+.tab-section-bg--articles{background-image:url('https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
 .tab-tool-tile{width:100%;box-sizing:border-box;text-align:left;margin-top:24px;}
 .tab-tool-tile .card{background:rgba(8,14,32,0.88)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:rgba(255,255,255,0.1)!important;}
 .tab-tool-tile .info,.tab-tool-tile .deals-disclaimer{background:rgba(8,14,32,0.75);backdrop-filter:blur(8px);border-radius:12px;padding:14px 16px;margin-bottom:0;}
