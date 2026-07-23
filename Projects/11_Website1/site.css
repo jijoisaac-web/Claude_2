@@ -1,4 +1,4 @@
-/* v13.1 */
+/* v13.2 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2371,6 +2371,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .tab-section-bg--edabroad{background-image:url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 20%;}
 .tab-section-bg--invest{background-image:url('https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
 .tab-section-bg--articles{background-image:url('https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
+.tab-section-bg--rates{background-image:url('https://images.pexels.com/photos/6771900/pexels-photo-6771900.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
 .tab-tool-tile{width:100%;box-sizing:border-box;text-align:left;margin-top:24px;}
 .tab-tool-tile .card{background:rgba(8,14,32,0.88)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:rgba(255,255,255,0.1)!important;}
 .tab-tool-tile .info,.tab-tool-tile .deals-disclaimer{background:rgba(8,14,32,0.75);backdrop-filter:blur(8px);border-radius:12px;padding:14px 16px;margin-bottom:0;}

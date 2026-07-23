@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=13.1"/>
+<link rel="stylesheet" href="/site.css?v=13.2"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.1</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.2</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1554,13 +1554,14 @@ document.addEventListener('DOMContentLoaded',function(){
 
   <!-- TAB 1: LIVE RATES -->
   <div class="tool-section active" id="tab-rates">
-    <div class="tool-banner tb-rates">
-      <div class="tool-banner-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-      <div class="tool-banner-body">
-        <h2>Today's Best Rates to India</h2>
-        <p>Sorted by most rupees received · Local providers for your country · Click "Send Now" to confirm rate on provider's site</p>
-      </div>
-    </div>
+    <div class="tab-section-bg tab-section-bg--rates">
+      <div class="fl-tab-bg-overlay"></div>
+      <div class="fl-tab-bg-inner">
+        <div class="fl-tab-eyebrow" style="border-color:rgba(240,165,32,0.4);background:rgba(240,165,32,0.12);color:var(--amber)">&#128184; Live Remittance Rates</div>
+        <div class="fl-tab-headline">Get the Best Rate to India Today</div>
+        <div class="fl-tab-tagline">50+ providers compared live &mdash; sorted by most &#8377; rupees received &middot; Zero sign-up required</div>
+        <div class="tab-tool-tile">
+          <div class="card">
     <div class="amount-strip">
       <label>You send</label>
       <input type="number" id="sendAmount" value="1000" 
@@ -1599,9 +1600,9 @@ document.addEventListener('DOMContentLoaded',function(){
     </details>
 
     <div class="info" style="margin-top:16px;border-left:3px solid rgba(99,102,241,0.5)"><strong>How to read this:</strong> INR shown = today&apos;s mid-market rate minus each provider&apos;s <em>typical</em> margin &amp; fee. Visual bars show relative value — longer bar = more rupees received. <strong>Providers run promotions and change rates in real time</strong> — always click a provider to confirm the live rate before transferring. Promos (like zero-fee first transfers) will make the actual rate better than shown here.</div>
-
-    <!-- Rates Disclaimer -->
-    <div class="rates-disclaimer">
+          </div><!-- /card -->
+          <!-- Rates Disclaimer -->
+          <div class="rates-disclaimer">
       <div class="rd-icon">&#9888;&#65039;</div>
       <div class="rd-body">
         <div class="rd-title">Disclaimer &amp; Data Sources</div>
@@ -1621,9 +1622,11 @@ document.addEventListener('DOMContentLoaded',function(){
           <strong>Always visit the provider&apos;s official website or app to confirm the live rate and total cost before initiating any transfer.</strong> NRI Finance Hub accepts no liability for losses arising from reliance on rates displayed here.
         </div>
       </div>
-    </div>
+          </div><!-- /rates-disclaimer -->
+        </div><!-- /tab-tool-tile -->
+      </div><!-- /fl-tab-bg-inner -->
+    </div><!-- /tab-section-bg -->
   </div>
-
     <!-- AFFILIATE: Remittance providers -->
   <div class="aff-banner" style="margin:0 0 8px 0;">
     <div class="aff-banner-text">
@@ -3504,7 +3507,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=13.1"></script>
+<script src="/site.js?v=13.2"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
