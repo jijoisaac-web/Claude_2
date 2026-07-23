@@ -1,4 +1,4 @@
-/* v13.0 */
+/* v13.1 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -4601,7 +4601,7 @@ function closeNavDD(){
           +'<a class="fl-wprot fl-wprot-ah" href="https://airhelp.tpx.gr/1VvvXbdE" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=airhelp.com&sz=32" class="fl-prov-logo"> Claim delay comp</a>'
           +'<a class="fl-wprot fl-wprot-ekta" href="https://ektatraveling.tpx.gr/4Gwp3ZwH" target="_blank" rel="noopener sponsored"><img src="https://www.google.com/s2/favicons?domain=ektatraveling.com&sz=32" class="fl-prov-logo"> Travel insurance</a>'
           +'</div>'
-          +'<details class="fl-win-fare-details" open><summary class="fl-win-fare-summary">&#128202; Fare estimates</summary>'
+          +'<details class="fl-win-fare-details"><summary class="fl-win-fare-summary">&#128202; Fare estimates</summary>'
           +'<div class="fl-win-fares"><div class="fl-win-fare-est">&#128200; Estimated fare range &mdash; verify on booking sites</div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Outbound'+gMult+' ('+fromCode+'&rarr;'+destCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpOutMin.toLocaleString()+'&ndash;'+grpOutMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+outMin.toLocaleString()+'&ndash;'+outMax.toLocaleString()+'/person</span>':'')+' </div>'
           +'<div class="fl-win-fare-row"><span class="fl-win-fare-lbl">&#9992; Return'+gMult+' ('+destCode+'&rarr;'+fromCode+')</span><strong class="fl-win-fare-val">'+cur+' '+grpRetMin.toLocaleString()+'&ndash;'+grpRetMax.toLocaleString()+'</strong>'+(groupN>1?' <span class="fl-win-fare-pp">&nbsp;&#8776;&nbsp;'+cur+' '+retMin.toLocaleString()+'&ndash;'+retMax.toLocaleString()+'/person</span>':'')+' </div>'
