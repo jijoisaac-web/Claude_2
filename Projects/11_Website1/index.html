@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=12.5"/>
+<link rel="stylesheet" href="/site.css?v=12.6"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v12.5</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v12.6</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1047,15 +1047,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
   <!-- TAB: STUDY ABROAD COST PLANNER -->
   <div class="tool-section" id="tab-edabroad">
-    <div class="tab-hero-banner tab-hero-banner--edabroad">
+    <div class="tab-section-bg tab-section-bg--edabroad">
       <div class="fl-tab-bg-overlay"></div>
       <div class="fl-tab-bg-inner">
         <div class="fl-tab-eyebrow" style="border-color:rgba(129,140,248,0.4);background:rgba(129,140,248,0.12);color:#818cf8">&#127891; Study Abroad Planner</div>
         <div class="fl-tab-headline">Plan the Cost of Studying Abroad</div>
         <div class="fl-tab-tagline">Real university fees across 6 countries &middot; inflation-adjusted projections &middot; monthly SIP to fund it</div>
-      </div>
-    </div>
-
+        <div class="tab-tool-tile">
     <!-- Country selector -->
     <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em">Select country</div>
     <div class="edab-country-grid">
@@ -1323,6 +1321,9 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
     <!-- ══ END EXTRA EDUCATION TOOLS ══════════════════════════════════════ -->
     <div class="deals-disclaimer">Fee data sourced from university websites (2024–25 published rates). Exchange rates are indicative. Actual costs vary — verify at official university admissions portals. <a href="nri-education-planning.html">Read full NRI Education Planning Guide →</a></div>
+        </div><!-- /tab-tool-tile -->
+      </div><!-- /fl-tab-bg-inner -->
+    </div><!-- /tab-section-bg -->
   </div>
 
   <!-- TAB: RATE TIMER — SEND NOW OR WAIT? -->
@@ -1643,14 +1644,13 @@ document.addEventListener('DOMContentLoaded',function(){
 <!-- TAB 2: SIP & SWP -->
   <div class="tool-section" id="tab-invest">
   <div class="calc-cur-bar" id="ccb-invest"><span class="ccb-flag" id="ccb-flag-invest"></span><span class="ccb-rate" id="ccb-rate-invest">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-invest" type="number" placeholder="Amount" oninput="ccbConvert('invest')"/><span id="ccb-cur-invest" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-invest">₹—</span></div></div>
-    <div class="tab-hero-banner tab-hero-banner--invest">
+    <div class="tab-section-bg tab-section-bg--invest">
       <div class="fl-tab-bg-overlay"></div>
       <div class="fl-tab-bg-inner">
         <div class="fl-tab-eyebrow" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.12);color:var(--green)">&#128200; NRI Investments</div>
         <div class="fl-tab-headline">Grow Your India Corpus</div>
         <div class="fl-tab-tagline">SIP calculator &middot; SWP planner &middot; maximize your Indian portfolio from anywhere in the world</div>
-      </div>
-    </div>
+        <div class="tab-tool-tile">
     <div class="card">
       <div class="card-hd"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
       <div class="card-sub">How much will your monthly mutual fund investment grow to? Models compounding with annual step-up option.</div>
@@ -1719,6 +1719,9 @@ document.addEventListener('DOMContentLoaded',function(){
       </div>
     </div>
     <div class="info">&#128161; <strong>NRI Tip:</strong> SIP into ELSS, Flexi-cap or Index funds via NRE/NRO account. Returns from equity MFs held &gt;1 year taxed at 10% LTCG (above &#8377;1L). SWP from a balanced advantage fund can give tax-efficient monthly income in India post-return. Consult a SEBI-RIA before investing.</div>
+        </div><!-- /tab-tool-tile -->
+      </div><!-- /fl-tab-bg-inner -->
+    </div><!-- /tab-section-bg -->
   </div>
 
   <!-- TAB 3: NRE vs NRO -->
@@ -1956,14 +1959,13 @@ document.addEventListener('DOMContentLoaded',function(){
 <!-- TAB 5: RETURN PLANNER -->
   <div class="tool-section" id="tab-return">
   <div class="calc-cur-bar" id="ccb-return"><span class="ccb-flag" id="ccb-flag-return"></span><span class="ccb-rate" id="ccb-rate-return">Loading…</span><div class="ccb-convert"><input class="ccb-inp" id="ccb-inp-return" type="number" placeholder="Amount" oninput="ccbConvert('return')"/><span id="ccb-cur-return" style="font-size:12px;color:var(--muted);font-weight:700;"></span><span style="color:var(--muted);font-size:12px;">→</span><span class="ccb-result" id="ccb-out-return">₹—</span></div></div>
-    <div class="tab-hero-banner tab-hero-banner--return">
+    <div class="tab-section-bg tab-section-bg--return">
       <div class="fl-tab-bg-overlay"></div>
       <div class="fl-tab-bg-inner">
         <div class="fl-tab-eyebrow" style="border-color:rgba(20,184,166,0.4);background:rgba(20,184,166,0.12);color:var(--teal)">&#127968; Return to India</div>
         <div class="fl-tab-headline">Plan Your Move Back to India</div>
         <div class="fl-tab-tagline">Corpus calculator &middot; inflation-adjusted expenses &middot; step-by-step checklist for NRIs returning home</div>
-      </div>
-    </div>
+        <div class="tab-tool-tile">
     <div class="card rp-accordion">
       <!-- ── STEP 1 ── -->
       <div class="rp-step" id="rp-step-1">
@@ -2207,6 +2209,9 @@ document.addEventListener('DOMContentLoaded',function(){
     </div>
 
     <div class="info">&#128203; <strong>India Inflation Reality:</strong> CPI has averaged 5&ndash;7% p.a. over the last decade. Healthcare and education inflate faster (~8&ndash;10%). Kids education fees in metro schools: &#8377;10K&ndash;40K/month. Family health floater: &#8377;15K&ndash;40K/year. Build in a 20% buffer for unexpected expenses.</div>
+        </div><!-- /tab-tool-tile -->
+      </div><!-- /fl-tab-bg-inner -->
+    </div><!-- /tab-section-bg -->
   </div>
   </div><!-- /tab-return -->
   <!-- ══ TAX RESIDENCY CALCULATOR ══════════════════════════════════════════ -->
@@ -2502,14 +2507,13 @@ document.addEventListener('DOMContentLoaded',function(){
 
   <!-- TAB: NRI GUIDES / ARTICLES -->
   <div class="tool-section" id="tab-articles">
-    <div class="tab-hero-banner tab-hero-banner--articles">
+    <div class="tab-section-bg tab-section-bg--articles">
       <div class="fl-tab-bg-overlay"></div>
       <div class="fl-tab-bg-inner">
         <div class="fl-tab-eyebrow" style="border-color:rgba(240,165,32,0.4);background:rgba(240,165,32,0.12);color:var(--amber)">&#128218; NRI Finance Guides</div>
         <div class="fl-tab-headline">Everything NRIs Need to Know</div>
         <div class="fl-tab-tagline">In-depth guides on tax, banking, property, remittance &amp; more &mdash; practical &amp; jargon-free</div>
-      </div>
-    </div>
+        <div class="tab-tool-tile">
     <div id="art-list">
       <div class="art-search-wrap">
         <span class="art-search-icon">🔍</span>
@@ -2679,6 +2683,9 @@ document.addEventListener('DOMContentLoaded',function(){
       <button class="art-reader-back" onclick="closeArticle()">&#8592; Back to Guides</button>
       <div id="art-content"></div>
     </div>
+        </div><!-- /tab-tool-tile -->
+      </div><!-- /fl-tab-bg-inner -->
+    </div><!-- /tab-section-bg -->
   </div>
 
   <!-- TAB: PROPERTY TDS CALCULATOR -->
@@ -3497,7 +3504,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=12.5"></script>
+<script src="/site.js?v=12.6"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">
