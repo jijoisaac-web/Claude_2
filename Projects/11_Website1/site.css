@@ -1,4 +1,4 @@
-/* v12.7 */
+/* v12.8 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -2359,7 +2359,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 
 
 /* ── FLIGHTS: FULL-PAGE BACKGROUND + CARD ─────────────────────────────────── */
-.fl-tab-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;min-height:580px;display:flex;align-items:flex-start;justify-content:center;background-image:url('https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');background-size:cover;background-position:center 35%;margin-bottom:32px;border-radius:0;overflow:hidden;padding-bottom:48px;}
+.fl-tab-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;background-image:url('https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=1920&h=900&fit=crop');background-size:cover;background-position:center 35%;margin-bottom:32px;border-radius:0;overflow:hidden;padding-bottom:48px;}
 .fl-tab-bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,15,0.82) 0%,rgba(5,8,15,0.70) 40%,rgba(5,8,15,0.88) 100%);z-index:1;}
 .fl-tab-bg-inner{position:relative;z-index:2;width:100%;max-width:960px;margin:0 auto;padding:60px 40px 36px;text-align:center;display:flex;flex-direction:column;align-items:center;}
 .fl-tab-eyebrow{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(240,165,32,0.4);background:rgba(240,165,32,0.12);border-radius:100px;padding:5px 16px;font-size:12px;font-weight:700;color:var(--amber);margin-bottom:16px;}
@@ -2367,7 +2367,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .fl-tab-tagline{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:32px;}
 @media(max-width:768px){.fl-tab-bg{min-height:auto;}.fl-tab-bg-inner{padding:40px 20px 24px;}.fl-tab-headline{font-size:clamp(22px,6vw,34px);letter-spacing:-0.5px;}.fl-tab-tagline{font-size:13px;margin-bottom:20px;}.fl-tab-eyebrow{margin-bottom:12px;}}
 /* Tab hero banners — Return, Education, Invest, Guides */
-.tab-section-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;display:flex;align-items:flex-start;justify-content:center;background-size:cover;background-position:center;background-color:#05080f;overflow:hidden;padding-bottom:56px;}
+.tab-section-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;background-size:cover;background-position:center;background-color:#05080f;overflow:hidden;padding-bottom:56px;}
 .tab-section-bg--return{background-image:url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 30%;}
 .tab-section-bg--edabroad{background-image:url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 20%;}
 .tab-section-bg--invest{background-image:url('https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
@@ -2375,7 +2375,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .tab-tool-tile{width:100%;box-sizing:border-box;text-align:left;margin-top:24px;}
 .tab-tool-tile .card{background:rgba(8,14,32,0.88)!important;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:rgba(255,255,255,0.1)!important;}
 .tab-tool-tile .info,.tab-tool-tile .deals-disclaimer{background:rgba(8,14,32,0.75);backdrop-filter:blur(8px);border-radius:12px;padding:14px 16px;margin-bottom:0;}
-@media(max-width:768px){.tab-section-bg{padding-bottom:32px;}.tab-tool-tile{margin-top:16px;}}
+@media(max-width:768px){.tab-section-bg{padding-bottom:32px;min-height:auto;}.tab-tool-tile{margin-top:16px;}}
 
 /* ── FLIGHTS: AI HERO + COMPACT CITY LIST ──────────────────── */
 .fl-ai-hero{
