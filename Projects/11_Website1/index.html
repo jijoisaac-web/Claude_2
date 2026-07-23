@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=13.2"/>
+<link rel="stylesheet" href="/site.css?v=13.3"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.2</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.3</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1654,74 +1654,75 @@ document.addEventListener('DOMContentLoaded',function(){
         <div class="fl-tab-headline">Grow Your India Corpus</div>
         <div class="fl-tab-tagline">SIP calculator &middot; SWP planner &middot; maximize your Indian portfolio from anywhere in the world</div>
         <div class="tab-tool-tile">
-    <div class="card">
-      <div class="card-hd"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
-      <div class="card-sub">How much will your monthly mutual fund investment grow to? Models compounding with annual step-up option.</div>
-      <div class="tpl-row">
-        <span class="tpl-label">Quick fill:</span>
-        <button class="tpl-btn" onclick="applySIPTpl(15000,12,10,10)">🌱 Starter NRI</button>
-        <button class="tpl-btn" onclick="applySIPTpl(50000,12,20,10)">📈 Wealth Builder</button>
-        <button class="tpl-btn" onclick="applySIPTpl(20000,11,15,8)">🎓 Child Education</button>
-        <button class="tpl-btn" onclick="applySIPTpl(100000,10,8,0)">🏠 Property Corpus</button>
-        <button class="tpl-btn" onclick="applySIPTpl(75000,12,25,5)">🛡 Retirement Fund</button>
-      </div>
-      <div class="fg">
-        <div class="f"><label>Monthly SIP Amount (&#8377;)</label><input type="number" id="sip-amount" value="25000" placeholder="e.g. 25000"/></div>
-        <div class="f"><label>Expected Annual Return (%)</label><input type="number" id="sip-return" value="12" step="0.5"/></div>
-        <div class="f"><label>Investment Period (Years)</label><input type="number" id="sip-years" value="15" min="1" max="40"/></div>
-        <div class="f"><label>Annual Step-Up (% increase/yr)</label><input type="number" id="sip-stepup" value="10" step="1" min="0"/></div>
-      </div>
-      <button class="btn btn-amber" onclick="calcSIP()">Calculate SIP Growth &rarr;</button>
-      <div id="sip-result" style="display:none">
-        <div class="rg" id="sip-result-grid"></div>
-        <div class="box-green" id="sip-tip"></div>
-        <div class="btn-row">
-          <button class="btn btn-outline" onclick="downloadSIPCSV()">&#11015; Download Year-wise CSV</button>
-          <button class="btn btn-outline" id="sip-toggle-btn" onclick="toggleYearTable('sip')" style="margin-left:8px;">&#9650; Collapse Table</button>
-        </div>
-        <div class="year-table-wrap" id="sip-table-wrap">
-          <table class="year-table" id="sip-year-table">
-            <thead><tr><th>Year</th><th>Monthly SIP</th><th>Invested in Year</th><th>Total Invested</th><th>Corpus Value</th><th>Wealth Gained</th></tr></thead>
-            <tbody id="sip-year-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-hd"><div class="card-hd-bar"></div>SWP &mdash; Systematic Withdrawal Plan</div>
-      <div class="card-sub">You&apos;ve built a corpus. How long will it last with monthly withdrawals? Accounts for portfolio returns and inflation.</div>
-      <div class="tpl-row">
-        <span class="tpl-label">Quick fill:</span>
-        <button class="tpl-btn" onclick="applySWPTpl(100,30000,9,6,6)">🏡 Modest Retirement</button>
-        <button class="tpl-btn" onclick="applySWPTpl(300,100000,9,6,6)">🏙 Metro Lifestyle</button>
-        <button class="tpl-btn" onclick="applySWPTpl(500,150000,10,6,6)">💰 Gulf Return</button>
-        <button class="tpl-btn" onclick="applySWPTpl(200,50000,8,5,5)">🔒 Conservative</button>
-        <button class="tpl-btn" onclick="applySWPTpl(1000,300000,10,6,6)">👑 Affluent</button>
-      </div>
-      <div class="fg">
-        <div class="f"><label>Starting Corpus (&#8377; Lakhs)</label><input type="number" id="swp-corpus" value="200" step="10"/></div>
-        <div class="f"><label>Monthly Withdrawal (&#8377;)</label><input type="number" id="swp-monthly" value="75000"/></div>
-        <div class="f"><label>Expected Portfolio Return (% p.a.)</label><input type="number" id="swp-return" value="9" step="0.5"/></div>
-        <div class="f"><label>Inflation Rate (% p.a.)</label><input type="number" id="swp-inflation" value="6" step="0.5"/></div>
-        <div class="f"><label>Increase Withdrawal Each Year? (%)</label><input type="number" id="swp-stepup" value="6" step="1" min="0"/></div>
-      </div>
-      <button class="btn btn-amber" onclick="calcSWP()">Calculate Sustainability &rarr;</button>
-      <div id="swp-result" style="display:none">
-        <div class="rg" id="swp-result-grid"></div>
-        <div id="swp-verdict"></div>
-        <div class="btn-row">
-          <button class="btn btn-outline" onclick="downloadSWPCSV()">&#11015; Download Year-wise CSV</button>
-          <button class="btn btn-outline" id="swp-toggle-btn" onclick="toggleYearTable('swp')" style="margin-left:8px;">&#9650; Collapse Table</button>
-        </div>
-        <div class="year-table-wrap" id="swp-table-wrap">
-          <table class="year-table" id="swp-year-table">
-            <thead><tr><th>Year</th><th>Monthly Withdrawal</th><th>Annual Withdrawal</th><th>Portfolio Return</th><th>Closing Corpus</th><th>Status</th></tr></thead>
-            <tbody id="swp-year-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="info">&#128161; <strong>NRI Tip:</strong> SIP into ELSS, Flexi-cap or Index funds via NRE/NRO account. Returns from equity MFs held &gt;1 year taxed at 10% LTCG (above &#8377;1L). SWP from a balanced advantage fund can give tax-efficient monthly income in India post-return. Consult a SEBI-RIA before investing.</div>
+          <div class="invest-dual-grid">
+
+            <!-- SIP Card -->
+            <div class="card invest-card">
+              <div class="card-hd" style="font-size:14px;margin-bottom:4px"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
+              <div class="card-sub" style="font-size:12px;margin-bottom:12px">Monthly MF investment growth with step-up compounding.</div>
+              <div class="tpl-row" style="margin-bottom:10px;gap:5px">
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(15000,12,10,10)">🌱 Starter</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(50000,12,20,10)">📈 Wealth</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(20000,11,15,8)">🎓 Education</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(75000,12,25,5)">🛡 Retire</button>
+              </div>
+              <div class="fg invest-fg">
+                <div class="f"><label>Monthly SIP (&#8377;)</label><input type="number" id="sip-amount" value="25000" oninput="calcSIP()"/></div>
+                <div class="f"><label>Return (% p.a.)</label><input type="number" id="sip-return" value="12" step="0.5" oninput="calcSIP()"/></div>
+                <div class="f"><label>Period (Years)</label><input type="number" id="sip-years" value="15" min="1" max="40" oninput="calcSIP()"/></div>
+                <div class="f"><label>Step-Up (% /yr)</label><input type="number" id="sip-stepup" value="10" step="1" min="0" oninput="calcSIP()"/></div>
+              </div>
+              <div id="sip-result">
+                <div class="rg invest-rg" id="sip-result-grid"></div>
+                <div class="box-green invest-tip" id="sip-tip"></div>
+                <div class="invest-table-toggle">
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" id="sip-toggle-btn" onclick="toggleYearTable('sip')">&#9660; Show Table</button>
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="downloadSIPCSV()">&#11015; CSV</button>
+                </div>
+                <div class="year-table-wrap" id="sip-table-wrap" style="display:none">
+                  <table class="year-table" id="sip-year-table">
+                    <thead><tr><th>Yr</th><th>SIP/mo</th><th>Invested</th><th>Corpus</th><th>Gain</th></tr></thead>
+                    <tbody id="sip-year-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- SWP Card -->
+            <div class="card invest-card">
+              <div class="card-hd" style="font-size:14px;margin-bottom:4px"><div class="card-hd-bar" style="background:var(--green)"></div>SWP &mdash; Systematic Withdrawal Plan</div>
+              <div class="card-sub" style="font-size:12px;margin-bottom:12px">How long will your corpus last with monthly withdrawals?</div>
+              <div class="tpl-row" style="margin-bottom:10px;gap:5px">
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(100,30000,9,6,6)">🏡 Modest</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(300,100000,9,6,6)">🏙 Metro</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(500,150000,10,6,6)">💰 Gulf</button>
+                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(1000,300000,10,6,6)">👑 Affluent</button>
+              </div>
+              <div class="fg invest-fg">
+                <div class="f"><label>Corpus (&#8377; Lakhs)</label><input type="number" id="swp-corpus" value="200" step="10" oninput="calcSWP()"/></div>
+                <div class="f"><label>Monthly Withdrawal (&#8377;)</label><input type="number" id="swp-monthly" value="75000" oninput="calcSWP()"/></div>
+                <div class="f"><label>Return (% p.a.)</label><input type="number" id="swp-return" value="9" step="0.5" oninput="calcSWP()"/></div>
+                <div class="f"><label>Inflation (% p.a.)</label><input type="number" id="swp-inflation" value="6" step="0.5" oninput="calcSWP()"/></div>
+                <div class="f"><label>WD Step-Up (% /yr)</label><input type="number" id="swp-stepup" value="6" step="1" min="0" oninput="calcSWP()"/></div>
+              </div>
+              <div id="swp-result">
+                <div class="rg invest-rg" id="swp-result-grid"></div>
+                <div id="swp-verdict" class="invest-tip"></div>
+                <div class="invest-table-toggle">
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" id="swp-toggle-btn" onclick="toggleYearTable('swp')">&#9660; Show Table</button>
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="downloadSWPCSV()">&#11015; CSV</button>
+                </div>
+                <div class="year-table-wrap" id="swp-table-wrap" style="display:none">
+                  <table class="year-table" id="swp-year-table">
+                    <thead><tr><th>Yr</th><th>WD/mo</th><th>Total WD</th><th>Corpus</th><th>Status</th></tr></thead>
+                    <tbody id="swp-year-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /invest-dual-grid -->
+          <div class="info" style="margin-top:12px">&#128161; <strong>NRI Tip:</strong> SIP into ELSS, Flexi-cap or Index funds via NRE/NRO account. Returns from equity MFs held &gt;1 year taxed at 10% LTCG (above &#8377;1L). SWP from a balanced advantage fund gives tax-efficient monthly income post-return. Consult a SEBI-RIA before investing.</div>
         </div><!-- /tab-tool-tile -->
       </div><!-- /fl-tab-bg-inner -->
     </div><!-- /tab-section-bg -->
@@ -3507,7 +3508,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=13.2"></script>
+<script src="/site.js?v=13.3"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

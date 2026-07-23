@@ -1,4 +1,4 @@
-/* v13.2 */
+/* v13.3 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -805,7 +805,7 @@ function calcSIP(){
     <div class="ri"><div class="ri-lbl">Final Corpus</div><div class="ri-val" style="color:var(--green)">₹${(finalCorpus/100000).toFixed(1)}L</div>${sipLcL(finalCorpus)}<div class="ri-sub">at ${yrs} years</div></div>
     <div class="ri"><div class="ri-lbl">Wealth Multiplier</div><div class="ri-val">×${(finalCorpus/finalInvested).toFixed(1)}</div><div class="ri-sub">your money grew</div></div>`;
   document.getElementById('sip-tip').innerHTML=`🎯 Starting at ₹${sip0.toLocaleString('en-IN')}/mo and stepping up ${(stepup*100).toFixed(0)}% annually at <strong>${rate*100}% returns</strong> turns ₹${(finalInvested/100000).toFixed(0)}L invested into <strong>₹${(finalCorpus/100000).toFixed(1)}L</strong> — ${((finalCorpus/finalInvested)).toFixed(1)}× your money.`;
-  document.getElementById('sip-result').style.display='block';var _sw=document.getElementById('sip-table-wrap');var _sb=document.getElementById('sip-toggle-btn');if(_sw)_sw.style.display='';if(_sb)_sb.innerHTML='&#9650; Collapse Table';
+  document.getElementById('sip-result').style.display='block';
 }
 function toggleYearTable(id){
   const wrap=document.getElementById(id+'-table-wrap');
@@ -813,7 +813,7 @@ function toggleYearTable(id){
   if(!wrap||!btn)return;
   const isCollapsed=wrap.style.display==='none';
   wrap.style.display=isCollapsed?'':'none';
-  btn.innerHTML=isCollapsed?'&#9650; Collapse Table':'&#9660; Show Table';
+  btn.innerHTML=isCollapsed?'&#9650; Hide Table':'&#9660; Show Table';
 }
 function downloadSIPCSV(){
   const rows=[['Year','Monthly SIP (₹)','Invested in Year (₹)','Total Invested (₹)','Corpus Value (₹)','Wealth Gained (₹)']];
@@ -860,7 +860,7 @@ function calcSWP(){
   document.getElementById('swp-verdict').innerHTML=exhaustYear
     ?`<div class="box-red">⚠️ <strong>Corpus runs out in Year ${exhaustYear}.</strong> Options: reduce monthly withdrawal · increase portfolio return · add an income source · consider a larger starting corpus.</div>`
     :`<div class="box-green">✅ <strong>Corpus is sustainable.</strong> At ${ret*100}% returns with ${(stepup*100).toFixed(0)}% annual withdrawal increase, your corpus outlasts the 40-year projection. Remaining: ₹${(finalClose/100000).toFixed(1)}L.</div>`;
-  document.getElementById('swp-result').style.display='block';var _ww=document.getElementById('swp-table-wrap');var _wb=document.getElementById('swp-toggle-btn');if(_ww)_ww.style.display='';if(_wb)_wb.innerHTML='&#9650; Collapse Table';
+  document.getElementById('swp-result').style.display='block';
 }
 function downloadSWPCSV(){
   const rows=[['Year','Monthly Withdrawal (₹)','Annual Withdrawal (₹)','Portfolio Return (₹)','Closing Corpus (₹)']];
@@ -2677,7 +2677,7 @@ function calcRtpPreview(){
   }
 }
 // Init on page load
-window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);calcHeroHomeLoan(3000000);calcHeroRealty(3000000);});
+window.addEventListener('DOMContentLoaded',function(){calcRtpPreview();calcHeroCorpus(120000);calcHeroHomeLoan(3000000);calcHeroRealty(3000000);calcSIP();calcSWP();});
 /* ── Property TDS Calculator ── */
 function calcPropTDS(){
   var sale=parseFloat(document.getElementById('pt-sale').value)||0;
