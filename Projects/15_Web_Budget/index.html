@@ -1216,6 +1216,88 @@ tbody tr.income-row td:first-child{
 #rowCtxMenu button:hover{background:var(--surface2);}
 #rowCtxMenu button.ctx-active{color:var(--accent);font-weight:600;}
 #rowCtxMenu .ctx-sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* ══ INDIA VIEW ══ */
+:root{--india:#f97316;--india-s:rgba(249,115,22,.12);--india-g:rgba(249,115,22,.22);}
+.india-hero{
+  background:linear-gradient(135deg,#7c2d12 0%,#9a3412 40%,#c2410c 100%);
+  padding:20px 24px 18px;position:relative;overflow:hidden;
+  border-bottom:1px solid rgba(249,115,22,.2);
+}
+.india-hero::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(251,191,36,.15) 0%,transparent 70%);pointer-events:none;}
+.india-hero-title{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
+.india-hero-stats{display:flex;gap:12px;flex-wrap:wrap;}
+.india-stat{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:9px 15px;flex:1;min-width:120px;}
+.india-stat-label{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.india-stat-val{font-size:15px;font-weight:800;color:#fff;margin-top:3px;}
+.india-rate-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.india-rate-row label{font-size:11px;color:rgba(255,255,255,.6);font-weight:600;}
+.india-rate-input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;
+  border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;width:80px;font-family:var(--font);}
+.india-rate-input:focus{outline:none;border-color:rgba(251,191,36,.6);}
+/* sub-tabs */
+.india-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);
+  overflow-x:auto;padding:0 16px;position:sticky;top:calc(var(--hdr-h) + var(--nav-h));z-index:80;}
+.india-tabs::-webkit-scrollbar{height:0;}
+.india-tab-btn{padding:0 18px;height:44px;display:flex;align-items:center;gap:6px;cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;font-size:13px;font-weight:600;
+  color:var(--text2);transition:all .2s;}
+.india-tab-btn.active{color:var(--india);border-bottom-color:var(--india);}
+/* panels */
+.india-panel{display:none;padding:16px;}
+.india-panel.active{display:block;}
+/* expense table */
+.india-exp-row{display:grid;grid-template-columns:34px 1fr 100px 100px 90px 36px 36px;
+  align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);transition:background .15s;}
+.india-exp-row:hover{background:var(--surface2);}
+.india-exp-row.hdr{background:var(--surface2);font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.5px;border-radius:10px 10px 0 0;padding:8px 12px;}
+.india-exp-wrap{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
+.india-exp-total{display:flex;gap:16px;padding:10px 12px;background:var(--sum-bg);font-size:12px;font-weight:700;border-top:1px solid var(--border);}
+/* portfolio */
+.india-port-row{display:grid;grid-template-columns:26px 1fr 90px 90px 100px 70px 44px;
+  align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);transition:background .15s;}
+.india-port-row:hover{background:var(--surface2);}
+.india-port-row.hdr{background:var(--surface2);font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.5px;border-radius:10px 10px 0 0;padding:8px 12px;}
+.india-port-wrap{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
+.india-port-total{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
+.india-port-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
+.india-port-card-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.india-port-card-val{font-size:18px;font-weight:800;margin-top:4px;}
+/* remittance */
+.india-rem-row{display:grid;grid-template-columns:90px 80px 60px 90px 1fr 40px;
+  align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);}
+.india-rem-row.hdr{background:var(--surface2);font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.5px;border-radius:10px 10px 0 0;padding:8px 12px;}
+.india-rem-wrap{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border);}
+/* goals */
+.india-goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.india-goal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;}
+.india-goal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.india-goal-prog-track{height:6px;background:var(--border);border-radius:99px;margin:10px 0 6px;overflow:hidden;}
+.india-goal-prog-fill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.india-goal-pct{font-size:11px;color:var(--text2);font-weight:600;}
+.india-goal-vals{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px;}
+/* month selector for india expenses */
+.india-month-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.india-mth{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1px solid var(--border);color:var(--text2);background:transparent;transition:all .15s;}
+.india-mth.active{background:var(--india);color:#fff;border-color:var(--india);}
+/* modal */
+#indiaModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;padding:16px;}
+#indiaModal.show{display:flex;}
+.india-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);}
+@media(max-width:640px){
+  .india-exp-row{grid-template-columns:30px 1fr 80px 80px 36px 36px;}
+  .india-exp-row .col-myr{display:none;}
+  .india-port-row{grid-template-columns:22px 1fr 80px 80px 80px 36px;}
+  .india-rem-row{grid-template-columns:80px 70px 55px 80px 36px;}
+  .india-rem-row .col-pur{display:none;}
+}
 </style>
 </head>
 <body>
@@ -1332,7 +1414,7 @@ tbody tr.income-row td:first-child{
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h1>🇲🇾 Budget Tracker</h1>
       <span class="ver-badge" onclick="toggleChangelog()" title="View changelog">
-        <span class="ver-dot"></span>v3.10.4
+        <span class="ver-dot"></span>v2.0
       </span>
     </div>
     <div class="subtitle">Expected vs Actual · 2026–2032 · Analytics</div>
@@ -1355,6 +1437,7 @@ tbody tr.income-row td:first-child{
   <div class="nav-tab" onclick="switchView('budget',this)">🎯 Year Budget</div>
   <div class="nav-tab" onclick="switchView('analytics',this)">📈 Analytics</div>
   <div class="nav-tab" onclick="switchView('insights',this)">💡 Insights</div>
+  <div class="nav-tab" onclick="switchView('india',this)">🇮🇳 India</div>
   <div class="nav-tab" onclick="switchView('data',this)">⚙️ Settings</div>
 </nav>
 
@@ -1382,6 +1465,10 @@ tbody tr.income-row td:first-child{
     <div class="mob-label">Insights</div>
     <div class="mob-dot"></div>
   </div>
+  <div class="mob-tab" id="mobt-india" onclick="switchViewMob('india',this)">
+    <div class="mob-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+    <div class="mob-label">India</div><div class="mob-dot"></div>
+  </div>
   <div class="mob-tab" id="mobt-data" onclick="switchViewMob('data',this)" style="display:none">
     <div class="mob-icon"></div>
     <div class="mob-label">Settings</div><div class="mob-dot"></div>
@@ -1399,6 +1486,14 @@ tbody tr.income-row td:first-child{
 <div id="changelogPopup">
   <div class="cl-title">📋 Changelog <span style="cursor:pointer;font-size:16px;color:var(--text2)" onclick="toggleChangelog()">×</span></div>
 
+  <div class="cl-ver">
+    <div class="cl-ver-num">v2.0 <span class="cl-ver-date">Jul 2026</span></div>
+    <div class="cl-item">🇮🇳 India tab — expenses, portfolio, remittances &amp; savings goals in INR</div>
+    <div class="cl-item">Modern redesign — Plus Jakarta Sans font, glassmorphism header &amp; nav, new dark palette</div>
+    <div class="cl-item">Right-click / long-press category rows to instantly change type (Expense → Transfer etc.)</div>
+    <div class="cl-item">Annual tab: hide-empty toggle, Transfers section added</div>
+    <div class="cl-item">Insights: monthly category breakdown moved to top</div>
+  </div>
   <div class="cl-ver">
     <div class="cl-ver-num">v3.10.3 <span class="cl-ver-date">Jul 2026</span></div>
     <div class="cl-item">Transfer category type — tracks credit card payments & inter-account moves without counting them as expenses</div>
@@ -1668,6 +1763,49 @@ tbody tr.income-row td:first-child{
     <div id="insightsWaterfall" style="margin-top:18px"></div>
     <div id="insightsMerchants"></div>
     <div id="insightsRecurring" style="margin-top:16px"></div>
+  </div>
+</div>
+
+
+<!-- ──── INDIA VIEW ──── -->
+<div id="view-india" class="view">
+  <!-- Hero -->
+  <div class="india-hero">
+    <div class="india-rate-row">
+      <label>1 MYR =</label>
+      <input type="number" class="india-rate-input" id="indiaRateInp" value="19" min="1" step="0.1" onchange="saveIndiaRate();renderIndiaView()">
+      <label>INR</label>
+      <span style="font-size:11px;color:rgba(255,255,255,.45);margin-left:4px">(updates all conversions)</span>
+    </div>
+    <div class="india-hero-stats">
+      <div class="india-stat"><div class="india-stat-label">Remitted YTD</div><div class="india-stat-val" id="indiaHeroRemit">₹0</div></div>
+      <div class="india-stat"><div class="india-stat-label">India Expenses YTD</div><div class="india-stat-val" id="indiaHeroExp">₹0</div></div>
+      <div class="india-stat"><div class="india-stat-label">Portfolio Value</div><div class="india-stat-val" id="indiaHeroPort">₹0</div></div>
+      <div class="india-stat"><div class="india-stat-label">Goals Progress</div><div class="india-stat-val" id="indiaHeroGoals">0%</div></div>
+    </div>
+  </div>
+  <!-- Sub-tabs -->
+  <div class="india-tabs">
+    <div class="india-tab-btn active" onclick="switchIndiaTab('expenses',this)">💸 Expenses</div>
+    <div class="india-tab-btn" onclick="switchIndiaTab('portfolio',this)">📈 Portfolio</div>
+    <div class="india-tab-btn" onclick="switchIndiaTab('remittances',this)">✈️ Remittances</div>
+    <div class="india-tab-btn" onclick="switchIndiaTab('goals',this)">🎯 Goals</div>
+  </div>
+  <!-- Panels -->
+  <div id="india-expenses" class="india-panel active"></div>
+  <div id="india-portfolio" class="india-panel"></div>
+  <div id="india-remittances" class="india-panel"></div>
+  <div id="india-goals" class="india-panel"></div>
+</div>
+
+<!-- India Modal -->
+<div id="indiaModal">
+  <div class="india-modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <h3 id="indiaModalTitle" style="font-size:15px;font-weight:800">Add</h3>
+      <button class="del-btn" onclick="closeIndiaModal()">✕</button>
+    </div>
+    <div id="indiaModalBody"></div>
   </div>
 </div>
 
@@ -2189,6 +2327,7 @@ function switchView(name,tab){
   if(name==='budget') renderBudgetPlan();
   if(name==='analytics') renderChart();
   if(name==='insights') renderInsights();
+  if(name==='india'){ loadIndiaData(); renderIndiaView(); }
   if(name==='data') setTimeout(ghLoadConfig,50);
 }
 
@@ -2423,7 +2562,7 @@ function renderMonthTabs(){
 }
 
 /* Mobile nav sync */
-const MOB_VIEWS=['monthly','annual','budget','analytics','insights'];
+const MOB_VIEWS=['monthly','annual','budget','analytics','insights','india'];
 function moveMobPill(idx){
   const pill=document.getElementById('mobPillBg');
   if(pill) pill.style.left=(idx*20)+'%';
@@ -5670,6 +5809,495 @@ function ctxSetType(type){
 }
 function ctxEdit(){   if(_ctxCatId){ hideRowCtx(); openEditCat(_ctxCatId); } }
 function ctxDetail(){ if(_ctxCatId){ hideRowCtx(); openCatDetail(_ctxCatId); } }
+
+
+/* ══════════════════════════════════════════════
+   INDIA — DATA LAYER
+══════════════════════════════════════════════ */
+const INDIA_KEY = 'india_data';
+const INDIA_RATE_KEY = 'india_myr_rate';
+let indiaData = null;
+let indiaCurrentMonth = new Date().getMonth();
+let indiaActiveTab = 'expenses';
+
+function loadIndiaData(){
+  const raw = localStorage.getItem(INDIA_KEY);
+  indiaData = raw ? JSON.parse(raw) : { expenses:{}, portfolio:[], remittances:[], goals:[] };
+  if(!indiaData.expenses) indiaData.expenses={};
+  if(!indiaData.portfolio) indiaData.portfolio=[];
+  if(!indiaData.remittances) indiaData.remittances=[];
+  if(!indiaData.goals) indiaData.goals=[];
+  // load rate into input
+  const rate = parseFloat(localStorage.getItem(INDIA_RATE_KEY)||'19');
+  const inp = document.getElementById('indiaRateInp');
+  if(inp) inp.value = rate;
+}
+function saveIndiaData(){ localStorage.setItem(INDIA_KEY, JSON.stringify(indiaData)); }
+function saveIndiaRate(){
+  const v = parseFloat(document.getElementById('indiaRateInp').value)||19;
+  localStorage.setItem(INDIA_RATE_KEY, v);
+}
+function getIndiaRate(){ return parseFloat(localStorage.getItem(INDIA_RATE_KEY)||'19'); }
+function fmtINR(v){ return '₹'+fmt(Math.round(v)); }
+function fmtINRtoMYR(inr){ return 'MYR '+fmt(Math.round(inr/getIndiaRate()*100)/100); }
+
+/* ── India hero stats ── */
+function renderIndiaHero(){
+  if(!indiaData) return;
+  const rate = getIndiaRate();
+  // remit YTD
+  const remitYTD = indiaData.remittances.reduce((s,r)=>s+(r.inr||0),0);
+  // expenses YTD
+  let expYTD=0;
+  Object.values(indiaData.expenses).forEach(months=>{
+    Object.values(months).forEach(cats=>{
+      cats.forEach(cat=>{ expYTD+=(cat.actualINR||0); });
+    });
+  });
+  // portfolio
+  const portVal = indiaData.portfolio.reduce((s,p)=>s+(p.current||0),0);
+  // goals avg
+  const goals = indiaData.goals;
+  const goalsPct = goals.length ? Math.round(goals.reduce((s,g)=>s+(g.current||0)/Math.max(g.target,1)*100,0)/goals.length) : 0;
+
+  const el = id => document.getElementById(id);
+  if(el('indiaHeroRemit')) el('indiaHeroRemit').textContent = fmtINR(remitYTD);
+  if(el('indiaHeroExp'))   el('indiaHeroExp').textContent   = fmtINR(expYTD);
+  if(el('indiaHeroPort'))  el('indiaHeroPort').textContent  = fmtINR(portVal);
+  if(el('indiaHeroGoals')) el('indiaHeroGoals').textContent = goalsPct+'%';
+}
+
+/* ── Sub-tab switch ── */
+function switchIndiaTab(tab, btn){
+  indiaActiveTab = tab;
+  document.querySelectorAll('.india-tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.india-panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById('india-'+tab);
+  if(panel) panel.classList.add('active');
+  renderIndiaPanel(tab);
+}
+
+function renderIndiaView(){
+  renderIndiaHero();
+  renderIndiaPanel(indiaActiveTab);
+}
+
+function renderIndiaPanel(tab){
+  if(tab==='expenses')    renderIndiaExpenses();
+  if(tab==='portfolio')   renderIndiaPortfolio();
+  if(tab==='remittances') renderIndiaRemittances();
+  if(tab==='goals')       renderIndiaGoals();
+}
+
+/* ══════════════════════════════════════════════
+   INDIA — EXPENSES
+══════════════════════════════════════════════ */
+function getIndiaExpYear(){ return currentYear+''; }
+function getIndiaExpMonth(){ return indiaCurrentMonth+''; }
+function getIndiaCats(){
+  const y=getIndiaExpYear(), m=getIndiaExpMonth();
+  if(!indiaData.expenses[y]) indiaData.expenses[y]={};
+  if(!indiaData.expenses[y][m]) indiaData.expenses[y][m]=[];
+  return indiaData.expenses[y][m];
+}
+
+function renderIndiaExpenses(){
+  const el = document.getElementById('india-expenses');
+  if(!el) return;
+  const cats = getIndiaCats();
+  const MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // month selector
+  let monthHtml = '<div class="india-month-sel">';
+  MONTHS_S.forEach((m,i)=>{ monthHtml+=`<div class="india-mth${i===indiaCurrentMonth?' active':''}" onclick="indiaSetMonth(${i})">${m}</div>`; });
+  monthHtml += '</div>';
+
+  // table
+  let tableHtml = `<div class="india-exp-wrap">
+    <div class="india-exp-row hdr">
+      <span></span><span>Category</span><span style="text-align:right">Expected ₹</span>
+      <span style="text-align:right">Actual ₹</span>
+      <span class="col-myr" style="text-align:right">MYR</span>
+      <span style="text-align:center">Paid</span><span></span>
+    </div>`;
+
+  let totalExp=0, totalAct=0;
+  cats.forEach((cat,i)=>{
+    totalExp += cat.expectedINR||0;
+    totalAct += cat.actualINR||0;
+    const myr = fmtINRtoMYR(cat.actualINR||0);
+    tableHtml += `<div class="india-exp-row">
+      <span style="font-size:18px">${cat.emoji||'📌'}</span>
+      <span style="font-weight:500">${cat.name}</span>
+      <span style="text-align:right">
+        <span contenteditable="true" class="editable" style="min-width:70px"
+          onblur="indiaUpdateCat(${i},'expectedINR',parseFloat(this.textContent)||0)"
+          onkeydown="blurEnter(event)">${cat.expectedINR||0}</span>
+      </span>
+      <span style="text-align:right">
+        <span contenteditable="true" class="editable" style="min-width:70px"
+          onblur="indiaUpdateCat(${i},'actualINR',parseFloat(this.textContent)||0)"
+          onkeydown="blurEnter(event)">${cat.actualINR||0}</span>
+      </span>
+      <span class="col-myr" style="text-align:right;font-size:11px;color:var(--text2)">${myr}</span>
+      <span style="text-align:center">
+        <input type="checkbox" class="paid-check" ${cat.paid?'checked':''} onchange="indiaUpdateCat(${i},'paid',this.checked)">
+      </span>
+      <span><button class="del-btn" onclick="indiaDeleteCat(${i})">✕</button></span>
+    </div>`;
+  });
+
+  tableHtml += `<div class="india-exp-total">
+    <span>Total Expected: <b style="color:var(--blue)">${fmtINR(totalExp)}</b> <span style="color:var(--text3)">(${fmtINRtoMYR(totalExp)})</span></span>
+    <span>Total Actual: <b style="color:${totalAct>totalExp?'var(--red)':'var(--accent)'}">${fmtINR(totalAct)}</b> <span style="color:var(--text3)">(${fmtINRtoMYR(totalAct)})</span></span>
+  </div></div>`;
+
+  el.innerHTML = monthHtml + `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:700">${MONTHS[indiaCurrentMonth]} Expenses</span>
+      <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openIndiaAddCat()">＋ Add Category</button>
+    </div>` + tableHtml;
+}
+
+function indiaSetMonth(m){ indiaCurrentMonth=m; renderIndiaExpenses(); }
+function indiaUpdateCat(i,field,val){
+  const cats=getIndiaCats(); if(!cats[i]) return;
+  cats[i][field]=val; saveIndiaData(); renderIndiaHero(); renderIndiaExpenses();
+}
+function indiaDeleteCat(i){
+  const cats=getIndiaCats(); cats.splice(i,1); saveIndiaData(); renderIndiaExpenses();
+}
+
+function openIndiaAddCat(){
+  document.getElementById('indiaModalTitle').textContent='Add India Expense Category';
+  document.getElementById('indiaModalBody').innerHTML=`
+    <div style="display:grid;gap:12px">
+      <div><label class="modal-label">Emoji</label><input id="im_emoji" class="modal-input" value="📌" style="width:60px;text-align:center;font-size:20px"></div>
+      <div><label class="modal-label">Category Name</label><input id="im_name" class="modal-input" placeholder="e.g. Home Loan EMI"></div>
+      <div><label class="modal-label">Expected Monthly (₹)</label><input id="im_exp" class="modal-input" type="number" placeholder="0"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-gray" onclick="closeIndiaModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitIndiaAddCat()">Add</button>
+      </div>
+    </div>`;
+  document.getElementById('indiaModal').classList.add('show');
+  setTimeout(()=>document.getElementById('im_name').focus(),100);
+}
+
+function submitIndiaAddCat(){
+  const name=document.getElementById('im_name').value.trim();
+  if(!name){showToast('Enter a category name');return;}
+  const cat={id:Date.now()+'',name,emoji:document.getElementById('im_emoji').value||'📌',
+    expectedINR:parseFloat(document.getElementById('im_exp').value)||0,actualINR:0,paid:false,note:''};
+  getIndiaCats().push(cat);
+  saveIndiaData(); closeIndiaModal(); renderIndiaExpenses(); renderIndiaHero();
+}
+
+/* ══════════════════════════════════════════════
+   INDIA — PORTFOLIO
+══════════════════════════════════════════════ */
+const PORT_TYPES=['Mutual Fund','Stocks','Fixed Deposit','NPS','PPF','Gold','Real Estate','Crypto','Other'];
+const PORT_EMOJI={'Mutual Fund':'📊','Stocks':'📈','Fixed Deposit':'🏦','NPS':'🏛️','PPF':'💰','Gold':'🥇','Real Estate':'🏠','Crypto':'🪙','Other':'📦'};
+
+function renderIndiaPortfolio(){
+  const el=document.getElementById('india-portfolio');
+  if(!el) return;
+  const holdings=indiaData.portfolio;
+
+  // Summary cards
+  const totalInvested=holdings.reduce((s,h)=>s+(h.invested||0),0);
+  const totalCurrent=holdings.reduce((s,h)=>s+(h.current||0),0);
+  const totalGain=totalCurrent-totalInvested;
+  const gainPct=totalInvested>0?((totalGain/totalInvested)*100).toFixed(1):0;
+
+  let html=`<div class="india-port-total">
+    <div class="india-port-card"><div class="india-port-card-label">Total Invested</div>
+      <div class="india-port-card-val" style="color:var(--blue)">${fmtINR(totalInvested)}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtINRtoMYR(totalInvested)}</div></div>
+    <div class="india-port-card"><div class="india-port-card-label">Current Value</div>
+      <div class="india-port-card-val" style="color:var(--accent)">${fmtINR(totalCurrent)}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtINRtoMYR(totalCurrent)}</div></div>
+    <div class="india-port-card"><div class="india-port-card-label">Total Gain/Loss</div>
+      <div class="india-port-card-val" style="color:${totalGain>=0?'var(--accent)':'var(--red)'}">${fmtINR(totalGain)}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${gainPct}%</div></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openIndiaAddHolding()">＋ Add Holding</button>
+  </div>`;
+
+  if(!holdings.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">No holdings yet — add your first investment</div>';
+    el.innerHTML=html; return;
+  }
+
+  html+=`<div class="india-port-wrap">
+    <div class="india-port-row hdr">
+      <span></span><span>Name</span>
+      <span style="text-align:right">Invested ₹</span>
+      <span style="text-align:right">Current ₹</span>
+      <span style="text-align:right">Gain/Loss</span>
+      <span style="text-align:right">%</span>
+      <span></span>
+    </div>`;
+
+  holdings.forEach((h,i)=>{
+    const gain=(h.current||0)-(h.invested||0);
+    const pct=h.invested>0?((gain/h.invested)*100).toFixed(1):0;
+    const emoji=PORT_EMOJI[h.type]||'📦';
+    html+=`<div class="india-port-row">
+      <span title="${h.type}" style="font-size:16px">${emoji}</span>
+      <span><div style="font-weight:600;font-size:12.5px">${h.name}</div>
+        <div style="font-size:10px;color:var(--text3)">${h.type}${h.date?' · '+h.date:''}</div></span>
+      <span style="text-align:right;font-size:12px">
+        <span contenteditable="true" class="editable" onblur="indiaUpdateHolding(${i},'invested',parseFloat(this.textContent)||0)" onkeydown="blurEnter(event)">${h.invested||0}</span>
+      </span>
+      <span style="text-align:right;font-size:12px">
+        <span contenteditable="true" class="editable" onblur="indiaUpdateHolding(${i},'current',parseFloat(this.textContent)||0)" onkeydown="blurEnter(event)">${h.current||0}</span>
+      </span>
+      <span style="text-align:right;font-weight:600;color:${gain>=0?'var(--accent)':'var(--red)'};font-size:12px">${gain>=0?'+':''}${fmtINR(gain)}</span>
+      <span style="text-align:right;font-weight:700;color:${gain>=0?'var(--accent)':'var(--red)'};font-size:12px">${gain>=0?'+':''}${pct}%</span>
+      <span><button class="del-btn" onclick="indiaDeleteHolding(${i})">✕</button></span>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function indiaUpdateHolding(i,field,val){
+  indiaData.portfolio[i][field]=val; saveIndiaData(); renderIndiaPortfolio(); renderIndiaHero();
+}
+function indiaDeleteHolding(i){
+  indiaData.portfolio.splice(i,1); saveIndiaData(); renderIndiaPortfolio(); renderIndiaHero();
+}
+function openIndiaAddHolding(){
+  document.getElementById('indiaModalTitle').textContent='Add Holding';
+  document.getElementById('indiaModalBody').innerHTML=`
+    <div style="display:grid;gap:12px">
+      <div><label class="modal-label">Name</label><input id="ih_name" class="modal-input" placeholder="e.g. HDFC Flexi Cap Fund"></div>
+      <div><label class="modal-label">Type</label>
+        <select id="ih_type" class="modal-input">${PORT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="modal-label">Invested (₹)</label><input id="ih_inv" class="modal-input" type="number" placeholder="0"></div>
+        <div><label class="modal-label">Current Value (₹)</label><input id="ih_cur" class="modal-input" type="number" placeholder="0"></div>
+      </div>
+      <div><label class="modal-label">Start Date (optional)</label><input id="ih_date" class="modal-input" type="month"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-gray" onclick="closeIndiaModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitIndiaAddHolding()">Add</button>
+      </div>
+    </div>`;
+  document.getElementById('indiaModal').classList.add('show');
+  setTimeout(()=>document.getElementById('ih_name').focus(),100);
+}
+function submitIndiaAddHolding(){
+  const name=document.getElementById('ih_name').value.trim();
+  if(!name){showToast('Enter a name');return;}
+  indiaData.portfolio.push({id:Date.now()+'',name,
+    type:document.getElementById('ih_type').value,
+    invested:parseFloat(document.getElementById('ih_inv').value)||0,
+    current:parseFloat(document.getElementById('ih_cur').value)||0,
+    date:document.getElementById('ih_date').value||''});
+  saveIndiaData(); closeIndiaModal(); renderIndiaPortfolio(); renderIndiaHero();
+}
+
+/* ══════════════════════════════════════════════
+   INDIA — REMITTANCES
+══════════════════════════════════════════════ */
+function renderIndiaRemittances(){
+  const el=document.getElementById('india-remittances');
+  if(!el) return;
+  const rems=[...indiaData.remittances].sort((a,b)=>b.date.localeCompare(a.date));
+  const totalMYR=rems.reduce((s,r)=>s+(r.myr||0),0);
+  const totalINR=rems.reduce((s,r)=>s+(r.inr||0),0);
+  const avgRate=totalMYR>0?(totalINR/totalMYR).toFixed(2):0;
+
+  let html=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px">
+    <div class="india-port-card"><div class="india-port-card-label">Total Sent (MYR)</div>
+      <div class="india-port-card-val" style="color:var(--blue)">MYR ${fmt(totalMYR)}</div></div>
+    <div class="india-port-card"><div class="india-port-card-label">Total Received (₹)</div>
+      <div class="india-port-card-val" style="color:var(--accent)">${fmtINR(totalINR)}</div></div>
+    <div class="india-port-card"><div class="india-port-card-label">Avg Rate</div>
+      <div class="india-port-card-val">1 MYR = ₹${avgRate}</div></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+    <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openIndiaAddRemit()">＋ Log Transfer</button>
+  </div>`;
+
+  if(!rems.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">No transfers logged yet</div>';
+    el.innerHTML=html; return;
+  }
+
+  html+=`<div class="india-rem-wrap">
+    <div class="india-rem-row hdr">
+      <span>Date</span><span style="text-align:right">MYR Sent</span>
+      <span style="text-align:right">Rate</span><span style="text-align:right">₹ Received</span>
+      <span class="col-pur">Purpose</span><span></span>
+    </div>`;
+
+  rems.forEach((r,i)=>{
+    const origI=indiaData.remittances.findIndex(x=>x.id===r.id);
+    html+=`<div class="india-rem-row">
+      <span style="font-size:11px">${r.date}</span>
+      <span style="text-align:right;font-weight:600;color:var(--blue)">MYR ${fmt(r.myr||0)}</span>
+      <span style="text-align:right;font-size:11px;color:var(--text2)">₹${r.rate||0}</span>
+      <span style="text-align:right;font-weight:600;color:var(--accent)">${fmtINR(r.inr||0)}</span>
+      <span class="col-pur" style="font-size:11px;color:var(--text2)">${r.purpose||'—'}</span>
+      <span><button class="del-btn" onclick="indiaDeleteRemit(${origI})">✕</button></span>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function indiaDeleteRemit(i){
+  indiaData.remittances.splice(i,1); saveIndiaData(); renderIndiaRemittances(); renderIndiaHero();
+}
+function openIndiaAddRemit(){
+  const today=new Date().toISOString().slice(0,10);
+  const rate=getIndiaRate();
+  document.getElementById('indiaModalTitle').textContent='Log Remittance';
+  document.getElementById('indiaModalBody').innerHTML=`
+    <div style="display:grid;gap:12px">
+      <div><label class="modal-label">Date</label><input id="ir_date" class="modal-input" type="date" value="${today}"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="modal-label">MYR Sent</label><input id="ir_myr" class="modal-input" type="number" placeholder="0" oninput="indiaCalcINR()"></div>
+        <div><label class="modal-label">Rate (1 MYR = ₹)</label><input id="ir_rate" class="modal-input" type="number" value="${rate}" oninput="indiaCalcINR()"></div>
+      </div>
+      <div><label class="modal-label">₹ Received (auto-calculated)</label><input id="ir_inr" class="modal-input" type="number" placeholder="0"></div>
+      <div><label class="modal-label">Purpose</label><input id="ir_pur" class="modal-input" placeholder="e.g. Family, Home Loan, SIP"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-gray" onclick="closeIndiaModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitIndiaAddRemit()">Save</button>
+      </div>
+    </div>`;
+  document.getElementById('indiaModal').classList.add('show');
+  setTimeout(()=>document.getElementById('ir_myr').focus(),100);
+}
+function indiaCalcINR(){
+  const myr=parseFloat(document.getElementById('ir_myr').value)||0;
+  const rate=parseFloat(document.getElementById('ir_rate').value)||1;
+  document.getElementById('ir_inr').value=Math.round(myr*rate);
+}
+function submitIndiaAddRemit(){
+  const myr=parseFloat(document.getElementById('ir_myr').value)||0;
+  if(!myr){showToast('Enter MYR amount');return;}
+  indiaData.remittances.push({id:Date.now()+'',
+    date:document.getElementById('ir_date').value,
+    myr, rate:parseFloat(document.getElementById('ir_rate').value)||0,
+    inr:parseFloat(document.getElementById('ir_inr').value)||Math.round(myr*getIndiaRate()),
+    purpose:document.getElementById('ir_pur').value.trim()});
+  saveIndiaData(); closeIndiaModal(); renderIndiaRemittances(); renderIndiaHero();
+}
+
+/* ══════════════════════════════════════════════
+   INDIA — GOALS
+══════════════════════════════════════════════ */
+const GOAL_COLORS=['#34d399','#38bdf8','#f97316','#a78bfa','#fbbf24','#fb7185','#06b6d4'];
+
+function renderIndiaGoals(){
+  const el=document.getElementById('india-goals');
+  if(!el) return;
+  const goals=indiaData.goals;
+
+  let html=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <span style="font-size:13px;font-weight:700">Savings Goals</span>
+    <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openIndiaAddGoal()">＋ Add Goal</button>
+  </div>`;
+
+  if(!goals.length){
+    html+='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">No goals yet — add your first savings goal</div>';
+    el.innerHTML=html; return;
+  }
+
+  html+='<div class="india-goals-grid">';
+  goals.forEach((g,i)=>{
+    const pct=g.target>0?Math.min((g.current/g.target)*100,100):0;
+    const color=g.color||GOAL_COLORS[i%GOAL_COLORS.length];
+    const remaining=Math.max((g.target||0)-(g.current||0),0);
+    html+=`<div class="india-goal-card">
+      <div class="india-goal-card" style="padding:0;border:none;box-shadow:none;background:none">
+        <div style="background:${color}" class="india-goal-card" id="gc${i}"></div>
+      </div>
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:14px 14px 0 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:20px;margin-bottom:4px">${g.emoji||'🎯'}</div>
+          <div style="font-weight:700;font-size:13px">${g.name}</div>
+          ${g.deadline?`<div style="font-size:10px;color:var(--text3);margin-top:2px">By ${g.deadline}</div>`:''}
+        </div>
+        <button class="del-btn" onclick="indiaDeleteGoal(${i})" style="margin-top:2px">✕</button>
+      </div>
+      <div class="india-goal-prog-track">
+        <div class="india-goal-prog-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <div class="india-goal-pct">${pct.toFixed(0)}% complete</div>
+      <div class="india-goal-vals">
+        <span>Saved: <b style="color:${color}">${fmtINR(g.current||0)}</b></span>
+        <span>Target: <b>${fmtINR(g.target||0)}</b></span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Remaining: ${fmtINR(remaining)} <span style="color:var(--text3)">(${fmtINRtoMYR(remaining)})</span></div>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <input type="number" placeholder="Update saved ₹" class="modal-input" id="gupd${i}" style="font-size:11px;padding:5px 8px;flex:1" value="${g.current||0}">
+        <button class="btn btn-gray" style="font-size:11px;padding:5px 10px" onclick="indiaUpdateGoalAmount(${i})">Save</button>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function indiaUpdateGoalAmount(i){
+  const inp=document.getElementById('gupd'+i);
+  if(!inp) return;
+  indiaData.goals[i].current=parseFloat(inp.value)||0;
+  saveIndiaData(); renderIndiaGoals(); renderIndiaHero();
+}
+function indiaDeleteGoal(i){
+  indiaData.goals.splice(i,1); saveIndiaData(); renderIndiaGoals(); renderIndiaHero();
+}
+function openIndiaAddGoal(){
+  document.getElementById('indiaModalTitle').textContent='Add Savings Goal';
+  document.getElementById('indiaModalBody').innerHTML=`
+    <div style="display:grid;gap:12px">
+      <div style="display:grid;grid-template-columns:60px 1fr;gap:10px">
+        <div><label class="modal-label">Emoji</label><input id="ig_emoji" class="modal-input" value="🎯" style="text-align:center;font-size:18px"></div>
+        <div><label class="modal-label">Goal Name</label><input id="ig_name" class="modal-input" placeholder="e.g. Home Down Payment"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="modal-label">Target (₹)</label><input id="ig_target" class="modal-input" type="number" placeholder="0"></div>
+        <div><label class="modal-label">Saved So Far (₹)</label><input id="ig_current" class="modal-input" type="number" placeholder="0"></div>
+      </div>
+      <div><label class="modal-label">Target Date (optional)</label><input id="ig_date" class="modal-input" type="month"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <button class="btn btn-gray" onclick="closeIndiaModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitIndiaAddGoal()">Add Goal</button>
+      </div>
+    </div>`;
+  document.getElementById('indiaModal').classList.add('show');
+  setTimeout(()=>document.getElementById('ig_name').focus(),100);
+}
+function submitIndiaAddGoal(){
+  const name=document.getElementById('ig_name').value.trim();
+  if(!name){showToast('Enter a goal name');return;}
+  const colors=GOAL_COLORS;
+  indiaData.goals.push({id:Date.now()+'',name,
+    emoji:document.getElementById('ig_emoji').value||'🎯',
+    target:parseFloat(document.getElementById('ig_target').value)||0,
+    current:parseFloat(document.getElementById('ig_current').value)||0,
+    deadline:document.getElementById('ig_date').value||'',
+    color:colors[indiaData.goals.length%colors.length]});
+  saveIndiaData(); closeIndiaModal(); renderIndiaGoals(); renderIndiaHero();
+}
+
+/* ── Modal close ── */
+function closeIndiaModal(){
+  document.getElementById('indiaModal').classList.remove('show');
+}
+document.getElementById('indiaModal').addEventListener('click',function(e){
+  if(e.target===this) closeIndiaModal();
+});
 
 </script>
 
