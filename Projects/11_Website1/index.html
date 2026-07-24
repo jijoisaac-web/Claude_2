@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=13.4"/>
+<link rel="stylesheet" href="/site.css?v=13.5"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.4</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.5</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1661,17 +1661,18 @@ document.addEventListener('DOMContentLoaded',function(){
               <div class="card-hd" style="font-size:14px;margin-bottom:4px"><div class="card-hd-bar"></div>SIP &mdash; Systematic Investment Plan</div>
               <div class="card-sub" style="font-size:12px;margin-bottom:12px">Monthly MF investment growth with step-up compounding.</div>
               <div class="tpl-row" style="margin-bottom:10px;gap:5px">
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(15000,12,10,10)">🌱 Starter</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(50000,12,20,10)">📈 Wealth</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(20000,11,15,8)">🎓 Education</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(75000,12,25,5)">🛡 Retire</button>
+                <button class="tpl-btn sip-tpl-btn active" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(15000,12,10,10,this)">🌱 Starter</button>
+                <button class="tpl-btn sip-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(50000,12,20,10,this)">📈 Wealth</button>
+                <button class="tpl-btn sip-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(20000,11,15,8,this)">🎓 Education</button>
+                <button class="tpl-btn sip-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySIPTpl(75000,12,25,5,this)">🛡 Retire</button>
               </div>
               <div class="fg invest-fg">
-                <div class="f"><label>Monthly SIP (&#8377;)</label><input type="number" id="sip-amount" value="25000" oninput="calcSIP()"/></div>
-                <div class="f"><label>Return (% p.a.)</label><input type="number" id="sip-return" value="12" step="0.5" oninput="calcSIP()"/></div>
-                <div class="f"><label>Period (Years)</label><input type="number" id="sip-years" value="15" min="1" max="40" oninput="calcSIP()"/></div>
-                <div class="f"><label>Step-Up (% /yr)</label><input type="number" id="sip-stepup" value="10" step="1" min="0" oninput="calcSIP()"/></div>
+                <div class="f"><label>Monthly SIP (&#8377;)</label><input type="number" id="sip-amount" value="15000" oninput="clearSIPTpl();calcSIP()"/></div>
+                <div class="f"><label>Return (% p.a.)</label><input type="number" id="sip-return" value="12" step="0.5" oninput="clearSIPTpl();calcSIP()"/></div>
+                <div class="f"><label>Period (Years)</label><input type="number" id="sip-years" value="10" min="1" max="40" oninput="clearSIPTpl();calcSIP()"/></div>
+                <div class="f"><label>Step-Up (% /yr)</label><input type="number" id="sip-stepup" value="10" step="1" min="0" oninput="clearSIPTpl();calcSIP()"/></div>
               </div>
+              <button class="btn btn-amber invest-calc-btn" onclick="calcSIP()">&#9654; Calculate SIP</button>
               <div id="sip-result">
                 <div class="rg invest-rg" id="sip-result-grid"></div>
                 <div class="box-green invest-tip" id="sip-tip"></div>
@@ -1687,18 +1688,19 @@ document.addEventListener('DOMContentLoaded',function(){
               <div class="card-hd" style="font-size:14px;margin-bottom:4px"><div class="card-hd-bar" style="background:var(--green)"></div>SWP &mdash; Systematic Withdrawal Plan</div>
               <div class="card-sub" style="font-size:12px;margin-bottom:12px">How long will your corpus last with monthly withdrawals?</div>
               <div class="tpl-row" style="margin-bottom:10px;gap:5px">
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(100,30000,9,6,6)">🏡 Modest</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(300,100000,9,6,6)">🏙 Metro</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(500,150000,10,6,6)">💰 Gulf</button>
-                <button class="tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(1000,300000,10,6,6)">👑 Affluent</button>
+                <button class="tpl-btn swp-tpl-btn active" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(100,30000,9,6,6,this)">🏡 Modest</button>
+                <button class="tpl-btn swp-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(300,100000,9,6,6,this)">🏙 Metro</button>
+                <button class="tpl-btn swp-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(500,150000,10,6,6,this)">💰 Gulf</button>
+                <button class="tpl-btn swp-tpl-btn" style="font-size:11px;padding:4px 9px" onclick="applySWPTpl(1000,300000,10,6,6,this)">👑 Affluent</button>
               </div>
               <div class="fg invest-fg">
-                <div class="f"><label>Corpus (&#8377; Lakhs)</label><input type="number" id="swp-corpus" value="200" step="10" oninput="calcSWP()"/></div>
-                <div class="f"><label>Monthly Withdrawal (&#8377;)</label><input type="number" id="swp-monthly" value="75000" oninput="calcSWP()"/></div>
-                <div class="f"><label>Return (% p.a.)</label><input type="number" id="swp-return" value="9" step="0.5" oninput="calcSWP()"/></div>
-                <div class="f"><label>Inflation (% p.a.)</label><input type="number" id="swp-inflation" value="6" step="0.5" oninput="calcSWP()"/></div>
-                <div class="f"><label>WD Step-Up (% /yr)</label><input type="number" id="swp-stepup" value="6" step="1" min="0" oninput="calcSWP()"/></div>
+                <div class="f"><label>Corpus (&#8377; Lakhs)</label><input type="number" id="swp-corpus" value="100" step="10" oninput="clearSWPTpl();calcSWP()"/></div>
+                <div class="f"><label>Monthly Withdrawal (&#8377;)</label><input type="number" id="swp-monthly" value="30000" oninput="clearSWPTpl();calcSWP()"/></div>
+                <div class="f"><label>Return (% p.a.)</label><input type="number" id="swp-return" value="9" step="0.5" oninput="clearSWPTpl();calcSWP()"/></div>
+                <div class="f"><label>Inflation (% p.a.)</label><input type="number" id="swp-inflation" value="6" step="0.5" oninput="clearSWPTpl();calcSWP()"/></div>
+                <div class="f"><label>WD Step-Up (% /yr)</label><input type="number" id="swp-stepup" value="6" step="1" min="0" oninput="clearSWPTpl();calcSWP()"/></div>
               </div>
+              <button class="btn btn-amber invest-calc-btn" onclick="calcSWP()">&#9654; Calculate SWP</button>
               <div id="swp-result">
                 <div class="rg invest-rg" id="swp-result-grid"></div>
                 <div id="swp-verdict" class="invest-tip"></div>
@@ -3522,7 +3524,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=13.4"></script>
+<script src="/site.js?v=13.5"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

@@ -1,4 +1,4 @@
-/* v13.4 */
+/* v13.5 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -955,6 +955,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tpl-label{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap;flex-shrink:0;}
 .tpl-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#000;}
+.tpl-btn.active{background:var(--amber)!important;border-color:var(--amber)!important;color:#000!important;box-shadow:0 0 0 2px rgba(240,165,32,0.3);}
+.invest-calc-btn{width:100%;padding:8px 12px;font-size:12px;font-weight:700;margin:4px 0 12px;border-radius:8px;}
 /* ── Invest dual grid (SIP + SWP side-by-side) ── */
 .invest-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
 .invest-card{padding:16px 18px;}

@@ -1,4 +1,4 @@
-/* v13.4 */
+/* v13.5 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -2514,19 +2514,25 @@ function toggleTheme(){
 }
 
 // ── SIP / SWP TEMPLATES ──────────────────────────────────────────────────────
-function applySIPTpl(amount, ret, years, stepup) {
+function clearSIPTpl(){document.querySelectorAll('.sip-tpl-btn').forEach(b=>b.classList.remove('active'));}
+function clearSWPTpl(){document.querySelectorAll('.swp-tpl-btn').forEach(b=>b.classList.remove('active'));}
+function applySIPTpl(amount, ret, years, stepup, btn) {
   document.getElementById('sip-amount').value = amount;
   document.getElementById('sip-return').value = ret;
   document.getElementById('sip-years').value = years;
   document.getElementById('sip-stepup').value = stepup;
+  clearSIPTpl();
+  if(btn) btn.classList.add('active');
   calcSIP();
 }
-function applySWPTpl(corpusLakhs, monthly, ret, inflation, stepup) {
+function applySWPTpl(corpusLakhs, monthly, ret, inflation, stepup, btn) {
   document.getElementById('swp-corpus').value = corpusLakhs;
   document.getElementById('swp-monthly').value = monthly;
   document.getElementById('swp-return').value = ret;
   document.getElementById('swp-inflation').value = inflation;
   document.getElementById('swp-stepup').value = stepup;
+  clearSWPTpl();
+  if(btn) btn.classList.add('active');
   calcSWP();
 }
 
