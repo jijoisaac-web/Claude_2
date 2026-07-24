@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>🇨🇦 Rate Card Poster</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  width:1080px;height:1080px;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 70px;position:relative;
+}
+.top-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px 48px;background:rgba(3,6,18,0.55);border-bottom:1px solid rgba(201,162,39,0.18);}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{width:48px;height:48px;background:linear-gradient(135deg,#f0a520,#c97c0a);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(240,165,32,0.45);}
+.brand-icon svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.3px;color:#fff;}
+.brand-url{font-size:12px;font-weight:600;color:#c9a227;letter-spacing:.3px;display:block;}
+.live-badge{display:flex;align-items:center;gap:8px;background:rgba(16,185,129,0.12);border:1.5px solid rgba(16,185,129,0.35);border-radius:30px;padding:8px 18px;}
+.pulse{width:9px;height:9px;border-radius:50%;background:#10b981;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.6);}50%{box-shadow:0 0 0 6px rgba(16,185,129,0);}}
+.live-text{font-size:14px;font-weight:700;color:#10b981;letter-spacing:.5px;}
+.main{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:30px;}
+.flag-row{display:flex;align-items:center;gap:20px;margin-bottom:18px;}
+.flag{font-size:72px;line-height:1;}
+.flag-arrow{font-size:40px;color:#c9a227;background:rgba(201,162,39,0.15);border:2px solid rgba(201,162,39,0.35);border-radius:50%;width:62px;height:62px;display:flex;align-items:center;justify-content:center;}
+.headline{font-size:52px;font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:10px;}
+.headline span{color:#c9a227;}
+.subhead{font-size:18px;color:rgba(255,255,255,0.65);margin-bottom:38px;font-weight:500;}
+.stat-row{display:flex;gap:16px;margin-bottom:34px;}
+.stat-pill{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px 22px;display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
+.stat-pill.highlight{background:rgba(201,162,39,0.12);border-color:rgba(201,162,39,0.35);}
+.stat-num{font-size:34px;font-weight:900;letter-spacing:-1px;}
+.stat-num.green{color:#10b981;}
+.stat-num.amber{color:#c9a227;}
+.stat-num.red{color:#ef4444;}
+.stat-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.50);letter-spacing:.5px;text-transform:uppercase;text-align:center;}
+.provider-label{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:34px;}
+.chip{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.10);border-radius:30px;padding:8px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);}
+.chip.best{background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:#10b981;}
+.chip.warn{background:rgba(239,68,68,0.10);border-color:rgba(239,68,68,0.25);color:#f87171;}
+.cta-box{background:rgba(201,162,39,0.12);border:2px solid rgba(201,162,39,0.40);border-radius:20px;padding:20px 46px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.cta-free{font-size:13px;font-weight:700;color:#c9a227;letter-spacing:1px;text-transform:uppercase;}
+.cta-url{font-size:22px;font-weight:900;letter-spacing:-.5px;color:#fff;}
+.cta-note{font-size:12px;color:rgba(255,255,255,0.45);font-weight:500;}
+.hashtags{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,0.27);font-weight:500;}
+body{background:linear-gradient(180deg,rgba(3,6,18,0.65) 0%,rgba(4,8,22,0.50) 40%,rgba(3,6,18,0.92) 100%),url('https://images.pexels.com/photos/1486325/pexels-photo-1486325.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop') center/cover no-repeat;}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div>
+      <span class="brand-name">NRI Finance Hub</span>
+      <span class="brand-url">nrifinancehub.com</span>
+    </div>
+  </div>
+  <div class="live-badge"><div class="pulse"></div><span class="live-text">LIVE RATES</span></div>
+</div>
+<div class="main">
+  <div class="flag-row">
+    <span class="flag">🇨🇦</span>
+    <div class="flag-arrow">→</div>
+    <span class="flag">🇮🇳</span>
+  </div>
+  <div class="headline">TD Bank taking<br><span>₹4,000+</span> extra?</div>
+  <div class="subhead">On CAD 1,000 — bank wire fees + bad rates cost you every time</div>
+  <div class="stat-row"><div class="stat-pill highlight"><div class="stat-num amber">2.4%</div><div class="stat-lbl">Best vs bank wire gap</div></div><div class="stat-pill "><div class="stat-num green">21</div><div class="stat-lbl">Canada providers ranked</div></div><div class="stat-pill "><div class="stat-num red">$50</div><div class="stat-lbl">Avg bank wire fee (wasted)</div></div></div>
+  <div class="provider-label">Ranked by rupees you actually receive</div>
+  <div class="chip-row"><div class="chip best">★ Wise</div><div class="chip best">KnightsbridgeFX</div><div class="chip best">Simplii</div><div class="chip best">InstaReM</div><div class="chip best">Remitly</div><div class="chip warn">✕ TD · RBC · Scotiabank wire</div></div>
+  <div class="cta-box">
+    <div class="cta-free">Free · No login · Live rates</div>
+    <div class="cta-url">nrifinancehub.com/cad-inr-rate-card.html</div>
+    <div class="cta-note">Check before every transfer — takes 10 seconds</div>
+  </div>
+</div>
+<div class="hashtags">#NRICanada · #IndiansinCanada · #SendMoneyToIndia · #CanadaNRI · #MoneyTransfer · #NRIFinance</div>
+</body>
+</html>
