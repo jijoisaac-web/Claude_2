@@ -3,20 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AED → INR Live Rate Card | NRI Finance Hub</title>
+<title>MYR → INR Live Rate Card | NRI Finance Hub</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#05080f;color:#e8eaf0;}
-
-/* ── SPLIT LAYOUT ── */
 .layout{display:grid;grid-template-columns:340px 1fr;min-height:100vh;}
-
-/* LEFT PANEL — Burj Khalifa */
 .left-panel{
   position:sticky;top:0;height:100vh;
   background:
     linear-gradient(180deg,rgba(3,6,14,0.55) 0%,rgba(5,10,20,0.40) 35%,rgba(3,6,14,0.85) 100%),
-    url('https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
+    url('https://images.pexels.com/photos/1040474/pexels-photo-1040474.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
     center/cover no-repeat;
   display:flex;flex-direction:column;justify-content:space-between;padding:28px 24px 24px;
 }
@@ -26,31 +22,24 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .brand-icon svg{width:17px;height:17px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 .brand-name{font-size:15px;font-weight:800;color:#fff;display:block;letter-spacing:-.3px;}
 .brand-url{font-size:10px;font-weight:600;color:#c9a227;letter-spacing:.3px;}
-
 .lp-hero{margin-top:auto;}
 .flag-pair{font-size:32px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
 .flag-arrow{color:#c9a227;font-size:20px;font-weight:900;}
 .lp-title{font-size:26px;font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:4px;}
 .lp-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:20px;}
-
 .lp-stats{display:flex;flex-direction:column;gap:10px;}
 .lp-stat{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;}
 .lp-stat-lbl{font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;}
 .lp-stat-val{font-size:20px;font-weight:800;color:#fff;}
 .lp-stat-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;}
 .xe-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,150,0,0.2);border:1px solid rgba(201,150,0,0.4);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;color:#c9a227;margin-top:5px;}
-
 .lp-bottom{display:flex;flex-direction:column;gap:8px;}
 .ts-line{font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px;}
 .refresh-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(201,150,0,0.15);border:1px solid rgba(201,150,0,0.35);border-radius:10px;color:#c9a227;font-size:12px;font-weight:700;padding:9px;cursor:pointer;transition:all .2s;width:100%;}
 .refresh-btn:hover{background:rgba(201,150,0,0.28);}
 .refresh-btn.spinning .spin-icon{display:inline-block;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* RIGHT PANEL — Tool */
 .right-panel{background:#080d18;overflow-y:auto;padding:20px 20px 32px;}
-
-/* Amount bar */
 .amount-bar{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .amount-lbl{font-size:11px;color:#6b7080;font-weight:700;white-space:nowrap;}
 .amt-btns{display:flex;gap:5px;flex-wrap:wrap;}
@@ -59,12 +48,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .amt-input-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
 .amt-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:#e8eaf0;font-size:12px;font-weight:700;padding:5px 9px;width:80px;outline:none;}
 .amt-cur{font-size:11px;font-weight:700;color:#c9a227;}
-
-/* Tip */
 .tip-bar{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:#9aa0b0;line-height:1.5;}
 .tip-bar strong{color:#10b981;}
-
-/* Table */
 .table-wrap{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .table-header{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);}
 .th{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.6px;text-transform:uppercase;}
@@ -72,11 +57,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .provider-row{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
 .provider-row:last-child{border-bottom:none;}
 .provider-row:hover{background:rgba(255,255,255,0.025);}
-
 .prov-logo-wrap{display:flex;align-items:center;justify-content:center;}
 .prov-logo{width:28px;height:28px;border-radius:7px;object-fit:contain;background:#141c2a;border:1px solid rgba(255,255,255,0.07);padding:3px;}
 .prov-logo-fb{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#1e2d4a,#0d1a2e);border:1px solid rgba(255,255,255,0.08);display:none;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#c9a227;}
-
 .prov-name{font-size:12px;font-weight:700;color:#e8eaf0;}
 .prov-note{font-size:10px;color:#6b7080;margin-top:1px;}
 .prov-rate{font-size:12px;font-weight:800;text-align:right;}
@@ -93,20 +76,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .tier-good .prov-diff{color:#c9a227;}
 .tier-fair .prov-diff{color:#9aa0b0;}
 .tier-poor .prov-diff{color:#ef4444;}
-
 .section-div{padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);}
 .section-div span{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.8px;text-transform:uppercase;}
 .loading-row{padding:28px;text-align:center;color:#6b7080;font-size:12px;}
 .error-row{padding:16px;text-align:center;color:#ef4444;font-size:11px;}
-
-/* Source + share row */
 .footer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 .source-text{font-size:10px;color:#4a5060;line-height:1.4;flex:1;}
 .source-text a{color:#c9a227;text-decoration:none;font-weight:600;}
 .share-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa0b0;font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .share-btn:hover{background:rgba(255,255,255,0.08);}
-
-/* Mobile */
 @media(max-width:700px){
   .layout{grid-template-columns:1fr;min-height:auto;}
   .left-panel{position:relative;height:auto;min-height:280px;padding:20px 18px 18px;}
@@ -119,8 +97,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 </head>
 <body>
 <div class="layout">
-
-  <!-- LEFT: Burj Khalifa + key stats -->
   <div class="left-panel">
     <div class="lp-top">
       <a class="brand" href="https://nrifinancehub.com" target="_blank" rel="noopener">
@@ -133,16 +109,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
         </div>
       </a>
     </div>
-
     <div class="lp-hero">
-      <div class="flag-pair">🇦🇪 <span class="flag-arrow">→</span> 🇮🇳</div>
-      <div class="lp-title">AED to INR<br>Live Rates</div>
+      <div class="flag-pair">🇲🇾 <span class="flag-arrow">→</span> 🇮🇳</div>
+      <div class="lp-title">MYR to INR<br>Live Rates</div>
       <div class="lp-sub">20 providers compared · Updated live</div>
       <div class="lp-stats">
         <div class="lp-stat">
           <div class="lp-stat-lbl">Mid-Market</div>
           <div class="lp-stat-val" id="midRateDisplay">—</div>
-          <div class="lp-stat-sub">1 AED in INR</div>
+          <div class="lp-stat-sub">1 MYR in INR</div>
           <div class="xe-badge">⚡ XE.COM</div>
         </div>
         <div class="lp-stat">
@@ -152,7 +127,6 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
         </div>
       </div>
     </div>
-
     <div class="lp-bottom">
       <div class="ts-line" id="tsLine">🕐 —</div>
       <button class="refresh-btn" onclick="fetchAndRender()" id="refreshBtn">
@@ -161,42 +135,30 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
     </div>
   </div>
 
-  <!-- RIGHT: Tool -->
   <div class="right-panel">
-
-    <!-- Amount -->
     <div class="amount-bar">
       <span class="amount-lbl">You send:</span>
       <div class="amt-btns">
-        <button class="amt-btn" onclick="setAmt(500,this)">500</button>
-        <button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button>
-        <button class="amt-btn" onclick="setAmt(2000,this)">2,000</button>
-        <button class="amt-btn" onclick="setAmt(5000,this)">5,000</button>
+        <button class="amt-btn" onclick="setAmt(500,this)">500</button><button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2000,this)">2,000</button><button class="amt-btn" onclick="setAmt(5000,this)">5,000</button>
       </div>
       <div class="amt-input-wrap">
         <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,null,true)"/>
-        <span class="amt-cur">AED</span>
+        <span class="amt-cur">MYR</span>
       </div>
     </div>
-
-    <!-- Tip -->
     <div class="tip-bar">
       💡 <strong>How to read:</strong> Rates use each provider's typical spread over the live mid-market rate. Always confirm on provider's app before transferring.
     </div>
-
-    <!-- Table -->
     <div class="table-wrap">
       <div class="table-header">
         <div class="th"></div>
         <div class="th" style="text-align:left">Provider</div>
-        <div class="th">Rate / AED</div>
+        <div class="th">Rate / MYR</div>
         <div class="th" id="inrColHeader">You get</div>
         <div class="th">vs XE</div>
       </div>
       <div id="rateRows"><div class="loading-row">⏳ Fetching live rate…</div></div>
     </div>
-
-    <!-- Footer -->
     <div class="footer-row">
       <div class="source-text">
         Rate source: Frankfurter / ECB API. Rates are indicative — not guaranteed.<br>
@@ -204,34 +166,205 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
       </div>
       <button class="share-btn" onclick="copyLink()">🔗 Share</button>
     </div>
-
   </div>
 </div>
-
 <script>
 const PROVIDERS = [
-  {name:'Aspora',domain:'aspora.com',spread:.003,fee:0,link:'https://www.aspora.com/ae',note:'Zero fees · Google-rate matching'},
-  {name:'Wise',domain:'wise.com',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · +AED 3 fee'},
-  {name:'Emirates NBD DirectRemit',domain:'emiratesnbd.com',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
-  {name:'Careem Pay',domain:'careem.com',spread:.009,fee:0,link:'https://www.careem.com/en-AE/pay/sendmoney/',note:'In-app · powered by Lulu'},
-  {name:'ADCB Money Transfer',domain:'adcb.com',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank · fast'},
-  {name:'FAB India Transfers',domain:'bankfab.com',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
-  {name:'LuluMoney',domain:'lulumoney.com',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
-  {name:'InstaReM',domain:'instarem.com',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
-  {name:'Al Ansari Exchange',domain:'alansariexchange.com',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
-  {name:'GCC Exchange',domain:'gccexchange.com',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
-  {name:'Joyalukkas Exchange',domain:'joyalukkas.com',spread:.012,fee:0,link:'https://joyalukkas.com/exchange',note:'Walk-in · UAE wide'},
-  {name:'NOW Money',domain:'nowmoney.me',spread:.012,fee:0,link:'https://nowmoney.me',note:'Neobank app-based'},
-  {name:'Wall Street Exchange',domain:'wallstreetexchange.com',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
-  {name:'UAE Exchange',domain:'uaeexchange.com',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
-  {name:'Al Fardan Exchange',domain:'alfardanexchange.com',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium service'},
-  {name:'Remitly',domain:'remitly.com',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
-  {name:'Sharaf Exchange',domain:'sharafexchange.com',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
-  {name:'Ria Money Transfer',domain:'riamoneytransfer.com',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
-  {name:'MoneyGram',domain:'moneygram.com',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
-  {name:'Western Union',domain:'westernunion.com',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  {
+    "name": "Wise",
+    "domain": "wise.com",
+    "spread": 0.006,
+    "fee": 0,
+    "link": "https://wise.com",
+    "note": "Mid-market rate \u00b7 low fee"
+  },
+  {
+    "name": "BigPay",
+    "domain": "bigpay.com",
+    "spread": 0.008,
+    "fee": 0,
+    "link": "https://bigpayme.com",
+    "note": "AirAsia fintech \u00b7 app-only"
+  },
+  {
+    "name": "InstaReM",
+    "domain": "instarem.com",
+    "spread": 0.008,
+    "fee": 0,
+    "link": "https://instarem.com/en-my/",
+    "note": "MAS licensed \u00b7 digital"
+  },
+  {
+    "name": "Merchantrade Money",
+    "domain": "merchantrademoney.com",
+    "spread": 0.009,
+    "fee": 0,
+    "link": "https://merchantrademoney.com",
+    "note": "Malaysia's largest remittance network"
+  },
+  {
+    "name": "Jomremit",
+    "domain": "jomremit.com",
+    "spread": 0.01,
+    "fee": 0,
+    "link": "https://jomremit.com",
+    "note": "Malaysia remittance app"
+  },
+  {
+    "name": "Remitly",
+    "domain": "remitly.com",
+    "spread": 0.01,
+    "fee": 0,
+    "link": "https://remitly.com",
+    "note": "Express & Economy"
+  },
+  {
+    "name": "IME Malaysia",
+    "domain": "ime.com.my",
+    "spread": 0.01,
+    "fee": 0,
+    "link": "https://ime.com.my",
+    "note": "Walk-in \u00b7 convenient"
+  },
+  {
+    "name": "SBI Malaysia",
+    "domain": "sbimalaysia.com.my",
+    "spread": 0.012,
+    "fee": 0,
+    "link": "https://sbimalaysia.com.my",
+    "note": "State Bank of India"
+  },
+  {
+    "name": "Maybank",
+    "domain": "maybank.com",
+    "spread": 0.012,
+    "fee": 5,
+    "link": "https://www.maybank2u.com.my/",
+    "note": "Maybank M2U \u00b7 best for existing customers"
+  },
+  {
+    "name": "CIMB Bank",
+    "domain": "cimb.com",
+    "spread": 0.012,
+    "fee": 5,
+    "link": "https://cimbclicks.com.my",
+    "note": "Online & branches"
+  },
+  {
+    "name": "WorldRemit",
+    "domain": "worldremit.com",
+    "spread": 0.014,
+    "fee": 0,
+    "link": "https://worldremit.com",
+    "note": "Mobile \u00b7 fast"
+  },
+  {
+    "name": "Public Bank",
+    "domain": "publicbank.com.my",
+    "spread": 0.013,
+    "fee": 0,
+    "link": "https://publicbank.com.my",
+    "note": "Malaysia incumbent"
+  },
+  {
+    "name": "RHB Bank",
+    "domain": "rhbgroup.com",
+    "spread": 0.013,
+    "fee": 5,
+    "link": "https://rhbgroup.com",
+    "note": "Full-service bank"
+  },
+  {
+    "name": "Alliance Bank",
+    "domain": "alliancebank.com.my",
+    "spread": 0.014,
+    "fee": 0,
+    "link": "https://alliancebank.com.my",
+    "note": "Digital banking"
+  },
+  {
+    "name": "Hong Leong Bank",
+    "domain": "hlb.com.my",
+    "spread": 0.015,
+    "fee": 5,
+    "link": "https://hlb.com.my",
+    "note": "Malaysia bank"
+  },
+  {
+    "name": "AmBank",
+    "domain": "ambankgroup.com",
+    "spread": 0.015,
+    "fee": 5,
+    "link": "https://ambankgroup.com",
+    "note": "Walk-in \u00b7 nationwide"
+  },
+  {
+    "name": "Ria Money Transfer",
+    "domain": "riamoneytransfer.com",
+    "spread": 0.017,
+    "fee": 0,
+    "link": "https://riamoneytransfer.com",
+    "note": "Agent network"
+  },
+  {
+    "name": "Small World",
+    "domain": "smallworldfs.com",
+    "spread": 0.018,
+    "fee": 0,
+    "link": "https://smallworldfs.com",
+    "note": "Mobile-first"
+  },
+  {
+    "name": "MoneyGram",
+    "domain": "moneygram.com",
+    "spread": 0.022,
+    "fee": 5,
+    "link": "https://moneygram.com",
+    "note": "Cash & digital"
+  },
+  {
+    "name": "Western Union",
+    "domain": "westernunion.com",
+    "spread": 0.025,
+    "fee": 0,
+    "link": "https://westernunion.com",
+    "note": "Global network"
+  },
+  {
+    "name": "eRemit",
+    "domain": "eremit.com.my",
+    "spread": 0.001,
+    "fee": 13,
+    "link": "https://eremit.com.my/home",
+    "note": "Best rate in MY \u00b7 bank account only \u00b7 same-day India credit"
+  },
+  {
+    "name": "LuluMoney",
+    "domain": "lulumoney.com",
+    "spread": 0.001,
+    "fee": 15,
+    "link": "https://www.lulumoney.com/",
+    "note": "App exclusive \u00b7 low spread \u00b7 MYR 10\u201325 fee"
+  },
+  {
+    "name": "Lotus Remit",
+    "domain": "lotusremit.com",
+    "spread": 0.002,
+    "fee": 5,
+    "link": "https://lotusremit.com",
+    "note": "Same-day India credit \u00b7 flat MYR 5 fee"
+  },
+  {
+    "name": "EzyRemit",
+    "domain": "ezyremit.com.my",
+    "spread": 0.009,
+    "fee": 5,
+    "link": "https://ezyremit.com.my",
+    "note": "Popular among Indian workers in Malaysia"
+  }
 ];
-
+const FROM_CUR = 'MYR';
+const FWZ_KEY = 'myr';
 let midRate=null, sendAmt=1000;
 
 function setAmt(val,btn,custom=false){
@@ -245,8 +378,8 @@ function setAmt(val,btn,custom=false){
 }
 
 async function fetchMidRate(){
-  try{const r=await fetch('https://api.frankfurter.app/latest?from=AED&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
-  try{const r=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/aed.json');const d=await r.json();if(d.aed&&d.aed.inr)return d.aed.inr;}catch(e){}
+  try{const r=await fetch('https://api.frankfurter.app/latest?from='+FROM_CUR+'&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/'+FWZ_KEY+'.json');const d=await r.json();if(d[FWZ_KEY]&&d[FWZ_KEY].inr)return d[FWZ_KEY].inr;}catch(e){}
   return null;
 }
 
@@ -264,19 +397,17 @@ function logoHTML(p){
 }
 
 function renderTable(){
-  document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' AED';
+  document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' '+FROM_CUR;
   const sorted=PROVIDERS.map(p=>{
     const rate=midRate*(1-p.spread);
     const inrReceived=rate*sendAmt-p.fee*rate;
     const effectiveRate=inrReceived/sendAmt;
     return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100};
   }).sort((a,b)=>b.effectiveRate-a.effectiveRate);
-
-  const best=sorted[0],worst=sorted[sorted.length-1];
+  const best=sorted[0];
   document.getElementById('midRateDisplay').textContent='₹'+fmt(midRate,4);
   document.getElementById('bestRateDisplay').textContent='₹'+fmt(best.effectiveRate,4);
   document.getElementById('bestProviderName').textContent=best.name;
-
   const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
   let html='',lastTier=null;
   sorted.forEach((p,i)=>{
@@ -306,14 +437,14 @@ async function fetchAndRender(){
     renderTable();
     const now=new Date();
     document.getElementById('tsLine').textContent='🕐 '+
-      now.toLocaleDateString('en-AE',{day:'2-digit',month:'short'})+' · '+
-      now.toLocaleTimeString('en-AE',{hour:'2-digit',minute:'2-digit'});
+      now.toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+' · '+
+      now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   }
   btn.classList.remove('spinning');btn.disabled=false;
 }
 
 function copyLink(){
-  const url=window.location.href.split('?')[0]||'https://nrifinancehub.com/uae-rate-card.html';
+  const url=window.location.href.split('?')[0];
   navigator.clipboard.writeText(url).then(()=>{
     const btn=event.currentTarget,orig=btn.innerHTML;
     btn.textContent='✓ Copied!';

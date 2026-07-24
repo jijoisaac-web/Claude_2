@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>UAE Rate Card Poster</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  width:1080px;height:1080px;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:
+    linear-gradient(180deg,rgba(3,6,18,0.72) 0%,rgba(4,8,22,0.60) 45%,rgba(3,6,18,0.88) 100%),
+    url('https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=1080&h=1080&fit=crop')
+    center/cover no-repeat;
+  color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 70px;
+  position:relative;
+}
+
+/* Top bar */
+.top-bar{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 48px;
+  background:rgba(3,6,18,0.55);
+  border-bottom:1px solid rgba(201,162,39,0.18);
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,#f0a520,#c97c0a);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 28px rgba(240,165,32,0.45);
+}
+.brand-icon svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.brand-text{display:flex;flex-direction:column;}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:-.3px;color:#fff;}
+.brand-url{font-size:12px;font-weight:600;color:#c9a227;letter-spacing:.3px;}
+.live-badge{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(16,185,129,0.12);border:1.5px solid rgba(16,185,129,0.35);
+  border-radius:30px;padding:8px 18px;
+}
+.pulse{width:9px;height:9px;border-radius:50%;background:#10b981;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.6);}50%{box-shadow:0 0 0 6px rgba(16,185,129,0);}}
+.live-text{font-size:14px;font-weight:700;color:#10b981;letter-spacing:.5px;}
+
+/* Main content */
+.main{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:30px;}
+
+.flag-row{display:flex;align-items:center;gap:20px;margin-bottom:18px;}
+.flag{font-size:72px;line-height:1;}
+.flag-arrow{
+  font-size:40px;color:#c9a227;
+  background:rgba(201,162,39,0.15);border:2px solid rgba(201,162,39,0.35);
+  border-radius:50%;width:62px;height:62px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.headline{font-size:58px;font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:10px;}
+.headline span{color:#c9a227;}
+
+.subhead{font-size:19px;color:rgba(255,255,255,0.65);margin-bottom:44px;font-weight:500;}
+
+/* Stat pills */
+.stat-row{display:flex;gap:16px;margin-bottom:40px;}
+.stat-pill{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;padding:20px 28px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  flex:1;
+}
+.stat-pill.highlight{
+  background:rgba(201,162,39,0.12);
+  border-color:rgba(201,162,39,0.35);
+}
+.stat-num{font-size:36px;font-weight:900;letter-spacing:-1px;}
+.stat-num.green{color:#10b981;}
+.stat-num.amber{color:#c9a227;}
+.stat-lbl{font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:.5px;text-transform:uppercase;text-align:center;}
+
+/* Provider chips */
+.provider-label{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:40px;}
+.chip{
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:30px;padding:8px 18px;
+  font-size:14px;font-weight:600;color:rgba(255,255,255,0.8);
+}
+.chip.best{
+  background:rgba(16,185,129,0.12);
+  border-color:rgba(16,185,129,0.3);
+  color:#10b981;
+}
+
+/* CTA */
+.cta-box{
+  background:rgba(201,162,39,0.12);
+  border:2px solid rgba(201,162,39,0.40);
+  border-radius:20px;
+  padding:22px 50px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.cta-free{font-size:13px;font-weight:700;color:#c9a227;letter-spacing:1px;text-transform:uppercase;}
+.cta-url{font-size:26px;font-weight:900;letter-spacing:-.5px;color:#fff;}
+.cta-note{font-size:12px;color:rgba(255,255,255,0.45);font-weight:500;}
+
+/* Bottom hashtags */
+.hashtags{
+  position:absolute;bottom:28px;left:0;right:0;
+  text-align:center;font-size:13px;color:rgba(255,255,255,0.3);font-weight:500;letter-spacing:.3px;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">NRI Finance Hub</span>
+      <span class="brand-url">nrifinancehub.com</span>
+    </div>
+  </div>
+  <div class="live-badge">
+    <div class="pulse"></div>
+    <span class="live-text">LIVE RATES</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="flag-row">
+    <span class="flag">🇦🇪</span>
+    <div class="flag-arrow">→</div>
+    <span class="flag">🇮🇳</span>
+  </div>
+
+  <div class="headline">Stop leaving<br><span>₹3,000+</span> behind</div>
+  <div class="subhead">Every AED 5,000 transfer · choosing the wrong provider costs you</div>
+
+  <div class="stat-row">
+    <div class="stat-pill highlight">
+      <div class="stat-num amber">2.5%</div>
+      <div class="stat-lbl">Best vs worst gap</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num green">20</div>
+      <div class="stat-lbl">UAE providers compared</div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-num" style="color:#fff">0 sec</div>
+      <div class="stat-lbl">No login · instant</div>
+    </div>
+  </div>
+
+  <div class="provider-label">Top providers ranked live</div>
+  <div class="chip-row">
+    <div class="chip best">★ Aspora</div>
+    <div class="chip best">Wise</div>
+    <div class="chip">Emirates NBD</div>
+    <div class="chip">Careem Pay</div>
+    <div class="chip">Al Ansari</div>
+    <div class="chip">LuluMoney</div>
+    <div class="chip">InstaReM</div>
+    <div class="chip">+13 more</div>
+  </div>
+
+  <div class="cta-box">
+    <div class="cta-free">Free tool · updated in real-time</div>
+    <div class="cta-url">nrifinancehub.com/uae-rate-card.html</div>
+    <div class="cta-note">Open · check rates · save hundreds on every transfer</div>
+  </div>
+</div>
+
+<div class="hashtags">#NRIUae &nbsp;·&nbsp; #SendMoneyToIndia &nbsp;·&nbsp; #DubaiIndians &nbsp;·&nbsp; #UAEIndians &nbsp;·&nbsp; #MoneyTransfer &nbsp;·&nbsp; #NRIFinance</div>
+
+</body>
+</html>
