@@ -6,53 +6,83 @@
 <title>AED → INR Live Rate Card | NRI Finance Hub</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#05080f;color:#e8eaf0;min-height:100vh;padding:16px;}
-.card-wrap{max-width:680px;margin:0 auto;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#05080f;color:#e8eaf0;}
 
-/* Header */
-.header{background:linear-gradient(135deg,#0d1a2e 0%,#1a2a1a 50%,#0d1a2e 100%);border:1px solid rgba(201,150,0,0.3);border-radius:18px;padding:20px 24px;margin-bottom:14px;position:relative;overflow:hidden;}
-.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(201,150,0,0.12) 0%,transparent 60%);pointer-events:none;}
-.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+/* ── SPLIT LAYOUT ── */
+.layout{display:grid;grid-template-columns:340px 1fr;min-height:100vh;}
+
+/* LEFT PANEL — Burj Khalifa */
+.left-panel{
+  position:sticky;top:0;height:100vh;
+  background:
+    linear-gradient(180deg,rgba(3,6,14,0.55) 0%,rgba(5,10,20,0.40) 35%,rgba(3,6,14,0.85) 100%),
+    url('https://images.pexels.com/photos/162031/dubai-tower-arab-khalifa-162031.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
+    center/cover no-repeat;
+  display:flex;flex-direction:column;justify-content:space-between;padding:28px 24px 24px;
+}
+.lp-top{display:flex;flex-direction:column;gap:20px;}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#f0a520,#c97c0a);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(240,165,32,0.35);flex-shrink:0;}
-.brand-icon svg{width:16px;height:16px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
-.brand-name{font-size:15px;font-weight:800;color:#fff;display:block;letter-spacing:-.3px;line-height:1.2;}
-.brand-sub{font-size:10px;font-weight:500;color:#6b7080;margin-top:1px;}
-.flag-pair{display:flex;align-items:center;gap:6px;font-size:24px;}
-.flag-arrow{color:#c9a227;font-size:16px;font-weight:900;}
+.brand-icon{width:38px;height:38px;background:linear-gradient(135deg,#f0a520,#c97c0a);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(240,165,32,0.4);flex-shrink:0;}
+.brand-icon svg{width:17px;height:17px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.brand-name{font-size:15px;font-weight:800;color:#fff;display:block;letter-spacing:-.3px;}
+.brand-url{font-size:10px;font-weight:600;color:#c9a227;letter-spacing:.3px;}
 
-.mid-rate-block{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.mid-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px;}
-.mid-stat-lbl{font-size:10px;color:#6b7080;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;}
-.mid-stat-val{font-size:22px;font-weight:800;color:#f0f0f0;}
-.mid-stat-sub{font-size:11px;color:#6b7080;margin-top:2px;}
-.xe-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,150,0,0.15);border:1px solid rgba(201,150,0,0.3);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:#c9a227;margin-top:4px;}
+.lp-hero{margin-top:auto;}
+.flag-pair{font-size:32px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.flag-arrow{color:#c9a227;font-size:20px;font-weight:900;}
+.lp-title{font-size:26px;font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:4px;}
+.lp-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:20px;}
 
-/* Amount selector */
-.amount-bar{background:#0d1118;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.amount-lbl{font-size:12px;color:#6b7080;font-weight:700;white-space:nowrap;}
-.amt-btns{display:flex;gap:6px;flex-wrap:wrap;}
-.amt-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#9aa0b0;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;}
-.amt-btn.active{background:rgba(201,150,0,0.18);border-color:#c9a227;color:#c9a227;}
-.amt-input-wrap{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.amt-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e8eaf0;font-size:13px;font-weight:700;padding:6px 10px;width:90px;outline:none;}
-.amt-cur{font-size:12px;font-weight:700;color:#c9a227;}
+.lp-stats{display:flex;flex-direction:column;gap:10px;}
+.lp-stat{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;}
+.lp-stat-lbl{font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;}
+.lp-stat-val{font-size:20px;font-weight:800;color:#fff;}
+.lp-stat-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;}
+.xe-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,150,0,0.2);border:1px solid rgba(201,150,0,0.4);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;color:#c9a227;margin-top:5px;}
+
+.lp-bottom{display:flex;flex-direction:column;gap:8px;}
+.ts-line{font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px;}
+.refresh-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(201,150,0,0.15);border:1px solid rgba(201,150,0,0.35);border-radius:10px;color:#c9a227;font-size:12px;font-weight:700;padding:9px;cursor:pointer;transition:all .2s;width:100%;}
+.refresh-btn:hover{background:rgba(201,150,0,0.28);}
+.refresh-btn.spinning .spin-icon{display:inline-block;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* RIGHT PANEL — Tool */
+.right-panel{background:#080d18;overflow-y:auto;padding:20px 20px 32px;}
+
+/* Amount bar */
+.amount-bar{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.amount-lbl{font-size:11px;color:#6b7080;font-weight:700;white-space:nowrap;}
+.amt-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.amt-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#9aa0b0;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;}
+.amt-btn.active{background:rgba(201,150,0,0.16);border-color:#c9a227;color:#c9a227;}
+.amt-input-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.amt-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:#e8eaf0;font-size:12px;font-weight:700;padding:5px 9px;width:80px;outline:none;}
+.amt-cur{font-size:11px;font-weight:700;color:#c9a227;}
+
+/* Tip */
+.tip-bar{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:#9aa0b0;line-height:1.5;}
+.tip-bar strong{color:#10b981;}
 
 /* Table */
-.table-wrap{background:#0d1118;border:1px solid rgba(255,255,255,0.08);border-radius:14px;overflow:hidden;margin-bottom:14px;}
-.table-header{display:grid;grid-template-columns:1fr 110px 100px 80px;padding:10px 16px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);}
-.th{font-size:10px;font-weight:700;color:#6b7080;letter-spacing:.6px;text-transform:uppercase;}
+.table-wrap{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.table-header{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);}
+.th{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.6px;text-transform:uppercase;}
 .th:not(:first-child){text-align:right;}
-.provider-row{display:grid;grid-template-columns:1fr 110px 100px 80px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
+.provider-row{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
 .provider-row:last-child{border-bottom:none;}
-.provider-row:hover{background:rgba(255,255,255,0.03);}
-.prov-name{font-size:13px;font-weight:700;color:#e8eaf0;}
-.prov-note{font-size:10px;color:#6b7080;margin-top:2px;}
-.prov-rate{font-size:14px;font-weight:800;text-align:right;}
-.prov-inr{font-size:13px;font-weight:700;text-align:right;color:#e8eaf0;}
-.prov-diff{font-size:11px;font-weight:700;text-align:right;}
-.prov-fee{font-size:10px;color:#6b7080;text-align:right;margin-top:2px;}
-.rank-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;margin-right:6px;vertical-align:middle;}
+.provider-row:hover{background:rgba(255,255,255,0.025);}
+
+.prov-logo-wrap{display:flex;align-items:center;justify-content:center;}
+.prov-logo{width:28px;height:28px;border-radius:7px;object-fit:contain;background:#141c2a;border:1px solid rgba(255,255,255,0.07);padding:3px;}
+.prov-logo-fb{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#1e2d4a,#0d1a2e);border:1px solid rgba(255,255,255,0.08);display:none;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#c9a227;}
+
+.prov-name{font-size:12px;font-weight:700;color:#e8eaf0;}
+.prov-note{font-size:10px;color:#6b7080;margin-top:1px;}
+.prov-rate{font-size:12px;font-weight:800;text-align:right;}
+.prov-inr{font-size:12px;font-weight:700;text-align:right;color:#e8eaf0;}
+.prov-diff{font-size:10px;font-weight:700;text-align:right;}
+.rank-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;margin-right:4px;vertical-align:middle;}
 .rank-1{background:rgba(16,185,129,0.18);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
 .rank-2{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);}
 .tier-best .prov-rate{color:#10b981;}
@@ -64,267 +94,233 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tier-fair .prov-diff{color:#9aa0b0;}
 .tier-poor .prov-diff{color:#ef4444;}
 
-/* Section divider */
-.section-div{padding:7px 16px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);}
-.section-div span{font-size:10px;font-weight:700;color:#6b7080;letter-spacing:.8px;text-transform:uppercase;}
+.section-div{padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);}
+.section-div span{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.8px;text-transform:uppercase;}
+.loading-row{padding:28px;text-align:center;color:#6b7080;font-size:12px;}
+.error-row{padding:16px;text-align:center;color:#ef4444;font-size:11px;}
 
-/* Footer */
-.footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.refresh-btn{display:flex;align-items:center;gap:6px;background:rgba(201,150,0,0.12);border:1px solid rgba(201,150,0,0.3);border-radius:10px;color:#c9a227;font-size:12px;font-weight:700;padding:8px 16px;cursor:pointer;transition:all .2s;}
-.refresh-btn:hover{background:rgba(201,150,0,0.22);}
-.refresh-btn.spinning .spin-icon{display:inline-block;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.timestamp{font-size:11px;color:#6b7080;}
-.source-note{font-size:10px;color:#6b7080;margin-top:6px;text-align:center;}
-.share-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#9aa0b0;font-size:12px;font-weight:700;padding:8px 16px;cursor:pointer;transition:all .2s;}
+/* Source + share row */
+.footer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.source-text{font-size:10px;color:#4a5060;line-height:1.4;flex:1;}
+.source-text a{color:#c9a227;text-decoration:none;font-weight:600;}
+.share-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa0b0;font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
 .share-btn:hover{background:rgba(255,255,255,0.08);}
-.loading-row{padding:32px 16px;text-align:center;color:#6b7080;font-size:13px;}
-.error-row{padding:20px 16px;text-align:center;color:#ef4444;font-size:12px;}
 
-/* Tip bar */
-.tip-bar{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#9aa0b0;line-height:1.5;}
-.tip-bar strong{color:#10b981;}
-
-@media(max-width:500px){
-  .table-header,.provider-row{grid-template-columns:1fr 90px 70px;}
-  .th:last-child,.prov-diff,.prov-fee{display:none;}
-  .mid-rate-block{grid-template-columns:1fr;}
-  .amount-bar{flex-direction:column;align-items:flex-start;}
-  .amt-input-wrap{margin-left:0;}
+/* Mobile */
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;min-height:auto;}
+  .left-panel{position:relative;height:auto;min-height:280px;padding:20px 18px 18px;}
+  .lp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .right-panel{padding:14px 14px 24px;}
+  .table-header,.provider-row{grid-template-columns:32px 1fr 86px 72px;}
+  .th:last-child,.prov-diff{display:none;}
 }
 </style>
 </head>
 <body>
-<div class="card-wrap">
+<div class="layout">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-top">
+  <!-- LEFT: Burj Khalifa + key stats -->
+  <div class="left-panel">
+    <div class="lp-top">
       <a class="brand" href="https://nrifinancehub.com" target="_blank" rel="noopener">
         <div class="brand-icon">
           <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <div>
           <span class="brand-name">NRI Finance Hub</span>
-          <span class="brand-sub">For Indians working abroad · nrifinancehub.com</span>
+          <span class="brand-url">nrifinancehub.com</span>
         </div>
       </a>
+    </div>
+
+    <div class="lp-hero">
       <div class="flag-pair">🇦🇪 <span class="flag-arrow">→</span> 🇮🇳</div>
-    </div>
-    <div class="mid-rate-block">
-      <div class="mid-stat">
-        <div class="mid-stat-lbl">Mid-Market Rate</div>
-        <div class="mid-stat-val" id="midRateDisplay">—</div>
-        <div class="mid-stat-sub">1 AED = <span id="midRateSub">…</span> INR</div>
-        <div class="xe-badge">⚡ XE.COM LIVE</div>
+      <div class="lp-title">AED to INR<br>Live Rates</div>
+      <div class="lp-sub">20 providers compared · Updated live</div>
+      <div class="lp-stats">
+        <div class="lp-stat">
+          <div class="lp-stat-lbl">Mid-Market</div>
+          <div class="lp-stat-val" id="midRateDisplay">—</div>
+          <div class="lp-stat-sub">1 AED in INR</div>
+          <div class="xe-badge">⚡ XE.COM</div>
+        </div>
+        <div class="lp-stat">
+          <div class="lp-stat-lbl">Best Rate</div>
+          <div class="lp-stat-val" id="bestRateDisplay" style="color:#10b981">—</div>
+          <div class="lp-stat-sub" id="bestProviderName">Loading…</div>
+        </div>
       </div>
-      <div class="mid-stat">
-        <div class="mid-stat-lbl">Best Available Rate</div>
-        <div class="mid-stat-val" id="bestRateDisplay" style="color:#10b981">—</div>
-        <div class="mid-stat-sub" id="bestProviderName">Loading…</div>
-        <div style="margin-top:4px;font-size:10px;color:#6b7080" id="bestSavings"></div>
+    </div>
+
+    <div class="lp-bottom">
+      <div class="ts-line" id="tsLine">🕐 —</div>
+      <button class="refresh-btn" onclick="fetchAndRender()" id="refreshBtn">
+        <span class="spin-icon">↻</span> Refresh Rates
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Tool -->
+  <div class="right-panel">
+
+    <!-- Amount -->
+    <div class="amount-bar">
+      <span class="amount-lbl">You send:</span>
+      <div class="amt-btns">
+        <button class="amt-btn" onclick="setAmt(500,this)">500</button>
+        <button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button>
+        <button class="amt-btn" onclick="setAmt(2000,this)">2,000</button>
+        <button class="amt-btn" onclick="setAmt(5000,this)">5,000</button>
+      </div>
+      <div class="amt-input-wrap">
+        <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,null,true)"/>
+        <span class="amt-cur">AED</span>
       </div>
     </div>
-  </div>
 
-  <!-- Amount selector -->
-  <div class="amount-bar">
-    <span class="amount-lbl">You send:</span>
-    <div class="amt-btns">
-      <button class="amt-btn" onclick="setAmt(500)">AED 500</button>
-      <button class="amt-btn active" onclick="setAmt(1000)">AED 1,000</button>
-      <button class="amt-btn" onclick="setAmt(2000)">AED 2,000</button>
-      <button class="amt-btn" onclick="setAmt(5000)">AED 5,000</button>
+    <!-- Tip -->
+    <div class="tip-bar">
+      💡 <strong>How to read:</strong> Rates use each provider's typical spread over the live mid-market rate. Always confirm on provider's app before transferring.
     </div>
-    <div class="amt-input-wrap">
-      <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,true)"/>
-      <span class="amt-cur">AED</span>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="th"></div>
+        <div class="th" style="text-align:left">Provider</div>
+        <div class="th">Rate / AED</div>
+        <div class="th" id="inrColHeader">You get</div>
+        <div class="th">vs XE</div>
+      </div>
+      <div id="rateRows"><div class="loading-row">⏳ Fetching live rate…</div></div>
     </div>
-  </div>
 
-  <!-- Tip -->
-  <div class="tip-bar">
-    💡 <strong>How to read this:</strong> Rates shown are estimated based on each provider's typical spread over the live mid-market rate. Always confirm on the provider's app before transferring. Promotions (e.g. zero-fee first transfer) may improve the rate you actually receive.
-  </div>
-
-  <!-- Rate table -->
-  <div class="table-wrap">
-    <div class="table-header">
-      <div class="th">Provider</div>
-      <div class="th">Rate (1 AED)</div>
-      <div class="th" id="inrColHeader">You receive</div>
-      <div class="th">vs XE.com</div>
+    <!-- Footer -->
+    <div class="footer-row">
+      <div class="source-text">
+        Rate source: Frankfurter / ECB API. Rates are indicative — not guaranteed.<br>
+        Full comparison at <a href="https://nrifinancehub.com" target="_blank">nrifinancehub.com</a>
+      </div>
+      <button class="share-btn" onclick="copyLink()">🔗 Share</button>
     </div>
-    <div id="rateRows"><div class="loading-row">⏳ Fetching live mid-market rate…</div></div>
-  </div>
 
-  <!-- Footer -->
-  <div class="footer">
-    <button class="refresh-btn" onclick="fetchAndRender()" id="refreshBtn">
-      <span class="spin-icon">↻</span> Refresh Rates
-    </button>
-    <span class="timestamp" id="ts"></span>
-    <button class="share-btn" onclick="copyLink()">🔗 Share</button>
   </div>
-  <div class="source-note">Mid-market rate sourced from Frankfurter API (ECB). Provider rates are indicative estimates based on typical spreads — not guaranteed. Visit nrifinancehub.com for full comparison.</div>
-
 </div>
 
 <script>
 const PROVIDERS = [
-  {name:'Aspora',spread:.003,fee:0,link:'https://www.aspora.com/ae',note:'Zero fees · Google-rate matching'},
-  {name:'Wise',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate'},
-  {name:'Emirates NBD DirectRemit',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
-  {name:'Careem Pay',spread:.009,fee:0,link:'https://www.careem.com/en-AE/pay/sendmoney/',note:'In-app · powered by Lulu'},
-  {name:'ADCB Money Transfer',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank · fast'},
-  {name:'FAB India Transfers',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
-  {name:'LuluMoney',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
-  {name:'InstaReM',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
-  {name:'Al Ansari Exchange',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
-  {name:'GCC Exchange',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
-  {name:'Joyalukkas Exchange',spread:.012,fee:0,link:'https://joyalukkas.com/exchange',note:'Walk-in counters · UAE wide'},
-  {name:'NOW Money',spread:.012,fee:0,link:'https://nowmoney.me',note:'Neobank app-based'},
-  {name:'Wall Street Exchange',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
-  {name:'UAE Exchange',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
-  {name:'Al Fardan Exchange',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium exchange service'},
-  {name:'Remitly',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
-  {name:'Sharaf Exchange',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
-  {name:'Ria Money Transfer',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
-  {name:'MoneyGram',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
-  {name:'Western Union',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
+  {name:'Aspora',domain:'aspora.com',spread:.003,fee:0,link:'https://www.aspora.com/ae',note:'Zero fees · Google-rate matching'},
+  {name:'Wise',domain:'wise.com',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · +AED 3 fee'},
+  {name:'Emirates NBD',domain:'emiratesnbd.com',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
+  {name:'Careem Pay',domain:'careem.com',spread:.009,fee:0,link:'https://www.careem.com/en-AE/pay/sendmoney/',note:'In-app · powered by Lulu'},
+  {name:'ADCB Money Transfer',domain:'adcb.com',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank · fast'},
+  {name:'FAB India Transfers',domain:'bankfab.com',spread:.010,fee:0,link:'https://bankfab.com',note:'First Abu Dhabi Bank'},
+  {name:'LuluMoney',domain:'lulumoney.com',spread:.010,fee:0,link:'https://www.lulumoney.com/',note:'At Lulu Hypermarkets'},
+  {name:'InstaReM',domain:'instarem.com',spread:.011,fee:0,link:'https://instarem.com/en-ae/',note:'Digital · UAE licensed'},
+  {name:'Al Ansari Exchange',domain:'alansariexchange.com',spread:.012,fee:0,link:'https://alansariexchange.com',note:"UAE's largest exchange house"},
+  {name:'GCC Exchange',domain:'gccexchange.com',spread:.012,fee:0,link:'https://gccexchange.com',note:'Competitive walk-in rates'},
+  {name:'Joyalukkas Exchange',domain:'joyalukkas.com',spread:.012,fee:0,link:'https://joyalukkas.com/exchange',note:'Walk-in · UAE wide'},
+  {name:'NOW Money',domain:'nowmoney.me',spread:.012,fee:0,link:'https://nowmoney.me',note:'Neobank app-based'},
+  {name:'Wall Street Exchange',domain:'wallstreetexchange.com',spread:.013,fee:0,link:'https://wallstreetexchange.com',note:'UAE exchange specialist'},
+  {name:'UAE Exchange',domain:'uaeexchange.com',spread:.013,fee:0,link:'https://uaeexchange.com',note:'Wide UAE branch network'},
+  {name:'Al Fardan Exchange',domain:'alfardanexchange.com',spread:.014,fee:0,link:'https://alfardanexchange.com',note:'Premium service'},
+  {name:'Remitly',domain:'remitly.com',spread:.014,fee:0,link:'https://www.remitly.com/',note:'Digital · fast delivery'},
+  {name:'Sharaf Exchange',domain:'sharafexchange.com',spread:.015,fee:0,link:'https://sharafexchange.com',note:'At Sharaf DG stores'},
+  {name:'Ria Money Transfer',domain:'riamoneytransfer.com',spread:.017,fee:0,link:'https://www.riamoneytransfer.com/',note:'Good rural India reach'},
+  {name:'MoneyGram',domain:'moneygram.com',spread:.022,fee:2,link:'https://www.moneygram.com/',note:'Wide agent network'},
+  {name:'Western Union',domain:'westernunion.com',spread:.025,fee:0,link:'https://www.westernunion.com/',note:'Cash & digital'},
 ];
 
-let midRate = null;
-let sendAmt = 1000;
+let midRate=null, sendAmt=1000;
 
-function setAmt(val, custom=false) {
-  sendAmt = parseFloat(val) || 1000;
-  document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('active'));
-  if (!custom) {
-    document.getElementById('customAmt').value = sendAmt;
-    event.target.classList.add('active');
+function setAmt(val,btn,custom=false){
+  sendAmt=parseFloat(val)||1000;
+  if(!custom){
+    document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('customAmt').value=sendAmt;
+    if(btn)btn.classList.add('active');
   }
-  if (midRate) renderTable();
+  if(midRate)renderTable();
 }
 
-async function fetchMidRate() {
-  const apis = [
-    'https://api.frankfurter.app/latest?from=AED&to=INR',
-    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/aed.json',
-  ];
-  // Try Frankfurter first
-  try {
-    const r = await fetch(apis[0]);
-    const d = await r.json();
-    if (d.rates && d.rates.INR) return d.rates.INR;
-  } catch(e){}
-  // Fallback
-  try {
-    const r = await fetch(apis[1]);
-    const d = await r.json();
-    if (d.aed && d.aed.inr) return d.aed.inr;
-  } catch(e){}
+async function fetchMidRate(){
+  try{const r=await fetch('https://api.frankfurter.app/latest?from=AED&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/aed.json');const d=await r.json();if(d.aed&&d.aed.inr)return d.aed.inr;}catch(e){}
   return null;
 }
 
-function getTier(spread) {
-  if (spread <= 0.007) return 'tier-best';
-  if (spread <= 0.012) return 'tier-good';
-  if (spread <= 0.017) return 'tier-fair';
-  return 'tier-poor';
+function getTier(s){return s<=.007?'tier-best':s<=.012?'tier-good':s<=.017?'tier-fair':'tier-poor';}
+function fmt(n,d=4){return n.toFixed(d);}
+function fmtINR(n){return n>=100000?'₹'+(n/100000).toFixed(2)+'L':'₹'+Math.round(n).toLocaleString('en-IN');}
+
+function logoHTML(p){
+  const init=p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<div class="prov-logo-wrap">
+    <img class="prov-logo" src="https://www.google.com/s2/favicons?domain=${p.domain}&sz=64" alt="${p.name}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <div class="prov-logo-fb">${init}</div>
+  </div>`;
 }
 
-function fmt(n, dec=2) { return n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
-function fmtINR(n) {
-  if (n >= 100000) return '₹' + (n/100000).toFixed(2) + 'L';
-  return '₹' + Math.round(n).toLocaleString('en-IN');
-}
+function renderTable(){
+  document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' AED';
+  const sorted=PROVIDERS.map(p=>{
+    const rate=midRate*(1-p.spread);
+    const inrReceived=rate*sendAmt-p.fee*rate;
+    const effectiveRate=inrReceived/sendAmt;
+    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100};
+  }).sort((a,b)=>b.effectiveRate-a.effectiveRate);
 
-function renderTable() {
-  const rows = document.getElementById('rateRows');
-  const col = document.getElementById('inrColHeader');
-  col.textContent = `₹ for ${sendAmt.toLocaleString('en-IN')} AED`;
+  const best=sorted[0],worst=sorted[sorted.length-1];
+  document.getElementById('midRateDisplay').textContent='₹'+fmt(midRate,4);
+  document.getElementById('bestRateDisplay').textContent='₹'+fmt(best.effectiveRate,4);
+  document.getElementById('bestProviderName').textContent=best.name;
 
-  // Sort by effective rate (best first)
-  const sorted = PROVIDERS.map(p => {
-    const rate = midRate * (1 - p.spread);
-    const inrReceived = rate * sendAmt - p.fee * (midRate * (1 - p.spread)); // fee in AED converted
-    const effectiveRate = inrReceived / sendAmt;
-    const lostPct = ((midRate - effectiveRate) / midRate * 100);
-    return {...p, rate, effectiveRate, inrReceived, lostPct};
-  }).sort((a,b) => b.effectiveRate - a.effectiveRate);
-
-  const best = sorted[0];
-
-  // Update header stats
-  document.getElementById('midRateDisplay').textContent = '₹' + fmt(midRate, 4);
-  document.getElementById('midRateSub').textContent = fmt(midRate, 4);
-  document.getElementById('bestRateDisplay').textContent = '₹' + fmt(best.effectiveRate, 4);
-  document.getElementById('bestProviderName').textContent = best.name;
-  document.getElementById('bestSavings').textContent = `vs Western Union: save ₹${Math.round((best.effectiveRate - sorted[sorted.length-1].effectiveRate) * sendAmt).toLocaleString('en-IN')}`;
-
-  let html = '';
-  let lastTier = null;
-  const tierLabels = {'tier-best':'🏆 Best Rates','tier-good':'✅ Good Rates','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
-
-  sorted.forEach((p, i) => {
-    const tier = getTier(p.spread);
-    if (tier !== lastTier) {
-      lastTier = tier;
-      html += `<div class="section-div"><span>${tierLabels[tier]}</span></div>`;
-    }
-    const rankBadge = i === 0 ? '<span class="rank-badge rank-1">★ BEST</span>' : i === 1 ? '<span class="rank-badge rank-2">2nd</span>' : '';
-    const diffSign = p.lostPct > 0 ? '-' : '+';
-    const feeNote = p.fee > 0 ? `+AED ${p.fee} fee` : 'No fee';
-    html += `<a class="provider-row ${tier}" href="${p.link}" target="_blank" rel="noopener">
-      <div>
-        <div class="prov-name">${rankBadge}${p.name}</div>
-        <div class="prov-note">${p.note} · ${feeNote}</div>
-      </div>
-      <div>
-        <div class="prov-rate">₹${fmt(p.effectiveRate, 4)}</div>
-      </div>
-      <div>
-        <div class="prov-inr">${fmtINR(p.inrReceived)}</div>
-      </div>
-      <div>
-        <div class="prov-diff">${diffSign}${p.lostPct.toFixed(2)}%</div>
-      </div>
+  const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
+  let html='',lastTier=null;
+  sorted.forEach((p,i)=>{
+    const tier=getTier(p.spread);
+    if(tier!==lastTier){lastTier=tier;html+=`<div class="section-div"><span>${labels[tier]}</span></div>`;}
+    const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
+    html+=`<a class="provider-row ${tier}" href="${p.link}" target="_blank" rel="noopener">
+      ${logoHTML(p)}
+      <div><div class="prov-name">${rb}${p.name}</div><div class="prov-note">${p.note}</div></div>
+      <div><div class="prov-rate">₹${fmt(p.effectiveRate,4)}</div></div>
+      <div><div class="prov-inr">${fmtINR(p.inrReceived)}</div></div>
+      <div><div class="prov-diff">-${p.lostPct.toFixed(2)}%</div></div>
     </a>`;
   });
-
-  rows.innerHTML = html;
+  document.getElementById('rateRows').innerHTML=html;
 }
 
-async function fetchAndRender() {
-  const btn = document.getElementById('refreshBtn');
-  btn.classList.add('spinning');
-  btn.disabled = true;
-  document.getElementById('rateRows').innerHTML = '<div class="loading-row">⏳ Fetching live rate…</div>';
-
-  midRate = await fetchMidRate();
-
-  if (!midRate) {
-    document.getElementById('rateRows').innerHTML = '<div class="error-row">⚠️ Could not fetch live rate. Please try again.</div>';
-  } else {
+async function fetchAndRender(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');btn.disabled=true;
+  document.getElementById('rateRows').innerHTML='<div class="loading-row">⏳ Fetching live rate…</div>';
+  midRate=await fetchMidRate();
+  if(!midRate){
+    document.getElementById('rateRows').innerHTML='<div class="error-row">⚠️ Could not fetch live rate. Try again.</div>';
+    document.getElementById('tsLine').textContent='⚠️ Fetch failed';
+  }else{
     renderTable();
-    const now = new Date();
-    document.getElementById('ts').textContent = 'Updated ' + now.toLocaleTimeString('en-AE',{hour:'2-digit',minute:'2-digit'});
+    const now=new Date();
+    document.getElementById('tsLine').textContent='🕐 '+
+      now.toLocaleDateString('en-AE',{day:'2-digit',month:'short'})+' · '+
+      now.toLocaleTimeString('en-AE',{hour:'2-digit',minute:'2-digit'});
   }
-
-  btn.classList.remove('spinning');
-  btn.disabled = false;
+  btn.classList.remove('spinning');btn.disabled=false;
 }
 
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href || 'https://nrifinancehub.com/uae-rate-card.html').then(() => {
-    const btn = event.target;
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.innerHTML = '🔗 Share', 1500);
+function copyLink(){
+  const url=window.location.href.split('?')[0]||'https://nrifinancehub.com/uae-rate-card.html';
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=event.currentTarget,orig=btn.innerHTML;
+    btn.textContent='✓ Copied!';
+    setTimeout(()=>btn.innerHTML=orig,1800);
   });
 }
 
-// Init
 fetchAndRender();
 </script>
 </body>
