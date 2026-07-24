@@ -66,10 +66,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 
 /* Table */
 .table-wrap{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;margin-bottom:12px;}
-.table-header{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);}
+.table-header{display:grid;grid-template-columns:38px 1fr 95px 82px 62px 62px;padding:9px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);}
 .th{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.6px;text-transform:uppercase;}
 .th:not(:first-child){text-align:right;}
-.provider-row{display:grid;grid-template-columns:38px 1fr 100px 90px 70px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
+.provider-row{display:grid;grid-template-columns:38px 1fr 95px 82px 62px 62px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
 .provider-row:last-child{border-bottom:none;}
 .provider-row:hover{background:rgba(255,255,255,0.025);}
 
@@ -82,6 +82,8 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .prov-rate{font-size:12px;font-weight:800;text-align:right;}
 .prov-inr{font-size:12px;font-weight:700;text-align:right;color:#e8eaf0;}
 .prov-diff{font-size:10px;font-weight:700;text-align:right;}
+.prov-fee{font-size:11px;font-weight:600;text-align:right;color:#9aa0b0;}
+.prov-fee.paid{color:#f59e0b;}
 .rank-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;margin-right:4px;vertical-align:middle;}
 .rank-1{background:rgba(16,185,129,0.18);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
 .rank-2{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);}
@@ -112,7 +114,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
   .left-panel{position:relative;height:auto;min-height:280px;padding:20px 18px 18px;}
   .lp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .right-panel{padding:14px 14px 24px;}
-  .table-header,.provider-row{grid-template-columns:32px 1fr 86px 72px;}
+  .table-header,.provider-row{grid-template-columns:32px 1fr 80px 68px 56px;}
   .th:last-child,.prov-diff{display:none;}
 }
 </style>
@@ -191,7 +193,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
         <div class="th" style="text-align:left">Provider</div>
         <div class="th">Rate / AED</div>
         <div class="th" id="inrColHeader">You get</div>
-        <div class="th">vs XE</div>
+        <div class="th">Fee</div><div class="th">vs XE</div>
       </div>
       <div id="rateRows"><div class="loading-row">⏳ Fetching live rate…</div></div>
     </div>
@@ -283,11 +285,14 @@ function renderTable(){
     const tier=getTier(p.spread);
     if(tier!==lastTier){lastTier=tier;html+=`<div class="section-div"><span>${labels[tier]}</span></div>`;}
     const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
+    const feeStr=p.fee?`${FROM_CUR} ${p.fee}`:'Free';
+    const feeCls=p.fee?'paid':'';
     html+=`<a class="provider-row ${tier}" href="${p.link}" target="_blank" rel="noopener">
       ${logoHTML(p)}
       <div><div class="prov-name">${rb}${p.name}</div><div class="prov-note">${p.note}</div></div>
       <div><div class="prov-rate">₹${fmt(p.effectiveRate,4)}</div></div>
       <div><div class="prov-inr">${fmtINR(p.inrReceived)}</div></div>
+      <div><div class="prov-fee ${feeCls}">${feeStr}</div></div>
       <div><div class="prov-diff">-${p.lostPct.toFixed(2)}%</div></div>
     </a>`;
   });
