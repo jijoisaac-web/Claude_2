@@ -1763,6 +1763,7 @@ tbody tr.income-row td:first-child{
     <div id="insightsWaterfall" style="margin-top:18px"></div>
     <div id="insightsMerchants"></div>
     <div id="insightsRecurring" style="margin-top:16px"></div>
+    <div id="insightsCCBreakdown" style="margin-top:20px"></div>
   </div>
 </div>
 
@@ -2277,6 +2278,16 @@ function loadState(year){
 
 function saveState(){ localStorage.setItem(sKey(currentYear), JSON.stringify(state)); }
 function saveRate(){ localStorage.setItem(rKey(), document.getElementById('inrRate').value); }
+
+/* Net actual for a category — income-type txns in expense/transfer cats are credits (subtract) */
+function netActual(catType, txns){
+  return Math.round(txns.reduce((s,t)=>{
+    const credit = t.type==='income';
+    return s + (catType==='income' ? t.amount : (credit ? -t.amount : t.amount));
+  },0)*100)/100;
+}
+function catTypeById(id){ const c=state.categories.find(c=>c.id===id); return c?c.type:'expense'; }
+
 function loadRate(){ return parseFloat(localStorage.getItem(rKey())||'23.5'); }
 
 function ensureMonth(mi){
@@ -2626,15 +2637,24 @@ function openCatDetail(catId){
       +'<th style="width:32px"></th>'
       +'</tr></thead><tbody>';
     txns.forEach((t,i)=>{
-      const amtCol=t.type==='income'?'var(--accent)':'var(--red)';
+      // In expense/transfer cats, income-type txns are credits — show negative
+      const isCredit=t.type==='income' && cat.type!=='income';
+      const displayAmt=(isCredit?'-':'')+'MYR '+fmt(t.amount);
+      const amtCol=isCredit?'var(--teal)':t.type==='income'?'var(--accent)':'var(--red)';
       body+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">'
         +'<td style="padding:7px 8px;white-space:nowrap;color:var(--text2)">'+t.date+'</td>'
-        +'<td style="padding:7px 8px;word-break:break-word;min-width:160px">'+t.desc+'</td>'
-        +'<td style="padding:7px 8px;text-align:right;font-weight:700;white-space:nowrap;color:'+amtCol+'">MYR '+fmt(t.amount)+'</td>'
+        +'<td style="padding:7px 8px;word-break:break-word;min-width:160px">'+t.desc
+          +(isCredit?'<span style="margin-left:6px;font-size:9px;background:rgba(52,211,153,.15);color:var(--teal);padding:1px 5px;border-radius:4px;font-weight:700">CREDIT</span>':'')
+          +'</td>'
+        +'<td style="padding:7px 8px;text-align:right;font-weight:700;white-space:nowrap;color:'+amtCol+'">'+displayAmt+'</td>'
         +'<td style="padding:7px 8px">'
           +'<select class="bi-sel" style="width:100%;font-size:11px" data-cid="'+catId+'" data-ti="'+i+'" onchange="moveTxnCategory(this)">'
           +catMoveOpts+'</select></td>'
-        +'<td style="padding:7px 8px;text-align:center"><button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button></td>'
+        +'<td style="padding:7px 8px;text-align:center;display:flex;gap:4px;justify-content:center">'
+          +'<button title="'+(isCredit?"Mark as debit":"Mark as credit")+'" style="background:none;border:1px solid var(--border);border-radius:5px;padding:2px 5px;cursor:pointer;font-size:10px;color:var(--text2)" '
+          +'data-cid="'+catId+'" data-ti="'+i+'" onclick="flipTxnType(this)">⇄</button>'
+          +'<button class="del-btn" data-cid="'+catId+'" data-ti="'+i+'" onclick="deleteCatTxn(this)" title="Remove">✕</button>'
+        +'</td>'
         +'</tr>';
     });
     body+='</tbody></table></div>';
@@ -2662,6 +2682,18 @@ function closeTxnDetail(){
   document.getElementById('txnDetailOverlay').style.display='none';
 }
 
+
+function flipTxnType(btn){
+  const catId=btn.dataset.cid, idx=parseInt(btn.dataset.ti);
+  const md=state.months[currentMonth];
+  if(!md||!md[catId]) return;
+  const t=md[catId].transactions[idx];
+  if(!t) return;
+  t.type=(t.type==='income')?'expense':'income';
+  const cat=state.categories.find(c=>c.id===catId)||{type:'expense'};
+  md[catId].actual=netActual(cat.type,md[catId].transactions);
+  saveState(); renderMonthly(); openCatDetail(catId);
+}
 function deleteCatTxn(btn){ deleteTxnEntry(btn.dataset.cid, parseInt(btn.dataset.ti)); }
 
 function deleteTxnEntry(catId,idx){
@@ -2695,7 +2727,7 @@ function rematchCatTxns(catId){
     } else { toKeep.push(t); }
   });
   md[catId].transactions=toKeep;
-  md[catId].actual=toKeep.reduce((s,t)=>s+t.amount,0);
+  md[catId].actual=netActual(catTypeById(catId),toKeep);
   saveState(); renderMonthly();
   openCatDetail(catId); // refresh modal
   if(moved) alert(moved+' transaction'+(moved>1?'s were':' was')+' re-matched and moved to their categories.');
@@ -2721,7 +2753,7 @@ function rematchAllOthers(){
       moved++;
     } else { toKeep.push(t); }
   });
-  if(md[othCat.id]){ md[othCat.id].transactions=toKeep; md[othCat.id].actual=toKeep.reduce((s,t)=>s+t.amount,0); }
+  if(md[othCat.id]){ md[othCat.id].transactions=toKeep; md[othCat.id].actual=netActual(othCat.type,toKeep); }
   saveState(); renderMonthly();
   openCatDetail(othCat.id);
   if(moved) alert(moved+' transaction'+(moved>1?'s were':' was')+' re-matched and moved out of Others.');
@@ -2757,11 +2789,12 @@ function moveTxnCategory(sel){
       if(!toMove.length) return;
       const toKeep=cd.transactions.filter(t=>!matchFn(t));
       cd.transactions=toKeep;
-      cd.actual=Math.round(toKeep.reduce((s,t)=>s+t.amount,0)*100)/100;
+      cd.actual=netActual(cat.type,toKeep);
       if(!mdata[toCatId]) mdata[toCatId]={actual:0,paid:false,note:'',transactions:[]};
       if(!mdata[toCatId].transactions) mdata[toCatId].transactions=[];
       mdata[toCatId].transactions.push(...toMove);
-      mdata[toCatId].actual=Math.round(((mdata[toCatId].actual||0)+toMove.reduce((s,t)=>s+t.amount,0))*100)/100;
+      const toCat=state.categories.find(c=>c.id===toCatId)||{type:'expense'};
+      mdata[toCatId].actual=netActual(toCat.type,mdata[toCatId].transactions);
       totalMoved+=toMove.length;
     });
   }
@@ -4965,8 +4998,8 @@ function importBiTxns(){
         if(existing.has(key)){totalSkipped++;return false;}
         return true;
       });
-      const newTotal=newTxns.reduce((s,t)=>s+t.amount,0);
-      tState.months[month][catId].actual=Math.round(((tState.months[month][catId].actual||0)+newTotal)*100)/100;
+      const tCat=state.categories.find(cc=>cc.id===catId)||{type:'expense'};
+      tState.months[month][catId].actual=netActual(tCat.type,tState.months[month][catId].transactions);
       tState.months[month][catId].transactions.push(...newTxns);
     });
     if(year!==currentYear) localStorage.setItem(sKey(year),JSON.stringify(tState));
@@ -5359,6 +5392,7 @@ function renderInsights(){
   renderInsightsCategoryTrends(st, cats, activeMos);
   renderInsightsWaterfall(catStats, totalInc);
   renderInsightsRecurring(st, cats);
+  renderInsightsCCBreakdown(st, cats, year);
 }
 
 function renderInsightsMonthlyTable(st, year){
@@ -5600,7 +5634,8 @@ function dedupAllTransactions(){
         });
         if(deduped.length<d.transactions.length){
           d.transactions=deduped;
-          d.actual=Math.round(deduped.reduce((s,t)=>s+(t.amount||0),0)*100)/100;
+          const dCat=tState.categories.find(cc=>cc.id===catId)||{type:'expense'};
+          d.actual=netActual(dCat.type,deduped);
           changed=true;
         }
       }
@@ -6298,6 +6333,44 @@ function closeIndiaModal(){
 document.getElementById('indiaModal').addEventListener('click',function(e){
   if(e.target===this) closeIndiaModal();
 });
+
+
+function renderInsightsCCBreakdown(st, cats, year){
+  const el=document.getElementById('insightsCCBreakdown');
+  if(!el) return;
+  // Find credit card categories (name contains 'credit card' or 'cc')
+  const ccCats=cats.filter(c=>c.type==='expense'&&/credit.?card|CC\b/i.test(c.name));
+  if(!ccCats.length){ el.innerHTML=''; return; }
+
+  let html=`<div class="ia-section">
+<div class="ia-title">💳 Credit Card Breakdown</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:14px">`;
+
+  ccCats.forEach(cat=>{
+    let annTotal=0;
+    const monthData=[];
+    for(let mi=0;mi<12;mi++){
+      const d=st[mi]&&st[mi][cat.id]?st[mi][cat.id]:{actual:0,transactions:[]};
+      annTotal+=d.actual||0;
+      if(d.actual) monthData.push({m:MONTHS[mi].slice(0,3),v:d.actual});
+    }
+    if(!annTotal) return;
+    const txnCount=Object.values(st).reduce((s,md)=>{
+      const d=md&&md[cat.id]; return s+(d&&d.transactions?d.transactions.length:0);
+    },0);
+    html+=`<div style="background:var(--surface2);border-radius:12px;padding:14px;border:1px solid var(--border)">
+      <div style="font-weight:700;font-size:13px;margin-bottom:6px">${cat.name}</div>
+      <div style="font-size:20px;font-weight:800;color:var(--red);margin-bottom:4px">MYR ${fmt(annTotal)}</div>
+      <div style="font-size:11px;color:var(--text2)">${txnCount} transactions · Avg MYR ${fmt(Math.round(annTotal/Math.max(monthData.length,1)))}/mo</div>
+      ${monthData.length?`<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">
+        ${monthData.map(x=>`<span style="font-size:10px;background:var(--red-l);color:var(--red);padding:2px 7px;border-radius:5px">${x.m}: ${fmt(x.v)}</span>`).join('')}
+      </div>`:''}
+    </div>`;
+  });
+
+  html+=`</div></div>`;
+  el.innerHTML=html;
+}
 
 </script>
 
