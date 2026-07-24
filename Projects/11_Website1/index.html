@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/site.css?v=13.3"/>
+<link rel="stylesheet" href="/site.css?v=13.4"/>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.3</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.4</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -1676,14 +1676,8 @@ document.addEventListener('DOMContentLoaded',function(){
                 <div class="rg invest-rg" id="sip-result-grid"></div>
                 <div class="box-green invest-tip" id="sip-tip"></div>
                 <div class="invest-table-toggle">
-                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" id="sip-toggle-btn" onclick="toggleYearTable('sip')">&#9660; Show Table</button>
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="showInvestTable('sip')">&#9660; Year-by-Year</button>
                   <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="downloadSIPCSV()">&#11015; CSV</button>
-                </div>
-                <div class="year-table-wrap" id="sip-table-wrap" style="display:none">
-                  <table class="year-table" id="sip-year-table">
-                    <thead><tr><th>Yr</th><th>SIP/mo</th><th>Invested</th><th>Corpus</th><th>Gain</th></tr></thead>
-                    <tbody id="sip-year-body"></tbody>
-                  </table>
                 </div>
               </div>
             </div>
@@ -1709,19 +1703,39 @@ document.addEventListener('DOMContentLoaded',function(){
                 <div class="rg invest-rg" id="swp-result-grid"></div>
                 <div id="swp-verdict" class="invest-tip"></div>
                 <div class="invest-table-toggle">
-                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" id="swp-toggle-btn" onclick="toggleYearTable('swp')">&#9660; Show Table</button>
+                  <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="showInvestTable('swp')">&#9660; Year-by-Year</button>
                   <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="downloadSWPCSV()">&#11015; CSV</button>
-                </div>
-                <div class="year-table-wrap" id="swp-table-wrap" style="display:none">
-                  <table class="year-table" id="swp-year-table">
-                    <thead><tr><th>Yr</th><th>WD/mo</th><th>Total WD</th><th>Corpus</th><th>Status</th></tr></thead>
-                    <tbody id="swp-year-body"></tbody>
-                  </table>
                 </div>
               </div>
             </div>
 
           </div><!-- /invest-dual-grid -->
+
+          <!-- Full-width year table panel -->
+          <div class="invest-full-table" id="invest-full-table" style="display:none">
+            <div class="invest-ft-hdr">
+              <div class="invest-ft-tabs">
+                <button id="ift-sip-btn" class="ift-tab" onclick="showInvestTable('sip')">&#128200; SIP Year-by-Year</button>
+                <button id="ift-swp-btn" class="ift-tab" onclick="showInvestTable('swp')">&#128176; SWP Year-by-Year</button>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-outline" id="ift-csv-btn" style="font-size:11px;padding:5px 12px">&#11015; CSV</button>
+                <button onclick="closeInvestTable()" class="ift-close">&#10005; Close</button>
+              </div>
+            </div>
+            <div id="invest-ft-sip-wrap">
+              <table class="year-table" id="sip-year-table">
+                <thead><tr><th>Year</th><th>Monthly SIP</th><th>Invested in Year</th><th>Total Invested</th><th>Corpus Value</th><th>Wealth Gained</th></tr></thead>
+                <tbody id="sip-year-body"></tbody>
+              </table>
+            </div>
+            <div id="invest-ft-swp-wrap" style="display:none">
+              <table class="year-table" id="swp-year-table">
+                <thead><tr><th>Year</th><th>Monthly WD</th><th>Annual WD</th><th>Portfolio Return</th><th>Closing Corpus</th><th>Status</th></tr></thead>
+                <tbody id="swp-year-body"></tbody>
+              </table>
+            </div>
+          </div>
           <div class="info" style="margin-top:12px">&#128161; <strong>NRI Tip:</strong> SIP into ELSS, Flexi-cap or Index funds via NRE/NRO account. Returns from equity MFs held &gt;1 year taxed at 10% LTCG (above &#8377;1L). SWP from a balanced advantage fund gives tax-efficient monthly income post-return. Consult a SEBI-RIA before investing.</div>
         </div><!-- /tab-tool-tile -->
       </div><!-- /fl-tab-bg-inner -->
@@ -3508,7 +3522,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 
 
-<script src="/site.js?v=13.3"></script>
+<script src="/site.js?v=13.4"></script>
 
 <!-- MOBILE BOTTOM NAVIGATION BAR -->
 <nav class="mob-bnav" id="mobBnav" aria-label="Mobile bottom navigation">

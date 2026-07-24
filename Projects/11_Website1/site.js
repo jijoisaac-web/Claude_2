@@ -1,4 +1,4 @@
-/* v13.3 */
+/* v13.4 */
 
 
 // ── CURRENCY DATA MAP ──────────────────────────────
@@ -814,6 +814,26 @@ function toggleYearTable(id){
   const isCollapsed=wrap.style.display==='none';
   wrap.style.display=isCollapsed?'':'none';
   btn.innerHTML=isCollapsed?'&#9650; Hide Table':'&#9660; Show Table';
+}
+function showInvestTable(type){
+  const panel=document.getElementById('invest-full-table');
+  const sipW=document.getElementById('invest-ft-sip-wrap');
+  const swpW=document.getElementById('invest-ft-swp-wrap');
+  const sipB=document.getElementById('ift-sip-btn');
+  const swpB=document.getElementById('ift-swp-btn');
+  const csvB=document.getElementById('ift-csv-btn');
+  if(!panel)return;
+  panel.style.display='block';
+  sipW.style.display=type==='sip'?'':'none';
+  swpW.style.display=type==='swp'?'':'none';
+  if(sipB){sipB.classList.toggle('active',type==='sip');}
+  if(swpB){swpB.classList.toggle('active',type==='swp');}
+  if(csvB){csvB.onclick=type==='sip'?downloadSIPCSV:downloadSWPCSV;}
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeInvestTable(){
+  const panel=document.getElementById('invest-full-table');
+  if(panel)panel.style.display='none';
 }
 function downloadSIPCSV(){
   const rows=[['Year','Monthly SIP (₹)','Invested in Year (₹)','Total Invested (₹)','Corpus Value (₹)','Wealth Gained (₹)']];

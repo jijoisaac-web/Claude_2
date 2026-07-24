@@ -1,4 +1,4 @@
-/* v13.3 */
+/* v13.4 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -956,7 +956,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tpl-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#000;}
 /* ── Invest dual grid (SIP + SWP side-by-side) ── */
-.invest-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;}
+.invest-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
 .invest-card{padding:16px 18px;}
 .invest-fg{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
 .invest-fg .f label{font-size:11px;}
@@ -968,6 +968,16 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .invest-rg .ri-sub{font-size:10px;}
 .invest-tip{font-size:12px;padding:10px 12px;margin-bottom:8px;}
 .invest-table-toggle{display:flex;gap:8px;margin-bottom:8px;}
+
+/* Invest full-width year table */
+.invest-full-table{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-top:14px;}
+.invest-ft-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;flex-wrap:wrap;}
+.invest-ft-tabs{display:flex;gap:6px;}
+.ift-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.ift-tab.active{background:var(--amber);border-color:var(--amber);color:#000;}
+.ift-close{padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:background .2s;}
+.ift-close:hover{background:var(--elevated);}
+@media(max-width:600px){.invest-ft-hdr{flex-direction:column;align-items:flex-start;}.invest-ft-tabs{flex-wrap:wrap;}}
 @media(max-width:900px){.invest-dual-grid{grid-template-columns:1fr;}.invest-fg{grid-template-columns:1fr 1fr;}.invest-rg{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:500px){.invest-fg{grid-template-columns:1fr;}.invest-rg{grid-template-columns:1fr 1fr;}}
 
