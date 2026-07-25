@@ -344,13 +344,14 @@ progress{accent-color:var(--violet);}
       <option value="date">Sort: most recent first</option>
     </select>
     <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe</label>
+    <label class="muted"><input type="checkbox" id="dealsShowRoundTrips" onchange="renderDeals()"> Show same-day round trips (likely intraday)</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
-  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now.</div>
+  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge.</div>
 
   <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
-  <div class="controls">
+  <div class="controls" style="flex-wrap:wrap">
     <select id="delivUniverse" onchange="renderDelivery()">
       <option value="NIFTY 50" selected>NIFTY 50</option>
       <option value="NEXT 50">NEXT 50</option>
@@ -359,6 +360,13 @@ progress{accent-color:var(--violet);}
       <option value="MICROCAP 250">MICROCAP 250</option>
       <option value="ALL">All (~750)</option>
     </select>
+    <div class="rangebtns" id="delivSignalBtns">
+      <button data-sig="ALL" class="active">All signals</button>
+      <button data-sig="ACCUM">Genuine accumulation</button>
+      <button data-sig="SELL">Genuine selling</button>
+      <button data-sig="FLAT">High conviction, flat</button>
+      <button data-sig="CHURN">Speculative churn</button>
+    </div>
     <button class="btn ghost" onclick="loadDelivery(true)">↻ Refresh</button>
   </div>
   <div id="delivTable"><div class="loading">Loading…</div></div>
@@ -881,6 +889,18 @@ function renderDeals(){
   const distinctDays = new Set(dealsData.map(d=>d.date)).size;
   let deals = [...dealsData];
   if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
+  // same client + same stock + same date on both BUY and SELL sides = a same-day round trip, not a
+  // held position — NSE's disclosure has no intraday flag, but this pattern is the closest visible
+  // proxy for it, so hide these by default rather than counting them as institutional accumulation.
+  const sideCount = new Map();
+  for(const d of deals){
+    const key = `${d.client}|${d.symbol}|${d.date}`;
+    if(!sideCount.has(key)) sideCount.set(key, new Set());
+    sideCount.get(key).add(d.side);
+  }
+  deals = deals.map(d=>({...d, roundTrip: sideCount.get(`${d.client}|${d.symbol}|${d.date}`).size > 1}));
+  const roundTripHidden = !$("dealsShowRoundTrips").checked ? deals.filter(d=>d.roundTrip).length : 0;
+  if(!$("dealsShowRoundTrips").checked) deals = deals.filter(d=>!d.roundTrip);
   const side = $("dealsSide").value;
   if(side !== "ALL") deals = deals.filter(d=>d.side===side);
   const activeBtn = document.querySelector("#dealsRangeBtns button.active");
@@ -894,14 +914,14 @@ function renderDeals(){
   const newestStr = dealsData.find(d=>dealDateTs(d)===newestTs)?.date || "";
   const oldestStr = dealsData.find(d=>dealDateTs(d)===oldestTs)?.date || "";
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
-  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}) · showing top ${shown.length} by ${sortBy==="value"?"value":"date"}`;
+  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · showing top ${shown.length} by ${sortBy==="value"?"value":"date"}`;
   $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
       const inUni = ALL_STOCKS[d.symbol+".NS"];
       return `<tr ${inUni?`onclick="openChart('${d.symbol}.NS')" style="cursor:pointer"`:'style="cursor:default"'}>
       <td style="white-space:nowrap">${d.date||"—"}</td>
-      <td style="text-align:left;max-width:280px">${d.client}</td>
+      <td style="text-align:left;max-width:280px">${d.client}${d.roundTrip?' <span class="badge neutral" title="Same client bought and sold this stock on this date — likely intraday, not a held position">ROUND TRIP</span>':""}</td>
       <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
       <td><span class="sym">${d.symbol}</span><br><span class="subname">${d.name||""}</span></td>
       <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
@@ -982,14 +1002,17 @@ function renderDelivery(){
   const rows = delivData.rows
     .filter(r => universeSyms.has(r.s) && r.c!=null && r.p)
     .map(r => ({...r, chg: (r.c-r.p)/r.p*100}));
-  $("delivMeta").textContent = `· ${delivData.date} · ${rows.length} stocks matched`;
   const read = r =>
-    r.d>=60 && r.chg>=0.5 ? ["bullish","GENUINE ACCUMULATION"] :
-    r.d>=60 && r.chg<=-0.5 ? ["bearish","GENUINE SELLING"] :
-    r.d>=60 ? ["neutral","HIGH CONVICTION, FLAT"] :
-    r.d<=30 && Math.abs(r.chg)>=1.5 ? ["neutral","SPECULATIVE CHURN"] : null;
-  const flagged = rows.map(r=>({...r, tag: read(r)})).filter(r=>r.tag)
-    .sort((a,b)=>b.d-a.d).slice(0,20);
+    r.d>=60 && r.chg>=0.5 ? ["bullish","GENUINE ACCUMULATION","ACCUM"] :
+    r.d>=60 && r.chg<=-0.5 ? ["bearish","GENUINE SELLING","SELL"] :
+    r.d>=60 ? ["neutral","HIGH CONVICTION, FLAT","FLAT"] :
+    r.d<=30 && Math.abs(r.chg)>=1.5 ? ["neutral","SPECULATIVE CHURN","CHURN"] : null;
+  const allFlagged = rows.map(r=>({...r, tag: read(r)})).filter(r=>r.tag);
+  const sigBtn = document.querySelector("#delivSignalBtns button.active");
+  const sig = sigBtn ? sigBtn.dataset.sig : "ALL";
+  const filtered = sig==="ALL" ? allFlagged : allFlagged.filter(r=>r.tag[2]===sig);
+  const flagged = [...filtered].sort((a,b)=>b.d-a.d).slice(0,20);
+  $("delivMeta").textContent = `· ${delivData.date} · ${rows.length} stocks matched · ${filtered.length} with a notable reading${sig!=="ALL"?` (${sigBtn.textContent})`:""} · showing top ${flagged.length}`;
   $("delivTable").innerHTML = flagged.length ? `<table><thead><tr>
     <th>Stock</th><th>Price ₹</th><th>Chg %</th>
     <th title="Share of traded volume actually delivered into demat — higher = more conviction">Delivery %</th>
@@ -1004,9 +1027,13 @@ function renderDelivery(){
       <td style="text-align:left"><span class="badge ${r.tag[0]}">${r.tag[1]}</span></td>
       <td><button class="btn ghost" style="padding:3px 8px" onclick="event.stopPropagation();openFundamentals('${sym}')">📊</button></td></tr>`;
     }).join("") + `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">Showing notable readings (delivery ≥60% or churn ≥1.5% move on ≤30% delivery), top 20 by delivery. A multi-day pattern of high-delivery up-days is the strong version — check the chart's volume behaviour before concluding.</div>`
-    : '<div class="loading">No notable delivery readings in this universe today.</div>';
+    <div class="muted" style="font-size:11px;margin-top:4px">Showing notable readings (delivery ≥60% or churn ≥1.5% move on ≤30% delivery), top 20 by delivery within the selected signal filter. A multi-day pattern of high-delivery up-days is the strong version — check the chart's volume behaviour before concluding.</div>`
+    : `<div class="loading">No ${sig!=="ALL"?sigBtn.textContent.toLowerCase()+" ":"notable delivery "}readings in this universe today.</div>`;
 }
+document.querySelectorAll("#delivSignalBtns button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#delivSignalBtns button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active"); renderDelivery();
+});
 
 /* ---- market pulse: breadth, sectors, movers — from the latest scan ---- */
 async function loadPulse(){

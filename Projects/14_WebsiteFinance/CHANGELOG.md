@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.3.4] — 2026-07-25 · Round-trip filtering + delivery signal filters
+
+- Bulk & block deals now **hides same-day round trips by default**: when the same client shows up as both BUY and SELL for the same stock on the same date, that's same-day trading activity, not a held institutional position — NSE's disclosure has no intraday flag, but this pattern is the closest visible proxy, so these rows are filtered out unless you tick "Show same-day round trips." When shown, they're marked with a ROUND TRIP badge. Meta line now also states how many were hidden
+- Delivery % gets **one-click signal filters** — All / Genuine accumulation / Genuine selling / High conviction flat / Speculative churn — instead of always showing a mixed top-20. Filtering now happens before the top-20 cut, so picking "Genuine accumulation" won't miss rows that would've been pushed out by other signal types in a mixed list
+
 ## [3.3.3] — 2026-07-25 · Bulk & block deals: range/sort/side controls
 
 - Replaced the old binary "latest session / all days" checkbox with **date-range presets** (1D/3D/7D/14D/all available) on the Bulk & block deals table, matching the range-button pattern already used on Charts
