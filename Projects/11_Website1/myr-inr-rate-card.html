@@ -12,7 +12,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
   position:sticky;top:0;height:100vh;
   background:
     linear-gradient(180deg,rgba(3,6,14,0.55) 0%,rgba(5,10,20,0.40) 35%,rgba(3,6,14,0.85) 100%),
-    url('https://images.pexels.com/photos/1040474/pexels-photo-1040474.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
+    url('https://images.pexels.com/photos/3201647/pexels-photo-3201647.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
     center/cover no-repeat;
   display:flex;flex-direction:column;justify-content:space-between;padding:28px 24px 24px;
 }
@@ -141,15 +141,15 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
     <div class="amount-bar">
       <span class="amount-lbl">You send:</span>
       <div class="amt-btns">
-        <button class="amt-btn" onclick="setAmt(500,this)">500</button><button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2000,this)">2,000</button><button class="amt-btn" onclick="setAmt(5000,this)">5,000</button>
+        <button class="amt-btn" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2500,this)">2,500</button><button class="amt-btn active" onclick="setAmt(5000,this)">5,000</button><button class="amt-btn" onclick="setAmt(7500,this)">7,500</button><button class="amt-btn" onclick="setAmt(10000,this)">10,000</button><button class="amt-btn" onclick="setAmt(12500,this)">12,500</button><button class="amt-btn" onclick="setAmt(15000,this)">15,000</button><button class="amt-btn" onclick="setAmt(20000,this)">20,000</button>
       </div>
       <div class="amt-input-wrap">
-        <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,null,true)"/>
+        <input class="amt-input" type="number" id="customAmt" value="5000" oninput="setAmt(this.value,null,true)"/>
         <span class="amt-cur">MYR</span>
       </div>
     </div>
     <div class="tip-bar">
-      💡 <strong>How to read:</strong> Rates use each provider's typical spread over the live mid-market rate. Always confirm on provider's app before transferring.
+      💡 <strong>How to read:</strong> Effective rate includes each provider's spread + fee. Providers marked <strong>★</strong> have tiered fees that vary with amount. Always confirm on provider's app.
     </div>
     <div class="table-wrap">
       <div class="table-header">
@@ -175,10 +175,11 @@ const PROVIDERS = [
   {
     "name": "Wise",
     "domain": "wise.com",
-    "spread": 0.006,
+    "spread": 0.001,
     "fee": 0,
+    "feeFormula": {"fixed": 4.59, "pct": 0.007246},
     "link": "https://wise.com",
-    "note": "Mid-market rate \u00b7 low fee"
+    "note": "Mid-market rate \u00b7 fee = MYR 4.59 + 0.72% included in amount"
   },
   {
     "name": "BigPay",
@@ -191,10 +192,11 @@ const PROVIDERS = [
   {
     "name": "InstaReM",
     "domain": "instarem.com",
-    "spread": 0.008,
+    "spread": 0.001,
     "fee": 0,
+    "feeFormula": {"fixed": 0, "pct": 0.0055},
     "link": "https://instarem.com/en-my/",
-    "note": "MAS licensed \u00b7 digital"
+    "note": "Near mid-market rate \u00b7 0.55% fee \u00b7 zero fee first transfer \u2264MYR 4K"
   },
   {
     "name": "Merchantrade Money",
@@ -327,10 +329,10 @@ const PROVIDERS = [
   {
     "name": "Western Union",
     "domain": "westernunion.com",
-    "spread": 0.025,
-    "fee": 0,
+    "spread": 0.003,
+    "fee": 10,
     "link": "https://westernunion.com",
-    "note": "Global network"
+    "note": "Global network \u00b7 MYR 10 fee \u00b7 competitive rate"
   },
   {
     "name": "eRemit",
@@ -344,14 +346,15 @@ const PROVIDERS = [
     "name": "LuluMoney",
     "domain": "lulumoney.com",
     "spread": 0.001,
-    "fee": 15,
+    "fee": 0,
+    "feeTiers": [{"max":5000,"fee":10},{"max":10000,"fee":15},{"max":1000000000,"fee":25}],
     "link": "https://www.lulumoney.com/",
-    "note": "App exclusive \u00b7 low spread \u00b7 MYR 10\u201325 fee"
+    "note": "App exclusive \u00b7 low spread \u00b7 MYR 10\u201325 fee (amount-based)"
   },
   {
     "name": "Lotus Remit",
     "domain": "lotusremit.com",
-    "spread": 0.002,
+    "spread": 0.0025,
     "fee": 5,
     "link": "https://lotusremit.com",
     "note": "Same-day India credit \u00b7 flat MYR 5 fee"
@@ -367,10 +370,10 @@ const PROVIDERS = [
 ];
 const FROM_CUR = 'MYR';
 const FWZ_KEY = 'myr';
-let midRate=null, sendAmt=1000;
+let midRate=null, sendAmt=5000;
 
 function setAmt(val,btn,custom=false){
-  sendAmt=parseFloat(val)||1000;
+  sendAmt=parseFloat(val)||5000;
   if(!custom){
     document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('active'));
     document.getElementById('customAmt').value=sendAmt;
@@ -380,12 +383,18 @@ function setAmt(val,btn,custom=false){
 }
 
 async function fetchMidRate(){
+  try{const r=await fetch('https://api.exchangerate-api.com/v4/latest/'+FROM_CUR);const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
   try{const r=await fetch('https://api.frankfurter.app/latest?from='+FROM_CUR+'&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
-  try{const r=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/'+FWZ_KEY+'.json');const d=await r.json();if(d[FWZ_KEY]&&d[FWZ_KEY].inr)return d[FWZ_KEY].inr;}catch(e){}
+  try{const r=await fetch('https://latest.currency-api.pages.dev/v1/currencies/'+FWZ_KEY+'.json');const d=await r.json();if(d[FWZ_KEY]&&d[FWZ_KEY].inr)return d[FWZ_KEY].inr;}catch(e){}
   return null;
 }
 
-function getTier(s){return s<=.007?'tier-best':s<=.012?'tier-good':s<=.017?'tier-fair':'tier-poor';}
+function getTier(lostPct){return lostPct<=.7?'tier-best':lostPct<=1.2?'tier-good':lostPct<=1.7?'tier-fair':'tier-poor';}
+function getProviderFee(p,amt){
+  if(p.feeFormula){return p.feeFormula.fixed+amt*p.feeFormula.pct;}
+  if(p.feeTiers){for(const t of p.feeTiers){if(amt<=t.max)return t.fee;}return p.feeTiers[p.feeTiers.length-1].fee;}
+  return p.fee||0;
+}
 function fmt(n,d=4){return n.toFixed(d);}
 function fmtINR(n){return n>=100000?'₹'+(n/100000).toFixed(2)+'L':'₹'+Math.round(n).toLocaleString('en-IN');}
 
@@ -401,10 +410,11 @@ function logoHTML(p){
 function renderTable(){
   document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' '+FROM_CUR;
   const sorted=PROVIDERS.map(p=>{
+    const fee=getProviderFee(p,sendAmt);
     const rate=midRate*(1-p.spread);
-    const inrReceived=rate*sendAmt-p.fee*rate;
+    const inrReceived=rate*sendAmt-fee*rate;
     const effectiveRate=inrReceived/sendAmt;
-    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100};
+    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100,_fee:fee};
   }).sort((a,b)=>b.effectiveRate-a.effectiveRate);
   const best=sorted[0];
   document.getElementById('midRateDisplay').textContent='₹'+fmt(midRate,4);
@@ -413,11 +423,11 @@ function renderTable(){
   const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
   let html='',lastTier=null;
   sorted.forEach((p,i)=>{
-    const tier=getTier(p.spread);
+    const tier=getTier(p.lostPct);
     if(tier!==lastTier){lastTier=tier;html+=`<div class="section-div"><span>${labels[tier]}</span></div>`;}
     const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
-    const feeStr=p.fee?`${FROM_CUR} ${p.fee}`:'Free';
-    const feeCls=p.fee?'paid':'';
+    const feeStr=p._fee?`${FROM_CUR} ${Math.round(p._fee)}${(p.feeTiers||p.feeFormula)?' ★':''}`:'Free';
+    const feeCls=p._fee?'paid':'';
     html+=`<a class="provider-row ${tier}" href="${p.link}" target="_blank" rel="noopener">
       ${logoHTML(p)}
       <div><div class="prov-name">${rb}${p.name}</div><div class="prov-note">${p.note}</div></div>

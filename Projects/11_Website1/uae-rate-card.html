@@ -248,12 +248,13 @@ function setAmt(val,btn,custom=false){
 }
 
 async function fetchMidRate(){
-  try{const r=await fetch('https://api.frankfurter.app/latest?from=AED&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
-  try{const r=await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/aed.json');const d=await r.json();if(d.aed&&d.aed.inr)return d.aed.inr;}catch(e){}
+  try{const r=await fetch('https://api.exchangerate-api.com/v4/latest/'+FROM_CUR);const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://api.frankfurter.app/latest?from='+FROM_CUR+'&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://latest.currency-api.pages.dev/v1/currencies/'+FWZ_KEY+'.json');const d=await r.json();if(d[FWZ_KEY]&&d[FWZ_KEY].inr)return d[FWZ_KEY].inr;}catch(e){}
   return null;
 }
 
-function getTier(s){return s<=.007?'tier-best':s<=.012?'tier-good':s<=.017?'tier-fair':'tier-poor';}
+function getTier(lostPct){return lostPct<=.7?'tier-best':lostPct<=1.2?'tier-good':lostPct<=1.7?'tier-fair':'tier-poor';}
 function fmt(n,d=4){return n.toFixed(d);}
 function fmtINR(n){return n>=100000?'₹'+(n/100000).toFixed(2)+'L':'₹'+Math.round(n).toLocaleString('en-IN');}
 
@@ -283,7 +284,7 @@ function renderTable(){
   const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
   let html='',lastTier=null;
   sorted.forEach((p,i)=>{
-    const tier=getTier(p.spread);
+    const tier=getTier(p.lostPct);
     if(tier!==lastTier){lastTier=tier;html+=`<div class="section-div"><span>${labels[tier]}</span></div>`;}
     const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
     const feeStr=p.fee?`${FROM_CUR} ${p.fee}`:'Free';
