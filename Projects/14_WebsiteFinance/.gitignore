@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-data/
+/data/
 *.db
 nohup.out
 .DS_Store

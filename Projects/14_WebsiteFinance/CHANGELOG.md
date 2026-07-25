@@ -2,6 +2,42 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.10.0] — 2026-07-25 · Git-committed baseline for deal history + export button
+
+- **New: `site/data/deals-archive.json`**, a static file committed to the repo and served by Cloudflare Pages like any other asset. Generated from the user's own two uploaded CSVs (Bulk + Block, 25-Jul-2025 to 24-Jul-2026) — 26,962 rows across 246 distinct days. Every visitor's browser now bootstraps from this file once (tracked via an IndexedDB flag) and merges it into their local archive, so history is available immediately for new visitors instead of only accumulating one day at a time
+- **New: "⬇ Export to site/data/deals-archive.json" button** on the FII/DII tab — downloads the browser's full accumulated local archive as JSON, so it can be dropped back into `site/data/deals-archive.json` and committed/pushed to refresh the shared baseline as real days pile up beyond what's currently baked in
+- **Fixed `.gitignore` bug**: the rule `data/` (unanchored) matched `site/data/` too, at any depth, which would have silently kept the new baseline file out of every commit. Anchored to `/data/` so only the root-level Python backend's `data/` folder is still excluded
+- Updated the FII/DII tab footnote and `DEPLOY.md` to describe the three-layer model: git baseline (shared) → per-browser IndexedDB (grows daily / via CSV import) → today's live snapshot (always freshest)
+- **Still required from you**: commit + push `site/data/deals-archive.json` and the corrected `.gitignore` via GitHub Desktop — this file was generated and written to disk locally but nothing is live until that push happens
+
+## [3.9.0] — 2026-07-25 · Deal history moved fully client-side (no Cloudflare setup)
+
+- **Reverted the Cloudflare KV + GitHub Actions approach from 3.7.0/3.8.0** — per the user's preference not to make any Cloudflare dashboard changes. Removed `/api/deals-snapshot-save`, the server-side `/api/deals-import`, and `.github/workflows/daily-deals-snapshot.yml`
+- **New: fully client-side deal history**, no backend setup required —
+  - The FII/DII tab now saves each day's disclosed deals into an IndexedDB archive in the browser, growing by one real day every time the tab is opened (IndexedDB rather than localStorage since a year of deals is a few MB, past localStorage's ~5MB ceiling on some browsers)
+  - New **"Import history"** control on the FII/DII tab: upload a Bulk Deals or Block Deals CSV downloaded directly from NSE's own Bulk/Block Deals Archives page (works from a normal browser, unlike the same request from this app's server) for instant backfill — the user's own year-long CSV export (~27,000 rows) was used to validate the parser
+  - Added a "Clear local history" button
+  - `/api/largedeals` simplified back down to just today's live snapshot (plus an opportunistic, normally-blocked historical attempt) — its only job now is supplying one fresh day per visit for the browser to accumulate
+  - Same caveat as the existing Mutual Funds folio feature: this history lives in one browser only and is lost if site data is cleared — re-import the CSV to restore it
+- 6M/1Y range buttons and the ~400-day retention window from 3.8.0 are kept, now backed by the local archive instead of KV
+
+## [3.8.0] — 2026-07-25 · Manual CSV backfill + 6M/1Y range buttons
+
+- New `/api/deals-import` endpoint: parses NSE's own downloadable Bulk/Block Deals CSV export (from `nseindia.com/report-detail/display-bulk-and-block-deals`, which works from a normal browser even though the same data is blocked server-side) and merges it into the KV archive, replacing rows per (type, date) so re-imports are safe. The user downloaded a full year of both files (~27,000 rows total) and this is how it gets loaded in
+- Deals archive retention and serving window extended from ~97 days to ~400 days to actually use that year of backfilled history
+- Added **6M** and **1Y** buttons to the Bulk & Block Deals range picker; "All" no longer claims a fixed day count since the real window now depends on how much has been imported/accumulated
+- Footnote updated to describe the self-managed-archive model plainly instead of implying a fixed NSE-provided window
+
+## [3.7.0] — 2026-07-25 · Self-managed deals archive (works around NSE's IP block)
+
+- **Root cause confirmed via `?debug=1`, pasted by the user**: NSE's `/api/historical/bulk-deals` and `/api/historical/block-deals` return an "NSE India" bot-block HTML page with HTTP 200 when called from Cloudflare's IPs — an IP-reputation block, not a fixable header/cookie/referer issue. No amount of request tweaking gets past this from a Cloudflare Function
+- New workaround, chosen by the user from three options: build a self-managed rolling archive instead of fighting NSE's blocked endpoint
+  - New `/api/deals-snapshot-save` Function: fetches the live single-day snapshot (which NSE does allow) and saves it into Cloudflare KV (`DEALS_KV` binding, key `deals:archive`), de-duplicating by date and pruning entries past ~100 days
+  - New `.github/workflows/daily-deals-snapshot.yml`: calls that endpoint once a day (19:00 IST, Mon–Fri) via a `workflow_dispatch`-enabled GitHub Actions schedule, authenticated with a shared secret
+  - `/api/largedeals` now reads the KV archive first (real multi-day history, growing by one real day at a time from whichever day this is set up), always merges in today's live snapshot on top for freshness, and keeps the historical-endpoint attempt as a cheap opportunistic fallback in case NSE ever lifts the block
+  - Requires one-time manual setup (Cloudflare KV namespace + binding + secret, matching GitHub Actions secret) — documented step by step in `DEPLOY.md` under "Bulk & block deals multi-day history"
+  - Cannot backfill days before this is set up (that data is genuinely inaccessible), but the table is never worse off than before, and gets real from day one forward
+
 ## [3.6.1] — 2026-07-25 · Debug mode now captures the actual blocked response
 
 - User-confirmed via `?debug=1`: NSE's historical bulk/block-deals calls are returning HTTP 200 with a body that isn't valid JSON ("parse-error") — almost certainly a bot-block/challenge page, not real data

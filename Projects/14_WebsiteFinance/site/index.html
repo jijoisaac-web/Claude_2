@@ -340,7 +340,9 @@ progress{accent-color:var(--violet);}
       <button data-d="30">30D</button>
       <button data-d="60">60D</button>
       <button data-d="90">90D</button>
-      <button data-d="0">All (~95D)</button>
+      <button data-d="180">6M</button>
+      <button data-d="365">1Y</button>
+      <button data-d="0">All</button>
     </div>
     <select id="dealsSide" onchange="dealsPage=0;renderDeals()">
       <option value="ALL">Buy + Sell</option>
@@ -359,13 +361,25 @@ progress{accent-color:var(--violet);}
     <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="dealsPage=0;renderDeals()"> Only stocks in my universe</label>
     <label class="muted"><input type="checkbox" id="dealsShowRoundTrips" onchange="dealsPage=0;renderDeals()"> Show same-day round trips (likely intraday)</label>
   </div>
+  <div class="controls" style="flex-wrap:wrap;background:#0d1424;border:1px solid var(--border);border-radius:10px;padding:8px 10px">
+    <span class="muted" style="font-size:11px">Import history: download <b>Bulk Deals</b> / <b>Block Deals</b> CSVs from NSE's own <a href="https://www.nseindia.com/report-detail/display-bulk-and-block-deals" target="_blank" rel="noopener" style="color:var(--blue)">Bulk/Block Deals Archives page</a> (works from your browser even though this site's server can't reach it) and drop the file in here —</span>
+    <input type="file" id="dealsCsvFile" accept=".csv" onchange="dealsCsvFileChanged()">
+    <select id="dealsCsvType">
+      <option value="BULK">Bulk deals file</option>
+      <option value="BLOCK">Block deals file</option>
+    </select>
+    <button class="btn ghost" onclick="importDealsCsv()">⬆ Import into local history</button>
+    <button class="btn ghost" onclick="clearDealsArchive()" title="Erase everything imported/accumulated so far in this browser">🗑 Clear local history</button>
+    <button class="btn ghost" onclick="exportDealsArchiveJson()" title="Download this browser's full local history as deals-archive.json — drop it in site/data/ and commit+push to refresh the shared baseline every visitor gets">⬇ Export to site/data/deals-archive.json</button>
+    <span class="muted" id="dealsCsvStatus" style="font-size:11px"></span>
+  </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
   <div class="controls" id="dealsPager" style="display:none;justify-content:center;margin-top:8px">
     <button id="dealsPrevBtn" onclick="dealsPage=Math.max(0,dealsPage-1);renderDeals()">‹ Previous</button>
     <span class="muted" id="dealsPageLabel" style="margin:0 10px"></span>
     <button id="dealsNextBtn" onclick="dealsPage=dealsPage+1;renderDeals()">Next ›</button>
   </div>
-  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. Deal history is pulled from NSE's historical bulk/block-deals filings and covers roughly the last 95 calendar days, so 3D/7D/14D/30D/60D/90D genuinely filter into that window rather than a single day's snapshot — the deal count and date span shown next to the heading tells you exactly what's loaded right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list. "<b>Known domestic institutions/groups only</b>" is the same heuristic applied to a separate curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, etc.) and domestic financial institutions (LIC, GIC, nationalised banks) — also name-matching, also incomplete. Results are paginated 20 per page, newest/biggest first depending on the sort picked.</div>
+  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. Deal history has three layers: a git-committed baseline file (<code>site/data/deals-archive.json</code>) that every visitor bootstraps from once, on top of which your own browser keeps a local history that grows day by day just from visiting (NSE blocks its own multi-day archive from being fetched server-side, so this app can't refresh the shared baseline automatically — someone has to periodically re-export it). The "Import history" box above lets you backfill your own browser instantly from NSE's own downloadable CSV; the "Export" button next to it downloads your browser's full accumulated history as JSON so it can be dropped into <code>site/data/deals-archive.json</code> and committed/pushed, refreshing what every future visitor bootstraps from. Clearing site data/cache wipes your browser's local layer (the git baseline still bootstraps back in on next load, just without whatever days you'd added since). 3D/7D/…/1Y only show real data where it exists; the deal count and date span shown next to the heading tells you exactly what's stored right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list. "<b>Known domestic institutions/groups only</b>" is the same heuristic applied to a separate curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, etc.) and domestic financial institutions (LIC, GIC, nationalised banks) — also name-matching, also incomplete. Results are paginated 20 per page, newest/biggest first depending on the sort picked.</div>
 
   <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
@@ -986,17 +1000,195 @@ function isKnownDomesticInst(client){
 /* ---- bulk & block deals (NSE) ---- */
 let dealsData = null;
 let dealsPage = 0;
-let dealsSource = null;   // "historical" (real multi-day window) or "snapshot-fallback" (today only)
+let dealsSource = null;   // "historical" (rare, NSE normally blocks it) or "snapshot" (today only, from the server)
+
+/* ---- local (per-browser) deals archive, IndexedDB-backed ----
+   No server database for this: NSE blocks its own multi-day archive from being fetched
+   server-side (see largedeals.js), so instead each browser builds its own history — a little
+   every visit (today's snapshot gets merged in), or instantly via the "Import history" CSV
+   upload. IndexedDB rather than localStorage because a year of deals is a few MB, comfortably
+   past localStorage's ~5MB ceiling on some browsers. */
+const DEALS_DB_NAME = "ist_deals_archive", DEALS_STORE = "kv", DEALS_ARCHIVE_KEY = "archive";
+const DEALS_ARCHIVE_MAX_DAYS = 400;   // covers the 1Y button plus buffer
+function openDealsDB(){
+  return new Promise((resolve, reject)=>{
+    if(!window.indexedDB){ reject(new Error("IndexedDB not available")); return; }
+    const req = indexedDB.open(DEALS_DB_NAME, 1);
+    req.onupgradeneeded = () => { if(!req.result.objectStoreNames.contains(DEALS_STORE)) req.result.createObjectStore(DEALS_STORE); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet_(key){
+  try{
+    const db = await openDealsDB();
+    return await new Promise((resolve, reject)=>{
+      const tx = db.transaction(DEALS_STORE, "readonly");
+      const req = tx.objectStore(DEALS_STORE).get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }catch(e){ return undefined; }
+}
+async function idbSet_(key, val){
+  try{
+    const db = await openDealsDB();
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(DEALS_STORE, "readwrite");
+      tx.objectStore(DEALS_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    return true;
+  }catch(e){ return false; }
+}
+async function dealsArchiveGet(){ const v = await idbGet_(DEALS_ARCHIVE_KEY); return Array.isArray(v) ? v : []; }
+async function dealsArchiveSet(arr){ return idbSet_(DEALS_ARCHIVE_KEY, arr); }
+
+// One-time (per browser) bootstrap from a static baseline committed to the repo — this is what
+// makes history show up for every visitor immediately after deploy, not just after they've
+// personally imported a CSV or visited daily. Use "Export to site/data/deals-archive.json"
+// below to refresh this baseline from an accumulated local archive; commit + push it via GitHub
+// Desktop and every future visitor gets that history for free.
+const DEALS_BASELINE_URL = "/data/deals-archive.json";
+const DEALS_BOOTSTRAP_KEY = "staticBaselineLoadedV1";
+async function ensureStaticBaselineLoaded(){
+  try{
+    if(await idbGet_(DEALS_BOOTSTRAP_KEY)) return;
+    const r = await fetch(DEALS_BASELINE_URL, { cache: "force-cache" });
+    if(!r.ok) return;   // not deployed (yet) — retry on a future visit rather than giving up permanently
+    const baseline = await r.json();
+    if(Array.isArray(baseline) && baseline.length) await mergeIntoDealsArchive(baseline);
+    await idbSet_(DEALS_BOOTSTRAP_KEY, true);
+  }catch(e){ /* static file missing/invalid — silently skip, try again next visit */ }
+}
+// Merge a fresh batch of deals into the local archive, replacing existing rows for the same
+// (type, date) so re-importing/re-fetching the same day is safe rather than duplicating.
+async function mergeIntoDealsArchive(newRows){
+  if(!newRows || !newRows.length) return await dealsArchiveGet();
+  let archive = await dealsArchiveGet();
+  const coversTypeDate = new Set(newRows.map(r => r.type+"|"+r.date));
+  const cutoff = Date.now() - DEALS_ARCHIVE_MAX_DAYS*86400000;
+  archive = archive.filter(d => {
+    const t = dealDateTs(d);
+    if(t == null || t < cutoff) return false;
+    if(coversTypeDate.has(d.type+"|"+d.date)) return false;
+    return true;
+  });
+  archive = archive.concat(newRows);
+  await dealsArchiveSet(archive);
+  return archive;
+}
+async function clearDealsArchive(){
+  if(!confirm("Erase all imported/accumulated deal history in this browser? This can't be undone (re-import the CSV to restore it).")) return;
+  await dealsArchiveSet([]);
+  $("dealsCsvStatus").textContent = "Local history cleared.";
+  loadDeals();
+}
+
+// Downloads this browser's full accumulated archive as JSON. Drop the result at
+// site/data/deals-archive.json (overwriting the existing one) and commit+push via GitHub Desktop
+// to refresh the shared static baseline every visitor bootstraps from on first load.
+async function exportDealsArchiveJson(){
+  const archive = await dealsArchiveGet();
+  if(!archive.length){ $("dealsCsvStatus").textContent = "Nothing to export yet."; return; }
+  const blob = new Blob([JSON.stringify(archive)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "deals-archive.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+  const distinctDays = new Set(archive.map(d=>d.date)).size;
+  $("dealsCsvStatus").textContent = `Exported ${archive.length} deals across ${distinctDays} days. Save as site/data/deals-archive.json and commit+push.`;
+}
+
 async function loadDeals(force){
+  await ensureStaticBaselineLoaded();   // one-time per browser: seed from the git-committed baseline
+  let snapErr = null;
   try{
     const r = await fetch("/api/largedeals" + (force===true ? "?t="+Date.now() : ""));
     const d = await r.json();
     if(!r.ok || !d.deals) throw new Error(d.error || "no data");
-    dealsData = d.deals;
     dealsSource = d.source || null;
+    dealsData = await mergeIntoDealsArchive(d.deals);   // also grows the local archive by one more real day
+  }catch(e){ snapErr = e; }
+  if(!dealsData || !dealsData.length){
+    // Live fetch failed (or returned nothing) — fall back to whatever's already stored locally
+    // rather than showing nothing.
+    const archive = await dealsArchiveGet();
+    if(archive.length){ dealsData = archive; dealsSource = "local-archive-only"; }
+  }
+  if(dealsData && dealsData.length){ renderDeals(); }
+  else{
+    $("dealsTable").innerHTML = `<div class="loading">NSE didn't serve deal data${snapErr?` (${snapErr.message})`:""} — published after market close on trading days; try again later, or use "Import history" above.</div>`;
+  }
+}
+
+/* ---- manual CSV backfill: parses NSE's own Bulk/Block Deals export (from
+   nseindia.com/report-detail/display-bulk-and-block-deals — works from a normal browser even
+   though the same data is blocked when this site's own server tries to fetch it) ---- */
+function dealsCsvFileChanged(){
+  const f = $("dealsCsvFile").files[0];
+  if(!f) return;
+  if(/block/i.test(f.name)) $("dealsCsvType").value = "BLOCK";
+  else if(/bulk/i.test(f.name)) $("dealsCsvType").value = "BULK";
+}
+function parseCsvLine_(line){
+  const out = []; const re = /"([^"]*)"/g; let m;
+  while((m = re.exec(line))) out.push(m[1]);
+  return out;
+}
+const CSV_MONTHS_UP = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+const CSV_MONTHS_TITLE = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function csvToTitleDate_(raw){
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec((raw||"").trim());
+  if(!m) return null;
+  const mi = CSV_MONTHS_UP[m[2].toUpperCase()];
+  if(mi == null) return null;
+  return `${m[1].padStart(2,"0")}-${CSV_MONTHS_TITLE[mi]}-${m[3]}`;
+}
+function csvNum_(s){ const n = parseFloat(String(s||"").replace(/,/g,"")); return isNaN(n) ? null : n; }
+function parseNseDealsCsv(text, type){
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+  if(!lines.length) throw new Error("Empty file");
+  const header = parseCsvLine_(lines[0]).map(h => h.trim().toLowerCase());
+  const idx = name => header.findIndex(h => h.startsWith(name));
+  const iDate=idx("date"), iSymbol=idx("symbol"), iName=idx("security name"), iClient=idx("client name"),
+    iSide=idx("buy"), iQty=idx("quantity"), iPrice=idx("trade price");
+  if([iDate,iSymbol,iClient,iSide,iQty,iPrice].some(i => i===-1))
+    throw new Error("Unrecognized CSV format — expected NSE's Bulk/Block Deals export columns");
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const f = parseCsvLine_(lines[i]);
+    if(!f.length) continue;
+    const date = csvToTitleDate_(f[iDate]);
+    const symbol = (f[iSymbol]||"").trim();
+    const qty = csvNum_(f[iQty]), price = csvNum_(f[iPrice]);
+    if(!date || !symbol || qty==null) continue;
+    rows.push({ type, date, symbol, name:(f[iName]||"").trim(), client:(f[iClient]||"").trim(),
+      side:(f[iSide]||"").trim().toUpperCase(), qty, price,
+      valueCr: (qty!=null && price!=null) ? qty*price/1e7 : null });
+  }
+  if(!rows.length) throw new Error("No valid rows parsed — check it's an unmodified NSE export");
+  return rows;
+}
+async function importDealsCsv(){
+  const fileInput = $("dealsCsvFile");
+  const file = fileInput.files && fileInput.files[0];
+  const type = $("dealsCsvType").value;
+  if(!file){ $("dealsCsvStatus").textContent = "Choose a CSV file first."; return; }
+  $("dealsCsvStatus").textContent = "Parsing…";
+  try{
+    const text = await file.text();
+    const rows = parseNseDealsCsv(text, type);
+    const archive = await mergeIntoDealsArchive(rows);
+    const distinctDays = new Set(archive.map(d=>d.date)).size;
+    $("dealsCsvStatus").textContent = `Imported ${rows.length} ${type} rows · local history now ${archive.length} deals across ${distinctDays} days.`;
+    fileInput.value = "";
+    dealsData = archive; dealsPage = 0;
     renderDeals();
   }catch(e){
-    $("dealsTable").innerHTML = `<div class="loading">NSE didn't serve deal data (${e.message}) — published after market close on trading days; try again later.</div>`;
+    $("dealsCsvStatus").textContent = "Import failed: " + e.message;
   }
 }
 // same client + same stock + same date on both BUY and SELL sides = a same-day round trip, not a
@@ -1042,8 +1234,8 @@ function renderDeals(){
   const oldestStr = dealsData.find(d=>dealDateTs(d)===oldestTs)?.date || "";
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
   const clientLabel = clientFilter==="KNOWN_FII" ? ", known FIIs only" : clientFilter==="KNOWN_INSTITUTION" ? ", known domestic institutions only" : "";
-  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientLabel})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · page ${dealsPage+1} of ${totalPages}, sorted by ${sortBy==="value"?"value":"date"}`;
-  const fallbackWarning = dealsSource === "snapshot-fallback" ? `<div class="muted" style="font-size:11px;margin-bottom:6px;color:#f59e0b">⚠ NSE's multi-day archive didn't respond just now, so this is only today's snapshot (1 day) — the 3D/7D/…/90D buttons have nothing extra to filter into until the next successful refresh. Try the ↻ Refresh button above in a few minutes.</div>` : "";
+  $("dealsMeta").textContent = `· local history: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} stored) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientLabel})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · page ${dealsPage+1} of ${totalPages}, sorted by ${sortBy==="value"?"value":"date"}`;
+  const fallbackWarning = distinctDays <= 2 ? `<div class="muted" style="font-size:11px;margin-bottom:6px;color:#f59e0b">⚠ Only ${distinctDays} day${distinctDays===1?"":"s"} of deal history stored in this browser, so the 3D/7D/…/1Y buttons have little to filter into yet. Use "Import history" above to backfill instantly from NSE's own CSV, or just keep visiting this tab — it grows by one real day every time.</div>` : "";
   $("dealsTable").innerHTML = fallbackWarning + (shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
@@ -2815,8 +3007,9 @@ async function runFiiDealBacktest(){
   if(clientFilter === "KNOWN_FII") deals = deals.filter(d=>isKnownFii(d.client));
   else if(clientFilter === "KNOWN_INSTITUTION") deals = deals.filter(d=>isKnownDomesticInst(d.client));
   if(sideFilter !== "ALL") deals = deals.filter(d=>d.side===sideFilter);
-  if(dealsSource === "snapshot-fallback"){
-    $("fbtSummary").textContent = "⚠ Only 1 day of deal data is currently loaded (NSE's multi-day archive didn't respond) — this backtest will be thin until the next successful refresh.";
+  const distinctDaysLoaded = new Set(dealsData.map(d=>d.date)).size;
+  if(distinctDaysLoaded <= 2){
+    $("fbtSummary").textContent = `⚠ Only ${distinctDaysLoaded} day${distinctDaysLoaded===1?"":"s"} of deal history stored in this browser — this backtest will be thin. Use "Import history" on the FII/DII tab to backfill from NSE's CSV.`;
   }
   if(!deals.length){
     $("fbtResults").innerHTML = '<div class="loading">No matching deals in the last 90 days for this filter.</div>';
