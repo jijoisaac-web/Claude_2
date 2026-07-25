@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.3.3] — 2026-07-25 · Bulk & block deals: range/sort/side controls
+
+- Replaced the old binary "latest session / all days" checkbox with **date-range presets** (1D/3D/7D/14D/all available) on the Bulk & block deals table, matching the range-button pattern already used on Charts
+- Added **Buy only / Sell only / Buy + Sell** filter and a **sort toggle** (biggest value first vs most recent first) — sorting by value is what actually surfaces "top deals" in a window, which date-first sorting didn't
+- Row cap raised from a hardcoded top 15 to top 50
+- Meta line now states NSE's actual data window explicitly (oldest → newest date, day count) since NSE's snapshot only covers a limited trailing period regardless of which preset is picked — a 14D selection will silently show fewer days if that's all NSE currently publishes, and the header now says so instead of leaving it ambiguous
+- Note added: bulk/block deals aren't tagged FII vs DII by NSE — that split only exists in the aggregate FII/DII cash-flow cards above this table, not in the named-client deal rows. "Top FII/DII deals" here means judging by the client name column, not a filterable category
+
 ## [3.3.2] — 2026-07-25 · AI news brief fix
 
 - Fixed the Fundamentals tab's "News & AI brief" panel, which was failing with error 5028 ("This model was deprecated") and silently falling back to generic, non-symbol-specific headlines. Cloudflare deprecated `@cf/meta/llama-3.1-8b-instruct` on 2026-05-30 (confirmed via their Workers AI changelog) — swapped to `@cf/meta/llama-3.1-8b-instruct-fast`, the variant Cloudflare confirmed stays active, same model family and request shape so no prompt changes needed
