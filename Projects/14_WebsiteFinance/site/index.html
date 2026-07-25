@@ -92,7 +92,7 @@ progress{width:180px;accent-color:var(--blue);}
 #searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
 #kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,#mfCapTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,#mfCapTable,#ipresStockView,#ipresScanResults,#smcScanResults,#omResults,#delivTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -114,7 +114,7 @@ progress{width:180px;accent-color:var(--blue);}
   select,input[type=text]{padding:7px 8px;font-size:13px;max-width:46vw;}
   button.btn{padding:7px 10px;font-size:12px;}
   /* wide tables: scroll inside their container */
-  #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table,#convResults table,#mfHoldingsTable table{min-width:640px;}
+  #screenerTable table,#ideasShort table,#ideasMed table,#ideasLong table,#oppView table,#dealsTable table,#btResults table,#convResults table,#mfHoldingsTable table,#ipresScanResults table,#smcScanResults table,#omResults table,#delivTable table{min-width:640px;}
   #mfCapTable table{min-width:480px;}
   #watchTable table,#peerView table{min-width:420px;}
   .sectorRow .sname{width:96px;font-size:11px;}
@@ -334,24 +334,30 @@ progress{accent-color:var(--violet);}
       <button data-d="14">14D</button>
       <button data-d="0">All in NSE's window</button>
     </div>
-    <select id="dealsSide" onchange="renderDeals()">
+    <select id="dealsSide" onchange="dealsPage=0;renderDeals()">
       <option value="ALL">Buy + Sell</option>
       <option value="BUY">Buy only</option>
       <option value="SELL">Sell only</option>
     </select>
-    <select id="dealsClientFilter" onchange="renderDeals()">
+    <select id="dealsClientFilter" onchange="dealsPage=0;renderDeals()">
       <option value="ALL">All clients</option>
-      <option value="KNOWN_FII">Known large FIIs/funds only</option>
+      <option value="KNOWN_FII" selected>Known large FIIs/funds only</option>
+      <option value="KNOWN_INSTITUTION">Known domestic institutions/groups only</option>
     </select>
-    <select id="dealsSort" onchange="renderDeals()">
+    <select id="dealsSort" onchange="dealsPage=0;renderDeals()">
       <option value="value">Sort: biggest value first</option>
       <option value="date">Sort: most recent first</option>
     </select>
-    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="renderDeals()"> Only stocks in my universe</label>
-    <label class="muted"><input type="checkbox" id="dealsShowRoundTrips" onchange="renderDeals()"> Show same-day round trips (likely intraday)</label>
+    <label class="muted"><input type="checkbox" id="dealsUniverseOnly" onchange="dealsPage=0;renderDeals()"> Only stocks in my universe</label>
+    <label class="muted"><input type="checkbox" id="dealsShowRoundTrips" onchange="dealsPage=0;renderDeals()"> Show same-day round trips (likely intraday)</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
-  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list.</div>
+  <div class="controls" id="dealsPager" style="display:none;justify-content:center;margin-top:8px">
+    <button id="dealsPrevBtn" onclick="dealsPage=Math.max(0,dealsPage-1);renderDeals()">‹ Previous</button>
+    <span class="muted" id="dealsPageLabel" style="margin:0 10px"></span>
+    <button id="dealsNextBtn" onclick="dealsPage=dealsPage+1;renderDeals()">Next ›</button>
+  </div>
+  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list. "<b>Known domestic institutions/groups only</b>" is the same heuristic applied to a separate curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, etc.) and domestic financial institutions (LIC, GIC, nationalised banks) — also name-matching, also incomplete. Results are paginated 20 per page, newest/biggest first depending on the sort picked.</div>
 
   <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
@@ -901,6 +907,7 @@ const KNOWN_FII_NAMES = [
   "Clsa Global Markets","Cresta Fund","Jupiter South Asia Investment","Blackrock","Fidelity",
   "Capital Group","JPMorgan","JP Morgan","Citigroup","BNP Paribas","HSBC","UBS","Credit Suisse",
   "Norges Bank","Kuwait Investment Authority","Qatar Investment Authority","Temasek",
+  "SoftBank Group","Ant Group","Westbridge Crossover Fund",
 ];
 function normName(s){ return (s||"").toUpperCase().replace(/[.,()'-]/g,"").replace(/\s+/g," ").trim(); }
 const KNOWN_FII_NORM = KNOWN_FII_NAMES.map(normName);
@@ -910,8 +917,30 @@ function isKnownFii(client){
   return KNOWN_FII_NORM.some(k => n.includes(k));
 }
 
+/* ---- known large domestic institutions / promoter groups / PSU financial institutions, same
+   name-matching approach as KNOWN_FII_NAMES above, for the "Known domestic institutions" filter.
+   Mostly Indian conglomerate promoter groups (e.g. Tata Sons, Birla Group) and PSU/domestic
+   financial institutions (LIC, GIC, nationalised banks) that show up as clients in bulk/block
+   deals but are not FIIs/FPIs. ---- */
+const KNOWN_DOMESTIC_INST_NAMES = [
+  "President Of India","Life Insurance Corporation Of India","SBI Group","State Bank Of India",
+  "Tata Sons","ICICI Group","HDFC Group","Kotak Mahindra Group","Reliance Group","Sundaram Group",
+  "Axis Group","Birla Group","Aditya Birla","Canara Group","Canara Bank","Franklin India Group",
+  "Enam Securities","Punjab National Bank","Gagandeep Credit Capital",
+  "The New India Assurance Company","General Insurance Corporation Of India","Vistra Itcl India",
+  "Idbi Bank","Jm Financial Services","Plutus Wealth","Abakkus Fund","Unit Trust Of India","UTI",
+  "Employees Provident Fund Organisation","National Pension System Trust",
+];
+const KNOWN_DOMESTIC_INST_NORM = KNOWN_DOMESTIC_INST_NAMES.map(normName);
+function isKnownDomesticInst(client){
+  const n = normName(client);
+  if(!n) return false;
+  return KNOWN_DOMESTIC_INST_NORM.some(k => n.includes(k));
+}
+
 /* ---- bulk & block deals (NSE) ---- */
 let dealsData = null;
+let dealsPage = 0;
 async function loadDeals(force){
   try{
     const r = await fetch("/api/largedeals" + (force===true ? "?t="+Date.now() : ""));
@@ -946,6 +975,7 @@ function renderDeals(){
   if(side !== "ALL") deals = deals.filter(d=>d.side===side);
   const clientFilter = $("dealsClientFilter").value;
   if(clientFilter === "KNOWN_FII") deals = deals.filter(d=>isKnownFii(d.client));
+  else if(clientFilter === "KNOWN_INSTITUTION") deals = deals.filter(d=>isKnownDomesticInst(d.client));
   const activeBtn = document.querySelector("#dealsRangeBtns button.active");
   const days = activeBtn ? +activeBtn.dataset.d : 1;
   // 0 = "all days in NSE's window" (no filter); otherwise last N calendar days from the newest deal
@@ -953,11 +983,16 @@ function renderDeals(){
   const sortBy = $("dealsSort").value;
   if(sortBy === "value") deals.sort((a,b)=> (b.valueCr||0)-(a.valueCr||0));
   else deals.sort((a,b)=> dealDateTs(b)-dealDateTs(a) || (b.valueCr||0)-(a.valueCr||0));
-  const shown = deals.slice(0, 50);
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(deals.length / PAGE_SIZE));
+  if(dealsPage >= totalPages) dealsPage = totalPages - 1;
+  if(dealsPage < 0) dealsPage = 0;
+  const shown = deals.slice(dealsPage*PAGE_SIZE, dealsPage*PAGE_SIZE + PAGE_SIZE);
   const newestStr = dealsData.find(d=>dealDateTs(d)===newestTs)?.date || "";
   const oldestStr = dealsData.find(d=>dealDateTs(d)===oldestTs)?.date || "";
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
-  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientFilter==="KNOWN_FII"?", known FIIs only":""})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · showing top ${shown.length} by ${sortBy==="value"?"value":"date"}`;
+  const clientLabel = clientFilter==="KNOWN_FII" ? ", known FIIs only" : clientFilter==="KNOWN_INSTITUTION" ? ", known domestic institutions only" : "";
+  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientLabel})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · page ${dealsPage+1} of ${totalPages}, sorted by ${sortBy==="value"?"value":"date"}`;
   $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
@@ -973,10 +1008,14 @@ function renderDeals(){
     `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
     : '<div class="loading">No deals matching the filter.</div>';
+  $("dealsPager").style.display = deals.length ? "flex" : "none";
+  $("dealsPrevBtn").disabled = dealsPage <= 0;
+  $("dealsNextBtn").disabled = dealsPage >= totalPages - 1;
+  $("dealsPageLabel").textContent = `Page ${dealsPage+1} of ${totalPages}`;
 }
 document.querySelectorAll("#dealsRangeBtns button").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("#dealsRangeBtns button").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active"); renderDeals();
+  b.classList.add("active"); dealsPage=0; renderDeals();
 });
 
 /* ---- shared deal-date helpers (used by Conviction Scan + Smart Money to reuse dealsData) ---- */
@@ -3224,7 +3263,18 @@ async function runConvictionScan(){
     const b = toCandles(await fetchChart("^NSEI","1y","1d"));
     if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1;
   }catch(e){}
-  const scanned = (await pmap(syms, async s=>scanStock(s, toCandles(await fetchChart(s,"2y","1d")), bench63), 8, ()=>prog.value++)).filter(Boolean);
+  const scanned = (await pmap(syms, async s=>{
+    const candles = toCandles(await fetchChart(s,"2y","1d"));
+    const r = scanStock(s, candles, bench63);
+    if(!r) return null;
+    // bonus footprint: fresh unmitigated bullish order block (BOS within 7 days) — the Smart Money read
+    try{
+      const cut = Date.now() - 7*86400000;
+      r.freshOB = detectOrderBlocks(candles).find(ob =>
+        ob.type==="bullish" && !ob.mitigated && new Date(ob.bosDate).getTime() >= cut) || null;
+    }catch(e){ r.freshOB = null; }
+    return r;
+  }, 8, ()=>prog.value++)).filter(Boolean);
 
   $("convMeta").textContent = "Stage 2/3 — checking delivery data…";
   if(!delivData){ try{ await loadDelivery(); }catch(e){} }
@@ -3277,7 +3327,7 @@ async function runConvictionScan(){
   withFund.sort((a,b)=> totalGates(b)-totalGates(a) || (b.invScore??-1)-(a.invScore??-1));
 
   const final = withFund.filter(s=>s.marketGates===3 && s.fundOk)
-    .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1 + (s.dealRow?1:0)}))
+    .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1 + (s.dealRow?1:0) + (s.freshOB?1:0)}))
     .sort((a,b)=> b.footprints-a.footprints || (b.invScore-a.invScore));
 
   prog.style.display = "none";
@@ -3297,7 +3347,8 @@ function renderConvictionResults(rows, nearMiss){
         const badges = [...s.techSignals, ...s.flowSignals].map(x=>`<span class="badge bullish" title="${x.detail}">${x.type.replaceAll("_"," ")}</span>`).join("")
           + `<span class="badge bullish" title="Delivery ${fmt(s.deliveryRow.d,1)}%, price +${fmt(s.deliveryChgPct,1)}%">GENUINE ACCUMULATION</span>`
           + `<span class="badge bullish" title="Invest score ${s.invScore} — quality + value-trap + margin of safety">INVEST ${s.invScore}+</span>`
-          + (s.dealRow ? `<span class="badge bullish" title="${s.dealRow.type} deal: ${s.dealRow.side} by ${s.dealRow.client} on ${s.dealRow.date}, ₹${fmt(s.dealRow.valueCr,1)} Cr">INSTITUTIONAL DEAL</span>` : "");
+          + (s.dealRow ? `<span class="badge bullish" title="${s.dealRow.type} deal: ${s.dealRow.side} by ${s.dealRow.client} on ${s.dealRow.date}, ₹${fmt(s.dealRow.valueCr,1)} Cr">INSTITUTIONAL DEAL</span>` : "")
+          + (s.freshOB ? `<span class="badge bullish" title="Fresh unmitigated bullish order block ₹${fmt(s.freshOB.low,0)}–${fmt(s.freshOB.high,0)}, break of structure ${s.freshOB.bosDate} — open Smart Money for the volume-confirmation read">FRESH ORDER BLOCK</span>` : "");
         return `<tr onclick="openChart('${s.symbol}')">
         <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
         <td>${fmt(s.price)}</td>
@@ -3310,7 +3361,7 @@ function renderConvictionResults(rows, nearMiss){
         <td style="text-align:left">${badges}</td>
       </tr>`;
       }).join("") + `</tbody></table>
-      <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart (open the Fundamentals tab there for the full consolidated verdict). "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates, plus a bonus point if a disclosed bulk/block deal landed on this stock in the last ~3 sessions — more agreement, not a guarantee. Not investment advice.</div>`;
+      <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart (open the Fundamentals tab there for the full consolidated verdict). "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates, plus bonus points for a disclosed bulk/block deal in the last ~3 sessions and a fresh unmitigated bullish order block (last 7 days) — more agreement, not a guarantee. Not investment advice.</div>`;
     return;
   }
   // Nothing cleared all four — show the closest calls instead of a blank screen, with exactly

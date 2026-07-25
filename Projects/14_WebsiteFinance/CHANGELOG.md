@@ -2,6 +2,17 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.5.1] — 2026-07-25 · Domestic institutions filter + deals pagination
+
+- New "**Known domestic institutions/groups only**" filter on Bulk & block deals, alongside the existing Known FII filter: matches the client name against a curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, SBI/ICICI/HDFC/Kotak/Axis/Canara/Sundaram Group, President of India, and similar) and domestic financial institutions (LIC, GIC, IDBI Bank, PNB, JM Financial, Abakkus, Plutus Wealth, UTI, EPFO, NPS Trust, and similar). Same name-matching-heuristic caveats as the FII filter apply, and are noted in the UI
+- **Known large FIIs/funds only is now the default client filter** on the deals table (was "All clients")
+- **Bulk & block deals table is now paginated** — 20 results per page with Previous/Next controls and a page counter, instead of a flat top-50 cut. Changing any filter, sort, or date range resets back to page 1
+
+## [3.5.0] — 2026-07-17 · Conviction Scan Complete
+
+- Conviction Scan gains a sixth footprint: **fresh unmitigated bullish order block** (break of structure within 7 days) detected during the same technical pass — the Smart Money read now participates in the automated hunt alongside technicals, money flow, delivery, fundamentals, and disclosed deals
+- Mobile: Investor Presentations, Smart Money scanner, Options momentum, and Delivery tables added to the horizontal-scroll containers (page never side-scrolls on phones)
+
 ## [3.4.1] — 2026-07-25 · Known-FII filter on Bulk & block deals
 
 - New "**Known large FIIs/funds only**" filter on the Bulk & block deals table: matches the disclosed client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets (Government of Singapore, GPFG, Vanguard, GQG Partners, Morgan Stanley, Abu Dhabi Investment Authority, and similar, plus a handful of other well-known global institutions added beyond the original list). Combines with the existing Buy/Sell filter and the same-day-round-trip hiding already in place, so "known FII, buy only, excluding intraday round-trips" is one set of dropdowns away
