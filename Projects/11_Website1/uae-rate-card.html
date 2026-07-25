@@ -253,7 +253,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 <script>
 const PROVIDERS = [
   {name:'Aspora',domain:'aspora.com',spread:.003,fee:0,link:'https://www.aspora.com/ae',note:'Zero fees · Google-rate matching'},
-  {name:'Wise',domain:'wise.com',spread:.006,fee:3,link:'https://wise.com',note:'Mid-market rate · +AED 3 fee'},
+  {name:'Wise',domain:'wise.com',spread:0,fee:0,feeFormula:{fixed:2.08,pct:0.007639},link:'https://wise.com',note:'Mid-market rate · fee = AED 2.08 + 0.76% included in amount'},
   {name:'Emirates NBD DirectRemit',domain:'emiratesnbd.com',spread:.009,fee:0,link:'https://emiratesnbd.com',note:'Instant to major Indian banks'},
   {name:'Careem Pay',domain:'careem.com',spread:.009,fee:0,link:'https://www.careem.com/en-AE/pay/sendmoney/',note:'In-app · powered by Lulu'},
   {name:'ADCB Money Transfer',domain:'adcb.com',spread:.010,fee:0,link:'https://adcb.com',note:'ADCB bank · fast'},

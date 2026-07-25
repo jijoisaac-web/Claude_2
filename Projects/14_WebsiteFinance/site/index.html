@@ -419,6 +419,10 @@ progress{accent-color:var(--violet);}
   <div id="smcOBTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
   <div class="muted" style="font-size:11px;margin-top:6px">"Vol confirmation" compares how much of the window's volume traded inside a block's price range to what its width alone would predict if volume were spread evenly — above 1.0x means the zone saw more participation than an average slice of the range (volume-backed); below 1.0x means it's thinner than average (a possible low-liquidity air-pocket, more likely to be sliced through than to hold). This is a heuristic read of price/volume structure, not investment advice.</div>
 
+  <h2 style="margin-top:20px">Institutional deals <span class="muted" style="text-transform:none;font-weight:400">· disclosed bulk/block trades in this window — the one signal here that isn't a proxy</span></h2>
+  <div id="smcDealsTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
+  <div class="muted" style="font-size:11px;margin-top:6px">Everything else on this tab infers institutional activity from price/volume shape. This table is the actual disclosure: NSE-published bulk (&gt;0.5% of equity by one client in a day) and block (large negotiated-window) trades for this stock, marked on the chart above as ▲/▼ at the trade date.</div>
+
   <h2 style="margin-top:24px">Fresh block scanner <span class="muted" style="text-transform:none;font-weight:400">· new order blocks from the last 7 days, still unmitigated</span></h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Sweeps a whole universe for order blocks whose break-of-structure fired within the last 7 days and where price hasn't yet returned to the zone — the watchlist-worthy ones. A fresh <b>bullish</b> block below price is a candidate buy-the-retest level; a fresh <b>bearish</b> block above price is a ceiling to respect. "To zone" shows how far price is from the block — small numbers mean the retest (and the decision) is near.</div>
   <div class="controls">
@@ -562,6 +566,8 @@ progress{accent-color:var(--violet);}
   <div id="valView"></div>
   <div id="scoreView"></div>
   <div id="peerView"></div>
+  <div id="shareholdingView"></div>
+  <div id="concallView"></div>
 </section>
 
 <!-- CONVICTION SCAN -->
@@ -879,6 +885,28 @@ function renderDeals(){
     `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
     : '<div class="loading">No deals matching the filter.</div>';
+}
+
+/* ---- shared deal-date helpers (used by Conviction Scan + Smart Money to reuse dealsData) ---- */
+const DEAL_MABBR = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function dealDateTs(d){ const m=/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(d.date||""); return m? new Date(+m[3],DEAL_MABBR[m[2]]??0,+m[1]).getTime():0; }
+function dealDateISO(d){ const m=/^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(d.date||""); if(!m) return null;
+  return `${m[3]}-${String(DEAL_MABBR[m[2]]+1).padStart(2,"0")}-${m[1].padStart(2,"0")}`; }
+function dealsForSymbol(sym){ return dealsData ? dealsData.filter(d=>d.symbol===sym).sort((a,b)=>dealDateTs(b)-dealDateTs(a)) : []; }
+// Most-valuable deal per symbol within the last `days` (window anchored on the newest deal's own
+// date, since NSE can lag by a day) — feeds Conviction Scan as a bonus signal, not a hard gate:
+// disclosed deals are too sparse day-to-day to require, unlike the other three market-data checks.
+function recentDealsBySymbol(days){
+  if(!dealsData || !dealsData.length) return new Map();
+  const newest = Math.max(...dealsData.map(dealDateTs));
+  const cutoff = newest - days*86400000;
+  const m = new Map();
+  for(const d of dealsData){
+    if(dealDateTs(d) < cutoff) continue;
+    const prev = m.get(d.symbol);
+    if(!prev || (d.valueCr||0) > (prev.valueCr||0)) m.set(d.symbol, d);
+  }
+  return m;
 }
 
 /* ---- global markets with selectable timeframe ---- */
@@ -1685,22 +1713,37 @@ async function loadSmc(){
     const profile = buildVolumeProfile(c, {bars:vpBars, numBins:30});
     obs.forEach(ob=>{ ob.conf = obVolumeConfirmation(ob, profile); });
     obs.sort((a,b)=>b.idx-a.idx);
-    renderSmcChart(c, obs, profile);
+    if(!dealsData){ try{ await loadDeals(); }catch(e){} }
+    const rangeStart = c[0].time, rangeEnd = c[c.length-1].time;
+    const smcDeals = dealsForSymbol(sym.replace(".NS","")).filter(d=>{ const iso = dealDateISO(d); return iso && iso>=rangeStart && iso<=rangeEnd; });
+    renderSmcChart(c, obs, profile, smcDeals);
     renderSmcCards(c, obs, profile);
     renderSmcVP(profile);
     renderSmcOBTable(obs, c);
+    renderSmcDeals(smcDeals);
     $("smcMeta").textContent = `${nameOf(sym)} · ${c.length} bars · ${obs.length} order block${obs.length===1?"":"s"} found`;
   }catch(e){
     $("smcMeta").textContent = "Failed to load.";
     $("smcOBTable").innerHTML = `<div class="loading">${e.message}</div>`;
   }
 }
-function renderSmcChart(c, obs, profile){
+function renderSmcChart(c, obs, profile, deals){
   Object.values(window._smcCharts||{}).forEach(ch=>{ try{ ch.remove(); }catch(e){} });
   const ch = mkChart($("smcChart"), 420);
   window._smcCharts = {main: ch};
   const cs = ch.addCandlestickSeries({upColor:"#3fb950",downColor:"#f85149",borderVisible:false,wickUpColor:"#3fb950",wickDownColor:"#f85149"});
   cs.setData(c.map(d=>({time:d.time,open:d.open,high:d.high,low:d.low,close:d.close})));
+  if(deals && deals.length){
+    // disclosed bulk/block trades — the one marker on this chart that's an actual fact, not a proxy
+    const markers = deals.map(d=>({
+      time: dealDateISO(d),
+      position: d.side==="BUY" ? "belowBar" : "aboveBar",
+      color: d.side==="BUY" ? "#3fb950" : "#f85149",
+      shape: d.side==="BUY" ? "arrowUp" : "arrowDown",
+      text: `${d.type} ${d.side} ₹${fmt(d.valueCr,0)}Cr`,
+    })).sort((a,b)=> a.time<b.time?-1:a.time>b.time?1:0);
+    cs.setMarkers(markers);
+  }
   const LS = LightweightCharts.LineStyle;
   const fresh = obs.filter(o=>!o.mitigated);
   const freshBull = fresh.filter(o=>o.type==="bullish").sort((a,b)=>b.idx-a.idx).slice(0,5);
@@ -1764,6 +1807,23 @@ function renderSmcOBTable(obs, c){
         <td class="muted">${distPct>=0?"+":""}${fmt(distPct,1)}% (${distPct>=0?"above":"below"})</td></tr>`;
     }).join("") + `</tbody></table>`;
 }
+function renderSmcDeals(deals){
+  const el = document.getElementById("smcDealsTable");
+  if(!el) return;
+  if(!deals || !deals.length){
+    el.innerHTML = '<div class="loading">No disclosed bulk/block deals for this stock in the current chart window.</div>';
+    return;
+  }
+  el.innerHTML = `<table><thead><tr><th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
+    deals.map(d=>`<tr>
+      <td style="white-space:nowrap">${d.date}</td>
+      <td style="text-align:left;max-width:280px">${d.client}</td>
+      <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
+      <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
+      <td><b>${d.valueCr!=null?fmt(d.valueCr,1):"—"}</b></td>
+      <td><span class="badge ${d.type==="BLOCK"?"capL":"capM"}">${d.type}</span></td></tr>`).join("") +
+    `</tbody></table>`;
+}
 
 /* ================= fundamentals ================= */
 const FUND_CACHE = "ist_fund2:";
@@ -1787,6 +1847,7 @@ async function loadFundamentals(){
   if(!sym){ $("fundView").innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
   $("verdictView").innerHTML = ""; $("newsView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
+  $("shareholdingView").innerHTML = ""; $("concallView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -1811,7 +1872,73 @@ async function loadFundamentals(){
     loadPeerComparison(sym, f);
     renderVerdictPanel(sym, f);
     renderNewsBrief(sym, f.name || nameOf(sym));
+    loadShareholding(sym);
+    loadConcalls(sym, f.name || nameOf(sym));
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
+}
+
+/* ---- shareholding pattern (NSE quarterly filings): promoter stake trend ---- */
+async function loadShareholding(sym){
+  const el = $("shareholdingView");
+  el.innerHTML = '<div class="card"><div class="loading">Loading shareholding pattern…</div></div>';
+  try{
+    const r = await fetch(`/api/shareholding/${encodeURIComponent(sym)}`);
+    const d = await r.json();
+    if(comboSym("fundSymbol") !== sym) return;   // user moved on
+    if(!r.ok || !d.quarters || !d.quarters.length) throw new Error(d.error || "no filings found");
+    const q = d.quarters;   // newest first
+    // consecutive-quarter streak on promoter stake, from the most recent delta backwards
+    let streak = 0, dir = null;
+    for(const row of q){
+      if(row.promoterDeltaPp == null) break;
+      const rowDir = row.promoterDeltaPp > 0 ? 1 : row.promoterDeltaPp < 0 ? -1 : 0;
+      if(rowDir === 0) break;
+      if(dir == null) dir = rowDir;
+      if(rowDir !== dir) break;
+      streak++;
+    }
+    const callout = streak >= 2
+      ? `<div class="card" style="margin-bottom:10px;border-color:${dir>0?"#2ea043":"#f85149"}"><b class="${dir>0?"up":"down"}">Promoter stake ${dir>0?"rising":"falling"} ${streak} straight quarter${streak>1?"s":""}</b> <span class="muted">— ${dir>0?"insiders adding, a genuine conviction signal":"insiders trimming; worth understanding why before reading anything else bullishly"}</span></div>`
+      : "";
+    el.innerHTML = callout + `<h2 style="margin-top:0">Shareholding pattern <span class="muted" style="text-transform:none;font-weight:400">· quarterly, latest first</span></h2>
+      <table><thead><tr><th>As on</th><th>Promoter %</th><th>QoQ Δ</th><th>Public %</th><th>Employee Trusts %</th></tr></thead><tbody>` +
+      q.map(row=>`<tr>
+        <td>${row.date}</td>
+        <td><b>${row.promoterPct!=null?fmt(row.promoterPct,2)+"%":"—"}</b></td>
+        <td class="${row.promoterDeltaPp!=null?cls(row.promoterDeltaPp):""}">${row.promoterDeltaPp!=null?sign(row.promoterDeltaPp)+fmt(row.promoterDeltaPp,2)+"pp":"—"}</td>
+        <td>${row.publicPct!=null?fmt(row.publicPct,2)+"%":"—"}</td>
+        <td>${row.employeeTrustPct!=null?fmt(row.employeeTrustPct,2)+"%":"—"}</td>
+      </tr>`).join("") + `</tbody></table>
+      <div class="muted" style="font-size:11px;margin-top:4px">Source: NSE's quarterly shareholding-pattern filing (Table I summary). This shows Promoter vs Public in aggregate — it doesn't split Public into FII/DII/MF/Insurance sub-categories, which only exist in each quarter's full XBRL filing, not summarized here. A steadily rising or falling promoter stake is still a real, disclosure-based institutional signal on its own.</div>`;
+  }catch(e){
+    if(comboSym("fundSymbol") !== sym) return;
+    el.innerHTML = `<div class="muted" style="font-size:11px">Shareholding pattern unavailable (${e.message}).</div>`;
+  }
+}
+
+/* ---- corporate announcements: concalls / investor meets / financial results (corporate access proxy) ---- */
+const CONCALL_RE = /concall|conference call|investor meet|analyst meet|earnings call|investor presentation|investor interaction/i;
+async function loadConcalls(sym, name){
+  const el = $("concallView");
+  try{
+    const r = await fetch(`/api/announcements/${encodeURIComponent(sym)}`);
+    const d = await r.json();
+    if(comboSym("fundSymbol") !== sym) return;
+    if(!r.ok || !d.items) throw new Error(d.error || "no data");
+    const items = d.items.filter(x => CONCALL_RE.test(x.subject || x.desc || "")).slice(0, 8);
+    if(!items.length){ el.innerHTML = ""; return; }
+    el.innerHTML = `<h2 style="margin-top:0">Concalls &amp; investor meets <span class="muted" style="text-transform:none;font-weight:400">· corporate-access disclosures, most recent first</span></h2>
+      <table><thead><tr><th>Date</th><th style="text-align:left">Subject</th><th></th></tr></thead><tbody>` +
+      items.map(x=>`<tr>
+        <td style="white-space:nowrap">${x.date||"—"}</td>
+        <td style="text-align:left">${x.subject||x.desc||""}</td>
+        <td>${x.attachment ? `<a href="${x.attachment}" target="_blank" rel="noopener">PDF</a>` : ""}</td>
+      </tr>`).join("") + `</tbody></table>
+      <div class="muted" style="font-size:11px;margin-top:4px">Institutions get invited to these calls live; this is the same disclosure retail can read after the fact — NSE corporate-announcements, filtered to concall/investor-meet subjects. Not every filing carries a transcript attachment.</div>`;
+  }catch(e){
+    if(comboSym("fundSymbol") !== sym) return;
+    el.innerHTML = "";   // quiet failure — this panel is a bonus, not core to the tab
+  }
 }
 
 /* ---- AI news brief (Workers AI + Google News RSS) ---- */
@@ -2907,6 +3034,8 @@ async function runConvictionScan(){
   $("convMeta").textContent = "Stage 2/3 — checking delivery data…";
   if(!delivData){ try{ await loadDelivery(); }catch(e){} }
   const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
+  if(!dealsData){ try{ await loadDeals(); }catch(e){} }
+  const dealsBySymbol = recentDealsBySymbol(5);   // disclosed bulk/block trades, last ~3 sessions
 
   // Technical gate reuses setupScore() — the same trade-quality score the Ideas engine and the
   // Fundamentals tab's consolidated verdict use. It already rewards the bullish signals below AND
@@ -2921,8 +3050,9 @@ async function runConvictionScan(){
     const dr = delivBySymbol.get(s.symbol.replace(".NS",""));
     const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
     const deliveryOk = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
+    const dealRow = dealsBySymbol.get(s.symbol.replace(".NS",""));
     const marketGates = (techOk?1:0) + (flowOk?1:0) + (deliveryOk?1:0);
-    return {...s, techSignals, flowSignals, ts, techOk, flowOk, deliveryRow:dr, deliveryChgPct:chgPct, deliveryOk, marketGates};
+    return {...s, techSignals, flowSignals, ts, techOk, flowOk, deliveryRow:dr, deliveryChgPct:chgPct, deliveryOk, dealRow, marketGates};
   }).sort((a,b)=> b.marketGates-a.marketGates || b.ts-a.ts);
 
   // Only bother fetching fundamentals (the expensive stage) for names already agreeing on 2 of the
@@ -2952,7 +3082,7 @@ async function runConvictionScan(){
   withFund.sort((a,b)=> totalGates(b)-totalGates(a) || (b.invScore??-1)-(a.invScore??-1));
 
   const final = withFund.filter(s=>s.marketGates===3 && s.fundOk)
-    .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1}))
+    .map(s=>({...s, footprints: s.techSignals.length + s.flowSignals.length + 1 + 1 + (s.dealRow?1:0)}))
     .sort((a,b)=> b.footprints-a.footprints || (b.invScore-a.invScore));
 
   prog.style.display = "none";
@@ -2971,7 +3101,8 @@ function renderConvictionResults(rows, nearMiss){
       </tr></thead><tbody>` + rows.map(s=>{
         const badges = [...s.techSignals, ...s.flowSignals].map(x=>`<span class="badge bullish" title="${x.detail}">${x.type.replaceAll("_"," ")}</span>`).join("")
           + `<span class="badge bullish" title="Delivery ${fmt(s.deliveryRow.d,1)}%, price +${fmt(s.deliveryChgPct,1)}%">GENUINE ACCUMULATION</span>`
-          + `<span class="badge bullish" title="Invest score ${s.invScore} — quality + value-trap + margin of safety">INVEST ${s.invScore}+</span>`;
+          + `<span class="badge bullish" title="Invest score ${s.invScore} — quality + value-trap + margin of safety">INVEST ${s.invScore}+</span>`
+          + (s.dealRow ? `<span class="badge bullish" title="${s.dealRow.type} deal: ${s.dealRow.side} by ${s.dealRow.client} on ${s.dealRow.date}, ₹${fmt(s.dealRow.valueCr,1)} Cr">INSTITUTIONAL DEAL</span>` : "");
         return `<tr onclick="openChart('${s.symbol}')">
         <td><span class="sym">${s.symbol.replace(".NS","")}</span><br><span class="subname">${s.name}</span></td>
         <td>${fmt(s.price)}</td>
@@ -2984,7 +3115,7 @@ function renderConvictionResults(rows, nearMiss){
         <td style="text-align:left">${badges}</td>
       </tr>`;
       }).join("") + `</tbody></table>
-      <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart (open the Fundamentals tab there for the full consolidated verdict). "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates — more agreement, not a guarantee. Not investment advice.</div>`;
+      <div class="muted" style="font-size:11px;margin-top:4px">Click a row to open its chart (open the Fundamentals tab there for the full consolidated verdict). "Footprints" = count of confirming signals across technical + money-flow + delivery + fundamentals gates, plus a bonus point if a disclosed bulk/block deal landed on this stock in the last ~3 sessions — more agreement, not a guarantee. Not investment advice.</div>`;
     return;
   }
   // Nothing cleared all four — show the closest calls instead of a blank screen, with exactly

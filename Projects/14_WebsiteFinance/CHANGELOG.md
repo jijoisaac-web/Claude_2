@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.3.0] — 2026-07-25 · Institutional-edge gap closing (phase 1)
+
+First pass on the [institutional-edge roadmap](INSTITUTIONAL_EDGE_ROADMAP.md): closing gaps between what FIIs/DIIs/promoters see and what this tracker surfaces.
+
+- **Bulk/block deals wired into Conviction Scan and Smart Money** (previously only shown as a table in the FII/DII tab). Conviction Scan now gives a bonus footprint to any stock with a disclosed bulk/block deal in the last ~3 sessions, shown as an INSTITUTIONAL DEAL badge — additive, not a new hard gate, since deals are too sparse day-to-day to require. Smart Money's chart now plots ▲/▼ markers at the actual deal date/price for the selected stock, plus a new "Institutional deals" table on that tab — the one signal there that's a real disclosure rather than a price/volume proxy
+- New **shareholding pattern** panel on the Fundamentals tab: last 8 quarters of Promoter/Public/Employee-Trust % from NSE's quarterly filing, with quarter-over-quarter promoter delta and a callout when promoter stake has moved the same direction for 2+ straight quarters. New `/api/shareholding/:symbol` function. Note: this is the Table I summary only — NSE's FII/DII/MF sub-category breakdown lives in each quarter's XBRL attachment, not parsed here (would need XML parsing; scoped as a follow-up, not blocking since the promoter trend alone is a real signal)
+- New **concalls & investor meets** panel on the Fundamentals tab: NSE corporate-announcements filtered to concall/investor-meet/earnings-call subjects, last 180 days, with PDF links where NSE attaches one — retail's after-the-fact version of the corporate access institutions get live. New `/api/announcements/:symbol` function
+- **Not shipped this pass:** insider trading disclosures (SEBI PIT) — couldn't confirm NSE's exact JSON endpoint/field names from this environment (no working NSE reachability to verify against), so nothing is guessed into production. Needs a quick manual check (open the Network tab on NSE's insider-trading page for a symbol, copy the XHR request URL) before it can be built. AMFI monthly fund-flow aggregation (which stocks the mutual fund industry is net buying/selling) is scoped in the roadmap doc but not started — it's a heavier job (diffing full portfolio disclosures across ~40+ AMCs, likely needs a scheduled job rather than a live per-request fetch) that deserves its own pass
+
 ## [3.2.1] — 2026-07-19
 
 - Holdings can now be **edited** in place — a ✎ button per row loads units/invested amount/invested date back into the add-holding form (scheme itself is locked; remove and re-add to change which fund it is), with Save/Cancel
