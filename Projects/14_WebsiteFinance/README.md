@@ -23,7 +23,11 @@ Requires Python 3.10+ and internet access (data comes from Yahoo Finance, ~15 mi
 
 **Screener** — scans a chosen universe (NIFTY 50, Midcap 150, Smallcap 250, or all ~450 stocks) and flags opportunities: RSI oversold/overbought, golden/death cross (SMA50 vs SMA200), MACD crossovers, near 52-week high/low, volume spikes (2x+ average), Bollinger band touches. Filter by bullish/bearish. Results cached 10 minutes per universe. Constituent lists come from official NSE archives (July 2026); the Cloudflare version (`site/universe.js`) covers all three indices, while the local Python version scans NIFTY 50.
 
-**Charts** — candlestick charts (1M–5Y) with volume, SMA 20/50/200, Bollinger Bands, and synced RSI + MACD panels. Click any stock row anywhere to jump to its chart.
+**Charts** — candlestick charts (1M–5Y) with volume, SMA 20/50/200, Bollinger Bands, and synced RSI + MACD panels. Click any stock row anywhere to jump to its chart. *(Local Python app only — on the Cloudflare site, all "open chart" links go to Smart Money's chart instead; there's no separate Charts tab there.)*
+
+**Smart Money** (Cloudflare site only) — candlestick chart with order-block detection (last opposing candle before a break-of-structure move) and volume profile (Point of Control, Value Area), plus a disclosed bulk/block deals table and chart markers for the selected stock, and a fresh-block scanner across a universe. This is the one chart destination on the Cloudflare site — every "open chart" link elsewhere points here.
+
+**Investor Presentations** (Cloudflare site only) — lists NSE investor/earnings-presentation filings per stock (dates + PDF links, no content parsing) with a per-stock search or a universe-wide scan for filings in the last 14 days, each cross-referenced against technical setup, 52-week position, and delivery accumulation.
 
 **Fundamentals** — P/E, P/B, EPS, market cap, ROE, debt/equity, margins, growth, dividend yield, beta, 52-week range, analyst consensus and target price — plus intrinsic value (DCF, Graham, DDM, EPV with margin of safety and reverse DCF), five composite scores (Value, Quality, Multibagger, Value-Trap, Dividend), and peer comparison vs the industry median.
 

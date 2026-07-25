@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.4.0] — 2026-07-25 · Charts tab removed, Investor Presentations tab added
+
+- **Removed the standalone Charts tab.** Every "open chart" link across the app (Screener, Ideas, Deals, Delivery, Fundamentals, Insider filings, Investor Presentations — dozens of call sites) now opens **Smart Money's** chart instead (candlestick + order blocks + volume profile), via `openChart()` becoming a thin alias for `openSmartMoney()`. Standalone SMA/Bollinger toggle and separate RSI/MACD panels that only lived on the old Charts tab are gone — Smart Money's chart is the one chart destination now. Shared chart-library helpers (`mkChart`, `ensureChartsLib`) were kept since Smart Money depends on them
+- **New Investor Presentations tab**, in the same nav slot Charts occupied: 
+  - **One stock** — search a symbol, see its investor/earnings/results presentation filings (NSE corporate-announcements, filtered to presentation subjects) for the last 180 days, with dates and PDF links
+  - **Scan a universe** — sweep NIFTY 50 up to All ~750 for stocks with a presentation filed in the last 14 days
+  - Both views cross-reference each fresh filing (≤14 days old) against three signals already elsewhere in the app: technical setup score ≥50 + above SMA200, proximity to the 52-week high/low (within 3%), and delivery-based accumulation (≥60% delivery + price up ≥0.5%) — a filing count of how many agree, not a read of the deck's actual content (no PDF/PPT parsing happens; NSE doesn't publish presentations as structured data)
+  - Explicitly scoped: this cannot and does not summarize what's inside a presentation — only when it was filed, cross-referenced against market-data timing
+
 ## [3.3.4] — 2026-07-25 · Round-trip filtering + delivery signal filters
 
 - Bulk & block deals now **hides same-day round trips by default**: when the same client shows up as both BUY and SELL for the same stock on the same date, that's same-day trading activity, not a held institutional position — NSE's disclosure has no intraday flag, but this pattern is the closest visible proxy, so these rows are filtered out unless you tick "Show same-day round trips." When shown, they're marked with a ROUND TRIP badge. Meta line now also states how many were hidden
