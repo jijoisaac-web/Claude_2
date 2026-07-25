@@ -78,8 +78,10 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
 .tier-good .prov-diff{color:#c9a227;}
 .tier-fair .prov-diff{color:#9aa0b0;}
 .tier-poor .prov-diff{color:#ef4444;}
-.section-div{padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);}
+.section-div{padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding-right:14px;user-select:none;}
+.section-div:hover{background:rgba(255,255,255,0.05);}
 .section-div span{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.8px;text-transform:uppercase;}
+.tier-toggle-btn{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.4px;}
 .loading-row{padding:28px;text-align:center;color:#6b7080;font-size:12px;}
 .error-row{padding:16px;text-align:center;color:#ef4444;font-size:11px;}
 .footer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
@@ -95,6 +97,25 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
   .table-header,.provider-row{grid-template-columns:32px 1fr 80px 68px 56px;}
   .th:last-child,.prov-diff{display:none;}
 }
+/* Trend badge */
+.trend-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;margin-top:5px;}
+.trend-up{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;}
+.trend-down{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;}
+.trend-flat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#9aa0b0;}
+/* Planner */
+.planner-card{background:#0d1520;border:1px solid rgba(201,150,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.planner-hd{font-size:12px;font-weight:800;color:#c9a227;letter-spacing:.5px;margin-bottom:10px;}
+.planner-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.planner-label{font-size:11px;color:#9aa0b0;font-weight:600;}
+.planner-input{width:90px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:7px;color:#fff;font-size:13px;font-weight:700;padding:5px 8px;outline:none;}
+.planner-select{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:7px;color:#fff;font-size:11px;font-weight:700;padding:5px 8px;outline:none;}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.plan-stat{background:rgba(255,255,255,0.05);border-radius:9px;padding:10px 12px;}
+.plan-stat-lbl{font-size:9px;color:#6b7080;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.plan-stat-val{font-size:15px;font-weight:800;color:#fff;}
+.plan-stat.gold{background:rgba(201,150,0,0.1);border:1px solid rgba(201,150,0,0.25);}
+.plan-stat.gold .plan-stat-val{color:#c9a227;}
+.plan-stat.green .plan-stat-val{color:#10b981;}
 </style>
 </head>
 <body>
@@ -121,6 +142,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
           <div class="lp-stat-val" id="midRateDisplay">—</div>
           <div class="lp-stat-sub">1 CAD in INR</div>
           <div class="xe-badge">⚡ XE.COM</div>
+          <div id="trendBadge"></div>
         </div>
         <div class="lp-stat">
           <div class="lp-stat-lbl">Best Rate</div>
@@ -141,7 +163,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
     <div class="amount-bar">
       <span class="amount-lbl">You send:</span>
       <div class="amt-btns">
-        <button class="amt-btn" onclick="setAmt(500,this)">500</button><button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2000,this)">2,000</button><button class="amt-btn" onclick="setAmt(5000,this)">5,000</button>
+        <button class="amt-btn" onclick="setAmt(200,this)">200</button><button class="amt-btn" onclick="setAmt(500,this)">500</button><button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2000,this)">2,000</button><button class="amt-btn" onclick="setAmt(5000,this)">5,000</button><button class="amt-btn" onclick="setAmt(10000,this)">10,000</button>
       </div>
       <div class="amt-input-wrap">
         <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,null,true)"/>
@@ -160,6 +182,22 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sa
         <div class="th">Fee</div><div class="th">vs XE</div>
       </div>
       <div id="rateRows"><div class="loading-row">⏳ Fetching live rate…</div></div>
+    </div>
+    <div class="planner-card">
+      <div class="planner-hd">📅 Annual Remittance Planner</div>
+      <div class="planner-row">
+        <span class="planner-label">I send</span>
+        <span style="font-size:12px;font-weight:700;color:#c9a227;">CAD</span>
+        <input class="planner-input" type="number" id="planAmt" value="1000" min="100" oninput="computePlan()"/>
+        <span class="planner-label">every</span>
+        <select class="planner-select" id="planFreq" onchange="computePlan()">
+          <option value="52">week</option>
+          <option value="26">2 weeks</option>
+          <option value="12" selected>month</option>
+          <option value="4">quarter</option>
+        </select>
+      </div>
+      <div id="planResults"></div>
     </div>
     <div class="footer-row">
       <div class="source-text">
@@ -344,6 +382,9 @@ const PROVIDERS = [
 const FROM_CUR = 'CAD';
 const FWZ_KEY = 'cad';
 let midRate=null, sendAmt=1000;
+const tierOpen={'tier-best':true,'tier-good':true,'tier-fair':false,'tier-poor':false};
+function toggleTier(t){tierOpen[t]=!tierOpen[t];renderTable();}
+
 
 function setAmt(val,btn,custom=false){
   sendAmt=parseFloat(val)||1000;
@@ -375,27 +416,45 @@ function logoHTML(p){
   </div>`;
 }
 
+function getProviderFee(p,amt){
+  if(p.feeFormula){return p.feeFormula.fixed+amt*p.feeFormula.pct;}
+  if(p.feeTiers){for(const t of p.feeTiers){if(amt<=t.max)return t.fee;}return p.feeTiers[p.feeTiers.length-1].fee;}
+  return p.fee||0;
+}
+
 function renderTable(){
   document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' '+FROM_CUR;
   const sorted=PROVIDERS.map(p=>{
+    const fee=getProviderFee(p,sendAmt);
     const rate=midRate*(1-p.spread);
-    const inrReceived=rate*sendAmt-p.fee*rate;
+    const inrReceived=rate*sendAmt-fee*rate;
     const effectiveRate=inrReceived/sendAmt;
-    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100};
+    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100,_fee:fee};
   }).sort((a,b)=>b.effectiveRate-a.effectiveRate);
   const best=sorted[0];
   document.getElementById('midRateDisplay').textContent='₹'+fmt(midRate,4);
   document.getElementById('bestRateDisplay').textContent='₹'+fmt(best.effectiveRate,4);
   document.getElementById('bestProviderName').textContent=best.name;
   const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
+  const tierCounts={};
+  sorted.forEach(p=>{const t=getTier(p.lostPct);tierCounts[t]=(tierCounts[t]||0)+1;});
   let html='',lastTier=null;
   sorted.forEach((p,i)=>{
     const tier=getTier(p.lostPct);
-    if(tier!==lastTier){lastTier=tier;html+=`<div class="section-div"><span>${labels[tier]}</span></div>`;}
+    if(tier!==lastTier){
+      lastTier=tier;
+      const open=tierOpen[tier];
+      const cnt=tierCounts[tier];
+      html+=`<div class="section-div" onclick="toggleTier('${tier}')">
+        <span>${labels[tier]}</span>
+        <span class="tier-toggle-btn">${open?'▲ collapse':'▼ '+cnt+' providers'}</span>
+      </div>`;
+    }
+    const hidden=!tierOpen[tier];
     const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
-    const feeStr=p.fee?`${FROM_CUR} ${p.fee}`:'Free';
-    const feeCls=p.fee?'paid':'';
-    html+=`<a class="provider-row ${tier}" href="${p.link}" target="_blank" rel="noopener">
+    const feeStr=p._fee?`${FROM_CUR} ${Math.round(p._fee)}${(p.feeTiers||p.feeFormula)?' ★':''}`:'Free';
+    const feeCls=p._fee?'paid':'';
+    html+=`<a class="provider-row ${tier}" style="${hidden?'display:none':''}" href="${p.link}" target="_blank" rel="noopener">
       ${logoHTML(p)}
       <div><div class="prov-name">${rb}${p.name}</div><div class="prov-note">${p.note}</div></div>
       <div><div class="prov-rate">₹${fmt(p.effectiveRate,4)}</div></div>
@@ -407,6 +466,56 @@ function renderTable(){
   document.getElementById('rateRows').innerHTML=html;
 }
 
+
+async function fetchHistoricalRate(daysAgo){
+  const d=new Date();d.setDate(d.getDate()-daysAgo);
+  const ds=d.toISOString().split('T')[0];
+  try{
+    const r=await fetch(`https://api.frankfurter.app/${ds}?from=${FROM_CUR}&to=INR`);
+    const data=await r.json();
+    if(data.rates&&data.rates.INR)return data.rates.INR;
+  }catch(e){}
+  return null;
+}
+
+function updateTrendBadge(current,historical){
+  const el=document.getElementById('trendBadge');
+  if(!el||!historical){if(el)el.innerHTML='';return;}
+  const pct=((current-historical)/historical*100);
+  const abs=Math.abs(pct).toFixed(2);
+  if(pct>0.3){
+    el.innerHTML=`<span class="trend-badge trend-up">↑ ${abs}% vs 30-day avg · Good time to send</span>`;
+  }else if(pct<-0.3){
+    el.innerHTML=`<span class="trend-badge trend-down">↓ ${abs}% below 30-day avg · Consider waiting</span>`;
+  }else{
+    el.innerHTML=`<span class="trend-badge trend-flat">≈ Near 30-day average</span>`;
+  }
+}
+
+function computePlan(){
+  if(!midRate)return;
+  const amt=parseFloat(document.getElementById('planAmt').value)||sendAmt;
+  const freq=parseInt(document.getElementById('planFreq').value)||12;
+  const freqLabel={52:'weekly',26:'fortnightly',12:'monthly',4:'quarterly'}[freq]||freq+'x/yr';
+  const ranked=PROVIDERS.map(p=>{
+    const fee=getProviderFee(p,amt);
+    const rate=midRate*(1-p.spread);
+    const inr=rate*amt-fee*rate;
+    return{...p,inr,_fee:fee};
+  }).sort((a,b)=>b.inr-a.inr);
+  const best=ranked[0];
+  const worst=ranked[ranked.length-1];
+  const annualBest=best.inr*freq;
+  const annualWorst=worst.inr*freq;
+  const savings=annualBest-annualWorst;
+  document.getElementById('planResults').innerHTML=`<div class="plan-grid">
+    <div class="plan-stat gold"><div class="plan-stat-lbl">Best Provider</div><div class="plan-stat-val">${best.name}</div></div>
+    <div class="plan-stat gold"><div class="plan-stat-lbl">Annual INR (${freqLabel})</div><div class="plan-stat-val">${fmtINR(annualBest)}</div></div>
+    <div class="plan-stat green"><div class="plan-stat-lbl">vs Worst Option</div><div class="plan-stat-val">+${fmtINR(savings)}</div></div>
+    <div class="plan-stat"><div class="plan-stat-lbl">Worst Provider</div><div class="plan-stat-val" style="color:#ef4444;font-size:12px">${worst.name}</div></div>
+  </div>`;
+}
+
 async function fetchAndRender(){
   const btn=document.getElementById('refreshBtn');
   btn.classList.add('spinning');btn.disabled=true;
@@ -415,6 +524,7 @@ async function fetchAndRender(){
   if(!midRate){
     document.getElementById('rateRows').innerHTML='<div class="error-row">⚠️ Could not fetch live rate. Try again.</div>';
     document.getElementById('tsLine').textContent='⚠️ Fetch failed';
+    fetchHistoricalRate(30).then(hist=>updateTrendBadge(midRate,hist));
   }else{
     renderTable();
     const now=new Date();
