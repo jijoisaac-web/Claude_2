@@ -1,6 +1,8 @@
 // GET /api/news?symbol=RELIANCE&name=Reliance%20Industries
 // Fetches recent headlines (Google News RSS) and, if the Workers AI binding is configured,
-// generates a bull/bear brief with sentiment via @cf/meta/llama-3.1-8b-instruct.
+// generates a bull/bear brief with sentiment via @cf/meta/llama-3.1-8b-instruct-fast.
+// (Note: the non "-fast" variant was deprecated by Cloudflare on 2026-05-30 — the "-fast"
+// variant is the one Cloudflare confirmed stays active, same model family, same request shape.)
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
 function tag(block, t){
@@ -87,7 +89,7 @@ export async function onRequestGet({ request, env }) {
           items.map(i => "- " + i.title).join("\n") +
           `\n\nBased ONLY on these headlines, return strict JSON (no markdown, no extra text):\n` +
           `{"summary":"2-3 sentence neutral summary","bull":"the bull case in 1-2 sentences","bear":"the bear case in 1-2 sentences","sentiment":<integer from -5 (very negative) to 5 (very positive)>,"catalysts":["up to 3 short upcoming catalysts or watch-items"]}`;
-        const r = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+        const r = await env.AI.run("@cf/meta/llama-3.1-8b-instruct-fast", {
           messages: [
             { role: "system", content: "You are a concise, skeptical equity analyst. Output strict JSON only. Never invent facts not implied by the headlines." },
             { role: "user", content: prompt },

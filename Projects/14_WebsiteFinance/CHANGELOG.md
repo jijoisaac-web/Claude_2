@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.3.2] — 2026-07-25 · AI news brief fix
+
+- Fixed the Fundamentals tab's "News & AI brief" panel, which was failing with error 5028 ("This model was deprecated") and silently falling back to generic, non-symbol-specific headlines. Cloudflare deprecated `@cf/meta/llama-3.1-8b-instruct` on 2026-05-30 (confirmed via their Workers AI changelog) — swapped to `@cf/meta/llama-3.1-8b-instruct-fast`, the variant Cloudflare confirmed stays active, same model family and request shape so no prompt changes needed
+
 ## [3.3.1] — 2026-07-25 · Insider trading disclosures
 
 - New **insider trading disclosures** panel on the Fundamentals tab (SEBI PIT Regulation 7(2)): last 20 filings for the stock, most recent first, with a 90-day count callout and a "View" link straight to NSE's disclosure document. New `/api/insider/:symbol` function against `nseindia.com/api/corporates-pit-gg` — an endpoint that isn't documented in any public NSE wrapper library, found by inspecting DevTools Network tab directly (thanks to live testing this pass, since this environment can't reach nseindia.com to discover it independently)
