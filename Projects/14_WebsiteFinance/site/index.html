@@ -602,7 +602,7 @@ progress{accent-color:var(--violet);}
 <div class="collapsible" id="cbt-fii" style="margin-top:28px">
   <h2 class="collapse-h2" onclick="toggleCollapse('cbt-fii')"><span class="collapse-arrow">▾</span> FII/institutional bulk-deal backtest <span class="muted" style="text-transform:none;font-weight:400">· did following the disclosed trade actually work out?</span></h2>
   <div class="collapse-body">
-  <div class="muted" style="font-size:11px;margin-bottom:8px">Takes disclosed bulk/block deals from the last 90 days (same data as the FII/DII tab, same-day round trips excluded), fetches each stock's price history, and checks what happened between the deal date and now. This is a backtest of "follow the disclosed trade," not of the FII's actual holding period or cost basis — they may have entered earlier via other means, sized differently, or since exited; NSE only discloses this one transaction.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Takes disclosed bulk/block deals from the lookback window below (same data as the FII/DII tab, same-day round trips excluded), fetches each stock's price history, and checks what happened between the deal date and now. This is a backtest of "follow the disclosed trade," not of the FII's actual holding period or cost basis — they may have entered earlier via other means, sized differently, or since exited; NSE only discloses this one transaction. A longer window needs more real deal history stored to be meaningful — see the FII/DII tab's "Import history" if this browser doesn't have enough yet.</div>
   <div class="controls">
     <select id="fbtClientFilter">
       <option value="KNOWN_FII" selected>Known large FIIs/funds only</option>
@@ -614,7 +614,12 @@ progress{accent-color:var(--violet);}
       <option value="SELL">Sell only</option>
       <option value="ALL">Buy + Sell</option>
     </select>
-    <button class="btn" onclick="runFiiDealBacktest()">▶ Backtest last 90 days</button>
+    <select id="fbtLookback">
+      <option value="90">Last 90 days</option>
+      <option value="180">Last 6 months</option>
+      <option value="365" selected>Last 1 year</option>
+    </select>
+    <button class="btn" onclick="runFiiDealBacktest()">▶ Run backtest</button>
     <progress id="fbtProgress" style="display:none"></progress>
     <span class="muted" id="fbtSummary"></span>
   </div>
@@ -3001,25 +3006,32 @@ async function runFiiDealBacktest(){
   }
   const clientFilter = $("fbtClientFilter").value;
   const sideFilter = $("fbtSide").value;
-  const cutoffTs = Date.now() - 90*86400000;
+  const lookbackDays = parseInt($("fbtLookback").value, 10) || 365;
+  const cutoffTs = Date.now() - lookbackDays*86400000;
   let deals = dealsData.filter(d => ALL_STOCKS[d.symbol+".NS"] && dealDateTs(d) >= cutoffTs);
   deals = flagRoundTrips(deals).filter(d=>!d.roundTrip);
   if(clientFilter === "KNOWN_FII") deals = deals.filter(d=>isKnownFii(d.client));
   else if(clientFilter === "KNOWN_INSTITUTION") deals = deals.filter(d=>isKnownDomesticInst(d.client));
   if(sideFilter !== "ALL") deals = deals.filter(d=>d.side===sideFilter);
   const distinctDaysLoaded = new Set(dealsData.map(d=>d.date)).size;
+  const lookbackLabel = lookbackDays>=365 ? "1 year" : lookbackDays>=180 ? "6 months" : `${lookbackDays} days`;
   if(distinctDaysLoaded <= 2){
     $("fbtSummary").textContent = `⚠ Only ${distinctDaysLoaded} day${distinctDaysLoaded===1?"":"s"} of deal history stored in this browser — this backtest will be thin. Use "Import history" on the FII/DII tab to backfill from NSE's CSV.`;
+  } else if(distinctDaysLoaded < lookbackDays*0.5){
+    $("fbtSummary").textContent = `⚠ Only ${distinctDaysLoaded} days of deal history stored — less than the ${lookbackLabel} window selected, so results will undercount. Use "Import history" on the FII/DII tab to backfill more.`;
   }
   if(!deals.length){
-    $("fbtResults").innerHTML = '<div class="loading">No matching deals in the last 90 days for this filter.</div>';
+    $("fbtResults").innerHTML = `<div class="loading">No matching deals in the last ${lookbackLabel} for this filter.</div>`;
     fbtRows = []; renderFbtPage(); return;
   }
   const syms = [...new Set(deals.map(d=>d.symbol))];
   const prog = $("fbtProgress"); prog.style.display = "inline-block"; prog.value = 0; prog.max = syms.length;
   const priceMap = {};
+  // Chart range must reach back past the oldest deal in the window, plus enough headroom to still
+  // have a current close to compare against — "2y" comfortably covers a 1-year deal lookback.
+  const chartRange = lookbackDays > 180 ? "2y" : "1y";
   await pmap(syms, async sym=>{
-    try{ priceMap[sym] = toCandles(await fetchChart(sym+".NS","6mo","1d")); }
+    try{ priceMap[sym] = toCandles(await fetchChart(sym+".NS",chartRange,"1d")); }
     catch(e){ priceMap[sym] = null; }
   }, 6, ()=>prog.value++);
   prog.style.display = "none";

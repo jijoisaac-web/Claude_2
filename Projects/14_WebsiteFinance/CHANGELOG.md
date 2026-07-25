@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.11.0] — 2026-07-25 · Backtest lookback window: 90 days / 6 months / 1 year
+
+- Added a lookback selector to the FII/institutional bulk-deal backtest (Backtest tab) — 90 days, 6 months, or 1 year (default), replacing the hardcoded 90-day-only window
+- Widened the price-history fetch range to match: 1y chart data for the 90-day/6-month windows, 2y for the 1-year window, so deals near the edge of the lookback still have enough price history to anchor an entry close and a current close
+- New warning when stored deal history covers less than half the selected lookback window, pointing at "Import history" on the FII/DII tab — this backtest is only as good as the archive built up in 3.9.0–3.10.0
+
 ## [3.10.0] — 2026-07-25 · Git-committed baseline for deal history + export button
 
 - **New: `site/data/deals-archive.json`**, a static file committed to the repo and served by Cloudflare Pages like any other asset. Generated from the user's own two uploaded CSVs (Bulk + Block, 25-Jul-2025 to 24-Jul-2026) — 26,962 rows across 246 distinct days. Every visitor's browser now bootstraps from this file once (tracked via an IndexedDB flag) and merges it into their local archive, so history is available immediately for new visitors instead of only accumulating one day at a time
