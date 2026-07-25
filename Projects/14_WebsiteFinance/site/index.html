@@ -794,6 +794,12 @@ const fmt = (v,d=2)=> v==null||isNaN(v) ? "—" : Number(v).toLocaleString("en-I
 const fmtInt = v => v==null ? "—" : Number(v).toLocaleString("en-IN");
 const cls = v => v>=0 ? "up" : "down";
 const sign = v => v>=0 ? "+" : "";
+// Escapes text pulled from untrusted data sources (user-imported CSVs, the git-committed deals
+// baseline) before it's interpolated into innerHTML template strings. Deal client/security names
+// are free text on NSE's own disclosure forms and on a user-supplied CSV — without this, a crafted
+// name field (e.g. containing "<img src=x onerror=...>") would execute as HTML when the deals
+// table renders it.
+const escHtml = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toggleCollapse(id){ const el = $(id); if(el) el.classList.toggle("collapsed"); }
 
 async function pmap(items, fn, limit=6, onEach){
@@ -1253,9 +1259,9 @@ function renderDeals(){
       const inUni = ALL_STOCKS[d.symbol+".NS"];
       return `<tr ${inUni?`onclick="openChart('${d.symbol}.NS')" style="cursor:pointer"`:'style="cursor:default"'}>
       <td style="white-space:nowrap">${d.date||"—"}</td>
-      <td style="text-align:left;max-width:280px">${d.client}${d.roundTrip?' <span class="badge neutral" title="Same client bought and sold this stock on this date — likely intraday, not a held position">ROUND TRIP</span>':""}</td>
+      <td style="text-align:left;max-width:280px">${escHtml(d.client)}${d.roundTrip?' <span class="badge neutral" title="Same client bought and sold this stock on this date — likely intraday, not a held position">ROUND TRIP</span>':""}</td>
       <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
-      <td><span class="sym">${d.symbol}</span><br><span class="subname">${d.name||""}</span></td>
+      <td><span class="sym">${escHtml(d.symbol)}</span><br><span class="subname">${escHtml(d.name)}</span></td>
       <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
       <td><b>${d.valueCr!=null?fmt(d.valueCr,1):"—"}</b></td>
       <td><span class="badge ${d.type==="BLOCK"?"capL":"capM"}">${d.type}</span></td></tr>`;}).join("") +
@@ -2160,7 +2166,7 @@ function renderSmcDeals(deals){
   el.innerHTML = `<table><thead><tr><th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     deals.map(d=>`<tr>
       <td style="white-space:nowrap">${d.date}</td>
-      <td style="text-align:left;max-width:280px">${d.client}</td>
+      <td style="text-align:left;max-width:280px">${escHtml(d.client)}</td>
       <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
       <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
       <td><b>${d.valueCr!=null?fmt(d.valueCr,1):"—"}</b></td>
@@ -3116,7 +3122,7 @@ function renderFbtPage(){
     <th>Deal ₹Cr</th><th>Entry ₹</th><th>Now ₹</th><th>Change</th><th>Days held</th><th>Growth status</th></tr></thead><tbody>
     ${shown.map(r=>`<tr onclick="openChart('${r.symbol}.NS')" style="cursor:pointer">
       <td style="white-space:nowrap">${r.date}</td>
-      <td style="text-align:left;max-width:240px">${r.client}</td>
+      <td style="text-align:left;max-width:240px">${escHtml(r.client)}</td>
       <td><span class="badge ${r.side==="BUY"?"bullish":"bearish"}">${r.side}</span></td>
       <td><span class="sym">${r.symbol}</span></td>
       <td>${r.valueCr!=null?fmt(r.valueCr,1):"—"}</td>

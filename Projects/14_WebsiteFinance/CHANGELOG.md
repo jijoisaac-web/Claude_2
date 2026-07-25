@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.12.1] — 2026-07-25 · Security fix: escape deal client/name fields before rendering
+
+- **Fixed a stored XSS vector**: the FII/DII deals table, Smart Money's per-stock deals panel, and the backtest results table all inserted the deal's `client` (and, in one table, `name`) field into `innerHTML` unescaped. That field is free text — sourced from a user-imported CSV or the git-committed baseline file — so a crafted value (e.g. containing an `<img onerror=...>` tag) would have executed as HTML/JS in the browser rendering it
+- Added a shared `escHtml()` helper and applied it at all three render sites; deal `symbol` values used inside `onclick="openChart('...')"` handlers were checked separately and confirmed safe, since those only fire for symbols that exact-match the app's own trusted stock universe (crafted values wouldn't match and the onclick is simply omitted)
+- Audited the rest of the repo for other security-relevant issues per a user request (context: site access is gated by Cloudflare Access, restricted to defined users) — no secrets/API keys/credentials are committed anywhere in the repo; the `/api/*` proxy endpoints all set `Access-Control-Allow-Origin: *`, which is low-risk since they only proxy public market data and hold no secrets or user data, but worth knowing if you ever want to lock that down; `/api/largedeals?debug=1` exposes upstream call diagnostics (status codes, snippets of NSE's raw failed responses) — no secrets or PII, informational only
+
 ## [3.12.0] — 2026-07-25 · Growth status filter on backtest table
 
 - Added quick-filter pills above the backtest results table — **All / ✓ Called it / ✗ Missed / → Flat** — each labeled with a live count, so you can jump straight to winners or missed calls without scanning the whole page-by-page table
