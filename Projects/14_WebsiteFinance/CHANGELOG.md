@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.4.1] — 2026-07-25 · Known-FII filter on Bulk & block deals
+
+- New "**Known large FIIs/funds only**" filter on the Bulk & block deals table: matches the disclosed client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets (Government of Singapore, GPFG, Vanguard, GQG Partners, Morgan Stanley, Abu Dhabi Investment Authority, and similar, plus a handful of other well-known global institutions added beyond the original list). Combines with the existing Buy/Sell filter and the same-day-round-trip hiding already in place, so "known FII, buy only, excluding intraday round-trips" is one set of dropdowns away
+- This is name-matching against NSE's free-text client field, not an official FII/FPI classification NSE provides — it'll miss smaller or newly active funds not on the list, and is flagged as such in the UI
+
 ## [3.4.0] — 2026-07-25 · Charts tab removed, Investor Presentations tab added
 
 - **Removed the standalone Charts tab.** Every "open chart" link across the app (Screener, Ideas, Deals, Delivery, Fundamentals, Insider filings, Investor Presentations — dozens of call sites) now opens **Smart Money's** chart instead (candlestick + order blocks + volume profile), via `openChart()` becoming a thin alias for `openSmartMoney()`. Standalone SMA/Bollinger toggle and separate RSI/MACD panels that only lived on the old Charts tab are gone — Smart Money's chart is the one chart destination now. Shared chart-library helpers (`mkChart`, `ensureChartsLib`) were kept since Smart Money depends on them

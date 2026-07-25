@@ -339,6 +339,10 @@ progress{accent-color:var(--violet);}
       <option value="BUY">Buy only</option>
       <option value="SELL">Sell only</option>
     </select>
+    <select id="dealsClientFilter" onchange="renderDeals()">
+      <option value="ALL">All clients</option>
+      <option value="KNOWN_FII">Known large FIIs/funds only</option>
+    </select>
     <select id="dealsSort" onchange="renderDeals()">
       <option value="value">Sort: biggest value first</option>
       <option value="date">Sort: most recent first</option>
@@ -347,7 +351,7 @@ progress{accent-color:var(--violet);}
     <label class="muted"><input type="checkbox" id="dealsShowRoundTrips" onchange="renderDeals()"> Show same-day round trips (likely intraday)</label>
   </div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
-  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge.</div>
+  <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. NSE's own snapshot only covers a limited trailing window regardless of the range picked above — the deal count and date span shown next to the heading tells you how much history is actually available right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list.</div>
 
   <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
@@ -879,6 +883,33 @@ async function loadFiiDii(force){
   }
 }
 
+/* ---- known large FII/FPI/global-fund names, for matching against the deals table's free-text
+   client column ---- */
+const KNOWN_FII_NAMES = [
+  "Government Of Singapore","Government Pension Fund Global","Vanguard","GQG Partners",
+  "Smallcap World Fund","Nalanda India Fund","New World Fund","Pi Opportunities Fund",
+  "Amansa Holdings","Oppenheimer Developing Markets Fund","International Finance Corporation",
+  "Goldman Sachs","Malabar Investments","Steadview Capital","Monetary Authority Of Singapore",
+  "Massachusetts Institute Of Technology","Jwalamukhi Investment Holdings","Bank Muscat",
+  "Nomura","Abu Dhabi Investment Authority","Elm Park Fund","Saif Partners","Sequoia",
+  "Albula Investment Fund","Tree Line Asia Master Fund","East Bridge Capital","Bridge India Fund",
+  "Atyant Capital India Fund","Apms Investment Fund","Acacia Institutional Partners",
+  "Acacia Conservation Fund","Lavender Investments","Hypnos Fund","Europacific Growth Fund",
+  "India Capital Fund","Valiant Mauritius Partners","Eriska Investment Fund",
+  "Baron Emerging Markets Fund","Ares Diversified","Morgan Stanley","Fidelity Puritan Trust",
+  "Eastspring Investments","Matthews Pacific Tiger Fund","Stichting Depositary Apg",
+  "Clsa Global Markets","Cresta Fund","Jupiter South Asia Investment","Blackrock","Fidelity",
+  "Capital Group","JPMorgan","JP Morgan","Citigroup","BNP Paribas","HSBC","UBS","Credit Suisse",
+  "Norges Bank","Kuwait Investment Authority","Qatar Investment Authority","Temasek",
+];
+function normName(s){ return (s||"").toUpperCase().replace(/[.,()'-]/g,"").replace(/\s+/g," ").trim(); }
+const KNOWN_FII_NORM = KNOWN_FII_NAMES.map(normName);
+function isKnownFii(client){
+  const n = normName(client);
+  if(!n) return false;
+  return KNOWN_FII_NORM.some(k => n.includes(k));
+}
+
 /* ---- bulk & block deals (NSE) ---- */
 let dealsData = null;
 async function loadDeals(force){
@@ -913,6 +944,8 @@ function renderDeals(){
   if(!$("dealsShowRoundTrips").checked) deals = deals.filter(d=>!d.roundTrip);
   const side = $("dealsSide").value;
   if(side !== "ALL") deals = deals.filter(d=>d.side===side);
+  const clientFilter = $("dealsClientFilter").value;
+  if(clientFilter === "KNOWN_FII") deals = deals.filter(d=>isKnownFii(d.client));
   const activeBtn = document.querySelector("#dealsRangeBtns button.active");
   const days = activeBtn ? +activeBtn.dataset.d : 1;
   // 0 = "all days in NSE's window" (no filter); otherwise last N calendar days from the newest deal
@@ -924,7 +957,7 @@ function renderDeals(){
   const newestStr = dealsData.find(d=>dealDateTs(d)===newestTs)?.date || "";
   const oldestStr = dealsData.find(d=>dealDateTs(d)===oldestTs)?.date || "";
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
-  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · showing top ${shown.length} by ${sortBy==="value"?"value":"date"}`;
+  $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientFilter==="KNOWN_FII"?", known FIIs only":""})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · showing top ${shown.length} by ${sortBy==="value"?"value":"date"}`;
   $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
