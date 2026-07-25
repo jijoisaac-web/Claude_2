@@ -181,6 +181,11 @@ select:focus,input[type=text]:focus{outline:none;border-color:var(--blue);box-sh
 .price{letter-spacing:-.3px;}
 progress{accent-color:var(--violet);}
 .disclaimer{opacity:.8;}
+.collapse-h2{cursor:pointer;user-select:none;}
+.collapse-h2:hover{color:var(--text);}
+.collapse-arrow{display:inline-block;transition:transform .15s ease;font-size:11px;}
+.collapsible.collapsed .collapse-arrow{transform:rotate(-90deg);}
+.collapsible.collapsed .collapse-body{display:none;}
 </style>
 </head>
 <body>
@@ -480,7 +485,9 @@ progress{accent-color:var(--violet);}
 
 <!-- BACKTEST -->
 <section id="track" class="tab">
-  <h2>Backtest — replay the same buy rules on history</h2>
+<div class="collapsible" id="cbt-ideas">
+  <h2 class="collapse-h2" onclick="toggleCollapse('cbt-ideas')"><span class="collapse-arrow">▾</span> Backtest — replay the same buy rules on history</h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Simulates the Ideas engine's short-term BUY rules (breakout, MACD cross, gap-up, pullback dip, RSI oversold, BB lower touch — all filtered to stocks above SMA200) on past data. Entry at signal close, stop/target as the engine sets them, 10-session cooldown per stock. Shows what happened 1w/2w/1m/3m later.</div>
   <div class="controls">
     <span class="muted">Templates:</span>
@@ -545,8 +552,12 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="btMeta"></span>
   </div>
   <div id="btResults"></div>
+  </div>
+</div>
 
-  <h2 style="margin-top:28px">Options spread probability — indices &amp; F&amp;O stocks</h2>
+<div class="collapsible" id="cbt-osp" style="margin-top:28px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('cbt-osp')"><span class="collapse-arrow">▾</span> Options spread probability — indices &amp; F&amp;O stocks</h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the underlying actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only). Stock options in India don't have weekly expiries at all, so weekly is disabled for the ~30 liquid F&O names below — monthly only. Below the historical tables, a live risk-profile panel pulls the real NSE option chain to show actual ₹ max profit/loss and breakeven for 1 lot of each strategy.</div>
   <div class="controls">
     <select id="ospSymbol" onchange="ospSymbolChanged()">
@@ -571,6 +582,36 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="ospMeta"></span>
   </div>
   <div id="ospResults"></div>
+  </div>
+</div>
+
+<div class="collapsible" id="cbt-fii" style="margin-top:28px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('cbt-fii')"><span class="collapse-arrow">▾</span> FII/institutional bulk-deal backtest <span class="muted" style="text-transform:none;font-weight:400">· did following the disclosed trade actually work out?</span></h2>
+  <div class="collapse-body">
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Takes disclosed bulk/block deals from the last 90 days (same data as the FII/DII tab, same-day round trips excluded), fetches each stock's price history, and checks what happened between the deal date and now. This is a backtest of "follow the disclosed trade," not of the FII's actual holding period or cost basis — they may have entered earlier via other means, sized differently, or since exited; NSE only discloses this one transaction.</div>
+  <div class="controls">
+    <select id="fbtClientFilter">
+      <option value="KNOWN_FII" selected>Known large FIIs/funds only</option>
+      <option value="KNOWN_INSTITUTION">Known domestic institutions/groups only</option>
+      <option value="ALL">All disclosed clients</option>
+    </select>
+    <select id="fbtSide">
+      <option value="BUY" selected>Buy only</option>
+      <option value="SELL">Sell only</option>
+      <option value="ALL">Buy + Sell</option>
+    </select>
+    <button class="btn" onclick="runFiiDealBacktest()">▶ Backtest last 90 days</button>
+    <progress id="fbtProgress" style="display:none"></progress>
+    <span class="muted" id="fbtSummary"></span>
+  </div>
+  <div id="fbtResults"></div>
+  <div class="controls" id="fbtPager" style="display:none;justify-content:center;margin-top:8px">
+    <button id="fbtPrevBtn" onclick="fbtPage=Math.max(0,fbtPage-1);renderFbtPage()">‹ Previous</button>
+    <span class="muted" id="fbtPageLabel" style="margin:0 10px"></span>
+    <button id="fbtNextBtn" onclick="fbtPage=fbtPage+1;renderFbtPage()">Next ›</button>
+  </div>
+  </div>
+</div>
 </section>
 
 <!-- INVESTOR PRESENTATIONS -->
@@ -728,6 +769,7 @@ const fmt = (v,d=2)=> v==null||isNaN(v) ? "—" : Number(v).toLocaleString("en-I
 const fmtInt = v => v==null ? "—" : Number(v).toLocaleString("en-IN");
 const cls = v => v>=0 ? "up" : "down";
 const sign = v => v>=0 ? "+" : "";
+function toggleCollapse(id){ const el = $(id); if(el) el.classList.toggle("collapsed"); }
 
 async function pmap(items, fn, limit=6, onEach){
   const out = new Array(items.length); let i = 0;
@@ -944,16 +986,30 @@ function isKnownDomesticInst(client){
 /* ---- bulk & block deals (NSE) ---- */
 let dealsData = null;
 let dealsPage = 0;
+let dealsSource = null;   // "historical" (real multi-day window) or "snapshot-fallback" (today only)
 async function loadDeals(force){
   try{
     const r = await fetch("/api/largedeals" + (force===true ? "?t="+Date.now() : ""));
     const d = await r.json();
     if(!r.ok || !d.deals) throw new Error(d.error || "no data");
     dealsData = d.deals;
+    dealsSource = d.source || null;
     renderDeals();
   }catch(e){
     $("dealsTable").innerHTML = `<div class="loading">NSE didn't serve deal data (${e.message}) — published after market close on trading days; try again later.</div>`;
   }
+}
+// same client + same stock + same date on both BUY and SELL sides = a same-day round trip, not a
+// held position — NSE's disclosure has no intraday flag, but this pattern is the closest visible
+// proxy for it. Shared by the deals table and the FII deal backtest below.
+function flagRoundTrips(deals){
+  const sideCount = new Map();
+  for(const d of deals){
+    const key = `${d.client}|${d.symbol}|${d.date}`;
+    if(!sideCount.has(key)) sideCount.set(key, new Set());
+    sideCount.get(key).add(d.side);
+  }
+  return deals.map(d=>({...d, roundTrip: sideCount.get(`${d.client}|${d.symbol}|${d.date}`).size > 1}));
 }
 function renderDeals(){
   if(!dealsData || !dealsData.length) return;
@@ -962,16 +1018,7 @@ function renderDeals(){
   const distinctDays = new Set(dealsData.map(d=>d.date)).size;
   let deals = [...dealsData];
   if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
-  // same client + same stock + same date on both BUY and SELL sides = a same-day round trip, not a
-  // held position — NSE's disclosure has no intraday flag, but this pattern is the closest visible
-  // proxy for it, so hide these by default rather than counting them as institutional accumulation.
-  const sideCount = new Map();
-  for(const d of deals){
-    const key = `${d.client}|${d.symbol}|${d.date}`;
-    if(!sideCount.has(key)) sideCount.set(key, new Set());
-    sideCount.get(key).add(d.side);
-  }
-  deals = deals.map(d=>({...d, roundTrip: sideCount.get(`${d.client}|${d.symbol}|${d.date}`).size > 1}));
+  deals = flagRoundTrips(deals);
   const roundTripHidden = !$("dealsShowRoundTrips").checked ? deals.filter(d=>d.roundTrip).length : 0;
   if(!$("dealsShowRoundTrips").checked) deals = deals.filter(d=>!d.roundTrip);
   const side = $("dealsSide").value;
@@ -996,7 +1043,8 @@ function renderDeals(){
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
   const clientLabel = clientFilter==="KNOWN_FII" ? ", known FIIs only" : clientFilter==="KNOWN_INSTITUTION" ? ", known domestic institutions only" : "";
   $("dealsMeta").textContent = `· NSE's window: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} of data) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientLabel})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · page ${dealsPage+1} of ${totalPages}, sorted by ${sortBy==="value"?"value":"date"}`;
-  $("dealsTable").innerHTML = shown.length ? `<table><thead><tr>
+  const fallbackWarning = dealsSource === "snapshot-fallback" ? `<div class="muted" style="font-size:11px;margin-bottom:6px;color:#f59e0b">⚠ NSE's multi-day archive didn't respond just now, so this is only today's snapshot (1 day) — the 3D/7D/…/90D buttons have nothing extra to filter into until the next successful refresh. Try the ↻ Refresh button above in a few minutes.</div>` : "";
+  $("dealsTable").innerHTML = fallbackWarning + (shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
       const inUni = ALL_STOCKS[d.symbol+".NS"];
@@ -1010,7 +1058,7 @@ function renderDeals(){
       <td><span class="badge ${d.type==="BLOCK"?"capL":"capM"}">${d.type}</span></td></tr>`;}).join("") +
     `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
-    : '<div class="loading">No deals matching the filter.</div>';
+    : '<div class="loading">No deals matching the filter.</div>');
   $("dealsPager").style.display = deals.length ? "flex" : "none";
   $("dealsPrevBtn").disabled = dealsPage <= 0;
   $("dealsNextBtn").disabled = dealsPage >= totalPages - 1;
@@ -2744,6 +2792,111 @@ function renderBacktest(trades, uni, lookback){
       <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
     </tbody></table>
     <div class="muted" style="font-size:11px;margin-top:6px">Backtests overstate reality: no brokerage/slippage/taxes, entries at exact closes, and today's index constituents didn't all exist a year ago (survivorship bias). Treat relative comparisons (signal vs signal, strategy vs NIFTY) as more trustworthy than absolute returns.</div>`;
+}
+
+/* ================= FII/institutional bulk-deal backtest ================= */
+let fbtRows = [];
+let fbtPage = 0;
+async function runFiiDealBacktest(){
+  if(!dealsData || !dealsData.length){
+    $("fbtSummary").textContent = "Loading deal data…";
+    try{ await loadDeals(); }catch(e){}
+  }
+  if(!dealsData || !dealsData.length){
+    $("fbtResults").innerHTML = '<div class="loading">NSE didn\'t serve deal data — try opening the FII/DII tab once, or try again later.</div>';
+    $("fbtSummary").textContent = "";
+    return;
+  }
+  const clientFilter = $("fbtClientFilter").value;
+  const sideFilter = $("fbtSide").value;
+  const cutoffTs = Date.now() - 90*86400000;
+  let deals = dealsData.filter(d => ALL_STOCKS[d.symbol+".NS"] && dealDateTs(d) >= cutoffTs);
+  deals = flagRoundTrips(deals).filter(d=>!d.roundTrip);
+  if(clientFilter === "KNOWN_FII") deals = deals.filter(d=>isKnownFii(d.client));
+  else if(clientFilter === "KNOWN_INSTITUTION") deals = deals.filter(d=>isKnownDomesticInst(d.client));
+  if(sideFilter !== "ALL") deals = deals.filter(d=>d.side===sideFilter);
+  if(dealsSource === "snapshot-fallback"){
+    $("fbtSummary").textContent = "⚠ Only 1 day of deal data is currently loaded (NSE's multi-day archive didn't respond) — this backtest will be thin until the next successful refresh.";
+  }
+  if(!deals.length){
+    $("fbtResults").innerHTML = '<div class="loading">No matching deals in the last 90 days for this filter.</div>';
+    fbtRows = []; renderFbtPage(); return;
+  }
+  const syms = [...new Set(deals.map(d=>d.symbol))];
+  const prog = $("fbtProgress"); prog.style.display = "inline-block"; prog.value = 0; prog.max = syms.length;
+  const priceMap = {};
+  await pmap(syms, async sym=>{
+    try{ priceMap[sym] = toCandles(await fetchChart(sym+".NS","6mo","1d")); }
+    catch(e){ priceMap[sym] = null; }
+  }, 6, ()=>prog.value++);
+  prog.style.display = "none";
+
+  const rows = [];
+  for(const d of deals){
+    const c = priceMap[d.symbol];
+    if(!c || !c.length) continue;
+    const dealISO = dealDateISO(d);
+    if(!dealISO) continue;
+    // deals publish post-close, so the earliest realistic entry is the close on/after the deal date
+    const idx = c.findIndex(x=>x.time >= dealISO);
+    if(idx === -1) continue;
+    const entryClose = c[idx].close;
+    const last = c[c.length-1];
+    if(last.time === c[idx].time) continue;   // no session has elapsed yet — nothing to measure
+    const daysHeld = Math.round((new Date(last.time) - new Date(c[idx].time)) / 86400000);
+    const chgPct = (last.close - entryClose) / entryClose * 100;
+    const flat = Math.abs(chgPct) <= 1;
+    const called = flat ? null : (d.side==="BUY" ? chgPct > 0 : chgPct < 0);
+    rows.push({...d, entryClose, entryDate:c[idx].time, lastClose:last.close, lastDate:last.time, daysHeld, chgPct, called, flat});
+  }
+  rows.sort((a,b)=> dealDateTs(b)-dealDateTs(a) || (b.valueCr||0)-(a.valueCr||0));
+  fbtRows = rows;
+  fbtPage = 0;
+  renderFbtPage();
+}
+function renderFbtPage(){
+  const rows = fbtRows;
+  if(!rows.length){
+    if(!$("fbtResults").innerHTML) $("fbtResults").innerHTML = '<div class="loading">No priceable deals matched — run the backtest above.</div>';
+    $("fbtPager").style.display = "none";
+    return;
+  }
+  const called = rows.filter(r=>r.called===true).length;
+  const missed = rows.filter(r=>r.called===false).length;
+  const flatCount = rows.filter(r=>r.flat).length;
+  const hitRate = (called+missed) ? called/(called+missed)*100 : null;
+  const avgChg = rows.reduce((s,r)=>s+r.chgPct,0)/rows.length;
+  $("fbtSummary").textContent = `${rows.length} deal${rows.length===1?"":"s"} backtested · ${hitRate!=null?`${fmt(hitRate,0)}% called it right (${called}/${called+missed}, ${flatCount} flat)`:"—"} · avg move since deal ${sign(avgChg)}${fmt(avgChg,1)}%`;
+
+  const PAGE_SIZE = 20;
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  if(fbtPage >= totalPages) fbtPage = totalPages - 1;
+  if(fbtPage < 0) fbtPage = 0;
+  const shown = rows.slice(fbtPage*PAGE_SIZE, fbtPage*PAGE_SIZE + PAGE_SIZE);
+  const calledBadge = r => r.called===true ? '<span class="badge bullish">✓ Called it</span>'
+    : r.called===false ? '<span class="badge bearish">✗ Missed</span>'
+    : '<span class="badge neutral">→ Flat</span>';
+
+  $("fbtResults").innerHTML = `<table><thead><tr>
+    <th>Deal date</th><th style="text-align:left">Client</th><th>Side</th><th>Stock</th>
+    <th>Deal ₹Cr</th><th>Entry ₹</th><th>Now ₹</th><th>Change</th><th>Days held</th><th>Growth status</th></tr></thead><tbody>
+    ${shown.map(r=>`<tr onclick="openChart('${r.symbol}.NS')" style="cursor:pointer">
+      <td style="white-space:nowrap">${r.date}</td>
+      <td style="text-align:left;max-width:240px">${r.client}</td>
+      <td><span class="badge ${r.side==="BUY"?"bullish":"bearish"}">${r.side}</span></td>
+      <td><span class="sym">${r.symbol}</span></td>
+      <td>${r.valueCr!=null?fmt(r.valueCr,1):"—"}</td>
+      <td>${fmt(r.entryClose)}</td>
+      <td>${fmt(r.lastClose)}</td>
+      <td><span class="${cls(r.chgPct)}">${sign(r.chgPct)}${fmt(r.chgPct,1)}%</span></td>
+      <td>${r.daysHeld}d</td>
+      <td>${calledBadge(r)}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">"Growth status" checks whether the stock actually moved the way the disclosed side implied — <b>Called it</b> = BUY followed by a >1% rise or SELL followed by a >1% fall since the deal date; <b>Missed</b> = the opposite; <b>Flat</b> = move within ±1%, treated as noise. Entry is the close on/after the disclosed deal date (post-close disclosure, so same-day entry isn't realistic); no brokerage/slippage/taxes included.</div>`;
+  $("fbtPager").style.display = rows.length ? "flex" : "none";
+  $("fbtPrevBtn").disabled = fbtPage <= 0;
+  $("fbtNextBtn").disabled = fbtPage >= totalPages - 1;
+  $("fbtPageLabel").textContent = `Page ${fbtPage+1} of ${totalPages}`;
 }
 
 /* ================= options: spread width probability ================= */

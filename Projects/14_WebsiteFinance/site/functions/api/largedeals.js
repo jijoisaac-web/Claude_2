@@ -1,16 +1,26 @@
 // GET /api/largedeals — NSE bulk & block deals, last ~95 calendar days
 // Uses NSE's historical endpoints (which accept a date range) rather than the old
 // snapshot endpoint (which only ever returned the single latest published day — that's
-// why the 3D/7D/14D range buttons on the deals table used to be no-ops: there was never
-// more than one day of data to filter into). Falls back to the snapshot endpoint (today
-// only) if the historical endpoints are unavailable, so the table never goes fully empty.
+// why the 3D/7D/14D/30D/60D/90D range buttons on the deals table used to be no-ops: there
+// was never more than one day of data to filter into). Falls back to the snapshot endpoint
+// (today only) if the historical endpoints are unavailable, so the table never goes blank.
+//
+// Debug: hit /api/largedeals?debug=1 directly to see exactly what NSE returned for each
+// upstream call (status code, row count) without the cache getting in the way — useful for
+// diagnosing "still only 1 day of data" without a browser DevTools session.
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
-const HDRS = {
+const BASE_HDRS = {
   "user-agent": UA,
   "accept": "application/json, text/plain, */*",
   "accept-language": "en-US,en;q=0.9",
-  "referer": "https://www.nseindia.com/market-data/large-deals",
+  "x-requested-with": "XMLHttpRequest",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-site": "same-origin",
 };
+const SNAPSHOT_HDRS = { ...BASE_HDRS, referer: "https://www.nseindia.com/market-data/large-deals" };
+// The historical report page is a different route than the live snapshot page — NSE's WAF
+// sometimes keys off referer, so use the page that actually calls this endpoint.
+const HIST_HDRS = { ...BASE_HDRS, referer: "https://www.nseindia.com/report-detail/display-bulk-and-block-deals" };
 const HIST_BULK = "https://www.nseindia.com/api/historical/bulk-deals";
 const HIST_BLOCK = "https://www.nseindia.com/api/historical/block-deals";
 const SNAPSHOT_API = "https://www.nseindia.com/api/snapshot-capital-market-largedeal";
@@ -43,19 +53,24 @@ function newestDealTs(j){
   return newest;
 }
 
+let _cookieCache = null;
 async function getCookies(){
+  if(_cookieCache) return _cookieCache;
   const home = await fetch("https://www.nseindia.com/", { headers: { "user-agent": UA, accept: "text/html" } });
   const cookies = [];
   home.headers.forEach((v, k) => { if(k.toLowerCase()==="set-cookie") cookies.push(v.split(";")[0]); });
-  return cookies.join("; ");
+  _cookieCache = cookies.join("; ");
+  return _cookieCache;
 }
 
-async function fetchJson(url, cookie){
-  const r = await fetch(url, { headers: cookie ? { ...HDRS, cookie } : HDRS });
+async function fetchJson(url, hdrs, cookie){
+  let r;
+  try{ r = await fetch(url, { headers: cookie ? { ...hdrs, cookie } : hdrs }); }
+  catch(e){ return { ok:false, status:"network-error: "+e.message, data:null }; }
   if(!r.ok) return { ok:false, status:r.status, data:null };
   try{
     const j = await r.json();
-    return { ok:true, data:j };
+    return { ok:true, status:r.status, data:j };
   }catch(e){ return { ok:false, status:"parse-error", data:null }; }
 }
 
@@ -69,34 +84,39 @@ function asArray(j){
 
 async function fetchHistorical(url, from, to){
   const qs = `?from=${from}&to=${to}`;
-  let res = await fetchJson(url + qs);
+  // NSE's historical/report endpoints tend to need session cookies from the get-go (unlike
+  // the live snapshot, which is sometimes servable cookie-less) — always warm up the session.
+  const cookie = await getCookies();
+  let res = await fetchJson(url + qs, HIST_HDRS, cookie);
   let rows = asArray(res.data);
-  if(!res.ok || !rows.length){
-    const cookie = await getCookies();
-    res = await fetchJson(url + qs, cookie);
+  if((!res.ok || !rows.length)){
+    // one retry with a fresh cookie in case the first session was already stale/blocked
+    _cookieCache = null;
+    const cookie2 = await getCookies();
+    res = await fetchJson(url + qs, HIST_HDRS, cookie2);
     rows = asArray(res.data);
   }
-  return rows;
+  return { rows, status: res.status, ok: res.ok };
 }
 
 async function fetchSnapshotFallback(){
-  let res = await fetchJson(SNAPSHOT_API);
-  const ts = res.ok && res.data ? newestDealTs(res.data) : null;
-  if(res.ok && res.data && (res.data.BULK_DEALS_DATA || res.data.BLOCK_DEALS_DATA)) {
-    if(ts != null) return res.data;
-  }
+  let res = await fetchJson(SNAPSHOT_API, SNAPSHOT_HDRS);
+  if(res.ok && res.data && (res.data.BULK_DEALS_DATA || res.data.BLOCK_DEALS_DATA) && newestDealTs(res.data) != null) return res.data;
   const cookie = await getCookies();
-  const res2 = await fetchJson(SNAPSHOT_API, cookie);
+  const res2 = await fetchJson(SNAPSHOT_API, SNAPSHOT_HDRS, cookie);
   if(res2.ok && res2.data && (res2.data.BULK_DEALS_DATA || res2.data.BLOCK_DEALS_DATA)) return res2.data;
   return res.ok ? res.data : null;
 }
 
 export async function onRequestGet({ request }) {
   const url = new URL(request.url);
+  const debug = url.searchParams.get("debug") === "1";
   const cache = caches.default;
   const cacheKey = new Request(url.toString());
-  const hit = await cache.match(cacheKey);
-  if(hit) return hit;
+  if(!debug){
+    const hit = await cache.match(cacheKey);
+    if(hit) return hit;
+  }
   try{
     const num = v => { const n = parseFloat(String(v).replace(/,/g,"")); return isNaN(n) ? null : n; };
     const to = new Date();
@@ -112,19 +132,21 @@ export async function onRequestGet({ request }) {
 
     let deals = [];
     let source = "historical";
-    try{
-      const [bulkRows, blockRows] = await Promise.all([
-        fetchHistorical(HIST_BULK, fromStr, toStr),
-        fetchHistorical(HIST_BLOCK, fromStr, toStr),
-      ]);
-      deals = [...normHist(blockRows, "BLOCK"), ...normHist(bulkRows, "BULK")];
-    }catch(e){ deals = []; }
+    let debugInfo = {};
+    const [bulkRes, blockRes] = await Promise.all([
+      fetchHistorical(HIST_BULK, fromStr, toStr).catch(e=>({rows:[],ok:false,status:"threw: "+e.message})),
+      fetchHistorical(HIST_BLOCK, fromStr, toStr).catch(e=>({rows:[],ok:false,status:"threw: "+e.message})),
+    ]);
+    debugInfo.bulk = { ok:bulkRes.ok, status:bulkRes.status, rows:bulkRes.rows.length };
+    debugInfo.block = { ok:blockRes.ok, status:blockRes.status, rows:blockRes.rows.length };
+    deals = [...normHist(blockRes.rows, "BLOCK"), ...normHist(bulkRes.rows, "BULK")];
 
-    // Historical endpoints occasionally come back empty (NSE flakiness, not just "no deals") —
-    // fall back to the single-day snapshot so the table isn't blank.
+    // Historical endpoints occasionally come back empty (NSE flakiness/blocking, not just "no
+    // deals in range") — fall back to the single-day snapshot so the table isn't blank.
     if(!deals.length){
       source = "snapshot-fallback";
       const snap = await fetchSnapshotFallback();
+      debugInfo.snapshotUsed = !!snap;
       if(snap){
         const normSnap = (rows, type) => (rows||[]).map(d => {
           const qty = num(d.qty), price = num(d.watp);
@@ -137,15 +159,15 @@ export async function onRequestGet({ request }) {
     }
     if(!deals.length) throw new Error("NSE returned no deal data (historical or snapshot)");
 
-    const out = { deals, source, windowFrom: fromStr, windowTo: toStr };
+    const out = { deals, source, windowFrom: fromStr, windowTo: toStr, ...(debug ? { debug: debugInfo } : {}) };
     const res = new Response(JSON.stringify(out), {
       headers: {
         "content-type": "application/json",
-        "cache-control": "public, s-maxage=1800, max-age=600",
+        "cache-control": debug ? "no-store" : "public, s-maxage=1800, max-age=600",
         "access-control-allow-origin": "*",
       },
     });
-    await cache.put(cacheKey, res.clone());
+    if(!debug) await cache.put(cacheKey, res.clone());
     return res;
   }catch(e){
     return new Response(JSON.stringify({ error: String(e.message || e) }), {

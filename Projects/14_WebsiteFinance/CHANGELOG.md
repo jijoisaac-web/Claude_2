@@ -2,6 +2,19 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.6.0] — 2026-07-25 · Collapsible Backtest sections + FII deal backtest
+
+- Backtest tab's three sections (Ideas replay, Options spread probability, and the new FII deal backtest below) are now **collapsible** — click a section header to expand/collapse it
+- New **FII/institutional bulk-deal backtest** section: takes the last 90 days of disclosed bulk/block deals (filtered to Known FII / Known domestic institutions / All, same-day round trips excluded), fetches each stock's price history, and shows a table of deal date, entry price (close on/after the deal), current price, % change, days held, and a **Growth status** badge — "Called it" (BUY+price up >1% or SELL+price down >1%), "Missed" (opposite), or "Flat" (±1%, noise). Summary line shows overall hit rate and average move. Paginated 20 rows/page
+- Reused the deals table's round-trip detection logic (`flagRoundTrips`) instead of duplicating it
+
+## [3.5.4] — 2026-07-25 · Harden multi-day deal fetch, add fallback warning
+
+- User-reported: even after the 3.5.2/3.5.3 fixes, the deals table was still only showing 1 day of data in production — NSE's historical bulk/block-deals endpoints were silently failing and falling back to the single-day snapshot every time
+- `/api/largedeals` now always establishes an NSE session (cookie handshake) before calling the historical endpoints instead of trying cookie-less first, uses the correct referer for that specific report page, and adds the `x-requested-with`/`sec-fetch-*` headers NSE's own frontend sends — historical bulk and block calls also now fail independently rather than one dragging the other into the snapshot fallback
+- Added `/api/largedeals?debug=1` — bypasses cache and returns each upstream call's HTTP status and row count, for diagnosing without browser DevTools
+- The deals table now shows an on-page warning banner when it's serving the single-day fallback instead of the real multi-day window, so this failure mode is visible without checking the console
+
 ## [3.5.3] — 2026-07-25 · 30D/60D/90D range buttons on Bulk & block deals
 
 - Added **30D, 60D, 90D** buttons to the Bulk & block deals range picker (was 1D/3D/7D/14D/All)
