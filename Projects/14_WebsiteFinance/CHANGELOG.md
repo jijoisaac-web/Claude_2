@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.12.0] — 2026-07-25 · Growth status filter on backtest table
+
+- Added quick-filter pills above the backtest results table — **All / ✓ Called it / ✗ Missed / → Flat** — each labeled with a live count, so you can jump straight to winners or missed calls without scanning the whole page-by-page table
+- Filtering re-paginates against just the matching rows (still 20/page); the summary line above (hit rate, avg move) always reflects the full unfiltered backtest, not just the selected slice
+- Filter resets to "All" automatically each time you re-run the backtest
+
 ## [3.11.0] — 2026-07-25 · Backtest lookback window: 90 days / 6 months / 1 year
 
 - Added a lookback selector to the FII/institutional bulk-deal backtest (Backtest tab) — 90 days, 6 months, or 1 year (default), replacing the hardcoded 90-day-only window

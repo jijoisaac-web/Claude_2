@@ -623,6 +623,12 @@ progress{accent-color:var(--violet);}
     <progress id="fbtProgress" style="display:none"></progress>
     <span class="muted" id="fbtSummary"></span>
   </div>
+  <div class="rangebtns" id="fbtStatusBtns" style="margin-bottom:8px">
+    <button class="active" data-status="ALL" onclick="setFbtStatusFilter('ALL')">All</button>
+    <button data-status="CALLED" onclick="setFbtStatusFilter('CALLED')">✓ Called it</button>
+    <button data-status="MISSED" onclick="setFbtStatusFilter('MISSED')">✗ Missed</button>
+    <button data-status="FLAT" onclick="setFbtStatusFilter('FLAT')">→ Flat</button>
+  </div>
   <div id="fbtResults"></div>
   <div class="controls" id="fbtPager" style="display:none;justify-content:center;margin-top:8px">
     <button id="fbtPrevBtn" onclick="fbtPage=Math.max(0,fbtPage-1);renderFbtPage()">‹ Previous</button>
@@ -2994,6 +3000,20 @@ function renderBacktest(trades, uni, lookback){
 /* ================= FII/institutional bulk-deal backtest ================= */
 let fbtRows = [];
 let fbtPage = 0;
+let fbtStatusFilter = "ALL";
+function setFbtStatusFilter(status){
+  fbtStatusFilter = status;
+  document.querySelectorAll("#fbtStatusBtns button").forEach(b=>b.classList.toggle("active", b.dataset.status===status));
+  fbtPage = 0;
+  renderFbtPage();
+}
+function fbtMatchesStatus(r){
+  if(fbtStatusFilter==="ALL") return true;
+  if(fbtStatusFilter==="CALLED") return r.called===true;
+  if(fbtStatusFilter==="MISSED") return r.called===false;
+  if(fbtStatusFilter==="FLAT") return r.flat;
+  return true;
+}
 async function runFiiDealBacktest(){
   if(!dealsData || !dealsData.length){
     $("fbtSummary").textContent = "Loading deal data…";
@@ -3057,6 +3077,8 @@ async function runFiiDealBacktest(){
   rows.sort((a,b)=> dealDateTs(b)-dealDateTs(a) || (b.valueCr||0)-(a.valueCr||0));
   fbtRows = rows;
   fbtPage = 0;
+  fbtStatusFilter = "ALL";
+  document.querySelectorAll("#fbtStatusBtns button").forEach(b=>b.classList.toggle("active", b.dataset.status==="ALL"));
   renderFbtPage();
 }
 function renderFbtPage(){
@@ -3064,25 +3086,32 @@ function renderFbtPage(){
   if(!rows.length){
     if(!$("fbtResults").innerHTML) $("fbtResults").innerHTML = '<div class="loading">No priceable deals matched — run the backtest above.</div>';
     $("fbtPager").style.display = "none";
+    $("fbtStatusBtns").style.display = "none";
     return;
   }
+  $("fbtStatusBtns").style.display = "flex";
   const called = rows.filter(r=>r.called===true).length;
   const missed = rows.filter(r=>r.called===false).length;
   const flatCount = rows.filter(r=>r.flat).length;
   const hitRate = (called+missed) ? called/(called+missed)*100 : null;
   const avgChg = rows.reduce((s,r)=>s+r.chgPct,0)/rows.length;
   $("fbtSummary").textContent = `${rows.length} deal${rows.length===1?"":"s"} backtested · ${hitRate!=null?`${fmt(hitRate,0)}% called it right (${called}/${called+missed}, ${flatCount} flat)`:"—"} · avg move since deal ${sign(avgChg)}${fmt(avgChg,1)}%`;
+  document.querySelector('#fbtStatusBtns button[data-status="ALL"]').textContent = `All (${rows.length})`;
+  document.querySelector('#fbtStatusBtns button[data-status="CALLED"]').textContent = `✓ Called it (${called})`;
+  document.querySelector('#fbtStatusBtns button[data-status="MISSED"]').textContent = `✗ Missed (${missed})`;
+  document.querySelector('#fbtStatusBtns button[data-status="FLAT"]').textContent = `→ Flat (${flatCount})`;
 
+  const filtered = rows.filter(fbtMatchesStatus);
   const PAGE_SIZE = 20;
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   if(fbtPage >= totalPages) fbtPage = totalPages - 1;
   if(fbtPage < 0) fbtPage = 0;
-  const shown = rows.slice(fbtPage*PAGE_SIZE, fbtPage*PAGE_SIZE + PAGE_SIZE);
+  const shown = filtered.slice(fbtPage*PAGE_SIZE, fbtPage*PAGE_SIZE + PAGE_SIZE);
   const calledBadge = r => r.called===true ? '<span class="badge bullish">✓ Called it</span>'
     : r.called===false ? '<span class="badge bearish">✗ Missed</span>'
     : '<span class="badge neutral">→ Flat</span>';
 
-  $("fbtResults").innerHTML = `<table><thead><tr>
+  $("fbtResults").innerHTML = filtered.length ? `<table><thead><tr>
     <th>Deal date</th><th style="text-align:left">Client</th><th>Side</th><th>Stock</th>
     <th>Deal ₹Cr</th><th>Entry ₹</th><th>Now ₹</th><th>Change</th><th>Days held</th><th>Growth status</th></tr></thead><tbody>
     ${shown.map(r=>`<tr onclick="openChart('${r.symbol}.NS')" style="cursor:pointer">
@@ -3097,8 +3126,9 @@ function renderFbtPage(){
       <td>${r.daysHeld}d</td>
       <td>${calledBadge(r)}</td></tr>`).join("")}
     </tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">"Growth status" checks whether the stock actually moved the way the disclosed side implied — <b>Called it</b> = BUY followed by a >1% rise or SELL followed by a >1% fall since the deal date; <b>Missed</b> = the opposite; <b>Flat</b> = move within ±1%, treated as noise. Entry is the close on/after the disclosed deal date (post-close disclosure, so same-day entry isn't realistic); no brokerage/slippage/taxes included.</div>`;
-  $("fbtPager").style.display = rows.length ? "flex" : "none";
+    <div class="muted" style="font-size:11px;margin-top:4px">"Growth status" checks whether the stock actually moved the way the disclosed side implied — <b>Called it</b> = BUY followed by a >1% rise or SELL followed by a >1% fall since the deal date; <b>Missed</b> = the opposite; <b>Flat</b> = move within ±1%, treated as noise. Entry is the close on/after the disclosed deal date (post-close disclosure, so same-day entry isn't realistic); no brokerage/slippage/taxes included.</div>`
+    : `<div class="loading">No ${fbtStatusFilter==="CALLED"?"called-it":fbtStatusFilter==="MISSED"?"missed":"flat"} deals in this backtest.</div>`;
+  $("fbtPager").style.display = filtered.length ? "flex" : "none";
   $("fbtPrevBtn").disabled = fbtPage <= 0;
   $("fbtNextBtn").disabled = fbtPage >= totalPages - 1;
   $("fbtPageLabel").textContent = `Page ${fbtPage+1} of ${totalPages}`;
