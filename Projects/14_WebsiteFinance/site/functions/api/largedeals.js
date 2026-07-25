@@ -66,12 +66,15 @@ async function getCookies(){
 async function fetchJson(url, hdrs, cookie){
   let r;
   try{ r = await fetch(url, { headers: cookie ? { ...hdrs, cookie } : hdrs }); }
-  catch(e){ return { ok:false, status:"network-error: "+e.message, data:null }; }
-  if(!r.ok) return { ok:false, status:r.status, data:null };
+  catch(e){ return { ok:false, status:"network-error: "+e.message, data:null, raw:null }; }
+  let text;
+  try{ text = await r.text(); }
+  catch(e){ return { ok:false, status:r.status, data:null, raw:"<body read failed: "+e.message+">" }; }
+  if(!r.ok) return { ok:false, status:r.status, data:null, raw:text.slice(0,400) };
   try{
-    const j = await r.json();
-    return { ok:true, status:r.status, data:j };
-  }catch(e){ return { ok:false, status:"parse-error", data:null }; }
+    const j = JSON.parse(text);
+    return { ok:true, status:r.status, data:j, raw:null };
+  }catch(e){ return { ok:false, status:"parse-error", data:null, raw:text.slice(0,400) }; }
 }
 
 // Historical endpoints return either a bare array or {data:[...]} depending on NSE's mood —
@@ -96,7 +99,7 @@ async function fetchHistorical(url, from, to){
     res = await fetchJson(url + qs, HIST_HDRS, cookie2);
     rows = asArray(res.data);
   }
-  return { rows, status: res.status, ok: res.ok };
+  return { rows, status: res.status, ok: res.ok, raw: res.raw };
 }
 
 async function fetchSnapshotFallback(){
@@ -137,8 +140,8 @@ export async function onRequestGet({ request }) {
       fetchHistorical(HIST_BULK, fromStr, toStr).catch(e=>({rows:[],ok:false,status:"threw: "+e.message})),
       fetchHistorical(HIST_BLOCK, fromStr, toStr).catch(e=>({rows:[],ok:false,status:"threw: "+e.message})),
     ]);
-    debugInfo.bulk = { ok:bulkRes.ok, status:bulkRes.status, rows:bulkRes.rows.length };
-    debugInfo.block = { ok:blockRes.ok, status:blockRes.status, rows:blockRes.rows.length };
+    debugInfo.bulk = { ok:bulkRes.ok, status:bulkRes.status, rows:bulkRes.rows.length, ...(debug && bulkRes.raw ? {raw:bulkRes.raw} : {}) };
+    debugInfo.block = { ok:blockRes.ok, status:blockRes.status, rows:blockRes.rows.length, ...(debug && blockRes.raw ? {raw:blockRes.raw} : {}) };
     deals = [...normHist(blockRes.rows, "BLOCK"), ...normHist(bulkRes.rows, "BULK")];
 
     // Historical endpoints occasionally come back empty (NSE flakiness/blocking, not just "no

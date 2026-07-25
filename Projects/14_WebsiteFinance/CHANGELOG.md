@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.6.1] — 2026-07-25 · Debug mode now captures the actual blocked response
+
+- User-confirmed via `?debug=1`: NSE's historical bulk/block-deals calls are returning HTTP 200 with a body that isn't valid JSON ("parse-error") — almost certainly a bot-block/challenge page, not real data
+- `/api/largedeals?debug=1` now captures and returns the first ~400 characters of that raw response body per endpoint, instead of discarding it on parse failure — this is the detail needed to tell a WAF/challenge page apart from a malformed-but-real response, which so far couldn't be seen at all
+
 ## [3.6.0] — 2026-07-25 · Collapsible Backtest sections + FII deal backtest
 
 - Backtest tab's three sections (Ideas replay, Options spread probability, and the new FII deal backtest below) are now **collapsible** — click a section header to expand/collapse it
