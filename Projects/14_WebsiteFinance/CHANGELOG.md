@@ -2,6 +2,17 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.5.3] — 2026-07-25 · 30D/60D/90D range buttons on Bulk & block deals
+
+- Added **30D, 60D, 90D** buttons to the Bulk & block deals range picker (was 1D/3D/7D/14D/All)
+- `/api/largedeals` now fetches roughly the last **95 calendar days** from NSE's historical bulk/block-deals endpoints (was ~34 days), so the new 90D button has real data behind it. "All" relabeled to "All (~95D)"
+
+## [3.5.2] — 2026-07-25 · Deals day-range filter now actually filters
+
+- **Fixed:** the 3D/7D/14D range buttons on Bulk & block deals were effectively no-ops — `/api/largedeals` only ever fetched NSE's single latest-published-day snapshot, so there was never more than one day of data behind the filter regardless of which button was selected
+- `/api/largedeals` now pulls from NSE's historical bulk-deals and block-deals endpoints (date-range capable) covering roughly the last 30 calendar days, so selecting 3D/7D/14D genuinely slices into that real multi-day window. Falls back to the old single-day snapshot if the historical endpoints are unreachable, so the table never goes blank
+- "All in NSE's window" renamed to "All (~30D)" to reflect the new fixed fetch window; footnote updated accordingly
+
 ## [3.5.1] — 2026-07-25 · Domestic institutions filter + deals pagination
 
 - New "**Known domestic institutions/groups only**" filter on Bulk & block deals, alongside the existing Known FII filter: matches the client name against a curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, SBI/ICICI/HDFC/Kotak/Axis/Canara/Sundaram Group, President of India, and similar) and domestic financial institutions (LIC, GIC, IDBI Bank, PNB, JM Financial, Abakkus, Plutus Wealth, UTI, EPFO, NPS Trust, and similar). Same name-matching-heuristic caveats as the FII filter apply, and are noted in the UI
