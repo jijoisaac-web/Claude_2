@@ -567,6 +567,7 @@ progress{accent-color:var(--violet);}
   <div id="scoreView"></div>
   <div id="peerView"></div>
   <div id="shareholdingView"></div>
+  <div id="insiderView"></div>
   <div id="concallView"></div>
 </section>
 
@@ -1847,7 +1848,7 @@ async function loadFundamentals(){
   if(!sym){ $("fundView").innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
   $("verdictView").innerHTML = ""; $("newsView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
-  $("shareholdingView").innerHTML = ""; $("concallView").innerHTML = "";
+  $("shareholdingView").innerHTML = ""; $("insiderView").innerHTML = ""; $("concallView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -1873,6 +1874,7 @@ async function loadFundamentals(){
     renderVerdictPanel(sym, f);
     renderNewsBrief(sym, f.name || nameOf(sym));
     loadShareholding(sym);
+    loadInsiderTrading(sym);
     loadConcalls(sym, f.name || nameOf(sym));
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
 }
@@ -1913,6 +1915,32 @@ async function loadShareholding(sym){
   }catch(e){
     if(comboSym("fundSymbol") !== sym) return;
     el.innerHTML = `<div class="muted" style="font-size:11px">Shareholding pattern unavailable (${e.message}).</div>`;
+  }
+}
+
+/* ---- insider trading disclosures (SEBI PIT Reg 7(2)): promoters/insiders trading their own stock ---- */
+async function loadInsiderTrading(sym){
+  const el = $("insiderView");
+  try{
+    const r = await fetch(`/api/insider/${encodeURIComponent(sym)}`);
+    const d = await r.json();
+    if(comboSym("fundSymbol") !== sym) return;
+    if(!r.ok || !d.filings) throw new Error(d.error || "no data");
+    if(!d.filings.length){ el.innerHTML = ""; return; }
+    const recent90 = d.filings.filter(f => Date.now() - new Date(f.date).getTime() < 90*86400000);
+    el.innerHTML = `<h2 style="margin-top:0">Insider trading disclosures <span class="muted" style="text-transform:none;font-weight:400">· SEBI PIT Reg 7(2), most recent first</span></h2>
+      ${recent90.length ? `<div class="card" style="margin-bottom:10px"><b>${recent90.length}</b> <span class="muted">disclosure${recent90.length>1?"s":""} in the last 90 days</span></div>` : ""}
+      <table><thead><tr><th>Date</th><th>Regulation</th><th>Type</th><th></th></tr></thead><tbody>` +
+      d.filings.map(f=>`<tr>
+        <td style="white-space:nowrap">${f.date||"—"}</td>
+        <td>${f.regulation||"—"}</td>
+        <td>${f.revisionRemark ? `<span class="badge bearish" title="${f.revisionRemark}">${f.submissionType||"Revision"}</span>` : (f.submissionType||"—")}</td>
+        <td>${f.disclosureUrl ? `<a href="${f.disclosureUrl}" target="_blank" rel="noopener">View</a>` : ""}</td>
+      </tr>`).join("") + `</tbody></table>
+      <div class="muted" style="font-size:11px;margin-top:4px">This is the filing list — who filed and when, not the transaction itself. Click "View" for the actual disclosure (person, buy/sell, quantity, value), the same document institutions and analysts read. A cluster of filings in a short window is itself a signal worth noticing even before reading the detail.</div>`;
+  }catch(e){
+    if(comboSym("fundSymbol") !== sym) return;
+    el.innerHTML = "";   // quiet failure — bonus panel, not core to the tab
   }
 }
 

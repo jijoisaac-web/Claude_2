@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.3.1] — 2026-07-25 · Insider trading disclosures
+
+- New **insider trading disclosures** panel on the Fundamentals tab (SEBI PIT Regulation 7(2)): last 20 filings for the stock, most recent first, with a 90-day count callout and a "View" link straight to NSE's disclosure document. New `/api/insider/:symbol` function against `nseindia.com/api/corporates-pit-gg` — an endpoint that isn't documented in any public NSE wrapper library, found by inspecting DevTools Network tab directly (thanks to live testing this pass, since this environment can't reach nseindia.com to discover it independently)
+- Like shareholding pattern, this is the filing-list level: who filed and when, not the parsed transaction (person, buy/sell, qty, value) — that detail lives in each filing's linked iXBRL document, which isn't parsed here. The "View" link goes straight to it
+- AMFI fund-flow aggregation (Phase 3) is still open — confirmed real data exists (amfiindia.com/online-center/portfolio-disclosure, Excel per AMC/scheme with ISIN/qty/value/%NAV) but the download URL pattern needs to be grabbed live before building against it, same as this pass
+
 ## [3.3.0] — 2026-07-25 · Institutional-edge gap closing (phase 1)
 
 First pass on the [institutional-edge roadmap](INSTITUTIONAL_EDGE_ROADMAP.md): closing gaps between what FIIs/DIIs/promoters see and what this tracker surfaces.

@@ -2,7 +2,7 @@
 
 Where FIIs, DIIs, promoters and insiders still see something a retail user of India Shares Tracker doesn't, and how to close each gap. Written against the app as of v3.2.1.
 
-**Status (v3.3.0):** Phase 1 (deals wired into Conviction Scan + Smart Money), Phase 2 (shareholding pattern trend), and Phase 5 (concall/investor-meet links) are shipped — see CHANGELOG. Phase 4 (insider trading) is blocked on confirming NSE's exact endpoint/field names; needs a one-time manual check (open the Network tab on `nseindia.com/companies-listing/corporate-filings-insider-trading` for any symbol, copy the XHR URL) before it can be built without guessing. Phase 3 (AMFI fund-flow aggregation) is still just scoped below — it's the heaviest item and deserves its own pass.
+**Status (v3.3.1):** Phases 1, 2, 4, and 5 are shipped — see CHANGELOG. Phase 3 (AMFI fund-flow aggregation) is still just scoped below: confirmed the data exists (amfiindia.com/online-center/portfolio-disclosure), but the exact download URL pattern needs to be grabbed live before building against it — this environment can't reach amfiindia.com either. It's also the heaviest item (aggregating across ~45 AMCs), likely wanting a scheduled GitHub Action rather than a live per-request fetch, and deserves its own pass.
 
 ## What the app already replicates
 
