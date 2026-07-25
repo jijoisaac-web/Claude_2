@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.13.0] — 2026-07-25 · 4th cross-reference check + definitions on Investor Presentations
+
+- **New cross-reference: "Institutional buy"** — checks the already-loaded local deals archive (no extra API calls, so this doesn't slow down scanning a large universe) for a disclosed NSE bulk/block BUY by a known large FII or domestic institution within 14 days either side of the filing date. Surfaces the buying client's name and deal value on hover
+- Both the per-stock view and "Scan a universe" now check **4 signals instead of 3** (Technical setup, Near 52W high/low, Delivery accumulation, Institutional buy); sorting and the "X of 4 signals agree" summary updated accordingly
+- **Definitions added**: a permanent legend block under the Investor Presentations heading spells out exactly what each of the 4 checks means (the ≥50 technical score threshold, the 3% 52-week band, the 60%+ delivery threshold, the 14-day institutional-deal window). Every badge also now has a hover tooltip with its definition (or, for Institutional buy, the specific matched deal) so the meaning is available inline without leaving the table
+
 ## [3.12.1] — 2026-07-25 · Security fix: escape deal client/name fields before rendering
 
 - **Fixed a stored XSS vector**: the FII/DII deals table, Smart Money's per-stock deals panel, and the backtest results table all inserted the deal's `client` (and, in one table, `name`) field into `innerHTML` unescaped. That field is free text — sourced from a user-imported CSV or the git-committed baseline file — so a crafted value (e.g. containing an `<img onerror=...>` tag) would have executed as HTML/JS in the browser rendering it

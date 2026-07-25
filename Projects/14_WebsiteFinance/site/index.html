@@ -642,7 +642,13 @@ progress{accent-color:var(--violet);}
 <!-- INVESTOR PRESENTATIONS -->
 <section id="ipres" class="tab">
   <h2>Investor presentation reports</h2>
-  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE corporate filings — institutions read these decks the day they drop; retail usually finds out weeks later. This lists <b>when</b> a company filed an investor/earnings presentation and links straight to NSE's copy — it does not read what's inside the deck (no PDF/PPT parsing happens here). The checks next to a fresh filing are a structural cross-reference against signals already elsewhere in this app (technical setup, 52-week position, delivery accumulation) — a presentation landing next to a live setup is worth a closer look, not a verdict on what the deck says.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE corporate filings — institutions read these decks the day they drop; retail usually finds out weeks later. This lists <b>when</b> a company filed an investor/earnings presentation and links straight to NSE's copy — it does not read what's inside the deck (no PDF/PPT parsing happens here). The checks next to a fresh filing are a structural cross-reference against signals already elsewhere in this app — a presentation landing next to a live setup is worth a closer look, not a verdict on what the deck says. Hover any check for its exact definition; the four checks are:</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px;padding:8px 10px;background:#0d1424;border:1px solid var(--border);border-radius:10px">
+    <b>Technical setup</b> — composite technical score ≥50 (trend, momentum, volume signals combined) and price above its 200-day moving average.<br>
+    <b>Near 52W high/low</b> — price sits within 3% of its 52-week high (momentum continuation) or its 52-week low (potential basing/reversal zone).<br>
+    <b>Delivery accumulation</b> — latest session's delivery % is 60%+ with the price higher than the prior close: shares are being taken home, not just churned intraday.<br>
+    <b>Institutional buy</b> — a disclosed NSE bulk/block <b>BUY</b> deal by a known large FII or domestic institution landed within 14 days of the filing, either side of it.
+  </div>
 
   <h2 style="margin-top:0">One stock</h2>
   <div class="controls">
@@ -2324,7 +2330,25 @@ async function loadConcalls(sym, name){
    accumulation? Three independent, cheap checks, not a read of what's in the deck. */
 const IPRES_RE = /investor presentation|earnings presentation|results presentation|analyst presentation|corporate presentation/i;
 
-function ipresSignalRead(sym, c, bench63, delivBySymbol){
+// Largest disclosed bulk/block BUY by a known large FII or domestic institution within 14 days
+// (either side) of a filing date — reuses the same client-name heuristics as the FII/DII tab
+// (isKnownFii / isKnownDomesticInst) and the already-loaded local deals archive, so this adds no
+// extra network calls even when scanning a large universe.
+function institutionalDealNearby(sym, filingTs, deals){
+  if(!deals || !deals.length || filingTs==null || isNaN(filingTs)) return null;
+  const plainSym = sym.replace(".NS","");
+  const windowMs = 14*86400000;
+  let best = null;
+  for(const d of deals){
+    if(d.symbol !== plainSym || d.side !== "BUY") continue;
+    if(!(isKnownFii(d.client) || isKnownDomesticInst(d.client))) continue;
+    const dt = dealDateTs(d);
+    if(dt==null || Math.abs(dt-filingTs) > windowMs) continue;
+    if(!best || (d.valueCr||0) > (best.valueCr||0)) best = d;
+  }
+  return best;
+}
+function ipresSignalRead(sym, c, bench63, delivBySymbol, deals, filingTs){
   const scanned = scanStock(sym, c, bench63);
   if(!scanned) return null;
   const ts = setupScore({...scanned, action:"BUY"});
@@ -2336,8 +2360,10 @@ function ipresSignalRead(sym, c, bench63, delivBySymbol){
   const dr = delivBySymbol.get(sym.replace(".NS",""));
   const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
   const deliveryAccum = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
+  const instDeal = institutionalDealNearby(sym, filingTs, deals);
   return { ts, techOk, hi52:scanned.hi52, lo52:scanned.lo52, close:scanned.price, nearHigh, nearLow,
-    deliveryAccum, deliveryRow:dr, footprints: (techOk?1:0) + ((nearHigh||nearLow)?1:0) + (deliveryAccum?1:0) };
+    deliveryAccum, deliveryRow:dr, instDeal,
+    footprints: (techOk?1:0) + ((nearHigh||nearLow)?1:0) + (deliveryAccum?1:0) + (instDeal?1:0) };
 }
 async function benchReturn63(){
   try{ const b = toCandles(await fetchChart("^NSEI","1y","1d")); if(b.length>63) return b[b.length-1].close/b[b.length-64].close-1; }catch(e){}
@@ -2363,15 +2389,19 @@ async function loadIpresStock(){
     if(!isNaN(freshTs) && daysAgo <= 14){
       try{
         if(!delivData){ try{ await loadDelivery(); }catch(e){} }
+        if(!dealsData || !dealsData.length){ try{ await loadDeals(); }catch(e){} }
         const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
         const bench63 = await benchReturn63();
         const c = toCandles(await fetchChart(sym, "2y", "1d"));
         if(comboSym("ipresSymbol")===sym){
-          const sig = ipresSignalRead(sym, c, bench63, delivBySymbol);
+          const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, freshTs);
           if(sig){
-            const gate = (ok, label) => `<span class="badge ${ok?"bullish":"bearish"}">${ok?"✓":"✕"} ${label}</span>`;
-            signalHtml = `<div class="card" style="margin-bottom:10px"><b>Latest filing is ${daysAgo===0?"today":daysAgo+" day"+(daysAgo===1?"":"s")+" old"}</b> — cross-reference: ${gate(sig.techOk,"Technical setup")} ${gate(sig.nearHigh||sig.nearLow, sig.nearHigh?"Near 52W high":sig.nearLow?"Near 52W low":"52W extreme")} ${gate(sig.deliveryAccum,"Delivery accumulation")}
-              <div class="muted" style="font-size:11px;margin-top:6px">${sig.footprints} of 3 signals agree with this filing's timing. Structural cross-reference only — not a read of what's in the deck.</div></div>`;
+            const gate = (ok, label, title) => `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
+            const instTitle = sig.instDeal
+              ? `${sig.instDeal.client} bought ₹${fmt(sig.instDeal.valueCr,1)} Cr on ${sig.instDeal.date}`
+              : "No known-FII/institution buy disclosed within 14 days of this filing";
+            signalHtml = `<div class="card" style="margin-bottom:10px"><b>Latest filing is ${daysAgo===0?"today":daysAgo+" day"+(daysAgo===1?"":"s")+" old"}</b> — cross-reference: ${gate(sig.techOk,"Technical setup","Composite technical score ≥50 (trend/momentum/volume signals combined) and price above its 200-day moving average")} ${gate(sig.nearHigh||sig.nearLow, sig.nearHigh?"Near 52W high":sig.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(sig.deliveryAccum,"Delivery accumulation","Latest session's delivery % is 60%+ with the price higher than the prior close — shares held, not churned")} ${gate(!!sig.instDeal,"Institutional buy",instTitle)}
+              <div class="muted" style="font-size:11px;margin-top:6px">${sig.footprints} of 4 signals agree with this filing's timing. Structural cross-reference only — not a read of what's in the deck. Hover a badge for its definition.</div></div>`;
           }
         }
       }catch(e){}
@@ -2395,6 +2425,7 @@ async function scanInvestorPresentations(){
   $("ipresScanMeta").textContent = `Checking ${syms.length} stocks for recent filings…`;
   $("ipresScanResults").innerHTML = '<div class="loading">Scanning…</div>';
   if(!delivData){ try{ await loadDelivery(); }catch(e){} }
+  if(!dealsData || !dealsData.length){ try{ await loadDeals(); }catch(e){} }
   const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
   const bench63 = await benchReturn63();
   const rows = [];
@@ -2408,7 +2439,7 @@ async function scanInvestorPresentations(){
       const latestTs = new Date(fresh[0].date).getTime();
       if(isNaN(latestTs) || Date.now()-latestTs > 14*86400000) return;
       const c = toCandles(await fetchChart(sym, "2y", "1d"));
-      const sig = ipresSignalRead(sym, c, bench63, delivBySymbol);
+      const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, latestTs);
       if(!sig) return;
       rows.push({sym, name: nameOf(sym), latest: fresh[0], filingCount: fresh.length, ...sig});
     }catch(e){}
@@ -2420,19 +2451,22 @@ async function scanInvestorPresentations(){
 }
 function renderIpresScan(rows){
   if(!rows.length){ $("ipresScanResults").innerHTML = '<div class="loading">No fresh investor presentation filings in this universe right now.</div>'; return; }
-  const gate = (ok, label) => `<span class="badge ${ok?"bullish":"bearish"}">${ok?"✓":"✕"} ${label}</span>`;
+  const gate = (ok, label, title) => `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
   $("ipresScanResults").innerHTML = `<table><thead><tr><th>Stock</th><th>Price ₹</th><th>Filed</th><th style="text-align:left">Cross-reference</th><th></th></tr></thead><tbody>` +
     rows.map(r=>{
       const daysAgo = Math.round((Date.now()-new Date(r.latest.date).getTime())/86400000);
+      const instTitle = r.instDeal
+        ? `${r.instDeal.client} bought ₹${fmt(r.instDeal.valueCr,1)} Cr on ${r.instDeal.date}`
+        : "No known-FII/institution buy disclosed within 14 days of this filing";
       return `<tr style="cursor:pointer" onclick="openFundamentals('${r.sym}')">
       <td><span class="sym">${r.sym.replace(".NS","")}</span><br><span class="subname">${r.name}</span></td>
       <td>${fmt(r.close)}</td>
       <td>${daysAgo===0?"today":daysAgo+"d ago"}</td>
-      <td style="text-align:left">${gate(r.techOk,"Setup")} ${gate(r.nearHigh||r.nearLow, r.nearHigh?"Near 52W high":r.nearLow?"Near 52W low":"52W extreme")} ${gate(r.deliveryAccum,"Delivery")}</td>
+      <td style="text-align:left">${gate(r.techOk,"Setup","Composite technical score ≥50 and price above its 200-day moving average")} ${gate(r.nearHigh||r.nearLow, r.nearHigh?"Near 52W high":r.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(r.deliveryAccum,"Delivery","Latest session's delivery % is 60%+ with the price higher than the prior close")} ${gate(!!r.instDeal,"Inst. buy",instTitle)}</td>
       <td>${r.latest.attachment?`<a href="${r.latest.attachment}" target="_blank" rel="noopener" onclick="event.stopPropagation()">PDF</a>`:""}</td>
       </tr>`;
     }).join("") + `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">Sorted by how many of the three checks agree, then by filing recency. Click a row to open Fundamentals for the full picture (including the shareholding/insider/concall panels there) — this table is a shortlist, not a verdict.</div>`;
+    <div class="muted" style="font-size:11px;margin-top:4px">Sorted by how many of the four checks agree, then by filing recency. Hover a badge for its definition. Click a row to open Fundamentals for the full picture (including the shareholding/insider/concall panels there) — this table is a shortlist, not a verdict.</div>`;
 }
 
 /* ---- AI news brief (Workers AI + Google News RSS) ---- */
