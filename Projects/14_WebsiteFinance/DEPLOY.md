@@ -27,6 +27,7 @@ Your site goes live at `https://india-shares-tracker.pages.dev` (name depends on
 - `site/index.html` — the whole UI; indicators and screener run in your browser
 - `site/functions/api/chart/[symbol].js` — serverless proxy to Yahoo Finance charts (edge-cached 5 min)
 - `site/functions/api/fundamentals/[symbol].js` — serverless proxy for fundamentals (edge-cached 1 hour)
+- `site/functions/api/dividends/[symbol].js` — serverless proxy for dividend history, via Yahoo Finance (not NSE — see the Dividend Analysis tab's own footnote for why), edge-cached 6 hours
 - Watchlist is saved in your browser (localStorage) — no database needed
 - `backend/` + `frontend/` — the original Python version, still usable locally via `run.bat`; Cloudflare ignores it
 

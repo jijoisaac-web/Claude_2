@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.14.0] — 2026-07-25 · New tab: Dividend Analysis
+
+- **New "Dividend Analysis" tab** with two views, matching the Investor Presentations pattern: one stock (full dividend history, cadence, and trailing yield) and a universe scan that builds a grouped "knowledge base."
+- **New endpoint `/api/dividends/[symbol].js`** — sources dividend history from Yahoo Finance's chart API (10y of monthly data + dividend events), deliberately *not* NSE's corporate-actions endpoint. NSE's version would give the official Interim/Final/Special label and face-value %, but it sits behind the same IP-reputation block that already defeated NSE's historical bulk/block-deals endpoints from this app's server — so Yahoo's already-proven-reliable chart path is reused instead (same one `chart/[symbol].js` uses for price data).
+- Consequence of that tradeoff, stated explicitly in the tab's own footnote: the "%" shown is **dividend yield** (amount ÷ price), not face-value %; and **Interim/Final/Special badges are a heuristic** — inferred from payment month (Apr–Aug → Final, Sep–Mar → Interim) and amount vs. the stock's own median (a >2.5x outlier → Special) — not NSE's authoritative classification.
+- **Per-stock view**: trailing 12-month yield, a plain-language cadence read (Quarterly / Twice yearly / Once yearly / Irregular / Too new to tell, inferred from actual payout counts per completed year), and a year-by-year table with per-payment breakdown badges.
+- **Universe scan / "knowledge base"**: scans a chosen universe (NIFTY 50 through All ~750) and groups the results by any of the three categories requested — **dividend type** (the stock's own payout cadence pattern), **market-cap segment** (reuses the existing `capOf()` static lookup, no extra calls), or **sector** (reuses the existing `sectorOf()` static lookup, no extra calls) — showing, per category, what share of stocks pay a dividend at all and the average trailing yield among those that do, plus the full underlying stock-level table below it.
+
 ## [3.13.0] — 2026-07-25 · 4th cross-reference check + definitions on Investor Presentations
 
 - **New cross-reference: "Institutional buy"** — checks the already-loaded local deals archive (no extra API calls, so this doesn't slow down scanning a large universe) for a disclosed NSE bulk/block BUY by a known large FII or domestic institution within 14 days either side of the filing date. Surfaces the buying client's name and deal value on hover

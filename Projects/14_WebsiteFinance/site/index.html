@@ -203,6 +203,7 @@ progress{accent-color:var(--violet);}
     <button data-tab="smc">Smart Money</button>
     <button data-tab="conv">Conviction Scan</button>
     <button data-tab="mf">Mutual Funds</button>
+    <button data-tab="divid">Dividend Analysis</button>
   </nav>
   <div id="searchWrap">
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
@@ -672,6 +673,42 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="ipresScanMeta"></span>
   </div>
   <div id="ipresScanResults"></div>
+</section>
+
+<!-- DIVIDEND ANALYSIS -->
+<section id="divid" class="tab">
+  <h2>Dividend history</h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Historical dividend payouts come from Yahoo Finance's chart data, not NSE — NSE's corporate-actions endpoint (which states each dividend's official Interim/Final/Special label and face-value %) sits behind the same IP-reputation block that already defeated NSE's historical bulk/block-deals endpoints from this app's server (see the FII/DII tab). So "%" here means <b>dividend yield</b> (dividend per share ÷ price), not face-value %, and the <b>Interim/Final/Special</b> badges are a heuristic inferred from payment timing and amount, not NSE's official classification — flagged wherever it appears, not hidden.</div>
+
+  <h2 style="margin-top:0">One stock</h2>
+  <div class="controls">
+    <select id="divSelect" onchange="if(this.value){setCombo('divSymbol',this.value);loadDividendStock();}"></select>
+    <input type="text" id="divSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadDividendStock()">
+  </div>
+  <div id="divStockView"><div class="loading">Type a symbol or company name and pick from the suggestions</div></div>
+
+  <h2 style="margin-top:24px">Dividend knowledge base <span class="muted" style="text-transform:none;font-weight:400">· scan a universe, grouped by category</span></h2>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Builds an aggregate view of dividend behaviour across a universe: average trailing yield and typical payout cadence per category. <b>Dividend type</b> here groups stocks by their own historical cadence — Quarterly, Twice yearly (interim + final), Once yearly, or Irregular — inferred from how many times a year each stock has actually paid over its available history, which doubles as the "normal occurrence" read the category is named for.</div>
+  <div class="controls">
+    <select id="divScanUniverse">
+      <option value="NIFTY 50" selected>NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+      <option value="MICROCAP 250">MICROCAP 250</option>
+      <option value="ALL">All (~750, slower)</option>
+    </select>
+    <select id="divScanGroupBy">
+      <option value="PATTERN" selected>Group by: Dividend type (payout cadence)</option>
+      <option value="CAP">Group by: Market-cap segment</option>
+      <option value="SECTOR">Group by: Sector</option>
+    </select>
+    <button class="btn" onclick="scanDividends()">▶ Build knowledge base</button>
+    <progress id="divScanProgress" style="display:none"></progress>
+    <span class="muted" id="divScanMeta"></span>
+  </div>
+  <div id="divScanSummary"></div>
+  <div id="divScanResults"></div>
 </section>
 
 <!-- FUNDAMENTALS -->
@@ -2467,6 +2504,151 @@ function renderIpresScan(rows){
       </tr>`;
     }).join("") + `</tbody></table>
     <div class="muted" style="font-size:11px;margin-top:4px">Sorted by how many of the four checks agree, then by filing recency. Hover a badge for its definition. Click a row to open Fundamentals for the full picture (including the shareholding/insider/concall panels there) — this table is a shortlist, not a verdict.</div>`;
+}
+
+/* ================= dividend analysis =================
+   Sourced from Yahoo Finance (/api/dividends), not NSE — see the tab's own footnote for why.
+   "%" = dividend yield (amount ÷ price). Interim/Final/Special labeling is a client-side heuristic,
+   not NSE's official classification (Yahoo doesn't provide that label at all). */
+function dividendPattern(dividends){
+  if(!dividends || !dividends.length) return { pattern:"No dividends", avgPerYear:0, years:[], byYear:{} };
+  const byYear = {};
+  dividends.forEach(d=>{ const y = +d.date.slice(0,4); (byYear[y] = byYear[y]||[]).push(d); });
+  const thisYear = new Date().getFullYear();
+  const completeYears = Object.keys(byYear).map(Number).filter(y=>y<thisYear).sort((a,b)=>a-b);
+  if(!completeYears.length) return { pattern:"Too new to tell", avgPerYear:0, years:[], byYear };
+  const counts = completeYears.map(y=>byYear[y].length);
+  const avgPerYear = counts.reduce((a,b)=>a+b,0)/counts.length;
+  const modeCount = Math.round(avgPerYear);
+  const closeToMode = counts.filter(c=>c===modeCount).length / counts.length >= 0.6;
+  let pattern;
+  if(avgPerYear===0) pattern = "No dividends";
+  else if(modeCount>=4 && closeToMode) pattern = "Quarterly";
+  else if(modeCount===2 && closeToMode) pattern = "Twice yearly (interim + final)";
+  else if(modeCount===1 && closeToMode) pattern = "Once yearly";
+  else pattern = "Irregular";
+  return { pattern, avgPerYear, years:completeYears, byYear };
+}
+// Per-event heuristic label (calendar timing + amount vs this stock's own median) — NOT NSE's
+// official Interim/Final/Special classification. See the tab footnote.
+function dividendTypeLabel(d, allAmounts){
+  const month = +d.date.slice(5,7);
+  const sorted = [...allAmounts].sort((a,b)=>a-b);
+  const median = sorted[Math.floor(sorted.length/2)] || d.amount;
+  if(median>0 && d.amount > median*2.5) return "Special";
+  return (month>=4 && month<=8) ? "Final" : "Interim";
+}
+function ttmDividendYield(dividends, currentPrice){
+  if(!currentPrice || !dividends) return null;
+  const cutoff = Date.now() - 365*86400000;
+  const total = dividends.filter(d=>new Date(d.date).getTime()>=cutoff).reduce((s,d)=>s+d.amount,0);
+  return dividends.length ? total/currentPrice*100 : null;
+}
+function dividendYearYield(byYear, prices, year){
+  const total = (byYear[year]||[]).reduce((s,d)=>s+d.amount,0);
+  const yr = String(year);
+  const yearPrices = (prices||[]).filter(p=>p.date.slice(0,4)===yr).map(p=>p.close);
+  const avgPrice = yearPrices.length ? yearPrices.reduce((a,b)=>a+b,0)/yearPrices.length : null;
+  return avgPrice ? total/avgPrice*100 : null;
+}
+
+async function loadDividendStock(){
+  const sym = comboSym("divSymbol");
+  const el = $("divStockView");
+  if(!sym){ el.innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
+  el.innerHTML = '<div class="loading">Loading…</div>';
+  try{
+    const r = await fetch(`/api/dividends/${encodeURIComponent(sym)}`);
+    const d = await r.json();
+    if(comboSym("divSymbol") !== sym) return;
+    if(!r.ok) throw new Error(d.error || "no data");
+    if(!d.dividends || !d.dividends.length){
+      el.innerHTML = `<div class="loading">No dividend history found for ${sym.replace(".NS","")} in the last 10 years — either it doesn't pay one, or Yahoo doesn't carry it.</div>`;
+      return;
+    }
+    const { pattern, avgPerYear, years, byYear } = dividendPattern(d.dividends);
+    const ttmYield = ttmDividendYield(d.dividends, d.currentPrice);
+    const allAmounts = d.dividends.map(x=>x.amount);
+    const yearRows = years.slice(-8).reverse().map(y=>{
+      const total = (byYear[y]||[]).reduce((s,x)=>s+x.amount,0);
+      const yld = dividendYearYield(byYear, d.prices, y);
+      const badges = byYear[y].map(x=>{
+        const t = dividendTypeLabel(x, allAmounts);
+        const bc = t==="Special" ? "bearish" : t==="Final" ? "bullish" : "neutral";
+        return `<span class="badge ${bc}" title="${x.date}: ₹${fmt(x.amount,2)}/share — heuristic label, not NSE's official classification">${t} ₹${fmt(x.amount,2)}</span>`;
+      }).join(" ");
+      return `<tr><td>${y}</td><td>${byYear[y].length}</td><td>₹${fmt(total,2)}</td><td>${yld!=null?fmt(yld,2)+"%":"—"}</td>
+        <td style="text-align:left">${badges}</td></tr>`;
+    }).join("");
+    el.innerHTML = `<div class="card" style="margin-bottom:10px">
+      <div class="name">Trailing 12-month yield</div><div class="price">${ttmYield!=null?fmt(ttmYield,2)+"%":"—"}</div>
+      <div class="chg muted">Typical cadence: <b>${pattern}</b>${avgPerYear?` (~${fmt(avgPerYear,1)} payouts/yr over ${years.length} full year${years.length===1?"":"s"})`:""} · current price ₹${d.currentPrice!=null?fmt(d.currentPrice):"—"}</div>
+    </div>
+    <table><thead><tr><th>Year</th><th>Payouts</th><th>Total ₹/share</th><th>Yield (avg price that yr)</th><th style="text-align:left">Breakdown</th></tr></thead><tbody>${yearRows}</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px">Yield per year = that year's total dividend ÷ the stock's average monthly close that year (an approximation, not a realised return). Interim/Final/Special badges are a heuristic — see the tab note above.</div>`;
+  }catch(e){
+    if(comboSym("divSymbol") !== sym) return;
+    el.innerHTML = `<div class="loading">Failed: ${e.message}</div>`;
+  }
+}
+
+async function scanDividends(){
+  const uni = $("divScanUniverse").value;
+  const groupBy = $("divScanGroupBy").value;
+  const syms = uni === "ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni]);
+  const prog = $("divScanProgress"); prog.style.display = "inline-block"; prog.value = 0; prog.max = syms.length;
+  $("divScanMeta").textContent = `Checking ${syms.length} stocks…`;
+  $("divScanSummary").innerHTML = ""; $("divScanResults").innerHTML = '<div class="loading">Scanning…</div>';
+  const rows = [];
+  await pmap(syms, async sym=>{
+    try{
+      const r = await fetch(`/api/dividends/${encodeURIComponent(sym)}`);
+      const d = await r.json();
+      if(!r.ok || !d.dividends) return;
+      const { pattern, avgPerYear, years } = dividendPattern(d.dividends);
+      const ttmYield = ttmDividendYield(d.dividends, d.currentPrice);
+      rows.push({ sym, name: nameOf(sym), pattern, avgPerYear, years: years.length, ttmYield,
+        cap: capOf(sym), sector: sectorOf(sym) });
+    }catch(e){}
+  }, 6, ()=>prog.value++);
+  prog.style.display = "none";
+  $("divScanMeta").textContent = `${syms.length} scanned · ${rows.length} with usable dividend data`;
+  renderDividendScan(rows, groupBy);
+}
+
+const DIV_PATTERN_ORDER = ["Quarterly","Twice yearly (interim + final)","Once yearly","Irregular","Too new to tell","No dividends"];
+function renderDividendScan(rows, groupBy){
+  if(!rows.length){ $("divScanResults").innerHTML = '<div class="loading">No dividend data came back for this universe.</div>'; return; }
+  const keyOf = r => groupBy==="CAP" ? (r.cap || "Unclassified")
+                    : groupBy==="SECTOR" ? (r.sector || "Unclassified")
+                    : r.pattern;
+  const groups = {};
+  rows.forEach(r=>{ const k = keyOf(r); (groups[k] = groups[k]||[]).push(r); });
+  let keys = Object.keys(groups);
+  if(groupBy==="PATTERN") keys.sort((a,b)=>DIV_PATTERN_ORDER.indexOf(a)-DIV_PATTERN_ORDER.indexOf(b));
+  else if(groupBy==="CAP") keys.sort((a,b)=>["LARGE","MID","SMALL","MICRO"].indexOf(a)-["LARGE","MID","SMALL","MICRO"].indexOf(b));
+  else keys.sort((a,b)=> groups[b].length-groups[a].length);
+
+  const summaryRows = keys.map(k=>{
+    const g = groups[k];
+    const payers = g.filter(r=>r.ttmYield!=null && r.ttmYield>0);
+    const avgYield = payers.length ? payers.reduce((s,r)=>s+r.ttmYield,0)/payers.length : null;
+    const payerPct = g.length ? payers.length/g.length*100 : 0;
+    return `<tr><td style="text-align:left"><b>${escHtml(k)}</b></td><td>${g.length}</td><td>${fmt(payerPct,0)}%</td>
+      <td>${avgYield!=null?fmt(avgYield,2)+"%":"—"}</td></tr>`;
+  }).join("");
+  $("divScanSummary").innerHTML = `<table><thead><tr><th style="text-align:left">Category</th><th>Stocks</th><th>% that pay a dividend</th><th>Avg trailing yield (payers only)</th></tr></thead><tbody>${summaryRows}</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">This is the "knowledge base": per category, what share of stocks pay a dividend at all, and the typical trailing yield among those that do. Full stock-level detail is below.</div>`;
+
+  rows.sort((a,b)=> (b.ttmYield||0)-(a.ttmYield||0));
+  $("divScanResults").innerHTML = `<table><thead><tr><th>Stock</th><th style="text-align:left">Category</th><th>Trailing yield</th><th>Cadence</th><th>Years of history</th></tr></thead><tbody>` +
+    rows.map(r=>`<tr style="cursor:pointer" onclick="openFundamentals('${r.sym}')">
+      <td><span class="sym">${r.sym.replace(".NS","")}</span><br><span class="subname">${escHtml(r.name)}</span></td>
+      <td style="text-align:left">${escHtml(keyOf(r))}</td>
+      <td>${r.ttmYield!=null?fmt(r.ttmYield,2)+"%":"—"}</td>
+      <td>${r.pattern}</td>
+      <td>${r.years}</td>
+    </tr>`).join("") + `</tbody></table>`;
 }
 
 /* ---- AI news brief (Workers AI + Google News RSS) ---- */
@@ -4371,7 +4553,7 @@ function mfRenderRecs(){
 function mfRenderAll(){ mfRenderHoldings(); mfRenderAllocation(); mfRenderCapAllocation(); mfRenderRecs(); }
 
 /* ================= global search + keyboard shortcuts ================= */
-const TAB_ORDER = ["dashboard","screener","ideas","ipres","fundamentals","track","insti","options","smc","conv","mf"];
+const TAB_ORDER = ["dashboard","screener","ideas","ipres","fundamentals","track","insti","options","smc","conv","mf","divid"];
 let srSel = -1;
 function searchMatches(q){
   q = q.trim().toLowerCase(); if(!q) return [];
@@ -4450,6 +4632,7 @@ function setCombo(id, sym){ $(id).value = sym.replace(".NS","") + " — " + (ALL
   const browse = '<option value="">Browse all shares…</option>' + opts;
   $("ipresSelect").innerHTML = browse;
   $("fundSelect").innerHTML = browse;
+  $("divSelect").innerHTML = browse;
   $("btStockSel").innerHTML = '<option value="">Whole universe (no single share)</option>' + opts;
   setCombo("fundSymbol", "RELIANCE.NS");
   $("versionTag").textContent = "India Shares Tracker v" + APP_VERSION;
