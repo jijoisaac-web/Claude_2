@@ -1,6 +1,10 @@
 // GET /api/fundamentals/:symbol — Yahoo quoteSummary (needs cookie + crumb handshake)
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
-const MODULES = "price,summaryDetail,defaultKeyStatistics,financialData,assetProfile";
+// incomeStatementHistoryQuarterly / balanceSheetHistoryQuarterly add ~last 4 quarters of net income
+// and debt so the Investor Presentations tab can read a profit-consistency / debt-reduction trend.
+// Coverage for NSE-listed names on Yahoo can be sparse — callers must treat empty arrays as "not
+// enough data", not as a real trend of zero.
+const MODULES = "price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,incomeStatementHistoryQuarterly,balanceSheetHistoryQuarterly";
 
 let session = { cookie: null, crumb: null, ts: 0 };
 
@@ -37,6 +41,23 @@ export async function onRequestGet({ request, params }) {
     if (!r) throw new Error("no data");
     const sd = r.summaryDetail || {}, ks = r.defaultKeyStatistics || {},
           fd = r.financialData || {}, ap = r.assetProfile || {}, pr = r.price || {};
+
+    // Last ~4 quarters of net income (oldest → newest), for a profit-consistency read.
+    const quarterlyIncome = ((r.incomeStatementHistoryQuarterly || {}).incomeStatementHistory || [])
+      .map(q => ({ end: raw(q.endDate), revenue: raw(q.totalRevenue), netIncome: raw(q.netIncome) }))
+      .filter(q => q.end != null)
+      .sort((a, b) => a.end - b.end);
+    // Last ~4 quarters of debt (long-term + short/current portion of long-term debt), for a
+    // debt-reduction read. Falls back to null (not 0) when Yahoo doesn't carry the debt line items.
+    const quarterlyDebt = ((r.balanceSheetHistoryQuarterly || {}).balanceSheetStatements || [])
+      .map(q => {
+        const ltd = raw(q.longTermDebt), sltd = raw(q.shortLongTermDebt);
+        const debt = (ltd != null || sltd != null) ? (ltd || 0) + (sltd || 0) : null;
+        return { end: raw(q.endDate), debt, totalLiab: raw(q.totalLiab) };
+      })
+      .filter(q => q.end != null)
+      .sort((a, b) => a.end - b.end);
+
     const out = {
       symbol: decodeURIComponent(params.symbol),
       name: pr.longName || pr.shortName || null,
@@ -73,6 +94,8 @@ export async function onRequestGet({ request, params }) {
       roa: raw(fd.returnOnAssets),
       ocf: raw(fd.operatingCashflow),
       fcf: raw(fd.freeCashflow),
+      quarterlyIncome,
+      quarterlyDebt,
     };
     const res = new Response(JSON.stringify(out), {
       headers: {

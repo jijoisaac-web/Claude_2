@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.15.0] — 2026-07-25 · Financial trend added to Investor Presentations cross-reference
+
+- **Two new checks: "Profit consistency" and "Debt reduction"**, added to both the per-stock view and the universe scan on Investor Presentations (now 6 checks total, up from 4). Profit consistency passes when net profit was positive in every one of the last (up to 4) quarters with at most one q/q dip; debt reduction passes when total debt (long-term + short-term portion) is down 10%+ from the earliest to the most recent of the last (up to 4) quarters.
+- **`/api/fundamentals/[symbol].js` extended** with two more Yahoo quoteSummary modules (`incomeStatementHistoryQuarterly`, `balanceSheetHistoryQuarterly`) to source this — used by the Fundamentals tab, Conviction Scan, and Screener too, but additive only, no existing fields changed.
+- **Handled honestly, not silently**: Yahoo's quarterly-statement coverage for NSE-listed names can be thin or missing. When there isn't enough data to judge, the badge shows a neutral grey "—" rather than a false ✕, and that signal is excluded from the "X of Y checkable signals" denominator instead of being counted as a miss — both the per-stock view and the scan table now show a variable Y (4–6) depending on data availability, with a note when signals are unavailable.
+- Universe-scan ranking updated to sort by hit-rate (footprints ÷ checkable signals) rather than raw footprint count, since checkable count now varies stock to stock.
+- Fundamentals are only fetched for stocks that already cleared the "fresh filing in the last 14 days" gate during a scan, not the whole universe — keeps scan cost proportional to relevant stocks rather than doubling the API calls for all ~750.
+
 ## [3.14.0] — 2026-07-25 · New tab: Dividend Analysis
 
 - **New "Dividend Analysis" tab** with two views, matching the Investor Presentations pattern: one stock (full dividend history, cadence, and trailing yield) and a universe scan that builds a grouped "knowledge base."

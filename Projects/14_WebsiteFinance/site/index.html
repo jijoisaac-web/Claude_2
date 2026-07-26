@@ -643,13 +643,16 @@ progress{accent-color:var(--violet);}
 <!-- INVESTOR PRESENTATIONS -->
 <section id="ipres" class="tab">
   <h2>Investor presentation reports</h2>
-  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE corporate filings — institutions read these decks the day they drop; retail usually finds out weeks later. This lists <b>when</b> a company filed an investor/earnings presentation and links straight to NSE's copy — it does not read what's inside the deck (no PDF/PPT parsing happens here). The checks next to a fresh filing are a structural cross-reference against signals already elsewhere in this app — a presentation landing next to a live setup is worth a closer look, not a verdict on what the deck says. Hover any check for its exact definition; the four checks are:</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">NSE corporate filings — institutions read these decks the day they drop; retail usually finds out weeks later. This lists <b>when</b> a company filed an investor/earnings presentation and links straight to NSE's copy — it does not read what's inside the deck (no PDF/PPT parsing happens here). The checks next to a fresh filing are a structural cross-reference against signals already elsewhere in this app — a presentation landing next to a live setup is worth a closer look, not a verdict on what the deck says. Hover any check for its exact definition; the six checks are:</div>
   <div class="muted" style="font-size:11px;margin-bottom:8px;padding:8px 10px;background:#0d1424;border:1px solid var(--border);border-radius:10px">
     <b>Technical setup</b> — composite technical score ≥50 (trend, momentum, volume signals combined) and price above its 200-day moving average.<br>
     <b>Near 52W high/low</b> — price sits within 3% of its 52-week high (momentum continuation) or its 52-week low (potential basing/reversal zone).<br>
     <b>Delivery accumulation</b> — latest session's delivery % is 60%+ with the price higher than the prior close: shares are being taken home, not just churned intraday.<br>
-    <b>Institutional buy</b> — a disclosed NSE bulk/block <b>BUY</b> deal by a known large FII or domestic institution landed within 14 days of the filing, either side of it.
+    <b>Institutional buy</b> — a disclosed NSE bulk/block <b>BUY</b> deal by a known large FII or domestic institution landed within 14 days of the filing, either side of it.<br>
+    <b>Profit consistency</b> — net profit was positive in every one of the last (up to 4) quarters, with at most one quarter-over-quarter dip.<br>
+    <b>Debt reduction</b> — total debt (long-term + short-term portion) is down 10%+ from the earliest to the most recent of the last (up to 4) quarters.
   </div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Profit consistency and debt reduction come from Yahoo Finance's quarterly statements, not NSE (same reasoning as the Dividend Analysis tab) — coverage for NSE-listed names can be thin, so a grey "—" badge means <b>not enough quarterly data to judge</b>, not a fail. It's excluded from the "X of Y checkable signals" count rather than silently scored as a miss.</div>
 
   <h2 style="margin-top:0">One stock</h2>
   <div class="controls">
@@ -843,6 +846,7 @@ const sign = v => v>=0 ? "+" : "";
 // name field (e.g. containing "<img src=x onerror=...>") would execute as HTML when the deals
 // table renders it.
 const escHtml = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtCr = v => v==null ? "—" : "₹"+fmt(v/1e7,1)+" Cr";
 function toggleCollapse(id){ const el = $(id); if(el) el.classList.toggle("collapsed"); }
 
 async function pmap(items, fn, limit=6, onEach){
@@ -2385,7 +2389,33 @@ function institutionalDealNearby(sym, filingTs, deals){
   }
   return best;
 }
-function ipresSignalRead(sym, c, bench63, delivBySymbol, deals, filingTs){
+// Profit-consistency and debt-reduction reads off the last ~4 quarters (from /api/fundamentals'
+// quarterlyIncome/quarterlyDebt). Yahoo's quarterly statement coverage for NSE-listed names can be
+// thin or absent, so both come back null ("not enough data") rather than a false fail when there
+// isn't enough history to judge — the UI shows that as a distinct neutral state, not a ✕.
+function financialTrendRead(fund){
+  if(!fund) return { profitConsistent:null, debtDown:null, profitDetail:"Fundamentals unavailable", debtDetail:"Fundamentals unavailable" };
+  const qi = (fund.quarterlyIncome||[]).slice(-4);
+  const qd = (fund.quarterlyDebt||[]).filter(q=>q.debt!=null).slice(-4);
+  let profitConsistent = null, profitDetail = "Not enough quarterly data to judge";
+  if(qi.length>=2){
+    const allProfitable = qi.every(q=>q.netIncome!=null && q.netIncome>0);
+    let declines = 0;
+    for(let i=1;i<qi.length;i++){
+      if(qi[i].netIncome!=null && qi[i-1].netIncome!=null && qi[i].netIncome < qi[i-1].netIncome) declines++;
+    }
+    profitConsistent = allProfitable && declines<=1;
+    profitDetail = `Net profit, last ${qi.length}Q: ${qi.map(q=>fmtCr(q.netIncome)).join(" → ")}`;
+  }
+  let debtDown = null, debtDetail = "Not enough quarterly data to judge";
+  if(qd.length>=2 && qd[0].debt>0){
+    const chgPct = (qd[qd.length-1].debt - qd[0].debt)/qd[0].debt*100;
+    debtDown = chgPct <= -10;
+    debtDetail = `Total debt, last ${qd.length}Q: ${fmtCr(qd[0].debt)} → ${fmtCr(qd[qd.length-1].debt)} (${sign(chgPct)}${fmt(chgPct,1)}%)`;
+  }
+  return { profitConsistent, debtDown, profitDetail, debtDetail };
+}
+function ipresSignalRead(sym, c, bench63, delivBySymbol, deals, filingTs, fund){
   const scanned = scanStock(sym, c, bench63);
   if(!scanned) return null;
   const ts = setupScore({...scanned, action:"BUY"});
@@ -2398,9 +2428,14 @@ function ipresSignalRead(sym, c, bench63, delivBySymbol, deals, filingTs){
   const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
   const deliveryAccum = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
   const instDeal = institutionalDealNearby(sym, filingTs, deals);
+  const fin = financialTrendRead(fund);
+  // Signals that can be null (not just true/false) are excluded from the footprints denominator
+  // rather than silently counted as a fail — "3 of 5 checkable" instead of a misleading "3 of 6".
+  const checks = [techOk, (nearHigh||nearLow), deliveryAccum, !!instDeal, fin.profitConsistent, fin.debtDown];
+  const checkable = checks.filter(v=>v!=null);
   return { ts, techOk, hi52:scanned.hi52, lo52:scanned.lo52, close:scanned.price, nearHigh, nearLow,
-    deliveryAccum, deliveryRow:dr, instDeal,
-    footprints: (techOk?1:0) + ((nearHigh||nearLow)?1:0) + (deliveryAccum?1:0) + (instDeal?1:0) };
+    deliveryAccum, deliveryRow:dr, instDeal, fin,
+    footprints: checkable.filter(Boolean).length, checkableCount: checkable.length };
 }
 async function benchReturn63(){
   try{ const b = toCandles(await fetchChart("^NSEI","1y","1d")); if(b.length>63) return b[b.length-1].close/b[b.length-64].close-1; }catch(e){}
@@ -2430,15 +2465,23 @@ async function loadIpresStock(){
         const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
         const bench63 = await benchReturn63();
         const c = toCandles(await fetchChart(sym, "2y", "1d"));
+        let fund = null;
+        try{
+          const fr = await fetch(`/api/fundamentals/${encodeURIComponent(sym)}`);
+          const fd = await fr.json();
+          if(fr.ok && !fd.error) fund = fd;
+        }catch(e){}
         if(comboSym("ipresSymbol")===sym){
-          const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, freshTs);
+          const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, freshTs, fund);
           if(sig){
-            const gate = (ok, label, title) => `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
+            const gate = (ok, label, title) => ok==null
+              ? `<span class="badge neutral" title="${escHtml(title||"")}">— ${label}</span>`
+              : `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
             const instTitle = sig.instDeal
               ? `${sig.instDeal.client} bought ₹${fmt(sig.instDeal.valueCr,1)} Cr on ${sig.instDeal.date}`
               : "No known-FII/institution buy disclosed within 14 days of this filing";
-            signalHtml = `<div class="card" style="margin-bottom:10px"><b>Latest filing is ${daysAgo===0?"today":daysAgo+" day"+(daysAgo===1?"":"s")+" old"}</b> — cross-reference: ${gate(sig.techOk,"Technical setup","Composite technical score ≥50 (trend/momentum/volume signals combined) and price above its 200-day moving average")} ${gate(sig.nearHigh||sig.nearLow, sig.nearHigh?"Near 52W high":sig.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(sig.deliveryAccum,"Delivery accumulation","Latest session's delivery % is 60%+ with the price higher than the prior close — shares held, not churned")} ${gate(!!sig.instDeal,"Institutional buy",instTitle)}
-              <div class="muted" style="font-size:11px;margin-top:6px">${sig.footprints} of 4 signals agree with this filing's timing. Structural cross-reference only — not a read of what's in the deck. Hover a badge for its definition.</div></div>`;
+            signalHtml = `<div class="card" style="margin-bottom:10px"><b>Latest filing is ${daysAgo===0?"today":daysAgo+" day"+(daysAgo===1?"":"s")+" old"}</b> — cross-reference: ${gate(sig.techOk,"Technical setup","Composite technical score ≥50 (trend/momentum/volume signals combined) and price above its 200-day moving average")} ${gate(sig.nearHigh||sig.nearLow, sig.nearHigh?"Near 52W high":sig.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(sig.deliveryAccum,"Delivery accumulation","Latest session's delivery % is 60%+ with the price higher than the prior close — shares held, not churned")} ${gate(!!sig.instDeal,"Institutional buy",instTitle)} ${gate(sig.fin.profitConsistent,"Profit consistency",sig.fin.profitDetail)} ${gate(sig.fin.debtDown,"Debt reduction",sig.fin.debtDetail)}
+              <div class="muted" style="font-size:11px;margin-top:6px">${sig.footprints} of ${sig.checkableCount} checkable signals agree with this filing's timing${sig.checkableCount<6?` (${6-sig.checkableCount} unavailable — not enough quarterly financial data)`:""}. Structural cross-reference only — not a read of what's in the deck. Hover a badge for its definition.</div></div>`;
           }
         }
       }catch(e){}
@@ -2476,19 +2519,33 @@ async function scanInvestorPresentations(){
       const latestTs = new Date(fresh[0].date).getTime();
       if(isNaN(latestTs) || Date.now()-latestTs > 14*86400000) return;
       const c = toCandles(await fetchChart(sym, "2y", "1d"));
-      const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, latestTs);
+      // Fundamentals are only fetched for stocks that already cleared the fresh-filing gate above —
+      // that's typically a small subset of the scanned universe, so this doesn't multiply the cost
+      // of scanning ~750 stocks by a second full API call each.
+      let fund = null;
+      try{
+        const fr = await fetch(`/api/fundamentals/${encodeURIComponent(sym)}`);
+        const fd = await fr.json();
+        if(fr.ok && !fd.error) fund = fd;
+      }catch(e){}
+      const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, latestTs, fund);
       if(!sig) return;
       rows.push({sym, name: nameOf(sym), latest: fresh[0], filingCount: fresh.length, ...sig});
     }catch(e){}
   }, 6, ()=>prog.value++);
   prog.style.display = "none";
-  rows.sort((a,b)=> b.footprints-a.footprints || new Date(b.latest.date)-new Date(a.latest.date));
+  // Rank by hit-rate (footprints ÷ checkable signals) first, since checkableCount varies stock to
+  // stock when quarterly financial data is thin — raw footprint counts alone would unfairly favour
+  // stocks that simply had more signals available to check, not stocks that actually agreed more.
+  rows.sort((a,b)=> (b.footprints/(b.checkableCount||1)) - (a.footprints/(a.checkableCount||1)) || b.footprints-a.footprints || new Date(b.latest.date)-new Date(a.latest.date));
   $("ipresScanMeta").textContent = `${syms.length} scanned · ${rows.length} with a presentation filed in the last 14 days`;
   renderIpresScan(rows);
 }
 function renderIpresScan(rows){
   if(!rows.length){ $("ipresScanResults").innerHTML = '<div class="loading">No fresh investor presentation filings in this universe right now.</div>'; return; }
-  const gate = (ok, label, title) => `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
+  const gate = (ok, label, title) => ok==null
+    ? `<span class="badge neutral" title="${escHtml(title||"")}">— ${label}</span>`
+    : `<span class="badge ${ok?"bullish":"bearish"}" title="${escHtml(title||"")}">${ok?"✓":"✕"} ${label}</span>`;
   $("ipresScanResults").innerHTML = `<table><thead><tr><th>Stock</th><th>Price ₹</th><th>Filed</th><th style="text-align:left">Cross-reference</th><th></th></tr></thead><tbody>` +
     rows.map(r=>{
       const daysAgo = Math.round((Date.now()-new Date(r.latest.date).getTime())/86400000);
@@ -2499,11 +2556,11 @@ function renderIpresScan(rows){
       <td><span class="sym">${r.sym.replace(".NS","")}</span><br><span class="subname">${r.name}</span></td>
       <td>${fmt(r.close)}</td>
       <td>${daysAgo===0?"today":daysAgo+"d ago"}</td>
-      <td style="text-align:left">${gate(r.techOk,"Setup","Composite technical score ≥50 and price above its 200-day moving average")} ${gate(r.nearHigh||r.nearLow, r.nearHigh?"Near 52W high":r.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(r.deliveryAccum,"Delivery","Latest session's delivery % is 60%+ with the price higher than the prior close")} ${gate(!!r.instDeal,"Inst. buy",instTitle)}</td>
+      <td style="text-align:left">${gate(r.techOk,"Setup","Composite technical score ≥50 and price above its 200-day moving average")} ${gate(r.nearHigh||r.nearLow, r.nearHigh?"Near 52W high":r.nearLow?"Near 52W low":"52W extreme","Price is within 3% of its 52-week high or low")} ${gate(r.deliveryAccum,"Delivery","Latest session's delivery % is 60%+ with the price higher than the prior close")} ${gate(!!r.instDeal,"Inst. buy",instTitle)} ${gate(r.fin.profitConsistent,"Profit",r.fin.profitDetail)} ${gate(r.fin.debtDown,"Debt down",r.fin.debtDetail)}</td>
       <td>${r.latest.attachment?`<a href="${r.latest.attachment}" target="_blank" rel="noopener" onclick="event.stopPropagation()">PDF</a>`:""}</td>
       </tr>`;
     }).join("") + `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">Sorted by how many of the four checks agree, then by filing recency. Hover a badge for its definition. Click a row to open Fundamentals for the full picture (including the shareholding/insider/concall panels there) — this table is a shortlist, not a verdict.</div>`;
+    <div class="muted" style="font-size:11px;margin-top:4px">Sorted by how many checkable signals agree (as a fraction — some stocks have fewer checkable signals than others when quarterly financial data is thin), then by filing recency. Hover a badge for its definition; a grey "—" badge means there wasn't enough data to judge that one, not a fail. Click a row to open Fundamentals for the full picture (including the shareholding/insider/concall panels there) — this table is a shortlist, not a verdict.</div>`;
 }
 
 /* ================= dividend analysis =================
