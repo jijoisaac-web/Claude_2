@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.25.0] — 2026-07-26 · Conviction Scan backtest — does the gate combination itself have edge?
+
+- **New `/api/delivery-hist/:date`** — fetches NSE's daily bhavdata delivery-% archive for an arbitrary past date (not just "latest," like the existing `/api/delivery`). NSE's archive turns out to be addressable by date going back years, which is what makes a genuine point-in-time delivery-gate backtest possible without maintaining any historical archive of our own. Cached hard (30 days) since past bhavdata never changes.
+- **New "Conviction Scan backtest" section on the Backtest tab** — walks a chosen universe backward at weekly cadence over 6/12/24 months, recomputing the same technical, money-flow, and delivery gates the live Conviction Scan uses (same thresholds), using only data available as of each historical date (candles truncated to that point, that date's own delivery print — no lookahead). Groups every (stock, date) instance by how many of the 3 gates it hit and compares forward returns (1W/2W/1M/3M vs NIFTY) across the 3/3, 2/3, 1/3 and 0/3 cohorts — the direct test of whether requiring all of them together beats any single ingredient, i.e. whether the shortlist logic itself has edge.
+- **Fundamentals gate deliberately excluded from this backtest** and documented as such in the UI: Yahoo only exposes current trailing fundamentals, not a historical snapshot for arbitrary past dates, so applying it retroactively would be hindsight bias rather than a real backtest. Only the 3 gates that can be computed with true point-in-time integrity are simulated.
+
 ## [3.24.0] — 2026-07-26 · Experimental: NSE's own results feed as a deeper history source
 
 - **New `/api/results/:symbol` (not yet wired into any tab)** — tries NSE's own `results-comparision` endpoint, the same cookie-handshake pattern already working in production for announcements/insider/shareholding, as a candidate replacement for Yahoo's timeseries fetch. Since it would be the primary regulatory filing feed rather than a third-party aggregator, it may carry much deeper history for NSE names than Yahoo's ~5Q/4Y ceiling confirmed for Bajaj Finance.

@@ -767,6 +767,30 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
   </div>
 </div>
+
+<div class="collapsible collapsed" id="cbt-conv" style="margin-top:28px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('cbt-conv')"><span class="collapse-arrow">▾</span> Conviction Scan backtest <span class="muted" style="text-transform:none;font-weight:400">· does the gate combination itself have edge?</span></h2>
+  <div class="collapse-body">
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Conviction Scan's live shortlist requires 4 gates to agree: technical setup, money-flow, delivery accumulation, and fundamentals. This replays the first 3 — the ones computable point-in-time from historical prices and NSE's own daily delivery archive — at a weekly cadence across the lookback window, using only data that would have been known on each date (no lookahead), and measures what actually happened afterward. It then compares stocks that hit all 3 gates against stocks that only hit 2, 1, or 0, so you can see whether requiring all of them together actually adds edge over any single ingredient. The 4th gate (fundamentals) can't be included with the same rigor — Yahoo only exposes today's trailing figures, not a historical snapshot for each past date — so it's left out here rather than faked in with hindsight.</div>
+  <div class="controls">
+    <select id="cbtConvUniverse">
+      <option value="NIFTY 50">NIFTY 50</option>
+      <option value="NEXT 50">NEXT 50</option>
+      <option value="MIDCAP 150">MIDCAP 150</option>
+      <option value="SMALLCAP 250">SMALLCAP 250</option>
+    </select>
+    <select id="cbtConvLookback">
+      <option value="6">Last 6 months</option>
+      <option value="12" selected>Last 12 months</option>
+      <option value="24">Last 24 months</option>
+    </select>
+    <button class="btn" onclick="runConvictionBacktest()">▶ Run backtest</button>
+    <progress id="cbtConvProgress" style="display:none"></progress>
+    <span class="muted" id="cbtConvMeta"></span>
+  </div>
+  <div id="cbtConvResults"></div>
+  </div>
+</div>
 </section>
 
 <!-- INVESTOR PRESENTATIONS -->
@@ -3837,6 +3861,143 @@ function renderFbtPage(){
   $("fbtPrevBtn").disabled = fbtPage <= 0;
   $("fbtNextBtn").disabled = fbtPage >= totalPages - 1;
   $("fbtPageLabel").textContent = `Page ${fbtPage+1} of ${totalPages}`;
+}
+
+/* ================= Conviction Scan backtest — does the 3-gate combination itself have edge? ================= */
+// Walk-forward simulation of the SAME technical+flow+delivery gates runConvictionScan uses live,
+// evaluated at a series of past dates (not today), each gate computed only from data that would
+// have been known at that point: candles truncated to that date (scanStock/setupScore are strictly
+// backward-looking, so slicing the array up to index i is equivalent to "as of that day"), and that
+// date's own NSE delivery print via /api/delivery-hist (fetched once per date, shared across every
+// stock — bhavdata is a whole-market file, not a per-stock one).
+// The 4th live gate (fundamentals) is deliberately NOT included here — Yahoo only exposes CURRENT
+// trailing fundamentals, there's no free point-in-time snapshot for arbitrary past dates, so
+// applying it historically would be hindsight bias dressed up as a backtest, not a real one. What
+// this DOES answer honestly: does needing all 3 point-in-time-checkable gates together actually
+// predict better forward returns than needing 2, or 1, or none — i.e. does the AND-combination
+// itself have edge, or is it just riding whichever single ingredient happens to work.
+let convBtCache = {};   // date -> Map(bareSymbol -> {s,c,p,d,t}) | null, shared across the whole run
+async function fetchDeliveryHistMap(dateStr){
+  if(dateStr in convBtCache) return convBtCache[dateStr];
+  try{
+    const r = await fetch(`/api/delivery-hist/${dateStr}`);
+    const d = await r.json();
+    if(!r.ok || !d.rows){ convBtCache[dateStr] = null; return null; }
+    const map = new Map(d.rows.map(x=>[x.s, x]));
+    convBtCache[dateStr] = map;
+    return map;
+  }catch(e){ convBtCache[dateStr] = null; return null; }
+}
+
+async function runConvictionBacktest(){
+  const uni = $("cbtConvUniverse").value;
+  const lookbackMonths = +$("cbtConvLookback").value;
+  const syms = uni === "ALL" ? Object.keys(ALL_STOCKS) : Object.keys(UNIVERSES[uni]);
+  const prog = $("cbtConvProgress"); prog.style.display="inline-block"; prog.value=0; prog.max=syms.length;
+  $("cbtConvMeta").textContent = "Fetching NIFTY + building cadence dates…";
+  $("cbtConvResults").innerHTML = '<div class="loading">Running…</div>';
+  convBtCache = {};
+  window._cbtConvFilter = null;
+
+  let nifty = [];
+  try{ nifty = toCandles(await fetchChart("^NSEI","3y","1d")); }catch(e){}
+  if(nifty.length < 300){ $("cbtConvMeta").textContent = "Couldn't load NIFTY history — try again."; prog.style.display="none"; return; }
+  const nIdx = {}; nifty.forEach((d,i)=>nIdx[d.time]=i);
+  const nH = (date,n) => { const i=nIdx[date]; return i!=null && i+n<nifty.length ? (nifty[i+n].close-nifty[i].close)/nifty[i].close*100 : null; };
+
+  const CADENCE = 5;      // ~weekly — one shared bhavdata fetch per cadence date, not per stock
+  const MAX_HOLD = 63;    // 3 months forward-return room, needed at the tail end of the window
+  const lookbackDays = Math.round(lookbackMonths*21);
+  const startIdx = Math.max(252, nifty.length - lookbackDays - MAX_HOLD);   // need 252 bars behind each eval date for SMA200
+  const endIdx = nifty.length - MAX_HOLD;
+  const cadenceDates = [];
+  for(let i=startIdx; i<endIdx; i+=CADENCE) cadenceDates.push(nifty[i].time);
+  if(!cadenceDates.length){ $("cbtConvMeta").textContent = "Lookback window too short for this universe."; prog.style.display="none"; return; }
+
+  // NIFTY's own 63-day return AS OF each cadence date — feeds the same relative-strength read
+  // scanStock uses live, just computed at each historical point instead of today.
+  const bench63ByDate = {};
+  for(const dt of cadenceDates){
+    const i = nIdx[dt];
+    bench63ByDate[dt] = (i!=null && i>63 && nifty[i-63].close) ? nifty[i].close/nifty[i-63].close - 1 : null;
+  }
+
+  $("cbtConvMeta").textContent = `Stage 1/2 — fetching ${cadenceDates.length} historical delivery snapshots…`;
+  await pmap(cadenceDates, dt=>fetchDeliveryHistMap(dt), 4);
+
+  $("cbtConvMeta").textContent = `Stage 2/2 — replaying ${syms.length} stocks across ${cadenceDates.length} dates…`;
+  const gateHits = {3:[], 2:[], 1:[], 0:[]};   // marketGates count -> array of outcomes
+
+  await pmap(syms, async sym=>{
+    let c; try{ c = toCandles(await fetchChart(sym,"3y","1d")); }catch(e){ return; }
+    if(c.length < 300) return;
+    const cIdx = {}; c.forEach((d,i)=>cIdx[d.time]=i);
+    const bareSym = sym.replace(".NS","");
+    let lastHitIdx = -999;
+    for(const dt of cadenceDates){
+      const i = cIdx[dt];
+      if(i==null || i < 252) continue;
+      if(i - lastHitIdx < 15) continue;   // cooldown — don't recount one continuous move as many "signals"
+      const truncated = c.slice(0, i+1);   // only bars up to and including this date — no lookahead
+      const r = scanStock(sym, truncated, bench63ByDate[dt]);
+      if(!r) continue;
+      const techSignals = r.signals.filter(x=>CONV_TECH.has(x.type));
+      const flowSignals = r.signals.filter(x=>CONV_FLOW.has(x.type));
+      const ts = setupScore({...r, action:"BUY"});
+      const techOk = techSignals.length>0 && !!r.above_sma200 && ts>=50;
+      const flowOk = flowSignals.length>0;
+      const dMap = convBtCache[dt];
+      const dr = dMap ? dMap.get(bareSym) : null;
+      const chgPct = dr && dr.p ? (dr.c-dr.p)/dr.p*100 : null;
+      const deliveryOk = !!(dr && chgPct!=null && dr.d>=60 && chgPct>=0.5);
+      const marketGates = (techOk?1:0) + (flowOk?1:0) + (deliveryOk?1:0);
+      const H = n => i+n<c.length ? (c[i+n].close-c[i].close)/c[i].close*100 : null;
+      gateHits[marketGates].push({sym, date:dt, r5:H(5), r10:H(10), r21:H(21), r63:H(MAX_HOLD),
+        n5:nH(dt,5), n10:nH(dt,10), n21:nH(dt,21), n63:nH(dt,MAX_HOLD)});
+      lastHitIdx = i;
+    }
+  }, 6, ()=>prog.value++);
+
+  prog.style.display = "none";
+  renderConvictionBacktest(gateHits, uni, lookbackMonths, cadenceDates.length);
+}
+
+function cbtConvFilter(k){
+  window._cbtConvFilter = window._cbtConvFilter===k ? null : k;
+  if(window._cbtConv) renderConvictionBacktest(window._cbtConv.gateHits, window._cbtConv.uni, window._cbtConv.lookbackMonths, window._cbtConv.dateCount, true);
+}
+function renderConvictionBacktest(gateHits, uni, lookbackMonths, dateCount, isRefilter){
+  window._cbtConv = {gateHits, uni, lookbackMonths, dateCount};
+  const total = [3,2,1,0].reduce((s,k)=>s+gateHits[k].length,0);
+  if(!isRefilter) $("cbtConvMeta").textContent = `${total} stock/date evaluations across ${dateCount} dates · ${uni} · ${lookbackMonths}mo lookback`;
+  if(!total){ $("cbtConvResults").innerHTML = '<div class="loading">No evaluations produced — try a longer lookback or a bigger universe.</div>'; return; }
+  const pctCell = v => v==null?"—":`<span class="${cls(v)}">${sign(v)}${fmt(v,2)}%</span>`;
+  const rows = [3,2,1,0].map(k=>{
+    const g = gateHits[k];
+    const withR21 = g.filter(t=>t.r21!=null);
+    const hitRate21 = withR21.length ? withR21.filter(t=>t.r21>0).length/withR21.length*100 : null;
+    return {k, g, hitRate21};
+  });
+  const activeFilter = window._cbtConvFilter!=null ? window._cbtConvFilter : 3;
+  $("cbtConvResults").innerHTML = `
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Each row is every (stock, date) combination in the window that hit exactly this many of the 3 point-in-time-checkable gates (technical setup, money-flow, delivery accumulation) — same gates, same thresholds as the live Conviction Scan. The <b>fundamentals gate is excluded here</b>: Yahoo only exposes today's trailing figures, not a snapshot as of each past date, so applying it retroactively would just be hindsight bias, not a real backtest. If the 3-gate row beats the weaker rows below it, the AND-combination itself is adding edge, not just riding whichever single ingredient happens to work.</div>
+    <table><thead><tr><th style="text-align:left">Gates hit</th><th>Instances</th><th title="Share of instances with a positive return 1 month later">% positive at 1mo</th>
+      <th>Avg 1W</th><th>Avg 2W</th><th>Avg 1M</th><th>Avg 3M</th><th>NIFTY same dates (1M)</th></tr></thead><tbody>
+    ${rows.map(({k,g,hitRate21})=>`<tr style="cursor:pointer" onclick="cbtConvFilter(${k})" class="${activeFilter===k?'sel':''}">
+      <td style="text-align:left">${k}/3 gates${k===3?' <span class="badge bullish">full Conviction Scan match</span>':''}</td>
+      <td>${g.length}</td>
+      <td>${hitRate21!=null?`<span class="${hitRate21>=50?'up':'down'}">${fmt(hitRate21,0)}%</span>`:"—"}</td>
+      <td>${pctCell(avg(g.map(t=>t.r5)))}</td><td>${pctCell(avg(g.map(t=>t.r10)))}</td>
+      <td>${pctCell(avg(g.map(t=>t.r21)))}</td><td>${pctCell(avg(g.map(t=>t.r63)))}</td>
+      <td>${pctCell(avg(g.map(t=>t.n21)))}</td></tr>`).join("")}
+    </tbody></table>
+    <h2 style="margin-top:18px">Instances · ${activeFilter}/3 gates${window._cbtConvFilter!=null?` <a href="#" style="color:var(--blue)" onclick="event.preventDefault();cbtConvFilter(null)">back to 3/3 ✕</a>`:" (last 40)"}</h2>
+    <table><thead><tr><th>Date</th><th>Stock</th><th>1W</th><th>2W</th><th>1M</th><th>3M</th></tr></thead><tbody>
+    ${gateHits[activeFilter].slice(-40).reverse().map(t=>`<tr onclick="openChart('${t.sym}')">
+      <td>${t.date}</td><td><span class="sym">${t.sym.replace(".NS","")}</span></td>
+      <td>${pctCell(t.r5)}</td><td>${pctCell(t.r10)}</td><td>${pctCell(t.r21)}</td><td>${pctCell(t.r63)}</td></tr>`).join("")}
+    </tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:6px">Weekly cadence (evaluated every ~5 trading days, not every single day) with a 15-trading-day cooldown per stock once it hits — same reasoning as the other backtests: avoids counting one continuous move as dozens of overlapping "signals." No brokerage/slippage/taxes; today's index constituents didn't all exist across the whole window (survivorship bias); an occasional NSE bhavdata gap day is skipped rather than faked.</div>`;
 }
 
 /* ================= options: spread width probability ================= */
