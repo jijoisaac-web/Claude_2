@@ -2,6 +2,14 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.18.0] — 2026-07-26 · Financial trend & ratio flags on Investor Presentations
+
+- **New "Financial trend & ratios" panel** on the Investor Presentations "One stock" view — shown for every stock you pick, regardless of whether it has a recent investor-presentation filing (previously all financial data on this tab only surfaced as a cross-reference next to a fresh filing).
+- **Multi-quarter and multi-year trend tables**: revenue, net profit, net margin, gross margin, operating margin, ROE, debt, and debt/equity — one column per period (last up to 4 quarters, last up to 4 years), each cell flagged green ▲ if it improved vs. the prior period shown or red ▼ if it worsened (debt and debt/equity flip the direction — a fall is the improvement there).
+- **Ratio snapshot**: current ROE, operating/gross/net margin, debt/equity, current ratio, ROA, P/E, and P/B, each flagged Good/Average/Weak against the same generic thresholds already used by the Fundamentals tab's composite scores (`lin()`/`de()`), so the read is consistent across the app rather than a second, different rubric.
+- **`/api/fundamentals/[symbol].js` extended**: added the annual `incomeStatementHistory`/`balanceSheetHistory` Yahoo modules (previously only the *Quarterly versions were fetched) and enriched both with `grossProfit`/`operatingIncome` (income) and `totalAssets`/`totalStockholderEquity` (balance) — additive only, existing fields and the profit-consistency/debt-reduction checks that depend on them are unchanged.
+- Honest about coverage gaps throughout: a blank cell means "not reported" (never guessed as zero), and thresholds are labelled as generic/not sector-adjusted with a nudge toward the Fundamentals tab's peer comparison before judging a capital-intensive business against a software company's margins.
+
 ## [3.17.0] — 2026-07-26 · Background photography per tab + responsive tightening
 
 - **Every tab now has its own real photo background** (previously a plain mesh-gradient, shared across all tabs) — Dashboard: city financial skyline; Screener: candlestick chart workspace; Ideas: lightbulb/notebook; Investor Presentations: boardroom presentation; Fundamentals: calculator and paperwork; Backtest: hourglass; FII/DII: stock exchange building; Options: chess pieces; Smart Money: gold bars; Conviction Scan: magnifying glass; Mutual Funds: piggy bank; Dividend Analysis: coin stacks with an upward arrow. All photos are free-to-use, properly licensed (Unsplash License, no attribution required).

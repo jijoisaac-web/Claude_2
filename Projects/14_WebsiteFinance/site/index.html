@@ -764,6 +764,7 @@ progress{accent-color:var(--violet);}
     <b>Debt reduction</b> — total debt (long-term + short-term portion) is down 10%+ from the earliest to the most recent of the last (up to 4) quarters.
   </div>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Profit consistency and debt reduction come from Yahoo Finance's quarterly statements, not NSE (same reasoning as the Dividend Analysis tab) — coverage for NSE-listed names can be thin, so a grey "—" badge means <b>not enough quarterly data to judge</b>, not a fail. It's excluded from the "X of Y checkable signals" count rather than silently scored as a miss.</div>
+  <div class="muted" style="font-size:11px;margin-bottom:8px">The "One stock" view below also shows a standalone <b>financial trend &amp; ratios</b> panel — multi-quarter and multi-year revenue/margin/debt trends with green/red flags vs. the prior period, plus a current-ratio snapshot flagged Good/Average/Weak — shown whenever you pick a stock, whether or not it has a recent investor-presentation filing.</div>
 
   <div class="collapsible" id="ipres-stock">
   <h2 class="collapse-h2" onclick="toggleCollapse('ipres-stock')" style="margin-top:0"><span class="collapse-arrow">▾</span> One stock</h2>
@@ -2589,19 +2590,119 @@ async function benchReturn63(){
   return null;
 }
 
+/* ---- financial trend & ratio-flag panel (multi-quarter/multi-year, good/bad flagged) ----
+   Shown on the Investor Presentations "one stock" view regardless of whether a fresh filing exists —
+   it's useful on its own, not just as a cross-reference to filing timing. */
+function buildRatioTrend(incomeArr, balanceArr){
+  const inc = incomeArr || [];
+  const balByEnd = new Map((balanceArr||[]).map(b=>[b.end,b]));
+  return inc.map((q,i)=>{
+    const bal = balByEnd.get(q.end) || null;
+    const netMargin = (q.revenue && q.netIncome!=null) ? q.netIncome/q.revenue*100 : null;
+    const grossMargin = (q.revenue && q.grossProfit!=null) ? q.grossProfit/q.revenue*100 : null;
+    const opMargin = (q.revenue && q.operatingIncome!=null) ? q.operatingIncome/q.revenue*100 : null;
+    const debtToEq = (bal && bal.debt!=null && bal.totalStockholderEquity) ? bal.debt/bal.totalStockholderEquity : null;
+    const roe = (bal && bal.totalStockholderEquity && q.netIncome!=null) ? q.netIncome/bal.totalStockholderEquity*100 : null;
+    return { end:q.end, revenue:q.revenue, netIncome:q.netIncome, netMargin, grossMargin, opMargin,
+      debt: bal?bal.debt:null, debtToEq, roe };
+  });
+}
+// A single cell showing the value plus an up/down flag vs. the previous period in the row.
+function trendCell(val, prevVal, higherIsBetter, fmtFn){
+  if(val==null) return `<td class="muted">—</td>`;
+  let cellCls = "", arrow = "";
+  if(prevVal!=null && isFinite(prevVal) && val!==prevVal){
+    if(higherIsBetter ? val>prevVal : val<prevVal){ cellCls="up"; arrow=" ▲"; }
+    else { cellCls="down"; arrow=" ▼"; }
+  }
+  return `<td class="${cellCls}">${fmtFn(val)}${arrow}</td>`;
+}
+function renderTrendTable(title, periods, periodLabelFn){
+  if(!periods || periods.length<2) return "";
+  const pctFmt = v=>fmt(v,1)+"%", crFmt = v=>fmtCr(v), xFmt = v=>fmt(v,2)+"x";
+  const rows = [
+    ["Revenue", p=>p.revenue, crFmt, true],
+    ["Net profit", p=>p.netIncome, crFmt, true],
+    ["Net margin", p=>p.netMargin, pctFmt, true],
+    ["Gross margin", p=>p.grossMargin, pctFmt, true],
+    ["Operating margin", p=>p.opMargin, pctFmt, true],
+    ["ROE (period)", p=>p.roe, pctFmt, true],
+    ["Debt", p=>p.debt, crFmt, false],
+    ["Debt/Equity", p=>p.debtToEq, xFmt, false],
+  ];
+  return `<div class="muted" style="font-size:12px;margin:8px 0 2px">${title}</div>
+    <table style="margin-bottom:8px"><thead><tr><th style="text-align:left"></th>${periods.map(p=>`<th>${periodLabelFn(p.end)}</th>`).join("")}</tr></thead><tbody>` +
+    rows.map(([label,getter,fmtFn,higherBetter])=>{
+      const vals = periods.map(p=>getter(p));
+      if(vals.every(v=>v==null)) return "";   // whole row unreported — don't show an all-dash line
+      return `<tr><td style="text-align:left">${label}</td>` +
+        periods.map((p,i)=>trendCell(getter(p), i>0?getter(periods[i-1]):null, higherBetter, fmtFn)).join("") +
+      `</tr>`;
+    }).join("") + `</tbody></table>`;
+}
+// Current-period ratio snapshot, flagged Good/Average/Weak against generic (not sector-adjusted)
+// thresholds — reuses the same lin()/de() scoring helpers and threshold bands already established
+// for the Fundamentals tab's composite scores, so the read is consistent across the app.
+function ratioFlag(score){
+  if(score==null) return ["—","muted"];
+  return score>=0.66 ? ["Good","up"] : score>=0.33 ? ["Average","muted"] : ["Weak","down"];
+}
+function renderRatioSnapshot(f){
+  const rows = [
+    ["ROE", f.roe!=null?fmt(f.roe*100,1)+"%":"—", lin(f.roe,0.05,0.20)],
+    ["Operating margin", f.operating_margin!=null?fmt(f.operating_margin*100,1)+"%":"—", lin(f.operating_margin,0,0.20)],
+    ["Gross margin", f.gross_margin!=null?fmt(f.gross_margin*100,1)+"%":"—", lin(f.gross_margin,0.10,0.40)],
+    ["Net margin", f.profit_margin!=null?fmt(f.profit_margin*100,1)+"%":"—", lin(f.profit_margin,0,0.15)],
+    ["Debt/Equity", de(f)!=null?fmt(de(f),2)+"x":"—", de(f)!=null?lin(de(f),2,0.3):null],
+    ["Current ratio", f.current_ratio!=null?fmt(f.current_ratio,2)+"x":"—", lin(f.current_ratio,0.8,1.5)],
+    ["ROA", f.roa!=null?fmt(f.roa*100,1)+"%":"—", lin(f.roa,0.02,0.08)],
+    ["P/E", fmt(f.pe,1), f.pe!=null?lin(f.pe,40,12):null],
+    ["P/B", fmt(f.pb,1), f.pb!=null?lin(f.pb,8,1.5):null],
+  ];
+  return `<table style="margin-bottom:4px"><thead><tr><th style="text-align:left">Ratio</th><th>Value</th><th>Read</th></tr></thead><tbody>` +
+    rows.map(([label,val,score])=>{
+      const [lbl,c] = ratioFlag(score);
+      return `<tr><td style="text-align:left">${label}</td><td>${val}</td><td class="${c}">${lbl}</td></tr>`;
+    }).join("") + `</tbody></table>`;
+}
+function renderFinancialTrend(fund){
+  if(!fund) return `<div class="card" style="margin-bottom:10px"><b>Financial trend</b><div class="muted" style="font-size:12px;margin-top:4px">Fundamentals unavailable for this stock right now.</div></div>`;
+  const qTrend = buildRatioTrend((fund.quarterlyIncome||[]).slice(-4), fund.quarterlyDebt||[]);
+  const yTrend = buildRatioTrend((fund.yearlyIncome||[]).slice(-4), fund.yearlyDebt||[]);
+  const qLabel = end => end==null ? "—" : new Date(end*1000).toLocaleDateString("en-IN",{month:"short",year:"2-digit"});
+  const yLabel = end => end==null ? "—" : new Date(end*1000).getUTCFullYear();
+  const qTable = qTrend.length>=2 ? renderTrendTable(`Last ${qTrend.length} quarters`, qTrend, qLabel)
+    : `<div class="muted" style="font-size:12px">Not enough quarterly statement data on Yahoo for this stock.</div>`;
+  const yTable = yTrend.length>=2 ? renderTrendTable(`Last ${yTrend.length} years`, yTrend, yLabel)
+    : `<div class="muted" style="font-size:12px">Not enough annual statement data on Yahoo for this stock.</div>`;
+  return `<div class="card" style="margin-bottom:10px">
+    <b>Financial trend &amp; ratios</b>
+    <div class="muted" style="font-size:11px;margin:4px 0 8px">Trailing quarters/years from Yahoo's statement data — <span class="up">green</span> means improved vs. the prior period shown, <span class="down">red</span> means worsened. Coverage for NSE-listed names on Yahoo can be thin; a blank cell means "not reported", not zero.</div>
+    ${qTable}
+    ${yTable}
+    <div class="muted" style="font-size:12px;margin-top:8px"><b style="color:var(--text)">Ratio snapshot</b> (current)</div>
+    ${renderRatioSnapshot(fund)}
+    <div class="muted" style="font-size:11px">Generic thresholds, not sector-adjusted — a capital-intensive business (utilities, NBFCs) naturally runs higher debt and lower margins than a software company. Cross-check against the peer comparison on the Fundamentals tab before judging.</div>
+  </div>`;
+}
+
 async function loadIpresStock(){
   window._ipresLoaded = true;
   const sym = comboSym("ipresSymbol");
   const el = $("ipresStockView");
   if(!sym){ el.innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   el.innerHTML = '<div class="loading">Loading…</div>';
+  let fund = null;
+  try{ fund = await fetchFundamentals(sym); }catch(e){}
+  if(comboSym("ipresSymbol") !== sym) return;
+  const finHtml = renderFinancialTrend(fund);
   try{
     const r = await fetch(`/api/announcements/${encodeURIComponent(sym.replace(".NS",""))}`);
     const d = await r.json();
     if(comboSym("ipresSymbol") !== sym) return;
     if(!r.ok || !d.items) throw new Error(d.error || "no data");
     const items = d.items.filter(x => IPRES_RE.test(x.subject || "")).slice(0, 15);
-    if(!items.length){ el.innerHTML = '<div class="loading">No investor presentation filings found for this stock in the last 180 days.</div>'; return; }
+    if(!items.length){ el.innerHTML = finHtml + '<div class="loading">No investor presentation filings found for this stock in the last 180 days.</div>'; return; }
     let signalHtml = "";
     const freshTs = new Date(items[0].date).getTime();
     const daysAgo = Math.round((Date.now()-freshTs)/86400000);
@@ -2612,12 +2713,6 @@ async function loadIpresStock(){
         const delivBySymbol = new Map((delivData && delivData.rows || []).map(r=>[r.s, r]));
         const bench63 = await benchReturn63();
         const c = toCandles(await fetchChart(sym, "2y", "1d"));
-        let fund = null;
-        try{
-          const fr = await fetch(`/api/fundamentals/${encodeURIComponent(sym)}`);
-          const fd = await fr.json();
-          if(fr.ok && !fd.error) fund = fd;
-        }catch(e){}
         if(comboSym("ipresSymbol")===sym){
           const sig = ipresSignalRead(sym, c, bench63, delivBySymbol, dealsData, freshTs, fund);
           if(sig){
@@ -2633,7 +2728,7 @@ async function loadIpresStock(){
         }
       }catch(e){}
     }
-    el.innerHTML = signalHtml + `<table><thead><tr><th>Date</th><th style="text-align:left">Subject</th><th></th></tr></thead><tbody>` +
+    el.innerHTML = signalHtml + finHtml + `<table><thead><tr><th>Date</th><th style="text-align:left">Subject</th><th></th></tr></thead><tbody>` +
       items.map(x=>`<tr>
         <td style="white-space:nowrap">${x.date||"—"}</td>
         <td style="text-align:left">${x.subject||""}</td>
@@ -2641,7 +2736,7 @@ async function loadIpresStock(){
       </tr>`).join("") + `</tbody></table>`;
   }catch(e){
     if(comboSym("ipresSymbol") !== sym) return;
-    el.innerHTML = `<div class="loading">Failed: ${e.message}</div>`;
+    el.innerHTML = finHtml + `<div class="loading">Failed: ${e.message}</div>`;
   }
 }
 

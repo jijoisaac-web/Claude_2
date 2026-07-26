@@ -1,10 +1,11 @@
 // GET /api/fundamentals/:symbol — Yahoo quoteSummary (needs cookie + crumb handshake)
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
-// incomeStatementHistoryQuarterly / balanceSheetHistoryQuarterly add ~last 4 quarters of net income
-// and debt so the Investor Presentations tab can read a profit-consistency / debt-reduction trend.
-// Coverage for NSE-listed names on Yahoo can be sparse — callers must treat empty arrays as "not
-// enough data", not as a real trend of zero.
-const MODULES = "price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,incomeStatementHistoryQuarterly,balanceSheetHistoryQuarterly";
+// *Quarterly modules add ~last 4 quarters, *History (annual) modules add ~last 4 years, of income
+// statement + balance sheet line items — used by the Investor Presentations tab's financial-trend
+// section (multi-quarter/multi-year ratio trend with good/bad flags) and the profit-consistency /
+// debt-reduction cross-reference checks. Coverage for NSE-listed names on Yahoo can be sparse —
+// callers must treat empty arrays as "not enough data", not as a real trend of zero.
+const MODULES = "price,summaryDetail,defaultKeyStatistics,financialData,assetProfile,incomeStatementHistoryQuarterly,balanceSheetHistoryQuarterly,incomeStatementHistory,balanceSheetHistory";
 
 let session = { cookie: null, crumb: null, ts: 0 };
 
@@ -42,21 +43,33 @@ export async function onRequestGet({ request, params }) {
     const sd = r.summaryDetail || {}, ks = r.defaultKeyStatistics || {},
           fd = r.financialData || {}, ap = r.assetProfile || {}, pr = r.price || {};
 
-    // Last ~4 quarters of net income (oldest → newest), for a profit-consistency read.
-    const quarterlyIncome = ((r.incomeStatementHistoryQuarterly || {}).incomeStatementHistory || [])
-      .map(q => ({ end: raw(q.endDate), revenue: raw(q.totalRevenue), netIncome: raw(q.netIncome) }))
+    // Income-statement periods (oldest → newest): revenue/netIncome for the profit-consistency read,
+    // plus grossProfit/operatingIncome so the financial-trend UI can show margin trends, not just
+    // a single net-income line.
+    const parseIncomeHistory = list => (list || [])
+      .map(q => ({ end: raw(q.endDate), revenue: raw(q.totalRevenue), grossProfit: raw(q.grossProfit),
+                   operatingIncome: raw(q.operatingIncome), netIncome: raw(q.netIncome) }))
       .filter(q => q.end != null)
       .sort((a, b) => a.end - b.end);
-    // Last ~4 quarters of debt (long-term + short/current portion of long-term debt), for a
-    // debt-reduction read. Falls back to null (not 0) when Yahoo doesn't carry the debt line items.
-    const quarterlyDebt = ((r.balanceSheetHistoryQuarterly || {}).balanceSheetStatements || [])
+    // Balance-sheet periods (oldest → newest): debt (long-term + short/current portion) for the
+    // debt-reduction read, plus totalAssets/totalStockholderEquity so the financial-trend UI can
+    // derive ROE and Debt/Equity per period. Falls back to null (not 0) when Yahoo doesn't carry a
+    // line item — never guess a real trend out of missing data.
+    const parseBalanceHistory = list => (list || [])
       .map(q => {
         const ltd = raw(q.longTermDebt), sltd = raw(q.shortLongTermDebt);
         const debt = (ltd != null || sltd != null) ? (ltd || 0) + (sltd || 0) : null;
-        return { end: raw(q.endDate), debt, totalLiab: raw(q.totalLiab) };
+        return { end: raw(q.endDate), debt, totalLiab: raw(q.totalLiab),
+                 totalAssets: raw(q.totalAssets), totalStockholderEquity: raw(q.totalStockholderEquity) };
       })
       .filter(q => q.end != null)
       .sort((a, b) => a.end - b.end);
+
+    // Last ~4 quarters and last ~4 years — Yahoo's *Quarterly vs annual (no suffix) history modules.
+    const quarterlyIncome = parseIncomeHistory((r.incomeStatementHistoryQuarterly || {}).incomeStatementHistory);
+    const quarterlyDebt = parseBalanceHistory((r.balanceSheetHistoryQuarterly || {}).balanceSheetStatements);
+    const yearlyIncome = parseIncomeHistory((r.incomeStatementHistory || {}).incomeStatementHistory);
+    const yearlyDebt = parseBalanceHistory((r.balanceSheetHistory || {}).balanceSheetStatements);
 
     const out = {
       symbol: decodeURIComponent(params.symbol),
@@ -96,6 +109,8 @@ export async function onRequestGet({ request, params }) {
       fcf: raw(fd.freeCashflow),
       quarterlyIncome,
       quarterlyDebt,
+      yearlyIncome,
+      yearlyDebt,
     };
     const res = new Response(JSON.stringify(out), {
       headers: {
