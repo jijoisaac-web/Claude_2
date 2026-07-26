@@ -193,7 +193,7 @@ progress{accent-color:var(--violet);}
 .collapse-arrow{display:inline-block;transition:transform .15s ease;font-size:11px;}
 .collapsible.collapsed .collapse-arrow{transform:rotate(-90deg);}
 .collapsible.collapsed .collapse-body{display:none;}
-/* ===================== per-tab background photography (v3.21 — full-page, edge-to-edge) ===================== */
+/* ===================== per-tab background photography (v3.23 — clearer photo, lighter scrim) ===================== */
 /* Real photos per tab for a "modern look". Cards/tables keep their own solid backgrounds
    (see .card, table rules above) so only the gaps between them show the photo — a dark scrim
    underneath keeps text/number readability unaffected.
@@ -209,21 +209,26 @@ progress{accent-color:var(--violet);}
    sizes against body's own final content height instead, so the photo reaches all the way to the
    bottom of the page however tall it is. The sticky <header> (its own near-opaque blurred
    background, z-index:10) sits above this layer in the stacking order, so visually the photo
-   starts right below the header + search bar, exactly where the tab content begins. */
+   starts right below the header + search bar, exactly where the tab content begins.
+   v3.23: the scrim was too dark everywhere (.74 at the top fading to .92) and the photos were
+   fetched at q=60, so on top of the header's own blur + the grain-texture overlay the whole thing
+   read as an indistinct "cloudy" haze rather than a recognizable photo. Lightened the scrim
+   (.30 at the very top, where there's normally no text yet, fading to .80 further down where
+   content needs the contrast) and raised quality/width so the image itself reads clearly. */
 body::after{content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
   background-size:cover;background-position:center top;background-repeat:no-repeat;}
-body[data-bg="dashboard"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1627327053419-fe894c4650ed?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="screener"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1744782211816-c5224434614f?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="ideas"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1508666709797-f0bb3d96324d?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="ipres"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="fundamentals"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="track"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1633265486501-0cf524a07213?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="insti"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="options"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="smc"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1762463176312-1757d5125c85?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="conv"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="mf"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=1600&q=60&auto=format&fit=crop');}
-body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1772413438617-937e44f2642e?w=1600&q=60&auto=format&fit=crop');}
+body[data-bg="dashboard"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1627327053419-fe894c4650ed?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="screener"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1744782211816-c5224434614f?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="ideas"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1508666709797-f0bb3d96324d?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="ipres"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="fundamentals"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="track"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1633265486501-0cf524a07213?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="insti"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="options"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="smc"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1762463176312-1757d5125c85?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="conv"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="mf"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=1920&q=80&auto=format&fit=crop');}
+body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,22,.30),rgba(9,13,22,.55) 35%,rgba(9,13,22,.80)),url('https://images.unsplash.com/photo-1772413438617-937e44f2642e?w=1920&q=80&auto=format&fit=crop');}
 .tab.visible{border-radius:16px;padding:20px 20px 28px;margin:-4px -4px 0;}
 </style>
 </head>

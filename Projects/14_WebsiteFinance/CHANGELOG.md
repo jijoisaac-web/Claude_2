@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.23.0] — 2026-07-26 · Background photo lightened — was reading as a plain haze
+
+- **Lightened the per-tab background scrim**: was a flat dark overlay from .74 to .92 opacity, which — combined with the header's own blur and the grain texture on top — made every tab's photo read as an indistinct dark haze rather than a recognizable image ("looks cloudy, hard to tell there's a background image"). Now fades from .30 near the top (right below the header, where there's normally no text yet) to .80 further down where content needs the contrast.
+- **Raised photo quality/resolution** (`q=60→80`, `w=1600→1920`) so the image itself is crisper instead of soft/compressed.
+
 ## [3.22.0] — 2026-07-26 · EPS/P·E/P·B added, collapsible panel, 8-quarter fetch fix
 
 - **Fixed a real bug behind the missing 8-quarter/5-year history**: the quarterly and annual timeseries requests to Yahoo were fetched with `Promise.all`, so if *either* leg failed (e.g. Yahoo has no annual timeseries for a given NSE name, or a transient error), the whole extended fetch was rejected and BOTH quarterly and yearly silently fell back to the base 4Q/4Y — even when the other leg would have succeeded on its own. Switched to `Promise.allSettled` so each leg is used independently.
