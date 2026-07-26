@@ -576,8 +576,10 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
     </select>
     <label class="muted">Volume profile <select id="smcVPBars"><option value="60">last 60 bars</option><option value="90" selected>last 90 bars</option><option value="150">last 150 bars</option></select></label>
     <button class="btn" onclick="loadSmc()">▶ Analyze</button>
+    <button class="btn ghost" onclick="explainSmcMove()">🤖 Explain this move</button>
     <span class="muted" id="smcMeta"></span>
   </div>
+  <div id="smcExplain" style="margin-bottom:10px"></div>
   <div class="cards" id="smcCards"></div>
   <div id="smcChart"></div>
   <div class="muted" style="font-size:11px;margin-bottom:10px">Dashed lines mark unmitigated (still-fresh) order block zones — green above/below for bullish, red for bearish. A block is <b>"mitigated"</b> once price has traded back into its range: whoever built the position there has had their chance to act (fill remaining orders, defend the level, or exit), so the zone is considered "used up" and loses its predictive edge. Unmitigated = price hasn't returned yet — the pending-interest idea is still live. Mitigated zones are shown in the table below but not on the chart.</div>
@@ -926,6 +928,14 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   <div class="collapsible collapsed" id="fund-concall" style="margin-top:14px">
     <h2 class="collapse-h2" onclick="toggleCollapse('fund-concall')"><span class="collapse-arrow">▾</span> Concalls &amp; investor meets</h2>
     <div class="collapse-body"><div id="concallView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-report" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-report')"><span class="collapse-arrow">▾</span> AI research report</h2>
+    <div class="collapse-body">
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Stitches together the valuation, scores, technical setup, news sentiment, promoter shareholding trend and insider activity already shown above into a short written report — it doesn't add any new data or opinion beyond what's already on this tab, it just reads it as prose. Not investment advice.</div>
+    <button class="btn ghost" onclick="generateResearchReport()">🤖 Generate report</button>
+    <div id="reportView" style="margin-top:10px"></div>
+    </div>
   </div>
 </section>
 
@@ -2337,9 +2347,57 @@ async function loadSmc(){
     renderSmcOBTable(obs, c);
     renderSmcDeals(smcDeals);
     $("smcMeta").textContent = `${nameOf(sym)} · ${c.length} bars · ${obs.length} order block${obs.length===1?"":"s"} found`;
+    // stashed for the "Explain this move" AI button — avoids re-fetching/re-detecting anything
+    window._smcCtx = {sym, c, obs, profile, smcDeals};
+    $("smcExplain").innerHTML = "";
   }catch(e){
     $("smcMeta").textContent = "Failed to load.";
     $("smcOBTable").innerHTML = `<div class="loading">${e.message}</div>`;
+  }
+}
+
+/* ---- "Explain this move" — AI read of today's action, from context already computed above ---- */
+async function explainSmcMove(){
+  const ctx = window._smcCtx;
+  const el = $("smcExplain");
+  if(!ctx){ el.innerHTML = '<div class="muted" style="font-size:12px">Run Analyze first.</div>'; return; }
+  el.innerHTML = '<div class="card"><div class="loading">Thinking…</div></div>';
+  const {sym, c, obs, profile, smcDeals} = ctx;
+  const last = c[c.length-1], prev = c[c.length-2];
+  const changePct = prev && prev.close ? (last.close-prev.close)/prev.close*100 : null;
+  const vol20 = c.slice(-21,-1).reduce((s,d)=>s+(d.volume||0),0)/Math.max(1,c.slice(-21,-1).length);
+  const volumeRatio = vol20>0 && last.volume!=null ? last.volume/vol20 : null;
+  const priceVsValueArea = profile ? (last.close>profile.vah?"above its Value Area (higher than where 70% of recent volume traded — can mean breakout, or extension)":
+    last.close<profile.val?"below its Value Area (lower than where 70% of recent volume traded — can mean breakdown, or a discount)":
+    "inside its Value Area (trading where most recent volume already agreed on)") : null;
+  const fresh = (obs||[]).filter(o=>!o.mitigated);
+  const nearest = fresh.map(o=>({...o, dist:Math.abs(last.close-(o.low+o.high)/2)})).sort((a,b)=>a.dist-b.dist)[0];
+  const nearestBlock = nearest ? `a fresh ${nearest.type} order block at ₹${fmt(nearest.low,2)}–${fmt(nearest.high,2)}, ${fmt(nearest.dist/last.close*100,1)}% away` : null;
+  const lastDeal = smcDeals && smcDeals.length ? [...smcDeals].sort((a,b)=>dealDateISO(b).localeCompare(dealDateISO(a)))[0] : null;
+  const recentDeal = lastDeal ? `${escHtml(lastDeal.client)} ${lastDeal.side} ₹${fmt(lastDeal.valueCr,1)} Cr (${lastDeal.type}) on ${dealDateISO(lastDeal)}` : null;
+  let headlines = [];
+  try{
+    const nr = await fetch(`/api/news?symbol=${encodeURIComponent(sym)}&name=${encodeURIComponent(nameOf(sym))}`);
+    const nd = await nr.json();
+    if(nr.ok && Array.isArray(nd.items)) headlines = nd.items.slice(0,6).map(i=>i.title).filter(Boolean);
+  }catch(e){}
+  try{
+    const r = await fetch(`/api/explain/${encodeURIComponent(sym)}`, { method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ name:nameOf(sym), changePct, volumeRatio, priceVsValueArea, nearestBlock, recentDeal, headlines }) });
+    const d = await r.json();
+    if(window._smcCtx !== ctx) return;   // user switched symbols while this was in flight
+    if(!d.aiConfigured){
+      el.innerHTML = '<div class="card"><div class="muted" style="font-size:12px">⚙️ AI explanation not enabled yet — same one-time setup as the News tab\'s AI brief (Cloudflare dashboard → Workers &amp; Pages → your project → Settings → Bindings → Add → Workers AI, variable name AI, then redeploy).</div></div>';
+      return;
+    }
+    if(d.error){ el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Explanation unavailable right now (${escHtml(d.error)}).</div></div>`; return; }
+    const confColor = d.confidence==="high"?"var(--green)":d.confidence==="low"?"var(--red)":"var(--amber)";
+    el.innerHTML = `<div class="card"><div class="name">Why did this move? <span style="color:${confColor};font-weight:600;text-transform:none">· ${escHtml(d.confidence||"")} confidence</span></div>
+      <div style="font-size:13px;line-height:1.6;margin-top:4px">${escHtml(d.explanation||"")}</div>
+      <div class="muted" style="font-size:10px;margin-top:6px">Generated from the numbers on this page plus recent headlines — timing correlation with a headline isn't proof of causation. Cross-check before acting.</div></div>`;
+  }catch(e){
+    if(window._smcCtx !== ctx) return;
+    el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Explanation failed: ${escHtml(e.message)}</div></div>`;
   }
 }
 function renderSmcChart(c, obs, profile, deals){
@@ -2594,6 +2652,91 @@ async function loadConcalls(sym, name){
   }catch(e){
     if(comboSym("fundSymbol") !== sym) return;
     el.innerHTML = "";   // quiet failure — this panel is a bonus, not core to the tab
+  }
+}
+
+/* ---- AI research report — stitches together data already fetched elsewhere on this tab, doesn't
+   add anything new: valuation, quality/value scores, technical setup, news sentiment, promoter
+   shareholding trend, insider filing activity. Same Workers AI pattern as news.js/finai.js/explain.js. ---- */
+async function generateResearchReport(){
+  const sym = comboSym("fundSymbol");
+  const el = $("reportView");
+  if(!sym){ el.innerHTML = '<div class="muted" style="font-size:12px">Pick a stock first.</div>'; return; }
+  el.innerHTML = '<div class="card"><div class="loading">Assembling report…</div></div>';
+  try{
+    const f = await fetchFundamentals(sym);
+    const {score:investScore, q:qualityScore, vt:valueTrapRisk} = computeInvestScore(f);
+    let techScore = null, aboveSma200 = null;
+    try{
+      let bench63 = null;
+      try{ const b = toCandles(await fetchChart("^NSEI","1y","1d")); if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1; }catch(e){}
+      const tech = scanStock(sym, toCandles(await fetchChart(sym,"2y","1d")), bench63);
+      if(tech){ techScore = Math.round(setupScore({...tech, action:"BUY"})); aboveSma200 = tech.above_sma200; }
+    }catch(e){}
+    let promoterTrend = null, promoterPct = null;
+    try{
+      const sr = await fetch(`/api/shareholding/${encodeURIComponent(sym)}`);
+      const sd = await sr.json();
+      if(sr.ok && sd.quarters && sd.quarters.length){
+        promoterPct = sd.quarters[0].promoterPct;
+        let streak=0, dir=null;
+        for(const row of sd.quarters){
+          if(row.promoterDeltaPp==null) break;
+          const rd = row.promoterDeltaPp>0?1:row.promoterDeltaPp<0?-1:0;
+          if(rd===0) break;
+          if(dir==null) dir=rd;
+          if(rd!==dir) break;
+          streak++;
+        }
+        if(streak>=2) promoterTrend = `${dir>0?"rising":"falling"} ${streak} straight quarters`;
+      }
+    }catch(e){}
+    let insiderFilings90d = 0;
+    try{
+      const ir = await fetch(`/api/insider/${encodeURIComponent(sym)}`);
+      const id = await ir.json();
+      if(ir.ok && id.filings) insiderFilings90d = id.filings.filter(x=>Date.now()-new Date(x.date).getTime()<90*86400000).length;
+    }catch(e){}
+    let newsSentiment = null;
+    try{
+      const nr = await fetch(`/api/news?symbol=${encodeURIComponent(sym)}&name=${encodeURIComponent(f.name||nameOf(sym))}`);
+      const nd = await nr.json();
+      if(nr.ok && nd.ai && typeof nd.ai.sentiment==="number") newsSentiment = nd.ai.sentiment;
+    }catch(e){}
+
+    const payload = {
+      name: f.name || nameOf(sym), sector: f.sector, industry: f.industry,
+      price: f.price!=null?fmt(f.price):null, marketCapCr: f.market_cap!=null?f.market_cap/1e7:null,
+      pe: f.pe!=null?fmt(f.pe,1):null, pb: f.pb!=null?fmt(f.pb,1):null, eps: f.eps!=null?fmt(f.eps,2):null,
+      dividendYield: f.dividend_yield, roe: f.roe!=null?f.roe*100:null, debtToEquity: f.debt_to_equity!=null?fmt(f.debt_to_equity,2):null,
+      profitMargin: f.profit_margin!=null?f.profit_margin*100:null, revenueGrowth: f.revenue_growth!=null?f.revenue_growth*100:null,
+      earningsGrowth: f.earnings_growth!=null?f.earnings_growth*100:null, recommendation: f.recommendation, targetPrice: f.target_price!=null?fmt(f.target_price):null,
+      investScore: investScore!=null?Math.round(investScore):null, qualityScore: qualityScore!=null?Math.round(qualityScore):null,
+      valueTrapRisk: valueTrapRisk!=null?Math.round(valueTrapRisk):null, techScore, aboveSma200,
+      newsSentiment, promoterTrend, promoterPct, insiderFilings90d,
+    };
+    if(comboSym("fundSymbol") !== sym) return;
+    const r = await fetch(`/api/report/${encodeURIComponent(sym)}`, { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(payload) });
+    const d = await r.json();
+    if(comboSym("fundSymbol") !== sym) return;
+    if(!d.aiConfigured){
+      el.innerHTML = '<div class="card"><div class="muted" style="font-size:12px">⚙️ AI report not enabled yet — same one-time setup as the News tab\'s AI brief (Cloudflare dashboard → Workers &amp; Pages → your project → Settings → Bindings → Add → Workers AI, variable name AI, then redeploy).</div></div>';
+      return;
+    }
+    if(d.error){ el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Report unavailable right now (${escHtml(d.error)}).</div></div>`; return; }
+    const sec = (title, text) => text ? `<div style="margin-bottom:10px"><div class="name" style="margin-bottom:2px">${title}</div><div style="font-size:13px;line-height:1.6">${escHtml(text)}</div></div>` : "";
+    el.innerHTML = `<div class="card">
+      ${sec("Overview", d.overview)}
+      ${sec("Financial health", d.financialHealth)}
+      ${sec("Technical picture", d.technicalPicture)}
+      ${sec("Institutional activity", d.institutionalActivity)}
+      ${sec("Risks", d.risks)}
+      ${sec("Bottom line", d.bottomLine)}
+      <div class="muted" style="font-size:10px;margin-top:4px">AI-generated from the app's own numbers above — not a recommendation, and it can misjudge context an analyst wouldn't. Cross-check anything that would change a decision.</div>
+    </div>`;
+  }catch(e){
+    if(comboSym("fundSymbol") !== sym) return;
+    el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Report failed: ${escHtml(e.message)}</div></div>`;
   }
 }
 

@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.26.0] — 2026-07-26 · AI layer: "explain this move" + AI research report
+
+- **New "🤖 Explain this move" on the Smart Money tab** — reads today's price/volume move, where price sits relative to its recent volume-profile Value Area, the nearest fresh order block, any disclosed bulk/block deal nearby, and recent headlines, then asks Workers AI for a plain-English read of what likely happened — including saying plainly when nothing stands out and the move looks like ordinary noise, rather than inventing a story. Shows a high/medium/low confidence tag based on how much real corroborating evidence (volume, deal, news) actually lines up.
+- **New "AI research report" section on the Fundamentals tab** — stitches together the valuation, quality/value scores, technical setup, news sentiment, promoter shareholding trend, and insider filing activity already shown elsewhere on that tab into a short written report (overview, financial health, technical picture, institutional activity, risks, bottom line). Adds no new data or opinion beyond what's already on the tab — it's an assembly + narration step, not a new analysis engine — and is explicit never to give a buy/sell instruction, only a balanced read of the trade-offs.
+- **New `/api/explain/:symbol` and `/api/report/:symbol`** — same Workers AI pattern as the existing News brief and Investor Presentations ratio-trend read: the client assembles the numeric/text context it already has, the endpoint only interprets it, nothing is fetched server-side. Both require the same one-time Workers AI binding as the other AI features; both show the same "not enabled yet" setup message if it isn't configured.
+
 ## [3.25.0] — 2026-07-26 · Conviction Scan backtest — does the gate combination itself have edge?
 
 - **New `/api/delivery-hist/:date`** — fetches NSE's daily bhavdata delivery-% archive for an arbitrary past date (not just "latest," like the existing `/api/delivery`). NSE's archive turns out to be addressable by date going back years, which is what makes a genuine point-in-time delivery-gate backtest possible without maintaining any historical archive of our own. Cached hard (30 days) since past bhavdata never changes.
