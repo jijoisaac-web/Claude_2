@@ -225,9 +225,15 @@ progress{accent-color:var(--violet);}
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="tab visible">
-  <h2>Indices</h2>
+<div class="collapsible" id="dash-idx">
+  <h2 class="collapse-h2" onclick="toggleCollapse('dash-idx')"><span class="collapse-arrow">▾</span> Indices</h2>
+  <div class="collapse-body">
   <div class="cards" id="indexCards"><div class="loading">Loading indices…</div></div>
-  <h2>Global markets &amp; macro</h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="dash-glob" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('dash-glob')"><span class="collapse-arrow">▾</span> Global markets &amp; macro</h2>
+  <div class="collapse-body">
   <div class="controls">
     <select id="globalTF" onchange="loadGlobal()">
       <option value="1" selected>1 day</option>
@@ -239,17 +245,31 @@ progress{accent-color:var(--violet);}
     <span class="muted" style="font-size:11px">Each card shows its own last-quote date — foreign markets show their latest session (closed markets = previous close).</span>
   </div>
   <div class="cards small" id="globalCards"><div class="loading">Loading…</div></div>
-  <h2>Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="dash-pulse" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('dash-pulse')"><span class="collapse-arrow">▾</span> Market pulse <span class="muted" id="pulseMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div id="pulseView"><div class="loading">Analysing market…</div></div>
-  <h2>Top opportunities today</h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="dash-opp" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('dash-opp')"><span class="collapse-arrow">▾</span> Top opportunities today</h2>
+  <div class="collapse-body">
   <div id="oppView"><div class="loading">…</div></div>
-  <h2>Watchlist</h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="dash-watch" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('dash-watch')"><span class="collapse-arrow">▾</span> Watchlist</h2>
+  <div class="collapse-body">
   <div class="controls">
     <input type="text" id="addSelect" list="allStocksDL" placeholder="Search any share…" size="24" autocomplete="off">
     <button class="btn" onclick="addToWatchlist()">+ Add</button>
     <button class="btn ghost" onclick="loadDashboard()">↻ Refresh</button>
   </div>
   <div id="watchTable"><div class="loading">Loading watchlist…</div></div>
+  </div>
+</div>
 </section>
 
 <!-- SCREENER -->
@@ -299,15 +319,29 @@ progress{accent-color:var(--violet);}
     <button class="btn ghost" onclick="$('briefsView').scrollIntoView({behavior:'smooth'})">📋 Jump to decision briefs</button>
     <span class="muted" id="ideasMeta"></span>
   </div>
-  <h2>Short term · 1–4 weeks (momentum / mean-reversion)</h2>
+  <div class="collapsible" id="ideas-short">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ideas-short')"><span class="collapse-arrow">▾</span> Short term · 1–4 weeks (momentum / mean-reversion)</h2>
+  <div class="collapse-body">
   <div id="ideasShort"><div class="loading">…</div></div>
   <div id="briefsView"></div>
-  <h2>Medium term · 1–6 months (trend following)</h2>
+  </div>
+  </div>
+  <div class="collapsible collapsed" id="ideas-med" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ideas-med')"><span class="collapse-arrow">▾</span> Medium term · 1–6 months (trend following)</h2>
+  <div class="collapse-body">
   <div id="ideasMed"><div class="loading">…</div></div>
-  <h2>Long term · 6+ months (stage-2 accumulation)</h2>
+  </div>
+  </div>
+  <div class="collapsible collapsed" id="ideas-long" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ideas-long')"><span class="collapse-arrow">▾</span> Long term · 6+ months (stage-2 accumulation)</h2>
+  <div class="collapse-body">
   <div id="ideasLong"><div class="loading">…</div></div>
+  </div>
+  </div>
 
-  <h2>Position size &amp; margin calculator</h2>
+  <div class="collapsible collapsed" id="ideas-pos" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ideas-pos')"><span class="collapse-arrow">▾</span> Position size &amp; margin calculator</h2>
+  <div class="collapse-body">
   <div class="card">
     <div class="controls" style="margin-bottom:8px;">
       <label class="muted">Capital ₹ <input type="text" id="pcCapital" value="100000" size="8" oninput="calcPosition()"></label>
@@ -321,17 +355,25 @@ progress{accent-color:var(--violet);}
     <div id="pcOut" class="muted">Click 📐 on any idea to prefill entry/stop.</div>
     <div class="muted" style="font-size:11px;margin-top:6px;">Leverage amplifies losses as much as gains — a 5x intraday position loses 5% of capital on a 1% adverse move. Delivery (1x) is safest while learning.</div>
   </div>
+  </div>
+  </div>
 </section>
 
 <!-- INSTITUTIONS: FII/DII + large deals -->
 <section id="insti" class="tab">
-  <h2>FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
+<div class="collapsible" id="insti-fiidii">
+  <h2 class="collapse-h2" onclick="toggleCollapse('insti-fiidii')"><span class="collapse-arrow">▾</span> FII / DII activity <span class="muted" id="fiidiiMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div class="controls">
     <button class="btn ghost" onclick="loadFiiDii(true);loadDeals(true)">↻ Refresh flows &amp; deals</button>
     <span class="muted" style="font-size:11px">NSE publishes provisional figures after ~6pm IST — during market hours the previous session shows (check the date).</span>
   </div>
   <div class="cards" id="fiidiiCards"><div class="loading">Loading…</div></div>
-  <h2>Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="insti-deals" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('insti-deals')"><span class="collapse-arrow">▾</span> Bulk &amp; block deals <span class="muted" id="dealsMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div class="controls" style="flex-wrap:wrap">
     <div class="rangebtns" id="dealsRangeBtns">
       <button data-d="1" class="active">1D</button>
@@ -382,7 +424,12 @@ progress{accent-color:var(--violet);}
   </div>
   <div class="muted" style="font-size:11px;margin-top:4px">"Top deals" here means biggest single disclosed trades by value — bulk/block deals aren't tagged FII vs DII in NSE's disclosure, so use the client name column to judge (foreign custodians/funds vs domestic AMCs/insurers/banks). For the actual FII/DII split, that's the cards above, which are aggregate cash-market totals, not by-name. Deal history has three layers: a git-committed baseline file (<code>site/data/deals-archive.json</code>) that every visitor bootstraps from once, on top of which your own browser keeps a local history that grows day by day just from visiting (NSE blocks its own multi-day archive from being fetched server-side, so this app can't refresh the shared baseline automatically — someone has to periodically re-export it). The "Import history" box above lets you backfill your own browser instantly from NSE's own downloadable CSV; the "Export" button next to it downloads your browser's full accumulated history as JSON so it can be dropped into <code>site/data/deals-archive.json</code> and committed/pushed, refreshing what every future visitor bootstraps from. Clearing site data/cache wipes your browser's local layer (the git baseline still bootstraps back in on next load, just without whatever days you'd added since). 3D/7D/…/1Y only show real data where it exists; the deal count and date span shown next to the heading tells you exactly what's stored right now. Rows where the <b>same client bought and sold the same stock on the same day</b> are hidden by default (that's same-day round-trip activity, not a held position) — tick the box above to see them, marked with a ROUND TRIP badge. "<b>Known large FIIs/funds only</b>" matches the client name against a curated list of ~50 large sovereign wealth funds, global asset managers and known FIIs active in Indian markets — it's a name-matching heuristic against NSE's free-text client field, not an official FII/FPI classification from NSE, so it will miss smaller or newly active funds not on the list. "<b>Known domestic institutions/groups only</b>" is the same heuristic applied to a separate curated list of large Indian promoter groups (Tata Sons, Birla Group, Reliance Group, etc.) and domestic financial institutions (LIC, GIC, nationalised banks) — also name-matching, also incomplete. Results are paginated 20 per page, newest/biggest first depending on the sort picked.</div>
 
-  <h2 style="margin-top:24px">Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
+  </div>
+</div>
+
+<div class="collapsible collapsed" id="insti-deliv" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('insti-deliv')"><span class="collapse-arrow">▾</span> Delivery % — who's taking stock home <span class="muted" id="delivMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Delivery % is the share of the day's volume actually settled into demat accounts rather than squared off intraday. <b>High delivery + price up</b> = buyers keeping the stock — genuine accumulation. <b>High delivery + price down</b> = holders genuinely exiting, not just traders. Low delivery moves are churn and usually fade. Single-day reading — always confirm against the chart.</div>
   <div class="controls" style="flex-wrap:wrap">
     <select id="delivUniverse" onchange="renderDelivery()">
@@ -403,6 +450,8 @@ progress{accent-color:var(--violet);}
     <button class="btn ghost" onclick="loadDelivery(true)">↻ Refresh</button>
   </div>
   <div id="delivTable"><div class="loading">Loading…</div></div>
+  </div>
+</div>
 </section>
 
 <!-- OPTIONS -->
@@ -424,12 +473,22 @@ progress{accent-color:var(--violet);}
   </div>
   <div class="cards" id="optCards"><div class="loading">Pick a symbol — loads NSE option chain</div></div>
   <div id="optVerdict"></div>
-  <h2>Open interest by strike <span class="muted" style="text-transform:none;font-weight:400">· green = puts (support below), red = calls (resistance above)</span></h2>
+  <div class="collapsible" id="opt-oi">
+  <h2 class="collapse-h2" onclick="toggleCollapse('opt-oi')"><span class="collapse-arrow">▾</span> Open interest by strike <span class="muted" style="text-transform:none;font-weight:400">· green = puts (support below), red = calls (resistance above)</span></h2>
+  <div class="collapse-body">
   <div class="card" id="optLadder"></div>
-  <h2>Biggest OI changes today</h2>
+  </div>
+  </div>
+  <div class="collapsible collapsed" id="opt-chg" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('opt-chg')"><span class="collapse-arrow">▾</span> Biggest OI changes today</h2>
+  <div class="collapse-body">
   <div id="optChanges"></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Options momentum scanner <span class="muted" style="text-transform:none;font-weight:400">· who has flow behind them</span></h2>
+  <div class="collapsible collapsed" id="opt-mom" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('opt-mom')"><span class="collapse-arrow">▾</span> Options momentum scanner <span class="muted" style="text-transform:none;font-weight:400">· who has flow behind them</span></h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Scans ~30 liquid F&O names and scores the bullishness of their options flow: PCR, fresh put-vs-call writing today, put-wall support proximity, room to the call wall, position vs max pain, and call unwinding overhead. High score = option writers are positioned for upside — momentum-long friendly. Stops/targets come from the OI walls themselves.</div>
   <div class="controls">
     <button class="btn" onclick="scanOptionsMomentum()">▶ Scan F&O flow</button>
@@ -438,8 +497,12 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="omResults"></div>
   <div class="muted" style="font-size:11px;margin-top:6px">OI reads are strongest near expiry and for liquid names. Writers (sellers) drive OI walls: heavy put OI = a level someone is paid to defend; heavy call OI = a ceiling someone is paid to cap. Data ~3-min delayed during market hours; stale after close. Not investment advice.</div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">IV vs realized volatility <span class="muted" style="text-transform:none;font-weight:400">· who's priced rich vs cheap</span></h2>
+  <div class="collapsible collapsed" id="opt-ivrv" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('opt-ivrv')"><span class="collapse-arrow">▾</span> IV vs realized volatility <span class="muted" style="text-transform:none;font-weight:400">· who's priced rich vs cheap</span></h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Scans the same ~30 liquid F&O names and compares each one's live ATM implied volatility (what the option chain is currently pricing) against its own realized volatility (how much it has actually moved, annualized from the last 20/60 trading days). IV running well above realized = the market is pricing in more movement than has actually been happening — historically the more favorable side to be selling premium (credit spreads, strangles). IV well below realized = premium looks cheap relative to actual movement — more favorable for buying it (long straddle/strangle). This is a relative read, not a timing signal, and says nothing about direction.</div>
   <div class="controls">
     <button class="btn" onclick="scanIvRv()">▶ Scan IV vs RV</button>
@@ -448,11 +511,15 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="ivrvResults"></div>
   <div class="muted" style="font-size:11px;margin-top:6px">IV is the chain's live ATM figure (avg of call/put where both exist); realized vol uses close-to-close log returns, no overnight-gap or intraday adjustment. Neither is forecasting the other — a rich reading can stay rich (or get richer) around known events (earnings, budget, RBI policy). Not investment advice.</div>
+  </div>
+  </div>
 </section>
 
 <!-- SMART MONEY: order blocks + volume profile -->
 <section id="smc" class="tab">
-  <h2>Smart money — order blocks &amp; volume profile</h2>
+<div class="collapsible" id="smc-main">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-main')"><span class="collapse-arrow">▾</span> Smart money — order blocks &amp; volume profile</h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">No exchange publishes who placed a trade, so this isn't a view into actual institutional order flow — it's a structural read of price and volume that approximates it. An <b>order block</b> is the last opposing candle before a sharp break of structure (a "bullish" block is the last red candle before a rally that clears a recent swing high; "bearish" is the mirror on the downside) — the classic retail-facing proxy for "this is roughly where a large position was likely built." <b>Volume profile</b> shows how much trading actually happened at each price level over the window regardless of when, with its Point of Control (POC) and Value Area marking where the most participation agreed on. Combining the two: a block sitting inside a high-volume zone has real participation behind it; one in a thin, low-volume gap is a weaker signal — that comparison is the "Vol confirmation" column below.</div>
   <div class="controls">
     <select id="smcSymbol"></select>
@@ -470,17 +537,33 @@ progress{accent-color:var(--violet);}
   <div class="cards" id="smcCards"></div>
   <div id="smcChart"></div>
   <div class="muted" style="font-size:11px;margin-bottom:10px">Dashed lines mark unmitigated (still-fresh) order block zones — green above/below for bullish, red for bearish. A block is <b>"mitigated"</b> once price has traded back into its range: whoever built the position there has had their chance to act (fill remaining orders, defend the level, or exit), so the zone is considered "used up" and loses its predictive edge. Unmitigated = price hasn't returned yet — the pending-interest idea is still live. Mitigated zones are shown in the table below but not on the chart.</div>
-  <h2 style="margin-top:12px">Volume profile <span class="muted" id="smcVPMeta" style="text-transform:none;font-weight:400"></span></h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="smc-vp" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-vp')"><span class="collapse-arrow">▾</span> Volume profile <span class="muted" id="smcVPMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div class="card" id="smcVPLadder"></div>
-  <h2 style="margin-top:20px">Order blocks <span class="muted" style="text-transform:none;font-weight:400">· most recent first</span></h2>
+  </div>
+</div>
+<div class="collapsible collapsed" id="smc-ob" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-ob')"><span class="collapse-arrow">▾</span> Order blocks <span class="muted" style="text-transform:none;font-weight:400">· most recent first</span></h2>
+  <div class="collapse-body">
   <div id="smcOBTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
   <div class="muted" style="font-size:11px;margin-top:6px">"Vol confirmation" compares how much of the window's volume traded inside a block's price range to what its width alone would predict if volume were spread evenly — above 1.0x means the zone saw more participation than an average slice of the range (volume-backed); below 1.0x means it's thinner than average (a possible low-liquidity air-pocket, more likely to be sliced through than to hold). This is a heuristic read of price/volume structure, not investment advice.</div>
+  </div>
+</div>
 
-  <h2 style="margin-top:20px">Institutional deals <span class="muted" style="text-transform:none;font-weight:400">· disclosed bulk/block trades in this window — the one signal here that isn't a proxy</span></h2>
+<div class="collapsible collapsed" id="smc-deals" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-deals')"><span class="collapse-arrow">▾</span> Institutional deals <span class="muted" style="text-transform:none;font-weight:400">· disclosed bulk/block trades in this window — the one signal here that isn't a proxy</span></h2>
+  <div class="collapse-body">
   <div id="smcDealsTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
   <div class="muted" style="font-size:11px;margin-top:6px">Everything else on this tab infers institutional activity from price/volume shape. This table is the actual disclosure: NSE-published bulk (&gt;0.5% of equity by one client in a day) and block (large negotiated-window) trades for this stock, marked on the chart above as ▲/▼ at the trade date.</div>
+  </div>
+</div>
 
-  <h2 style="margin-top:24px">Fresh block scanner <span class="muted" style="text-transform:none;font-weight:400">· new order blocks from the last 7 days, still unmitigated</span></h2>
+<div class="collapsible collapsed" id="smc-fresh" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-fresh')"><span class="collapse-arrow">▾</span> Fresh block scanner <span class="muted" style="text-transform:none;font-weight:400">· new order blocks from the last 7 days, still unmitigated</span></h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Sweeps a whole universe for order blocks whose break-of-structure fired within the last 7 days and where price hasn't yet returned to the zone — the watchlist-worthy ones. A fresh <b>bullish</b> block below price is a candidate buy-the-retest level; a fresh <b>bearish</b> block above price is a ceiling to respect. "To zone" shows how far price is from the block — small numbers mean the retest (and the decision) is near.</div>
   <div class="controls">
     <select id="smcScanUniverse">
@@ -496,6 +579,8 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="smcScanMeta"></span>
   </div>
   <div id="smcScanResults"></div>
+  </div>
+</div>
 </section>
 
 <!-- BACKTEST -->
@@ -570,7 +655,7 @@ progress{accent-color:var(--violet);}
   </div>
 </div>
 
-<div class="collapsible" id="cbt-osp" style="margin-top:28px">
+<div class="collapsible collapsed" id="cbt-osp" style="margin-top:28px">
   <h2 class="collapse-h2" onclick="toggleCollapse('cbt-osp')"><span class="collapse-arrow">▾</span> Options spread probability — indices &amp; F&amp;O stocks</h2>
   <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">NSE doesn't publish free historical option premiums, so this isn't a replay of real option prices. Instead it measures how far the underlying actually moved between past expiry-length windows and turns that into a historical "closed inside the range" hit rate for a spread width you pick — since NSE options are cash-settled on the closing level, that maps directly to probability of profit for credit spreads/iron condors (ignoring premium collected, brokerage, and slippage). Weekly/monthly windows are trading-day proxies (5d / 21d), not exact calendar expiry days, because NSE has changed the actual expiry weekday more than once (NIFTY weekly moved Thu→Tue in Sep 2025; BankNifty weekly was discontinued in Nov 2024 — it's monthly-only now; shown here in weekly form too, for comparison only). Stock options in India don't have weekly expiries at all, so weekly is disabled for the ~30 liquid F&O names below — monthly only. Below the historical tables, a live risk-profile panel pulls the real NSE option chain to show actual ₹ max profit/loss and breakeven for 1 lot of each strategy.</div>
@@ -600,7 +685,7 @@ progress{accent-color:var(--violet);}
   </div>
 </div>
 
-<div class="collapsible" id="cbt-fii" style="margin-top:28px">
+<div class="collapsible collapsed" id="cbt-fii" style="margin-top:28px">
   <h2 class="collapse-h2" onclick="toggleCollapse('cbt-fii')"><span class="collapse-arrow">▾</span> FII/institutional bulk-deal backtest <span class="muted" style="text-transform:none;font-weight:400">· did following the disclosed trade actually work out?</span></h2>
   <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Takes disclosed bulk/block deals from the lookback window below (same data as the FII/DII tab, same-day round trips excluded), fetches each stock's price history, and checks what happened between the deal date and now. This is a backtest of "follow the disclosed trade," not of the FII's actual holding period or cost basis — they may have entered earlier via other means, sized differently, or since exited; NSE only discloses this one transaction. A longer window needs more real deal history stored to be meaningful — see the FII/DII tab's "Import history" if this browser doesn't have enough yet.</div>
@@ -654,14 +739,20 @@ progress{accent-color:var(--violet);}
   </div>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Profit consistency and debt reduction come from Yahoo Finance's quarterly statements, not NSE (same reasoning as the Dividend Analysis tab) — coverage for NSE-listed names can be thin, so a grey "—" badge means <b>not enough quarterly data to judge</b>, not a fail. It's excluded from the "X of Y checkable signals" count rather than silently scored as a miss.</div>
 
-  <h2 style="margin-top:0">One stock</h2>
+  <div class="collapsible" id="ipres-stock">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ipres-stock')" style="margin-top:0"><span class="collapse-arrow">▾</span> One stock</h2>
+  <div class="collapse-body">
   <div class="controls">
     <select id="ipresSelect" onchange="if(this.value){setCombo('ipresSymbol',this.value);loadIpresStock();}"></select>
     <input type="text" id="ipresSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadIpresStock()">
   </div>
   <div id="ipresStockView"><div class="loading">Type a symbol or company name and pick from the suggestions</div></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Scan a universe <span class="muted" style="text-transform:none;font-weight:400">· stocks with a presentation filed in the last 14 days</span></h2>
+  <div class="collapsible collapsed" id="ipres-scan" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ipres-scan')"><span class="collapse-arrow">▾</span> Scan a universe <span class="muted" style="text-transform:none;font-weight:400">· stocks with a presentation filed in the last 14 days</span></h2>
+  <div class="collapse-body">
   <div class="controls">
     <select id="ipresScanUniverse">
       <option value="NIFTY 50" selected>NIFTY 50</option>
@@ -676,6 +767,8 @@ progress{accent-color:var(--violet);}
     <span class="muted" id="ipresScanMeta"></span>
   </div>
   <div id="ipresScanResults"></div>
+  </div>
+  </div>
 </section>
 
 <!-- DIVIDEND ANALYSIS -->
@@ -683,14 +776,20 @@ progress{accent-color:var(--violet);}
   <h2>Dividend history</h2>
   <div class="muted" style="font-size:11px;margin-bottom:8px">Historical dividend payouts come from Yahoo Finance's chart data, not NSE — NSE's corporate-actions endpoint (which states each dividend's official Interim/Final/Special label and face-value %) sits behind the same IP-reputation block that already defeated NSE's historical bulk/block-deals endpoints from this app's server (see the FII/DII tab). So "%" here means <b>dividend yield</b> (dividend per share ÷ price), not face-value %, and the <b>Interim/Final/Special</b> badges are a heuristic inferred from payment timing and amount, not NSE's official classification — flagged wherever it appears, not hidden.</div>
 
-  <h2 style="margin-top:0">One stock</h2>
+  <div class="collapsible" id="div-stock">
+  <h2 class="collapse-h2" onclick="toggleCollapse('div-stock')" style="margin-top:0"><span class="collapse-arrow">▾</span> One stock</h2>
+  <div class="collapse-body">
   <div class="controls">
     <select id="divSelect" onchange="if(this.value){setCombo('divSymbol',this.value);loadDividendStock();}"></select>
     <input type="text" id="divSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadDividendStock()">
   </div>
   <div id="divStockView"><div class="loading">Type a symbol or company name and pick from the suggestions</div></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Dividend knowledge base <span class="muted" style="text-transform:none;font-weight:400">· scan a universe, grouped by category</span></h2>
+  <div class="collapsible collapsed" id="div-scan" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('div-scan')"><span class="collapse-arrow">▾</span> Dividend knowledge base <span class="muted" style="text-transform:none;font-weight:400">· scan a universe, grouped by category</span></h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Builds an aggregate view of dividend behaviour across a universe: average trailing yield and typical payout cadence per category. <b>Dividend type</b> here groups stocks by their own historical cadence — Quarterly, Twice yearly (interim + final), Once yearly, or Irregular — inferred from how many times a year each stock has actually paid over its available history, which doubles as the "normal occurrence" read the category is named for.</div>
   <div class="controls">
     <select id="divScanUniverse">
@@ -712,6 +811,8 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="divScanSummary"></div>
   <div id="divScanResults"></div>
+  </div>
+  </div>
 </section>
 
 <!-- FUNDAMENTALS -->
@@ -757,7 +858,9 @@ progress{accent-color:var(--violet);}
     <span class="muted">⚠️ Your folio is stored only in this browser's local storage (never sent anywhere except the AMFI NAV lookups below) — it does <b>not</b> sync across devices or browsers automatically, and clearing browser data or using private/incognito mode will lose it. Use Export/Import below to move it to another device or keep a backup. NAVs come from AMFI's daily file via mfapi.in, refreshed once per day after markets close. Category/asset-class tagging is automated from AMFI's own scheme classification plus the scheme name — always check your CAS/factsheet before acting. Educational tool, not investment advice; switching plans can trigger exit load and capital gains tax, so check both first.</span>
   </div>
 
-  <h2>Add a fund to your folio</h2>
+  <div class="collapsible" id="mf-add">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-add')"><span class="collapse-arrow">▾</span> Add a fund to your folio</h2>
+  <div class="collapse-body">
   <div class="controls" style="flex-wrap:wrap">
     <select id="mfHouse" onchange="mfHouseChanged()"><option value="">Loading fund houses…</option></select>
     <select id="mfSchemeSel" onchange="mfSchemeSelChanged()" style="min-width:260px" disabled><option value="">Pick a fund house first</option></select>
@@ -772,8 +875,12 @@ progress{accent-color:var(--violet);}
     <button class="btn ghost" id="mfCancelBtn" style="display:none" onclick="mfCancelEdit()">Cancel</button>
   </div>
   <div class="muted" id="mfAddMeta" style="font-size:11px;margin:4px 0 14px"></div>
+  </div>
+  </div>
 
-  <h2>Your folio <span class="muted" id="mfFolioMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapsible collapsed" id="mf-folio" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-folio')"><span class="collapse-arrow">▾</span> Your folio <span class="muted" id="mfFolioMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
   <div class="controls" style="flex-wrap:wrap">
     <button class="btn ghost" onclick="mfRefreshNavs()">↻ Refresh NAVs</button>
     <button class="btn ghost" onclick="mfExportFolio()">⬇ Export</button>
@@ -782,8 +889,12 @@ progress{accent-color:var(--violet);}
   </div>
   <div class="cards" id="mfSummaryCards"></div>
   <div id="mfHoldingsTable"><div class="loading">Add a fund above to start your folio</div></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Asset allocation vs target</h2>
+  <div class="collapsible collapsed" id="mf-alloc" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-alloc')"><span class="collapse-arrow">▾</span> Asset allocation vs target</h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Each holding is bucketed into a broad asset class from AMFI's scheme category (falling back to a name-based guess for index/gold/FoF schemes, which AMFI files under "Other Scheme"). Pick a preset or set your own target mix.</div>
   <div class="controls">
     <span class="muted">Target preset:</span>
@@ -803,8 +914,12 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="mfAllocBar" class="breadthBar" style="margin:10px 0"></div>
   <div id="mfAllocTable"></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Market-cap tilt (within equity)</h2>
+  <div class="collapsible collapsed" id="mf-cap" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-cap')"><span class="collapse-arrow">▾</span> Market-cap tilt (within equity)</h2>
+  <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Large/Mid/Small tilt comes from AMFI's scheme category (Large & Mid Cap funds split 50/50 across both). Multi Cap, Flexi Cap, ELSS, Focused, Value, Contra and Sectoral/Thematic funds have no fixed mandate — shown separately as "Flexible", excluded from the target math since we can't know their actual cap mix.</div>
   <div class="controls">
     <span class="muted">Target preset:</span>
@@ -823,9 +938,15 @@ progress{accent-color:var(--violet);}
   </div>
   <div id="mfCapBar" class="breadthBar" style="margin:10px 0"></div>
   <div id="mfCapTable"></div>
+  </div>
+  </div>
 
-  <h2 style="margin-top:24px">Rebalancing recommendations</h2>
+  <div class="collapsible collapsed" id="mf-recs" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-recs')"><span class="collapse-arrow">▾</span> Rebalancing recommendations</h2>
+  <div class="collapse-body">
   <div id="mfRecs"><div class="loading">Add holdings above to see recommendations</div></div>
+  </div>
+  </div>
 </section>
 
 <div class="disclaimer"><span id="versionTag"></span> · Data via Yahoo Finance, delayed ~15 min. For information only — not investment advice.</div>

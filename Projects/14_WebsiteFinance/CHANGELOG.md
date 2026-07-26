@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.16.0] — 2026-07-25 · Collapsible sections across every tab
+
+- Every tab with more than one distinct section now uses the same collapse/expand pattern the Backtest tab already had (▾ arrow, click the heading to toggle) — **Dashboard** (Indices / Global markets / Market pulse / Top opportunities / Watchlist), **Ideas** (Short/Medium/Long term / Position calculator), **FII/DII** (FII/DII activity / Bulk & block deals / Delivery %), **Options** (Open interest / OI changes / Momentum scanner / IV vs RV), **Smart Money** (main analysis / Volume profile / Order blocks / Institutional deals / Fresh block scanner), **Investor Presentations** (One stock / Scan a universe), **Dividend Analysis** (One stock / Knowledge base), and **Mutual Funds** (Add a fund / Your folio / Asset allocation / Market-cap tilt / Rebalancing).
+- **Only the first section in each tab is expanded by default** — everything else starts collapsed, so opening a tab shows its most important view first instead of a long scroll of every section at once. The Backtest tab's existing 3 sections were adjusted the same way (only "Backtest — replay the same buy rules" stays open by default now).
+- **Screener, Fundamentals, and Conviction Scan were left as single flowing views** — none of them have more than one internal section to collapse against, so adding a collapse toggle there wouldn't declutter anything.
+
 ## [3.15.0] — 2026-07-25 · Financial trend added to Investor Presentations cross-reference
 
 - **Two new checks: "Profit consistency" and "Debt reduction"**, added to both the per-stock view and the universe scan on Investor Presentations (now 6 checks total, up from 4). Profit consistency passes when net profit was positive in every one of the last (up to 4) quarters with at most one q/q dip; debt reduction passes when total debt (long-term + short-term portion) is down 10%+ from the earliest to the most recent of the last (up to 4) quarters.
