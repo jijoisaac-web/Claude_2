@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.21.0] — 2026-07-26 · Background photo now covers the full page, edge-to-edge
+
+- **Background photo moved from the tab section to `body`** — previously painted on `.tab.visible`, which sits inside `<main>` (capped at `max-width:1200px`, centered), so on wider windows the photo never reached the left/right edges of the browser, and it only extended as far down as that tab's own content, leaving plain page background below short tabs.
+- Now painted on a `body::after` layer sized with `position:absolute;inset:0` against `body` itself (not `position:fixed`, which would reintroduce the old viewport-only-sizing bug) — this reaches the full width of the window at any size and the full height of the page however long it scrolls, switching per tab via a `body[data-bg="…"]` attribute set on tab-click and on initial load.
+- The sticky header (title + nav + search bar) sits above this layer with its own near-opaque blurred background, so visually the photo starts right below the header and search box, as intended.
+
 ## [3.20.0] — 2026-07-26 · 8Q/5Y ratio history, retention ratio, ratio glossary, AI trend read
 
 - **Removed the "Ratio snapshot" panel** on Investor Presentations "One stock" (the current-value Good/Average/Weak table) per request — superseded by the trend tables and glossary below.
