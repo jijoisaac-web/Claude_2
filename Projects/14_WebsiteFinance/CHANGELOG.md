@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.20.0] — 2026-07-26 · 8Q/5Y ratio history, retention ratio, ratio glossary, AI trend read
+
+- **Removed the "Ratio snapshot" panel** on Investor Presentations "One stock" (the current-value Good/Average/Weak table) per request — superseded by the trend tables and glossary below.
+- **History depth extended from 4 to up to 8 quarters / 5 years**: `/api/fundamentals/[symbol].js` now accepts `?extended=1`, which best-effort-fetches Yahoo's `fundamentals-timeseries` API for deeper statement history in addition to the usual `quoteSummary` modules, and only replaces the 4Q/4Y arrays if the deeper fetch actually returns more periods than that — any failure or shape mismatch falls back silently to the existing 4Q/4Y data. Only the Investor Presentations view requests this (`fetchFundamentalsExtended`, its own localStorage cache key so a plain cached entry from the Fundamentals tab can't starve it); every other caller (Fundamentals tab, peer comparison, Screener, scans) is unaffected.
+- **New "Retention ratio" trend row**: `(net income − dividends paid in that period) ÷ net income × 100`, matching dividend payments (from `/api/dividends`) into each period's window and scaling by current shares outstanding — flagged as approximate in the UI since historical share counts aren't available.
+- **Revenue CAGR** shown as a summary line under the trend tables — annualized compounding growth rate across the full window of periods with reported revenue, computed from the actual date span rather than just a period count.
+- **New ratio glossary**: definition, formula, and a worked example for each of Revenue, Gross margin, Net profit, Net margin, ROE, Retention ratio, Revenue CAGR, and PEG ratio — the example plugs in the selected stock's own most recent real numbers rather than a generic hypothetical.
+- **New AI trend read** (`/api/finai/[symbol].js`, Workers AI, same setup as the News tab's AI brief): reads the computed ratio trend and returns a plain-English summary plus the single best-performing and worst/most-concerning metric and an overall improving/stable/deteriorating call — grounded only in the numbers shown, with a note to cross-check before acting. Not edge-cached (POST body varies per stock); cached client-side for 6 hours per symbol.
+
 ## [3.19.0] — 2026-07-26 · Background photo coverage fix + Fundamentals collapse sections
 
 - **Fixed background photos only showing near the top of a tab** ("fitting to tiles, not the full screen") — the previous CSS used `background-attachment:fixed`, which sizes `cover` against the *browser viewport* rather than the tab section itself; on any section taller than one screenful, everything below the first viewport-height was left unpainted. Switched to the default `scroll` attachment so the photo + dark scrim now always size against the section's own full height, however tall its content grows. Also lightened the scrim slightly (was .90–.95 opacity, now .74–.92) so the photo reads more clearly through it.

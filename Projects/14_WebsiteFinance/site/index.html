@@ -2412,6 +2412,20 @@ async function fetchFundamentals(sym){
   try{ localStorage.setItem(FUND_CACHE+sym, JSON.stringify({ts:Date.now(), f})); }catch(e){}
   return f;
 }
+// Separate cache key from fetchFundamentals() above — this variant asks the endpoint for the
+// deeper 8-quarter/5-year statement history (?extended=1). Kept distinct so a plain (non-extended)
+// cache entry from visiting the Fundamentals tab first can never silently starve the Investor
+// Presentations trend view of the extra periods it specifically asked for.
+const FUND_EXT_CACHE = "ist_fund_ext:";
+async function fetchFundamentalsExtended(sym){
+  try{ const c = JSON.parse(localStorage.getItem(FUND_EXT_CACHE+sym));
+    if(c && Date.now()-c.ts < 60*60*1000) return c.f; }catch(e){}
+  const r = await fetch("/api/fundamentals/"+encodeURIComponent(sym)+"?extended=1");
+  const f = await r.json();
+  if(!r.ok) throw new Error(f.error||r.status);
+  try{ localStorage.setItem(FUND_EXT_CACHE+sym, JSON.stringify({ts:Date.now(), f})); }catch(e){}
+  return f;
+}
 function openFundamentals(sym){
   setCombo("fundSymbol", sym);
   document.querySelector('nav button[data-tab="fundamentals"]').click();
@@ -2622,10 +2636,10 @@ async function benchReturn63(){
   return null;
 }
 
-/* ---- financial trend & ratio-flag panel (multi-quarter/multi-year, good/bad flagged) ----
+/* ---- financial trend: up to 8 quarters / 5 years, retention ratio, glossary + AI trend read ----
    Shown on the Investor Presentations "one stock" view regardless of whether a fresh filing exists —
    it's useful on its own, not just as a cross-reference to filing timing. */
-function buildRatioTrend(incomeArr, balanceArr){
+function buildRatioTrend(incomeArr, balanceArr, dividends, sharesOut){
   const inc = incomeArr || [];
   const balByEnd = new Map((balanceArr||[]).map(b=>[b.end,b]));
   return inc.map((q,i)=>{
@@ -2633,10 +2647,25 @@ function buildRatioTrend(incomeArr, balanceArr){
     const netMargin = (q.revenue && q.netIncome!=null) ? q.netIncome/q.revenue*100 : null;
     const grossMargin = (q.revenue && q.grossProfit!=null) ? q.grossProfit/q.revenue*100 : null;
     const opMargin = (q.revenue && q.operatingIncome!=null) ? q.operatingIncome/q.revenue*100 : null;
-    const debtToEq = (bal && bal.debt!=null && bal.totalStockholderEquity) ? bal.debt/bal.totalStockholderEquity : null;
-    const roe = (bal && bal.totalStockholderEquity && q.netIncome!=null) ? q.netIncome/bal.totalStockholderEquity*100 : null;
-    return { end:q.end, revenue:q.revenue, netIncome:q.netIncome, netMargin, grossMargin, opMargin,
-      debt: bal?bal.debt:null, debtToEq, roe };
+    const equity = bal ? bal.totalStockholderEquity : null;
+    const debtToEq = (bal && bal.debt!=null && equity) ? bal.debt/equity : null;
+    const roe = (equity && q.netIncome!=null) ? q.netIncome/equity*100 : null;
+    // Retention ratio: share of net profit kept back rather than paid out as dividends this period.
+    // Approximate by design — dividends are matched by payment date falling in (prev period end,
+    // this period end], then scaled by the CURRENT share count (Yahoo doesn't expose historical
+    // share counts per period), so a stock with a big buyback/issuance years ago will see older
+    // periods skew slightly. `dividends===null` (fetch failed) leaves it unavailable; a
+    // successfully-fetched-but-empty list legitimately means "paid nothing that period" (100%).
+    let retention = null;
+    if(dividends && q.netIncome!=null && q.netIncome>0 && sharesOut){
+      const prevEnd = i>0 ? inc[i-1].end : null;
+      const perShareSum = dividends
+        .filter(d=>{ const t=new Date(d.date).getTime()/1000; return t<=q.end && (prevEnd==null || t>prevEnd); })
+        .reduce((s,d)=>s+(d.amount||0),0);
+      retention = (q.netIncome - perShareSum*sharesOut)/q.netIncome*100;
+    }
+    return { end:q.end, revenue:q.revenue, grossProfit:q.grossProfit, operatingIncome:q.operatingIncome,
+      netIncome:q.netIncome, netMargin, grossMargin, opMargin, debt: bal?bal.debt:null, equity, debtToEq, roe, retention };
   });
 }
 // A single cell showing the value plus an up/down flag vs. the previous period in the row.
@@ -2654,11 +2683,12 @@ function renderTrendTable(title, periods, periodLabelFn){
   const pctFmt = v=>fmt(v,1)+"%", crFmt = v=>fmtCr(v), xFmt = v=>fmt(v,2)+"x";
   const rows = [
     ["Revenue", p=>p.revenue, crFmt, true],
+    ["Gross margin", p=>p.grossMargin, pctFmt, true],
     ["Net profit", p=>p.netIncome, crFmt, true],
     ["Net margin", p=>p.netMargin, pctFmt, true],
-    ["Gross margin", p=>p.grossMargin, pctFmt, true],
     ["Operating margin", p=>p.opMargin, pctFmt, true],
     ["ROE (period)", p=>p.roe, pctFmt, true],
+    ["Retention ratio", p=>p.retention, pctFmt, true],
     ["Debt", p=>p.debt, crFmt, false],
     ["Debt/Equity", p=>p.debtToEq, xFmt, false],
   ];
@@ -2672,50 +2702,128 @@ function renderTrendTable(title, periods, periodLabelFn){
       `</tr>`;
     }).join("") + `</tbody></table>`;
 }
-// Current-period ratio snapshot, flagged Good/Average/Weak against generic (not sector-adjusted)
-// thresholds — reuses the same lin()/de() scoring helpers and threshold bands already established
-// for the Fundamentals tab's composite scores, so the read is consistent across the app.
-function ratioFlag(score){
-  if(score==null) return ["—","muted"];
-  return score>=0.66 ? ["Good","up"] : score>=0.33 ? ["Average","muted"] : ["Weak","down"];
+// Annualized revenue CAGR across whatever window of periods is available (first period with
+// positive revenue → last). Not a per-period row — CAGR is inherently a whole-window statistic.
+function computeCAGR(periods){
+  const withRev = (periods||[]).filter(p=>p.revenue>0);
+  if(withRev.length<2) return null;
+  const first = withRev[0], last = withRev[withRev.length-1];
+  const years = (last.end-first.end)/(365.25*86400);
+  if(!(years>0)) return null;
+  return (Math.pow(last.revenue/first.revenue, 1/years)-1)*100;
 }
-function renderRatioSnapshot(f){
-  const rows = [
-    ["ROE", f.roe!=null?fmt(f.roe*100,1)+"%":"—", lin(f.roe,0.05,0.20)],
-    ["Operating margin", f.operating_margin!=null?fmt(f.operating_margin*100,1)+"%":"—", lin(f.operating_margin,0,0.20)],
-    ["Gross margin", f.gross_margin!=null?fmt(f.gross_margin*100,1)+"%":"—", lin(f.gross_margin,0.10,0.40)],
-    ["Net margin", f.profit_margin!=null?fmt(f.profit_margin*100,1)+"%":"—", lin(f.profit_margin,0,0.15)],
-    ["Debt/Equity", de(f)!=null?fmt(de(f),2)+"x":"—", de(f)!=null?lin(de(f),2,0.3):null],
-    ["Current ratio", f.current_ratio!=null?fmt(f.current_ratio,2)+"x":"—", lin(f.current_ratio,0.8,1.5)],
-    ["ROA", f.roa!=null?fmt(f.roa*100,1)+"%":"—", lin(f.roa,0.02,0.08)],
-    ["P/E", fmt(f.pe,1), f.pe!=null?lin(f.pe,40,12):null],
-    ["P/B", fmt(f.pb,1), f.pb!=null?lin(f.pb,8,1.5):null],
+const fmtEnd = end => end==null ? "—" : new Date(end*1000).toISOString().slice(0,10);
+// Definitions + formula + a worked example using THIS stock's own most recent numbers (rather than
+// a generic hypothetical) — covers the same 8 ratios the reference material asked for: Revenue,
+// Gross Margin, Net Profit, Net Margin, ROE, Retention Ratio, Revenue CAGR, PEG.
+function renderRatioGlossary(fund, qTrend, yTrend){
+  const p = qTrend.length ? qTrend[qTrend.length-1] : (yTrend.length ? yTrend[yTrend.length-1] : null);
+  const plabel = qTrend.length ? "latest quarter" : "latest year";
+  const stockName = (fund && fund.name) || "this stock";
+  const cagr = computeCAGR(yTrend) ?? computeCAGR(qTrend);
+  const peg = (fund && fund.pe!=null && fund.earnings_growth) ? fund.pe/(fund.earnings_growth*100) : null;
+  const entries = [
+    { name:"Revenue", def:"Total money generated from sales before any deductions.", formula:"Units sold × price",
+      example: p ? `${stockName}'s ${plabel} (ending ${fmtEnd(p.end)}): revenue was ${fmtCr(p.revenue)}.` : "Not enough data for this stock yet." },
+    { name:"Gross margin", def:"Percentage of revenue kept after subtracting direct production/service costs (COGS).", formula:"(Revenue − COGS) ÷ Revenue × 100",
+      example: (p && p.grossProfit!=null && p.revenue) ? `${fmtCr(p.grossProfit)} ÷ ${fmtCr(p.revenue)} × 100 = ${fmt(p.grossMargin,1)}% kept after direct costs.` : "Gross profit isn't separately reported for this stock on Yahoo." },
+    { name:"Net profit", def:"Final bottom-line earnings left after all operating expenses, interest and taxes.", formula:"Revenue − total expenses",
+      example: p ? `${stockName}'s ${plabel}: ${fmtCr(p.netIncome)} left over as pure take-home earnings.` : "Not enough data for this stock yet." },
+    { name:"Net margin", def:"The percentage of revenue that successfully converts into final net profit.", formula:"Net profit ÷ Revenue × 100",
+      example: (p && p.netIncome!=null && p.revenue) ? `${fmtCr(p.netIncome)} ÷ ${fmtCr(p.revenue)} × 100 = ${fmt(p.netMargin,1)}% — that many rupees per ₹100 of sales is pure profit.` : "Not enough data for this stock yet." },
+    { name:"Return on Equity (ROE)", def:"Measures how efficiently management generates profit using shareholders' own capital.", formula:"Net income ÷ Shareholders' equity × 100",
+      example: (p && p.equity && p.netIncome!=null) ? `${fmtCr(p.netIncome)} ÷ ${fmtCr(p.equity)} × 100 = ${fmt(p.roe,1)}% return on the equity shareholders have invested.` : "Equity figure isn't reported for this stock on Yahoo." },
+    { name:"Retention ratio", def:"Share of earnings the company keeps back to fund future growth instead of paying out as dividends.", formula:"(Net income − dividends paid) ÷ Net income × 100",
+      example: (p && p.retention!=null) ? `${fmt(p.retention,0)}% of ${plabel}'s profit was ploughed back rather than paid out as dividends.` : "Needs both a profitable period and dividend-payment data — one of the two is unavailable here." },
+    { name:"Revenue CAGR", def:"The smoothed, compounding annualized growth rate of revenue over the window shown.", formula:"(Ending revenue ÷ Starting revenue)^(1 ÷ years) − 1",
+      example: cagr!=null ? `Across the ${yTrend.length>=2?yTrend.length+" years":qTrend.length+" quarters"} above: a ${fmt(cagr,1)}% compound annual growth rate.` : "Not enough periods with positive revenue to compute this yet." },
+    { name:"PEG ratio", def:"Compares the current market valuation (P/E) to the pace of earnings growth, to judge if a stock is priced fairly for its growth.", formula:"P/E ÷ Annual EPS growth rate (%)",
+      example: peg!=null ? `${fmt(fund.pe,1)} P/E ÷ ${fmt(fund.earnings_growth*100,1)}% growth = ${fmt(peg,2)} — ${peg<1?"cheap relative to its growth rate":peg<=1.5?"roughly fair for its growth rate":"pricier than its growth rate alone would justify"}.` : "Needs both a positive P/E and a positive earnings-growth figure." },
   ];
-  return `<table style="margin-bottom:4px"><thead><tr><th style="text-align:left">Ratio</th><th>Value</th><th>Read</th></tr></thead><tbody>` +
-    rows.map(([label,val,score])=>{
-      const [lbl,c] = ratioFlag(score);
-      return `<tr><td style="text-align:left">${label}</td><td>${val}</td><td class="${c}">${lbl}</td></tr>`;
-    }).join("") + `</tbody></table>`;
+  return `<div class="muted" style="font-size:12px;margin:10px 0 4px"><b style="color:var(--text)">What these ratios mean</b> — definitions, formulas, and a worked example using ${stockName}'s own numbers</div>
+    <table style="margin-bottom:4px"><thead><tr><th style="text-align:left">Ratio</th><th style="text-align:left">Definition</th><th style="text-align:left">Formula</th><th style="text-align:left">Worked example</th></tr></thead><tbody>` +
+    entries.map(e=>`<tr><td style="text-align:left;white-space:nowrap"><b>${e.name}</b></td><td style="text-align:left;font-size:12px">${e.def}</td><td style="text-align:left;font-size:12px;white-space:nowrap">${e.formula}</td><td style="text-align:left;font-size:12px">${e.example}</td></tr>`).join("") +
+    `</tbody></table>`;
 }
-function renderFinancialTrend(fund){
+function renderFinancialTrendHtml(fund, qTrend, yTrend){
   if(!fund) return `<div class="card" style="margin-bottom:10px"><b>Financial trend</b><div class="muted" style="font-size:12px;margin-top:4px">Fundamentals unavailable for this stock right now.</div></div>`;
-  const qTrend = buildRatioTrend((fund.quarterlyIncome||[]).slice(-4), fund.quarterlyDebt||[]);
-  const yTrend = buildRatioTrend((fund.yearlyIncome||[]).slice(-4), fund.yearlyDebt||[]);
   const qLabel = end => end==null ? "—" : new Date(end*1000).toLocaleDateString("en-IN",{month:"short",year:"2-digit"});
   const yLabel = end => end==null ? "—" : new Date(end*1000).getUTCFullYear();
-  const qTable = qTrend.length>=2 ? renderTrendTable(`Last ${qTrend.length} quarters`, qTrend, qLabel)
+  const qTable = qTrend.length>=2 ? renderTrendTable(`Last ${qTrend.length} quarter${qTrend.length>1?"s":""}`, qTrend, qLabel)
     : `<div class="muted" style="font-size:12px">Not enough quarterly statement data on Yahoo for this stock.</div>`;
-  const yTable = yTrend.length>=2 ? renderTrendTable(`Last ${yTrend.length} years`, yTrend, yLabel)
+  const yTable = yTrend.length>=2 ? renderTrendTable(`Last ${yTrend.length} year${yTrend.length>1?"s":""}`, yTrend, yLabel)
     : `<div class="muted" style="font-size:12px">Not enough annual statement data on Yahoo for this stock.</div>`;
+  const cagr = computeCAGR(yTrend) ?? computeCAGR(qTrend);
+  const cagrLine = cagr!=null ? `<div class="muted" style="font-size:12px;margin-top:2px">Revenue CAGR over this window: <b class="${cls(cagr)}">${sign(cagr)}${fmt(cagr,1)}%</b> annualized.</div>` : "";
   return `<div class="card" style="margin-bottom:10px">
-    <b>Financial trend &amp; ratios</b>
-    <div class="muted" style="font-size:11px;margin:4px 0 8px">Trailing quarters/years from Yahoo's statement data — <span class="up">green</span> means improved vs. the prior period shown, <span class="down">red</span> means worsened. Coverage for NSE-listed names on Yahoo can be thin; a blank cell means "not reported", not zero.</div>
+    <b>Financial trend &amp; ratios</b> <span class="muted" style="font-size:11px">· up to 8 quarters / 5 years, whatever Yahoo carries for this stock</span>
+    <div class="muted" style="font-size:11px;margin:4px 0 8px">Trailing quarters/years from Yahoo's statement data — <span class="up">green</span> means improved vs. the prior period shown, <span class="down">red</span> means worsened. Coverage for NSE-listed names on Yahoo can be thin — a blank cell means "not reported", not zero, and fewer than 8 quarters/5 years just means Yahoo doesn't carry more history for this name.</div>
     ${qTable}
     ${yTable}
-    <div class="muted" style="font-size:12px;margin-top:8px"><b style="color:var(--text)">Ratio snapshot</b> (current)</div>
-    ${renderRatioSnapshot(fund)}
-    <div class="muted" style="font-size:11px">Generic thresholds, not sector-adjusted — a capital-intensive business (utilities, NBFCs) naturally runs higher debt and lower margins than a software company. Cross-check against the peer comparison on the Fundamentals tab before judging.</div>
+    ${cagrLine}
+    ${renderRatioGlossary(fund, qTrend, yTrend)}
+    <div id="finaiCard" class="card" style="margin-top:10px;border-color:#3d4d75"><div class="loading">Reading the trend…</div></div>
   </div>`;
+}
+
+/* ---- AI read of the ratio trend — same Workers AI pattern as the News tab's bull/bear brief,
+   just fed this stock's own computed numbers instead of headlines. ---- */
+const FINAI_CACHE = "ist_finai:";
+function trendForAI(periods){
+  return (periods||[]).map(p=>({
+    label: p.end ? new Date(p.end*1000).toISOString().slice(0,7) : "—",
+    revenue: p.revenue!=null?Math.round(p.revenue/1e7):null,
+    netIncome: p.netIncome!=null?Math.round(p.netIncome/1e7):null,
+    netMargin: p.netMargin!=null?Math.round(p.netMargin*10)/10:null,
+    grossMargin: p.grossMargin!=null?Math.round(p.grossMargin*10)/10:null,
+    opMargin: p.opMargin!=null?Math.round(p.opMargin*10)/10:null,
+    roe: p.roe!=null?Math.round(p.roe*10)/10:null,
+    debt: p.debt!=null?Math.round(p.debt/1e7):null,
+    debtToEq: p.debtToEq!=null?Math.round(p.debtToEq*100)/100:null,
+    retention: p.retention!=null?Math.round(p.retention):null,
+  }));
+}
+function paintFinAI(sym, html, attempts){
+  attempts = attempts||0;
+  if(comboSym("ipresSymbol") !== sym) return;
+  const el = $("finaiCard");
+  if(el){ el.innerHTML = html; return; }
+  if(attempts<10) setTimeout(()=>paintFinAI(sym, html, attempts+1), 300);   // el not painted yet — retry briefly
+}
+function renderFinAIResult(d){
+  return `<b>AI read of the trend</b>
+    <div style="font-size:13px;line-height:1.6;margin:6px 0">${escHtml(d.summary||"")}</div>
+    <div class="pulse-grid" style="grid-template-columns:1fr 1fr;margin:6px 0">
+      <div class="card" style="border-color:rgba(52,211,153,.3)"><div class="name">Best</div><div style="font-size:12.5px;line-height:1.5;margin-top:3px">${escHtml(d.best||"—")}</div></div>
+      <div class="card" style="border-color:rgba(251,113,133,.3)"><div class="name">Worst</div><div style="font-size:12.5px;line-height:1.5;margin-top:3px">${escHtml(d.worst||"—")}</div></div>
+    </div>
+    <div class="muted" style="font-size:12px">${escHtml(d.trend||"")}</div>
+    <div class="muted" style="font-size:10px;margin-top:6px">Generated from the exact numbers in the tables above — it can still misjudge context (one-off items, seasonality, restatements). Cross-check before acting on it.</div>`;
+}
+async function triggerFinAI(sym, fund, qTrend, yTrend){
+  if(qTrend.length<2 && yTrend.length<2){
+    paintFinAI(sym, '<div class="muted" style="font-size:12px">Not enough quarters/years of data yet for an AI trend read.</div>');
+    return;
+  }
+  const payload = { name: (fund && fund.name) || sym, quarterly: trendForAI(qTrend), yearly: trendForAI(yTrend) };
+  const cacheKey = FINAI_CACHE+sym;
+  try{
+    const c = JSON.parse(localStorage.getItem(cacheKey));
+    if(c && Date.now()-c.ts < 6*60*60*1000 && c.q===qTrend.length && c.y===yTrend.length){ paintFinAI(sym, renderFinAIResult(c.data)); return; }
+  }catch(e){}
+  try{
+    const r = await fetch(`/api/finai/${encodeURIComponent(sym)}`, { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(payload) });
+    const d = await r.json();
+    if(!d.aiConfigured){
+      paintFinAI(sym, '<div class="muted" style="font-size:12px">⚙️ AI trend read not enabled yet — same one-time setup as the News tab\'s AI brief (Cloudflare dashboard → Workers &amp; Pages → your project → Settings → Bindings → Add → Workers AI, variable name AI, then redeploy). The tables above work regardless.</div>');
+      return;
+    }
+    if(d.error){ paintFinAI(sym, `<div class="muted" style="font-size:12px">AI trend read unavailable right now (${escHtml(d.error)}).</div>`); return; }
+    try{ localStorage.setItem(cacheKey, JSON.stringify({ts:Date.now(), q:qTrend.length, y:yTrend.length, data:d})); }catch(e){}
+    paintFinAI(sym, renderFinAIResult(d));
+  }catch(e){
+    paintFinAI(sym, `<div class="muted" style="font-size:12px">AI trend read failed: ${escHtml(e.message)}</div>`);
+  }
 }
 
 async function loadIpresStock(){
@@ -2725,9 +2833,16 @@ async function loadIpresStock(){
   if(!sym){ el.innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   el.innerHTML = '<div class="loading">Loading…</div>';
   let fund = null;
-  try{ fund = await fetchFundamentals(sym); }catch(e){}
+  try{ fund = await fetchFundamentalsExtended(sym); }catch(e){}
   if(comboSym("ipresSymbol") !== sym) return;
-  const finHtml = renderFinancialTrend(fund);
+  let divs = null;
+  try{ const dr = await fetch(`/api/dividends/${encodeURIComponent(sym)}`); const dd = await dr.json(); if(dr.ok && dd.dividends) divs = dd.dividends; }catch(e){}
+  if(comboSym("ipresSymbol") !== sym) return;
+  const sharesOut = (fund && fund.market_cap && fund.price) ? fund.market_cap/fund.price : null;
+  const qTrend = fund ? buildRatioTrend((fund.quarterlyIncome||[]).slice(-8), fund.quarterlyDebt||[], divs, sharesOut) : [];
+  const yTrend = fund ? buildRatioTrend((fund.yearlyIncome||[]).slice(-5), fund.yearlyDebt||[], divs, sharesOut) : [];
+  const finHtml = renderFinancialTrendHtml(fund, qTrend, yTrend);
+  if(fund) triggerFinAI(sym, fund, qTrend, yTrend);   // fire-and-forget; paints into #finaiCard once ready
   try{
     const r = await fetch(`/api/announcements/${encodeURIComponent(sym.replace(".NS",""))}`);
     const d = await r.json();

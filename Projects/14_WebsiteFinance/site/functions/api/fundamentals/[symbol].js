@@ -1,4 +1,10 @@
 // GET /api/fundamentals/:symbol — Yahoo quoteSummary (needs cookie + crumb handshake)
+// GET /api/fundamentals/:symbol?extended=1 — same, plus a best-effort deeper history fetch
+// (Yahoo's fundamentals-timeseries API) for up to 8 quarters / 5 years instead of the usual ~4/4 —
+// used only by the Investor Presentations "one stock" view, which needs the longer trend. The
+// `extended` flag keeps every other caller (Fundamentals tab, peer comparison, Screener, scans)
+// on the fast 3-request path unchanged, since the extra timeseries calls add latency that isn't
+// worth paying for a bulk scan or a 15-stock peer comparison.
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 // *Quarterly modules add ~last 4 quarters, *History (annual) modules add ~last 4 years, of income
 // statement + balance sheet line items — used by the Investor Presentations tab's financial-trend
@@ -24,8 +30,78 @@ async function getSession() {
 
 const raw = (v) => (v && typeof v === "object" ? v.raw ?? null : v ?? null);
 
+// ---- deeper history via Yahoo's fundamentals-timeseries API (best-effort, unverified against a
+// live response since this sandbox can't reach Yahoo directly — wrapped so any failure or shape
+// mismatch just falls back to the quoteSummary-derived 4Q/4Y data, never breaks the base response.
+const TS_INCOME_FIELDS = ["TotalRevenue", "GrossProfit", "OperatingIncome", "NetIncome"];
+const TS_BALANCE_FIELDS = ["TotalDebt", "LongTermDebt", "CurrentDebt", "StockholdersEquity", "TotalAssets"];
+
+async function fetchTimeseriesMap(symbol, cookie, crumb, prefix, fields) {
+  const types = fields.map(f => prefix + f).join(",");
+  const period2 = Math.floor(Date.now() / 1000);
+  const period1 = period2 - 6 * 365 * 86400;   // ~6y back — comfortably covers 5 fiscal years + buffer
+  const tsUrl = `https://query2.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/${symbol}` +
+    `?symbol=${symbol}&type=${types}&period1=${period1}&period2=${period2}&merge=false&crumb=${encodeURIComponent(crumb)}`;
+  const r = await fetch(tsUrl, { headers: { "user-agent": UA, cookie, accept: "application/json" } });
+  if (!r.ok) throw new Error(`yahoo timeseries ${r.status}`);
+  const j = await r.json();
+  const results = (j.timeseries && j.timeseries.result) || [];
+  const byDate = new Map();   // "YYYY-MM-DD" -> { TotalRevenue: n, NetIncome: n, ... }
+  for (const entry of results) {
+    const type = entry && entry.meta && entry.meta.type && entry.meta.type[0];
+    if (!type || !type.startsWith(prefix)) continue;
+    const field = fields.find(f => type === prefix + f);
+    if (!field) continue;
+    const arr = entry[type];
+    if (!Array.isArray(arr)) continue;
+    for (const item of arr) {
+      if (!item || item.asOfDate == null) continue;
+      const val = item.reportedValue && typeof item.reportedValue.raw === "number" ? item.reportedValue.raw : null;
+      if (val == null) continue;
+      const rec = byDate.get(item.asOfDate) || {};
+      rec[field] = val;
+      byDate.set(item.asOfDate, rec);
+    }
+  }
+  return byDate;
+}
+const toEndSeconds = dateStr => { const t = Date.parse(dateStr + "T00:00:00Z"); return isNaN(t) ? null : Math.floor(t / 1000); };
+function timeseriesToIncomeArray(byDate) {
+  return [...byDate.entries()]
+    .map(([date, v]) => ({ end: toEndSeconds(date), revenue: v.TotalRevenue ?? null, grossProfit: v.GrossProfit ?? null,
+                            operatingIncome: v.OperatingIncome ?? null, netIncome: v.NetIncome ?? null }))
+    .filter(q => q.end != null && (q.revenue != null || q.netIncome != null))
+    .sort((a, b) => a.end - b.end);
+}
+function timeseriesToBalanceArray(byDate) {
+  return [...byDate.entries()]
+    .map(([date, v]) => {
+      const debt = v.TotalDebt ?? ((v.LongTermDebt != null || v.CurrentDebt != null) ? (v.LongTermDebt || 0) + (v.CurrentDebt || 0) : null);
+      return { end: toEndSeconds(date), debt, totalLiab: null, totalAssets: v.TotalAssets ?? null,
+               totalStockholderEquity: v.StockholdersEquity ?? null };
+    })
+    .filter(q => q.end != null)
+    .sort((a, b) => a.end - b.end);
+}
+async function fetchExtendedHistory(symbol, cookie, crumb) {
+  const allFields = [...TS_INCOME_FIELDS, ...TS_BALANCE_FIELDS];
+  // Two calls total (quarterly + annual), each carrying both income and balance-sheet field types —
+  // cheaper than four separate round trips, and either can fail independently without the other.
+  const [qMap, yMap] = await Promise.all([
+    fetchTimeseriesMap(symbol, cookie, crumb, "quarterly", allFields),
+    fetchTimeseriesMap(symbol, cookie, crumb, "annual", allFields),
+  ]);
+  return {
+    quarterlyIncome: timeseriesToIncomeArray(qMap).slice(-8),
+    quarterlyDebt: timeseriesToBalanceArray(qMap).slice(-8),
+    yearlyIncome: timeseriesToIncomeArray(yMap).slice(-5),
+    yearlyDebt: timeseriesToBalanceArray(yMap).slice(-5),
+  };
+}
+
 export async function onRequestGet({ request, params }) {
   const url = new URL(request.url);
+  const wantExtended = url.searchParams.get("extended") === "1";
   const cache = caches.default;
   const cacheKey = new Request(url.toString());
   const hit = await cache.match(cacheKey);
@@ -66,10 +142,24 @@ export async function onRequestGet({ request, params }) {
       .sort((a, b) => a.end - b.end);
 
     // Last ~4 quarters and last ~4 years — Yahoo's *Quarterly vs annual (no suffix) history modules.
-    const quarterlyIncome = parseIncomeHistory((r.incomeStatementHistoryQuarterly || {}).incomeStatementHistory);
-    const quarterlyDebt = parseBalanceHistory((r.balanceSheetHistoryQuarterly || {}).balanceSheetStatements);
-    const yearlyIncome = parseIncomeHistory((r.incomeStatementHistory || {}).incomeStatementHistory);
-    const yearlyDebt = parseBalanceHistory((r.balanceSheetHistory || {}).balanceSheetStatements);
+    let quarterlyIncome = parseIncomeHistory((r.incomeStatementHistoryQuarterly || {}).incomeStatementHistory);
+    let quarterlyDebt = parseBalanceHistory((r.balanceSheetHistoryQuarterly || {}).balanceSheetStatements);
+    let yearlyIncome = parseIncomeHistory((r.incomeStatementHistory || {}).incomeStatementHistory);
+    let yearlyDebt = parseBalanceHistory((r.balanceSheetHistory || {}).balanceSheetStatements);
+
+    // Best-effort: try to stretch quarterly to 8 periods and yearly to 5 via the timeseries API.
+    // Only ever *replaces* a shorter array with a longer one — if the timeseries call fails or
+    // Yahoo simply doesn't carry more history for this NSE name, callers still get the same 4Q/4Y
+    // they'd have gotten before this existed.
+    if (wantExtended) {
+      try {
+        const ext = await fetchExtendedHistory(symbol, cookie, crumb);
+        if (ext.quarterlyIncome.length > quarterlyIncome.length) quarterlyIncome = ext.quarterlyIncome;
+        if (ext.quarterlyDebt.length > quarterlyDebt.length) quarterlyDebt = ext.quarterlyDebt;
+        if (ext.yearlyIncome.length > yearlyIncome.length) yearlyIncome = ext.yearlyIncome;
+        if (ext.yearlyDebt.length > yearlyDebt.length) yearlyDebt = ext.yearlyDebt;
+      } catch (e) { /* fall back silently to the 4Q/4Y already computed above */ }
+    }
 
     const out = {
       symbol: decodeURIComponent(params.symbol),
