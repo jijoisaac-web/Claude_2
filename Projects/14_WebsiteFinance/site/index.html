@@ -2674,8 +2674,12 @@ function buildRatioTrend(incomeArr, balanceArr, dividends, sharesOut){
         .reduce((s,d)=>s+(d.amount||0),0);
       retention = (q.netIncome - perShareSum*sharesOut)/q.netIncome*100;
     }
+    // EPS per period — same approximation caveat as retention ratio: uses the CURRENT share count
+    // (Yahoo doesn't expose historical share counts per period), so older periods can skew slightly
+    // if the share count has since changed materially (buyback, split, fresh issuance).
+    const eps = (q.netIncome!=null && sharesOut) ? q.netIncome/sharesOut : null;
     return { end:q.end, revenue:q.revenue, grossProfit:q.grossProfit, operatingIncome:q.operatingIncome,
-      netIncome:q.netIncome, netMargin, grossMargin, opMargin, debt: bal?bal.debt:null, equity, debtToEq, roe, retention };
+      netIncome:q.netIncome, netMargin, grossMargin, opMargin, debt: bal?bal.debt:null, equity, debtToEq, roe, retention, eps };
   });
 }
 // A single cell showing the value plus an up/down flag vs. the previous period in the row.
@@ -2690,13 +2694,14 @@ function trendCell(val, prevVal, higherIsBetter, fmtFn){
 }
 function renderTrendTable(title, periods, periodLabelFn){
   if(!periods || periods.length<2) return "";
-  const pctFmt = v=>fmt(v,1)+"%", crFmt = v=>fmtCr(v), xFmt = v=>fmt(v,2)+"x";
+  const pctFmt = v=>fmt(v,1)+"%", crFmt = v=>fmtCr(v), xFmt = v=>fmt(v,2)+"x", rsFmt = v=>"₹"+fmt(v,2);
   const rows = [
     ["Revenue", p=>p.revenue, crFmt, true],
     ["Gross margin", p=>p.grossMargin, pctFmt, true],
     ["Net profit", p=>p.netIncome, crFmt, true],
     ["Net margin", p=>p.netMargin, pctFmt, true],
     ["Operating margin", p=>p.opMargin, pctFmt, true],
+    ["EPS (approx.)", p=>p.eps, rsFmt, true],
     ["ROE (period)", p=>p.roe, pctFmt, true],
     ["Retention ratio", p=>p.retention, pctFmt, true],
     ["Debt", p=>p.debt, crFmt, false],
@@ -2743,12 +2748,18 @@ function renderRatioGlossary(fund, qTrend, yTrend){
       example: (p && p.netIncome!=null && p.revenue) ? `${fmtCr(p.netIncome)} ÷ ${fmtCr(p.revenue)} × 100 = ${fmt(p.netMargin,1)}% — that many rupees per ₹100 of sales is pure profit.` : "Not enough data for this stock yet." },
     { name:"Return on Equity (ROE)", def:"Measures how efficiently management generates profit using shareholders' own capital.", formula:"Net income ÷ Shareholders' equity × 100",
       example: (p && p.equity && p.netIncome!=null) ? `${fmtCr(p.netIncome)} ÷ ${fmtCr(p.equity)} × 100 = ${fmt(p.roe,1)}% return on the equity shareholders have invested.` : "Equity figure isn't reported for this stock on Yahoo." },
+    { name:"Earnings Per Share (EPS)", def:"Net profit sliced down to a per-share basis — what each single share earned.", formula:"Net income ÷ Shares outstanding",
+      example: (fund && fund.eps!=null) ? `Yahoo's trailing EPS for ${stockName}: ₹${fmt(fund.eps,2)} earned per share over the last 12 months.` : (p && p.eps!=null) ? `${plabel}: ${fmtCr(p.netIncome)} ÷ shares outstanding ≈ ₹${fmt(p.eps,2)} per share (approximate — uses today's share count against that period's profit).` : "Not enough data for this stock yet." },
     { name:"Retention ratio", def:"Share of earnings the company keeps back to fund future growth instead of paying out as dividends.", formula:"(Net income − dividends paid) ÷ Net income × 100",
       example: (p && p.retention!=null) ? `${fmt(p.retention,0)}% of ${plabel}'s profit was ploughed back rather than paid out as dividends.` : "Needs both a profitable period and dividend-payment data — one of the two is unavailable here." },
     { name:"Revenue CAGR", def:"The smoothed, compounding annualized growth rate of revenue over the window shown.", formula:"(Ending revenue ÷ Starting revenue)^(1 ÷ years) − 1",
       example: cagr!=null ? `Across the ${yTrend.length>=2?yTrend.length+" years":qTrend.length+" quarters"} above: a ${fmt(cagr,1)}% compound annual growth rate.` : "Not enough periods with positive revenue to compute this yet." },
     { name:"PEG ratio", def:"Compares the current market valuation (P/E) to the pace of earnings growth, to judge if a stock is priced fairly for its growth.", formula:"P/E ÷ Annual EPS growth rate (%)",
       example: peg!=null ? `${fmt(fund.pe,1)} P/E ÷ ${fmt(fund.earnings_growth*100,1)}% growth = ${fmt(peg,2)} — ${peg<1?"cheap relative to its growth rate":peg<=1.5?"roughly fair for its growth rate":"pricier than its growth rate alone would justify"}.` : "Needs both a positive P/E and a positive earnings-growth figure." },
+    { name:"Price-to-Earnings (P/E)", def:"How many years of current earnings the market price is asking you to pay — a market valuation multiple, not a statement ratio, so it's a single current value rather than a per-period trend.", formula:"Share price ÷ EPS",
+      example: (fund && fund.pe!=null) ? `${stockName}'s current price is ${fmt(fund.pe,1)}× its trailing EPS${fund.eps!=null?` (₹${fmt(fund.price,2)} ÷ ₹${fmt(fund.eps,2)})`:""}.` : "P/E isn't available for this stock right now (needs a positive EPS)." },
+    { name:"Price-to-Book (P/B)", def:"Compares the market price to the accounting (book) value of the company per share — under 1 can flag deep-value or distress, well above sector peers can flag a rich valuation.", formula:"Share price ÷ Book value per share",
+      example: (fund && fund.pb!=null) ? `${stockName}: ${fmt(fund.pb,1)}× its book value${fund.book_value!=null?` (₹${fmt(fund.price,2)} ÷ ₹${fmt(fund.book_value,2)} book value/share)`:""}.` : "P/B isn't available for this stock right now." },
   ];
   return `<div class="muted" style="font-size:12px;margin:10px 0 4px"><b style="color:var(--text)">What these ratios mean</b> — definitions, formulas, and a worked example using ${stockName}'s own numbers</div>
     <table style="margin-bottom:4px"><thead><tr><th style="text-align:left">Ratio</th><th style="text-align:left">Definition</th><th style="text-align:left">Formula</th><th style="text-align:left">Worked example</th></tr></thead><tbody>` +
@@ -2765,14 +2776,26 @@ function renderFinancialTrendHtml(fund, qTrend, yTrend){
     : `<div class="muted" style="font-size:12px">Not enough annual statement data on Yahoo for this stock.</div>`;
   const cagr = computeCAGR(yTrend) ?? computeCAGR(qTrend);
   const cagrLine = cagr!=null ? `<div class="muted" style="font-size:12px;margin-top:2px">Revenue CAGR over this window: <b class="${cls(cagr)}">${sign(cagr)}${fmt(cagr,1)}%</b> annualized.</div>` : "";
-  return `<div class="card" style="margin-bottom:10px">
-    <b>Financial trend &amp; ratios</b> <span class="muted" style="font-size:11px">· up to 8 quarters / 5 years, whatever Yahoo carries for this stock</span>
-    <div class="muted" style="font-size:11px;margin:4px 0 8px">Trailing quarters/years from Yahoo's statement data — <span class="up">green</span> means improved vs. the prior period shown, <span class="down">red</span> means worsened. Coverage for NSE-listed names on Yahoo can be thin — a blank cell means "not reported", not zero, and fewer than 8 quarters/5 years just means Yahoo doesn't carry more history for this name.</div>
+  // Current-value market ratios — P/E and P/B compare TODAY's price to trailing figures, so unlike
+  // the rows above they aren't a per-period trend; shown once as a snapshot alongside EPS.
+  const valBits = [];
+  if(fund.eps!=null) valBits.push(`EPS <b>₹${fmt(fund.eps,2)}</b>`);
+  if(fund.pe!=null) valBits.push(`P/E <b>${fmt(fund.pe,1)}x</b>`);
+  if(fund.pb!=null) valBits.push(`P/B <b>${fmt(fund.pb,1)}x</b>`);
+  const valLine = valBits.length ? `<div class="muted" style="font-size:12px;margin-top:2px">Current valuation (trailing, today's price): ${valBits.join(" · ")}</div>` : "";
+  return `<div class="collapsible" id="ipres-fin">
+  <h2 class="collapse-h2" onclick="toggleCollapse('ipres-fin')"><span class="collapse-arrow">▾</span> Financial trend &amp; ratios <span class="muted" style="text-transform:none;font-weight:400;font-size:11px">· up to 8 quarters / 5 years, whatever Yahoo carries for this stock</span></h2>
+  <div class="collapse-body">
+  <div class="card" style="margin-bottom:10px">
+    <div class="muted" style="font-size:11px;margin-bottom:8px">Trailing quarters/years from Yahoo's statement data — <span class="up">green</span> means improved vs. the prior period shown, <span class="down">red</span> means worsened. Coverage for NSE-listed names on Yahoo can be thin — a blank cell means "not reported", not zero, and fewer than 8 quarters/5 years just means Yahoo doesn't carry more history for this name.</div>
     ${qTable}
     ${yTable}
     ${cagrLine}
+    ${valLine}
     ${renderRatioGlossary(fund, qTrend, yTrend)}
     <div id="finaiCard" class="card" style="margin-top:10px;border-color:#3d4d75"><div class="loading">Reading the trend…</div></div>
+  </div>
+  </div>
   </div>`;
 }
 

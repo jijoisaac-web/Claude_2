@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.22.0] — 2026-07-26 · EPS/P·E/P·B added, collapsible panel, 8-quarter fetch fix
+
+- **Fixed a real bug behind the missing 8-quarter/5-year history**: the quarterly and annual timeseries requests to Yahoo were fetched with `Promise.all`, so if *either* leg failed (e.g. Yahoo has no annual timeseries for a given NSE name, or a transient error), the whole extended fetch was rejected and BOTH quarterly and yearly silently fell back to the base 4Q/4Y — even when the other leg would have succeeded on its own. Switched to `Promise.allSettled` so each leg is used independently.
+- **Added `?debug=1` on `/api/fundamentals/:symbol?extended=1&debug=1`**: returns a `_debug` block with the exact HTTP status, the Yahoo type keys requested vs. actually returned, and per-leg (quarterly/yearly) success/error — so if history is still short for a specific stock after this fix, the exact cause can be read directly instead of guessing.
+- **Stopped caching a failed fallback for a full hour**: an extended request that couldn't stretch past 4Q/4Y now gets a 60–120 second edge cache instead of the usual hour, so a fix (or Yahoo recovering) takes effect almost immediately instead of being stuck behind a stale cached response.
+- **EPS added as a per-period trend row** (approximate — net income ÷ today's share count, same caveat as the retention-ratio row) alongside the existing ratios.
+- **P/E and P/B added to the ratio glossary** plus a one-line "current valuation" summary (EPS, P/E, P/B) under the trend tables — these are market-price ratios, not statement ratios, so they're shown as a current snapshot rather than a per-period trend.
+- **Financial trend & ratios panel is now collapsible**, matching every other section in the app (▾ arrow, expanded by default).
+
 ## [3.21.0] — 2026-07-26 · Background photo now covers the full page, edge-to-edge
 
 - **Background photo moved from the tab section to `body`** — previously painted on `.tab.visible`, which sits inside `<main>` (capped at `max-width:1200px`, centered), so on wider windows the photo never reached the left/right edges of the browser, and it only extended as far down as that tab's own content, leaving plain page background below short tabs.

@@ -36,16 +36,25 @@ const raw = (v) => (v && typeof v === "object" ? v.raw ?? null : v ?? null);
 const TS_INCOME_FIELDS = ["TotalRevenue", "GrossProfit", "OperatingIncome", "NetIncome"];
 const TS_BALANCE_FIELDS = ["TotalDebt", "LongTermDebt", "CurrentDebt", "StockholdersEquity", "TotalAssets"];
 
-async function fetchTimeseriesMap(symbol, cookie, crumb, prefix, fields) {
+async function fetchTimeseriesMap(symbol, cookie, crumb, prefix, fields, debugOut) {
   const types = fields.map(f => prefix + f).join(",");
   const period2 = Math.floor(Date.now() / 1000);
   const period1 = period2 - 6 * 365 * 86400;   // ~6y back — comfortably covers 5 fiscal years + buffer
   const tsUrl = `https://query2.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/${symbol}` +
     `?symbol=${symbol}&type=${types}&period1=${period1}&period2=${period2}&merge=false&crumb=${encodeURIComponent(crumb)}`;
   const r = await fetch(tsUrl, { headers: { "user-agent": UA, cookie, accept: "application/json" } });
-  if (!r.ok) throw new Error(`yahoo timeseries ${r.status}`);
-  const j = await r.json();
+  const bodyText = await r.text();
+  if (debugOut) debugOut.httpStatus = r.status;
+  if (!r.ok) throw new Error(`yahoo timeseries ${r.status}: ${bodyText.slice(0, 300)}`);
+  let j;
+  try { j = JSON.parse(bodyText); } catch (e) { throw new Error(`non-JSON response: ${bodyText.slice(0, 300)}`); }
+  if (j.timeseries && j.timeseries.error) throw new Error(`yahoo error: ${JSON.stringify(j.timeseries.error).slice(0, 300)}`);
   const results = (j.timeseries && j.timeseries.result) || [];
+  if (debugOut) {
+    debugOut.typesRequested = types;
+    debugOut.resultCount = results.length;
+    debugOut.typesSeen = results.map(e => e && e.meta && e.meta.type && e.meta.type[0]).filter(Boolean);
+  }
   const byDate = new Map();   // "YYYY-MM-DD" -> { TotalRevenue: n, NetIncome: n, ... }
   for (const entry of results) {
     const type = entry && entry.meta && entry.meta.type && entry.meta.type[0];
@@ -83,14 +92,24 @@ function timeseriesToBalanceArray(byDate) {
     .filter(q => q.end != null)
     .sort((a, b) => a.end - b.end);
 }
-async function fetchExtendedHistory(symbol, cookie, crumb) {
+async function fetchExtendedHistory(symbol, cookie, crumb, debugOut) {
   const allFields = [...TS_INCOME_FIELDS, ...TS_BALANCE_FIELDS];
   // Two calls total (quarterly + annual), each carrying both income and balance-sheet field types —
-  // cheaper than four separate round trips, and either can fail independently without the other.
-  const [qMap, yMap] = await Promise.all([
-    fetchTimeseriesMap(symbol, cookie, crumb, "quarterly", allFields),
-    fetchTimeseriesMap(symbol, cookie, crumb, "annual", allFields),
+  // cheaper than four separate round trips. Uses allSettled (not Promise.all) so that if ONE of the
+  // two legs fails (e.g. Yahoo has no annual timeseries for this NSE name, or a transient error), the
+  // other still gets used instead of both silently falling all the way back to the base 4Q/4Y — that
+  // was the original bug: Promise.all rejects the whole thing the moment either leg throws.
+  const qDebug = {}, yDebug = {};
+  const [qRes, yRes] = await Promise.allSettled([
+    fetchTimeseriesMap(symbol, cookie, crumb, "quarterly", allFields, qDebug),
+    fetchTimeseriesMap(symbol, cookie, crumb, "annual", allFields, yDebug),
   ]);
+  if (debugOut) {
+    debugOut.quarterly = { ...qDebug, ok: qRes.status === "fulfilled", error: qRes.status === "rejected" ? String(qRes.reason && qRes.reason.message || qRes.reason) : null };
+    debugOut.yearly = { ...yDebug, ok: yRes.status === "fulfilled", error: yRes.status === "rejected" ? String(yRes.reason && yRes.reason.message || yRes.reason) : null };
+  }
+  const qMap = qRes.status === "fulfilled" ? qRes.value : new Map();
+  const yMap = yRes.status === "fulfilled" ? yRes.value : new Map();
   return {
     quarterlyIncome: timeseriesToIncomeArray(qMap).slice(-8),
     quarterlyDebt: timeseriesToBalanceArray(qMap).slice(-8),
@@ -102,9 +121,12 @@ async function fetchExtendedHistory(symbol, cookie, crumb) {
 export async function onRequestGet({ request, params }) {
   const url = new URL(request.url);
   const wantExtended = url.searchParams.get("extended") === "1";
+  const wantDebug = url.searchParams.get("debug") === "1";
   const cache = caches.default;
   const cacheKey = new Request(url.toString());
-  const hit = await cache.match(cacheKey);
+  // Debug requests always bypass the edge cache — that's the whole point of using ?debug=1, to see
+  // exactly what Yahoo returned just now, not a cached snapshot from up to an hour ago.
+  const hit = wantDebug ? null : await cache.match(cacheKey);
   if (hit) return hit;
 
   const symbol = encodeURIComponent(decodeURIComponent(params.symbol));
@@ -151,14 +173,16 @@ export async function onRequestGet({ request, params }) {
     // Only ever *replaces* a shorter array with a longer one — if the timeseries call fails or
     // Yahoo simply doesn't carry more history for this NSE name, callers still get the same 4Q/4Y
     // they'd have gotten before this existed.
+    let extDebug = null, extendedApplied = false;
     if (wantExtended) {
+      extDebug = wantDebug ? {} : null;
       try {
-        const ext = await fetchExtendedHistory(symbol, cookie, crumb);
-        if (ext.quarterlyIncome.length > quarterlyIncome.length) quarterlyIncome = ext.quarterlyIncome;
-        if (ext.quarterlyDebt.length > quarterlyDebt.length) quarterlyDebt = ext.quarterlyDebt;
-        if (ext.yearlyIncome.length > yearlyIncome.length) yearlyIncome = ext.yearlyIncome;
-        if (ext.yearlyDebt.length > yearlyDebt.length) yearlyDebt = ext.yearlyDebt;
-      } catch (e) { /* fall back silently to the 4Q/4Y already computed above */ }
+        const ext = await fetchExtendedHistory(symbol, cookie, crumb, extDebug);
+        if (ext.quarterlyIncome.length > quarterlyIncome.length) { quarterlyIncome = ext.quarterlyIncome; extendedApplied = true; }
+        if (ext.quarterlyDebt.length > quarterlyDebt.length) { quarterlyDebt = ext.quarterlyDebt; extendedApplied = true; }
+        if (ext.yearlyIncome.length > yearlyIncome.length) { yearlyIncome = ext.yearlyIncome; extendedApplied = true; }
+        if (ext.yearlyDebt.length > yearlyDebt.length) { yearlyDebt = ext.yearlyDebt; extendedApplied = true; }
+      } catch (e) { if (extDebug) extDebug.fatalError = String(e.message || e); }
     }
 
     const out = {
@@ -202,14 +226,21 @@ export async function onRequestGet({ request, params }) {
       yearlyIncome,
       yearlyDebt,
     };
+    if (wantDebug) out._debug = { wantExtended, extendedApplied, ...(extDebug ? { extended: extDebug } : {}) };
     const res = new Response(JSON.stringify(out), {
       headers: {
         "content-type": "application/json",
-        "cache-control": "public, s-maxage=3600, max-age=600",
+        // Extended requests that didn't actually manage to stretch past 4Q/4Y (Yahoo's timeseries
+        // call failed or came up empty) get a short cache instead of the usual hour — otherwise a
+        // transient failure gets baked into the edge cache and keeps serving the 4Q/4Y fallback for
+        // up to an hour even after whatever caused it clears up. Debug requests aren't cached at all.
+        "cache-control": wantDebug ? "no-store"
+          : (wantExtended && !extendedApplied) ? "public, s-maxage=120, max-age=60"
+          : "public, s-maxage=3600, max-age=600",
         "access-control-allow-origin": "*",
       },
     });
-    await cache.put(cacheKey, res.clone());
+    if (!wantDebug) await cache.put(cacheKey, res.clone());
     return res;
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e.message || e) }), {
