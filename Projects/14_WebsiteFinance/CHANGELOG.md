@@ -2,6 +2,11 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.19.0] — 2026-07-26 · Background photo coverage fix + Fundamentals collapse sections
+
+- **Fixed background photos only showing near the top of a tab** ("fitting to tiles, not the full screen") — the previous CSS used `background-attachment:fixed`, which sizes `cover` against the *browser viewport* rather than the tab section itself; on any section taller than one screenful, everything below the first viewport-height was left unpainted. Switched to the default `scroll` attachment so the photo + dark scrim now always size against the section's own full height, however tall its content grows. Also lightened the scrim slightly (was .90–.95 opacity, now .74–.92) so the photo reads more clearly through it.
+- **Fundamentals tab now has the same collapsible sections as every other tab** — Consolidated verdict, Overview & key metrics, News & AI brief, Intrinsic value, Scores, Peer comparison, Shareholding pattern, Insider trading disclosures, and Concalls & investor meets are each their own collapse/expand section (▾ arrow, click the heading to toggle), with only **Consolidated verdict** expanded by default. This tab was skipped in the original collapsible-sections pass (v3.16.0) on the mistaken assumption it had no internal sections to collapse — it has nine.
+
 ## [3.18.0] — 2026-07-26 · Financial trend & ratio flags on Investor Presentations
 
 - **New "Financial trend & ratios" panel** on the Investor Presentations "One stock" view — shown for every stock you pick, regardless of whether it has a recent investor-presentation filing (previously all financial data on this tab only surfaced as a cross-reference next to a fresh filing).

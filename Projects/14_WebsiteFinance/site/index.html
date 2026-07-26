@@ -125,8 +125,7 @@ progress{width:180px;accent-color:var(--blue);}
   .fund-grid .card .price{font-size:15px;}
   #smcChart{height:320px;}
   .disclaimer{font-size:10px;}
-  /* background photos: fixed attachment is janky on mobile browsers and can hurt scroll perf */
-  .tab.visible{background-attachment:scroll;padding:12px 12px 18px;border-radius:12px;margin:-2px -2px 0;}
+  .tab.visible{padding:12px 12px 18px;border-radius:12px;margin:-2px -2px 0;}
 }
 @media(min-width:701px) and (max-width:1366px){
   /* small laptop screens (1280x720 / 1366x768) — tighten up the fixed 1200px desktop layout */
@@ -194,24 +193,29 @@ progress{accent-color:var(--violet);}
 .collapse-arrow{display:inline-block;transition:transform .15s ease;font-size:11px;}
 .collapsible.collapsed .collapse-arrow{transform:rotate(-90deg);}
 .collapsible.collapsed .collapse-body{display:none;}
-/* ===================== per-tab background photography (v3.17) ===================== */
+/* ===================== per-tab background photography (v3.19 fix) ===================== */
 /* Real photos per tab for a "modern look". Cards/tables keep their own solid backgrounds
-   (see .card, table rules above) so only the gaps between them show the photo — a strong
-   dark scrim underneath keeps text/number readability unaffected. */
-.tab.visible{background-size:cover;background-position:center;background-repeat:no-repeat;
-  background-attachment:fixed;border-radius:16px;padding:20px 20px 28px;margin:-4px -4px 0;}
-#dashboard.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1627327053419-fe894c4650ed?w=1600&q=55&auto=format&fit=crop');}
-#screener.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1744782211816-c5224434614f?w=1600&q=55&auto=format&fit=crop');}
-#ideas.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1508666709797-f0bb3d96324d?w=1600&q=55&auto=format&fit=crop');}
-#ipres.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=1600&q=55&auto=format&fit=crop');}
-#fundamentals.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=55&auto=format&fit=crop');}
-#track.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1633265486501-0cf524a07213?w=1600&q=55&auto=format&fit=crop');}
-#insti.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?w=1600&q=55&auto=format&fit=crop');}
-#options.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1600&q=55&auto=format&fit=crop');}
-#smc.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1762463176312-1757d5125c85?w=1600&q=55&auto=format&fit=crop');}
-#conv.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?w=1600&q=55&auto=format&fit=crop');}
-#mf.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=1600&q=55&auto=format&fit=crop');}
-#divid.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1772413438617-937e44f2642e?w=1600&q=55&auto=format&fit=crop');}
+   (see .card, table rules above) so only the gaps between them show the photo — a dark scrim
+   underneath keeps text/number readability unaffected.
+   IMPORTANT: background-attachment:fixed sizes "cover" against the *viewport*, not the element —
+   on a section taller than one screenful that leaves everything below the first viewport-height
+   unpainted (transparent), which read as "the photo only fills the top tiles, not the full tab".
+   Using the default `scroll` attachment instead sizes cover against the element's own (full) box,
+   so the photo + scrim always span the whole section no matter how tall its content grows. */
+.tab.visible{background-size:cover;background-position:center top;background-repeat:no-repeat;
+  border-radius:16px;padding:20px 20px 28px;margin:-4px -4px 0;}
+#dashboard.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1627327053419-fe894c4650ed?w=1600&q=60&auto=format&fit=crop');}
+#screener.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1744782211816-c5224434614f?w=1600&q=60&auto=format&fit=crop');}
+#ideas.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1508666709797-f0bb3d96324d?w=1600&q=60&auto=format&fit=crop');}
+#ipres.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=1600&q=60&auto=format&fit=crop');}
+#fundamentals.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=60&auto=format&fit=crop');}
+#track.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1633265486501-0cf524a07213?w=1600&q=60&auto=format&fit=crop');}
+#insti.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?w=1600&q=60&auto=format&fit=crop');}
+#options.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1600&q=60&auto=format&fit=crop');}
+#smc.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1762463176312-1757d5125c85?w=1600&q=60&auto=format&fit=crop');}
+#conv.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?w=1600&q=60&auto=format&fit=crop');}
+#mf.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=1600&q=60&auto=format&fit=crop');}
+#divid.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.74),rgba(9,13,22,.92)),url('https://images.unsplash.com/photo-1772413438617-937e44f2642e?w=1600&q=60&auto=format&fit=crop');}
 </style>
 </head>
 <body>
@@ -848,15 +852,43 @@ progress{accent-color:var(--violet);}
     <select id="fundSelect" onchange="if(this.value){setCombo('fundSymbol',this.value);loadFundamentals();}"></select>
     <input type="text" id="fundSymbol" list="allStocksDL" placeholder="…or type to search" size="20" autocomplete="off" onchange="loadFundamentals()">
   </div>
-  <div id="verdictView"></div>
-  <div id="newsView"></div>
-  <div id="fundView"><div class="loading">Select a stock</div></div>
-  <div id="valView"></div>
-  <div id="scoreView"></div>
-  <div id="peerView"></div>
-  <div id="shareholdingView"></div>
-  <div id="insiderView"></div>
-  <div id="concallView"></div>
+
+  <div class="collapsible" id="fund-verdict">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-verdict')"><span class="collapse-arrow">▾</span> Consolidated verdict</h2>
+    <div class="collapse-body"><div id="verdictView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-overview" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-overview')"><span class="collapse-arrow">▾</span> Overview &amp; key metrics</h2>
+    <div class="collapse-body"><div id="fundView"><div class="loading">Select a stock</div></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-news" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-news')"><span class="collapse-arrow">▾</span> News &amp; AI brief</h2>
+    <div class="collapse-body"><div id="newsView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-val" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-val')"><span class="collapse-arrow">▾</span> Intrinsic value</h2>
+    <div class="collapse-body"><div id="valView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-scores" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-scores')"><span class="collapse-arrow">▾</span> Scores</h2>
+    <div class="collapse-body"><div id="scoreView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-peer" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-peer')"><span class="collapse-arrow">▾</span> Peer comparison</h2>
+    <div class="collapse-body"><div id="peerView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-shareholding" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-shareholding')"><span class="collapse-arrow">▾</span> Shareholding pattern</h2>
+    <div class="collapse-body"><div id="shareholdingView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-insider" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-insider')"><span class="collapse-arrow">▾</span> Insider trading disclosures</h2>
+    <div class="collapse-body"><div id="insiderView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-concall" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-concall')"><span class="collapse-arrow">▾</span> Concalls &amp; investor meets</h2>
+    <div class="collapse-body"><div id="concallView"></div></div>
+  </div>
 </section>
 
 <!-- CONVICTION SCAN -->
@@ -2409,7 +2441,7 @@ async function loadFundamentals(){
     ];
     const cap = capOf(sym), capCls = cap==="LARGE"?"capL":cap==="MID"?"capM":"capS";
     $("fundView").innerHTML = `
-      <h2>${f.name || sym} ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""} <span class="muted" style="text-transform:none">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></h2>
+      <div style="font-size:14px;font-weight:600;margin-bottom:8px">${f.name || sym} ${cap?`<span class="badge ${capCls}">${cap} CAP</span>`:""} <span class="muted" style="font-weight:400">· ${f.sector||""} ${f.industry?"· "+f.industry:""}</span></div>
       <div class="fund-grid">${rows.map(([k,v])=>`<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("")}</div>`;
     renderValuation(sym, f);
     renderScores(f);
@@ -2445,7 +2477,7 @@ async function loadShareholding(sym){
     const callout = streak >= 2
       ? `<div class="card" style="margin-bottom:10px;border-color:${dir>0?"#2ea043":"#f85149"}"><b class="${dir>0?"up":"down"}">Promoter stake ${dir>0?"rising":"falling"} ${streak} straight quarter${streak>1?"s":""}</b> <span class="muted">— ${dir>0?"insiders adding, a genuine conviction signal":"insiders trimming; worth understanding why before reading anything else bullishly"}</span></div>`
       : "";
-    el.innerHTML = callout + `<h2 style="margin-top:0">Shareholding pattern <span class="muted" style="text-transform:none;font-weight:400">· quarterly, latest first</span></h2>
+    el.innerHTML = callout + `<div class="muted" style="font-size:12px;margin-bottom:6px">Quarterly, latest first</div>
       <table><thead><tr><th>As on</th><th>Promoter %</th><th>QoQ Δ</th><th>Public %</th><th>Employee Trusts %</th></tr></thead><tbody>` +
       q.map(row=>`<tr>
         <td>${row.date}</td>
@@ -2471,7 +2503,7 @@ async function loadInsiderTrading(sym){
     if(!r.ok || !d.filings) throw new Error(d.error || "no data");
     if(!d.filings.length){ el.innerHTML = ""; return; }
     const recent90 = d.filings.filter(f => Date.now() - new Date(f.date).getTime() < 90*86400000);
-    el.innerHTML = `<h2 style="margin-top:0">Insider trading disclosures <span class="muted" style="text-transform:none;font-weight:400">· SEBI PIT Reg 7(2), most recent first</span></h2>
+    el.innerHTML = `<div class="muted" style="font-size:12px;margin-bottom:6px">SEBI PIT Reg 7(2), most recent first</div>
       ${recent90.length ? `<div class="card" style="margin-bottom:10px"><b>${recent90.length}</b> <span class="muted">disclosure${recent90.length>1?"s":""} in the last 90 days</span></div>` : ""}
       <table><thead><tr><th>Date</th><th>Regulation</th><th>Type</th><th></th></tr></thead><tbody>` +
       d.filings.map(f=>`<tr>
@@ -2498,7 +2530,7 @@ async function loadConcalls(sym, name){
     if(!r.ok || !d.items) throw new Error(d.error || "no data");
     const items = d.items.filter(x => CONCALL_RE.test(x.subject || x.desc || "")).slice(0, 8);
     if(!items.length){ el.innerHTML = ""; return; }
-    el.innerHTML = `<h2 style="margin-top:0">Concalls &amp; investor meets <span class="muted" style="text-transform:none;font-weight:400">· corporate-access disclosures, most recent first</span></h2>
+    el.innerHTML = `<div class="muted" style="font-size:12px;margin-bottom:6px">Corporate-access disclosures, most recent first</div>
       <table><thead><tr><th>Date</th><th style="text-align:left">Subject</th><th></th></tr></thead><tbody>` +
       items.map(x=>`<tr>
         <td style="white-space:nowrap">${x.date||"—"}</td>
@@ -3107,8 +3139,7 @@ function computeInvestScore(f){
 function renderValuation(sym, f){
   const el = $("valView");
   const defG = Math.min(0.20, Math.max(0.04, f.earnings_growth ?? f.revenue_growth ?? 0.10));
-  el.innerHTML = `<h2>Intrinsic value</h2>
-    <div class="controls" style="margin-bottom:8px">
+  el.innerHTML = `<div class="controls" style="margin-bottom:8px">
       <label class="muted">Growth % <input type="text" id="ivG" size="4" value="${(defG*100).toFixed(0)}"></label>
       <label class="muted">Discount % <input type="text" id="ivR" size="4" value="12"></label>
       <label class="muted">Terminal % <input type="text" id="ivT" size="4" value="4"></label>
@@ -3222,7 +3253,7 @@ function renderScores(f){
     ["Value-Trap Risk", scoreValueTrap(f), "Higher is worse — cheapness with deteriorating fundamentals"],
     ["Dividend Quality", scoreDividend(f), "Yield, payout sanity, FCF coverage"],
   ];
-  $("scoreView").innerHTML = `<h2>Scores</h2><div class="cards">` +
+  $("scoreView").innerHTML = `<div class="cards">` +
     defs.map(([name, sc, desc], i)=>{
       const inv = name==="Value-Trap Risk";
       const [label, c] = inv ? (sc.score==null?["—","muted"]:sc.score>=60?["High risk","down"]:sc.score>=40?["Moderate","muted"]:["Low risk","up"]) : scoreLabel(sc.score);
@@ -3254,7 +3285,7 @@ async function loadPeerComparison(sym, me){
   let peers = peersOf(sym);
   if(peers.length < 3){ el.innerHTML=""; return; }
   if(peers.length > 15) peers = peers.slice(0,15);
-  el.innerHTML = `<h2>vs ${sector} peers</h2><div class="loading">Comparing with ${peers.length} peers…</div>`;
+  el.innerHTML = `<div class="loading">vs ${sector} peers — comparing with ${peers.length} peers…</div>`;
   const peerData = (await pmap(peers, fetchFundamentals, 6)).filter(Boolean);
   if(comboSym("fundSymbol") !== sym) return;   // user moved on mid-fetch
   if(peerData.length < 3){ el.innerHTML=""; return; }
@@ -3280,8 +3311,8 @@ async function loadPeerComparison(sym, me){
     v==="better" ? '<span class="badge bullish">better</span>' :
     v==="worse"  ? '<span class="badge bearish">worse</span>' :
                    '<span class="badge neutral">in line</span>';
-  el.innerHTML = `<h2>vs ${sector} peers <span class="badge ${overall[0]}" style="font-size:12px">${overall[1]}</span>
-    <span class="muted" style="text-transform:none;font-weight:400">· median of ${peerData.length} peers: ${peerData.map(p=>(p.symbol||"").replace(".NS","")).join(", ")}</span></h2>
+  el.innerHTML = `<div style="font-size:14px;font-weight:600;margin-bottom:8px">vs ${sector} peers <span class="badge ${overall[0]}" style="font-size:12px">${overall[1]}</span>
+    <span class="muted" style="font-weight:400">· median of ${peerData.length} peers: ${peerData.map(p=>(p.symbol||"").replace(".NS","")).join(", ")}</span></div>
     <table><thead><tr><th>Metric</th><th>${sym.replace(".NS","")}</th><th>Peer median</th><th style="text-align:left">Standing</th></tr></thead><tbody>` +
     rows.map(r=>`<tr><td>${r.label}</td><td>${fmtMetric(r.mine,r.how)}</td><td>${fmtMetric(r.med,r.how)}</td>
       <td style="text-align:left">${vBadge(r.verdict)}</td></tr>`).join("") +
