@@ -2,6 +2,15 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.24.0] — 2026-07-26 · Experimental: NSE's own results feed as a deeper history source
+
+- **New `/api/results/:symbol` (not yet wired into any tab)** — tries NSE's own `results-comparision` endpoint, the same cookie-handshake pattern already working in production for announcements/insider/shareholding, as a candidate replacement for Yahoo's timeseries fetch. Since it would be the primary regulatory filing feed rather than a third-party aggregator, it may carry much deeper history for NSE names than Yahoo's ~5Q/4Y ceiling confirmed for Bajaj Finance.
+- **Unverified by design** — this sandbox can't reach nseindia.com any more than it can reach Yahoo, so neither the endpoint path nor the field names are confirmed against a live response yet. Call `/api/results/BAJFINANCE?debug=1` on the deployed site to see the raw NSE payload (or the exact HTTP status/error if the endpoint path itself is wrong) — that will confirm whether this is viable before any UI work is built on top of it.
+
+## [3.23.1] — 2026-07-26 · Deeper debug on the 8Q/5Y history question
+
+- User-supplied `?extended=1&debug=1` output for BAJFINANCE confirmed both the quarterly and annual Yahoo timeseries calls succeeded (HTTP 200) and matched every field-name type requested — so the field-name guessing that shipped in 3.20.0 was correct, it isn't the cause of the short (5Q/4Y) trend. Added a finer `_debug.perType` breakdown (item count + raw dates actually returned per line item, e.g. `quarterlyStockholdersEquity`) to tell apart "Yahoo genuinely only has this many data points for this stock" from "a parsing/slicing bug is dropping dates that were there" — needed before concluding this is a real Yahoo coverage ceiling for this NSE name rather than something fixable.
+
 ## [3.23.0] — 2026-07-26 · Background photo lightened — was reading as a plain haze
 
 - **Lightened the per-tab background scrim**: was a flat dark overlay from .74 to .92 opacity, which — combined with the header's own blur and the grain texture on top — made every tab's photo read as an indistinct dark haze rather than a recognizable image ("looks cloudy, hard to tell there's a background image"). Now fades from .30 near the top (right below the header, where there's normally no text yet) to .80 further down where content needs the contrast.

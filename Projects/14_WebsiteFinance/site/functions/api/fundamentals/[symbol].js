@@ -55,6 +55,7 @@ async function fetchTimeseriesMap(symbol, cookie, crumb, prefix, fields, debugOu
     debugOut.resultCount = results.length;
     debugOut.typesSeen = results.map(e => e && e.meta && e.meta.type && e.meta.type[0]).filter(Boolean);
   }
+  if (debugOut) debugOut.perType = {};
   const byDate = new Map();   // "YYYY-MM-DD" -> { TotalRevenue: n, NetIncome: n, ... }
   for (const entry of results) {
     const type = entry && entry.meta && entry.meta.type && entry.meta.type[0];
@@ -63,6 +64,11 @@ async function fetchTimeseriesMap(symbol, cookie, crumb, prefix, fields, debugOu
     if (!field) continue;
     const arr = entry[type];
     if (!Array.isArray(arr)) continue;
+    // Per-type diagnostics: how many data points Yahoo actually sent back for this specific line
+    // item, and their raw dates — the previous debug pass only proved the *type names* were right;
+    // this tells us whether a short trend is a real Yahoo coverage limit (few dates here too) or a
+    // parsing bug (many dates here, but they didn't make it into the final trend array).
+    if (debugOut) debugOut.perType[type] = { itemCount: arr.length, dates: arr.filter(it => it && it.asOfDate != null).map(it => it.asOfDate) };
     for (const item of arr) {
       if (!item || item.asOfDate == null) continue;
       const val = item.reportedValue && typeof item.reportedValue.raw === "number" ? item.reportedValue.raw : null;
