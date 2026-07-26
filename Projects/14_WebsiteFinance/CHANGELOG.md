@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.17.0] — 2026-07-26 · Background photography per tab + responsive tightening
+
+- **Every tab now has its own real photo background** (previously a plain mesh-gradient, shared across all tabs) — Dashboard: city financial skyline; Screener: candlestick chart workspace; Ideas: lightbulb/notebook; Investor Presentations: boardroom presentation; Fundamentals: calculator and paperwork; Backtest: hourglass; FII/DII: stock exchange building; Options: chess pieces; Smart Money: gold bars; Conviction Scan: magnifying glass; Mutual Funds: piggy bank; Dividend Analysis: coin stacks with an upward arrow. All photos are free-to-use, properly licensed (Unsplash License, no attribution required).
+- A strong dark scrim sits between each photo and the page content (`linear-gradient` over the image), so the photo only shows through in the gaps around cards and tables — every card/table already had its own solid background, so table and number readability is unaffected.
+- **Mobile**: background photos switch from `background-attachment:fixed` to `scroll` under 700px width — fixed backgrounds are janky and hurt scroll performance on mobile browsers (especially iOS Safari).
+- **New small-laptop breakpoint** (701–1366px, e.g. 1280×720 / 1366×768 screens): loosens the previously-fixed 1200px-max desktop layout so the card grid and fundamental-metric grid use tighter minimum column widths instead of leaving dead space or wrapping awkwardly.
+
 ## [3.16.0] — 2026-07-25 · Collapsible sections across every tab
 
 - Every tab with more than one distinct section now uses the same collapse/expand pattern the Backtest tab already had (▾ arrow, click the heading to toggle) — **Dashboard** (Indices / Global markets / Market pulse / Top opportunities / Watchlist), **Ideas** (Short/Medium/Long term / Position calculator), **FII/DII** (FII/DII activity / Bulk & block deals / Delivery %), **Options** (Open interest / OI changes / Momentum scanner / IV vs RV), **Smart Money** (main analysis / Volume profile / Order blocks / Institutional deals / Fresh block scanner), **Investor Presentations** (One stock / Scan a universe), **Dividend Analysis** (One stock / Knowledge base), and **Mutual Funds** (Add a fund / Your folio / Asset allocation / Market-cap tilt / Rebalancing).

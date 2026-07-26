@@ -125,6 +125,14 @@ progress{width:180px;accent-color:var(--blue);}
   .fund-grid .card .price{font-size:15px;}
   #smcChart{height:320px;}
   .disclaimer{font-size:10px;}
+  /* background photos: fixed attachment is janky on mobile browsers and can hurt scroll perf */
+  .tab.visible{background-attachment:scroll;padding:12px 12px 18px;border-radius:12px;margin:-2px -2px 0;}
+}
+@media(min-width:701px) and (max-width:1366px){
+  /* small laptop screens (1280x720 / 1366x768) — tighten up the fixed 1200px desktop layout */
+  main{max-width:100%;padding:16px 20px;}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+  .fund-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));}
 }
 /* ===================== visual refresh (v2.14) — override layer ===================== */
 :root{--bg:#0a0e17;--panel:#111827;--border:#26314a;--text:#e8edf7;--muted:#93a0bd;
@@ -186,6 +194,24 @@ progress{accent-color:var(--violet);}
 .collapse-arrow{display:inline-block;transition:transform .15s ease;font-size:11px;}
 .collapsible.collapsed .collapse-arrow{transform:rotate(-90deg);}
 .collapsible.collapsed .collapse-body{display:none;}
+/* ===================== per-tab background photography (v3.17) ===================== */
+/* Real photos per tab for a "modern look". Cards/tables keep their own solid backgrounds
+   (see .card, table rules above) so only the gaps between them show the photo — a strong
+   dark scrim underneath keeps text/number readability unaffected. */
+.tab.visible{background-size:cover;background-position:center;background-repeat:no-repeat;
+  background-attachment:fixed;border-radius:16px;padding:20px 20px 28px;margin:-4px -4px 0;}
+#dashboard.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1627327053419-fe894c4650ed?w=1600&q=55&auto=format&fit=crop');}
+#screener.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1744782211816-c5224434614f?w=1600&q=55&auto=format&fit=crop');}
+#ideas.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1508666709797-f0bb3d96324d?w=1600&q=55&auto=format&fit=crop');}
+#ipres.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1573167507387-6b4b98cb7c13?w=1600&q=55&auto=format&fit=crop');}
+#fundamentals.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1600&q=55&auto=format&fit=crop');}
+#track.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1633265486501-0cf524a07213?w=1600&q=55&auto=format&fit=crop');}
+#insti.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1770461846516-b7e5993a8e4f?w=1600&q=55&auto=format&fit=crop');}
+#options.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=1600&q=55&auto=format&fit=crop');}
+#smc.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1762463176312-1757d5125c85?w=1600&q=55&auto=format&fit=crop');}
+#conv.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1586769852836-bc069f19e1b6?w=1600&q=55&auto=format&fit=crop');}
+#mf.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=1600&q=55&auto=format&fit=crop');}
+#divid.visible{background-image:linear-gradient(180deg,rgba(9,13,22,.90),rgba(9,13,22,.95)),url('https://images.unsplash.com/photo-1772413438617-937e44f2642e?w=1600&q=55&auto=format&fit=crop');}
 </style>
 </head>
 <body>
