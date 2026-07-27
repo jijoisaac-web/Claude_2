@@ -9,6 +9,42 @@ function tag(block, t){
   const r = new RegExp(`<${t}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${t}>`).exec(block);
   return r ? r[1].trim() : null;
 }
+function extractJson(txt) {
+  const jm = (txt || "").match(/\{[\s\S]*\}/);
+  if (!jm) return null;
+  const raw = jm[0];
+  const cleaned = raw.replace(/[\r\n]+/g, " ").replace(/,\s*([}\]])/g, "$1");
+  try { return JSON.parse(cleaned); } catch (e) {}
+  try { return JSON.parse(raw); } catch (e) {}
+  return null;
+}
+// Workers AI is documented as returning `{ response: "<text>" }`, but has been confirmed (live, on
+// the sibling /api/report endpoint) to sometimes hand back that field already as an object rather
+// than a string — the naive `(r.response || r.result || "") + ""` stringifies any object into the
+// literal text "[object Object]" via JS's default toString(), destroying the content before parsing
+// ever ran. Walk the whole response looking for either a matching object directly, or a string
+// anywhere inside it that parses into one.
+function deepFindJson(node, validate, depth) {
+  depth = depth || 0;
+  if (depth > 6 || node == null) return null;
+  if (typeof node === "string") {
+    const t = node.trim();
+    if (t.length > 1 && (t[0] === "{" || t[0] === "[")) {
+      const parsed = extractJson(node);
+      if (parsed && validate(parsed)) return parsed;
+    }
+    return null;
+  }
+  if (typeof node === "object") {
+    if (!Array.isArray(node) && validate(node)) return node;
+    const vals = Array.isArray(node) ? node : Object.values(node);
+    for (const v of vals) {
+      const found = deepFindJson(v, validate, depth + 1);
+      if (found) return found;
+    }
+  }
+  return null;
+}
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
@@ -96,12 +132,10 @@ export async function onRequestGet({ request, env }) {
           ],
           max_tokens: 512,
         });
-        const txt = (r && (r.response || r.result || "")) + "";
-        const jm = txt.match(/\{[\s\S]*\}/);
-        if(jm){
-          const parsed = JSON.parse(jm[0]);
-          if(parsed && typeof parsed.summary === "string") ai = parsed;
-        }
+        let raw;
+        try { raw = JSON.stringify(r); } catch (e) { raw = String(r); }
+        const parsed = deepFindJson(r, o => typeof o.summary === "string") || extractJson(raw);
+        if(parsed && typeof parsed.summary === "string") ai = parsed;
       }catch(e){ ai = { error: String(e.message || e) }; }
     }
     const out = { symbol, name, aiConfigured: !!env.AI, feed: feedUsed, items: items.slice(0, 8), ai };

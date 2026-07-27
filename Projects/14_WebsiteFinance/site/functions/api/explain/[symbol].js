@@ -17,6 +17,33 @@ function extractJson(txt) {
   try { return JSON.parse(raw); } catch (e) {}
   return null;
 }
+// Workers AI is documented as returning `{ response: "<text>" }`, but has been confirmed (live, on
+// the sibling /api/report endpoint) to sometimes hand back that field already as an object rather
+// than a string — the naive `(r.response || r.result || "") + ""` stringifies any object into the
+// literal text "[object Object]" via JS's default toString(), destroying the content before this
+// function ever runs. Walk the whole response looking for either a matching object directly, or a
+// string anywhere inside it that parses into one.
+function deepFindJson(node, validate, depth) {
+  depth = depth || 0;
+  if (depth > 6 || node == null) return null;
+  if (typeof node === "string") {
+    const t = node.trim();
+    if (t.length > 1 && (t[0] === "{" || t[0] === "[")) {
+      const parsed = extractJson(node);
+      if (parsed && validate(parsed)) return parsed;
+    }
+    return null;
+  }
+  if (typeof node === "object") {
+    if (!Array.isArray(node) && validate(node)) return node;
+    const vals = Array.isArray(node) ? node : Object.values(node);
+    for (const v of vals) {
+      const found = deepFindJson(v, validate, depth + 1);
+      if (found) return found;
+    }
+  }
+  return null;
+}
 
 export async function onRequestPost({ request, env, params }) {
   const symbol = decodeURIComponent(params.symbol || "");
@@ -60,9 +87,12 @@ export async function onRequestPost({ request, env, params }) {
       ],
       max_tokens: 300,
     });
-    const txt = (r && (r.response || r.result || "")) + "";
-    const parsed = extractJson(txt);
-    if (!parsed || typeof parsed.explanation !== "string") throw new Error("AI did not return usable JSON");
+    let raw;
+    try { raw = JSON.stringify(r); } catch (e) { raw = String(r); }
+    const parsed = deepFindJson(r, o => typeof o.explanation === "string") || extractJson(raw);
+    if (!parsed || typeof parsed.explanation !== "string") {
+      throw new Error(`AI did not return usable JSON — got: ${JSON.stringify((raw || "").slice(0, 180))}`);
+    }
     return new Response(JSON.stringify({ aiConfigured: true, ...parsed }), { headers: { "content-type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ aiConfigured: true, error: String(e.message || e) }),

@@ -50,6 +50,36 @@ function extractFieldsFallback(txt) {
 function countValidKeys(obj) {
   return obj ? REPORT_KEYS.filter(k => typeof obj[k] === "string" && obj[k].length > 0).length : 0;
 }
+// Workers AI's documented shape for this model is `{ response: "<text>" }`, and that's what all four
+// AI endpoints in this app were built against. In practice (confirmed live: this endpoint returned
+// "attempt 1: \"[object Object]\"" for two consecutive real invocations) `r.response` — or `r.result`
+// — can itself already be a non-string object, one level deeper than expected. The old code did
+// `(r.response || r.result || "") + ""`, which silently stringifies any object via JS's default
+// toString() into the literal text "[object Object]", destroying the data before extraction ever ran.
+// This walks the entire response value looking for either an object that already has our keys, or a
+// string anywhere inside it that parses into one — so whatever shape Workers AI actually handed back,
+// real content gets found instead of thrown away.
+function deepFindJson(node, validate, depth) {
+  depth = depth || 0;
+  if (depth > 6 || node == null) return null;
+  if (typeof node === "string") {
+    const t = node.trim();
+    if (t.length > 1 && (t[0] === "{" || t[0] === "[")) {
+      const parsed = extractJson(node);
+      if (parsed && validate(parsed)) return parsed;
+    }
+    return null;
+  }
+  if (typeof node === "object") {
+    if (!Array.isArray(node) && validate(node)) return node;
+    const vals = Array.isArray(node) ? node : Object.values(node);
+    for (const v of vals) {
+      const found = deepFindJson(v, validate, depth + 1);
+      if (found) return found;
+    }
+  }
+  return null;
+}
 function fillGaps(obj) {
   const out = { ...obj };
   for (const k of REPORT_KEYS) if (typeof out[k] !== "string" || !out[k].length) out[k] = "Not enough information came back for this section — try Generate report again.";
@@ -104,8 +134,13 @@ export async function onRequestPost({ request, env, params }) {
         messages: [{ role: "system", content: systemMsg }, { role: "user", content: promptText }],
         max_tokens: tokens,
       });
-      const raw = (r && (r.response || r.result || "")) + "";
-      let obj = extractJson(raw);
+      // Try the whole-response deep search first (handles the object-shaped-response case above);
+      // `raw` is a JSON.stringify of the entire response for the regex fallback + any diagnostic
+      // snippet, which is far more useful to debug from than the old "[object Object]" text ever was.
+      let raw;
+      try { raw = JSON.stringify(r); } catch (e) { raw = String(r); }
+      let obj = deepFindJson(r, o => countValidKeys(o) > 0);
+      if (!obj) obj = extractJson(raw);
       let keyCount = countValidKeys(obj);
       if (keyCount < REPORT_KEYS.length) {
         // Whole-object parse failed or was incomplete — try pulling individual fields out by regex
