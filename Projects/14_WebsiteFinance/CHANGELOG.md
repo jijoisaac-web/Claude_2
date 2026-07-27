@@ -2,6 +2,13 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.27.0] — 2026-07-26 · Real-edge batch: cost basis, smart-money divergence, institution leaderboard, new entrants
+
+- **New "Institutional cost basis & smart money read" panel on the Fundamentals tab** — combines three things: (1) estimated cost basis from disclosed bulk/block deals (volume-weighted average price, shown for all disclosed buyers and for known-FII/institution buyers separately, vs current price), (2) an estimated cost basis for the most recent meaningful promoter-shareholding shift (average price over that filing quarter, vs today), and (3) a "smart money read" that compares 3-month price direction against three institutional proxies (promoter shareholding delta, net disclosed bulk/block buying in the last 90 days, and delivery/volume accumulation signals) to flag Bullish divergence, Bearish divergence, Aligned, or Mixed. None of the three proxies is proof on its own — the panel says so directly — but agreement across two or more is a real tell.
+- **New "By institution" leaderboard on the FII/institutional bulk-deal backtest** (Backtest tab) — regroups the same backtested deals by disclosing client name instead of by individual deal, ranking which named FIIs/institutions have actually had the best hit rate and average "mirrored return" (what following their disclosed side, every time, would have returned) in the selected window/filter. Only clients appearing 2+ times are ranked.
+- **New "NEW ENTRANT" badge on the FII/DII deals table** — flags a disclosed deal that's the earliest recorded trade by that exact client in that exact stock across this browser's stored archive, shown only once 30+ days of history are stored (otherwise everything would trivially look "new"). Explicitly caveated as bounded by archive depth, not a claim the client never held the stock before.
+- All three reuse data already being fetched/stored (deals archive, shareholding filings, technical signals, the existing FII deal backtest) — no new external data source for this batch.
+
 ## [3.26.1] — 2026-07-26 · Fixed "AI did not return JSON" on the research report
 
 - **Root cause**: the report endpoint asked for 6 sections at up to 3-4 sentences each inside a 700-token budget — often enough to run out mid-sentence before the closing `}`, producing incomplete JSON that failed to parse. Confirmed live via the "Report unavailable right now (AI did not return JSON)" message.

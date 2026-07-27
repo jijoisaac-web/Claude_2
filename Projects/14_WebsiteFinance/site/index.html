@@ -767,6 +767,8 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
     <span class="muted" id="fbtPageLabel" style="margin:0 10px"></span>
     <button id="fbtNextBtn" onclick="fbtPage=fbtPage+1;renderFbtPage()">Next ›</button>
   </div>
+  <h2 style="margin-top:18px">By institution <span class="muted" style="text-transform:none;font-weight:400">· which named clients has following actually worked for, in this backtest window</span></h2>
+  <div id="fbtByClient"></div>
   </div>
 </div>
 
@@ -920,6 +922,10 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   <div class="collapsible collapsed" id="fund-shareholding" style="margin-top:14px">
     <h2 class="collapse-h2" onclick="toggleCollapse('fund-shareholding')"><span class="collapse-arrow">▾</span> Shareholding pattern</h2>
     <div class="collapse-body"><div id="shareholdingView"></div></div>
+  </div>
+  <div class="collapsible collapsed" id="fund-instsignal" style="margin-top:14px">
+    <h2 class="collapse-h2" onclick="toggleCollapse('fund-instsignal')"><span class="collapse-arrow">▾</span> Institutional cost basis &amp; smart money read</h2>
+    <div class="collapse-body"><div id="instSignalView"></div></div>
   </div>
   <div class="collapsible collapsed" id="fund-insider" style="margin-top:14px">
     <h2 class="collapse-h2" onclick="toggleCollapse('fund-insider')"><span class="collapse-arrow">▾</span> Insider trading disclosures</h2>
@@ -1496,11 +1502,24 @@ function flagRoundTrips(deals){
   }
   return deals.map(d=>({...d, roundTrip: sideCount.get(`${d.client}|${d.symbol}|${d.date}`).size > 1}));
 }
+// "New entrant" — the earliest recorded trade by this exact client in this exact stock, across the
+// FULL archive (not just whatever filter/range is currently applied). Bounded by how much history
+// this browser actually has stored — with only a couple of days loaded, everything looks "new"
+// trivially, so the badge is suppressed until there's at least 30 days of archive to mean something.
+function computeFirstSeen(allDeals){
+  const m = new Map();
+  for(const d of allDeals){
+    const k = `${d.client}|${d.symbol}`, ts = dealDateTs(d);
+    if(!m.has(k) || ts < m.get(k)) m.set(k, ts);
+  }
+  return m;
+}
 function renderDeals(){
   if(!dealsData || !dealsData.length) return;
   const newestTs = Math.max(...dealsData.map(dealDateTs));
   const oldestTs = Math.min(...dealsData.map(dealDateTs));
   const distinctDays = new Set(dealsData.map(d=>d.date)).size;
+  const firstSeen = computeFirstSeen(dealsData);
   let deals = [...dealsData];
   if($("dealsUniverseOnly").checked) deals = deals.filter(d=>ALL_STOCKS[d.symbol+".NS"]);
   deals = flagRoundTrips(deals);
@@ -1533,16 +1552,17 @@ function renderDeals(){
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +
     shown.map(d=>{
       const inUni = ALL_STOCKS[d.symbol+".NS"];
+      const isNew = distinctDays>=30 && dealDateTs(d) === firstSeen.get(`${d.client}|${d.symbol}`);
       return `<tr ${inUni?`onclick="openChart('${d.symbol}.NS')" style="cursor:pointer"`:'style="cursor:default"'}>
       <td style="white-space:nowrap">${d.date||"—"}</td>
-      <td style="text-align:left;max-width:280px">${escHtml(d.client)}${d.roundTrip?' <span class="badge neutral" title="Same client bought and sold this stock on this date — likely intraday, not a held position">ROUND TRIP</span>':""}</td>
+      <td style="text-align:left;max-width:280px">${escHtml(d.client)}${d.roundTrip?' <span class="badge neutral" title="Same client bought and sold this stock on this date — likely intraday, not a held position">ROUND TRIP</span>':""}${isNew?` <span class="badge bullish" title="Earliest recorded trade by this exact client in this exact stock across this browser's ${distinctDays}-day archive — a genuinely new position by that reading, though only as far back as the archive goes">NEW ENTRANT</span>`:""}</td>
       <td><span class="badge ${d.side==="BUY"?"bullish":"bearish"}">${d.side}</span></td>
       <td><span class="sym">${escHtml(d.symbol)}</span><br><span class="subname">${escHtml(d.name)}</span></td>
       <td>${fmtInt(d.qty)}</td><td>${fmt(d.price)}</td>
       <td><b>${d.valueCr!=null?fmt(d.valueCr,1):"—"}</b></td>
       <td><span class="badge ${d.type==="BLOCK"?"capL":"capM"}">${d.type}</span></td></tr>`;}).join("") +
     `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing).</div>`
+    <div class="muted" style="font-size:11px;margin-top:4px">Bulk = >0.5% of equity traded by one client in a day (disclosed post-close). Block = large negotiated trades in the special window. A marquee investor buying is interesting; but note funds also sell for reasons unrelated to the stock (redemptions, rebalancing). <b>NEW ENTRANT</b> flags the earliest recorded disclosed trade by that exact client in that exact stock across this browser's stored archive (shown only once 30+ days of history are stored) — it means "never showed up before in what's stored here," not "never held this stock ever," since the archive can't see further back than it's been backfilled.</div>`
     : '<div class="loading">No deals matching the filter.</div>');
   $("dealsPager").style.display = deals.length ? "flex" : "none";
   $("dealsPrevBtn").disabled = dealsPage <= 0;
@@ -2534,7 +2554,7 @@ async function loadFundamentals(){
   if(!sym){ $("fundView").innerHTML = '<div class="loading">Type a symbol or company name and pick from the suggestions</div>'; return; }
   $("fundView").innerHTML = '<div class="loading">Loading…</div>';
   $("verdictView").innerHTML = ""; $("newsView").innerHTML = ""; $("valView").innerHTML = ""; $("scoreView").innerHTML = ""; $("peerView").innerHTML = "";
-  $("shareholdingView").innerHTML = ""; $("insiderView").innerHTML = ""; $("concallView").innerHTML = "";
+  $("shareholdingView").innerHTML = ""; $("insiderView").innerHTML = ""; $("concallView").innerHTML = ""; $("instSignalView").innerHTML = "";
   try{
     const f = await fetchFundamentals(sym);
     const cr = v => v==null?"—":`₹${fmtInt(Math.round(v/1e7))} Cr`;
@@ -2562,6 +2582,7 @@ async function loadFundamentals(){
     loadShareholding(sym);
     loadInsiderTrading(sym);
     loadConcalls(sym, f.name || nameOf(sym));
+    loadInstitutionalSignal(sym);
   }catch(e){ $("fundView").innerHTML = `<div class="loading">Failed: ${e.message}</div>`; }
 }
 
@@ -2601,6 +2622,118 @@ async function loadShareholding(sym){
   }catch(e){
     if(comboSym("fundSymbol") !== sym) return;
     el.innerHTML = `<div class="muted" style="font-size:11px">Shareholding pattern unavailable (${e.message}).</div>`;
+  }
+}
+
+/* ---- institutional cost basis, smart-money divergence & accumulation read ----
+   Combines three real-but-imperfect institutional proxies into one view: disclosed bulk/block deal
+   prices (real transactions, but only ones large enough to require disclosure), promoter shareholding
+   deltas (real filings, but promoter-only — NSE's summary API doesn't break Public% into FII/DII/MF),
+   and delivery/volume-based accumulation signals (a structural proxy, not a confirmed institutional
+   trade). None of these alone is proof of anything; agreement across two or more is the actual signal. */
+function ddmmmyyyyToISO(s){
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(s||"");
+  return m ? `${m[3]}-${String(DEAL_MABBR[m[2]]+1).padStart(2,"0")}-${m[1].padStart(2,"0")}` : null;
+}
+function avgCloseBetween(candles, fromISO, toISO){
+  const win = candles.filter(c => (fromISO==null || c.time>fromISO) && c.time<=toISO);
+  if(!win.length) return null;
+  return win.reduce((s,c)=>s+c.close,0)/win.length;
+}
+async function loadInstitutionalSignal(sym){
+  const el = $("instSignalView");
+  el.innerHTML = '<div class="card"><div class="loading">Assembling institutional read…</div></div>';
+  try{
+    if(!dealsData || !dealsData.length){ try{ await loadDeals(); }catch(e){} }
+    if(comboSym("fundSymbol") !== sym) return;
+    const bareSym = sym.replace(".NS","");
+    const deals = dealsForSymbol(bareSym);
+    let quarters = [];
+    try{ const sr = await fetch(`/api/shareholding/${encodeURIComponent(sym)}`); const sd = await sr.json(); if(sr.ok && sd.quarters) quarters = sd.quarters; }catch(e){}
+    let candles = [];
+    try{ candles = toCandles(await fetchChart(sym,"3y","1d")); }catch(e){}
+    if(comboSym("fundSymbol") !== sym) return;
+    const currentPrice = candles.length ? candles[candles.length-1].close : null;
+
+    // ---- (6) estimated institutional cost basis ----
+    const wavg = list => { const q = list.reduce((s,d)=>s+(d.qty||0),0); return q ? list.reduce((s,d)=>s+(d.qty||0)*(d.price||0),0)/q : null; };
+    const buysAll = deals.filter(d=>d.side==="BUY" && d.qty && d.price);
+    const sellsAll = deals.filter(d=>d.side==="SELL" && d.qty && d.price);
+    const buysKnown = buysAll.filter(d=>isKnownFii(d.client)||isKnownDomesticInst(d.client));
+    const buyWavgAll = wavg(buysAll), buyWavgKnown = wavg(buysKnown), sellWavgAll = wavg(sellsAll);
+    const gainVs = basis => (basis!=null && currentPrice!=null) ? (currentPrice-basis)/basis*100 : null;
+
+    let promoterCostBasis = null;
+    if(quarters.length>1 && candles.length){
+      const row = quarters.find(q=>q.promoterDeltaPp!=null && Math.abs(q.promoterDeltaPp)>=0.1);
+      if(row){
+        const idx = quarters.indexOf(row), prevRow = quarters[idx+1];
+        const toISO = ddmmmyyyyToISO(row.date), fromISO = prevRow ? ddmmmyyyyToISO(prevRow.date) : null;
+        const avgPx = toISO ? avgCloseBetween(candles, fromISO, toISO) : null;
+        if(avgPx!=null) promoterCostBasis = {date:row.date, delta:row.promoterDeltaPp, avgPx, gain:gainVs(avgPx)};
+      }
+    }
+
+    // ---- (7)/(8) smart-money divergence & accumulation read ----
+    let bench63 = null;
+    try{ const b = toCandles(await fetchChart("^NSEI","1y","1d")); if(b.length>63) bench63 = b[b.length-1].close/b[b.length-64].close - 1; }catch(e){}
+    const tech = candles.length ? scanStock(sym, candles, bench63) : null;
+    const has = t => tech && tech.signals.some(x=>x.type===t);
+    const priceRet3m = tech ? tech.ret63 : null;
+    const promoterRow = quarters.find(q=>q.promoterDeltaPp!=null);
+    const promoterDir = promoterRow ? (promoterRow.promoterDeltaPp>0?1:promoterRow.promoterDeltaPp<0?-1:0) : null;
+    const recentDeals = deals.filter(d=>Date.now()-dealDateTs(d) < 90*86400000);
+    const netDealCr = recentDeals.reduce((s,d)=> s + (d.side==="BUY"?(d.valueCr||0):-(d.valueCr||0)), 0);
+    const dealDir = recentDeals.length ? (netDealCr>0.01?1:netDealCr<-0.01?-1:0) : null;
+    const techDir = (has("ACCUMULATION")||has("QUIET_ACCUMULATION")||has("MONEY_FLOW_IN")) ? 1
+      : (has("QUIET_DISTRIBUTION")||has("MONEY_FLOW_OUT")) ? -1 : null;
+    const proxies = [
+      {label:"Promoter shareholding", dir:promoterDir, detail: promoterRow ? `${promoterRow.promoterDeltaPp>0?"+":""}${fmt(promoterRow.promoterDeltaPp,2)}pp last quarter (${promoterRow.date})` : "no filing on file"},
+      {label:"Disclosed bulk/block deals (90d)", dir:dealDir, detail: recentDeals.length ? `net ${netDealCr>=0?"buying":"selling"} ₹${fmt(Math.abs(netDealCr),1)} Cr across ${recentDeals.length} deal${recentDeals.length>1?"s":""}` : "no disclosed deals in 90 days"},
+      {label:"Delivery/volume accumulation read", dir:techDir, detail: techDir===1?"accumulation signal present":techDir===-1?"distribution signal present":"no clear signal"},
+    ];
+    const knownDirs = proxies.filter(p=>p.dir!=null);
+    const leanScore = knownDirs.reduce((s,p)=>s+p.dir,0);
+    const priceDir = priceRet3m!=null ? (priceRet3m>0.03?1:priceRet3m<-0.03?-1:0) : null;
+    let divergenceRead;
+    if(priceDir==null || !knownDirs.length){
+      divergenceRead = {label:"Not enough data", cls:"muted", detail:"Need both a 3-month price read and at least one institutional proxy to judge this."};
+    } else if(priceDir!==0 && leanScore!==0 && Math.sign(leanScore)===-priceDir){
+      divergenceRead = priceDir<0
+        ? {label:"Bullish divergence", cls:"up", detail:"Price has fallen over 3 months while institutional proxies lean toward accumulation — a classic “smart money buying the dip” pattern, though it can also just mean the dip continues."}
+        : {label:"Bearish divergence", cls:"down", detail:"Price has risen over 3 months while institutional proxies lean toward distribution — worth checking whether the rally has real backing."};
+    } else if(priceDir!==0 && leanScore!==0 && Math.sign(leanScore)===priceDir){
+      divergenceRead = {label:"Aligned — no divergence", cls:"muted", detail:"Price direction and institutional proxies agree with each other; nothing contrarian to flag."};
+    } else {
+      divergenceRead = {label:"Mixed signals", cls:"muted", detail:"The institutional proxies don't agree with each other, or price is roughly flat — no clean read either way."};
+    }
+
+    const costRows = [];
+    if(buyWavgAll!=null) costRows.push(["All disclosed bulk/block buyers", buyWavgAll, gainVs(buyWavgAll), buysAll.length]);
+    if(buyWavgKnown!=null) costRows.push(["Known FIIs/institutions only", buyWavgKnown, gainVs(buyWavgKnown), buysKnown.length]);
+    if(sellWavgAll!=null) costRows.push(["All disclosed bulk/block sellers (reference)", sellWavgAll, gainVs(sellWavgAll), sellsAll.length]);
+    const costTable = costRows.length ? `<table style="margin-bottom:6px"><thead><tr><th style="text-align:left">Volume-weighted disclosed-deal price</th><th>Est. price</th><th>vs current</th><th># deals</th></tr></thead><tbody>` +
+      costRows.map(([label,px,gain,n])=>`<tr><td style="text-align:left">${label}</td><td>₹${fmt(px,2)}</td><td class="${gain!=null?cls(gain):""}">${gain!=null?sign(gain)+fmt(gain,1)+"%":"—"}</td><td>${n}</td></tr>`).join("") +
+      `</tbody></table>` : `<div class="muted" style="font-size:12px">No disclosed bulk/block deals on file for this stock in this browser's archive.</div>`;
+    const promoterLine = promoterCostBasis ? `<div class="muted" style="font-size:12px;margin-top:2px">Promoter ${promoterCostBasis.delta>0?"added to":"trimmed"} its stake in the quarter ending ${promoterCostBasis.date} (${promoterCostBasis.delta>0?"+":""}${fmt(promoterCostBasis.delta,2)}pp) — estimated average price that quarter <b>₹${fmt(promoterCostBasis.avgPx,2)}</b>, <span class="${cls(promoterCostBasis.gain)}">${sign(promoterCostBasis.gain)}${fmt(promoterCostBasis.gain,1)}%</span> vs today.</div>` : "";
+    const proxyRows = proxies.map(p=>`<tr><td style="text-align:left">${p.label}</td><td>${p.dir==null?'<span class="muted">—</span>':p.dir>0?'<span class="up">Bullish</span>':p.dir<0?'<span class="down">Bearish</span>':'<span class="muted">Neutral</span>'}</td><td class="muted" style="text-align:left;font-size:12px">${p.detail}</td></tr>`).join("");
+
+    el.innerHTML = `<div class="card" style="margin-bottom:10px">
+      <b>Estimated institutional cost basis</b>
+      <div class="muted" style="font-size:11px;margin:4px 0 8px">Volume-weighted average price across disclosed bulk/block deals — the real transaction price for those specific disclosed trades, not necessarily a full position's true average cost (the rest may have been built off-market or gradually). Deal history depth depends on what's stored in this browser — see the FII/DII tab's archive controls.</div>
+      ${costTable}
+      ${promoterLine}
+    </div>
+    <div class="card" style="border-color:${divergenceRead.cls==="up"?"#2ea043":divergenceRead.cls==="down"?"#f85149":"var(--border)"}">
+      <b>Smart money read: <span class="${divergenceRead.cls}">${divergenceRead.label}</span></b>
+      <div style="font-size:13px;margin:4px 0 8px">${divergenceRead.detail}</div>
+      <div class="muted" style="font-size:12px;margin-bottom:4px">Price over the last 3 months: <span class="${priceRet3m!=null?cls(priceRet3m*100):""}">${priceRet3m!=null?sign(priceRet3m*100)+fmt(priceRet3m*100,1)+"%":"—"}</span></div>
+      <table><thead><tr><th style="text-align:left">Proxy</th><th>Read</th><th style="text-align:left">Detail</th></tr></thead><tbody>${proxyRows}</tbody></table>
+      <div class="muted" style="font-size:11px;margin-top:6px">"Institutional" here is approximated three ways, none of them proof on its own: promoter shareholding filings (real, but promoter-only — NSE's summary API doesn't break Public% into FII/DII/MF), disclosed bulk/block deals (real transactions, but only ones large enough to require disclosure), and delivery/volume-based accumulation signals (a structural proxy, not a confirmed institutional trade). Agreement across two or more of these is a stronger tell than any single one alone.</div>
+    </div>`;
+  }catch(e){
+    if(comboSym("fundSymbol") !== sym) return;
+    el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Institutional read unavailable: ${e.message}</div></div>`;
   }
 }
 
@@ -3959,6 +4092,7 @@ function renderFbtPage(){
     if(!$("fbtResults").innerHTML) $("fbtResults").innerHTML = '<div class="loading">No priceable deals matched — run the backtest above.</div>';
     $("fbtPager").style.display = "none";
     $("fbtStatusBtns").style.display = "none";
+    $("fbtByClient").innerHTML = "";
     return;
   }
   $("fbtStatusBtns").style.display = "flex";
@@ -4004,6 +4138,43 @@ function renderFbtPage(){
   $("fbtPrevBtn").disabled = fbtPage <= 0;
   $("fbtNextBtn").disabled = fbtPage >= totalPages - 1;
   $("fbtPageLabel").textContent = `Page ${fbtPage+1} of ${totalPages}`;
+  renderFbtByClient();
+}
+// Groups the SAME backtested rows above by disclosing client name — "which named FIIs/institutions
+// has following actually paid off for, historically, in this exact window/filter." Not a new data
+// source: fbtRows already carries called/chgPct per deal, this just re-aggregates it by client
+// instead of by deal. "Mirrored return" flips the sign for SELL disclosures so a client who
+// correctly sold before a drop shows a positive number, same direction-adjustment "called" already uses.
+function renderFbtByClient(){
+  const el = $("fbtByClient");
+  const rows = fbtRows;
+  if(!rows.length){ el.innerHTML = ""; return; }
+  const byClient = {};
+  for(const r of rows){
+    const k = r.client || "Unknown";
+    (byClient[k] = byClient[k] || []).push(r);
+  }
+  const clients = Object.entries(byClient)
+    .map(([client, g]) => {
+      const decided = g.filter(r=>!r.flat);
+      const hits = decided.filter(r=>r.called===true).length;
+      const hitRate = decided.length ? hits/decided.length*100 : null;
+      const mirrored = g.map(r => r.side==="SELL" ? -r.chgPct : r.chgPct);
+      const avgMirrored = mirrored.reduce((s,v)=>s+v,0)/mirrored.length;
+      const totalCr = g.reduce((s,r)=>s+(r.valueCr||0),0);
+      return {client, n:g.length, hitRate, avgMirrored, totalCr, decided:decided.length};
+    })
+    .filter(c => c.n >= 2)   // a single deal isn't a "track record" — needs at least 2 to rank
+    .sort((a,b) => (b.hitRate??-1)-(a.hitRate??-1) || b.n-a.n);
+  if(!clients.length){ el.innerHTML = '<div class="muted" style="font-size:12px">No client shows up 2+ times in this window/filter — widen the lookback or switch to "All disclosed clients" to build a track record.</div>'; return; }
+  const pctCell = v => v==null?"—":`<span class="${cls(v)}">${sign(v)}${fmt(v,1)}%</span>`;
+  el.innerHTML = `<div class="muted" style="font-size:11px;margin-bottom:8px">"Mirrored return" flips the sign for SELL disclosures, so a client who sold ahead of a real drop shows a positive number too — it answers "would copying this client's disclosed side, every time, have worked?" Only clients appearing 2+ times in the current filter/window are ranked; a single deal isn't a track record.</div>
+    <table><thead><tr><th style="text-align:left">Client</th><th># deals</th><th title="Share of non-flat deals where the disclosed side was proven right">Hit rate</th><th title="Average return if you'd mirrored this client's side on every disclosed deal">Avg mirrored return</th><th>Total disclosed ₹Cr</th></tr></thead><tbody>
+    ${clients.slice(0,25).map(c=>`<tr><td style="text-align:left;max-width:260px">${escHtml(c.client)}</td><td>${c.n}</td>
+      <td>${c.hitRate!=null?`<span class="${c.hitRate>=50?'up':'down'}">${fmt(c.hitRate,0)}%</span> <span class="muted">(${c.decided})</span>`:'<span class="muted">all flat</span>'}</td>
+      <td>${pctCell(c.avgMirrored)}</td><td>${fmt(c.totalCr,1)}</td></tr>`).join("")}
+    </tbody></table>
+    ${clients.length>25?`<div class="muted" style="font-size:11px;margin-top:4px">Showing top 25 of ${clients.length} clients with 2+ deals.</div>`:""}`;
 }
 
 /* ================= Conviction Scan backtest — does the 3-gate combination itself have edge? ================= */
