@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.26.1] — 2026-07-26 · Fixed "AI did not return JSON" on the research report
+
+- **Root cause**: the report endpoint asked for 6 sections at up to 3-4 sentences each inside a 700-token budget — often enough to run out mid-sentence before the closing `}`, producing incomplete JSON that failed to parse. Confirmed live via the "Report unavailable right now (AI did not return JSON)" message.
+- **Fix**: shorter per-section asks (1-2 sentences instead of 2-4), a larger 900-token budget, an instruction to never use a quote character or line break inside a text value (the rarer "complete but malformed" case), and a single automatic retry with an even shorter prompt if the first attempt still doesn't parse — before finally showing the same friendly error.
+- Applied the same tolerant JSON parsing (strips stray line breaks/trailing commas before parsing) to `/api/finai` and `/api/explain` as well — lower risk given their shorter fields, but the same fragile single-attempt `JSON.parse` was there too.
+
 ## [3.26.0] — 2026-07-26 · AI layer: "explain this move" + AI research report
 
 - **New "🤖 Explain this move" on the Smart Money tab** — reads today's price/volume move, where price sits relative to its recent volume-profile Value Area, the nearest fresh order block, any disclosed bulk/block deal nearby, and recent headlines, then asks Workers AI for a plain-English read of what likely happened — including saying plainly when nothing stands out and the move looks like ordinary noise, rather than inventing a story. Shows a high/medium/low confidence tag based on how much real corroborating evidence (volume, deal, news) actually lines up.

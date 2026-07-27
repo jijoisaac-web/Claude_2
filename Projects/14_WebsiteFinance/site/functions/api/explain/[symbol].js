@@ -4,6 +4,20 @@
 // Workers AI pattern as news.js's bull/bear brief and finai.js's ratio-trend read: this endpoint
 // does no data-fetching of its own, it only interprets numbers/text the client already has, so the
 // explanation is grounded in exactly what's on screen (Smart Money tab).
+
+// Tolerates the model wrapping valid JSON with a stray newline or trailing comma — same defensive
+// treatment applied to the report/finai endpoints after a truncation bug there caused "AI did not
+// return JSON" failures.
+function extractJson(txt) {
+  const jm = (txt || "").match(/\{[\s\S]*\}/);
+  if (!jm) return null;
+  const raw = jm[0];
+  const cleaned = raw.replace(/[\r\n]+/g, " ").replace(/,\s*([}\]])/g, "$1");
+  try { return JSON.parse(cleaned); } catch (e) {}
+  try { return JSON.parse(raw); } catch (e) {}
+  return null;
+}
+
 export async function onRequestPost({ request, env, params }) {
   const symbol = decodeURIComponent(params.symbol || "");
   let body;
@@ -47,10 +61,8 @@ export async function onRequestPost({ request, env, params }) {
       max_tokens: 300,
     });
     const txt = (r && (r.response || r.result || "")) + "";
-    const jm = txt.match(/\{[\s\S]*\}/);
-    if (!jm) throw new Error("AI did not return JSON");
-    const parsed = JSON.parse(jm[0]);
-    if (!parsed || typeof parsed.explanation !== "string") throw new Error("unexpected AI response shape");
+    const parsed = extractJson(txt);
+    if (!parsed || typeof parsed.explanation !== "string") throw new Error("AI did not return usable JSON");
     return new Response(JSON.stringify({ aiConfigured: true, ...parsed }), { headers: { "content-type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ aiConfigured: true, error: String(e.message || e) }),

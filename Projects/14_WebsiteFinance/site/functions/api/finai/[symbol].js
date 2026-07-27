@@ -13,6 +13,20 @@ const fmtRow = p => `${p.label}: revenue ${p.revenue ?? "—"}, net profit ${p.n
   `ROE ${p.roe ?? "—"}%, debt ${p.debt ?? "—"}, debt/equity ${p.debtToEq ?? "—"}x` +
   (p.retention != null ? `, retention ratio ${p.retention}%` : "");
 
+// Tolerates the model wrapping valid JSON with a stray newline or trailing comma — cheap insurance
+// against the same "AI did not return JSON" failure the report endpoint hit (there it was caused by
+// truncation from too tight a token budget; here the fields are short enough that's unlikely, but
+// the parse itself is just as fragile so it gets the same defensive treatment).
+function extractJson(txt) {
+  const jm = (txt || "").match(/\{[\s\S]*\}/);
+  if (!jm) return null;
+  const raw = jm[0];
+  const cleaned = raw.replace(/[\r\n]+/g, " ").replace(/,\s*([}\]])/g, "$1");
+  try { return JSON.parse(cleaned); } catch (e) {}
+  try { return JSON.parse(raw); } catch (e) {}
+  return null;
+}
+
 export async function onRequestPost({ request, env, params }) {
   const symbol = decodeURIComponent(params.symbol || "");
   let body;
@@ -49,10 +63,8 @@ export async function onRequestPost({ request, env, params }) {
       max_tokens: 400,
     });
     const txt = (r && (r.response || r.result || "")) + "";
-    const jm = txt.match(/\{[\s\S]*\}/);
-    if (!jm) throw new Error("AI did not return JSON");
-    const parsed = JSON.parse(jm[0]);
-    if (!parsed || typeof parsed.summary !== "string") throw new Error("unexpected AI response shape");
+    const parsed = extractJson(txt);
+    if (!parsed || typeof parsed.summary !== "string") throw new Error("AI did not return usable JSON");
     return new Response(JSON.stringify({ aiConfigured: true, ...parsed }), { headers: { "content-type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ aiConfigured: true, error: String(e.message || e) }),
