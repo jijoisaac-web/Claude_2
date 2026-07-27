@@ -2859,6 +2859,7 @@ async function generateResearchReport(){
     if(d.error){ el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Report unavailable right now (${escHtml(d.error)}).</div></div>`; return; }
     const sec = (title, text) => text ? `<div style="margin-bottom:10px"><div class="name" style="margin-bottom:2px">${title}</div><div style="font-size:13px;line-height:1.6">${escHtml(text)}</div></div>` : "";
     el.innerHTML = `<div class="card">
+      ${d._partial ? '<div class="muted" style="font-size:11px;margin-bottom:8px;color:#d29922">⚠ The AI response came back incomplete — one or more sections below couldn\'t be recovered and say so plainly. Try Generate report again for a full version.</div>' : ""}
       ${sec("Overview", d.overview)}
       ${sec("Financial health", d.financialHealth)}
       ${sec("Technical picture", d.technicalPicture)}

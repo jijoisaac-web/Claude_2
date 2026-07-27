@@ -2,6 +2,10 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.27.1] — 2026-07-26 · AI research report still failing even after the v3.26.1 retry fix
+
+- User hit "AI did not return complete JSON after retry" on ADANIENT — both attempts failed identically, which the truncation-only fix in 3.26.1 didn't cover. Added: (1) normalization for typographic quotes/dashes and stray ```json fences the model sometimes substitutes, which silently break `JSON.parse` even on an otherwise-complete response; (2) a per-field regex fallback that recovers individual sections even when the object as a whole won't parse, so one broken field doesn't sink five good ones; (3) graceful degradation — if 3+ of 6 sections are recovered, the report now renders with a plain "not enough information came back" placeholder in the gaps instead of failing outright, with a small warning banner; (4) if it's still genuinely unusable after both attempts, the error message now includes a snippet of what the model actually returned, so any further failure is debuggable directly from the error text instead of needing another guess-and-redeploy round.
+
 ## [3.27.0] — 2026-07-26 · Real-edge batch: cost basis, smart-money divergence, institution leaderboard, new entrants
 
 - **New "Institutional cost basis & smart money read" panel on the Fundamentals tab** — combines three things: (1) estimated cost basis from disclosed bulk/block deals (volume-weighted average price, shown for all disclosed buyers and for known-FII/institution buyers separately, vs current price), (2) an estimated cost basis for the most recent meaningful promoter-shareholding shift (average price over that filing quarter, vs today), and (3) a "smart money read" that compares 3-month price direction against three institutional proxies (promoter shareholding delta, net disclosed bulk/block buying in the last 90 days, and delivery/volume accumulation signals) to flag Bullish divergence, Bearish divergence, Aligned, or Mixed. None of the three proxies is proof on its own — the panel says so directly — but agreement across two or more is a real tell.

@@ -8,22 +8,52 @@
 const fmtCr = v => v == null ? "—" : `₹${Math.round(v).toLocaleString("en-IN")} Cr`;
 const fmtPct = v => v == null ? "—" : `${v.toFixed(1)}%`;
 
-// Pulls the JSON object out of the model's raw text and tolerates the two failure modes actually
-// seen in practice: (a) a literal newline or stray trailing comma inside an otherwise-valid object
-// (cheap to repair), and (b) the response getting cut off mid-sentence because max_tokens ran out
-// before the model finished all 6 sections (only fixable by asking again with more room / less to say).
+const REPORT_KEYS = ["overview", "financialHealth", "technicalPicture", "institutionalActivity", "risks", "bottomLine"];
+
+// Small "fast" instruct models occasionally substitute typographic quotes/dashes for plain ASCII
+// ones, or wrap the object in a ```json fence despite being told not to — neither breaks a human
+// reading it, but both break JSON.parse outright. Normalize before ever trying to parse.
+function normalizeModelText(s) {
+  return (s || "")
+    .replace(/```json/gi, "").replace(/```/g, "")
+    .replace(/[“”„‟]/g, '"')
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[–—]/g, "-");
+}
+// Pulls the JSON object out of the model's raw text and tolerates the failure modes actually seen
+// in practice: normalization above, a literal newline or stray trailing comma inside an otherwise-
+// valid object (cheap to repair), or the response getting cut off mid-sentence because max_tokens
+// ran out before the model finished all 6 sections.
 function extractJson(txt) {
-  const jm = (txt || "").match(/\{[\s\S]*\}/);
+  const cleanedFull = normalizeModelText(txt);
+  const jm = cleanedFull.match(/\{[\s\S]*\}/);
   if (!jm) return null;
   const raw = jm[0];
-  const cleaned = raw.replace(/[\r\n]+/g, " ").replace(/,\s*([}\]])/g, "$1");
-  try { return JSON.parse(cleaned); } catch (e) {}
-  try { return JSON.parse(raw); } catch (e) {}
+  const attempts = [raw, raw.replace(/[\r\n]+/g, " ").replace(/,\s*([}\]])/g, "$1")];
+  for (const a of attempts) { try { const p = JSON.parse(a); if (p) return p; } catch (e) {} }
   return null;
 }
-const REPORT_KEYS = ["overview", "financialHealth", "technicalPicture", "institutionalActivity", "risks", "bottomLine"];
-function validReport(parsed) {
-  return !!parsed && REPORT_KEYS.every(k => typeof parsed[k] === "string" && parsed[k].length > 0);
+// Last-resort fallback when the object as a whole won't parse (e.g. one field has an unescaped
+// quote the model forgot to escape) — pulls each expected "key":"value" pair out individually by
+// regex, so five good fields aren't sunk by one broken one. Tolerant of either quote style since
+// normalizeModelText already ran.
+function extractFieldsFallback(txt) {
+  const cleaned = normalizeModelText(txt);
+  const out = {};
+  for (const k of REPORT_KEYS) {
+    const re = new RegExp(`"${k}"\\s*:\\s*"([\\s\\S]*?)"\\s*(?:,\\s*"[a-zA-Z]+"\\s*:|\\}\\s*$|\\})`, "m");
+    const m = re.exec(cleaned);
+    if (m) out[k] = m[1].replace(/\\"/g, '"').replace(/\s+/g, " ").trim();
+  }
+  return out;
+}
+function countValidKeys(obj) {
+  return obj ? REPORT_KEYS.filter(k => typeof obj[k] === "string" && obj[k].length > 0).length : 0;
+}
+function fillGaps(obj) {
+  const out = { ...obj };
+  for (const k of REPORT_KEYS) if (typeof out[k] !== "string" || !out[k].length) out[k] = "Not enough information came back for this section — try Generate report again.";
+  return out;
 }
 
 export async function onRequestPost({ request, env, params }) {
@@ -74,19 +104,41 @@ export async function onRequestPost({ request, env, params }) {
         messages: [{ role: "system", content: systemMsg }, { role: "user", content: promptText }],
         max_tokens: tokens,
       });
-      const txt = (r && (r.response || r.result || "")) + "";
-      return extractJson(txt);
+      const raw = (r && (r.response || r.result || "")) + "";
+      let obj = extractJson(raw);
+      let keyCount = countValidKeys(obj);
+      if (keyCount < REPORT_KEYS.length) {
+        // Whole-object parse failed or was incomplete — try pulling individual fields out by regex
+        // before giving up on this attempt entirely; a partial recovery still beats a hard failure.
+        const fallback = extractFieldsFallback(raw);
+        const fbCount = countValidKeys(fallback);
+        if (fbCount > keyCount) { obj = fallback; keyCount = fbCount; }
+      }
+      return { obj, keyCount, raw };
     }
 
-    let parsed = await attempt(basePrompt, 900);
-    if (!validReport(parsed)) {
-      // One retry with an even harder cap on length — cheaper to ask for less than to debug why a
-      // longer answer got cut off a second time.
-      const retryPrompt = basePrompt.replace(/1-2 sentences/g, "1 sentence").replace(/2-3 sentences/g, "1-2 sentences");
-      parsed = await attempt(retryPrompt, 700);
+    let a1 = await attempt(basePrompt, 900);
+    if (a1.keyCount === REPORT_KEYS.length) {
+      return new Response(JSON.stringify({ aiConfigured: true, ...a1.obj }), { headers: { "content-type": "application/json" } });
     }
-    if (!validReport(parsed)) throw new Error("AI did not return complete JSON after retry");
-    return new Response(JSON.stringify({ aiConfigured: true, ...parsed }), { headers: { "content-type": "application/json" } });
+    // One retry with an even harder cap on length — cheaper to ask for less than to debug why a
+    // longer answer got cut off a second time.
+    const retryPrompt = basePrompt.replace(/1-2 sentences/g, "1 sentence").replace(/2-3 sentences/g, "1-2 sentences");
+    const a2 = await attempt(retryPrompt, 700);
+    const best = a2.keyCount >= a1.keyCount ? a2 : a1;
+    if (best.keyCount === REPORT_KEYS.length) {
+      return new Response(JSON.stringify({ aiConfigured: true, ...best.obj }), { headers: { "content-type": "application/json" } });
+    }
+    if (best.keyCount >= 3) {
+      // Recovered most of it — fill the rest with a plain placeholder rather than throwing away a
+      // mostly-good report over one or two missing sections.
+      return new Response(JSON.stringify({ aiConfigured: true, ...fillGaps(best.obj), _partial: true }), { headers: { "content-type": "application/json" } });
+    }
+    // Genuinely unusable both times — surface a snippet of what actually came back so this is
+    // debuggable from the error message alone instead of needing another blind guess-and-redeploy
+    // round: was the field empty (wrong response key from Workers AI?), truncated, or malformed?
+    const snip = s => s ? JSON.stringify(s.slice(0, 180)) : "(empty)";
+    throw new Error(`AI did not return usable JSON — attempt 1: ${snip(a1.raw)} | attempt 2: ${snip(a2.raw)}`);
   } catch (e) {
     return new Response(JSON.stringify({ aiConfigured: true, error: String(e.message || e) }),
       { status: 502, headers: { "content-type": "application/json" } });
