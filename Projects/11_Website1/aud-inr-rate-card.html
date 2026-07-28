@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="Live AUD to INR exchange rate comparison. 15 Australia to India money transfer providers ranked by best rate."/>
+<link rel="canonical" href="https://nrifinancehub.com/aud-inr-rate-card.html"/>
+<title>AUD → INR Live Rate Card | NRI Finance Hub</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#05080f;color:#e8eaf0;}
+.layout{display:grid;grid-template-columns:340px 1fr;min-height:100vh;}
+.left-panel{
+  position:sticky;top:0;height:100vh;
+  background:
+    linear-gradient(180deg,rgba(3,6,14,0.55) 0%,rgba(5,10,20,0.40) 35%,rgba(3,6,14,0.85) 100%),
+    url('https://images.pexels.com/photos/995764/pexels-photo-995764.jpeg?auto=compress&cs=tinysrgb&w=800&h=1200&fit=crop')
+    center/cover no-repeat;
+  display:flex;flex-direction:column;justify-content:space-between;padding:28px 24px 24px;
+}
+.lp-top{display:flex;flex-direction:column;gap:20px;}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.brand-icon{width:38px;height:38px;background:linear-gradient(135deg,#f0a520,#c97c0a);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(240,165,32,0.4);flex-shrink:0;}
+.brand-icon svg{width:17px;height:17px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.brand-name{font-size:15px;font-weight:800;color:#fff;display:block;letter-spacing:-.3px;}
+.brand-url{font-size:10px;font-weight:600;color:#c9a227;letter-spacing:.3px;}
+.lp-hero{margin-top:auto;}
+.flag-pair{margin-bottom:10px;display:flex;align-items:center;gap:16px;}
+.flag-arrow{color:#c9a227;font-size:20px;font-weight:900;}
+.lp-title{font-size:26px;font-weight:900;line-height:1.15;letter-spacing:-.5px;margin-bottom:4px;}
+.lp-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:20px;}
+.lp-stats{display:flex;flex-direction:column;gap:10px;}
+.lp-stat{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;}
+.lp-stat-lbl{font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;}
+.lp-stat-val{font-size:20px;font-weight:800;color:#fff;}
+.lp-stat-sub{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;}
+.xe-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,150,0,0.2);border:1px solid rgba(201,150,0,0.4);border-radius:5px;padding:2px 7px;font-size:9px;font-weight:700;color:#c9a227;margin-top:5px;}
+.lp-bottom{display:flex;flex-direction:column;gap:8px;}
+.ts-line{font-size:10px;color:rgba(255,255,255,0.4);display:flex;align-items:center;gap:5px;}
+.refresh-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(201,150,0,0.15);border:1px solid rgba(201,150,0,0.35);border-radius:10px;color:#c9a227;font-size:12px;font-weight:700;padding:9px;cursor:pointer;transition:all .2s;width:100%;}
+.refresh-btn:hover{background:rgba(201,150,0,0.28);}
+.refresh-btn.spinning .spin-icon{display:inline-block;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.right-panel{background:#080d18;overflow-y:auto;padding:20px 20px 32px;}
+.amount-bar{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.amount-lbl{font-size:11px;color:#6b7080;font-weight:700;white-space:nowrap;}
+.amt-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.amt-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#9aa0b0;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;}
+.amt-btn.active{background:rgba(201,150,0,0.16);border-color:#c9a227;color:#c9a227;}
+.amt-input-wrap{display:flex;align-items:center;gap:5px;margin-left:auto;}
+.amt-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:#e8eaf0;font-size:12px;font-weight:700;padding:5px 9px;width:80px;outline:none;}
+.amt-cur{font-size:11px;font-weight:700;color:#c9a227;}
+.tip-bar{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.18);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:#9aa0b0;line-height:1.5;}
+.tip-bar strong{color:#10b981;}
+.table-wrap{background:#0d1520;border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.table-header{display:grid;grid-template-columns:38px 1fr 95px 82px 62px 62px;padding:9px 12px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);}
+.th{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.6px;text-transform:uppercase;}
+.th:not(:first-child){text-align:right;}
+.provider-row{display:grid;grid-template-columns:38px 1fr 95px 82px 62px 62px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center;transition:background .15s;cursor:pointer;text-decoration:none;color:inherit;}
+.provider-row:last-child{border-bottom:none;}
+.provider-row:hover{background:rgba(255,255,255,0.025);}
+.prov-logo-wrap{display:flex;align-items:center;justify-content:center;}
+.prov-logo{width:28px;height:28px;border-radius:7px;object-fit:contain;background:#141c2a;border:1px solid rgba(255,255,255,0.07);padding:3px;}
+.prov-logo-fb{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#1e2d4a,#0d1a2e);border:1px solid rgba(255,255,255,0.08);display:none;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#c9a227;}
+.prov-name{font-size:12px;font-weight:700;color:#e8eaf0;}
+.prov-note{font-size:10px;color:#6b7080;margin-top:1px;}
+.prov-rate{font-size:12px;font-weight:800;text-align:right;}
+.prov-inr{font-size:12px;font-weight:700;text-align:right;color:#e8eaf0;}
+.prov-diff{font-size:10px;font-weight:700;text-align:right;}
+.prov-fee{font-size:11px;font-weight:600;text-align:right;color:#9aa0b0;}
+.prov-fee.paid{color:#f59e0b;}
+.rank-badge{display:inline-flex;align-items:center;font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;margin-right:4px;vertical-align:middle;}
+.rank-1{background:rgba(16,185,129,0.18);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
+.rank-2{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.2);}
+.tier-best .prov-rate{color:#10b981;}
+.tier-good .prov-rate{color:#c9a227;}
+.tier-fair .prov-rate{color:#9aa0b0;}
+.tier-poor .prov-rate{color:#ef4444;}
+.tier-best .prov-diff{color:#10b981;}
+.tier-good .prov-diff{color:#c9a227;}
+.tier-fair .prov-diff{color:#9aa0b0;}
+.tier-poor .prov-diff{color:#ef4444;}
+.section-div{padding:5px 12px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding-right:14px;user-select:none;}
+.section-div:hover{background:rgba(255,255,255,0.05);}
+.section-div span{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.8px;text-transform:uppercase;}
+.tier-toggle-btn{font-size:9px;font-weight:700;color:#6b7080;letter-spacing:.4px;}
+.loading-row{padding:28px;text-align:center;color:#6b7080;font-size:12px;}
+.error-row{padding:16px;text-align:center;color:#ef4444;font-size:11px;}
+.footer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.source-text{font-size:10px;color:#4a5060;line-height:1.4;flex:1;}
+.source-text a{color:#c9a227;text-decoration:none;font-weight:600;}
+.share-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa0b0;font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.share-btn:hover{background:rgba(255,255,255,0.08);}
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;min-height:auto;}
+  .left-panel{position:relative;height:auto;min-height:280px;padding:20px 18px 18px;}
+  .lp-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .right-panel{padding:14px 14px 24px;}
+  .table-header,.provider-row{grid-template-columns:32px 1fr 80px 68px 56px;}
+  .th:last-child,.prov-diff{display:none;}
+}
+/* Trend badge */
+.trend-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;margin-top:5px;}
+.trend-up{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;}
+.trend-down{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;}
+.trend-flat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#9aa0b0;}
+/* Planner */
+.planner-card{background:#0d1520;border:1px solid rgba(201,150,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.planner-hd{font-size:12px;font-weight:800;color:#c9a227;letter-spacing:.5px;margin-bottom:10px;}
+.planner-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.planner-label{font-size:11px;color:#9aa0b0;font-weight:600;}
+.planner-input{width:90px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:7px;color:#fff;font-size:13px;font-weight:700;padding:5px 8px;outline:none;}
+.planner-select{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:7px;color:#fff;font-size:11px;font-weight:700;padding:5px 8px;outline:none;}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.plan-stat{background:rgba(255,255,255,0.05);border-radius:9px;padding:10px 12px;}
+.plan-stat-lbl{font-size:9px;color:#6b7080;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.plan-stat-val{font-size:15px;font-weight:800;color:#fff;}
+.plan-stat.gold{background:rgba(201,150,0,0.1);border:1px solid rgba(201,150,0,0.25);}
+.plan-stat.gold .plan-stat-val{color:#c9a227;}
+.plan-stat.green .plan-stat-val{color:#10b981;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="left-panel">
+    <div class="lp-top">
+      <a class="brand" href="https://nrifinancehub.com" target="_blank" rel="noopener">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <span class="brand-name">NRI Finance Hub</span>
+          <span class="brand-url">nrifinancehub.com</span>
+        </div>
+      </a>
+    </div>
+    <div class="lp-hero">
+      <div class="flag-pair"><img src="https://flagcdn.com/w40/au.png" width="48" height="32" style="border-radius:4px;vertical-align:middle;box-shadow:0 2px 6px rgba(0,0,0,0.4)"/> <span class="flag-arrow">→</span> <img src="https://flagcdn.com/w40/in.png" width="48" height="32" style="border-radius:4px;vertical-align:middle;box-shadow:0 2px 6px rgba(0,0,0,0.4)"/></div>
+      <div class="lp-title">AUD to INR<br>Live Rates</div>
+      <div class="lp-sub">15 providers compared · Updated live</div>
+      <div class="lp-stats">
+        <div class="lp-stat">
+          <div class="lp-stat-lbl">Mid-Market</div>
+          <div class="lp-stat-val" id="midRateDisplay">—</div>
+          <div class="lp-stat-sub">1 AUD in INR</div>
+          <div class="xe-badge">⚡ XE.COM</div>
+          <div id="trendBadge"></div>
+        </div>
+        <div class="lp-stat">
+          <div class="lp-stat-lbl">Best Rate</div>
+          <div class="lp-stat-val" id="bestRateDisplay" style="color:#10b981">—</div>
+          <div class="lp-stat-sub" id="bestProviderName">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <div class="lp-bottom">
+      <div class="ts-line" id="tsLine">🕐 —</div>
+      <button class="refresh-btn" onclick="fetchAndRender()" id="refreshBtn">
+        <span class="spin-icon">↻</span> Refresh Rates
+      </button>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="amount-bar">
+      <span class="amount-lbl">You send:</span>
+      <div class="amt-btns">
+        <button class="amt-btn" onclick="setAmt(200,this)">200</button><button class="amt-btn" onclick="setAmt(500,this)">500</button><button class="amt-btn active" onclick="setAmt(1000,this)">1,000</button><button class="amt-btn" onclick="setAmt(2000,this)">2,000</button><button class="amt-btn" onclick="setAmt(5000,this)">5,000</button><button class="amt-btn" onclick="setAmt(10000,this)">10,000</button>
+      </div>
+      <div class="amt-input-wrap">
+        <input class="amt-input" type="number" id="customAmt" value="1000" oninput="setAmt(this.value,null,true)"/>
+        <span class="amt-cur">AUD</span>
+      </div>
+    </div>
+    <div class="tip-bar">
+      💡 <strong>How to read:</strong> Rates use each provider's typical spread over the live mid-market rate. Wise fee is estimated — share your Wise screenshot for exact formula.
+    </div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <div class="th"></div>
+        <div class="th" style="text-align:left">Provider</div>
+        <div class="th">Rate / AUD</div>
+        <div class="th" id="inrColHeader">You get</div>
+        <div class="th">Fee</div><div class="th">vs XE</div>
+      </div>
+      <div id="rateRows"><div class="loading-row">⏳ Fetching live rate…</div></div>
+    </div>
+    <div class="planner-card">
+      <div class="planner-hd">📅 Annual Remittance Planner</div>
+      <div class="planner-row">
+        <span class="planner-label">I send</span>
+        <span style="font-size:12px;font-weight:700;color:#c9a227;">AUD</span>
+        <input class="planner-input" type="number" id="planAmt" value="1000" min="100" oninput="computePlan()"/>
+        <span class="planner-label">every</span>
+        <select class="planner-select" id="planFreq" onchange="computePlan()">
+          <option value="52">week</option>
+          <option value="26">2 weeks</option>
+          <option value="12" selected>month</option>
+          <option value="4">quarter</option>
+        </select>
+      </div>
+      <div id="planResults"></div>
+    </div>
+    <div class="footer-row">
+      <div class="source-text">
+        Rate source: Frankfurter / ECB API. Rates are indicative — not guaranteed.<br>
+        Full comparison at <a href="https://nrifinancehub.com/aud-inr-rate-card.html" target="_blank">nrifinancehub.com</a>
+      </div>
+      <button class="share-btn" onclick="copyLink()">🔗 Share</button>
+    </div>
+  </div>
+</div>
+<script>
+const PROVIDERS = [
+  {
+    "name": "Wise",
+    "domain": "wise.com",
+    "spread": 0,
+    "fee": 0,
+    "feeFormula": {
+      "fixed": 0.35,
+      "pct": 0.0045
+    },
+    "link": "https://wise.com",
+    "note": "Mid-market rate · fee ~0.45% est."
+  },
+  {
+    "name": "SingX",
+    "domain": "singx.co",
+    "spread": 0.003,
+    "fee": 0,
+    "link": "https://singx.co/au/",
+    "note": "AU licensed · near mid-market"
+  },
+  {
+    "name": "InstaReM",
+    "domain": "instarem.com",
+    "spread": 0.004,
+    "fee": 0,
+    "link": "https://instarem.com/en-au/",
+    "note": "ASIC licensed · zero fee first transfer"
+  },
+  {
+    "name": "OFX",
+    "domain": "ofx.com",
+    "spread": 0.005,
+    "fee": 0,
+    "link": "https://ofx.com/",
+    "note": "No transfer fee · AU regulated"
+  },
+  {
+    "name": "TorFX",
+    "domain": "torfx.com",
+    "spread": 0.006,
+    "fee": 0,
+    "link": "https://torfx.com/",
+    "note": "Specialist FX · personal service"
+  },
+  {
+    "name": "CurrencyFair",
+    "domain": "currencyfair.com",
+    "spread": 0.004,
+    "fee": 3,
+    "link": "https://currencyfair.com/",
+    "note": "Peer-to-peer · low spread"
+  },
+  {
+    "name": "Remitly",
+    "domain": "remitly.com",
+    "spread": 0.007,
+    "fee": 0,
+    "link": "https://remitly.com/",
+    "note": "Digital · fast delivery"
+  },
+  {
+    "name": "WorldRemit",
+    "domain": "worldremit.com",
+    "spread": 0.009,
+    "fee": 0,
+    "link": "https://worldremit.com/",
+    "note": "Mobile-first · fast"
+  },
+  {
+    "name": "Ria Money Transfer",
+    "domain": "riamoneytransfer.com",
+    "spread": 0.012,
+    "fee": 0,
+    "link": "https://riamoneytransfer.com/",
+    "note": "Good rural India reach"
+  },
+  {
+    "name": "Western Union",
+    "domain": "westernunion.com",
+    "spread": 0.018,
+    "fee": 0,
+    "link": "https://westernunion.com/",
+    "note": "Digital & cash options"
+  },
+  {
+    "name": "MoneyGram",
+    "domain": "moneygram.com",
+    "spread": 0.022,
+    "fee": 0,
+    "link": "https://moneygram.com/",
+    "note": "Wide agent network"
+  },
+  {
+    "name": "ANZ",
+    "domain": "anz.com.au",
+    "spread": 0.025,
+    "fee": 9,
+    "link": "https://anz.com.au",
+    "note": "ANZ bank · AUD 9 fee"
+  },
+  {
+    "name": "CommBank",
+    "domain": "commbank.com.au",
+    "spread": 0.025,
+    "fee": 22,
+    "link": "https://commbank.com.au",
+    "note": "CBA · AUD 22 fee"
+  },
+  {
+    "name": "NAB",
+    "domain": "nab.com.au",
+    "spread": 0.025,
+    "fee": 22,
+    "link": "https://nab.com.au",
+    "note": "NAB · AUD 22 fee"
+  },
+  {
+    "name": "Westpac",
+    "domain": "westpac.com.au",
+    "spread": 0.028,
+    "fee": 22,
+    "link": "https://westpac.com.au",
+    "note": "Westpac · AUD 22 fee"
+  }
+];
+const FROM_CUR = 'AUD';
+const FWZ_KEY = 'aud';
+let midRate=null, sendAmt=1000;
+const tierOpen={'tier-best':true,'tier-good':true,'tier-fair':false,'tier-poor':false};
+function toggleTier(t){tierOpen[t]=!tierOpen[t];renderTable();}
+
+
+function setAmt(val,btn,custom=false){
+  sendAmt=parseFloat(val)||1000;
+  if(!custom){
+    document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('customAmt').value=sendAmt;
+    if(btn)btn.classList.add('active');
+  }
+  if(midRate)renderTable();
+}
+
+async function fetchMidRate(){
+  try{const r=await fetch('https://api.exchangerate-api.com/v4/latest/'+FROM_CUR);const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://api.frankfurter.app/latest?from='+FROM_CUR+'&to=INR');const d=await r.json();if(d.rates&&d.rates.INR)return d.rates.INR;}catch(e){}
+  try{const r=await fetch('https://latest.currency-api.pages.dev/v1/currencies/'+FWZ_KEY+'.json');const d=await r.json();if(d[FWZ_KEY]&&d[FWZ_KEY].inr)return d[FWZ_KEY].inr;}catch(e){}
+  return null;
+}
+
+function getTier(lostPct){return lostPct<=.7?'tier-best':lostPct<=1.2?'tier-good':lostPct<=1.7?'tier-fair':'tier-poor';}
+function fmt(n,d=4){return n.toFixed(d);}
+function fmtINR(n){return n>=100000?'₹'+(n/100000).toFixed(2)+'L':'₹'+Math.round(n).toLocaleString('en-IN');}
+
+function logoHTML(p){
+  const init=p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<div class="prov-logo-wrap">
+    <img class="prov-logo" src="https://www.google.com/s2/favicons?domain=${p.domain}&sz=64" alt="${p.name}"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <div class="prov-logo-fb">${init}</div>
+  </div>`;
+}
+
+function getProviderFee(p,amt){
+  if(p.feeFormula){return p.feeFormula.fixed+amt*p.feeFormula.pct;}
+  if(p.feeTiers){for(const t of p.feeTiers){if(amt<=t.max)return t.fee;}return p.feeTiers[p.feeTiers.length-1].fee;}
+  return p.fee||0;
+}
+
+function renderTable(){
+  document.getElementById('inrColHeader').textContent='₹ / '+sendAmt.toLocaleString('en-IN')+' '+FROM_CUR;
+  const sorted=PROVIDERS.map(p=>{
+    const fee=getProviderFee(p,sendAmt);
+    const rate=midRate*(1-p.spread);
+    const inrReceived=rate*sendAmt-fee*rate;
+    const effectiveRate=inrReceived/sendAmt;
+    return{...p,effectiveRate,inrReceived,lostPct:(midRate-effectiveRate)/midRate*100,_fee:fee};
+  }).sort((a,b)=>b.effectiveRate-a.effectiveRate);
+  const best=sorted[0];
+  document.getElementById('midRateDisplay').textContent='₹'+fmt(midRate,4);
+  document.getElementById('bestRateDisplay').textContent='₹'+fmt(best.effectiveRate,4);
+  document.getElementById('bestProviderName').textContent=best.name;
+  const labels={'tier-best':'🏆 Best','tier-good':'✅ Good','tier-fair':'🟡 Average','tier-poor':'🔴 Expensive'};
+  const tierCounts={};
+  sorted.forEach(p=>{const t=getTier(p.lostPct);tierCounts[t]=(tierCounts[t]||0)+1;});
+  let html='',lastTier=null;
+  sorted.forEach((p,i)=>{
+    const tier=getTier(p.lostPct);
+    if(tier!==lastTier){
+      lastTier=tier;
+      const open=tierOpen[tier];
+      const cnt=tierCounts[tier];
+      html+=`<div class="section-div" onclick="toggleTier('${tier}')">
+        <span>${labels[tier]}</span>
+        <span class="tier-toggle-btn">${open?'▲ collapse':'▼ '+cnt+' providers'}</span>
+      </div>`;
+    }
+    const hidden=!tierOpen[tier];
+    const rb=i===0?'<span class="rank-badge rank-1">★ BEST</span>':i===1?'<span class="rank-badge rank-2">2nd</span>':'';
+    const feeStr=p._fee?`${FROM_CUR} ${Math.round(p._fee)}${(p.feeTiers||p.feeFormula)?' ★':''}`:'Free';
+    const feeCls=p._fee?'paid':'';
+    html+=`<a class="provider-row ${tier}" style="${hidden?'display:none':''}" href="${p.link}" target="_blank" rel="noopener">
+      ${logoHTML(p)}
+      <div><div class="prov-name">${rb}${p.name}</div><div class="prov-note">${p.note}</div></div>
+      <div><div class="prov-rate">₹${fmt(p.effectiveRate,4)}</div></div>
+      <div><div class="prov-inr">${fmtINR(p.inrReceived)}</div></div>
+      <div><div class="prov-fee ${feeCls}">${feeStr}</div></div>
+      <div><div class="prov-diff">-${p.lostPct.toFixed(2)}%</div></div>
+    </a>`;
+  });
+  document.getElementById('rateRows').innerHTML=html;
+}
+
+
+async function fetchHistoricalRate(daysAgo){
+  const d=new Date();d.setDate(d.getDate()-daysAgo);
+  const ds=d.toISOString().split('T')[0];
+  try{
+    const r=await fetch(`https://api.frankfurter.app/${ds}?from=${FROM_CUR}&to=INR`);
+    const data=await r.json();
+    if(data.rates&&data.rates.INR)return data.rates.INR;
+  }catch(e){}
+  return null;
+}
+
+function updateTrendBadge(current,historical){
+  const el=document.getElementById('trendBadge');
+  if(!el||!historical){if(el)el.innerHTML='';return;}
+  const pct=((current-historical)/historical*100);
+  const abs=Math.abs(pct).toFixed(2);
+  if(pct>0.3){
+    el.innerHTML=`<span class="trend-badge trend-up">↑ ${abs}% vs 30-day avg · Good time to send</span>`;
+  }else if(pct<-0.3){
+    el.innerHTML=`<span class="trend-badge trend-down">↓ ${abs}% below 30-day avg · Consider waiting</span>`;
+  }else{
+    el.innerHTML=`<span class="trend-badge trend-flat">≈ Near 30-day average</span>`;
+  }
+}
+
+function computePlan(){
+  if(!midRate)return;
+  const amt=parseFloat(document.getElementById('planAmt').value)||sendAmt;
+  const freq=parseInt(document.getElementById('planFreq').value)||12;
+  const freqLabel={52:'weekly',26:'fortnightly',12:'monthly',4:'quarterly'}[freq]||freq+'x/yr';
+  const ranked=PROVIDERS.map(p=>{
+    const fee=getProviderFee(p,amt);
+    const rate=midRate*(1-p.spread);
+    const inr=rate*amt-fee*rate;
+    return{...p,inr,_fee:fee};
+  }).sort((a,b)=>b.inr-a.inr);
+  const best=ranked[0];
+  const worst=ranked[ranked.length-1];
+  const annualBest=best.inr*freq;
+  const annualWorst=worst.inr*freq;
+  const savings=annualBest-annualWorst;
+  document.getElementById('planResults').innerHTML=`<div class="plan-grid">
+    <div class="plan-stat gold"><div class="plan-stat-lbl">Best Provider</div><div class="plan-stat-val">${best.name}</div></div>
+    <div class="plan-stat gold"><div class="plan-stat-lbl">Annual INR (${freqLabel})</div><div class="plan-stat-val">${fmtINR(annualBest)}</div></div>
+    <div class="plan-stat green"><div class="plan-stat-lbl">vs Worst Option</div><div class="plan-stat-val">+${fmtINR(savings)}</div></div>
+    <div class="plan-stat"><div class="plan-stat-lbl">Worst Provider</div><div class="plan-stat-val" style="color:#ef4444;font-size:12px">${worst.name}</div></div>
+  </div>`;
+}
+
+async function fetchAndRender(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');btn.disabled=true;
+  document.getElementById('rateRows').innerHTML='<div class="loading-row">⏳ Fetching live rate…</div>';
+  midRate=await fetchMidRate();
+  if(!midRate){
+    document.getElementById('rateRows').innerHTML='<div class="error-row">⚠️ Could not fetch live rate. Try again.</div>';
+    document.getElementById('tsLine').textContent='⚠️ Fetch failed';
+    fetchHistoricalRate(30).then(hist=>updateTrendBadge(midRate,hist));
+  }else{
+    renderTable();
+    const now=new Date();
+    document.getElementById('tsLine').textContent='🕐 '+
+      now.toLocaleDateString('en-AU',{day:'2-digit',month:'short'})+' · '+
+      now.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  }
+  btn.classList.remove('spinning');btn.disabled=false;
+}
+
+function copyLink(){
+  const url=window.location.href.split('?')[0]||'https://nrifinancehub.com/aud-inr-rate-card.html';
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=event.currentTarget,orig=btn.innerHTML;
+    btn.textContent='✓ Copied!';
+    setTimeout(()=>btn.innerHTML=orig,1800);
+  });
+}
+
+fetchAndRender();
+</script>
+</body>
+</html>
