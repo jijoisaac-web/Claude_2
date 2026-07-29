@@ -3,7 +3,7 @@
  * FLAG: Creditors (Has Credit > flagAbove) are flagged — they are owed money by the group
  */
 
-const VERSION    = "2.7.0";
+const VERSION    = "2.8.0";
 const BUILD_DATE = "2026-07-29";
 const SW_BASE    = "https://secure.splitwise.com/api/v3.0";
 
@@ -203,6 +203,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 .mgg:last-child{margin-bottom:0;}
 .mggh{padding:7px 12px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px;}
 .mggbadge{margin-left:auto;padding:1px 7px;border-radius:20px;font-size:.67rem;font-weight:700;background:rgba(0,0,0,.12);}
+.mggtot{font-size:.67rem;font-weight:700;opacity:.75;white-space:nowrap;}
+.mgcbtn{background:none;border:none;cursor:pointer;font-size:.72rem;padding:0 3px;line-height:1;color:inherit;opacity:.65;}
+.mgcbtn:hover{opacity:1;}
 .mggh.rd{background:#FFEBEE;color:#B71C1C;border-bottom:1.5px solid #FFCDD2;}
 .mggh.yw{background:#FFFDE7;color:#F57F17;border-bottom:1.5px solid #FFF9C4;}
 .mggh.bl{background:#E3F2FD;color:#1565C0;border-bottom:1.5px solid #BBDEFB;}
@@ -309,8 +312,14 @@ function categorize(desc){
   return 'Others';
 }
 
-function mgSection(members,cls,title){
+function mgSection(members,cls,title,opts){
   if(!members.length) return '';
+  opts=opts||{};
+  const total=members.reduce((s,m)=>s+Math.abs(m.balance),0);
+  const totalTag=total>0?'<span class="mggtot">MYR '+total.toFixed(2)+'</span>':'';
+  const colBtn=opts.collapsible
+    ?'<button class="mgcbtn" onclick="var b=this.parentElement.nextElementSibling;b.style.display=b.style.display===\'none\'?\'\':\'none\';this.textContent=this.textContent===\'▼\'?\'▲\':\'▼\'">▼<\/button>'
+    :'';
   const rows=members.map(m=>{
     const ini=(m.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));
     const abs=Math.abs(m.balance);
@@ -322,9 +331,13 @@ function mgSection(members,cls,title){
       +'<div class="mgra '+cls+'">'+amt+'</div>'
       +'</div>';
   }).join('');
+  const bodyStyle=opts.collapsed?'style="display:none"':'';
   return '<div class="mgg">'
-    +'<div class="mggh '+cls+'">'+title+'<span class="mggbadge">'+members.length+'</span></div>'
-    +rows+'</div>';
+    +'<div class="mggh '+cls+'">'+title
+    +'<span class="mggbadge">'+members.length+'</span>'
+    +totalTag+colBtn+'</div>'
+    +'<div class="mgbd" '+bodyStyle+'>'+rows+'</div>'
+    +'</div>';
 }
 
 // ── RENDER ──
@@ -348,11 +361,11 @@ function renderApp(d){
   const grouped=
     '<div class="mg4top">'
       +mgSection(highCr,'rd','🔴 Credit > MYR 50')
-      +mgSection(owesM,'gn','💚 Owes Group')
+      +mgSection(owesM,'gn','💸 Owes the Group')
       +mgSection(midCr,'yw','🟡 Credit 20–50')
       +mgSection(lowCr,'bl','🔵 Credit < MYR 20')
     +'</div>'
-    +mgSection(settledM,'bl','✅ Settled');
+    +mgSection(settledM,'bl','✅ Settled',{collapsible:true,collapsed:true});
 
   // Build member dropdown — all unique names from payers + participants
   const allNames=new Set();
@@ -427,10 +440,10 @@ function renderApp(d){
       +'<div id="ins-months" style="display:flex;gap:5px;flex-wrap:wrap"></div>'
     +'</div>'
     +'<div class="ig">'
-      +'<div class="ic"><div class="it">🥧 Spend by Category</div><canvas id="cat-chart" height="160"></canvas></div>'
+      +'<div class="ic"><div class="it">🥧 Spend by Category</div><canvas id="cat-chart" height="80"></canvas></div>'
       +'<div class="ic"><div class="it">📈 Category Trends (Last 12 Months)</div><canvas id="trend-chart" height="160"></canvas></div>'
       +'<div class="ic full"><div class="it">📅 Monthly Total Spend</div>'
-        +'<canvas id="monthly-chart" height="80"></canvas></div>'
+        +'<canvas id="monthly-chart" height="40"></canvas></div>'
       +'<div class="ic full"><div class="it" id="items-title">Expenses by Category</div>'
         +'<div id="items-table"></div></div>'
       +'<div class="ic"><div class="it">🔴 Owed to Members</div><div id="top-cred"></div></div>'
