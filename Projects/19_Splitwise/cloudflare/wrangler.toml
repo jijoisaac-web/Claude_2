@@ -6,3 +6,6 @@ compatibility_date = "2024-09-01"
 GROUP_NAME  = "Badminton Expense"
 FLAG_ABOVE  = "50"
 DAYS_BACK   = "1095"
+# Set this to your GitHub raw URL after first push, e.g.:
+# CACHE_URL = "https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/data/cache.json"
+CACHE_URL   = ""
