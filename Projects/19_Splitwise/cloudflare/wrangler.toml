@@ -1,0 +1,8 @@
+name = "splitwise-dashboard"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+GROUP_NAME  = "Badminton Expense"
+FLAG_ABOVE  = "50"
+DAYS_BACK   = "1095"
