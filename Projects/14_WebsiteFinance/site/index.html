@@ -1020,6 +1020,20 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
   </div>
 
+  <div class="collapsible collapsed" id="mf-cas" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-cas')"><span class="collapse-arrow">▾</span> CAS XIRR — your true money-weighted returns <span class="muted" id="casMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Upload the <b>detailed CAS Excel</b> (the one with "Portfolio Details" + "Transaction Details" sheets, e.g. from MF Central / CAMS-KFintech). Every purchase, SIP and redemption becomes a dated cashflow and each fund gets its true <b>XIRR</b> — the annualised return your actual money earned, which trailing 1M/3M/1Y numbers can't tell you. Units bought before the statement window are valued at their NAV on the window's start date (fetched from AMFI history) so pre-existing holdings don't fake the returns. The file is parsed entirely in your browser — nothing is uploaded anywhere.</div>
+  <div class="controls">
+    <label class="btn ghost" style="cursor:pointer">📄 Upload CAS .xlsx<input type="file" id="casFile" accept=".xlsx" style="display:none" onchange="casHandleFile(this.files[0])"></label>
+    <progress id="casProgress" style="display:none"></progress>
+    <span class="muted" id="casStatus"></span>
+  </div>
+  <div class="cards" id="casCards"></div>
+  <div id="casTable"></div>
+  </div>
+  </div>
+
   <div class="collapsible collapsed" id="mf-alloc" style="margin-top:14px">
   <h2 class="collapse-h2" onclick="toggleCollapse('mf-alloc')"><span class="collapse-arrow">▾</span> Asset allocation vs target</h2>
   <div class="collapse-body">
@@ -1221,7 +1235,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
-  if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); xrayPopulate(); }
+  if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); xrayPopulate(); casRestore(); }
 });
 
 /* ================= watchlist (localStorage) ================= */
@@ -5185,6 +5199,167 @@ async function runXray(){
       <td>${h.above200==null?"—":h.above200?'<span class="up">▲</span>':'<span class="down">▼</span>'}</td>
     </tr>`).join("") + `</tbody></table></div>
     <div class="muted" style="font-size:11px;margin-top:4px">"Not matched" = outside this site's ~750-stock universe (or a bond/cash line). Holdings disclosures are monthly — the book may have changed since. Click a matched row for its chart; use the Fundamentals tab's verdict on any holding that worries you.</div>`;
+}
+
+/* ---- CAS XIRR: parse the detailed CAS xlsx and compute money-weighted returns ---- */
+const CAS_KEY = "ist_mf_cas_v1";
+async function ensureXlsxLib(){
+  if(typeof XLSX !== "undefined") return;
+  await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+  if(typeof XLSX === "undefined") throw new Error("spreadsheet library failed to load");
+}
+const casNorm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+function casPrefixLen(a, b){
+  let c = 0;
+  for(let i = 0; i < Math.min(a.length, b.length, 26); i++){
+    if(a[i] === b[i]) c++; else break;
+  }
+  return c;
+}
+const CAS_MON = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+function casDate(v){
+  if(v instanceof Date) return v;
+  if(typeof v === "number") return new Date(Math.round((v - 25569) * 86400 * 1000));
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})/.exec(String(v).trim());
+  return m ? new Date(+m[3], CAS_MON[m[2].toUpperCase()] ?? 0, +m[1]) : null;
+}
+function casXirr(cfs){
+  if(cfs.length < 2) return null;
+  const t0 = Math.min(...cfs.map(c => c[0].getTime()));
+  const npv = r => cfs.reduce((s, [d, cf]) => s + cf / Math.pow(1 + r, (d.getTime() - t0) / 3.15576e10), 0);
+  let lo = -0.99, hi = 20;
+  if(npv(lo) * npv(hi) > 0) return null;
+  for(let i = 0; i < 200; i++){
+    const mid = (lo + hi) / 2;
+    if(npv(lo) * npv(mid) <= 0) hi = mid; else lo = mid;
+  }
+  return (lo + hi) / 2;
+}
+async function casOpeningNav(fundName, startDate){
+  // holding name → AMFI scheme code (prefer Direct plans when name says Direct) → NAV on/before start
+  try{
+    if(!mfSchemes.length) await mfLoadSchemes();
+    const n = casNorm(fundName);
+    let best = null, bl = 0;
+    for(const s of mfSchemes){
+      const l = casPrefixLen(n, casNorm(s.name));
+      const bonus = /direct/i.test(fundName) === /direct/i.test(s.name) ? 2 : 0;
+      if(l + bonus > bl){ best = s; bl = l + bonus; }
+    }
+    if(!best || bl < 14) return null;
+    const j = await (await fetch(`https://api.mfapi.in/mf/${best.code}`)).json();
+    let hit = null;
+    for(const d of (j.data || [])){                      // newest first, dates are "dd-mm-yyyy"
+      const dd = new Date(+d.date.slice(6), +d.date.slice(3,5) - 1, +d.date.slice(0,2));
+      if(!isNaN(dd) && dd <= startDate){ hit = parseFloat(d.nav); break; }
+    }
+    return hit || null;
+  }catch(e){ return null; }
+}
+async function casHandleFile(file){
+  if(!file) return;
+  const prog = $("casProgress"); prog.style.display = "inline-block"; prog.removeAttribute("value");
+  $("casStatus").textContent = "Parsing…";
+  try{
+    await ensureXlsxLib();
+    const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+    const grid = name => {
+      const ws = wb.Sheets[name] || wb.Sheets[wb.SheetNames.find(s => new RegExp(name, "i").test(s))];
+      return ws ? XLSX.utils.sheet_to_json(ws, { header: 1, raw: false }) : null;
+    };
+    const P = grid("Portfolio"), T = grid("Transaction");
+    if(!P || !T) throw new Error('need the detailed CAS with "Portfolio Details" and "Transaction Details" sheets');
+    // window start
+    let start = null;
+    for(const r of P){ if(String(r[0]).trim() === "From Date"){ start = casDate(String(r[1]).trim().replace(/(\d+)-(\w{3})-(\d+)/, (m,a,b,c)=>`${a}-${b.toUpperCase()}-${c}`)) || new Date(String(r[1]).trim()); break; } }
+    if(!(start instanceof Date) || isNaN(start)) start = null;
+    // holdings
+    const hIdx = P.findIndex(r => String(r[0]).trim() === "Scheme Name");
+    if(hIdx < 0) throw new Error("holdings header not found");
+    const holdings = P.slice(hIdx + 1).filter(r => r[0]).map(r => ({
+      name: String(r[0]).trim(), invested: parseFloat(r[4]) || 0,
+      current: parseFloat(r[5]) || 0, units: parseFloat(r[7]) || 0,
+    }));
+    // transactions
+    const tIdx = T.findIndex(r => String(r[0]).trim() === "Scheme Name");
+    const skip = /address|contact|nominee/i;
+    const txns = [];
+    for(const r of T.slice(tIdx + 1)){
+      if(!r[0] || !r[5]) continue;
+      if(skip.test(String(r[1]))) continue;
+      const amt = parseFloat(r[5]);
+      const d = casDate(r[2]);
+      if(!amt || !d) continue;
+      txns.push({ name: String(r[0]).trim(), date: d, units: parseFloat(r[4]) || 0, amount: amt });
+    }
+    if(!txns.length) throw new Error("no monetary transactions found");
+    if(!start) start = new Date(Math.min(...txns.map(t => t.date.getTime())));
+    const END = new Date();
+    // match txns → holdings
+    const hn = holdings.map(h => casNorm(h.name));
+    const byFund = new Map(holdings.map(h => [h.name, []]));
+    for(const t of txns){
+      const tn = casNorm(t.name);
+      let bi = -1, bl = 0;
+      hn.forEach((x, i) => { const l = casPrefixLen(tn, x); if(l > bl){ bi = i; bl = l; } });
+      if(bi >= 0 && bl >= 12) byFund.get(holdings[bi].name).push(t);
+    }
+    // per-fund XIRR (+ opening valuation for pre-window units)
+    $("casStatus").textContent = "Computing XIRR (fetching opening NAVs where needed)…";
+    const rows = [], allFlows = [], notes = [];
+    for(const h of holdings){
+      const ts = (byFund.get(h.name) || []).sort((a, b) => a.date - b.date);
+      const cfs = ts.map(t => [t.date, -t.amount]);
+      const inwUnits = ts.reduce((s, t) => s + t.units, 0);
+      const openUnits = h.units - inwUnits;
+      let openNote = "";
+      if(openUnits > 0.01 && h.current > 0){
+        const nav0 = await casOpeningNav(h.name, start);
+        if(nav0){ cfs.push([start, -openUnits * nav0]); openNote = "opening units valued at window start"; }
+        else openNote = "⚠ pre-window units, opening NAV unavailable — XIRR overstated";
+      }
+      if(h.current > 0) cfs.push([END, h.current]);
+      const r = casXirr(cfs.slice().sort((a, b) => a[0] - b[0]));
+      allFlows.push(...cfs);
+      const first = cfs.length ? new Date(Math.min(...cfs.map(c => c[0].getTime()))) : null;
+      const young = first && (END - first) < 360 * 86400000;
+      rows.push({ name: h.name, invested: h.invested, current: h.current, xirr: r,
+        exited: h.current <= 0 && ts.length > 0, young, note: openNote });
+    }
+    const overall = casXirr(allFlows.slice().sort((a, b) => a[0] - b[0]));
+    const result = { ts: Date.now(), start: start.toISOString().slice(0,10), end: END.toISOString().slice(0,10),
+      overall, rows: rows.filter(r => r.invested > 0 || r.exited) };
+    try{ localStorage.setItem(CAS_KEY, JSON.stringify(result)); }catch(e){}
+    renderCas(result);
+    $("casStatus").textContent = "";
+  }catch(e){
+    $("casStatus").textContent = "Failed: " + e.message;
+  }
+  prog.style.display = "none";
+}
+function renderCas(res){
+  if(!res || !res.rows) return;
+  const inv = res.rows.reduce((s, r) => s + r.invested, 0);
+  const cur = res.rows.reduce((s, r) => s + r.current, 0);
+  const pctc = v => v == null ? "—" : `<span class="${v >= 0 ? "up" : "down"}" style="font-weight:700">${v >= 0 ? "+" : ""}${(v * 100).toFixed(1)}%</span>`;
+  $("casMeta").textContent = `· ${res.start} → ${res.end}`;
+  $("casCards").innerHTML = [
+    ["Invested", "₹" + fmtInt(Math.round(inv))],
+    ["Current value", "₹" + fmtInt(Math.round(cur))],
+    ["P/L", `<span class="${cls(cur - inv)}">${sign(cur - inv)}₹${fmtInt(Math.round(Math.abs(cur - inv)))}</span>`],
+    ["OVERALL XIRR", pctc(res.overall) + '<span class="muted" style="font-size:12px">/yr</span>'],
+  ].map(([k, v]) => `<div class="card"><div class="name">${k}</div><div class="price">${v}</div></div>`).join("");
+  $("casTable").innerHTML = `<table><thead><tr><th style="text-align:left">Fund</th><th>Invested ₹</th><th>Current ₹</th><th>XIRR /yr</th><th style="text-align:left">Notes</th></tr></thead><tbody>` +
+    res.rows.slice().sort((a, b) => (b.xirr ?? -9) - (a.xirr ?? -9)).map(r => `<tr>
+      <td style="text-align:left">${r.name}</td>
+      <td>${fmtInt(Math.round(r.invested))}</td><td>${fmtInt(Math.round(r.current))}</td>
+      <td>${pctc(r.xirr)}</td>
+      <td style="text-align:left;font-size:11px">${[r.exited ? '<span class="badge neutral">EXITED</span>' : "", r.young ? '<span class="badge neutral">YOUNG — annualised % is noisy</span>' : "", r.note ? `<span class="muted">${r.note}</span>` : ""].filter(Boolean).join(" ")}</td>
+    </tr>`).join("") + `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">XIRR = the discount rate that makes all your dated cashflows (buys negative, redemptions positive, today's value positive) sum to zero — the honest annualised return of your actual money. Sorted best-first. EXITED funds show realised XIRR from their completed flows.</div>`;
+}
+function casRestore(){
+  try{ const c = JSON.parse(localStorage.getItem(CAS_KEY)); if(c && c.rows) renderCas(c); }catch(e){}
 }
 
 const MF_KEY = "ist_mf_folio";               // holdings, client-only

@@ -212,6 +212,12 @@ All notable changes to India Shares Tracker.
 - **Known large FIIs/funds only is now the default client filter** on the deals table (was "All clients")
 - **Bulk & block deals table is now paginated** — 20 results per page with Previous/Next controls and a page counter, instead of a flat top-50 cut. Changing any filter, sort, or date range resets back to page 1
 
+## [3.30.0] — 2026-08-01 · CAS XIRR
+
+- Mutual Funds tab: new **CAS XIRR** section — upload the detailed CAS Excel (Portfolio + Transaction sheets) and every purchase/SIP/redemption becomes a dated cashflow, producing true **money-weighted XIRR per fund and overall** (the number trailing returns can't give you)
+- Pre-window holdings handled honestly: units bought before the statement window are valued at their NAV on the window start date (scheme matched to AMFI, history from mfapi.in) so old positions don't inflate returns; funds where that NAV can't be found are flagged as overstated instead of silently wrong
+- EXITED funds show realised XIRR; holdings younger than ~1 year get a "annualised % is noisy" badge; results persist in the browser and everything parses client-side — the file never leaves your machine (SheetJS loaded on demand)
+
 ## [3.29.2] — 2026-08-01
 
 - Fund X-Ray NAV returns showed "—": the site's own NAV endpoint only carries the latest value, so 1M/3M/1Y returns now come from mfapi.in's full history fetched directly by the browser (CORS-open, verified live: 3,350 rows for a test scheme)
