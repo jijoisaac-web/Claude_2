@@ -92,7 +92,7 @@ progress{width:180px;accent-color:var(--blue);}
 #searchResults .sr:hover,#searchResults .sr.sel{background:#1c2129;}
 #kbdHelp{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;}
 /* table containers scroll horizontally instead of clipping */
-#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,#mfCapTable,#ipresStockView,#ipresScanResults,#smcScanResults,#omResults,#delivTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#watchTable,#screenerTable,#oppView,#peerView,#ideasShort,#ideasMed,#ideasLong,#dealsTable,#btResults,#convResults,#mfHoldingsTable,#mfAllocTable,#mfCapTable,#ipresStockView,#ipresScanResults,#smcScanResults,#omResults,#delivTable,#xrayTable,.pulse-grid>div{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 @media(max-width:700px){
   main{padding:10px;}
@@ -1005,6 +1005,21 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
   </div>
 
+  <div class="collapsible collapsed" id="mf-xray" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-xray')"><span class="collapse-arrow">▾</span> Fund X-Ray — what's inside &amp; how it's trending <span class="muted" id="xrayMeta" style="text-transform:none;font-weight:400"></span></h2>
+  <div class="collapse-body">
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Analyses one fund from your folio: its own NAV trend vs NIFTY, then its <b>underlying stock holdings</b> — auto-fetched when the source cooperates, or paste the top holdings from the factsheet — with each matched share's 1-month/3-month trend from this site's own data. The weighted view answers: is the portfolio behind this fund strengthening or rolling over?</div>
+  <div class="controls" style="flex-wrap:wrap">
+    <select id="xrayFund"><option value="">Pick a fund from your folio…</option></select>
+    <button class="btn" onclick="runXray()">▶ Analyse</button>
+    <progress id="xrayProgress" style="display:none"></progress>
+  </div>
+  <div class="cards" id="xrayNavCards"></div>
+  <div id="xrayHoldArea"></div>
+  <div id="xrayTrendArea"></div>
+  </div>
+  </div>
+
   <div class="collapsible collapsed" id="mf-alloc" style="margin-top:14px">
   <h2 class="collapse-h2" onclick="toggleCollapse('mf-alloc')"><span class="collapse-arrow">▾</span> Asset allocation vs target</h2>
   <div class="collapse-body">
@@ -1206,7 +1221,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="options" && !window._optLoaded) loadOptions();
   if(b.dataset.tab==="fundamentals" && !window._fundLoaded) loadFundamentals();
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
-  if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); }
+  if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); xrayPopulate(); }
 });
 
 /* ================= watchlist (localStorage) ================= */
@@ -5030,6 +5045,147 @@ function optSearchGo(){
 }
 
 /* ================= mutual funds ================= */
+/* ---- Fund X-Ray: NAV trend + underlying holdings trend ---- */
+const XRAY_KEY = c => "ist_mf_xray:" + c;
+function mfMatchSymbol(name){
+  const norm = s => String(s).toUpperCase()
+    .replace(/\b(LTD|LIMITED|INDIA|CO|CORP|CORPORATION|COMPANY|THE|AND|PVT|PRIVATE)\b/g,"")
+    .replace(/[^A-Z0-9 ]/g," ").replace(/\s+/g," ").trim();
+  const n = norm(name);
+  if(!n) return null;
+  const g = n.replace(/ /g,"");
+  if(ALL_STOCKS[g+".NS"]) return g+".NS";
+  let best = null, bestLen = 0;
+  for(const [sym, nm] of Object.entries(ALL_STOCKS)){
+    const m = norm(nm);
+    if(!m) continue;
+    if(m === n) return sym;
+    if((n.includes(m) || m.includes(n)) && m.length > bestLen){ best = sym; bestLen = m.length; }
+  }
+  return best;
+}
+function xrayPopulate(){
+  const folio = getMfFolio();
+  $("xrayFund").innerHTML = '<option value="">Pick a fund from your folio…</option>' +
+    folio.map(h=>`<option value="${h.code}">${h.name}</option>`).join("");
+}
+function parsePastedHoldings(text){
+  return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{
+    const m = /^(.*?)[\s,;:–-]+([\d.]+)\s*%?\s*$/.exec(l);
+    return m ? { name: m[1].trim(), pct: parseFloat(m[2]) } : { name: l.replace(/[,;]+$/,""), pct: null };
+  }).filter(h=>h.name.length>2).slice(0,40);
+}
+function xraySavePasted(code){
+  const holdings = parsePastedHoldings($("xrayPaste").value);
+  if(holdings.length < 3){ alert("Paste at least 3 holdings (one per line, optional % at the end)."); return; }
+  localStorage.setItem(XRAY_KEY(code), JSON.stringify({ts:Date.now(), src:"pasted", holdings}));
+  runXray();
+}
+async function runXray(){
+  const code = $("xrayFund").value;
+  if(!code){ alert("Pick a fund from your folio first."); return; }
+  const fund = getMfFolio().find(h=>h.code===code);
+  if(!fund) return;
+  const prog = $("xrayProgress"); prog.style.display="inline-block"; prog.removeAttribute("value");
+  $("xrayNavCards").innerHTML = '<div class="loading">Reading NAV history…</div>';
+  $("xrayHoldArea").innerHTML = ""; $("xrayTrendArea").innerHTML = "";
+
+  // --- 1) the fund's own trend from NAV history ---
+  let navRet = {};
+  try{
+    const r = await fetch(`/api/mf/nav/${code}`);
+    const j = await r.json();
+    const rows = (j.data||[]).map(d=>({t:d.date, v:parseFloat(d.nav)})).filter(d=>d.v);   // newest first
+    const at = n => rows[Math.min(n, rows.length-1)]?.v;
+    const ret = n => at(0) && at(n) ? (at(0)-at(n))/at(n)*100 : null;
+    navRet = { m1: ret(21), m3: ret(63), y1: ret(252) };
+  }catch(e){}
+  let niftyRet = {};
+  try{
+    const c = toCandles(await fetchChart("^NSEI","2y","1d"));
+    const at = n => c[c.length-1-n]?.close;
+    const ret = n => at(0) && at(n) ? (at(0)-at(n))/at(n)*100 : null;
+    niftyRet = { m1: ret(21), m3: ret(63), y1: ret(252) };
+  }catch(e){}
+  const pct = v => v==null ? "—" : `<span class="${cls(v)}">${sign(v)}${fmt(v,1)}%</span>`;
+  $("xrayNavCards").innerHTML = [["1 month","m1"],["3 months","m3"],["1 year","y1"]].map(([l,k])=>`
+    <div class="card"><div class="name">Fund NAV · ${l}</div><div class="price">${pct(navRet[k])}</div>
+    <div class="chg muted">NIFTY: ${pct(niftyRet[k])}</div></div>`).join("");
+
+  // --- 2) holdings: cached/pasted, else auto-fetch ---
+  let hold = null;
+  try{ const c = JSON.parse(localStorage.getItem(XRAY_KEY(code))); if(c && c.holdings) hold = c; }catch(e){}
+  if(!hold){
+    $("xrayHoldArea").innerHTML = '<div class="loading">Fetching holdings…</div>';
+    try{
+      const r = await fetch(`/api/mf/holdings?q=${encodeURIComponent(fund.name)}`);
+      const j = await r.json();
+      if(r.ok && j.holdings && j.holdings.length >= 5){
+        hold = {ts:Date.now(), src:"auto", holdings:j.holdings};
+        localStorage.setItem(XRAY_KEY(code), JSON.stringify(hold));
+      }
+    }catch(e){}
+  }
+  if(!hold){
+    prog.style.display="none";
+    $("xrayHoldArea").innerHTML = `<div class="card">
+      <div class="name">Holdings not auto-available for this scheme</div>
+      <div class="muted" style="font-size:12px;margin:6px 0">Open the fund's latest factsheet (AMC site) and paste the top holdings — one per line, weight % at the end if you have it, e.g. <code>HDFC Bank Ltd 9.8</code></div>
+      <textarea id="xrayPaste" rows="8" style="width:100%;background:#0d1424;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px"></textarea>
+      <div class="controls" style="margin-top:8px"><button class="btn" onclick="xraySavePasted('${code}')">Save &amp; analyse</button></div>
+    </div>`;
+    return;
+  }
+
+  // --- 3) underlying trend: match to universe, fetch each matched share's chart ---
+  const matched = hold.holdings.map(h=>({...h, sym: mfMatchSymbol(h.name)}));
+  const withSym = matched.filter(h=>h.sym);
+  $("xrayHoldArea").innerHTML = `<div class="muted" style="font-size:12px;margin:6px 0">
+    Holdings ${hold.src==="auto"?"auto-fetched":"from your paste"} · ${hold.holdings.length} positions · ${withSym.length} matched to listed shares
+    <a href="#" style="color:var(--blue)" onclick="event.preventDefault();localStorage.removeItem('${XRAY_KEY(code)}');runXray()">↻ re-fetch / re-paste</a></div>`;
+  prog.max = withSym.length; prog.value = 0;
+  const trends = await pmap(withSym, async h=>{
+    try{
+      const c = toCandles(await fetchChart(h.sym,"1y","1d"));
+      if(c.length < 60) return {...h};
+      const last = c[c.length-1].close;
+      const at = n => c[c.length-1-n]?.close;
+      const sma200 = c.length>=200 ? c.slice(-200).reduce((s,d)=>s+d.close,0)/200 : null;
+      return {...h, price:last, m1: at(21)?(last-at(21))/at(21)*100:null, m3: at(63)?(last-at(63))/at(63)*100:null,
+        above200: sma200!=null ? last>sma200 : null};
+    }catch(e){ return {...h}; }
+  }, 6, ()=>prog.value++);
+  prog.style.display = "none";
+
+  const wt = h => h.pct!=null ? h.pct : (100/withSym.length);
+  const totW = trends.reduce((s,h)=>s+wt(h),0) || 1;
+  const wavg = k => { const v = trends.filter(h=>h[k]!=null); if(!v.length) return null;
+    return v.reduce((s,h)=>s+h[k]*wt(h),0) / v.reduce((s,h)=>s+wt(h),0); };
+  const w1 = wavg("m1"), w3 = wavg("m3");
+  const known = trends.filter(h=>h.above200!=null);
+  const breadth = known.length ? known.filter(h=>h.above200).length : null;
+  const verdict = w3==null ? "" :
+    w3>=5 && breadth/Math.max(1,known.length)>=0.6 ? `<span class="badge bullish">HOLDINGS STRENGTHENING</span> The portfolio behind this fund is in a broad uptrend.` :
+    w3<=-5 || breadth/Math.max(1,known.length)<=0.35 ? `<span class="badge bearish">HOLDINGS ROLLING OVER</span> Most of what this fund owns is trending down — NAV weakness has a reason.` :
+    `<span class="badge neutral">MIXED TAPE</span> The underlying book is split; watch the breadth number.`;
+  $("xrayTrendArea").innerHTML = `
+    <div class="cards">
+      <div class="card"><div class="name">Holdings · weighted 1M</div><div class="price">${pct(w1)}</div></div>
+      <div class="card"><div class="name">Holdings · weighted 3M</div><div class="price">${pct(w3)}</div></div>
+      <div class="card"><div class="name">Breadth above 200-DMA</div><div class="price">${breadth!=null?breadth+"/"+known.length:"—"}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:10px;font-size:13px;line-height:1.6">${verdict}
+      ${navRet.m3!=null && w3!=null ? `<span class="muted"> · Fund NAV 3M ${sign(navRet.m3)}${fmt(navRet.m3,1)}% vs holdings ${sign(w3)}${fmt(w3,1)}% — ${Math.abs(navRet.m3-w3)<4?"tracking as expected":"gap suggests cash/debt allocation, unlisted positions or stale holdings data"}.</span>`:""}</div>
+    <div id="xrayTable"><table><thead><tr><th style="text-align:left">Holding</th><th>Wt %</th><th>Share</th><th>Price ₹</th><th>1M</th><th>3M</th><th>Trend</th></tr></thead><tbody>` +
+    trends.sort((a,b)=>wt(b)-wt(a)).map(h=>`<tr ${h.sym?`style="cursor:pointer" onclick="openChart('${h.sym}')"`:""}>
+      <td style="text-align:left">${h.name}</td><td>${h.pct!=null?fmt(h.pct,1):"—"}</td>
+      <td>${h.sym?`<span class="sym">${h.sym.replace(".NS","")}</span>`:'<span class="muted">not matched</span>'}</td>
+      <td>${h.price!=null?fmt(h.price):"—"}</td><td>${pct(h.m1)}</td><td>${pct(h.m3)}</td>
+      <td>${h.above200==null?"—":h.above200?'<span class="up">▲</span>':'<span class="down">▼</span>'}</td>
+    </tr>`).join("") + `</tbody></table></div>
+    <div class="muted" style="font-size:11px;margin-top:4px">"Not matched" = outside this site's ~750-stock universe (or a bond/cash line). Holdings disclosures are monthly — the book may have changed since. Click a matched row for its chart; use the Fundamentals tab's verdict on any holding that worries you.</div>`;
+}
+
 const MF_KEY = "ist_mf_folio";               // holdings, client-only
 const MF_SCHEMES_CACHE = "ist_mf_schemes_v1"; // cached AMFI scheme list (~28k rows), refreshed daily
 let mfSchemes = [];        // [{code, name, house}]

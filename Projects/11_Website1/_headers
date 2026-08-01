@@ -1,27 +1,44 @@
-# Cloudflare Pages cache headers
+# Cloudflare Pages cache + security headers
 
-# HTML pages — short cache, always revalidate
+# HTML pages
 /*.html
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  X-Robots-Tag: index, follow
 
 # Root index
 /
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
 
-# JS/CSS — short cache so version bumps propagate immediately
+# JS/CSS — short cache
 /site.js
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
 
 /site.css
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 
-# Static assets — long cache
+# Images — long cache
+/*.png
+  Cache-Control: public, max-age=2592000, immutable
+
+/*.jpg
+  Cache-Control: public, max-age=2592000, immutable
+
+/*.svg
+  Cache-Control: public, max-age=2592000, immutable
+
+/*.ico
+  Cache-Control: public, max-age=2592000, immutable
+
+# Static assets
 /sitemap.xml
   Cache-Control: public, max-age=86400
 

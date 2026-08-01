@@ -3,8 +3,8 @@
  * FLAG: Creditors (Has Credit > flagAbove) are flagged — they are owed money by the group
  */
 
-const VERSION    = "2.8.0";
-const BUILD_DATE = "2026-07-29";
+const VERSION    = "2.9.11";
+const BUILD_DATE = "2026-08-01";
 const SW_BASE    = "https://secure.splitwise.com/api/v3.0";
 
 async function swFetch(path, token) {
@@ -141,10 +141,10 @@ return `<!DOCTYPE html>
 <style>
 :root{--g:#1B6C3E;--g2:#2E9E5B;--r:#C62828;--o:#E65100;--b:#1565C0;--sh:0 4px 20px rgba(0,0,0,.10)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;background:rgba(240,244,240,0.15);position:relative;}
+body{font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;background:transparent;position:relative;}
 body::before{content:'';position:fixed;inset:0;z-index:-1;
   background:url("${bgUrl}") center/cover no-repeat;
-  opacity:0.5;pointer-events:none;}
+  opacity:0.75;pointer-events:none;}
 
 /* HERO */
 .hero{background:linear-gradient(135deg,#062215 0%,#0f4023 40%,#1B6C3E 75%,#27854c 100%);
@@ -167,15 +167,17 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 /* CARDS */
 .cw{padding:0 32px;margin-top:-48px;position:relative;z-index:10;}
 .cards{display:flex;gap:14px;flex-wrap:wrap;}
-.card{background:rgba(255,255,255,0.84);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:14px;padding:18px 22px;flex:1;min-width:148px;
+.card{background:rgba(255,255,255,0.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:14px;padding:18px 22px;flex:1;min-width:148px;
   box-shadow:var(--sh);border-top:3px solid #eee;}
 .card.cr{border-top-color:var(--b)}.card.db{border-top-color:var(--o)}
 .card.fl{border-top-color:var(--r)}.card.ok{border-top-color:var(--g)}
-.card .lbl{font-size:.71rem;color:#999;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.card .lbl{font-size:.71rem;color:#555;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
 .card .val{font-size:1.6rem;font-weight:800;margin-top:5px;line-height:1;}
-.card .hint{font-size:.74rem;color:#bbb;margin-top:3px;}
+.card .hint{font-size:.74rem;color:#777;margin-top:3px;}
 .card.cr .val{color:var(--b)}.card.db .val{color:var(--o)}
 .card.fl .val{color:var(--r)}.card.ok .val{color:var(--g)}
+
+/* MONTH STRIP */
 
 /* ALERT */
 .alert{margin:18px 32px 4px;padding:12px 20px;border-radius:10px;
@@ -192,7 +194,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 .tc{display:none}.tc.active{display:block}
 
 /* SECTION */
-.sec{background:rgba(255,255,255,0.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin:0 32px 20px;border-radius:0 14px 14px 14px;box-shadow:var(--sh);overflow:hidden;}
+.sec{background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);margin:0 32px 20px;border-radius:0 14px 14px 14px;box-shadow:var(--sh);overflow:hidden;}
 .sh{padding:15px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #F0F0F0;}
 .st{font-size:.95rem;font-weight:700;color:#333;}
 .sc{font-size:.77rem;color:#aaa;background:#F5F5F5;padding:3px 10px;border-radius:20px;}
@@ -249,8 +251,8 @@ tr:hover td{background:#FAFBFC;}
 
 /* INSIGHTS */
 .ig{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;}
-.ic{background:rgba(249,250,251,0.80);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:12px;padding:16px;border:1px solid #EEEEEE;}
-.ic.full{grid-column:1/-1;}
+.ic{background:rgba(249,250,251,0.50);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border-radius:12px;padding:16px;border:1px solid #EEEEEE;overflow:hidden;min-width:0;}
+.ic.full{grid-column:1/-1;}canvas{max-width:100%;}
 .it{font-size:.82rem;font-weight:700;color:#555;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;}
 .ibar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
 .ibar select{padding:6px 10px;border:1.5px solid #E0E0E0;border-radius:8px;
@@ -270,6 +272,20 @@ tr:hover td{background:#FAFBFC;}
 .rbw{flex:1;background:#EEE;border-radius:4px;height:5px;overflow:hidden;}
 .rbb{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--g),var(--g2));transition:.5s;}
 
+/* MEMBER SPEND */
+.mem-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.mem-stats .card{min-width:0;}
+.mem-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mem-settle{margin-top:16px;padding-top:14px;border-top:1px solid #EEEEEE;}
+.mem-settle-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;
+  margin-bottom:8px;font-size:.82rem;font-weight:700;color:#555;}
+.mem-settle-head>span:last-child{font-size:.78rem;color:#8E24AA;font-weight:700;white-space:nowrap;}
+.msr{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F5F5F5;font-size:.82rem;}
+.msr:last-child{border-bottom:none;}
+.msr-date{color:#999;white-space:nowrap;min-width:66px;}
+.msr-desc{flex:1;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.msr-amt{font-weight:700;white-space:nowrap;}
+
 /* MISC */
 .loading{text-align:center;padding:60px;color:#888;font-size:1rem;}
 .err{color:var(--r);padding:24px 32px;font-weight:600;}
@@ -281,35 +297,56 @@ tr:hover td{background:#FAFBFC;}
 }
 @media(max-width:700px){
   .hero{padding:20px 18px 60px;}.hero h1{font-size:1.5rem;}
-  .cw,.sec,.alert,.tw,.foot{margin-left:12px;margin-right:12px;}
-  .ig{grid-template-columns:1fr;}.ic.full{grid-column:1;}
-  .mgw{padding:8px 12px 12px;}
-  .cards{gap:8px;}.card{min-width:110px;padding:14px 14px;}
-  .card .val{font-size:1.25rem;}
+  .cw{padding:0 8px;}
+  .cw,.sec,.alert,.tw,.foot{margin-left:10px;margin-right:10px;}
+  
+  .ig{grid-template-columns:1fr;overflow-x:hidden;padding:10px 12px;}.ic.full{grid-column:1;}
+  .mgw{padding:8px 10px 12px;}
+  .cards{gap:8px;}.card{min-width:100px;padding:12px 12px;}
+  .card .val{font-size:1.15rem;}
   .ebar{flex-direction:column;align-items:stretch;}
   .ebar input,.ebar select{width:100% !important;}
-  th,td{padding:8px 10px;font-size:.79rem;}
+  th,td{padding:6px 8px;font-size:.74rem;}
+  .tab{padding:7px 12px;font-size:.80rem;}
+  .tw{padding:14px 10px 0;gap:3px;}
+  .mggh{font-size:.65rem;padding:6px 10px;gap:4px;}
+  .mggtot{font-size:.62rem;}
+  .mgrn{font-size:.78rem;}
+  .mgra{font-size:.78rem;}
+  .ibar{width:100%;}
+  .ibar select{width:100%;}
+  .mem-stats{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .mem-charts{grid-template-columns:1fr;gap:12px;}
 }
 @media(max-width:420px){
   .mg4top{grid-template-columns:1fr;}
+  .mggtot{font-size:.60rem;}
+  .tab{padding:6px 9px;font-size:.75rem;}
+  th,td{padding:5px 6px;font-size:.70rem;}
+  .mem-stats{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
 <div id="app"><div class="loading">⏳ Loading Badminton data...</div></div>
 <script>
-let D=null, chartMonthly=null, chartType=null, chartTrend=null, chartCat=null, chartPayers=null, expFilter='2y', insMonthFilter='all';
+let D=null, chartMonthly=null, chartType=null, chartTrend=null, chartCat=null, chartPayers=null, chartMemberCat=null, expFilter='2y', insMonthFilter='all', memberSpendFilter='';
 
 const twoYearsAgo=()=>{const d=new Date();d.setFullYear(d.getFullYear()-2);return d.toISOString().slice(0,10);};
 
 function categorize(desc){
   const d=(desc||'').toLowerCase();
+  // Non-badminton activities tracked in this group — keep separate from real spend categories
+  if(d.includes('futsal')||d.includes('cricket')||d.includes('ns7')) return 'Others';
   if(d.includes('shuttle')||d.includes('rsl')) return 'Shuttle Expenses';
-  if(d.includes('court')||d.includes('sentosa')) return 'Court Fees';
+  // Known venue/court names, in addition to the generic 'court'/'sentosa' keywords
+  if(d.includes('court')||d.includes('sentosa')||d.includes('iwk')||d.includes('sentul')||
+     d.includes('lavana')||d.includes('seri alam')||d.includes('tt sports')) return 'Court Fees';
   if(d.includes('water')) return 'Water/Drinks';
-  if(d.includes('work')||d.includes('cash')||d.includes('payment')||
-     d.includes('fee')||d.includes('advance')||d.includes('settle')) return 'Payment/Settlement';
-  return 'Others';
+  if(d.includes('work')||d.includes('cash')||d.includes('payment')||d.includes('dues')||
+     d.includes('tournament')||d.includes('fee')||d.includes('advance')||d.includes('settle')) return 'Payment/Settlement';
+  // Fallback: most unlabeled one-off entries turn out to be ad-hoc court bookings
+  return 'Court Fees';
 }
 
 function mgSection(members,cls,title,opts){
@@ -318,7 +355,7 @@ function mgSection(members,cls,title,opts){
   const total=members.reduce((s,m)=>s+Math.abs(m.balance),0);
   const totalTag=total>0?'<span class="mggtot">MYR '+total.toFixed(2)+'</span>':'';
   const colBtn=opts.collapsible
-    ?'<button class="mgcbtn" onclick="var b=this.parentElement.nextElementSibling;b.style.display=b.style.display===\'none\'?\'\':\'none\';this.textContent=this.textContent===\'▼\'?\'▲\':\'▼\'">▼<\/button>'
+    ?'<button class="mgcbtn" onclick="var b=this.parentElement.nextElementSibling;b.style.display=b.style.display===\\'none\\'?\\'\\':\\'none\\';this.textContent=this.textContent===\\'▼\\'?\\'▲\\':\\'▼\\'">▼<\/button>'
     :'';
   const rows=members.map(m=>{
     const ini=(m.name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));
@@ -340,6 +377,7 @@ function mgSection(members,cls,title,opts){
     +'</div>';
 }
 
+
 // ── RENDER ──
 function renderApp(d){
   D=d;
@@ -360,8 +398,8 @@ function renderApp(d){
   // 4-col: active groups side-by-side; settled alone at bottom
   const grouped=
     '<div class="mg4top">'
+      +mgSection(owesM,'gn','💸 Group Overpaid for Them')
       +mgSection(highCr,'rd','🔴 Credit > MYR 50')
-      +mgSection(owesM,'gn','💸 Owes the Group')
       +mgSection(midCr,'yw','🟡 Credit 20–50')
       +mgSection(lowCr,'bl','🔵 Credit < MYR 20')
     +'</div>'
@@ -429,7 +467,7 @@ function renderApp(d){
       +'<button class="fb" id="f-payment" onclick="setF(\\'payment\\')">Payments</button>'
     +'</div>'
     +'<div style="overflow-x:auto"><table>'
-      +'<thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Total</th><th>Paid By</th><th>Participants</th><th>My Share</th><th>Net</th></tr></thead>'
+      +'<thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Total</th><th>Paid By</th><th>My Share</th><th>Net</th></tr></thead>'
       +'<tbody id="exp-tbody"></tbody>'
     +'</table></div></div></div>'
 
@@ -440,8 +478,32 @@ function renderApp(d){
       +'<div id="ins-months" style="display:flex;gap:5px;flex-wrap:wrap"></div>'
     +'</div>'
     +'<div class="ig">'
-      +'<div class="ic"><div class="it">🥧 Spend by Category</div><canvas id="cat-chart" height="80"></canvas></div>'
-      +'<div class="ic"><div class="it">📈 Category Trends (Last 12 Months)</div><canvas id="trend-chart" height="160"></canvas></div>'
+      +'<div class="ic full"><div class="it">👤 Spend by Member <span id="mem-scope" style="font-weight:500;color:#999;font-size:.75rem;text-transform:none;letter-spacing:0"></span></div>'
+        +'<div class="ibar"><span style="font-size:.78rem;font-weight:700;color:#888;margin-right:4px">MEMBER:</span>'
+        +'<select id="mem-select" onchange="setMemberFilter(this.value)"><option value="">— Select a member —</option></select></div>'
+        +'<div id="mem-empty" class="empty">Pick a member above to see how much they have spent.</div>'
+        +'<div id="mem-body" style="display:none">'
+          +'<div class="mem-stats">'
+            +'<div class="card ok"><div class="lbl">Their Share (Spent)</div><div class="val" id="mem-owed" style="font-size:1.2rem"></div></div>'
+            +'<div class="card cr"><div class="lbl">Amount Paid</div><div class="val" id="mem-paid" style="font-size:1.2rem"></div></div>'
+            +'<div class="card"><div class="lbl">Net Balance</div><div class="val" id="mem-net" style="font-size:1.2rem"></div></div>'
+            +'<div class="card"><div class="lbl">Transactions</div><div class="val" id="mem-count" style="font-size:1.2rem"></div></div>'
+          +'</div>'
+          +'<div class="mem-charts">'
+            +'<div style="height:180px;position:relative"><canvas id="mem-cat-chart"></canvas></div>'
+            +'<div id="mem-cat-detail"></div>'
+          +'</div>'
+          +'<div class="mem-settle">'
+            +'<div class="mem-settle-head">'
+              +'<span>💸 Payments &amp; Settlements <span style="font-weight:500;color:#999;text-transform:none">(kept separate from spend above)</span></span>'
+              +'<span id="mem-settle-summary"></span>'
+            +'</div>'
+            +'<div id="mem-settle-list"></div>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="ic"><div class="it">🥧 Spend by Category</div><div style="height:160px;position:relative"><canvas id="cat-chart"></canvas></div><div id="cat-detail" style="margin-top:10px"></div></div>'
+      +'<div class="ic"><div class="it">📈 Category Trends (Last 12 Months)</div><div style="height:160px;position:relative"><canvas id="trend-chart"></canvas></div></div>'
       +'<div class="ic full"><div class="it">📅 Monthly Total Spend</div>'
         +'<canvas id="monthly-chart" height="40"></canvas></div>'
       +'<div class="ic full"><div class="it" id="items-title">Expenses by Category</div>'
@@ -458,6 +520,13 @@ function renderApp(d){
 }
 
 // ── EXPENSES ──
+// Treat "advance"/"settled"/"settlement" entries as Payment type on the Expenses tab,
+// even when Splitwise recorded them as a regular expense.
+function isPmt(e){
+  if(e.isPayment) return true;
+  const d=(e.desc||'').toLowerCase();
+  return d.includes('advance')||d.includes('settled')||d.includes('settlement');
+}
 function setF(f){
   expFilter=f;
   ['2y','all','expense','payment'].forEach(x=>{
@@ -475,8 +544,8 @@ function filterExp(){
   const cut2y=twoYearsAgo();
   const filtered=D.expenses.filter(e=>{
     if(expFilter==='2y'&&e.date<cut2y) return false;
-    if(expFilter==='expense'&&e.isPayment) return false;
-    if(expFilter==='payment'&&!e.isPayment) return false;
+    if(expFilter==='expense'&&isPmt(e)) return false;
+    if(expFilter==='payment'&&!isPmt(e)) return false;
     if(member){
       const inParts=(e.participants||[]).some(p=>p.name===member);
       const isPayer=e.payer===member;
@@ -487,24 +556,17 @@ function filterExp(){
   });
   if(countEl) countEl.textContent=filtered.length+' transactions';
   tbody.innerHTML=filtered.length===0
-    ?'<tr><td colspan="8" class="empty">No transactions found</td></tr>'
+    ?'<tr><td colspan="7" class="empty">No transactions found</td></tr>'
     :filtered.map(e=>{
-      const t=e.isPayment?'<span class="bdg pay">💸 Payment</span>':'<span class="bdg exp">🧾 Expense</span>';
+      const t=isPmt(e)?'<span class="bdg pay">💸 Payment</span>':'<span class="bdg exp">🧾 Expense</span>';
       const nc=e.myNet>=0?'np':'nn', ns=e.myNet>=0?'+':'';
-      const parts=(e.participants||[]).map(p=>{
-        const hi=member&&p.name===member;
-        return '<span style="display:inline-block;margin:1px 3px 1px 0;padding:1px 6px;border-radius:10px;font-size:.72rem;'
-          +(hi?'background:#1B6C3E;color:#fff;font-weight:700':'background:#F0F0F0;color:#555')
-          +'">'+p.name+' <b>'+p.owed.toFixed(2)+'</b></span>';
-      }).join('');
       const share=e.myOwed>0
         ?'<span style="color:#C62828;font-weight:700">'+e.currency+' '+e.myOwed.toFixed(2)+'</span>'
-        :(e.isPayment?'<span style="color:#bbb">—</span>':'<span style="color:#bbb">0.00</span>');
+        :(isPmt(e)?'<span style="color:#bbb">—</span>':'<span style="color:#bbb">0.00</span>');
       return '<tr><td style="color:#999;white-space:nowrap">'+e.date+'</td><td>'+t+'</td>'
         +'<td style="font-weight:500">'+e.desc+'</td>'
         +'<td style="white-space:nowrap">'+e.currency+' '+e.cost.toFixed(2)+'</td>'
         +'<td style="color:#666">'+e.payer+'</td>'
-        +'<td style="max-width:260px">'+parts+'</td>'
         +'<td style="white-space:nowrap">'+share+'</td>'
         +'<td class="'+nc+'" style="white-space:nowrap">'+ns+e.myNet.toFixed(2)+'</td></tr>';
     }).join('');
@@ -522,9 +584,116 @@ function buildMonthButtons(){
 }
 function setInsMonth(m){insMonthFilter=m;buildInsights();}
 
+// ── MEMBER SPEND ──
+function populateMemberOptions(){
+  const sel=document.getElementById('mem-select'); if(!sel||!D) return;
+  const names=new Set();
+  D.expenses.forEach(e=>{
+    if(e.payer) names.add(e.payer);
+    (e.participants||[]).forEach(p=>names.add(p.name));
+  });
+  const cur=memberSpendFilter;
+  sel.innerHTML='<option value="">— Select a member —</option>'
+    +[...names].sort().map(n=>'<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>').join('');
+}
+function setMemberFilter(v){ memberSpendFilter=v; renderMemberSpend(); }
+function renderMemberSpend(){
+  const empty=document.getElementById('mem-empty'), body=document.getElementById('mem-body');
+  if(!empty||!body||!D) return;
+  if(!memberSpendFilter){ empty.style.display='block'; body.style.display='none'; return; }
+  empty.style.display='none'; body.style.display='block';
+  const name=memberSpendFilter;
+  const mo=insMonthFilter;
+  const scopeEl=document.getElementById('mem-scope');
+  if(scopeEl) scopeEl.textContent='('+(mo==='all'?'All time':new Date(mo+'-01').toLocaleString('en',{month:'long',year:'numeric'}))+')';
+
+  // Real badminton spend only — excludes Splitwise payment records AND anything categorized as
+  // Payment/Settlement (dues, tournament fees, advances, balance settlements). This keeps every
+  // number on this card (paid/owed/net/count/chart) scoped to actual spend, so the category
+  // slices below always add up to "Their Share (Spent)".
+  const pool=D.expenses.filter(e=>!e.isPayment&&(mo==='all'||e.date.startsWith(mo))&&categorize(e.desc)!=='Payment/Settlement');
+  const relevant=pool.filter(e=>e.payer===name||(e.participants||[]).some(p=>p.name===name));
+  let paid=0, owed=0;
+  relevant.forEach(e=>{
+    if(e.payer===name) paid+=e.cost;
+    const p=(e.participants||[]).find(p=>p.name===name);
+    if(p) owed+=p.owed;
+  });
+  const net=paid-owed;
+  const owedEl=document.getElementById('mem-owed'), paidEl=document.getElementById('mem-paid'),
+        netEl=document.getElementById('mem-net'), cntEl=document.getElementById('mem-count');
+  if(owedEl) owedEl.textContent='MYR '+owed.toFixed(2);
+  if(paidEl) paidEl.textContent='MYR '+paid.toFixed(2);
+  if(netEl){
+    netEl.textContent=(net>=0?'+':'')+'MYR '+net.toFixed(2);
+    netEl.style.color=net>=0?'var(--g)':'var(--r)';
+  }
+  if(cntEl) cntEl.textContent=relevant.length;
+
+  // Category breakdown of this member's share (Payment/Settlement already excluded from the pool above).
+  const catBuckets={};
+  relevant.forEach(e=>{
+    const p=(e.participants||[]).find(p=>p.name===name);
+    const amt=p?p.owed:0;
+    if(amt<=0) return;
+    const c=categorize(e.desc);
+    catBuckets[c]=(catBuckets[c]||0)+amt;
+  });
+  const catColorMap={'Shuttle Expenses':'#E53935','Court Fees':'#1E88E5','Water/Drinks':'#00ACC1','Others':'#43A047','Payment/Settlement':'#8E24AA'};
+  const catKeys=Object.keys(catBuckets).sort((a,b)=>catBuckets[b]-catBuckets[a]);
+  const catColorArr=catKeys.map(k=>catColorMap[k]||'#999');
+  const catTotal=catKeys.reduce((s,k)=>s+catBuckets[k],0);
+  if(chartMemberCat){chartMemberCat.destroy();chartMemberCat=null;}
+  const mCtx=document.getElementById('mem-cat-chart')?.getContext('2d');
+  if(mCtx) chartMemberCat=new Chart(mCtx,{type:'doughnut',
+    data:{labels:catKeys,datasets:[{data:catKeys.map(k=>catBuckets[k]),backgroundColor:catColorArr,borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:6}},
+      tooltip:{callbacks:{label:ctx=>' '+ctx.label+': MYR '+ctx.raw.toFixed(2)+' ('+(catTotal>0?(ctx.raw/catTotal*100).toFixed(1):0)+'%)'}}}}});
+  const detailEl=document.getElementById('mem-cat-detail');
+  if(detailEl) detailEl.innerHTML=catKeys.length===0?'<div class="empty">No expense history</div>':catKeys.map((k,i)=>{
+    const pct=catTotal>0?(catBuckets[k]/catTotal*100).toFixed(1):0;
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.05)">'
+      +'<span style="width:10px;height:10px;border-radius:50%;background:'+catColorArr[i]+';flex-shrink:0"></span>'
+      +'<span style="flex:1;font-size:.8rem;color:#333">'+k+'</span>'
+      +'<span style="font-size:.78rem;font-weight:700;color:#222">MYR '+catBuckets[k].toFixed(2)+'</span>'
+      +'<span style="font-size:.72rem;color:#888;min-width:36px;text-align:right">'+pct+'%</span>'
+      +'</div>';
+  }).join('');
+
+  // Payments & Settlements — shown as their own itemized list, deliberately kept out of the
+  // spend totals/chart above (dues, tournament fees, advances, balance settlements, real Splitwise payments).
+  const settlePool=D.expenses.filter(e=>(mo==='all'||e.date.startsWith(mo))&&(e.isPayment||categorize(e.desc)==='Payment/Settlement'));
+  const settleItems=settlePool.filter(e=>e.payer===name||(e.participants||[]).some(p=>p.name===name));
+  let settlePaid=0, settleShare=0;
+  settleItems.forEach(e=>{
+    if(e.payer===name) settlePaid+=e.cost;
+    const p=(e.participants||[]).find(p=>p.name===name);
+    if(p) settleShare+=p.owed;
+  });
+  const settleSummaryEl=document.getElementById('mem-settle-summary');
+  if(settleSummaryEl) settleSummaryEl.textContent=settleItems.length===0?'':'Paid MYR '+settlePaid.toFixed(2)+'  ·  Share MYR '+settleShare.toFixed(2);
+  const settleListEl=document.getElementById('mem-settle-list');
+  if(settleListEl){
+    const sorted=[...settleItems].sort((a,b)=>b.date.localeCompare(a.date));
+    settleListEl.innerHTML=sorted.length===0?'<div class="empty">No payments or settlements this period</div>'
+      :sorted.map(e=>{
+        const isPayer=e.payer===name;
+        const p=(e.participants||[]).find(p=>p.name===name);
+        const amt=isPayer?e.cost:(p?p.owed:0);
+        const tag=isPayer?'Paid':'Share';
+        const color=isPayer?'#1B6C3E':'#8E24AA';
+        return '<div class="msr"><span class="msr-date">'+e.date+'</span>'
+          +'<span class="msr-desc">'+e.desc+'</span>'
+          +'<span class="msr-amt" style="color:'+color+'">'+tag+' '+e.currency+' '+amt.toFixed(2)+'</span></div>';
+      }).join('');
+  }
+}
+
 function buildInsights(){
   if(!D) return;
   buildMonthButtons();
+  populateMemberOptions();
+  renderMemberSpend();
   const mo=insMonthFilter;
   const lbl=document.getElementById('ins-label');
   if(lbl) lbl.textContent=mo==='all'?'All months':'Month: '+new Date(mo+'-01').toLocaleString('en',{month:'long',year:'numeric'});
@@ -547,8 +716,23 @@ function buildInsights(){
   const cCtx=document.getElementById('cat-chart')?.getContext('2d');
   if(cCtx) chartCat=new Chart(cCtx,{type:'doughnut',
     data:{labels:catKeys,datasets:[{data:catKeys.map(k=>catBuckets[k]),backgroundColor:catColorArr,borderWidth:2,borderColor:'#fff'}]},
-    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:6}},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:6}},
       tooltip:{callbacks:{label:ctx=>' '+ctx.label+': MYR '+ctx.raw.toFixed(2)+' ('+(catTotal>0?(ctx.raw/catTotal*100).toFixed(1):0)+'%)'}}}}});
+  // ── Category detail list ──
+  const catDetailEl=document.getElementById('cat-detail');
+  if(catDetailEl){
+    catDetailEl.innerHTML=catKeys.map((k,i)=>{
+      const pct=catTotal>0?(catBuckets[k]/catTotal*100).toFixed(1):0;
+      const col=catColorArr[i]||'#999';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'
+        +'<span style="width:10px;height:10px;border-radius:50%;background:'+col+';flex-shrink:0"></span>'
+        +'<span style="flex:1;font-size:.75rem;color:#333">'+k+'</span>'
+        +'<span style="font-size:.74rem;font-weight:700;color:#222">MYR '+catBuckets[k].toFixed(0)+'</span>'
+        +'<span style="font-size:.70rem;color:#888;min-width:36px;text-align:right">'+pct+'%</span>'
+        +'</div>';
+    }).join('');
+  }
+
 
   // ── Top payers ──
   const payerTotals={};
@@ -598,7 +782,7 @@ function buildInsights(){
   const tCtx2=document.getElementById('trend-chart')?.getContext('2d');
   if(tCtx2) chartTrend=new Chart(tCtx2,{type:'line',
     data:{labels:last12.map(m=>new Date(m+'-01').toLocaleString('en',{month:'short',year:'2-digit'})),datasets:trendDS},
-    options:{responsive:true,interaction:{mode:'index',intersect:false},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},
       scales:{y:{beginAtZero:true,ticks:{callback:v=>'MYR'+v.toFixed(0)}}}}});
 

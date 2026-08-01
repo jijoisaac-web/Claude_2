@@ -1,7 +1,51 @@
 User-agent: *
 Allow: /
+
+# Block WordPress scanners and exploit paths
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /wp-login.php
+Disallow: /wp-includes/
+Disallow: /xmlrpc.php
+
+# Block PHP exploit file probes
+Disallow: /file.php
+Disallow: /fpwch.php
+Disallow: /as.php
+Disallow: /a.php
+Disallow: /*.php$
+
+# Block env and config files
 Disallow: /.env
 Disallow: /.env.bak
 Disallow: /.env.backup
+Disallow: /.git/
+Disallow: /config/
+
+# Block aggressive crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+# Allow good bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
 
 Sitemap: https://nrifinancehub.com/sitemap.xml
