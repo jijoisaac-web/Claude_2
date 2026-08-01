@@ -5089,6 +5089,14 @@ function parsePastedHoldings(text){
     return m ? { name: m[1].trim(), pct: parseFloat(m[2]) } : { name: l.replace(/[,;]+$/,""), pct: null };
   }).filter(h=>h.name.length>2).slice(0,40);
 }
+function xrayPasteBox(code){
+  return `<div class="card" style="margin:6px 0">
+    <div class="name">Paste exact holdings from the factsheet</div>
+    <div class="muted" style="font-size:12px;margin:6px 0">One per line, weight % at the end if you have it, e.g. <code>HDFC Bank Ltd 9.8</code></div>
+    <textarea id="xrayPaste" rows="8" style="width:100%;background:#0d1424;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px"></textarea>
+    <div class="controls" style="margin-top:8px"><button class="btn" onclick="xraySavePasted('${code}')">Save &amp; analyse</button></div>
+  </div>`;
+}
 function xraySavePasted(code){
   const holdings = parsePastedHoldings($("xrayPaste").value);
   if(holdings.length < 3){ alert("Paste at least 3 holdings (one per line, optional % at the end)."); return; }
@@ -5142,22 +5150,58 @@ async function runXray(){
     }catch(e){}
   }
   if(!hold){
-    prog.style.display="none";
-    $("xrayHoldArea").innerHTML = `<div class="card">
-      <div class="name">Holdings not auto-available for this scheme</div>
-      <div class="muted" style="font-size:12px;margin:6px 0">Open the fund's latest factsheet (AMC site) and paste the top holdings — one per line, weight % at the end if you have it, e.g. <code>HDFC Bank Ltd 9.8</code></div>
-      <textarea id="xrayPaste" rows="8" style="width:100%;background:#0d1424;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px"></textarea>
-      <div class="controls" style="margin-top:8px"><button class="btn" onclick="xraySavePasted('${code}')">Save &amp; analyse</button></div>
-    </div>`;
-    return;
+    // tier 2: index funds — we hold the constituent lists ourselves
+    const nm = fund.name.toLowerCase();
+    const IDX = [
+      [/nifty\s*next\s*50|junior/i, "NEXT 50"], [/midcap\s*150/i, "MIDCAP 150"],
+      [/smallcap\s*250/i, "SMALLCAP 250"], [/nifty\s*50(?!0)|sensex/i, "NIFTY 50"],
+    ];
+    let proxyUni = null, proxyLabel = "";
+    for(const [re, u] of IDX){ if(re.test(nm)){ proxyUni = [u]; proxyLabel = `index constituents (${u})`; break; } }
+    // tier 3: category proxy from AMFI classification
+    if(!proxyUni){
+      let cat = "";
+      try{ const j = await (await fetch(`https://api.mfapi.in/mf/${code}`)).json(); cat = (j.meta && j.meta.scheme_category) || ""; }catch(e){}
+      const c = (cat + " " + nm).toLowerCase();
+      if(/multi asset|hybrid|debt|liquid|gilt|arbitrage|overnight|bond/.test(c)){
+        prog.style.display = "none";
+        $("xrayHoldArea").innerHTML = `<div class="card"><div class="name">Not a pure equity book</div>
+          <div class="muted" style="font-size:12px;margin-top:4px">AMFI classifies this as "${cat || "hybrid/debt"}" — a share-level trend read doesn't apply. The NAV-vs-NIFTY cards above are the meaningful view. If the factsheet shows a large equity sleeve you care about, paste those holdings below.</div></div>` + xrayPasteBox(code);
+        return;
+      }
+      if(/mid cap|midcap/.test(c)) { proxyUni = ["MIDCAP 150"]; }
+      else if(/small cap|smallcap/.test(c)) { proxyUni = ["SMALLCAP 250"]; }
+      else if(/large cap|bluechip|top 100|focused/.test(c)) { proxyUni = ["NIFTY 50","NEXT 50"]; }
+      else { proxyUni = ["NIFTY 50","MIDCAP 150","SMALLCAP 250"]; }
+      proxyLabel = `category proxy — ${cat || "diversified equity"}`;
+    }
+    // build pseudo-holdings: prefer the cached scan's top-turnover names for the pond, else the list head
+    let names = [];
+    for(const u of proxyUni){
+      let syms = Object.keys(UNIVERSES[u]);
+      try{
+        const sc = JSON.parse(localStorage.getItem(SCAN_KEY + ":" + u));
+        if(sc && sc.data && sc.data.stocks){
+          syms = sc.data.stocks.filter(s=>s.turnover!=null).sort((a,b)=>b.turnover-a.turnover).map(s=>s.symbol);
+        }
+      }catch(e){}
+      names.push(...syms.slice(0, Math.ceil(30/proxyUni.length)));
+    }
+    hold = { ts: Date.now(), src: "proxy", label: proxyLabel,
+      holdings: names.slice(0,30).map(s=>({ name: nameOf(s), pct: null })) };
   }
 
   // --- 3) underlying trend: match to universe, fetch each matched share's chart ---
-  const matched = hold.holdings.map(h=>({...h, sym: mfMatchSymbol(h.name)}));
+  const matched = hold.holdings.map(h=>({...h, sym: h.sym || mfMatchSymbol(h.name)}));
   const withSym = matched.filter(h=>h.sym);
+  const srcLine = hold.src==="auto" ? "Holdings auto-fetched" :
+                  hold.src==="pasted" ? "Holdings from your factsheet paste" :
+                  `⚠ Exact holdings unavailable — analysing a <b>${hold.label}</b> (equal-weight top names, the pond this fund fishes in, NOT its actual book)`;
   $("xrayHoldArea").innerHTML = `<div class="muted" style="font-size:12px;margin:6px 0">
-    Holdings ${hold.src==="auto"?"auto-fetched":"from your paste"} · ${hold.holdings.length} positions · ${withSym.length} matched to listed shares
-    <a href="#" style="color:var(--blue)" onclick="event.preventDefault();localStorage.removeItem('${XRAY_KEY(code)}');runXray()">↻ re-fetch / re-paste</a></div>`;
+    ${srcLine} · ${hold.holdings.length} names · ${withSym.length} matched
+    <a href="#" style="color:var(--blue)" onclick="event.preventDefault();localStorage.removeItem('${XRAY_KEY(code)}');runXray()">↻ re-fetch</a>
+    ${hold.src==="proxy" ? `· <a href="#" style="color:var(--blue)" onclick="event.preventDefault();document.getElementById('xrayPasteWrap').style.display='block'">paste exact holdings instead</a>` : ""}
+  </div>` + (hold.src==="proxy" ? `<div id="xrayPasteWrap" style="display:none">${xrayPasteBox(code)}</div>` : "");
   prog.max = withSym.length; prog.value = 0;
   const trends = await pmap(withSym, async h=>{
     try{

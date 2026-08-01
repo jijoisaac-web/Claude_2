@@ -212,6 +212,11 @@ All notable changes to India Shares Tracker.
 - **Known large FIIs/funds only is now the default client filter** on the deals table (was "All clients")
 - **Bulk & block deals table is now paginated** — 20 results per page with Previous/Next controls and a page counter, instead of a flat top-50 cut. Changing any filter, sort, or date range resets back to page 1
 
+## [3.30.1] — 2026-08-01
+
+- Fund X-Ray now ALWAYS produces an underlying-assets analysis, three tiers deep: exact holdings (auto-fetch or factsheet paste) → **index constituents** for index funds (our own NSE lists) → **category proxy** for active funds (Midcap fund → Midcap 150 pond, large cap → NIFTY 50+Next 50, flexi → blended sample; equal-weight top ~30 names, prioritised by turnover when a scan is cached). Proxy results are clearly labelled as the fund's pond, not its actual book, with a one-click switch to paste exact holdings
+- Hybrid/debt/multi-asset schemes get an honest "share-level read doesn't apply" note instead of a misleading proxy
+
 ## [3.30.0] — 2026-08-01 · CAS XIRR
 
 - Mutual Funds tab: new **CAS XIRR** section — upload the detailed CAS Excel (Portfolio + Transaction sheets) and every purchase/SIP/redemption becomes a dated cashflow, producing true **money-weighted XIRR per fund and overall** (the number trailing returns can't give you)
