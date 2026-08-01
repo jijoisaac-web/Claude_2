@@ -5082,10 +5082,10 @@ function xraySavePasted(code){
   runXray();
 }
 async function runXray(){
-  const code = $("xrayFund").value;
+  const code = String($("xrayFund").value || "");
   if(!code){ alert("Pick a fund from your folio first."); return; }
-  const fund = getMfFolio().find(h=>h.code===code);
-  if(!fund) return;
+  const fund = getMfFolio().find(h=>String(h.code)===code);
+  if(!fund){ alert("Fund not found in folio — re-open the tab and try again."); return; }
   const prog = $("xrayProgress"); prog.style.display="inline-block"; prog.removeAttribute("value");
   $("xrayNavCards").innerHTML = '<div class="loading">Reading NAV history…</div>';
   $("xrayHoldArea").innerHTML = ""; $("xrayTrendArea").innerHTML = "";
@@ -5093,7 +5093,8 @@ async function runXray(){
   // --- 1) the fund's own trend from NAV history ---
   let navRet = {};
   try{
-    const r = await fetch(`/api/mf/nav/${code}`);
+    // full NAV history straight from mfapi.in (CORS-open); our own /api/mf/nav only carries the latest NAV
+    const r = await fetch(`https://api.mfapi.in/mf/${code}`);
     const j = await r.json();
     const rows = (j.data||[]).map(d=>({t:d.date, v:parseFloat(d.nav)})).filter(d=>d.v);   // newest first
     const at = n => rows[Math.min(n, rows.length-1)]?.v;

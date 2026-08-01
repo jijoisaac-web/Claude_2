@@ -212,6 +212,14 @@ All notable changes to India Shares Tracker.
 - **Known large FIIs/funds only is now the default client filter** on the deals table (was "All clients")
 - **Bulk & block deals table is now paginated** — 20 results per page with Previous/Next controls and a page counter, instead of a flat top-50 cut. Changing any filter, sort, or date range resets back to page 1
 
+## [3.29.2] — 2026-08-01
+
+- Fund X-Ray NAV returns showed "—": the site's own NAV endpoint only carries the latest value, so 1M/3M/1Y returns now come from mfapi.in's full history fetched directly by the browser (CORS-open, verified live: 3,350 rows for a test scheme)
+
+## [3.29.1] — 2026-08-01
+
+- Fixed Fund X-Ray "Analyse does nothing": folio scheme codes are numbers but the dropdown yields strings, so the strict-equality fund lookup silently failed — codes now compared as strings, and a failed lookup alerts instead of exiting silently
+
 ## [3.29.0] — 2026-08-01 · Fund X-Ray
 
 - Mutual Funds tab: new **Fund X-Ray** — pick any fund from your folio and get (1) its NAV trend at 1M/3M/1Y vs NIFTY, (2) its **stock holdings** (auto-fetched from a public source when available, else paste the factsheet's top holdings — parsed and remembered per fund), (3) each matched holding's 1M/3M trend and 200-DMA status from this site's own data, rolled into a **weighted holdings momentum** with breadth and a verdict (STRENGTHENING / MIXED / ROLLING OVER)
