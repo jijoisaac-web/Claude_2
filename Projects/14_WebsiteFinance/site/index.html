@@ -731,7 +731,7 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
 </div>
 
-<div class="collapsible collapsed" id="cbt-fii" style="margin-top:28px">
+<div class="collapsible" id="cbt-fii" style="margin-top:28px">
   <h2 class="collapse-h2" onclick="toggleCollapse('cbt-fii')"><span class="collapse-arrow">▾</span> FII/institutional bulk-deal backtest <span class="muted" style="text-transform:none;font-weight:400">· did following the disclosed trade actually work out?</span></h2>
   <div class="collapse-body">
   <div class="muted" style="font-size:11px;margin-bottom:8px">Takes disclosed bulk/block deals from the lookback window below (same data as the FII/DII tab, same-day round trips excluded), fetches each stock's price history, and checks what happened between the deal date and now. This is a backtest of "follow the disclosed trade," not of the FII's actual holding period or cost basis — they may have entered earlier via other means, sized differently, or since exited; NSE only discloses this one transaction. A longer window needs more real deal history stored to be meaningful — see the FII/DII tab's "Import history" if this browser doesn't have enough yet.</div>
