@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.31.0] — 2026-08-03 · CAS XIRR: IDCW/dividend-option flag + portable insights JSON
+
+- **New IDCW/Growth option check on the CAS XIRR table** — each fund's scheme name is parsed for its option suffix (`mfOptionOf()`): a fund resolving to IDCW/dividend gets a red "IDCW/DIVIDEND OPTION" badge plus an explainer that those payouts are taxed as income and break compounding versus Growth. Handles the real-world naming quirks directly: "Dividend Yield Fund" is a *category* name and is stripped before token-matching so it doesn't false-positive as an option, "Payout of Income Distribution cum capital withdrawal option" (an older AMFI phrasing that doesn't contain the literal word "dividend" or "IDCW") is matched explicitly, and where a name contains both an option token and the word "growth" (e.g. a fund literally named "... Growth ... - IDCW"), whichever token appears *last* wins, since AMFI always puts the actual option suffix at the end of the scheme name.
+- **New "⬇ Export insights JSON" / "⬆ Import insights JSON" on the CAS XIRR section** — downloads everything computed in that section (returns, XIRR, and every flag, including this one) as a single file; importing it on another device restores the identical analysis instantly without re-uploading the CAS Excel or re-fetching AMFI NAV history. Same pattern as the mutual-fund folio's own Export/Import and the FII/DII tab's deal-archive export — this is the persistence layer the next few CAS-XIRR insights (capital-gains estimate, rolling returns, drawdown, SIP discipline) will also write into.
+- First of a batch of CAS-derived insights being added one at a time; each will extend the same exported JSON rather than inventing a new storage format per feature.
+
 ## [3.28.0] — 2026-07-27 · Fixed the real bug behind the AI report failures: Workers AI response coercion
 
 - Root cause found: after v3.27.1's diagnostic snippet was added specifically to surface what the model actually returned on failure, the very next real failure showed the raw text as the literal string `"[object Object]"` for both attempts. That's the tell-tale sign of `(r.response || r.result || "") + ""` silently stringifying a non-string object via JavaScript's default `toString()` — meaning Workers AI's response for this model isn't always a plain string like `{ response: "text" }`, at least not for every prompt/response combination, and the old code was throwing the actual content away before parsing ever got a chance to run.
