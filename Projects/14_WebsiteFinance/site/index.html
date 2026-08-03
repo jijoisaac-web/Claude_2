@@ -599,6 +599,15 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
 </div>
 
+<div class="collapsible collapsed" id="smc-struct" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('smc-struct')"><span class="collapse-arrow">▾</span> Market structure <span class="muted" style="text-transform:none;font-weight:400">· BOS, change of character &amp; liquidity sweeps</span></h2>
+  <div class="collapse-body">
+  <div class="muted" style="font-size:11px;margin-bottom:8px">Same swing-point structure as the order blocks above, read three ways. <b>BOS</b> (break of structure) = a close beyond a recent swing high/low that continues the existing trend. <b>CHoCH</b> (change of character) = the first break that goes the OTHER way — the market's first crack, and the more actionable of the two, since a trend continuing is unremarkable but its first reversal is what traders watch for. <b>Liquidity sweep</b> = price wicks past a swing point (triggering the stop-losses/breakout orders resting there) but fails to close beyond it, then moves away — a failed break rather than a confirmed one. On the chart above: purple arrows/line for CHoCH, green/red arrows for BOS, amber circles for sweeps.</div>
+  <div class="cards" id="smcStructCards"></div>
+  <div id="smcStructTable"><div class="loading">Pick a symbol and hit Analyze</div></div>
+  </div>
+</div>
+
 <div class="collapsible collapsed" id="smc-deals" style="margin-top:14px">
   <h2 class="collapse-h2" onclick="toggleCollapse('smc-deals')"><span class="collapse-arrow">▾</span> Institutional deals <span class="muted" style="text-transform:none;font-weight:400">· disclosed bulk/block trades in this window — the one signal here that isn't a proxy</span></h2>
   <div class="collapse-body">
@@ -2361,6 +2370,78 @@ function detectOrderBlocks(c, opts){
   });
   return deduped;
 }
+// Trend structure: walks swing points chronologically, tracking whether highs+lows are both
+// rising (uptrend) or both falling (downtrend). A break that CONTINUES that sequence is a BOS
+// (break of structure); the first break that goes the OTHER way — the market's first crack — is a
+// CHoCH (change of character), and flips the tracked trend. Mirrors detectOrderBlocks's
+// consume-then-null pattern so each swing point can only fire one event before a fresh swing
+// replaces it.
+function detectChoCH(c, opts){
+  opts = opts || {};
+  const k = opts.swingK || 2, minMovePct = opts.minMovePct != null ? opts.minMovePct : 1.0;
+  const swings = smcSwings(c, k);
+  const swingByIdx = {}; swings.forEach(s=>swingByIdx[s.i]=s);
+  let lastSwingHigh=null, lastSwingLow=null, prevHighPrice=null, prevLowPrice=null, trend=null;
+  const events = [];
+  for(let i=k;i<c.length;i++){
+    if(swingByIdx[i]){
+      const sw = swingByIdx[i];
+      if(sw.type==="high"){ if(lastSwingHigh) prevHighPrice=lastSwingHigh.price; lastSwingHigh=sw; }
+      else{ if(lastSwingLow) prevLowPrice=lastSwingLow.price; lastSwingLow=sw; }
+      if(trend==null && prevHighPrice!=null && prevLowPrice!=null && lastSwingHigh && lastSwingLow){
+        if(lastSwingHigh.price>prevHighPrice && lastSwingLow.price>prevLowPrice) trend="up";
+        else if(lastSwingHigh.price<prevHighPrice && lastSwingLow.price<prevLowPrice) trend="down";
+      }
+    }
+    if(trend==="up" && lastSwingLow && c[i].close < lastSwingLow.price && i > lastSwingLow.i){
+      const movePct = (lastSwingLow.price-c[i].close)/lastSwingLow.price*100;
+      if(movePct>=minMovePct){ events.push({type:"CHoCH", dir:"bearish", idx:i, date:c[i].time, level:lastSwingLow.price}); trend="down"; }
+      lastSwingLow=null;
+    }else if(trend==="down" && lastSwingHigh && c[i].close > lastSwingHigh.price && i > lastSwingHigh.i){
+      const movePct = (c[i].close-lastSwingHigh.price)/lastSwingHigh.price*100;
+      if(movePct>=minMovePct){ events.push({type:"CHoCH", dir:"bullish", idx:i, date:c[i].time, level:lastSwingHigh.price}); trend="up"; }
+      lastSwingHigh=null;
+    }else if(trend==="up" && lastSwingHigh && c[i].close > lastSwingHigh.price && i > lastSwingHigh.i){
+      events.push({type:"BOS", dir:"bullish", idx:i, date:c[i].time, level:lastSwingHigh.price});
+      lastSwingHigh=null;
+    }else if(trend==="down" && lastSwingLow && c[i].close < lastSwingLow.price && i > lastSwingLow.i){
+      events.push({type:"BOS", dir:"bearish", idx:i, date:c[i].time, level:lastSwingLow.price});
+      lastSwingLow=null;
+    }
+  }
+  return { events, trend };
+}
+// Liquidity sweep: price wicks past a swing high/low (triggering the stop-losses/breakout orders
+// resting there — the "liquidity") but fails to CLOSE beyond it, then moves away from that level
+// over the next few bars. Distinct from a BOS/CHoCH, which requires an actual close through — a
+// sweep is specifically the failed-break case. Only the first poke past each swing point counts.
+function detectLiquiditySweeps(c, opts){
+  opts = opts || {};
+  const k = opts.swingK || 2, lookahead = opts.lookahead || 5, searchForward = opts.searchForward || 30,
+    minRejectPct = opts.minRejectPct != null ? opts.minRejectPct : 0.5;
+  const swings = smcSwings(c, k);
+  const sweeps = [];
+  swings.forEach(sw=>{
+    const stop = Math.min(c.length, sw.i+1+searchForward);
+    for(let j=sw.i+1;j<stop;j++){
+      if(sw.type==="high" && c[j].high>sw.price && c[j].close<=sw.price){
+        const after = c.slice(j, Math.min(c.length, j+lookahead+1));
+        const minClose = Math.min(...after.map(d=>d.close));
+        const rejectPct = (sw.price-minClose)/sw.price*100;
+        if(rejectPct>=minRejectPct) sweeps.push({type:"bearish", swingIdx:sw.i, level:sw.price, idx:j, date:c[j].time, wick:c[j].high, rejectPct});
+        break;
+      }
+      if(sw.type==="low" && c[j].low<sw.price && c[j].close>=sw.price){
+        const after = c.slice(j, Math.min(c.length, j+lookahead+1));
+        const maxClose = Math.max(...after.map(d=>d.close));
+        const rejectPct = (maxClose-sw.price)/sw.price*100;
+        if(rejectPct>=minRejectPct) sweeps.push({type:"bullish", swingIdx:sw.i, level:sw.price, idx:j, date:c[j].time, wick:c[j].low, rejectPct});
+        break;
+      }
+    }
+  });
+  return sweeps;
+}
 // volume-at-price distribution over the last N bars: POC (highest-volume price) + 70% Value Area
 function buildVolumeProfile(c, opts){
   opts = opts || {};
@@ -2404,17 +2485,20 @@ async function loadSmc(){
     const profile = buildVolumeProfile(c, {bars:vpBars, numBins:30});
     obs.forEach(ob=>{ ob.conf = obVolumeConfirmation(ob, profile); });
     obs.sort((a,b)=>b.idx-a.idx);
+    const struct = detectChoCH(c, {swingK:2, minMovePct:1.0});
+    const sweeps = detectLiquiditySweeps(c, {swingK:2, lookahead:5, minRejectPct:0.5});
     if(!dealsData){ try{ await loadDeals(); }catch(e){} }
     const rangeStart = c[0].time, rangeEnd = c[c.length-1].time;
     const smcDeals = dealsForSymbol(sym.replace(".NS","")).filter(d=>{ const iso = dealDateISO(d); return iso && iso>=rangeStart && iso<=rangeEnd; });
-    renderSmcChart(c, obs, profile, smcDeals);
+    renderSmcChart(c, obs, profile, smcDeals, struct, sweeps);
     renderSmcCards(c, obs, profile);
     renderSmcVP(profile);
     renderSmcOBTable(obs, c);
     renderSmcDeals(smcDeals);
+    renderSmcStructure(c, struct, sweeps);
     $("smcMeta").textContent = `${nameOf(sym)} · ${c.length} bars · ${obs.length} order block${obs.length===1?"":"s"} found`;
     // stashed for the "Explain this move" AI button — avoids re-fetching/re-detecting anything
-    window._smcCtx = {sym, c, obs, profile, smcDeals};
+    window._smcCtx = {sym, c, obs, profile, smcDeals, struct, sweeps};
     $("smcExplain").innerHTML = "";
   }catch(e){
     $("smcMeta").textContent = "Failed to load.";
@@ -2466,23 +2550,37 @@ async function explainSmcMove(){
     el.innerHTML = `<div class="card"><div class="muted" style="font-size:12px">Explanation failed: ${escHtml(e.message)}</div></div>`;
   }
 }
-function renderSmcChart(c, obs, profile, deals){
+function renderSmcChart(c, obs, profile, deals, struct, sweeps){
   Object.values(window._smcCharts||{}).forEach(ch=>{ try{ ch.remove(); }catch(e){} });
   const ch = mkChart($("smcChart"), 420);
   window._smcCharts = {main: ch};
   const cs = ch.addCandlestickSeries({upColor:"#3fb950",downColor:"#f85149",borderVisible:false,wickUpColor:"#3fb950",wickDownColor:"#f85149"});
   cs.setData(c.map(d=>({time:d.time,open:d.open,high:d.high,low:d.low,close:d.close})));
-  if(deals && deals.length){
-    // disclosed bulk/block trades — the one marker on this chart that's an actual fact, not a proxy
-    const markers = deals.map(d=>({
-      time: dealDateISO(d),
-      position: d.side==="BUY" ? "belowBar" : "aboveBar",
-      color: d.side==="BUY" ? "#3fb950" : "#f85149",
-      shape: d.side==="BUY" ? "arrowUp" : "arrowDown",
-      text: `${d.type} ${d.side} ₹${fmt(d.valueCr,0)}Cr`,
-    })).sort((a,b)=> a.time<b.time?-1:a.time>b.time?1:0);
-    cs.setMarkers(markers);
-  }
+  // markers are a single call (setMarkers replaces, doesn't append) — merge every marker source
+  // (disclosed deals, CHoCH/BOS structure breaks, liquidity sweeps) into one sorted array.
+  const markers = [];
+  if(deals && deals.length) markers.push(...deals.map(d=>({
+    time: dealDateISO(d),
+    position: d.side==="BUY" ? "belowBar" : "aboveBar",
+    color: d.side==="BUY" ? "#3fb950" : "#f85149",
+    shape: d.side==="BUY" ? "arrowUp" : "arrowDown",
+    text: `${d.type} ${d.side} ₹${fmt(d.valueCr,0)}Cr`,
+  })));
+  if(struct && struct.events) markers.push(...struct.events.map(e=>({
+    time: e.date,
+    position: e.dir==="bullish" ? "belowBar" : "aboveBar",
+    color: e.type==="CHoCH" ? "#a78bfa" : (e.dir==="bullish" ? "#3fb950" : "#f85149"),
+    shape: e.dir==="bullish" ? "arrowUp" : "arrowDown",
+    text: e.type,
+  })));
+  if(sweeps && sweeps.length) markers.push(...sweeps.map(s=>({
+    time: s.date,
+    position: s.type==="bullish" ? "belowBar" : "aboveBar",
+    color: "#d29922",
+    shape: "circle",
+    text: "SWEEP",
+  })));
+  if(markers.length) cs.setMarkers(markers.sort((a,b)=> a.time<b.time?-1:a.time>b.time?1:0));
   const LS = LightweightCharts.LineStyle;
   const fresh = obs.filter(o=>!o.mitigated);
   const freshBull = fresh.filter(o=>o.type==="bullish").sort((a,b)=>b.idx-a.idx).slice(0,5);
@@ -2497,6 +2595,8 @@ function renderSmcChart(c, obs, profile, deals){
     cs.createPriceLine({price:profile.vah, color:"rgba(210,153,34,.55)", lineWidth:1, lineStyle:LS.Dotted, axisLabelVisible:true, title:"VAH"});
     cs.createPriceLine({price:profile.val, color:"rgba(210,153,34,.55)", lineWidth:1, lineStyle:LS.Dotted, axisLabelVisible:true, title:"VAL"});
   }
+  const lastChoCH = struct && struct.events ? [...struct.events].reverse().find(e=>e.type==="CHoCH") : null;
+  if(lastChoCH) cs.createPriceLine({price:lastChoCH.level, color:"#a78bfa", lineWidth:2, lineStyle:LS.Dashed, axisLabelVisible:true, title:"Last CHoCH"});
   ch.timeScale().fitContent();
 }
 function renderSmcCards(c, obs, profile){
@@ -2545,6 +2645,43 @@ function renderSmcOBTable(obs, c){
         <td><span style="color:${confColor};font-weight:600">${confTxt}</span></td>
         <td class="muted">${distPct>=0?"+":""}${fmt(distPct,1)}% (${distPct>=0?"above":"below"})</td></tr>`;
     }).join("") + `</tbody></table>`;
+}
+function renderSmcStructure(c, struct, sweeps){
+  const spot = c[c.length-1].close;
+  const events = (struct && struct.events) ? struct.events : [];
+  const lastChoCH = [...events].reverse().find(e=>e.type==="CHoCH");
+  const trend = struct ? struct.trend : null;
+  const trendTxt = trend==="up" ? "Uptrend" : trend==="down" ? "Downtrend" : "Not established";
+  const trendColor = trend==="up" ? "var(--green)" : trend==="down" ? "var(--red)" : "var(--muted)";
+  const recentSweeps = (sweeps||[]).slice().sort((a,b)=>b.idx-a.idx);
+  const lastSweep = recentSweeps[0];
+  $("smcStructCards").innerHTML = `
+    <div class="card"><div class="name">Current trend</div><div class="price" style="color:${trendColor}">${trendTxt}</div>
+      <div class="chg muted">from swing-point structure (highs+lows both rising/falling)</div></div>
+    <div class="card"><div class="name">Last CHoCH</div><div class="price" style="color:${lastChoCH?(lastChoCH.dir==="bullish"?"var(--green)":"var(--red)"):"var(--muted)"}">${lastChoCH?fmt(lastChoCH.level,2):"—"}</div>
+      <div class="chg muted">${lastChoCH?`${lastChoCH.dir} · ${lastChoCH.date} · ${fmt((spot-lastChoCH.level)/lastChoCH.level*100,1)}% away`:"none found in this window"}</div></div>
+    <div class="card"><div class="name">Last liquidity sweep</div><div class="price" style="color:${lastSweep?(lastSweep.type==="bullish"?"var(--green)":"var(--red)"):"var(--muted)"}">${lastSweep?fmt(lastSweep.level,2):"—"}</div>
+      <div class="chg muted">${lastSweep?`${lastSweep.type} · ${lastSweep.date} · rejected ${fmt(lastSweep.rejectPct,1)}%`:"none found in this window"}</div></div>`;
+  const rows = [
+    ...events.map(e=>({...e, kind:e.type})),
+    ...(sweeps||[]).map(s=>({idx:s.idx, date:s.date, dir:s.type, level:s.level, kind:"SWEEP", rejectPct:s.rejectPct})),
+  ].sort((a,b)=>b.idx-a.idx);
+  if(!rows.length){ $("smcStructTable").innerHTML = '<div class="loading">No BOS, CHoCH or liquidity sweeps found in this window — try a longer range.</div>'; return; }
+  $("smcStructTable").innerHTML = `<table><thead><tr><th style="text-align:left">Date</th><th>Event</th><th>Direction</th><th>Level</th><th>Note</th><th>Distance</th></tr></thead><tbody>` +
+    rows.slice(0,30).map(r=>{
+      const distPct = (spot-r.level)/r.level*100;
+      const badgeCls = r.kind==="CHoCH" ? (r.dir==="bullish"?"bullish":"bearish") : r.kind==="SWEEP" ? "neutral" : (r.dir==="bullish"?"bullish":"bearish");
+      const note = r.kind==="CHoCH" ? "First break against the prior trend — the market's first crack"
+        : r.kind==="BOS" ? "Break continuing the existing trend"
+        : `Wicked through, failed to close beyond, rejected ${fmt(r.rejectPct,1)}% away`;
+      return `<tr><td style="text-align:left">${r.date}</td>
+        <td><span class="badge ${badgeCls}">${r.kind}</span></td>
+        <td class="${r.dir==="bullish"?"up":"down"}">${r.dir}</td>
+        <td>${fmt(r.level,2)}</td>
+        <td class="muted" style="text-align:left;font-size:11px">${note}</td>
+        <td class="muted">${distPct>=0?"+":""}${fmt(distPct,1)}%</td></tr>`;
+    }).join("") + `</tbody></table>
+    <div class="muted" style="font-size:11px;margin-top:4px">BOS (break of structure) = a break that continues the existing trend. CHoCH (change of character) = the first break against it — the more actionable of the two. SWEEP = price wicked past a swing point without closing beyond it, then moved away — a proxy for stop-losses/breakout orders being triggered without genuine follow-through. All three are structural reads of price, same caveat as order blocks above: not a view into actual institutional activity, and none of this is investment advice.</div>`;
 }
 function renderSmcDeals(deals){
   const el = document.getElementById("smcDealsTable");
