@@ -1034,6 +1034,17 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
   </div>
 
+  <div class="collapsible collapsed" id="mf-intel" style="margin-top:14px">
+  <h2 class="collapse-h2" onclick="toggleCollapse('mf-intel')"><span class="collapse-arrow">▾</span> Portfolio intelligence — classification, look-through, projections &amp; overlap</h2>
+  <div class="collapse-body">
+  <div class="controls"><button class="btn ghost" onclick="renderMfIntel()">↻ Recompute</button><span class="muted" id="intelMeta" style="font-size:11px"></span></div>
+  <div id="intelBuckets"></div>
+  <div id="intelLook"></div>
+  <div id="intelProj"></div>
+  <div id="intelOverlap"></div>
+  </div>
+  </div>
+
   <div class="collapsible collapsed" id="mf-alloc" style="margin-top:14px">
   <h2 class="collapse-h2" onclick="toggleCollapse('mf-alloc')"><span class="collapse-arrow">▾</span> Asset allocation vs target</h2>
   <div class="collapse-body">
@@ -5404,6 +5415,84 @@ function renderCas(res){
 }
 function casRestore(){
   try{ const c = JSON.parse(localStorage.getItem(CAS_KEY)); if(c && c.rows) renderCas(c); }catch(e){}
+}
+
+/* ---- portfolio intelligence: classification, look-through, projections, overlap ---- */
+const INTEL_DECOMP = {   // mandate-typical decomposition per bucket (estimates, labelled as such)
+  "Mid":        {Large:.15, Mid:.70, Small:.10, Cash:.05},
+  "Small":      {Large:.05, Mid:.20, Small:.70, Cash:.05},
+  "Large":      {Large:.85, Mid:.08, Cash:.07},
+  "Large & Mid":{Large:.45, Mid:.45, Cash:.10},
+  "Flexible":   {Large:.55, Mid:.25, Small:.10, Cash:.10},
+  "Hybrid":     {Large:.25, Mid:.10, Debt:.55, Cash:.10},
+  "Debt":       {Debt:.95, Cash:.05},
+  "Gold":       {Gold:.95, Cash:.05},
+  "Other":      {Large:.50, Mid:.25, Small:.10, Cash:.15},
+};
+const INTEL_ER = {Large:11, Mid:12.5, Small:13.5, Debt:7, Gold:8, Cash:4};   // long-run nominal %/yr assumptions
+function intelBucketOf(h){
+  const ac = mfAssetClass(h);
+  if(ac !== "Equity") return ac;                       // Hybrid / Debt / Gold / Other
+  const t = mfCapTilt(h);
+  return ["Large","Mid","Small","Large & Mid"].includes(t) ? t : "Flexible";
+}
+function renderMfIntel(){
+  const folio = getMfFolio().filter(h => h.nav != null && h.units > 0);
+  if(!folio.length){
+    $("intelBuckets").innerHTML = '<div class="loading">Add funds to your folio (with NAVs loaded) first.</div>';
+    $("intelLook").innerHTML = $("intelProj").innerHTML = $("intelOverlap").innerHTML = "";
+    return;
+  }
+  const val = h => h.nav * h.units;
+  const total = folio.reduce((s, h) => s + val(h), 0);
+  $("intelMeta").textContent = `· ${folio.length} funds · ₹${fmtInt(Math.round(total))}`;
+  // 1) fund-level buckets
+  const bk = {};
+  folio.forEach(h => { const b = intelBucketOf(h); (bk[b] = bk[b] || {n:0, v:0}).n++; bk[b].v += val(h); });
+  $("intelBuckets").innerHTML = `<h2>Fund-level classification</h2><table><thead><tr><th style="text-align:left">Bucket</th><th>Funds</th><th>Value ₹</th><th>Weight</th></tr></thead><tbody>` +
+    Object.entries(bk).sort((a,b)=>b[1].v-a[1].v).map(([b,x])=>`<tr><td style="text-align:left">${b}</td><td>${x.n}</td><td>${fmtInt(Math.round(x.v))}</td><td><b>${fmt(x.v/total*100,1)}%</b></td></tr>`).join("") +
+    `</tbody></table>${(bk["Mid"]?.v||0)/total>0.4?'<div class="muted" style="font-size:11px;margin-top:4px">⚠ Over 40% in pure midcap funds — expect index-beating years AND 30–40% drawdowns; make sure the target in "Asset allocation" reflects that deliberately.</div>':""}`;
+  // 2) look-through
+  const lt = {};
+  folio.forEach(h => {
+    const d = INTEL_DECOMP[intelBucketOf(h)] || INTEL_DECOMP.Other;
+    for(const [k, w] of Object.entries(d)) lt[k] = (lt[k] || 0) + val(h) * w;
+  });
+  const ltCols = {Large:"#60a5fa", Mid:"#fbbf24", Small:"#fb7185", Debt:"#34d399", Gold:"#d4af37", Cash:"#8b949e"};
+  $("intelLook").innerHTML = `<h2>Look-through exposure <span class="muted" style="text-transform:none;font-weight:400">· mandate-typical estimate, not exact holdings</span></h2>
+    <div class="breadthBar" style="height:22px">${Object.entries(lt).filter(([,v])=>v>0).map(([k,v])=>`<div style="width:${v/total*100}%;background:${ltCols[k]||"#666"}" title="${k} ${fmt(v/total*100,1)}%"></div>`).join("")}</div>
+    <div class="muted" style="font-size:12px">${Object.entries(lt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} <b>${fmt(v/total*100,1)}%</b>`).join(" · ")}</div>`;
+  // 3) projections
+  const baseRate = Object.entries(lt).reduce((s,[k,v]) => s + (INTEL_ER[k] ?? 10) * v, 0) / total;
+  const proj = (r, y) => total * Math.pow(1 + r/100, y);
+  const rows = [["Bear", baseRate-4.5], ["Base", baseRate], ["Bull", baseRate+3]];
+  $("intelProj").innerHTML = `<h2>Projected corpus if held <span class="muted" style="text-transform:none;font-weight:400">· scenario math from long-run assumptions — NOT a promise</span></h2>
+    <table><thead><tr><th>Scenario</th><th>Assumed /yr</th><th>5 years</th><th>10 years</th></tr></thead><tbody>` +
+    rows.map(([n, r]) => `<tr${n==="Base"?' style="font-weight:600"':''}><td>${n}</td><td>${fmt(r,1)}%</td><td>₹${fmtInt(Math.round(proj(r,5)))}</td><td>₹${fmtInt(Math.round(proj(r,10)))}</td></tr>`).join("") +
+    `</tbody></table><div class="muted" style="font-size:11px;margin-top:4px">Blended from look-through weights (large ${INTEL_ER.Large}%, mid ${INTEL_ER.Mid}%, small ${INTEL_ER.Small}%, debt ${INTEL_ER.Debt}%). Compare the base rate with your realised CAS XIRR above — a persistent gap usually names the leak (fund selection or switching costs).</div>`;
+  // 4) overlap matrix from stored X-Ray holdings
+  const withHold = folio.map(h => {
+    try{ const c = JSON.parse(localStorage.getItem(XRAY_KEY(String(h.code))));
+      if(c && c.holdings && c.src !== "proxy"){
+        const m = new Map();
+        const hs = c.holdings.map(x => ({sym: mfMatchSymbol(x.name), pct: x.pct}));
+        const matched = hs.filter(x => x.sym);
+        const eq = 100 / (matched.length || 1);
+        matched.forEach(x => m.set(x.sym, (x.pct != null ? x.pct : eq)));
+        return {name: h.name, m};
+      } }catch(e){}
+    return null;
+  }).filter(Boolean);
+  if(withHold.length < 2){
+    $("intelOverlap").innerHTML = `<h2>Holdings overlap</h2><div class="muted" style="font-size:12px">Store exact holdings for at least two funds (Fund X-Ray → auto-fetch or paste the factsheet) and the pairwise overlap matrix appears here — the honest answer to "am I paying three managers for the same stocks?"</div>`;
+  }else{
+    const ov = (a, b) => { let s = 0; a.m.forEach((wa, k) => { if(b.m.has(k)) s += Math.min(wa, b.m.get(k)); }); return s; };
+    $("intelOverlap").innerHTML = `<h2>Holdings overlap <span class="muted" style="text-transform:none;font-weight:400">· % of weight in common (min-overlap)</span></h2>
+      <table><thead><tr><th></th>${withHold.map(f=>`<th>${f.name.split(" ").slice(0,2).join(" ")}</th>`).join("")}</tr></thead><tbody>` +
+      withHold.map((a,i)=>`<tr><td style="text-align:left;font-size:12px">${a.name.split(" ").slice(0,3).join(" ")}</td>` +
+        withHold.map((b,j)=> i===j ? "<td>—</td>" : `<td><b class="${ov(a,b)>=35?"down":ov(a,b)>=20?"muted":"up"}">${fmt(ov(a,b),0)}%</b></td>`).join("") + "</tr>").join("") +
+      `</tbody></table><div class="muted" style="font-size:11px;margin-top:4px">Above ~35% (red) = you're paying two expense ratios for substantially one portfolio — consolidation candidate. Based on stored top holdings, so real overlap is likely a little higher.</div>`;
+  }
 }
 
 const MF_KEY = "ist_mf_folio";               // holdings, client-only
