@@ -1031,6 +1031,12 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
   </div>
   <div class="cards" id="casCards"></div>
   <div id="casTable"></div>
+  <div class="controls" style="margin-top:8px">
+    <button class="btn ghost" onclick="casExportJson()">⬇ Export insights JSON</button>
+    <label class="btn ghost" style="cursor:pointer">⬆ Import insights JSON<input type="file" id="casInsightsFile" accept=".json" style="display:none" onchange="casImportJson(this.files[0])"></label>
+    <span class="muted" id="casJsonStatus" style="font-size:11px"></span>
+  </div>
+  <div class="muted" style="font-size:11px;margin-top:4px">These results only live in this browser until exported. <b>Export</b> downloads everything computed above (returns, flags, and every insight added below) as one JSON file — save it anywhere (Drive, email, USB) and <b>Import</b> it on another device to see the same analysis instantly, without re-uploading the CAS or re-fetching NAV history.</div>
   </div>
   </div>
 
@@ -5379,7 +5385,8 @@ async function casHandleFile(file){
       const first = cfs.length ? new Date(Math.min(...cfs.map(c => c[0].getTime()))) : null;
       const young = first && (END - first) < 360 * 86400000;
       rows.push({ name: h.name, invested: h.invested, current: h.current, xirr: r,
-        exited: h.current <= 0 && ts.length > 0, young, note: openNote });
+        exited: h.current <= 0 && ts.length > 0, young, note: openNote,
+        idcw: mfOptionOf(h.name) === "IDCW" });
     }
     const overall = casXirr(allFlows.slice().sort((a, b) => a[0] - b[0]));
     const result = { ts: Date.now(), start: start.toISOString().slice(0,10), end: END.toISOString().slice(0,10),
@@ -5409,12 +5416,37 @@ function renderCas(res){
       <td style="text-align:left">${r.name}</td>
       <td>${fmtInt(Math.round(r.invested))}</td><td>${fmtInt(Math.round(r.current))}</td>
       <td>${pctc(r.xirr)}</td>
-      <td style="text-align:left;font-size:11px">${[r.exited ? '<span class="badge neutral">EXITED</span>' : "", r.young ? '<span class="badge neutral">YOUNG — annualised % is noisy</span>' : "", r.note ? `<span class="muted">${r.note}</span>` : ""].filter(Boolean).join(" ")}</td>
+      <td style="text-align:left;font-size:11px">${[r.exited ? '<span class="badge neutral">EXITED</span>' : "", r.young ? '<span class="badge neutral">YOUNG — annualised % is noisy</span>' : "", r.idcw ? '<span class="badge bearish" title="Payouts are taxable as income and break compounding vs Growth">IDCW/DIVIDEND OPTION</span>' : "", r.note ? `<span class="muted">${r.note}</span>` : ""].filter(Boolean).join(" ")}</td>
     </tr>`).join("") + `</tbody></table>
-    <div class="muted" style="font-size:11px;margin-top:4px">XIRR = the discount rate that makes all your dated cashflows (buys negative, redemptions positive, today's value positive) sum to zero — the honest annualised return of your actual money. Sorted best-first. EXITED funds show realised XIRR from their completed flows.</div>`;
+    <div class="muted" style="font-size:11px;margin-top:4px">XIRR = the discount rate that makes all your dated cashflows (buys negative, redemptions positive, today's value positive) sum to zero — the honest annualised return of your actual money. Sorted best-first. EXITED funds show realised XIRR from their completed flows.${res.rows.some(r=>r.idcw) ? " <b>IDCW/DIVIDEND OPTION</b> flags a fund that looks like it is paying out instead of reinvesting — those payouts are taxed as income and break compounding; if unintentional, ask the AMC about switching to Growth (check exit load/capital-gains tax first)." : ""}</div>`;
 }
 function casRestore(){
   try{ const c = JSON.parse(localStorage.getItem(CAS_KEY)); if(c && c.rows) renderCas(c); }catch(e){}
+}
+// Downloads the full computed bundle (returns + every insight merged into the same object) as one
+// JSON file. Drop it on another device via "Import insights JSON" to see identical results without
+// re-uploading the CAS or re-fetching AMFI NAV history — same move as the mutual-fund folio's own
+// Export/Import and the FII/DII tab's deal-archive export.
+function casExportJson(){
+  let res; try{ res = JSON.parse(localStorage.getItem(CAS_KEY)); }catch(e){ res = null; }
+  if(!res || !res.rows || !res.rows.length){ $("casJsonStatus").textContent = "Nothing to export yet — upload a CAS file first."; return; }
+  const blob = new Blob([JSON.stringify(res, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mf-cas-insights.json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+  $("casJsonStatus").textContent = `Exported ${res.rows.length} funds' worth of insights as of ${res.end}.`;
+}
+async function casImportJson(file){
+  if(!file) return;
+  try{
+    const res = JSON.parse(await file.text());
+    if(!res || !Array.isArray(res.rows)) throw new Error("not a recognised insights file");
+    localStorage.setItem(CAS_KEY, JSON.stringify(res));
+    renderCas(res);
+    $("casJsonStatus").textContent = `Imported ${res.rows.length} funds' worth of insights (as of ${res.end}).`;
+  }catch(e){ $("casJsonStatus").textContent = "Import failed: " + e.message; }
 }
 
 /* ---- portfolio intelligence: classification, look-through, projections, overlap ---- */
@@ -5509,6 +5541,19 @@ function mfPlanOf(name){
   if(/\bdirect\b/i.test(name||"")) return "Direct";
   if(/\bregular\b/i.test(name||"")) return "Regular";
   return "—";
+}
+// Growth vs IDCW(dividend) option, from the scheme name. "Dividend Yield" is a fund CATEGORY name
+// (e.g. "ICICI Prudential Dividend Yield Equity Fund"), not an option suffix, so it's stripped
+// before looking for the option tokens — whichever of "growth"/"idcw"/"dividend" appears LAST in
+// what's left is the actual option suffix (AMFI always puts it at the end of the scheme name).
+function mfOptionOf(name){
+  const n = (name||"").replace(/dividend\s+yield/gi, "");
+  const idcwIdx = n.search(/idcw|dividend|distribution cum capital withdrawal|income distribution/i);
+  const growthIdx = n.search(/\bgrowth\b/i);
+  if(growthIdx === -1 && idcwIdx === -1) return null;
+  if(idcwIdx === -1) return "Growth";
+  if(growthIdx === -1) return "IDCW";
+  return growthIdx > idcwIdx ? "Growth" : "IDCW";
 }
 function mfCategoryShort(cat){
   if(!cat) return "—";
