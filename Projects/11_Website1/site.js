@@ -635,137 +635,202 @@ function rtBadge(name,link){
   return '<div class="rt-badge" style="background:'+c[0]+';color:'+c[1]+'">'+ini+'</div>';
 }
 
-var _rateViewMode='tile';
+/* ── TIER-COLLAPSE RATES VIEW ───────────────────── */
+var _tierOpen={BEST:true,GOOD:true,FAIR:false,POOR:false};
+var _trendCache={};
 
-function setRateView(mode){
-  _rateViewMode=mode;
-  var wrap=document.getElementById('rates-container');
-  if(wrap){
-    wrap.classList.remove('rt-tile','rt-list');
-    wrap.classList.add(mode==='tile'?'rt-tile':'rt-list');
-  }
-  document.querySelectorAll('.rate-view-btn').forEach(function(b){
-    b.classList.toggle('active',b.dataset.view===mode);
-  });
+var RATE_AMTS={
+  AED:[500,1000,2000,5000,10000,20000],
+  MYR:[500,1000,2000,5000,10000,15000],
+  USD:[100,200,500,1000,2000,5000],
+  CAD:[200,500,1000,2000,5000,10000],
+  SGD:[200,500,1000,2000,5000,10000],
+  AUD:[200,500,1000,2000,5000,10000],
+  NZD:[200,500,1000,2000,5000,10000],
+  GBP:[100,200,500,1000,2000,5000],
+  EUR:[100,200,500,1000,2000,5000],
+  _def:[200,500,1000,2000,5000,10000]
+};
+
+function getTier(lostPct){
+  if(lostPct<=0.7)return 'BEST';
+  if(lostPct<=1.2)return 'GOOD';
+  if(lostPct<=1.7)return 'FAIR';
+  return 'POOR';
+}
+function toggleTier(t){
+  _tierOpen[t]=!_tierOpen[t];
   renderRates();
+}
+function setRatesAmt(v){
+  var inp=document.getElementById('sendAmount');
+  if(inp){inp.value=v;syncAmountFromMain(v);}
+  renderRates();renderMarketRate();
+}
+
+function fetchRateTrend(cur){
+  if(_trendCache[cur]!==undefined){renderTrendBadge(_trendCache[cur],cur);return;}
+  var d=new Date();d.setDate(d.getDate()-30);
+  var ds=d.toISOString().split('T')[0];
+  fetch('https://api.frankfurter.app/'+ds+'?from='+cur+'&to=INR')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      var hist=data.rates&&data.rates.INR;
+      if(!hist||!midRate)return;
+      var change=(midRate-hist)/hist*100;
+      _trendCache[cur]=change;
+      renderTrendBadge(change,cur);
+    }).catch(function(){});
+}
+function renderTrendBadge(change,cur){
+  var el=document.getElementById('rate-trend-badge');
+  if(!el)return;
+  var abs=Math.abs(change).toFixed(1);
+  var arrow,msg,cls;
+  if(change>0.3){arrow='&#8593;';msg=abs+'% stronger vs 30 days ago &mdash; good time to send';cls='trend-up';}
+  else if(change<-0.3){arrow='&#8595;';msg=abs+'% weaker vs 30 days ago &mdash; consider waiting';cls='trend-down';}
+  else{arrow='&#8776;';msg='Stable &mdash; rate unchanged vs 30 days ago';cls='trend-flat';}
+  el.innerHTML='<span class="trend-arrow">'+arrow+'</span> <span>'+msg+'</span>';
+  el.className='rate-trend-badge '+cls;
+  el.style.display='flex';
+}
+
+function computePlan(){
+  if(!midRate)return;
+  var amt=parseFloat(document.getElementById('planAmt').value)||1000;
+  var freq=parseInt(document.getElementById('planFreq').value)||12;
+  var providers=P[baseCur]||P['USD'];
+  var ranked=providers.map(function(p){
+    var fee=getDynFee(p,amt);
+    var inr=Math.max(0,amt-fee)*midRate*(1-p.spread);
+    return{name:p.name,link:p.link,inr:Math.round(inr),annual:Math.round(inr*freq)};
+  }).sort(function(a,b){return b.annual-a.annual;});
+  var best=ranked[0],worst=ranked[ranked.length-1];
+  var saving=best.annual-worst.annual;
+  var html='<div class="plan-result">'+
+    '<div class="plan-top">'+
+      '<div class="plan-best-badge">&#127942; Best: '+best.name+'</div>'+
+      '<div class="plan-saving">You save <strong>&#8377;'+saving.toLocaleString('en-IN')+'</strong> per year vs '+worst.name+'</div>'+
+    '</div>'+
+    '<div class="plan-rows">'+
+    ranked.slice(0,5).map(function(p,i){
+      var pct=worst.annual===best.annual?100:Math.round(70+(p.annual-worst.annual)/(best.annual-worst.annual)*30);
+      var barCol=i===0?'var(--green)':i===1?'var(--amber)':'var(--border2)';
+      return '<div class="plan-row">'+
+        '<div class="plan-row-name">'+(i===0?'&#127942; ':i===1?'&#129352; ':i===2?'&#129353; ':'')+p.name+'</div>'+
+        '<div class="plan-row-bar"><div class="plan-row-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
+        '<div class="plan-row-amt">&#8377;'+p.annual.toLocaleString('en-IN')+'</div>'+
+        '<a class="plan-row-cta" href="'+p.link+'" target="_blank" rel="noopener">Send</a>'+
+      '</div>';
+    }).join('')+
+    '</div>'+
+    '<div class="plan-note">Annual total based on '+freq+'× per year of '+baseCur+' '+amt.toLocaleString()+' each</div>'+
+  '</div>';
+  document.getElementById('plan-result').innerHTML=html;
+  document.getElementById('plan-result').style.display='block';
 }
 
 function renderRates(){
   if(!midRate)return;
   var amt=parseFloat(document.getElementById('sendAmount').value)||1000;
   var providers=P[baseCur]||P['USD'];
+
+  /* compute rows with lostPct */
   var rows=providers.map(function(p){
     var rate=midRate*(1-p.spread);
-    var _dynFee=getDynFee(p,amt);
-    var inr=Math.max(0,amt-_dynFee)*rate;
-    return Object.assign({},p,{rate:rate,inr:inr,_dynFee:_dynFee});
+    var fee=getDynFee(p,amt);
+    var inr=Math.max(0,amt-fee)*rate;
+    var effectiveRate=inr/amt;
+    var lostPct=(midRate-effectiveRate)/midRate*100;
+    var tier=getTier(lostPct);
+    return Object.assign({},p,{rate:rate,inr:inr,fee:fee,lostPct:lostPct,tier:tier});
   }).sort(function(a,b){return b.inr-a.inr;});
 
-  var best=rows[0].inr, worst=rows[rows.length-1].inr;
+  var best=rows[0].inr,worst=rows[rows.length-1].inr;
   var saving=Math.round(best-worst);
   var wrap=document.getElementById('rates-container');
 
-  /* ── view toggle ── */
-  var isTile=_rateViewMode==='tile';
-  var toggleHtml='<div class="rate-view-toggle">'+
-    '<span style="font-size:12px;font-weight:700;color:var(--muted)">View:</span>'+
-    '<button class="rate-view-btn'+(isTile?' active':'')+'" data-view="tile" onclick="setRateView(this.dataset.view)">&#9707; Tiles</button>'+
-    '<button class="rate-view-btn'+(!isTile?' active':'')+'" data-view="list" onclick="setRateView(this.dataset.view)">&#9776; List</button>'+
-    '<span class="rate-view-lbl">'+rows.length+' providers &middot; Best saves &#8377;'+saving.toLocaleString('en-IN')+' vs worst</span>'+
-  '</div>';
+  /* ── amount quick-select buttons ── */
+  var amts=RATE_AMTS[baseCur]||RATE_AMTS._def;
+  var amtBtns='<div class="rc-amt-strip">'+amts.map(function(v){
+    var active=Math.abs(amt-v)<0.5;
+    return '<button class="rc-amt-btn'+(active?' active':'')+'" onclick="setRatesAmt('+v+')">'+v.toLocaleString()+'</button>';
+  }).join('')+'</div>';
 
   /* ── summary strip ── */
-  var bestRow=rows[0], worstRow=rows[rows.length-1];
   var mmUpd=getLastUpdatedStr();
-  var mmTip='The mid-market rate is the real exchange rate banks trade at, with no markup. It\'s the benchmark — every provider below applies its own margin/fee on top, so you always receive slightly less than this.';
   var summaryHtml='<div class="rate-summary-strip">'+
     '<div class="rate-summary-cell">'+
       '<div class="rate-summary-label">Best Rate Today</div>'+
       '<div class="rate-summary-val" style="color:var(--green)">&#8377;'+Math.round(best).toLocaleString('en-IN')+'</div>'+
-      '<div class="rate-summary-sub">via '+bestRow.name+'</div>'+
+      '<div class="rate-summary-sub">via '+rows[0].name+'</div>'+
     '</div>'+
     '<div class="rate-summary-cell">'+
-      '<div class="rate-summary-label">Max You Can Save</div>'+
+      '<div class="rate-summary-label">Max Saving</div>'+
       '<div class="rate-summary-val" style="color:var(--amber)">&#8377;'+saving.toLocaleString('en-IN')+'</div>'+
-      '<div class="rate-summary-sub">vs worst provider on same amount</div>'+
+      '<div class="rate-summary-sub">best vs worst provider</div>'+
     '</div>'+
     '<div class="rate-summary-cell">'+
-      '<div class="rate-summary-label" style="display:flex;align-items:center;gap:4px">Mid-Market Rate'+
-        '<span title="'+mmTip+'" style="cursor:help;display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--border);color:var(--muted);font-size:9px;font-weight:900;font-style:normal;flex-shrink:0">?</span>'+
-      '</div>'+
+      '<div class="rate-summary-label">Mid-Market Rate</div>'+
       '<div class="rate-summary-val" style="color:var(--text2)">&#8377;'+midRate.toFixed(2)+'</div>'+
-      '<div class="rate-summary-sub" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+
-        '<img src="https://www.google.com/s2/favicons?domain=xe.com&sz=32" width="12" height="12" style="border-radius:3px;flex-shrink:0" alt="" onerror="this.style.display=\'none\'">'+
-        '<span>per '+baseCur+' &middot; XE.com'+(mmUpd?' &middot; '+mmUpd:'')+'</span>'+
-      '</div>'+
+      '<div class="rate-summary-sub">per '+baseCur+(mmUpd?' &middot; '+mmUpd:'')+'</div>'+
     '</div>'+
   '</div>';
 
-  /* ── tile cards ── */
-  var RANK_LABELS=['#1 Best','#2','#3','#4','#5','#6','#7','#8','#9','#10','#11','#12','#13','#14','#15','#16'];
-  var RANK_COLORS=['var(--green)','var(--amber)','var(--amber)'];
-  var tilesHtml='<div class="rate-tiles-grid">'+rows.map(function(p,i){
-    var isBest=i===0, isWorst=i===rows.length-1;
-    var pct=worst===best?100:Math.round(55+(p.inr-worst)/(best-worst)*45);
-    var barCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--amber)';
-    var tileCls=isBest?' rt-best':isWorst?' rt-worst':i<3?' rt-good':'';
-    var amtCls=isBest?' rt-best-amt':isWorst?' rt-worst-amt':'';
-    var rankCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--muted)';
-    var diffAmt=Math.round(best-p.inr);
-    var diffHtml=isBest
-      ?'<span class="rt-diff pos">Best today</span>'
-      :'<span class="rt-diff neg">-&#8377;'+diffAmt.toLocaleString('en-IN')+'</span>';
-    return '<div class="rate-tile'+tileCls+'">'+
-      '<div class="rt-header">'+
-        rtBadge(p.name,p.link)+
-        '<div class="rt-info">'+
-          '<div class="rt-name" title="'+p.name+'">'+p.name+'</div>'+
-          '<div class="rt-rank" style="color:'+rankCol+'">'+RANK_LABELS[i]+'</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="rt-amount'+amtCls+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
-      '<div class="rt-per">&#8377;'+p.rate.toFixed(4)+' per '+baseCur+'</div>'+
-      '<div class="rt-bar"><div class="rt-bar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
-      '<div class="rt-meta">'+((p.feeType==='incl')?baseCur+' '+p._dynFee.toFixed(2)+' fee (incl)':(p.feeType==='add')?'+'+baseCur+' '+p._dynFee.toFixed(2)+' fee extra':(p.fee>0?baseCur+' '+p.fee+' fee':'No fee'))+' &middot; '+(p.spread*100).toFixed(1)+'% margin &middot; '+p.note+'</div>'+
-      '<div class="rt-footer">'+
-        diffHtml+
-        '<a class="rt-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
-      '</div>'+
-    '</div>';
-  }).join('')+'</div>';
+  /* ── tier sections ── */
+  var TIER_CFG={
+    BEST:{label:'Best',sublabel:'&le;0.7% cost',col:'var(--green)',icon:'&#127942;'},
+    GOOD:{label:'Good',sublabel:'&le;1.2% cost',col:'var(--teal)',icon:'&#9989;'},
+    FAIR:{label:'Fair',sublabel:'&le;1.7% cost',col:'var(--amber)',icon:'&#9888;&#65039;'},
+    POOR:{label:'Poor',sublabel:'&gt;1.7% cost',col:'rgba(239,68,68,.85)',icon:'&#10060;'}
+  };
+  var tierOrder=['BEST','GOOD','FAIR','POOR'];
+  var tierMap={BEST:[],GOOD:[],FAIR:[],POOR:[]};
+  rows.forEach(function(r){tierMap[r.tier].push(r);});
 
-  /* ── list rows (compact, no broken images) ── */
-  var listHtml=rows.map(function(p,i){
-    var isBest=i===0, isWorst=i===rows.length-1;
-    var pct=worst===best?100:Math.round(55+(p.inr-worst)/(best-worst)*45);
-    var barCol=isBest?'var(--green)':isWorst?'rgba(239,68,68,.8)':'var(--amber)';
-    var diff=isBest?'<span class="best-tag">BEST TODAY</span>':
-      '<span style="font-size:11px;color:rgba(239,68,68,.9);font-weight:700">-&#8377;'+Math.round(best-p.inr).toLocaleString('en-IN')+'</span>';
-    return '<div class="rate-row'+(isBest?' best':'')+'">'+
-      rtBadge(p.name,p.link)+
-      '<div class="pinfo">'+
-        '<div class="pname">'+p.name+' '+diff+'</div>'+
-        '<div class="pmeta">'+p.note+' &middot; '+((p.feeType==='incl')?'Fee: '+baseCur+' '+p._dynFee.toFixed(2)+' (incl)':(p.feeType==='add')?'Fee: +'+baseCur+' '+p._dynFee.toFixed(2)+' extra':(p.fee>0?'Fee: '+baseCur+' '+p.fee:'No fee'))+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
+  var tiersHtml=tierOrder.map(function(t){
+    var cfg=TIER_CFG[t];
+    var trows=tierMap[t];
+    if(!trows.length)return'';
+    var isOpen=_tierOpen[t];
+    var rowsHtml=trows.map(function(p,i){
+      var pct=worst===best?100:Math.round(50+(p.inr-worst)/(best-worst)*50);
+      var feeStr=(p.feeType==='incl')?baseCur+' '+p.fee.toFixed(2)+' incl':(p.feeType==='add')?'+'+baseCur+' '+p.fee.toFixed(2):p.fee>0?baseCur+' '+p.fee.toFixed(2):'No fee';
+      var diffAmt=Math.round(best-p.inr);
+      var diffStr=diffAmt===0?'<span class="rc-best-tag">Best</span>':'<span class="rc-diff">-&#8377;'+diffAmt.toLocaleString('en-IN')+'</span>';
+      return '<div class="rc-row">'+
+        rtBadge(p.name,p.link)+
+        '<div class="rc-row-info">'+
+          '<div class="rc-row-name">'+p.name+' '+diffStr+'</div>'+
+          '<div class="rc-row-meta">'+feeStr+' &middot; '+(p.spread*100).toFixed(1)+'% margin</div>'+
+          '<div class="rc-row-bar"><div class="rc-row-fill" style="width:'+pct+'%;background:'+cfg.col+'"></div></div>'+
+        '</div>'+
+        '<div class="rc-row-right">'+
+          '<div class="rc-row-inr">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
+          '<div class="rc-row-rate">&#8377;'+p.rate.toFixed(2)+'/'+baseCur+'</div>'+
+          '<div class="rc-row-lost" style="color:'+cfg.col+'">'+(p.lostPct).toFixed(2)+'% cost</div>'+
+        '</div>'+
+        '<a class="rc-row-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
+      '</div>';
+    }).join('');
+    return '<div class="rc-tier">'+
+      '<div class="rc-tier-header" onclick="toggleTier(\''+t+'\')">'+
+        '<span class="rc-tier-icon" style="color:'+cfg.col+'">'+cfg.icon+'</span>'+
+        '<span class="rc-tier-label" style="color:'+cfg.col+'">'+cfg.label+'</span>'+
+        '<span class="rc-tier-sub">'+cfg.sublabel+'</span>'+
+        '<span class="rc-tier-count">'+trows.length+' provider'+(trows.length>1?'s':'')+'</span>'+
+        '<span class="rc-tier-arrow">'+(isOpen?'&#9650;':'&#9660;')+'</span>'+
       '</div>'+
-      '<div class="pbar-col">'+
-        '<div class="pamount" style="color:'+(isBest?'var(--green)':'var(--text)')+'">&#8377;'+Math.round(p.inr).toLocaleString('en-IN')+'</div>'+
-        '<div class="pamount-sub">&#8377;'+p.rate.toFixed(2)+' per '+baseCur+'</div>'+
-        '<div class="pbar-track"><div class="pbar-fill" style="width:'+pct+'%;background:'+barCol+'"></div></div>'+
-      '</div>'+
-      '<a class="rate-cta'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send Now &rarr;</a>'+
-      '<div class="rate-row-mobile-cta">'+
-        '<span style="font-size:11px;color:var(--muted)">'+p.note+'</span>'+
-        '<a class="rate-cta-sm'+(p.link==='#'?' disabled':'')+'" href="'+p.link+'" target="_blank" rel="noopener">Send &rarr;</a>'+
-      '</div>'+
+      (isOpen?'<div class="rc-tier-rows">'+rowsHtml+'</div>':'')+
     '</div>';
   }).join('');
 
-  wrap.innerHTML=isTile
-    ?toggleHtml+summaryHtml+tilesHtml
-    :toggleHtml+listHtml;
-  wrap.classList.remove('rt-tile','rt-list');
-  wrap.classList.add(isTile?'rt-tile':'rt-list');
+  wrap.innerHTML=amtBtns+summaryHtml+tiersHtml;
   wrap.style.display='block';
+  wrap.className='rates-wrap rc-view';
+
+  /* trigger trend fetch */
+  fetchRateTrend(baseCur);
 
   document.getElementById('rate-note-text').innerHTML='<strong>&#8505;&#65039; Estimates only.</strong> Rates = live mid-market (1 '+baseCur+' = &#8377;'+midRate.toFixed(4)+') minus provider margin &amp; fee. Rates change in real time — <span style="color:var(--amber);font-weight:700">always confirm on provider site before sending.</span>';
   renderRatePreview();

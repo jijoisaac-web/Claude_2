@@ -253,6 +253,8 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
     <input type="text" id="globalSearch" placeholder="Search stock…  ( / )" autocomplete="off">
     <div id="searchResults"></div>
   </div>
+  <label id="smcNewTabWrap" title="When on, every 🧠 Smart Money link (Dashboard, Screener, Ideas, Backtest, FII/DII, Options, Conviction Scan, etc.) opens Smart Money in a new browser tab instead of switching tabs here" style="display:flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;white-space:nowrap;cursor:pointer;margin-left:4px;">
+    <input type="checkbox" id="smcNewTabToggle" onchange="localStorage.setItem('ist_smc_newtab', this.checked?'1':'0')">🧠 new tab</label>
 </header>
 <div id="kbdHelp" style="display:none">
   <div class="card" style="max-width:420px;margin:80px auto;">
@@ -1263,6 +1265,23 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
   if(b.dataset.tab==="smc" && !window._smcLoaded) loadSmc();
   if(b.dataset.tab==="mf" && !window._mfLoaded){ window._mfLoaded=true; mfRenderAll(); mfLoadSchemes(); xrayPopulate(); casRestore(); }
 });
+
+/* "🧠 new tab" preference: restore checkbox state, and if this page load itself was opened
+   via openSmartMoney()'s window.open("...?tab=smc&symbol=...", "_blank"), jump straight to
+   Smart Money for that symbol instead of landing on the Dashboard. */
+$("smcNewTabToggle").checked = localStorage.getItem("ist_smc_newtab")==="1";
+(function(){
+  const p = new URLSearchParams(location.search);
+  const tab = p.get("tab");
+  if(!tab) return;
+  const btn = document.querySelector(`nav button[data-tab="${tab}"]`);
+  if(!btn) return;
+  if(tab==="smc"){
+    const sym = p.get("symbol");
+    if(sym) $("smcSymbol").value = sym;
+  }
+  btn.click();
+})();
 
 /* ================= watchlist (localStorage) ================= */
 const WL_KEY = "ist_watchlist";
@@ -5192,6 +5211,10 @@ async function scanFreshBlocks(){
 
 /* ================= cross-tab openers ================= */
 function openSmartMoney(sym){
+  if(localStorage.getItem("ist_smc_newtab")==="1"){
+    window.open(location.pathname + "?tab=smc&symbol=" + encodeURIComponent(sym), "_blank");
+    return;
+  }
   $("smcSymbol").value = sym;
   document.querySelector('nav button[data-tab="smc"]').click();
   loadSmc();

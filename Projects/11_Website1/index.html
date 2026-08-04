@@ -1571,6 +1571,8 @@ document.addEventListener('DOMContentLoaded',function(){
       <span style="color:var(--muted);font-size:18px">&rarr;</span>
       <span style="font-size:13px;font-weight:600;color:var(--text2)">Recipient gets <strong style="color:var(--amber);font-size:15px">&#8377; INR</strong></span>
     </div>
+    <!-- Trend badge -->
+    <div id="rate-trend-badge" class="rate-trend-badge" style="display:none"></div>
     <div id="rates-loading" class="rates-loading" style="display:none"></div>
     <div id="rates-container" class="rates-wrap" style="display:none"></div>
     <div id="rate-note" class="rate-note" style="display:none"><span>&#8505;&#65039;</span><span id="rate-note-text"></span></div>
@@ -1623,6 +1625,36 @@ document.addEventListener('DOMContentLoaded',function(){
         </div>
       </div>
           </div><!-- /rates-disclaimer -->
+          <!-- Annual Planner -->
+          <div class="rc-planner-card">
+            <div class="rc-planner-hd">
+              <span class="rc-planner-icon">&#128197;</span>
+              <div>
+                <div class="rc-planner-title">Annual Remittance Planner</div>
+                <div class="rc-planner-sub">See your total INR over a year &mdash; pick the best provider for your pattern</div>
+              </div>
+            </div>
+            <div class="rc-planner-inputs">
+              <div class="rc-planner-field">
+                <label>Amount per transfer</label>
+                <input type="number" id="planAmt" value="1000" placeholder="e.g. 1000"/>
+              </div>
+              <div class="rc-planner-field">
+                <label>Transfers per year</label>
+                <select id="planFreq">
+                  <option value="1">Once a year</option>
+                  <option value="2">Twice a year</option>
+                  <option value="4">Quarterly (4x)</option>
+                  <option value="6">Every 2 months (6x)</option>
+                  <option value="12" selected>Monthly (12x)</option>
+                  <option value="26">Fortnightly (26x)</option>
+                  <option value="52">Weekly (52x)</option>
+                </select>
+              </div>
+              <button class="rc-planner-btn" onclick="computePlan()">Calculate &#8594;</button>
+            </div>
+            <div id="plan-result" style="display:none"></div>
+          </div>
         </div><!-- /tab-tool-tile -->
       </div><!-- /fl-tab-bg-inner -->
     </div><!-- /tab-section-bg -->

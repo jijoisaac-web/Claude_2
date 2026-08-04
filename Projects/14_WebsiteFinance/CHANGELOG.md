@@ -2,6 +2,12 @@
 
 All notable changes to India Shares Tracker.
 
+## [3.33.0] — 2026-08-03 · Smart Money: open in a new browser tab
+
+- **New "🧠 new tab" toggle in the header** (next to the search box), persisted in `localStorage` (`ist_smc_newtab`). Off by default — behavior is unchanged (clicking a 🧠 link switches to the Smart Money tab in place, as before).
+- When switched on, every 🧠 Smart Money entry point across the whole site — the Dashboard/Screener/Ideas/Backtest/Conviction Scan row buttons, and any other caller of `openChart()`/`openSmartMoney()` — opens Smart Money for that symbol in a **new browser tab** instead of navigating away from whatever tab you're currently on. Useful for comparing Smart Money structure against the Screener or Backtest results side by side instead of losing your place.
+- Implementation: `openSmartMoney(sym)` is the single choke point every "open Smart Money" link in the app already called (including the `openChart()` alias), so the toggle only needed to change one function. When on, it does `window.open(location.pathname + "?tab=smc&symbol=" + sym, "_blank")` instead of clicking the nav button in place. A small bootstrap snippet added right after the tab-switching logic reads `?tab=` (and `&symbol=` for `smc`) off the URL on page load, so the freshly opened tab lands directly on Smart Money for that stock rather than the Dashboard. This also means any tab can now be deep-linked via `?tab=<name>` — not used elsewhere yet, but came for free from the same fix.
+
 ## [3.32.0] — 2026-08-03 · Smart Money: BOS, change of character (CHoCH) & liquidity sweeps
 
 - **New "Market structure" section on the Smart Money tab** — extends the existing order-block detection with two more structural reads of the same swing-point data (`smcSwings()`, already used by `detectOrderBlocks()`): `detectChoCH()` tracks whether swing highs+lows are both rising (uptrend) or both falling (downtrend), classifying each break of a swing point as a **BOS** (break of structure — continues the existing trend) or the more actionable **CHoCH** (change of character — the first break that goes the other way, flipping the tracked trend). `detectLiquiditySweeps()` finds the failed-break case: price wicks past a swing point (the stop-losses/breakout orders resting there — the "liquidity") but fails to close beyond it, then moves away over the next few bars, confirmed by a minimum rejection percentage.

@@ -2672,3 +2672,89 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .rate-methodology .mkt-rate-card{border-radius:0;border:none;border-top:1px solid var(--border);margin:0;}
 .rate-methodology .rate-crosscheck{border-radius:0;border:none;border-top:1px solid var(--border);}
 
+
+/* ══ RATE CARD TIER VIEW (v13.6) ════════════════════════════════════════════ */
+
+/* Trend badge */
+.rate-trend-badge{display:none;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:600;margin-bottom:12px;border:1px solid;}
+.rate-trend-badge.trend-up{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.25);color:var(--green);}
+.rate-trend-badge.trend-down{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2);color:#ef4444;}
+.rate-trend-badge.trend-flat{background:rgba(255,255,255,.04);border-color:var(--border);color:var(--muted);}
+.trend-arrow{font-size:16px;font-weight:900;flex-shrink:0;}
+
+/* Amount quick-select buttons */
+.rc-amt-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.rc-amt-btn{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.rc-amt-btn:hover{border-color:var(--border2);color:var(--text);}
+.rc-amt-btn.active{background:rgba(240,165,32,.15);border-color:var(--amber);color:var(--amber);}
+
+/* Tier section */
+.rc-tier{margin-bottom:8px;border:1px solid var(--border);border-radius:13px;overflow:hidden;}
+.rc-tier-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;background:var(--elevated);transition:background .15s;}
+.rc-tier-header:hover{background:var(--card);}
+.rc-tier-icon{font-size:16px;flex-shrink:0;}
+.rc-tier-label{font-size:13px;font-weight:800;min-width:40px;}
+.rc-tier-sub{font-size:11px;color:var(--muted);flex:1;}
+.rc-tier-count{font-size:11px;color:var(--muted);background:var(--border);border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.rc-tier-arrow{font-size:10px;color:var(--muted);flex-shrink:0;}
+
+/* Provider rows */
+.rc-tier-rows{display:flex;flex-direction:column;}
+.rc-row{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--border);transition:background .15s;}
+.rc-row:hover{background:rgba(255,255,255,.02);}
+.rc-row-info{min-width:0;flex:1;}
+.rc-row-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:2px;flex-wrap:wrap;}
+.rc-row-meta{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.rc-row-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.rc-row-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.rc-row-right{text-align:right;flex-shrink:0;min-width:80px;}
+.rc-row-inr{font-size:15px;font-weight:800;letter-spacing:-.4px;}
+.rc-row-rate{font-size:10px;color:var(--muted);}
+.rc-row-lost{font-size:10.5px;font-weight:700;margin-top:2px;}
+.rc-row-cta{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;border:none;padding:6px 13px;border-radius:8px;font-size:11px;font-weight:800;white-space:nowrap;text-decoration:none;display:inline-block;transition:transform .12s,box-shadow .12s;flex-shrink:0;}
+.rc-row-cta:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(240,165,32,.4);}
+.rc-row-cta.disabled{opacity:.3;pointer-events:none;}
+.rc-best-tag{background:rgba(34,211,154,.15);color:var(--green);border-radius:5px;padding:1px 7px;font-size:10px;font-weight:800;}
+.rc-diff{font-size:11px;color:rgba(239,68,68,.85);font-weight:700;}
+
+/* Annual planner card */
+.rc-planner-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:16px;}
+.rc-planner-hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.rc-planner-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.rc-planner-title{font-size:14px;font-weight:800;}
+.rc-planner-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.rc-planner-inputs{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.rc-planner-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;}
+.rc-planner-field label{font-size:11px;font-weight:700;color:var(--muted);}
+.rc-planner-field input,.rc-planner-field select{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;}
+.rc-planner-field input:focus,.rc-planner-field select:focus{border-color:var(--amber);}
+.rc-planner-btn{background:var(--amber);color:#000;font-weight:800;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:13px;white-space:nowrap;transition:opacity .15s;flex-shrink:0;}
+.rc-planner-btn:hover{opacity:.85;}
+
+/* Plan results */
+.plan-result{margin-top:16px;border-top:1px solid var(--border);padding-top:14px;}
+.plan-top{margin-bottom:12px;}
+.plan-best-badge{font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.plan-saving{font-size:12px;color:var(--muted);}
+.plan-saving strong{color:var(--amber);}
+.plan-rows{display:flex;flex-direction:column;gap:7px;}
+.plan-row{display:grid;grid-template-columns:1fr auto 80px 48px;align-items:center;gap:8px;}
+.plan-row-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.plan-row-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;min-width:60px;}
+.plan-row-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+.plan-row-amt{font-size:12px;font-weight:700;text-align:right;white-space:nowrap;}
+.plan-row-cta{background:rgba(240,165,32,.15);border:1px solid rgba(240,165,32,.3);color:var(--amber);border-radius:7px;padding:3px 8px;font-size:10px;font-weight:800;text-decoration:none;text-align:center;}
+.plan-note{font-size:10.5px;color:var(--muted);margin-top:12px;border-top:1px solid var(--border);padding-top:8px;}
+
+/* Responsive */
+@media(max-width:600px){
+  .rc-row{grid-template-columns:36px 1fr auto;gap:8px;padding:10px 12px;}
+  .rc-row-cta{display:none;}
+  .rc-row-right{min-width:64px;}
+  .rc-tier-header{padding:10px 12px;gap:7px;}
+  .rc-planner-inputs{flex-direction:column;}
+  .rc-planner-btn{width:100%;}
+  .plan-row{grid-template-columns:1fr 60px 48px;}
+  .plan-row-bar{display:none;}
+}
+/* ══ END RATE CARD TIER VIEW ════════════════════════════════════════════════ */
