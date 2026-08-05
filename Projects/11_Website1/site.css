@@ -2683,8 +2683,9 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .trend-arrow{font-size:16px;font-weight:900;flex-shrink:0;}
 
 /* Amount quick-select buttons */
-.rc-amt-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
-.rc-amt-btn{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.rc-amt-strip{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.rc-amt-strip::-webkit-scrollbar{display:none;}
+.rc-amt-btn{background:var(--elevated);border:1px solid var(--border);border-radius:8px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;flex-shrink:0;}
 .rc-amt-btn:hover{border-color:var(--border2);color:var(--text);}
 .rc-amt-btn.active{background:rgba(240,165,32,.15);border-color:var(--amber);color:var(--amber);}
 
@@ -2756,5 +2757,6 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
   .rc-planner-btn{width:100%;}
   .plan-row{grid-template-columns:1fr 60px 48px;}
   .plan-row-bar{display:none;}
+  .rate-summary-label{white-space:nowrap;font-size:9px;}
 }
 /* ══ END RATE CARD TIER VIEW ════════════════════════════════════════════════ */
