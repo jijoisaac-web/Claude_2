@@ -871,6 +871,7 @@ function calcSIP(){
     <div class="ri"><div class="ri-lbl">Wealth Multiplier</div><div class="ri-val">×${(finalCorpus/finalInvested).toFixed(1)}</div><div class="ri-sub">your money grew</div></div>`;
   document.getElementById('sip-tip').innerHTML=`🎯 Starting at ₹${sip0.toLocaleString('en-IN')}/mo and stepping up ${(stepup*100).toFixed(0)}% annually at <strong>${rate*100}% returns</strong> turns ₹${(finalInvested/100000).toFixed(0)}L invested into <strong>₹${(finalCorpus/100000).toFixed(1)}L</strong> — ${((finalCorpus/finalInvested)).toFixed(1)}× your money.`;
   document.getElementById('sip-result').style.display='block';
+  updateInvestHints();
 }
 function toggleYearTable(id){
   const wrap=document.getElementById(id+'-table-wrap');
@@ -946,6 +947,22 @@ function calcSWP(){
     ?`<div class="box-red">⚠️ <strong>Corpus runs out in Year ${exhaustYear}.</strong> Options: reduce monthly withdrawal · increase portfolio return · add an income source · consider a larger starting corpus.</div>`
     :`<div class="box-green">✅ <strong>Corpus is sustainable.</strong> At ${ret*100}% returns with ${(stepup*100).toFixed(0)}% annual withdrawal increase, your corpus outlasts the 40-year projection. Remaining: ₹${(finalClose/100000).toFixed(1)}L.</div>`;
   document.getElementById('swp-result').style.display='block';
+  updateInvestHints();
+}
+function updateInvestHints(){
+  if(!midRate||midRate<=0)return;
+  var fmtM=function(inr){return '≈ '+baseCur+' '+Math.round(inr/midRate).toLocaleString('en-IN')+'/mo';};
+  var fmtL=function(lakhs){return '≈ '+baseCur+' '+(lakhs*100000/midRate/100000).toFixed(1)+'L';};
+  var fmtAmt=function(inr){return '≈ '+baseCur+' '+Math.round(inr/midRate).toLocaleString('en-IN');};
+  var h1=document.getElementById('hint-sip-amount');
+  var sipAmt=parseFloat(document.getElementById('sip-amount')?document.getElementById('sip-amount').value:0)||0;
+  if(h1)h1.textContent=sipAmt?fmtM(sipAmt):'';
+  var h2=document.getElementById('hint-swp-corpus');
+  var swpCorpus=parseFloat(document.getElementById('swp-corpus')?document.getElementById('swp-corpus').value:0)||0;
+  if(h2)h2.textContent=swpCorpus?fmtL(swpCorpus):'';
+  var h3=document.getElementById('hint-swp-monthly');
+  var swpMonthly=parseFloat(document.getElementById('swp-monthly')?document.getElementById('swp-monthly').value:0)||0;
+  if(h3)h3.textContent=swpMonthly?fmtM(swpMonthly):'';
 }
 function downloadSWPCSV(){
   const rows=[['Year','Monthly Withdrawal (₹)','Annual Withdrawal (₹)','Portfolio Return (₹)','Closing Corpus (₹)']];

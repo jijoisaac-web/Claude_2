@@ -1,4 +1,4 @@
-/* v13.6 */
+/* v13.7 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (Modern)
@@ -956,19 +956,21 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .tpl-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--elevated);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;}
 .tpl-btn:hover{background:var(--amber);border-color:var(--amber);color:#000;}
 .tpl-btn.active{background:var(--amber)!important;border-color:var(--amber)!important;color:#000!important;box-shadow:0 0 0 2px rgba(240,165,32,0.3);}
-.invest-calc-btn{width:100%;padding:8px 12px;font-size:12px;font-weight:700;margin:4px 0 12px;border-radius:8px;}
+.invest-calc-btn{width:100%;padding:10px 12px;font-size:13px;font-weight:700;margin:4px 0 12px;border-radius:8px;}
 /* ── Invest dual grid (SIP + SWP side-by-side) ── */
-.invest-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;}
-.invest-card{padding:16px 18px;}
-.invest-fg{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.invest-dual-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch;}
+.invest-card{padding:20px 22px;}
+.invest-fg{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .invest-fg .f label{font-size:11px;}
-.invest-fg .f input{padding:7px 10px;font-size:13px;}
+.invest-fg .f input{padding:9px 12px;font-size:14px;}
+.inv-fx-hint{font-size:10px;color:var(--amber);font-weight:600;margin-top:3px;min-height:14px;letter-spacing:.2px;}
 .invest-rg{gap:8px;grid-template-columns:repeat(2,1fr);margin:10px 0 8px;}
-.invest-rg .ri{padding:10px 12px;}
+.invest-rg .ri{padding:12px 14px;}
 .invest-rg .ri-lbl{font-size:10px;}
-.invest-rg .ri-val{font-size:18px;}
+.invest-rg .ri-val{font-size:20px;}
 .invest-rg .ri-sub{font-size:10px;}
 .invest-tip{font-size:12px;padding:10px 12px;margin-bottom:8px;}
+.tab-section-bg--invest .fl-tab-bg-inner{max-width:1200px;}
 .invest-table-toggle{display:flex;gap:8px;margin-bottom:8px;}
 
 /* Invest full-width year table */
