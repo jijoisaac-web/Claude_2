@@ -231,7 +231,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .f label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
 .f input,.f select{width:100%;background:var(--elevated);border:1px solid var(--border2);color:var(--text);padding:13px 16px;border-radius:10px;font-size:15px;font-weight:600;transition:border-color .2s,box-shadow .2s;}
 .f input:focus,.f select:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px var(--amber-dim);}
-.f select option{background:#141929;}
+.f select option{background:var(--elevated);}
 .btn{border:none;border-radius:10px;padding:13px 26px;font-size:14px;font-weight:800;transition:transform .15s,box-shadow .15s;}
 .btn-amber{background:linear-gradient(135deg,#f0a520,#c97c0a);color:#000;box-shadow:0 4px 18px rgba(240,165,32,.3);}
 .btn-amber:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(240,165,32,.45);}
@@ -496,7 +496,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .art-table tr:last-child td{border-bottom:none;}
 .art-table td:first-child{font-weight:700;color:var(--text);}
 .art-search-wrap{margin-bottom:20px;position:relative;}
-.art-search-input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 16px 12px 42px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;}
+.art-search-input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px 16px 12px 42px;font-size:14px;color:var(--text);font-family:inherit;outline:none;transition:border-color .2s;}
 .art-search-input::placeholder{color:var(--muted);}
 .art-search-input:focus{border-color:var(--teal);}
 .art-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;opacity:.5;}
@@ -2398,7 +2398,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .fl-tab-tagline{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:32px;}
 @media(max-width:768px){.fl-tab-bg{min-height:auto;}.fl-tab-bg-inner{padding:40px 20px 24px;}.fl-tab-headline{font-size:clamp(22px,6vw,34px);letter-spacing:-0.5px;}.fl-tab-tagline{font-size:13px;margin-bottom:20px;}.fl-tab-eyebrow{margin-bottom:12px;}}
 /* Tab hero banners — Return, Education, Invest, Guides */
-.tab-section-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;background-size:cover;background-position:center;background-color:#05080f;overflow:hidden;padding-bottom:56px;}
+.tab-section-bg{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;background-size:cover;background-position:center;background-color:var(--bg);overflow:hidden;padding-bottom:56px;}
 .tab-section-bg--return{background-image:url('https://images.pexels.com/photos/1007426/pexels-photo-1007426.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 30%;}
 .tab-section-bg--edabroad{background-image:url('https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 20%;}
 .tab-section-bg--invest{background-image:url('https://images.pexels.com/photos/534216/pexels-photo-534216.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 50%;}
@@ -2436,8 +2436,8 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
 .fl-opt-group{display:flex;flex-direction:column;gap:3px;flex:1;min-width:90px;}
 .fl-opt-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;}
 .fl-opt-sel{
-  background:#141929;border:1px solid rgba(255,255,255,0.12);
-  color:#f4f6ff;border-radius:8px;padding:6px 10px;
+  background:var(--elevated);border:1px solid var(--border2);
+  color:var(--text);border-radius:8px;padding:6px 10px;
   font-size:13px;font-weight:500;cursor:pointer;
   font-family:inherit;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aaa'/%3E%3C/svg%3E");
@@ -2445,7 +2445,7 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
   padding-right:26px;
 }
 .fl-opt-sel:focus{outline:none;border-color:#00cdb0;}
-.fl-opt-sel option{background:#141929;color:#f4f6ff;}
+.fl-opt-sel option{background:var(--elevated);color:var(--text);}
 
 /* Compact city list */
 .fl-dest-list{margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
