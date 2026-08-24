@@ -462,6 +462,7 @@ body[data-bg="divid"]::after{background-image:linear-gradient(180deg,rgba(9,13,2
     <button class="btn ghost" onclick="exportDealsArchiveJson()" title="Download this browser's full local history as deals-archive.json — drop it in site/data/ and commit+push to refresh the shared baseline every visitor gets">⬇ Export to site/data/deals-archive.json</button>
     <span class="muted" id="dealsCsvStatus" style="font-size:11px"></span>
   </div>
+  <div class="muted" id="dealsFreshness" style="font-size:11px;margin:4px 0"></div>
   <div id="dealsTable"><div class="loading">Loading…</div></div>
   <div class="controls" id="dealsPager" style="display:none;justify-content:center;margin-top:8px">
     <button id="dealsPrevBtn" onclick="dealsPage=Math.max(0,dealsPage-1);renderDeals()">‹ Previous</button>
@@ -1425,13 +1426,41 @@ async function dealsArchiveSet(arr){ return idbSet_(DEALS_ARCHIVE_KEY, arr); }
 // Desktop and every future visitor gets that history for free.
 const DEALS_BASELINE_URL = "/data/deals-archive.json";
 const DEALS_BOOTSTRAP_KEY = "staticBaselineLoadedV1";
+const DEALS_BASELINE_META_KEY = "baselineMetaV1";
+const DEALS_LOCAL_UPDATED_KEY = "localArchiveUpdatedAtV1";
+// Freshness info shown next to the "Bulk & block deals" heading — populated by
+// ensureStaticBaselineLoaded() and mergeIntoDealsArchive(), read (sync, no await) by renderDeals().
+let dealsBaselineMeta = null;    // { lastModified, fetchedAt, count, distinctDays, oldest, newest } for the git-committed file itself
+let dealsLocalUpdatedAt = null;  // ISO timestamp — last time THIS browser's IndexedDB archive actually changed (any source)
+function fmtTs(s){
+  if(!s) return null;
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d.toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});
+}
 async function ensureStaticBaselineLoaded(){
   try{
-    if(await idbGet_(DEALS_BOOTSTRAP_KEY)) return;
-    const r = await fetch(DEALS_BASELINE_URL, { cache: "force-cache" });
+    dealsBaselineMeta = await idbGet_(DEALS_BASELINE_META_KEY) || null;   // seed from last known, in case the check below is skipped or fails
+    const r = await fetch(DEALS_BASELINE_URL, { cache: "no-cache" });     // no-cache = always revalidate (cheap 304 if unchanged), never serve a stale local copy
     if(!r.ok) return;   // not deployed (yet) — retry on a future visit rather than giving up permanently
+    const lastMod = r.headers.get("last-modified") || r.headers.get("etag") || null;
+    const alreadyBootstrapped = await idbGet_(DEALS_BOOTSTRAP_KEY);
+    // Skip re-parsing/re-merging the (multi-MB) file if it's the exact same version we already merged.
+    if(alreadyBootstrapped && dealsBaselineMeta && lastMod && dealsBaselineMeta.lastModified === lastMod) return;
     const baseline = await r.json();
-    if(Array.isArray(baseline) && baseline.length) await mergeIntoDealsArchive(baseline);
+    if(Array.isArray(baseline) && baseline.length){
+      await mergeIntoDealsArchive(baseline);
+      const ts = baseline.map(dealDateTs).filter(t=>t!=null);
+      const oldestT = Math.min(...ts), newestT = Math.max(...ts);
+      dealsBaselineMeta = {
+        lastModified: lastMod,
+        fetchedAt: new Date().toISOString(),
+        count: baseline.length,
+        distinctDays: new Set(baseline.map(d=>d.date)).size,
+        oldest: baseline.find(d=>dealDateTs(d)===oldestT)?.date || null,
+        newest: baseline.find(d=>dealDateTs(d)===newestT)?.date || null,
+      };
+      await idbSet_(DEALS_BASELINE_META_KEY, dealsBaselineMeta);
+    }
     await idbSet_(DEALS_BOOTSTRAP_KEY, true);
   }catch(e){ /* static file missing/invalid — silently skip, try again next visit */ }
 }
@@ -1450,6 +1479,8 @@ async function mergeIntoDealsArchive(newRows){
   });
   archive = archive.concat(newRows);
   await dealsArchiveSet(archive);
+  dealsLocalUpdatedAt = new Date().toISOString();
+  await idbSet_(DEALS_LOCAL_UPDATED_KEY, dealsLocalUpdatedAt);
   return archive;
 }
 async function clearDealsArchive(){
@@ -1476,7 +1507,8 @@ async function exportDealsArchiveJson(){
 }
 
 async function loadDeals(force){
-  await ensureStaticBaselineLoaded();   // one-time per browser: seed from the git-committed baseline
+  if(dealsLocalUpdatedAt == null) dealsLocalUpdatedAt = await idbGet_(DEALS_LOCAL_UPDATED_KEY) || null;
+  await ensureStaticBaselineLoaded();   // checks the git-committed baseline for a newer version every visit, cheap 304 if unchanged
   let snapErr = null;
   try{
     const r = await fetch("/api/largedeals" + (force===true ? "?t="+Date.now() : ""));
@@ -1621,6 +1653,9 @@ function renderDeals(){
   const rangeLabel = days===0 ? "all available" : `last ${days}D`;
   const clientLabel = clientFilter==="KNOWN_FII" ? ", known FIIs only" : clientFilter==="KNOWN_INSTITUTION" ? ", known domestic institutions only" : "";
   $("dealsMeta").textContent = `· local history: ${oldestStr} → ${newestStr} (${distinctDays} day${distinctDays===1?"":"s"} stored) · ${deals.length} deal${deals.length===1?"":"s"} match (${rangeLabel}${side!=="ALL"?", "+side.toLowerCase():""}${clientLabel})${roundTripHidden?` · ${roundTripHidden} same-day round trip${roundTripHidden===1?"":"s"} hidden`:""} · page ${dealsPage+1} of ${totalPages}, sorted by ${sortBy==="value"?"value":"date"}`;
+  const baselineWhen = dealsBaselineMeta ? (fmtTs(dealsBaselineMeta.lastModified) || `${fmtTs(dealsBaselineMeta.fetchedAt)} (server sent no file date — showing when this browser first saw it)`) : "not loaded yet";
+  const baselineDetail = dealsBaselineMeta ? ` — ${dealsBaselineMeta.oldest} → ${dealsBaselineMeta.newest}, ${dealsBaselineMeta.count} deals` : "";
+  $("dealsFreshness").textContent = `📄 Baseline file (site/data/deals-archive.json) last changed: ${baselineWhen}${baselineDetail}  ·  💻 This browser's local history last changed: ${fmtTs(dealsLocalUpdatedAt) || "never"}`;
   const fallbackWarning = distinctDays <= 2 ? `<div class="muted" style="font-size:11px;margin-bottom:6px;color:#f59e0b">⚠ Only ${distinctDays} day${distinctDays===1?"":"s"} of deal history stored in this browser, so the 3D/7D/…/1Y buttons have little to filter into yet. Use "Import history" above to backfill instantly from NSE's own CSV, or just keep visiting this tab — it grows by one real day every time.</div>` : "";
   $("dealsTable").innerHTML = fallbackWarning + (shown.length ? `<table><thead><tr>
     <th>Date</th><th style="text-align:left">Institution / client</th><th>Side</th><th>Stock</th><th>Qty</th><th>Avg price ₹</th><th>Value ₹ Cr</th><th>Type</th></tr></thead><tbody>` +

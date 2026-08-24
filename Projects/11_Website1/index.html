@@ -12,6 +12,7 @@
 <link rel="alternate icon" href="/favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" sizes="192x192" href="/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="preload" as="image" href="https://images.pexels.com/photos/325185/pexels-photo-325185.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop" fetchpriority="high">
 <title>NRI Finance Hub — Live Remittance Rates, Calculators & Guides for Indians Abroad</title>
 <meta name="description" content="NRI Finance Hub — 20+ free tools for Indians abroad: compare live remittance rates from 50+ providers, time transfers with Rate Timer, plan Study Abroad costs, calculate SIP, DTAA tax, home loan EMI, Return Corpus &amp; more. No sign-up. Trusted by NRIs in UAE, USA, UK, Canada, Singapore &amp; Australia."/>
 <meta name="keywords" content="NRI remittance rates 2026, best way to send money to India, NRE vs NRO account, NRI home loan calculator, NRI tax calculator, DTAA India, NRI return to India planner, NRI SIP calculator, NRE FD rates, NRI tax residency status, send money UAE to India, send money USA to India, Wise vs Remitly India"/>
@@ -35,7 +36,7 @@
 <!-- JSON-LD: WebSite + SearchAction -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/site.css?v=13.5"/>
 <script type="application/ld+json">
 {
@@ -273,7 +274,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.7</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.9</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -394,6 +395,7 @@ document.addEventListener('DOMContentLoaded',function(){
     <span class="jn-link" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📋 Tax Status</span>
     <span class="jn-link" onclick="showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">&#128179; Cards</span>
     <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📖 Guides</span>
+    <span class="jn-link" style="color:var(--amber);font-weight:800;border-color:rgba(240,165,32,0.3);background:rgba(240,165,32,0.08)" onclick="showTab('nrifi',document.querySelector('[data-tab=nrifi]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏆 FI Score</span>
   </div>
 </nav>
 
@@ -1036,6 +1038,11 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-item" data-tab="articles" onclick="showTab('articles',this)">
       <div class="drawer-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">NRI Finance Guides</div><div class="drawer-desc">Tax, banking, property &amp; more</div></div>
+    </div>
+    <div class="drawer-section-lbl">&#127942; My Score</div>
+    <div class="drawer-item" data-tab="nrifi" onclick="showTab('nrifi',this)">
+      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="drawer-info"><div class="drawer-name">NRI-FI Score</div><div class="drawer-desc">Your financial independence score · 2 min</div></div>
     </div>
     <div class="drawer-section-lbl">&#128200; Markets</div>
     <div class="drawer-item" data-tab="deals" onclick="showTab('deals',this);initDeals()">
@@ -3497,6 +3504,242 @@ document.addEventListener('DOMContentLoaded',function(){
   })();
   </script>
   </div>
+
+  <!-- TAB: NRI-FI SCORE ═══════════════════════════════════════════════════ -->
+  <div class="tool-section" id="tab-nrifi">
+    <div class="tab-section-bg tab-section-bg--nrifi">
+      <div class="fl-tab-bg-overlay"></div>
+      <div class="fl-tab-bg-inner" style="max-width:860px">
+        <div class="fl-tab-eyebrow" style="border-color:rgba(240,165,32,0.4);background:rgba(240,165,32,0.12);color:var(--amber)">&#127942; NRI Financial Intelligence</div>
+        <div class="fl-tab-headline">Your NRI-FI Score</div>
+        <div class="fl-tab-tagline">5 questions &middot; 2 minutes &middot; Know exactly where you stand financially as an NRI</div>
+        <div class="tab-tool-tile">
+
+          <!-- QUIZ PANEL -->
+          <div id="nrifi-quiz" class="card nrifi-card">
+            <div class="nrifi-progress">
+              <div class="nrifi-steps">
+                <div class="nrifi-step active" id="nrifi-dot-1">1</div>
+                <div class="nrifi-step-line"></div>
+                <div class="nrifi-step" id="nrifi-dot-2">2</div>
+                <div class="nrifi-step-line"></div>
+                <div class="nrifi-step" id="nrifi-dot-3">3</div>
+                <div class="nrifi-step-line"></div>
+                <div class="nrifi-step" id="nrifi-dot-4">4</div>
+                <div class="nrifi-step-line"></div>
+                <div class="nrifi-step" id="nrifi-dot-5">5</div>
+              </div>
+              <div class="nrifi-prog-labels">
+                <span>Remittance</span><span>Corpus</span><span>Investing</span><span>Return Plan</span><span>Tax</span>
+              </div>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="nrifi-step-panel" id="nrifi-s1">
+              <div class="nrifi-step-hd">&#128184; How do you send money to India?</div>
+              <div class="nrifi-qs">
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Which service do you mainly use?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s1q1" value="best"><span>Wise / Remitly / InstaReM / Remittance app</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s1q1" value="good"><span>Exchange house (Al Ansari, Lulu, Al Fardan&hellip;)</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s1q1" value="fair"><span>My bank&rsquo;s international transfer</span></label>
+                  </div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">How often do you compare rates before sending?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s1q2" value="always"><span>Always &mdash; I check before every transfer</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s1q2" value="sometimes"><span>Sometimes</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s1q2" value="never"><span>Rarely or never</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="nrifi-nav"><button class="btn btn-amber" onclick="nrifiNext(1)">Next &#8594;</button></div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="nrifi-step-panel" id="nrifi-s2" style="display:none">
+              <div class="nrifi-step-hd">&#127968; Your India savings &amp; corpus goal</div>
+              <div class="nrifi-qs">
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Target corpus for your India return (&#8377; Lakhs)</div>
+                  <input type="number" class="nrifi-input" id="n-target" placeholder="e.g. 200 &mdash; enter 0 if not set yet" min="0"/>
+                  <div class="nrifi-hint">Enter 0 if you haven&rsquo;t set a target yet</div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Current India savings + investments (&#8377; Lakhs)</div>
+                  <input type="number" class="nrifi-input" id="n-saved" placeholder="e.g. 45" min="0"/>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">What % of your monthly income do you save?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s2q3" value="30"><span>More than 30%</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s2q3" value="20"><span>20&ndash;30%</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s2q3" value="10"><span>10&ndash;20%</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s2q3" value="5"><span>Less than 10%</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="nrifi-nav">
+                <button class="btn btn-outline" onclick="nrifiBack(2)">&#8592; Back</button>
+                <button class="btn btn-amber" onclick="nrifiNext(2)">Next &#8594;</button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="nrifi-step-panel" id="nrifi-s3" style="display:none">
+              <div class="nrifi-step-hd">&#128200; Your India investments</div>
+              <div class="nrifi-qs">
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Do you invest in Indian mutual funds (SIP)?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s3q1" value="active"><span>Yes &mdash; I have an active SIP running</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s3q1" value="past"><span>I have past investments but no active SIP</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s3q1" value="no"><span>No mutual fund investments</span></label>
+                  </div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Do you have an NRE / NRO account?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s3q2" value="nre"><span>Yes, NRE account (tax-free repatriation) &#10003;</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s3q2" value="nro"><span>Yes, NRO account only</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s3q2" value="no"><span>No account yet</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="nrifi-nav">
+                <button class="btn btn-outline" onclick="nrifiBack(3)">&#8592; Back</button>
+                <button class="btn btn-amber" onclick="nrifiNext(3)">Next &#8594;</button>
+              </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="nrifi-step-panel" id="nrifi-s4" style="display:none">
+              <div class="nrifi-step-hd">&#128197; Your India return plan</div>
+              <div class="nrifi-qs">
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">When do you plan to return to India?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s4q1" value="2"><span>Within 2 years</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q1" value="5"><span>2&ndash;5 years</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q1" value="10"><span>5&ndash;10 years</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q1" value="0"><span>10+ years / No plan yet</span></label>
+                  </div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Are you on track to hit your corpus goal by then?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s4q2" value="ahead"><span>Yes, ahead of schedule</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q2" value="track"><span>Roughly on track</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q2" value="behind"><span>Behind, but catching up</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s4q2" value="unsure"><span>Not sure / no plan yet</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="nrifi-nav">
+                <button class="btn btn-outline" onclick="nrifiBack(4)">&#8592; Back</button>
+                <button class="btn btn-amber" onclick="nrifiNext(4)">Next &#8594;</button>
+              </div>
+            </div>
+
+            <!-- STEP 5 -->
+            <div class="nrifi-step-panel" id="nrifi-s5" style="display:none">
+              <div class="nrifi-step-hd">&#129534; Tax &amp; compliance</div>
+              <div class="nrifi-qs">
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Do you file Indian Income Tax Return (ITR)?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s5q1" value="yes"><span>Yes, every year</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q1" value="sometimes"><span>Sometimes</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q1" value="no"><span>No</span></label>
+                  </div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Do you know and use your DTAA tax treaty benefits?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s5q2" value="use"><span>Yes &mdash; I actively claim DTAA benefits</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q2" value="know"><span>I know about it but haven&rsquo;t claimed</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q2" value="no"><span>Not familiar with DTAA</span></label>
+                  </div>
+                </div>
+                <div class="nrifi-q">
+                  <div class="nrifi-ql">Do you have a SEBI-registered financial advisor?</div>
+                  <div class="nrifi-opts">
+                    <label class="nrifi-opt"><input type="radio" name="s5q3" value="yes"><span>Yes</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q3" value="plan"><span>No, but planning to get one</span></label>
+                    <label class="nrifi-opt"><input type="radio" name="s5q3" value="no"><span>No</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="nrifi-nav">
+                <button class="btn btn-outline" onclick="nrifiBack(5)">&#8592; Back</button>
+                <button class="btn btn-amber" style="padding:11px 26px" onclick="nrifiCalc()">Calculate My Score &#8594;</button>
+              </div>
+            </div>
+          </div><!-- /nrifi-quiz -->
+
+          <!-- RESULT PANEL -->
+          <div id="nrifi-result" style="display:none">
+            <div class="nrifi-result-grid">
+
+              <!-- Score Gauge Card -->
+              <div class="card nrifi-score-card">
+                <div class="nrifi-gauge-wrap">
+                  <svg viewBox="0 0 200 120" class="nrifi-gauge">
+                    <defs>
+                      <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ef4444"/>
+                        <stop offset="45%" stop-color="#f0a520"/>
+                        <stop offset="100%" stop-color="#22c55e"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M 20,100 A 80,80 0 0 1 180,100" stroke="rgba(255,255,255,0.07)" stroke-width="14" fill="none" stroke-linecap="round"/>
+                    <path id="nrifi-arc" d="M 20,100 A 80,80 0 0 1 180,100" stroke="url(#gGrad)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251" style="transition:stroke-dashoffset 1.3s cubic-bezier(0.4,0,0.2,1)"/>
+                    <text x="100" y="85" text-anchor="middle" fill="white" font-size="36" font-weight="800" id="nrifi-num">0</text>
+                    <text x="100" y="103" text-anchor="middle" fill="#f0a520" font-size="10" font-weight="700" letter-spacing="1" id="nrifi-tier-svg">&#8212;</text>
+                  </svg>
+                </div>
+                <div class="nrifi-score-label" id="nrifi-tier-label">&mdash;</div>
+                <div class="nrifi-score-sub" id="nrifi-score-sub">&mdash;</div>
+                <button class="btn btn-outline nrifi-retake-btn" onclick="nrifiRetake()">&#8635; Retake Quiz</button>
+              </div>
+
+              <!-- Dimension Bars Card -->
+              <div class="card nrifi-dims-card">
+                <div class="nrifi-dims-hd">Score Breakdown</div>
+                <div class="nrifi-dim" id="nd-remit"></div>
+                <div class="nrifi-dim" id="nd-corpus"></div>
+                <div class="nrifi-dim" id="nd-invest"></div>
+                <div class="nrifi-dim" id="nd-return"></div>
+                <div class="nrifi-dim" id="nd-tax"></div>
+              </div>
+
+            </div><!-- /nrifi-result-grid -->
+
+            <!-- Action Cards -->
+            <div class="nrifi-actions" id="nrifi-actions"></div>
+
+            <!-- Share -->
+            <div class="nrifi-share-wrap">
+              <button class="nrifi-share-btn" onclick="nrifiShare()">&#128240; Share My Score</button>
+              <div id="nrifi-share-card" class="nrifi-share-card" style="display:none">
+                <div class="nsc-logo">NRI Finance Hub</div>
+                <div class="nsc-title">My NRI-FI Score</div>
+                <div class="nsc-score" id="nsc-score-val">—</div>
+                <div class="nsc-tier" id="nsc-tier-val">—</div>
+                <div class="nsc-url">nrifinancehub.com</div>
+                <div class="nsc-hint">Screenshot &amp; share to WhatsApp / Instagram</div>
+              </div>
+            </div>
+
+            <div class="info" style="margin-top:12px">&#128161; Score is self-reported and for personal awareness only. Not financial advice. Consult a SEBI-RIA for personalised guidance.</div>
+          </div><!-- /nrifi-result -->
+
+        </div><!-- /tab-tool-tile -->
+      </div>
+    </div>
+  </div><!-- /tab-nrifi -->
 
 </div><!-- /.main -->
 

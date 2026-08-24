@@ -1,20 +1,23 @@
-/* v13.7 */
+/* v13.9 */
 
 /* ══════════════════════════════════════════════════
-   DESIGN SYSTEM  – NRI Finance Hub (Modern)
+   DESIGN SYSTEM  – NRI Finance Hub (UI/UX Pro Max)
+   Style: Minimalism & Swiss · Font: IBM Plex Sans
+   Palette: Dark navy + Gold + Purple accent
 ══════════════════════════════════════════════════ */
 :root{
-  --bg:#05080f;
-  --surface:#0b0f1e;
-  --card:#0f1526;
-  --elevated:#141929;
-  --border:rgba(255,255,255,0.07);
-  --border2:rgba(255,255,255,0.12);
-  --text:#f4f6ff;
-  --text2:#bbc4dc;
-  --muted:rgba(255,255,255,0.45);
-  --amber:#f0a520;--amber-light:#fbbf24;
-  --amber-dim:rgba(240,165,32,0.1);--amber-glow:rgba(240,165,32,0.3);
+  --bg:#0f172a;
+  --surface:#141e33;
+  --card:#1e2a45;
+  --elevated:#263352;
+  --border:rgba(51,65,85,0.7);
+  --border2:rgba(51,65,85,1);
+  --text:#f8fafc;
+  --text2:#94a3b8;
+  --muted:rgba(248,250,252,0.45);
+  --amber:#f59e0b;--amber-light:#fbbf24;
+  --amber-dim:rgba(245,158,11,0.12);--amber-glow:rgba(245,158,11,0.3);
+  --purple:#8b5cf6;--purple-dim:rgba(139,92,246,0.12);--purple-glow:rgba(139,92,246,0.3);
   --teal:#00cdb0;--teal-dim:rgba(0,205,176,0.1);
   --green:#22d39a;--green-dim:rgba(34,211,154,0.1);
   --red:#f56570;--red-dim:rgba(245,101,112,0.1);
@@ -23,7 +26,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 a{text-decoration:none;color:inherit;}
 button{font-family:inherit;cursor:pointer;}
 input,select{font-family:inherit;}
@@ -39,7 +42,7 @@ input,select{font-family:inherit;}
 @keyframes eyebrowPulse{0%,100%{border-color:rgba(240,165,32,0.3);box-shadow:0 0 0 rgba(240,165,32,0);}50%{border-color:rgba(240,165,32,0.7);box-shadow:0 0 14px rgba(240,165,32,0.22);}}
 
 /* ── NAV ──────────────────────────────────────── */
-nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,8,15,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(15,23,42,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
 .nav-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#f0a520,#c97c0a);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(240,165,32,0.35);flex-shrink:0;}
 .nav-logo-mark svg{width:16px;height:16px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
@@ -2762,3 +2765,86 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
   .rate-summary-label{white-space:nowrap;font-size:9px;}
 }
 /* ══ END RATE CARD TIER VIEW ════════════════════════════════════════════════ */
+
+/* ══ NRI-FI SCORE (v13.8) ════════════════════════════════════════════════════ */
+.tab-section-bg--nrifi{background-image:url('https://images.pexels.com/photos/3943716/pexels-photo-3943716.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop');background-position:center 30%;}
+
+/* Quiz card */
+.nrifi-card{padding:26px 30px;max-width:680px;margin:0 auto;}
+
+/* Step progress bar */
+.nrifi-progress{margin-bottom:24px;}
+.nrifi-steps{display:flex;align-items:center;gap:0;margin-bottom:8px;}
+.nrifi-step{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--elevated);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .25s;flex-shrink:0;z-index:1;}
+.nrifi-step.active{border-color:var(--amber);background:var(--amber);color:#000;}
+.nrifi-step.done{border-color:var(--green);background:var(--green);color:#000;}
+.nrifi-step-line{flex:1;height:2px;background:var(--border);}
+.nrifi-prog-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.3px;padding:0 4px;}
+
+/* Step panels */
+.nrifi-step-hd{font-size:18px;font-weight:800;color:var(--text);margin-bottom:20px;letter-spacing:-.3px;}
+.nrifi-qs{display:flex;flex-direction:column;gap:18px;margin-bottom:22px;}
+.nrifi-ql{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:9px;}
+.nrifi-opts{display:flex;flex-direction:column;gap:7px;}
+.nrifi-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text2);line-height:1.4;}
+.nrifi-opt:hover{border-color:var(--border2);color:var(--text);}
+.nrifi-opt input[type=radio]{accent-color:var(--amber);width:15px;height:15px;flex-shrink:0;cursor:pointer;}
+.nrifi-opt:has(input:checked){border-color:var(--amber);background:rgba(240,165,32,0.09);color:var(--text);}
+.nrifi-input{width:100%;background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:15px;font-weight:700;color:var(--text);box-sizing:border-box;margin-top:2px;}
+.nrifi-input:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(240,165,32,0.12);}
+.nrifi-hint{font-size:11px;color:var(--muted);margin-top:5px;}
+.nrifi-nav{display:flex;gap:10px;justify-content:flex-end;}
+.nrifi-nav .btn{padding:10px 22px;font-size:13px;font-weight:700;}
+
+/* Result layout */
+.nrifi-result-grid{display:grid;grid-template-columns:230px 1fr;gap:16px;margin-bottom:14px;}
+
+/* Score gauge card */
+.nrifi-score-card{padding:22px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;}
+.nrifi-gauge-wrap{width:185px;}
+.nrifi-gauge{width:100%;display:block;filter:drop-shadow(0 0 18px rgba(240,165,32,0.18));}
+.nrifi-score-label{font-size:17px;font-weight:900;letter-spacing:.8px;margin-top:2px;}
+.nrifi-score-sub{font-size:12px;color:var(--muted);line-height:1.55;max-width:180px;}
+.nrifi-retake-btn{font-size:11px;padding:6px 16px;margin-top:4px;}
+
+/* Dimension bars card */
+.nrifi-dims-card{padding:20px 22px;}
+.nrifi-dims-hd{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;margin-bottom:16px;}
+.nrifi-dim{margin-bottom:14px;}
+.nrifi-dim:last-child{margin-bottom:0;}
+.nrifi-dim-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.nrifi-dim-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.nrifi-dim-name{font-size:12px;font-weight:700;color:var(--text2);flex:1;}
+.nrifi-dim-score{font-size:12px;font-weight:800;color:var(--text);white-space:nowrap;}
+.nrifi-dim-bar-wrap{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.nrifi-dim-bar{height:100%;border-radius:3px;width:0;transition:width 1s ease;}
+
+/* Action cards */
+.nrifi-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:14px;}
+.nrifi-action-card{background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:13px;padding:14px 16px;}
+.nrifi-action-priority{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--amber);margin-bottom:6px;}
+.nrifi-action-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:5px;line-height:1.35;}
+.nrifi-action-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+.nrifi-action-link{font-size:12px;color:var(--amber);font-weight:700;cursor:pointer;margin-top:8px;display:inline-block;text-decoration:none;}
+.nrifi-action-link:hover{text-decoration:underline;}
+
+/* Share */
+.nrifi-share-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:14px;}
+.nrifi-share-btn{background:linear-gradient(135deg,#25d366,#128c7e);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;padding:11px 26px;cursor:pointer;transition:opacity .15s;}
+.nrifi-share-btn:hover{opacity:.9;}
+.nrifi-share-card{background:linear-gradient(145deg,#0a0f1e 0%,#0f172a 100%);border:2px solid var(--amber);border-radius:18px;padding:28px 36px;text-align:center;min-width:240px;box-shadow:0 0 40px rgba(240,165,32,0.15);}
+.nsc-logo{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.nsc-title{font-size:13px;color:var(--text2);margin-bottom:6px;}
+.nsc-score{font-size:64px;font-weight:900;color:var(--amber);line-height:1;margin-bottom:4px;letter-spacing:-2px;}
+.nsc-tier{font-size:15px;font-weight:800;letter-spacing:1.5px;margin-bottom:16px;}
+.nsc-url{font-size:11px;color:var(--muted);}
+.nsc-hint{font-size:10px;color:rgba(255,255,255,0.25);margin-top:8px;}
+
+/* Responsive */
+@media(max-width:680px){
+  .nrifi-result-grid{grid-template-columns:1fr;}
+  .nrifi-gauge-wrap{width:160px;}
+  .nrifi-card{padding:18px 16px;}
+  .nrifi-step-hd{font-size:15px;}
+}
+/* ══ END NRI-FI SCORE ════════════════════════════════════════════════════════ */

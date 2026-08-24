@@ -6233,3 +6233,173 @@ document.addEventListener('DOMContentLoaded',function(){
 })();
 /* ── END EDUCATION EXTRA TOOLS ─────────────────────────────────────────── */
 
+// ── NRI-FI SCORE ─────────────────────────────────────────────────────────
+var _nrifi={d1:0,d2:0,d3:0,d4:0,d5:0,total:0};
+
+function nrifiNext(step){
+  var ok=true;
+  if(step===1){
+    ok=!!(document.querySelector('input[name="s1q1"]:checked')&&document.querySelector('input[name="s1q2"]:checked'));
+  } else if(step===2){
+    var t=document.getElementById('n-target').value;
+    var s=document.getElementById('n-saved').value;
+    ok=t!==''&&s!==''&&!!document.querySelector('input[name="s2q3"]:checked');
+  } else if(step===3){
+    ok=!!(document.querySelector('input[name="s3q1"]:checked')&&document.querySelector('input[name="s3q2"]:checked'));
+  } else if(step===4){
+    ok=!!(document.querySelector('input[name="s4q1"]:checked')&&document.querySelector('input[name="s4q2"]:checked'));
+  }
+  if(!ok){alert('Please answer all questions to continue.');return;}
+  document.getElementById('nrifi-s'+step).style.display='none';
+  document.getElementById('nrifi-s'+(step+1)).style.display='';
+  var d=document.getElementById('nrifi-dot-'+step);
+  if(d){d.classList.remove('active');d.classList.add('done');}
+  var nd=document.getElementById('nrifi-dot-'+(step+1));
+  if(nd)nd.classList.add('active');
+}
+
+function nrifiBack(step){
+  document.getElementById('nrifi-s'+step).style.display='none';
+  document.getElementById('nrifi-s'+(step-1)).style.display='';
+  var d=document.getElementById('nrifi-dot-'+step);
+  if(d)d.classList.remove('active');
+  var pd=document.getElementById('nrifi-dot-'+(step-1));
+  if(pd){pd.classList.remove('done');pd.classList.add('active');}
+}
+
+function nrifiCalc(){
+  if(!document.querySelector('input[name="s5q1"]:checked')||!document.querySelector('input[name="s5q2"]:checked')||!document.querySelector('input[name="s5q3"]:checked')){
+    alert('Please answer all questions to calculate your score.');return;
+  }
+  // D1: Remittance (max 20)
+  var prov=document.querySelector('input[name="s1q1"]:checked').value;
+  var cmp=document.querySelector('input[name="s1q2"]:checked').value;
+  var d1=(prov==='best'?8:prov==='good'?5:2)+(cmp==='always'?12:cmp==='sometimes'?7:2);
+
+  // D2: Corpus (max 25)
+  var target=parseFloat(document.getElementById('n-target').value)||0;
+  var saved=parseFloat(document.getElementById('n-saved').value)||0;
+  var savRate=parseInt(document.querySelector('input[name="s2q3"]:checked').value);
+  var corpPts=target>0?(5+Math.round(Math.min(saved/target,1)*(target>0?16:0))):3;
+  if(target>0){var pct=Math.min(saved/target,1);corpPts=5+(pct>=0.8?16:pct>=0.6?13:pct>=0.4?10:pct>=0.2?7:4);}
+  var savPts=savRate>=30?4:savRate>=20?3:savRate>=10?2:1;
+  var d2=Math.min(corpPts+savPts,25);
+
+  // D3: Investing (max 20)
+  var sip=document.querySelector('input[name="s3q1"]:checked').value;
+  var acct=document.querySelector('input[name="s3q2"]:checked').value;
+  var d3=(sip==='active'?12:sip==='past'?6:0)+(acct==='nre'?8:acct==='nro'?4:0);
+
+  // D4: Return Plan (max 20)
+  var when=document.querySelector('input[name="s4q1"]:checked').value;
+  var track=document.querySelector('input[name="s4q2"]:checked').value;
+  var whenPts=when==='0'?2:5;
+  var trackPts=track==='ahead'?15:track==='track'?11:track==='behind'?6:3;
+  var d4=Math.min(whenPts+trackPts,20);
+
+  // D5: Tax (max 15)
+  var itr=document.querySelector('input[name="s5q1"]:checked').value;
+  var dtaa=document.querySelector('input[name="s5q2"]:checked').value;
+  var ria=document.querySelector('input[name="s5q3"]:checked').value;
+  var d5=(itr==='yes'?5:itr==='sometimes'?3:0)+(dtaa==='use'?5:dtaa==='know'?3:0)+(ria==='yes'?5:ria==='plan'?2:0);
+
+  var total=d1+d2+d3+d4+d5;
+  _nrifi={d1:d1,d2:d2,d3:d3,d4:d4,d5:d5,total:total};
+
+  document.getElementById('nrifi-quiz').style.display='none';
+  document.getElementById('nrifi-result').style.display='';
+  nrifiRender(total,d1,d2,d3,d4,d5);
+}
+
+function nrifiTier(score){
+  if(score>=80)return{label:'FINANCIALLY FREE',color:'#22c55e',sub:'Top tier. Your NRI finances are well-optimised across all 5 dimensions.'};
+  if(score>=65)return{label:'ON TRACK',color:'#4ade80',sub:'Strong foundation. A few targeted moves could push you to the top tier.'};
+  if(score>=45)return{label:'BUILDING',color:'#f0a520',sub:'Good start, but key gaps need attention before your India return.'};
+  if(score>=25)return{label:'AT RISK',color:'#f97316',sub:'Multiple areas need focus to secure your long-term financial plan.'};
+  return{label:'CRITICAL',color:'#ef4444',sub:'Fundamental gaps across your NRI financial plan. Start with one step today.'};
+}
+
+function nrifiRender(total,d1,d2,d3,d4,d5){
+  var tier=nrifiTier(total);
+  // Animate gauge
+  setTimeout(function(){
+    var arc=document.getElementById('nrifi-arc');
+    if(arc)arc.style.strokeDashoffset=(251*(1-total/100)).toFixed(2);
+    // Count up number
+    var el=document.getElementById('nrifi-num');
+    var n=0;
+    var iv=setInterval(function(){
+      n+=Math.max(1,Math.ceil((total-n)/6));
+      if(n>=total){n=total;clearInterval(iv);}
+      if(el)el.textContent=n;
+    },18);
+    var ts=document.getElementById('nrifi-tier-svg');
+    if(ts)ts.textContent=tier.label;
+  },80);
+
+  var lbl=document.getElementById('nrifi-tier-label');
+  if(lbl){lbl.textContent=tier.label;lbl.style.color=tier.color;}
+  var sub=document.getElementById('nrifi-score-sub');
+  if(sub)sub.textContent=tier.sub;
+
+  // Dimension bars
+  var dims=[
+    {id:'nd-remit',icon:'💸',name:'Remittance Efficiency',score:d1,max:20},
+    {id:'nd-corpus',icon:'🏦',name:'Corpus Progress',score:d2,max:25},
+    {id:'nd-invest',icon:'📈',name:'India Investing',score:d3,max:20},
+    {id:'nd-return',icon:'🗓',name:'Return Plan',score:d4,max:20},
+    {id:'nd-tax',icon:'🧾',name:'Tax & Compliance',score:d5,max:15}
+  ];
+  dims.forEach(function(d){
+    var pct=Math.round(d.score/d.max*100);
+    var col=pct>=75?'#22c55e':pct>=50?'#f0a520':'#ef4444';
+    var el=document.getElementById(d.id);
+    if(!el)return;
+    el.innerHTML='<div class="nrifi-dim-row"><span class="nrifi-dim-icon">'+d.icon+'</span><span class="nrifi-dim-name">'+d.name+'</span><span class="nrifi-dim-score" style="color:'+col+'">'+d.score+'/'+d.max+'</span></div><div class="nrifi-dim-bar-wrap"><div class="nrifi-dim-bar" style="background:'+col+'"></div></div>';
+    setTimeout(function(){var bar=el.querySelector('.nrifi-dim-bar');if(bar)bar.style.width=pct+'%';},250);
+  });
+
+  // Action recommendations
+  var actions=[];
+  if(d1<12)actions.push({priority:'QUICK WIN',title:'Switch to a smarter remittance service',desc:'Using Wise, Remitly or InstaReM and comparing before each transfer can save ₹500–₹2,000 per month.',link:'👉 Compare rates now',tab:'rates'});
+  if(d2<15)actions.push({priority:'CRITICAL GAP',title:'Set a corpus target and track progress',desc:'Without a clear number, you can\'t know if you\'re on track. Use the Return Planner to calculate exactly what you need.',link:'👉 Open Return Planner',tab:'return'});
+  if(d3<12)actions.push({priority:'WEALTH GAP',title:'Start or revive your India SIP',desc:'Even ₹15,000/month at 12% for 10 years grows to ₹50L. NRE account makes your returns fully tax-free.',link:'👉 Try SIP Calculator',tab:'invest'});
+  if(d4<12)actions.push({priority:'PLAN MISSING',title:'Build your India return plan',desc:'Knowing your return date lets you reverse-engineer your savings. Most NRIs delay this — don\'t.',link:'👉 Plan My Return',tab:'return'});
+  if(d5<9)actions.push({priority:'TAX LEAK',title:'Claim DTAA benefits and file ITR',desc:'Most NRIs overpay tax by not claiming DTAA treaty exemptions. Filing ITR is mandatory if India income exceeds ₹2.5L.',link:'👉 Check DTAA Calculator',tab:'dtaa'});
+
+  var actEl=document.getElementById('nrifi-actions');
+  var top=actions.slice(0,3);
+  if(actEl)actEl.innerHTML=top.length?top.map(function(a){
+    return '<div class="nrifi-action-card"><div class="nrifi-action-priority">'+a.priority+'</div><div class="nrifi-action-title">'+a.title+'</div><div class="nrifi-action-desc">'+a.desc+'</div><span class="nrifi-action-link" onclick="showTab(\''+a.tab+'\',document.querySelector(\'[data-tab='+a.tab+']\'))">'+a.link+'</span></div>';
+  }).join(''):'<div class="nrifi-action-card" style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">🏆</div><div style="font-weight:800;color:var(--green);font-size:15px">Excellent score! No major gaps found.</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Keep up the disciplined approach to your NRI finances.</div></div>';
+
+  // Share card
+  var sv=document.getElementById('nsc-score-val');
+  var tv=document.getElementById('nsc-tier-val');
+  if(sv)sv.textContent=total;
+  if(tv){tv.textContent=tier.label;tv.style.color=tier.color;}
+}
+
+function nrifiShare(){
+  var card=document.getElementById('nrifi-share-card');
+  if(card)card.style.display=card.style.display==='none'?'block':'none';
+}
+
+function nrifiRetake(){
+  document.getElementById('nrifi-result').style.display='none';
+  document.getElementById('nrifi-quiz').style.display='';
+  for(var i=1;i<=5;i++){
+    var s=document.getElementById('nrifi-s'+i);
+    var dot=document.getElementById('nrifi-dot-'+i);
+    if(s)s.style.display=i===1?'':'none';
+    if(dot){dot.classList.remove('active','done');if(i===1)dot.classList.add('active');}
+  }
+  document.querySelectorAll('#nrifi-quiz input[type=radio]').forEach(function(r){r.checked=false;});
+  document.querySelectorAll('#nrifi-quiz input[type=number]').forEach(function(n){n.value='';});
+  var arc=document.getElementById('nrifi-arc');
+  if(arc)arc.style.strokeDashoffset='251';
+  var num=document.getElementById('nrifi-num');
+  if(num)num.textContent='0';
+}
+// ── END NRI-FI SCORE ─────────────────────────────────────────────────────
+
