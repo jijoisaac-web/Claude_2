@@ -2461,8 +2461,10 @@ function jumpTo(id){
 }
 (function(){
   let ticking=false;
-  // tab name → jn-link index mapping
-  const tabOrder=['rates','nrenro','realty','dtaa','return','invest','articles'];
+  // pathway card tab mapping
+  const moveTabsSet=new Set(['rates','timer']);
+  const manageTabsSet=new Set(['nrenro','invest','dtaa','taxres','homeloan','realty','proptds','epf','panaadhaar','budget','cards']);
+  const planTabsSet=new Set(['return','nrifi','edplan','edabroad']);
   window.addEventListener('scroll',function(){
     if(ticking)return;
     ticking=true;
@@ -2470,13 +2472,13 @@ function jumpTo(id){
       const jn=document.getElementById('jumpNav');
       if(!jn){ticking=false;return;}
       jn.style.display=window.scrollY>300?'block':'none';
-      // highlight jn-link matching the active tab
+      // highlight pathway card matching the active tab
       const activeTab=document.querySelector('.drawer-item.active');
       const activeTabName=activeTab?activeTab.getAttribute('data-tab'):'';
-      const links=jn.querySelectorAll('.jn-link');
-      links.forEach((l,i)=>{
-        l.classList.toggle('active',tabOrder[i]===activeTabName);
-      });
+      const cards=jn.querySelectorAll('.pathway-card');
+      if(cards[0])cards[0].classList.toggle('active',moveTabsSet.has(activeTabName));
+      if(cards[1])cards[1].classList.toggle('active',manageTabsSet.has(activeTabName));
+      if(cards[2])cards[2].classList.toggle('active',planTabsSet.has(activeTabName));
       ticking=false;
     });
   },{passive:true});

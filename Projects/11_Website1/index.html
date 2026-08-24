@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <span>For Indians working abroad</span>
     </div>
   </a>
-  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v13.9</span>
+  <span style="font-size:9px;color:rgba(255,255,255,0.22);font-weight:500;letter-spacing:.05em;margin-left:4px;align-self:flex-end;padding-bottom:5px;" class="hide-1380">v14.0</span>
   <div class="nav-links-center">
     <div class="nav-dropdown-wrap">
       <a class="nav-dd-trigger" onclick="toggleNavDD('dd-rates')">📡 Live Rates ▾</a>
@@ -383,19 +383,31 @@ document.addEventListener('DOMContentLoaded',function(){
      JUMP NAV (sticky section links)
 ══════════════════════════════════════════════ -->
 <nav id="jumpNav">
-  <div style="display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;">
-    <span class="jn-link" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">💸 Remittance</span>
-    <span class="jn-link" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏦 Banking</span>
-    <span class="jn-link" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏠 Property</span>
-    <span class="jn-link" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🛡 Tax</span>
-    <span class="jn-link" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🗓 Return Plan</span>
-    <span class="jn-link" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📈 Invest</span>
-    <span class="jn-link" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏗 Home Loan</span>
-    <span class="jn-link" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🎓 Education</span>
-    <span class="jn-link" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📋 Tax Status</span>
-    <span class="jn-link" onclick="showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">&#128179; Cards</span>
-    <span class="jn-link" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">📖 Guides</span>
-    <span class="jn-link" style="color:var(--amber);font-weight:800;border-color:rgba(240,165,32,0.3);background:rgba(240,165,32,0.08)" onclick="showTab('nrifi',document.querySelector('[data-tab=nrifi]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">🏆 FI Score</span>
+  <div class="pathway-row">
+    <div class="pathway-card pathway-card--move" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+      <div class="pathway-icon pathway-icon--move">&#x1F4B8;</div>
+      <div class="pathway-info">
+        <div class="pathway-label">Move Money</div>
+        <div class="pathway-sub">Rates &middot; Timer &middot; 50+ providers</div>
+      </div>
+      <span class="pathway-arrow">&#8594;</span>
+    </div>
+    <div class="pathway-card pathway-card--manage" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+      <div class="pathway-icon pathway-icon--manage">&#x1F4CA;</div>
+      <div class="pathway-info">
+        <div class="pathway-label">Manage Finances</div>
+        <div class="pathway-sub">Tax &middot; Banking &middot; Property &middot; Invest</div>
+      </div>
+      <span class="pathway-arrow">&#8594;</span>
+    </div>
+    <div class="pathway-card pathway-card--plan" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+      <div class="pathway-icon pathway-icon--plan">&#x1F5D3;</div>
+      <div class="pathway-info">
+        <div class="pathway-label">Plan Your Return</div>
+        <div class="pathway-sub">Corpus &middot; FI Score &middot; Education</div>
+      </div>
+      <span class="pathway-arrow">&#8594;</span>
+    </div>
   </div>
 </nav>
 
@@ -447,9 +459,9 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="hero-stat-item"><span class="hero-stat-num">100%</span><span class="hero-stat-lbl">Free</span></div>
     </div>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
-        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 5.62 5.62l.97-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 16"/><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Check Flights
+      <button class="btn-primary" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Compare Rates
       </button>
       <button class="btn-ghost" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
         <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -940,6 +952,118 @@ document.addEventListener('DOMContentLoaded',function(){
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     ALL TOOLS DISCOVERY GRID
+══════════════════════════════════════════════ -->
+<section class="all-tools-section" id="allToolsSection">
+  <div class="all-tools-inner">
+    <div class="all-tools-hd">
+      <div class="all-tools-title">All Tools</div>
+      <div class="all-tools-sub">21 free tools &mdash; no sign-up, no login</div>
+    </div>
+
+    <div class="all-tools-group">
+      <div class="all-tools-group-lbl">&#x1F4B8; Move Money</div>
+      <div class="all-tools-grid">
+        <div class="at-card" onclick="showTab('rates',document.querySelector('[data-tab=rates]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--amber-dim)">&#x1F4B1;</div>
+          <div class="at-info"><div class="at-name">Compare Rates</div><div class="at-desc">50+ providers live</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('timer',document.querySelector('[data-tab=timer]'));initRateTimer();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--amber-dim)">&#x23F1;</div>
+          <div class="at-info"><div class="at-name">Rate Timer</div><div class="at-desc">Time your transfer</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="all-tools-group">
+      <div class="all-tools-group-lbl">&#x1F4CA; Manage Finances</div>
+      <div class="all-tools-grid">
+        <div class="at-card" onclick="showTab('nrenro',document.querySelector('[data-tab=nrenro]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F3E6;</div>
+          <div class="at-info"><div class="at-name">NRE / NRO</div><div class="at-desc">Banking guide &amp; rates</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('invest',document.querySelector('[data-tab=invest]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F4C8;</div>
+          <div class="at-info"><div class="at-name">SIP / SWP</div><div class="at-desc">Investment calculator</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('dtaa',document.querySelector('[data-tab=dtaa]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F6E1;</div>
+          <div class="at-info"><div class="at-name">DTAA Tax</div><div class="at-desc">Avoid double taxation</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('taxres',document.querySelector('[data-tab=taxres]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F4CB;</div>
+          <div class="at-info"><div class="at-name">Tax Residency</div><div class="at-desc">RNOR / NRI status</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('homeloan',document.querySelector('[data-tab=homeloan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F3E1;</div>
+          <div class="at-info"><div class="at-name">Home Loan EMI</div><div class="at-desc">NRI loan rates</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('realty',document.querySelector('[data-tab=realty]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F3D7;</div>
+          <div class="at-info"><div class="at-name">Real Estate ROI</div><div class="at-desc">Property returns</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('proptds',document.querySelector('[data-tab=proptds]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F3E0;</div>
+          <div class="at-info"><div class="at-name">Property TDS</div><div class="at-desc">TDS on sale proceeds</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('epf',document.querySelector('[data-tab=epf]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F4BC;</div>
+          <div class="at-info"><div class="at-name">EPF Withdrawal</div><div class="at-desc">PF balance &amp; tax</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('panaadhaar',document.querySelector('[data-tab=panaadhaar]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1FAA6;</div>
+          <div class="at-info"><div class="at-name">PAN / Aadhaar</div><div class="at-desc">NRI identity guide</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('budget',document.querySelector('[data-tab=budget]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F4D3;</div>
+          <div class="at-info"><div class="at-name">Budget Tracker</div><div class="at-desc">Dual-currency budget</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('cards',document.querySelector('[data-tab=cards]'));initCards();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--purple-dim)">&#x1F4B3;</div>
+          <div class="at-info"><div class="at-name">Credit Cards</div><div class="at-desc">NRI card comparison</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="all-tools-group">
+      <div class="all-tools-group-lbl">&#x1F5D3; Plan Your Future</div>
+      <div class="all-tools-grid">
+        <div class="at-card" onclick="showTab('return',document.querySelector('[data-tab=return]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--green-dim)">&#x1F5D3;</div>
+          <div class="at-info"><div class="at-name">Return Plan</div><div class="at-desc">India return corpus</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('nrifi',document.querySelector('[data-tab=nrifi]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--green-dim)">&#x1F3C6;</div>
+          <div class="at-info"><div class="at-name">FI Score</div><div class="at-desc">Financial independence</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('edplan',document.querySelector('[data-tab=edplan]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--green-dim)">&#x1F393;</div>
+          <div class="at-info"><div class="at-name">Education Plan</div><div class="at-desc">Kids&apos; education corpus</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('edabroad',document.querySelector('[data-tab=edabroad]'));initEdAbroad();(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--green-dim)">&#x2708;</div>
+          <div class="at-info"><div class="at-name">Study Abroad</div><div class="at-desc">Cost planner</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="all-tools-group" style="margin-bottom:0">
+      <div class="all-tools-group-lbl">&#x2708; Travel &amp; Guides</div>
+      <div class="all-tools-grid">
+        <div class="at-card" onclick="showTab('flights',document.querySelector('[data-tab=flights]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--teal-dim)">&#x2708;</div>
+          <div class="at-info"><div class="at-name">Best Flight Dates</div><div class="at-desc">Cheapest windows</div></div>
+        </div>
+        <div class="at-card" onclick="showTab('articles',document.querySelector('[data-tab=articles]'));(function(){var m=document.querySelector('.main');if(m)window.scrollTo({top:m.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});})()">
+          <div class="at-icon" style="background:var(--teal-dim)">&#x1F4D6;</div>
+          <div class="at-info"><div class="at-name">NRI Guides</div><div class="at-desc">Finance articles</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- MAIN -->
 <div class="main">
   <!-- LEFT DRAWER -->
@@ -1018,11 +1142,6 @@ document.addEventListener('DOMContentLoaded',function(){
     <div class="drawer-item" data-tab="edabroad" onclick="showTab('edabroad',this);initEdAbroad()">
       <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M2 20c0-4 4.5-7 10-7s10 3 10 7"/><line x1="18" y1="2" x2="18" y2="8"/><line x1="15" y1="5" x2="21" y2="5"/></svg></div>
       <div class="drawer-info"><div class="drawer-name">Study Abroad Planner</div><div class="drawer-desc">University costs &amp; savings plan</div></div>
-    </div>
-    <div class="drawer-section-lbl">Travel</div>
-    <div class="drawer-item" data-tab="flights" onclick="showTab('flights',this)">
-      <div class="drawer-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.4-.8.9l.6 3.1c.1.5.5.8 1 .9L8 11l-1 3H4l-1 1 3 2 2 3 1-1V15l3-1 .1 3.5c.1.5.4.9.9 1l3.1.6c.5.1 1-.3.9-.8z"/></svg></div>
-      <div class="drawer-info"><div class="drawer-name">Flights to India</div><div class="drawer-desc">Fare ranges &amp; best booking sites</div></div>
     </div>
     <div class="drawer-section-lbl">Budgeting</div>
     <div class="drawer-item" data-tab="budget" onclick="showTab('budget',this)">

@@ -506,9 +506,41 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hl-lead-inp{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;box-sizing:border-box;font-family:inherit;}
 .hl-lead-inp:focus{outline:none;border-color:var(--amber);}
 /* jump nav */
-#jumpNav{display:none;position:sticky;top:64px;z-index:90;background:rgba(5,8,15,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;}
-.jn-link{flex-shrink:0;font-size:12px;font-weight:600;color:var(--muted);padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;}
-.jn-link:hover,.jn-link.active{color:var(--teal);border-bottom-color:var(--teal);}
+/* ── PATHWAY NAV (replaces jump nav pills) ── */
+#jumpNav{display:none;position:sticky;top:64px;z-index:90;background:rgba(15,23,42,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0;}
+.pathway-row{display:flex;max-width:100%;margin:0 auto;}
+.pathway-card{flex:1;display:flex;align-items:center;gap:12px;padding:13px 22px;cursor:pointer;border-right:1px solid var(--border);transition:background .18s;text-decoration:none;}
+.pathway-card:last-child{border-right:none;}
+.pathway-card:hover{background:rgba(255,255,255,0.04);}
+.pathway-card.active{background:var(--amber-dim);border-bottom:2px solid var(--amber);}
+.pathway-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.pathway-icon--move{background:var(--amber-dim);}
+.pathway-icon--manage{background:var(--purple-dim);}
+.pathway-icon--plan{background:var(--green-dim);}
+.pathway-info{flex:1;min-width:0;}
+.pathway-label{font-size:12px;font-weight:700;color:var(--text);line-height:1.2;}
+.pathway-sub{font-size:10px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pathway-arrow{color:var(--muted);font-size:11px;flex-shrink:0;}
+/* Keep jn-link class for JS compatibility (hidden) */
+.jn-link{display:none;}
+
+/* ── ALL TOOLS DISCOVERY GRID ── */
+.all-tools-section{background:var(--surface);border-bottom:1px solid var(--border);padding:52px 40px 40px;}
+.all-tools-inner{max-width:1200px;margin:0 auto;}
+.all-tools-hd{margin-bottom:36px;}
+.all-tools-title{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.all-tools-sub{font-size:13px;color:var(--text2);margin-top:4px;}
+.all-tools-group{margin-bottom:28px;}
+.all-tools-group-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.all-tools-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px;}
+.at-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px;}
+.at-card:hover{border-color:var(--amber);background:var(--elevated);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.25);}
+.at-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.at-info{flex:1;min-width:0;}
+.at-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.at-desc{font-size:10px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:900px){.all-tools-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.all-tools-grid{grid-template-columns:repeat(2,1fr);}.all-tools-section{padding:36px 16px 28px;}.pathway-card{padding:10px 12px;gap:8px;}.pathway-sub{display:none;}}
 /* dash strip */
 .dash-strip{background:var(--surface);border-bottom:1px solid var(--border);}
 .dash-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
