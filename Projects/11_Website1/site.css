@@ -1,4 +1,4 @@
-/* v14.1 */
+/* v14.2 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (UI/UX Pro Max)
@@ -1500,8 +1500,8 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 
 
 
-/* ── Hero split layout (text left, widgets right) ── */
-.hero-section{align-items:flex-start!important;justify-content:center!important;padding:90px 44px 36px!important;background-position:center 55%,center!important;}
+/* ── Hero split layout (text left, widgets right) — all desktop ── */
+.hero-section{align-items:flex-start!important;justify-content:flex-start!important;background-position:center 55%,center!important;}
 .hero-split{position:relative;z-index:2;display:flex;align-items:center;gap:44px;max-width:1280px;width:100%;margin:0 auto;}
 .hero-text-col{flex:0 0 40%;max-width:460px;text-align:left;}
 .hero-text-col .hero-eyebrow{justify-content:flex-start;}
@@ -1511,6 +1511,10 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hero-widgets-row{flex:1;min-width:0;margin-top:0!important;flex-wrap:nowrap;justify-content:flex-start!important;animation:none;}
 .hero-widgets-row .hero-rates-panel{flex:1 1 0;min-width:0;}
 .hero-corpus-panel{flex:0 0 268px;min-width:230px;}
+/* monitor ≥1441px: generous padding + fixed bg parallax */
+@media(min-width:1441px){
+  .hero-section{padding:90px 44px 36px!important;background-attachment:fixed,scroll!important;}
+}
 /* laptop 14" ≤1300px */
 @media(max-width:1300px) and (min-width:801px){
   .hero-split{gap:24px;}
