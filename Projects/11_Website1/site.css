@@ -1,4 +1,4 @@
-/* v14.0 */
+/* v14.1 */
 
 /* ══════════════════════════════════════════════════
    DESIGN SYSTEM  – NRI Finance Hub (UI/UX Pro Max)
@@ -1458,8 +1458,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .aff-disclaimer{font-size:9.5px;color:var(--muted);margin-top:6px;opacity:0.7;}
 
 /* ── Compact hero for 14-inch laptops (viewport ~768-900px height) ── */
-@media (max-width:1440px) and (min-width:769px){
-  .hero-section{padding:68px 32px 20px;}
+@media (max-width:1440px) and (min-width:801px){
+  .hero-section{
+    padding:72px 32px 28px !important;
+    background-attachment:scroll,scroll !important;
+    background-position:center 55%,center !important;
+    min-height:auto !important;
+  }
   .hero-eyebrow{margin-bottom:12px;padding:5px 13px;font-size:11px;}
   .hero-h1{font-size:40px!important;line-height:1.06;margin-bottom:10px;letter-spacing:-1.5px;}
   .hero-sub{font-size:13.5px;margin-bottom:14px;line-height:1.55;}
@@ -1480,8 +1485,13 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
   .hcp-stat-v{font-size:15px;}
   .hcp-cta{padding:9px 14px;font-size:11px;margin-top:10px;}
 }
-@media (max-height:800px) and (min-width:769px){
-  .hero-section{padding:62px 32px 16px;}
+@media (max-height:800px) and (min-width:801px){
+  .hero-section{
+    padding:62px 32px 20px !important;
+    background-attachment:scroll,scroll !important;
+    background-position:center 55%,center !important;
+    min-height:auto !important;
+  }
   .hero-h1{font-size:36px!important;margin-bottom:8px;}
   .hero-sub{font-size:13px;margin-bottom:12px;}
   .hero-actions{margin-bottom:12px;}
@@ -1491,7 +1501,7 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 
 
 /* ── Hero split layout (text left, widgets right) ── */
-.hero-section{align-items:flex-start!important;justify-content:center!important;padding:90px 44px 36px!important;}
+.hero-section{align-items:flex-start!important;justify-content:center!important;padding:90px 44px 36px!important;background-position:center 55%,center!important;}
 .hero-split{position:relative;z-index:2;display:flex;align-items:center;gap:44px;max-width:1280px;width:100%;margin:0 auto;}
 .hero-text-col{flex:0 0 40%;max-width:460px;text-align:left;}
 .hero-text-col .hero-eyebrow{justify-content:flex-start;}
@@ -1501,13 +1511,18 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hero-widgets-row{flex:1;min-width:0;margin-top:0!important;flex-wrap:nowrap;justify-content:flex-start!important;animation:none;}
 .hero-widgets-row .hero-rates-panel{flex:1 1 0;min-width:0;}
 .hero-corpus-panel{flex:0 0 268px;min-width:230px;}
-/* laptop 14" */
-@media(max-width:1300px){
-  .hero-split{gap:28px;}
-  .hero-text-col{flex:0 0 36%;}
-  .hero-text-col .hero-h1{font-size:clamp(26px,3vw,44px)!important;}
-  .hero-corpus-panel{flex:0 0 248px;min-width:220px;}
-  .hero-section{padding:80px 28px 28px!important;}
+/* laptop 14" ≤1300px */
+@media(max-width:1300px) and (min-width:801px){
+  .hero-split{gap:24px;}
+  .hero-text-col{flex:0 0 34%;}
+  .hero-text-col .hero-h1{font-size:clamp(24px,2.8vw,42px)!important;}
+  .hero-corpus-panel{flex:0 0 240px;min-width:210px;}
+  .hero-section{
+    padding:72px 24px 24px !important;
+    background-attachment:scroll,scroll !important;
+    background-position:center 55%,center !important;
+    min-height:auto !important;
+  }
 }
 /* mobile: stack */
 @media(max-width:800px){
