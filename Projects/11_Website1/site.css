@@ -2899,3 +2899,21 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
   .nrifi-step-hd{font-size:15px;}
 }
 /* ══ END NRI-FI SCORE ════════════════════════════════════════════════════════ */
+
+/* ══ 14" LAPTOP HERO FINAL OVERRIDE — placed last, wins cascade ════════════ */
+@media (max-width:1440px) and (min-width:801px) {
+  .hero-section {
+    padding: 68px 32px 24px !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    min-height: auto !important;
+    background-attachment: scroll, scroll !important;
+    background-position: center 65%, center !important;
+  }
+}
+@media (max-width:1300px) and (min-width:801px) {
+  .hero-section {
+    padding: 64px 24px 20px !important;
+  }
+}
+/* ══════════════════════════════════════════════════════════════════════════ */
