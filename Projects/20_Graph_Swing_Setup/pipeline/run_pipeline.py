@@ -20,6 +20,8 @@ in the environment (populated from GitHub Actions secrets in CI).
 import json
 import math
 import os
+
+# Patched 2026-08-28 04:48:58: graph-centrality failures no longer abort the whole run
 from datetime import datetime, timezone
 from pathlib import Path
 

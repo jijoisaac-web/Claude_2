@@ -4,3 +4,5 @@ numpy>=1.24
 networkx>=3.0
 python-dotenv>=1.0
 scipy>=1.11
+
+# scipy added 2026-08-28 04:48:58 -- required by networkx.pagerank(); was missing, caused CI failure
