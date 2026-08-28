@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nifty 750 Graph Swing Desk</title>
 <style>
+  /* ============ Design tokens (validated dataviz reference palette) ============ */
   .viz-root {
     color-scheme: light;
     --surface-1:      #fcfcfb;
+    --surface-2:      #f4f3f0;
     --page-plane:     #f9f9f7;
     --text-primary:   #0b0b0b;
     --text-secondary: #52514e;
@@ -15,16 +17,30 @@
     --gridline:       #e1e0d9;
     --baseline:       #c3c2b7;
     --border:         rgba(11,11,11,0.10);
-    --series-1:       #2a78d6;
+    --shadow-color:   rgba(11,11,11,0.06);
+
+    --series-1:       #2a78d6;  /* blue -- sequential hue, primary accent */
+    --series-2:       #eb6834;  /* orange */
+    --series-3:       #1baf7a;  /* aqua */
+    --series-8:       #e34948;  /* red */
+
+    --seq-100: #cde2fb; --seq-250: #86b6ef; --seq-400: #3987e5; --seq-500: #256abf;
+
     --status-good:      #0ca30c;
     --status-warning:   #fab219;
     --status-serious:   #ec835a;
     --status-critical:  #d03b3b;
+    --status-good-tint:     rgba(12,163,12,0.12);
+    --status-warning-tint:  rgba(250,178,25,0.16);
+    --status-serious-tint:  rgba(236,131,90,0.16);
+    --status-critical-tint: rgba(208,59,59,0.12);
+    --status-neutral-tint:  rgba(137,135,129,0.14);
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) .viz-root {
       color-scheme: dark;
       --surface-1:      #1a1a19;
+      --surface-2:      #212120;
       --page-plane:     #0d0d0d;
       --text-primary:   #ffffff;
       --text-secondary: #c3c2b7;
@@ -32,16 +48,30 @@
       --gridline:       #2c2c2a;
       --baseline:       #383835;
       --border:         rgba(255,255,255,0.10);
+      --shadow-color:   rgba(0,0,0,0.35);
+
       --series-1:       #3987e5;
+      --series-2:       #d95926;
+      --series-3:       #199e70;
+      --series-8:       #e66767;
+
+      --seq-100: #184f95; --seq-250: #1c5cab; --seq-400: #256abf; --seq-500: #3987e5;
+
       --status-good:      #0ca30c;
       --status-warning:   #fab219;
       --status-serious:   #ec835a;
       --status-critical:  #d03b3b;
+      --status-good-tint:     rgba(12,163,12,0.18);
+      --status-warning-tint:  rgba(250,178,25,0.16);
+      --status-serious-tint:  rgba(236,131,90,0.16);
+      --status-critical-tint: rgba(208,59,59,0.18);
+      --status-neutral-tint:  rgba(137,135,129,0.16);
     }
   }
   :root[data-theme="dark"] .viz-root {
     color-scheme: dark;
     --surface-1:      #1a1a19;
+    --surface-2:      #212120;
     --page-plane:     #0d0d0d;
     --text-primary:   #ffffff;
     --text-secondary: #c3c2b7;
@@ -49,263 +79,771 @@
     --gridline:       #2c2c2a;
     --baseline:       #383835;
     --border:         rgba(255,255,255,0.10);
+    --shadow-color:   rgba(0,0,0,0.35);
+
     --series-1:       #3987e5;
+    --series-2:       #d95926;
+    --series-3:       #199e70;
+    --series-8:       #e66767;
+
+    --seq-100: #184f95; --seq-250: #1c5cab; --seq-400: #256abf; --seq-500: #3987e5;
+
     --status-good:      #0ca30c;
     --status-warning:   #fab219;
     --status-serious:   #ec835a;
     --status-critical:  #d03b3b;
+    --status-good-tint:     rgba(12,163,12,0.18);
+    --status-warning-tint:  rgba(250,178,25,0.16);
+    --status-serious-tint:  rgba(236,131,90,0.16);
+    --status-critical-tint: rgba(208,59,59,0.18);
+    --status-neutral-tint:  rgba(137,135,129,0.16);
   }
 
+  /* ============ Base ============ */
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  }
   body.viz-root {
     background: var(--page-plane);
     color: var(--text-primary);
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    padding: 24px 16px 64px;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1100px; margin: 0 auto; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 
-  header.page-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--gridline);
-    padding-bottom: 16px;
+  a { color: var(--series-1); }
+  :focus-visible {
+    outline: 2px solid var(--series-1);
+    outline-offset: 2px;
+    border-radius: 3px;
   }
-  header.page-head h1 {
-    font-size: 1.4rem;
-    margin: 0;
-    letter-spacing: 0.01em;
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    padding: 10px 16px;
+    z-index: 100;
+    border-radius: 0 0 8px 0;
+    border: 1px solid var(--border);
   }
-  header.page-head .subtitle {
+  .skip-link:focus { left: 0; }
+
+  button { font: inherit; cursor: pointer; }
+  .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.15em; }
+  .icon-btn {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
   }
-  #generated-at {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-variant-numeric: tabular-nums;
-  }
+  .icon-btn:hover { color: var(--text-primary); border-color: var(--baseline); }
 
+  /* ============ Top bar ============ */
+  header.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--page-plane) 88%, transparent);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--gridline);
+  }
+  .top-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-mark {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(155deg, var(--series-1), var(--seq-500));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    flex: none;
+    box-shadow: 0 2px 8px var(--shadow-color);
+  }
+  .brand-mark .icon { width: 20px; height: 20px; }
+  .brand-text { min-width: 0; }
+  .brand-text h1 {
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    margin: 0;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand-text .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .top-bar-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+
+  .freshness {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .freshness .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--text-muted); }
+  .freshness.is-fresh .dot { background: var(--status-good); }
+  .freshness.is-aging .dot { background: var(--status-warning); }
+  .freshness.is-stale .dot { background: var(--status-critical); }
+
+  /* ============ Section nav ============ */
+  nav.section-nav {
+    position: sticky;
+    top: 65px;
+    z-index: 19;
+    background: var(--page-plane);
+    border-bottom: 1px solid var(--gridline);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav.section-nav::-webkit-scrollbar { display: none; }
+  .section-nav-inner { display: flex; gap: 4px; padding: 8px 0; }
+  .section-nav a {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+  .section-nav a:hover { background: var(--surface-1); color: var(--text-primary); }
+  .section-nav a.active { background: var(--surface-1); color: var(--text-primary); border-color: var(--border); }
+  .section-nav .icon { width: 14px; height: 14px; opacity: 0.8; }
+
+  main { display: block; padding: 24px 0 64px; }
+
+  /* ============ Cards ============ */
   .card {
     background: var(--surface-1);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
+    border-radius: 14px;
+    padding: 20px 22px;
     margin-bottom: 20px;
+    box-shadow: 0 1px 2px var(--shadow-color);
+    scroll-margin-top: 116px;
+  }
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   .card h2 {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     color: var(--text-secondary);
-    margin: 0 0 14px;
-  }
-
-  .regime-row {
+    margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+    align-items: center;
+    gap: 8px;
   }
-  .stat-tile {
-    flex: 1 1 200px;
+  .card h2 .icon { width: 15px; height: 15px; color: var(--text-muted); }
+  .card-desc { font-size: 0.78rem; color: var(--text-muted); }
+
+  /* ============ KPI grid ============ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+  }
+  .kpi-tile {
     background: var(--page-plane);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 14px 16px;
   }
-  .stat-tile .label {
+  .kpi-tile .label {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .stat-tile .value {
-    font-size: 1.6rem;
+  .kpi-tile .label .icon { width: 13px; height: 13px; }
+  .kpi-tile .value {
+    font-size: 1.55rem;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
+  .kpi-tile .value.dim { color: var(--text-muted); font-weight: 400; }
 
+  /* ============ Badges (icon + label, never color alone) ============ */
   .badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px;
+    padding: 4px 10px 4px 8px;
     border-radius: 999px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
+    line-height: 1.3;
   }
-  .badge::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
+  .badge .icon { width: 13px; height: 13px; }
+  .badge.good     { color: var(--status-good);     background: var(--status-good-tint); }
+  .badge.warning  { color: #8a6300;                background: var(--status-warning-tint); }
+  .badge.serious  { color: #9c4a26;                background: var(--status-serious-tint); }
+  .badge.critical { color: var(--status-critical); background: var(--status-critical-tint); }
+  .badge.neutral  { color: var(--text-secondary);  background: var(--status-neutral-tint); }
+  :root[data-theme="dark"] .badge.warning,
+  :root[data-theme="dark"] .badge.serious { color: var(--text-primary); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .badge.warning,
+    :root:not([data-theme="light"]) .badge.serious { color: var(--text-primary); }
   }
-  .badge.good     { color: var(--status-good); }
-  .badge.warning  { color: var(--status-warning); }
-  .badge.critical { color: var(--status-critical); }
-  .badge.neutral  { color: var(--text-muted); }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
+  /* ============ Tables ============ */
+  .table-scroll { position: relative; overflow-x: auto; margin: 0 -2px; }
+  .table-scroll.has-overflow::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 28px;
+    background: linear-gradient(to right, transparent, var(--surface-1));
+    pointer-events: none;
   }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
   thead th {
     text-align: left;
     color: var(--text-muted);
-    font-weight: 500;
-    font-size: 0.75rem;
+    font-weight: 600;
+    font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
     border-bottom: 1px solid var(--baseline);
-    padding: 8px 10px;
+    padding: 0;
+    white-space: nowrap;
   }
+  thead th.num, tbody td.num { text-align: right; }
+  .sort-btn {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 9px 10px;
+    color: inherit;
+    width: 100%;
+  }
+  thead th.num .sort-btn { justify-content: flex-end; }
+  .sort-btn:hover { color: var(--text-primary); }
+  .sort-btn .icon { width: 12px; height: 12px; opacity: 0.55; flex: none; }
+  .sort-btn[aria-current="true"] .icon { opacity: 1; color: var(--series-1); }
   tbody td {
-    padding: 8px 10px;
+    padding: 9px 10px;
     border-bottom: 1px solid var(--gridline);
     font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
   }
   tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--page-plane); }
   td.ticker { font-variant-numeric: normal; font-weight: 600; }
+  td.ticker .rank { color: var(--text-muted); font-weight: 400; margin-right: 6px; font-variant-numeric: tabular-nums; }
 
-  .table-scroll { overflow-x: auto; }
+  /* magnitude bar (sequential, single hue, thin, rounded) */
+  .mag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+  }
+  .mag-track {
+    flex: 1 1 auto;
+    height: 6px;
+    border-radius: 4px;
+    background: var(--gridline);
+    overflow: hidden;
+  }
+  .mag-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--seq-250), var(--series-1));
+  }
+  .mag-num { flex: none; font-weight: 600; min-width: 2.2em; text-align: right; }
+
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
 
   .empty-state {
     color: var(--text-muted);
     font-size: 0.85rem;
-    padding: 8px 0;
+    padding: 10px 2px 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
+  .empty-state .icon { width: 15px; height: 15px; }
+
   .warnings {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
     font-size: 0.8rem;
-    color: var(--status-serious);
-    margin-top: 4px;
+    color: #9c4a26;
+    background: var(--status-serious-tint);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 14px;
+  }
+  :root[data-theme="dark"] .warnings { color: var(--status-serious); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .warnings { color: var(--status-serious); } }
+  .warnings .icon { width: 15px; height: 15px; flex: none; margin-top: 1px; }
+
+  footer.page-foot {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 8px 20px 48px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    align-items: center;
+  }
+  footer.page-foot a { color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+  footer.page-foot a:hover { color: var(--series-1); }
+  footer.page-foot .icon { width: 13px; height: 13px; }
+
+  #load-error .card-head { margin-bottom: 8px; }
+
+  @media (max-width: 640px) {
+    .brand-text .subtitle { display: none; }
+    .top-bar-inner { padding: 12px 0 10px; flex-wrap: wrap; row-gap: 8px; }
+    .top-bar-actions { flex-basis: 100%; justify-content: space-between; }
+    .card { padding: 16px; }
   }
 </style>
 </head>
 <body class="viz-root">
-  <div class="wrap">
-    <header class="page-head">
-      <div>
-        <h1>Nifty 750 Graph Swing Desk</h1>
-        <div class="subtitle">Price action &middot; sectoral rotation &middot; graph-theoretic contagion</div>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="top-bar">
+    <div class="wrap top-bar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8 17l7.5-9.7M8.3 16.5l8 .8"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Nifty 750 Graph Swing Desk</h1>
+          <div class="subtitle">Price action &middot; sectoral rotation &middot; graph-theoretic contagion</div>
+        </div>
       </div>
-      <div id="generated-at">Loading&hellip;</div>
-    </header>
-
-    <div id="load-error" class="card" style="display:none;">
-      <h2>Could not load report</h2>
-      <p class="empty-state">
-        dashboard_data.json was not found or failed to parse. This dashboard is static --
-        it only reflects the last successful run of the GitHub Actions pipeline.
-        Check the Actions tab in the repo for the latest run status.
-      </p>
+      <div class="top-bar-actions">
+        <span id="freshness" class="freshness" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="freshness-text">Loading&hellip;</span>
+        </span>
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+          <svg id="theme-icon-sun" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+          <svg id="theme-icon-moon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z"/></svg>
+        </button>
+      </div>
     </div>
+    <nav class="section-nav wrap" aria-label="Report sections">
+      <div class="section-nav-inner" id="section-nav-inner">
+        <a href="#regime" class="active">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-10"/></svg>
+          Regime</a>
+        <a href="#rs">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          RS Ranking</a>
+        <a href="#hub">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 17l7.5-9.7M8.3 16.5l8 .8"/></svg>
+          Graph Hubs</a>
+        <a href="#institutional">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+          Institutional</a>
+        <a href="#derivatives">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>
+          Derivatives</a>
+      </div>
+    </nav>
+  </header>
 
-    <div id="content" style="display:none;">
-      <section class="card">
-        <h2>Systemic Regime</h2>
-        <div class="regime-row">
-          <div class="stat-tile">
-            <div class="label">Market Breadth</div>
-            <div class="value"><span id="breadth-badge" class="badge neutral">&mdash;</span></div>
+  <main id="main">
+    <div class="wrap">
+
+      <div id="load-error" class="card" style="display:none;">
+        <div class="card-head"><h2>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.2v.1"/></svg>
+          Could not load report</h2></div>
+        <p class="empty-state">
+          dashboard_data.json was not found or failed to parse. This dashboard is static &mdash;
+          it only reflects the last successful run of the GitHub Actions pipeline.
+          Check the Actions tab in the repo for the latest run status.
+        </p>
+      </div>
+
+      <div id="content" style="display:none;">
+
+        <section class="card" id="regime">
+          <div class="card-head"><h2>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-10"/></svg>
+            Systemic Regime</h2></div>
+          <div class="kpi-grid">
+            <div class="kpi-tile">
+              <div class="label">Market Breadth</div>
+              <div class="value"><span id="breadth-badge" class="badge neutral">&mdash;</span></div>
+            </div>
+            <div class="kpi-tile">
+              <div class="label">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V4M16 19v-6M22 19H2"/></svg>
+                % Above 50DMA</div>
+              <div class="value" id="pct-50dma">&mdash;</div>
+            </div>
+            <div class="kpi-tile">
+              <div class="label">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V4M16 19v-6M22 19H2"/></svg>
+                % Above 200DMA</div>
+              <div class="value" id="pct-200dma">&mdash;</div>
+            </div>
+            <div class="kpi-tile">
+              <div class="label">FII+DII 5D Flow Regime</div>
+              <div class="value"><span id="flow-badge" class="badge neutral">&mdash;</span></div>
+            </div>
           </div>
-          <div class="stat-tile">
-            <div class="label">% Above 50DMA</div>
-            <div class="value" id="pct-50dma">&mdash;</div>
+          <div id="regime-warning" class="warnings" style="display:none;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <span id="regime-warning-text"></span>
           </div>
-          <div class="stat-tile">
-            <div class="label">% Above 200DMA</div>
-            <div class="value" id="pct-200dma">&mdash;</div>
+        </section>
+
+        <section class="card" id="rs">
+          <div class="card-head">
+            <h2>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+              RS Ranking &mdash; Top 20</h2>
+            <span class="card-desc">vs NIFTY 500, IBD-style 1&ndash;99 rating</span>
           </div>
-          <div class="stat-tile">
-            <div class="label">FII+DII 5D Flow Regime</div>
-            <div class="value"><span id="flow-badge" class="badge neutral">&mdash;</span></div>
+          <div class="table-scroll">
+            <table id="rs-table">
+              <thead><tr>
+                <th data-key="RS_Rank">Rank</th>
+                <th data-key="Ticker">Ticker</th>
+                <th class="num" data-key="RS_Rating">RS Rating</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
           </div>
-        </div>
-        <div id="regime-warning" class="warnings" style="display:none;"></div>
-      </section>
+          <div id="rs-empty" class="empty-state" style="display:none;">No RS ranking data in this run.</div>
+        </section>
 
-      <section class="card">
-        <h2>RS Ranking &mdash; Top 20 (vs NIFTY 500)</h2>
-        <div class="table-scroll">
-          <table id="rs-table">
-            <thead><tr><th>Rank</th><th>Ticker</th><th>RS Rating</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="rs-empty" class="empty-state" style="display:none;">No RS ranking data in this run.</div>
-      </section>
+        <section class="card" id="hub">
+          <div class="card-head">
+            <h2>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 17l7.5-9.7M8.3 16.5l8 .8"/></svg>
+              Graph Hub Leaders</h2>
+            <span class="card-desc">PageRank + betweenness + degree, Louvain community</span>
+          </div>
+          <div class="table-scroll">
+            <table id="hub-table">
+              <thead><tr>
+                <th data-key="Ticker">Ticker</th>
+                <th class="num" data-key="Hub_Score">Hub Score</th>
+                <th class="num" data-key="Community_ID">Community</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="hub-empty" class="empty-state" style="display:none;">No graph centrality data in this run (Neo4j credentials not configured, or step skipped).</div>
+        </section>
 
-      <section class="card">
-        <h2>Graph Hub Leaders</h2>
-        <div class="table-scroll">
-          <table id="hub-table">
-            <thead><tr><th>Ticker</th><th>Hub Score</th><th>Community</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="hub-empty" class="empty-state" style="display:none;">No graph centrality data in this run (Neo4j credentials not configured, or step skipped).</div>
-      </section>
+        <section class="card" id="institutional">
+          <div class="card-head">
+            <h2>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+              Institutional Footprint</h2>
+            <span class="card-desc">Bulk / block deal net-buy pressure</span>
+          </div>
+          <div class="table-scroll">
+            <table id="inst-table">
+              <thead><tr>
+                <th data-key="Ticker">Ticker</th>
+                <th class="num" data-key="Net_Buy_Qty">Net Buy Qty</th>
+                <th class="num" data-key="Buy_Sell_Ratio">Buy/Sell Ratio</th>
+                <th data-key="Signal">Signal</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="inst-empty" class="empty-state" style="display:none;">No bulk deal data in this run.</div>
+        </section>
 
-      <section class="card">
-        <h2>Institutional Footprint &mdash; Bulk/Block Deals</h2>
-        <div class="table-scroll">
-          <table id="inst-table">
-            <thead><tr><th>Ticker</th><th>Net Buy Qty</th><th>Buy/Sell Ratio</th><th>Signal</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="inst-empty" class="empty-state" style="display:none;">No bulk deal data in this run.</div>
-      </section>
+        <section class="card" id="derivatives">
+          <div class="card-head">
+            <h2>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M5 8h14M5 16h14"/></svg>
+              Derivatives &mdash; High-Conviction Confluence</h2>
+            <span class="card-desc">OI buildup &times; PCR &times; rollover confirmation</span>
+          </div>
+          <div class="table-scroll">
+            <table id="deriv-table">
+              <thead><tr>
+                <th data-key="Ticker">Ticker</th>
+                <th data-key="Buildup_Type">Buildup</th>
+                <th class="num" data-key="PCR">PCR</th>
+                <th data-key="Rollover_Flag">Rollover</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="deriv-empty" class="empty-state" style="display:none;">No high-conviction derivatives confluence in this run.</div>
+        </section>
 
-      <section class="card">
-        <h2>Derivatives &mdash; High-Conviction Confluence</h2>
-        <div class="table-scroll">
-          <table id="deriv-table">
-            <thead><tr><th>Ticker</th><th>Buildup</th><th>PCR</th><th>Rollover</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div id="deriv-empty" class="empty-state" style="display:none;">No high-conviction derivatives confluence in this run.</div>
-      </section>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="page-foot wrap">
+    <span>Static report &mdash; reflects the last successful GitHub Actions run.</span>
+    <a href="https://github.com/jijoisaac-web/Claude_2/tree/main/Projects/20_Graph_Swing_Setup" target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.89-2.78.62-3.37-1.21-3.37-1.21-.45-1.18-1.11-1.5-1.11-1.5-.9-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.34 1.12 2.91.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.32.1-2.75 0 0 .84-.28 2.75 1.05a9.29 9.29 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.43.2 2.49.1 2.75.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.82 0 .28.18.61.69.5A10.28 10.28 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z"/></svg>
+      Repository</a>
+    <a href="https://nifty-graph-swing.pages.dev" target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg>
+      Live site</a>
+  </footer>
 
 <script>
 (function () {
+  "use strict";
+
+  // ---------- theme ----------
+  var THEME_KEY = "nifty750-theme";
+  function applyTheme(mode) {
+    if (mode === "dark" || mode === "light") {
+      document.documentElement.setAttribute("data-theme", mode);
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    var isDark = mode === "dark" || (mode !== "light" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.getElementById("theme-icon-sun").style.display = isDark ? "none" : "";
+    document.getElementById("theme-icon-moon").style.display = isDark ? "" : "none";
+    document.getElementById("theme-toggle").setAttribute("aria-pressed", String(isDark));
+  }
+  var storedTheme = null;
+  try { storedTheme = window.localStorage.getItem(THEME_KEY); } catch (e) { /* storage unavailable -- fall through to system default */ }
+  applyTheme(storedTheme);
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var current = document.documentElement.getAttribute("data-theme");
+    var isDark = current === "dark" || (!current && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next = isDark ? "light" : "dark";
+    applyTheme(next);
+    try { window.localStorage.setItem(THEME_KEY, next); } catch (e) { /* best effort only */ }
+  });
+
+  // ---------- section nav active-state ----------
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".section-nav a"));
+  if (navLinks.length && "IntersectionObserver" in window) {
+    var sections = navLinks.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); }).filter(Boolean);
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var id = entry.target.id;
+        navLinks.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + id); });
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+
+  // ---------- helpers ----------
   function regimeClass(regime) {
     if (regime === "RISK_ON") return "good";
     if (regime === "RISK_OFF" || regime === "NEUTRAL_LOW") return "critical";
     if (regime === "NEUTRAL") return "warning";
     return "neutral";
   }
+  var TREND_UP = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-9"/><path d="M15 6h6v6"/></svg>';
+  var TREND_DOWN = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 9"/><path d="M15 18h6v-6"/></svg>';
+  var DASH = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>';
+  var WARN_ICON = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>';
+  var CHECK_ICON = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/></svg>';
+  var EMPTY_ICON = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 21V9"/></svg>';
+
+  function regimeIcon(cls) {
+    if (cls === "good") return CHECK_ICON;
+    if (cls === "critical") return TREND_DOWN;
+    if (cls === "warning") return WARN_ICON;
+    return DASH;
+  }
 
   function fmtNum(n, digits) {
     if (n === null || n === undefined || Number.isNaN(n)) return "—";
-    return Number(n).toLocaleString(undefined, { maximumFractionDigits: digits ?? 2 });
+    return Number(n).toLocaleString(undefined, { maximumFractionDigits: digits === undefined ? 2 : digits });
   }
 
-  function fillTable(bodyId, emptyId, rows, rowFn) {
-    var tbody = document.querySelector("#" + bodyId + " tbody");
-    var empty = document.getElementById(emptyId);
-    if (!rows || rows.length === 0) {
-      empty.style.display = "block";
-      return;
-    }
-    empty.style.display = "none";
-    rows.forEach(function (row) {
-      var tr = document.createElement("tr");
-      tr.innerHTML = rowFn(row);
-      tbody.appendChild(tr);
+  function esc(s) {
+    return String(s === null || s === undefined ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
 
+  function signalBadge(signal) {
+    var cls = "neutral", icon = DASH;
+    if (signal === "INSTITUTIONAL_ACCUMULATION") { cls = "good"; icon = TREND_UP; }
+    else if (signal === "INSTITUTIONAL_DISTRIBUTION") { cls = "critical"; icon = TREND_DOWN; }
+    return '<span class="badge ' + cls + '">' + icon + esc(signal || "NEUTRAL").replace(/_/g, " ") + "</span>";
+  }
+
+  var BUILDUP_META = {
+    LONG_BUILDUP:    { cls: "good",     icon: TREND_UP },
+    SHORT_COVERING:  { cls: "good",     icon: TREND_UP },
+    SHORT_BUILDUP:   { cls: "critical", icon: TREND_DOWN },
+    LONG_UNWINDING:  { cls: "critical", icon: TREND_DOWN }
+  };
+  function buildupBadge(type) {
+    var meta = BUILDUP_META[type] || { cls: "neutral", icon: DASH };
+    return '<span class="badge ' + meta.cls + '">' + meta.icon + esc((type || "—").replace(/_/g, " ")) + "</span>";
+  }
+
+  function rolloverBadge(flag) {
+    var isCaution = /LOW|CAUTION/i.test(String(flag || ""));
+    var cls = isCaution ? "warning" : "good";
+    var icon = isCaution ? WARN_ICON : CHECK_ICON;
+    return '<span class="badge ' + cls + '">' + icon + esc(flag || "NORMAL") + "</span>";
+  }
+
+  function magnitudeBar(value, max, digits) {
+    var v = Number(value);
+    if (Number.isNaN(v)) return fmtNum(value, digits);
+    var pct = Math.max(0, Math.min(100, (v / max) * 100));
+    return '<div class="mag"><span class="mag-num">' + fmtNum(v, digits) + '</span>' +
+      '<span class="mag-track"><span class="mag-fill" style="width:' + pct.toFixed(1) + '%"></span></span></div>';
+  }
+
+  // ---------- sortable tables ----------
+  function makeSortable(tableId, rows, columns, renderRow) {
+    var table = document.getElementById(tableId);
+    var tbody = table.querySelector("tbody");
+    var state = { key: null, dir: 1 };
+
+    function render() {
+      var data = rows.slice();
+      if (state.key) {
+        data.sort(function (a, b) {
+          var av = a[state.key], bv = b[state.key];
+          var an = typeof av === "number", bn = typeof bv === "number";
+          var cmp;
+          if (an && bn) cmp = av - bv;
+          else cmp = String(av === undefined || av === null ? "" : av).localeCompare(String(bv === undefined || bv === null ? "" : bv));
+          return cmp * state.dir;
+        });
+      }
+      tbody.innerHTML = "";
+      data.forEach(function (row, i) {
+        var tr = document.createElement("tr");
+        tr.innerHTML = renderRow(row, i);
+        tbody.appendChild(tr);
+      });
+    }
+
+    columns.forEach(function (col) {
+      var th = table.querySelector('th[data-key="' + col + '"]');
+      if (!th) return;
+      var label = th.textContent;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "sort-btn";
+      btn.innerHTML = esc(label) + ' <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>';
+      th.textContent = "";
+      th.appendChild(btn);
+      btn.addEventListener("click", function () {
+        if (state.key === col) { state.dir *= -1; } else { state.key = col; state.dir = 1; }
+        columns.forEach(function (c) {
+          var b = table.querySelector('th[data-key="' + c + '"] .sort-btn');
+          if (b) b.removeAttribute("aria-current");
+        });
+        btn.setAttribute("aria-current", "true");
+        th.setAttribute("aria-sort", state.dir === 1 ? "ascending" : "descending");
+        render();
+      });
+    });
+
+    render();
+  }
+
+  function checkTableOverflow() {
+    document.querySelectorAll(".table-scroll").forEach(function (el) {
+      el.classList.toggle("has-overflow", el.scrollWidth > el.clientWidth + 1);
+    });
+  }
+  var overflowResizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(overflowResizeTimer);
+    overflowResizeTimer = setTimeout(checkTableOverflow, 120);
+  });
+
+  function fillTable(tableId, emptyId, rows, columns, renderRow) {
+    var empty = document.getElementById(emptyId);
+    if (!rows || rows.length === 0) {
+      empty.innerHTML = EMPTY_ICON + (empty.dataset.msg || empty.textContent);
+      empty.style.display = "flex";
+      return;
+    }
+    empty.style.display = "none";
+    makeSortable(tableId, rows, columns, renderRow);
+  }
+
+  // ---------- freshness ----------
+  function setFreshness(iso) {
+    var el = document.getElementById("freshness");
+    var text = document.getElementById("freshness-text");
+    if (!iso) { text.textContent = "Unknown"; return; }
+    var then = new Date(iso);
+    var hrs = (Date.now() - then.getTime()) / 36e5;
+    var label;
+    if (hrs < 1) label = "Updated just now";
+    else if (hrs < 24) label = "Updated " + Math.round(hrs) + "h ago";
+    else label = "Updated " + Math.round(hrs / 24) + "d ago";
+    text.textContent = label + " · " + then.toLocaleString();
+    el.classList.remove("is-fresh", "is-aging", "is-stale");
+    el.classList.add(hrs < 30 ? "is-fresh" : hrs < 72 ? "is-aging" : "is-stale");
+  }
+
+  // ---------- load ----------
   fetch("./dashboard_data.json", { cache: "no-store" })
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -313,20 +851,20 @@
     })
     .then(function (data) {
       document.getElementById("content").style.display = "block";
-      document.getElementById("generated-at").textContent =
-        "Last run: " + (data.generated_at_utc ? new Date(data.generated_at_utc).toLocaleString() : "unknown");
+      setFreshness(data.generated_at_utc);
 
       if (data.warnings && data.warnings.length) {
         var w = document.getElementById("regime-warning");
-        w.style.display = "block";
-        w.textContent = data.warnings.join(" • ");
+        w.style.display = "flex";
+        document.getElementById("regime-warning-text").textContent = data.warnings.join(" • ");
       }
 
       var breadth = data.breadth;
       var badge = document.getElementById("breadth-badge");
       if (breadth) {
-        badge.textContent = breadth.Regime;
-        badge.className = "badge " + regimeClass(breadth.Regime);
+        var cls = regimeClass(breadth.Regime);
+        badge.innerHTML = regimeIcon(cls) + esc(breadth.Regime || "—");
+        badge.className = "badge " + cls;
         document.getElementById("pct-50dma").textContent = fmtNum(breadth.Pct_Above_50DMA, 1) + "%";
         document.getElementById("pct-200dma").textContent = fmtNum(breadth.Pct_Above_200DMA, 1) + "%";
       }
@@ -334,29 +872,35 @@
       var flow = data.flow_regime;
       var flowBadge = document.getElementById("flow-badge");
       if (flow) {
-        flowBadge.textContent = flow.Flow_Regime;
-        flowBadge.className = "badge " + regimeClass(flow.Flow_Regime);
+        var fcls = regimeClass(flow.Flow_Regime);
+        flowBadge.innerHTML = regimeIcon(fcls) + esc(flow.Flow_Regime || "—");
+        flowBadge.className = "badge " + fcls;
+      } else {
+        flowBadge.innerHTML = DASH + "Unavailable";
+        flowBadge.className = "badge neutral";
       }
 
-      fillTable("rs-table", "rs-empty", data.rs_ranking_top20, function (r) {
-        return "<td>" + r.RS_Rank + "</td><td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.RS_Rating, 0) + "</td>";
+      fillTable("rs-table", "rs-empty", data.rs_ranking_top20, ["RS_Rank", "Ticker", "RS_Rating"], function (r) {
+        return "<td class='num'>" + fmtNum(r.RS_Rank, 0) + "</td><td class='ticker'>" + esc(r.Ticker) + "</td><td class='num'>" + magnitudeBar(r.RS_Rating, 99, 0) + "</td>";
       });
 
-      fillTable("hub-table", "hub-empty", data.graph_hub_leaders_top20, function (r) {
-        return "<td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.Hub_Score, 3) + "</td><td>" + fmtNum(r.Community_ID, 0) + "</td>";
+      fillTable("hub-table", "hub-empty", data.graph_hub_leaders_top20, ["Ticker", "Hub_Score", "Community_ID"], function (r) {
+        return "<td class='ticker'>" + esc(r.Ticker) + "</td><td class='num'>" + magnitudeBar(r.Hub_Score, 1, 3) + "</td><td class='num'><span class='pill'>" + fmtNum(r.Community_ID, 0) + "</span></td>";
       });
 
-      fillTable("inst-table", "inst-empty", data.institutional_signals, function (r) {
-        return "<td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.Net_Buy_Qty, 0) + "</td><td>" + fmtNum(r.Buy_Sell_Ratio, 2) + "</td><td>" + r.Signal + "</td>";
+      fillTable("inst-table", "inst-empty", data.institutional_signals, ["Ticker", "Net_Buy_Qty", "Buy_Sell_Ratio", "Signal"], function (r) {
+        return "<td class='ticker'>" + esc(r.Ticker) + "</td><td class='num'>" + fmtNum(r.Net_Buy_Qty, 0) + "</td><td class='num'>" + fmtNum(r.Buy_Sell_Ratio, 2) + "</td><td>" + signalBadge(r.Signal) + "</td>";
       });
 
-      fillTable("deriv-table", "deriv-empty", data.derivatives_high_conviction, function (r) {
-        return "<td class='ticker'>" + r.Ticker + "</td><td>" + r.Buildup_Type + "</td><td>" + fmtNum(r.PCR, 2) + "</td><td>" + r.Rollover_Flag + "</td>";
+      fillTable("deriv-table", "deriv-empty", data.derivatives_high_conviction, ["Ticker", "Buildup_Type", "PCR", "Rollover_Flag"], function (r) {
+        return "<td class='ticker'>" + esc(r.Ticker) + "</td><td>" + buildupBadge(r.Buildup_Type) + "</td><td class='num'>" + fmtNum(r.PCR, 2) + "</td><td>" + rolloverBadge(r.Rollover_Flag) + "</td>";
       });
+
+      checkTableOverflow();
     })
     .catch(function (err) {
       document.getElementById("load-error").style.display = "block";
-      document.getElementById("generated-at").textContent = "";
+      document.getElementById("freshness-text").textContent = "";
       console.error(err);
     });
 })();
