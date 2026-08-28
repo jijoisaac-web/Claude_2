@@ -1,0 +1,28 @@
+name: Load Stock Universe
+
+# Manual, on-demand only -- NOT scheduled. NSE reconstitutes the Nifty Total
+# Market Index semi-annually (typically late March / late September), so
+# there's nothing to gain from running this daily. Re-run it by hand after
+# each reconstitution, or whenever you want to refresh sector classifications.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  load-universe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r Projects/20_Graph_Swing_Setup/pipeline/requirements.txt
+
+      - name: Load Nifty Total Market universe into Neo4j
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        run: python Projects/20_Graph_Swing_Setup/pipeline/load_stock_universe.py
