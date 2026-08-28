@@ -66,6 +66,122 @@ def _read_csv(name, **kwargs):
     return pd.read_csv(path, **kwargs)
 
 
+# ---------------------------------------------------------------------------
+# GraphAlpha dashboard exports (2026-08-28) -- added when the GraphAlpha UI
+# was wired to real data. Everything below reads ONLY from data already in
+# scope in main() (eod, technical, index_levels.csv); no new upstream data
+# source except fetch_index_levels.py's index_levels.csv.
+# ---------------------------------------------------------------------------
+
+OHLC_EXPORT_TRADING_DAYS = 150   # enough for the dashboard's 6M range with headroom
+OHLC_EXPORT_TOP_N = 20           # matches swing_score_top20's own head(20) cap
+INDEX_SERIES_MAX_ROWS = 300      # generous cap; index_levels.csv retention keeps this well under anyway
+
+
+def _price_snapshot(eod_df: pd.DataFrame, tickers) -> pd.DataFrame:
+    """Per-ticker Price (latest Close) + Chg_1D_Pct + Chg_5D_Pct, for merging onto
+    swing_score_top20 rows -- the composite score has no price/return columns of its
+    own (it's built from RS/Technical/Volume/Sector/Graph/Regime *scores*, not raw
+    price), so the Opportunity Table/Top Opportunities list needs this merged in
+    separately to show real Price/1D/5D figures instead of the old mock ones."""
+    rows = []
+    ticker_set = set(tickers)
+    for ticker, g in eod_df[eod_df["Ticker"].isin(ticker_set)].groupby("Ticker"):
+        g = g.sort_values("Date")
+        closes = g["Close"].tolist()
+        if not closes:
+            continue
+        price = closes[-1]
+        chg_1d = ((price / closes[-2]) - 1.0) * 100.0 if len(closes) >= 2 and closes[-2] else None
+        chg_5d = ((price / closes[-6]) - 1.0) * 100.0 if len(closes) >= 6 and closes[-6] else None
+        rows.append({"Ticker": ticker, "Price": round(float(price), 2),
+                      "Chg_1D_Pct": round(chg_1d, 2) if chg_1d is not None else None,
+                      "Chg_5D_Pct": round(chg_5d, 2) if chg_5d is not None else None})
+    return pd.DataFrame(rows, columns=["Ticker", "Price", "Chg_1D_Pct", "Chg_5D_Pct"])
+
+
+def _export_stock_ohlc(eod_df: pd.DataFrame, tickers, days: int = OHLC_EXPORT_TRADING_DAYS) -> dict:
+    """Compact per-ticker OHLC+Volume history for the Stock Detail candlestick
+    chart, limited to `tickers` (the dashboard only ever links to stocks that
+    appear in swing_score_top20, so exporting the full ~750-ticker universe here
+    would just bloat dashboard_data.json for rows nothing on the page can reach).
+    EMA20/EMA50 are deliberately NOT precomputed here -- the dashboard already
+    has a client-side ema() helper from the mock-data build; keeping the
+    derivation client-side avoids exporting yet another wide time series."""
+    out = {}
+    ticker_set = set(tickers)
+    for ticker, g in eod_df[eod_df["Ticker"].isin(ticker_set)].groupby("Ticker"):
+        g = g.sort_values("Date").tail(days)
+        out[ticker] = [
+            {
+                "Date": row["Date"].strftime("%Y-%m-%d") if hasattr(row["Date"], "strftime") else str(row["Date"]),
+                "Open": round(float(row["Open"]), 2) if pd.notna(row["Open"]) else None,
+                "High": round(float(row["High"]), 2) if pd.notna(row["High"]) else None,
+                "Low": round(float(row["Low"]), 2) if pd.notna(row["Low"]) else None,
+                "Close": round(float(row["Close"]), 2) if pd.notna(row["Close"]) else None,
+                "Volume": int(row["Volume"]) if pd.notna(row["Volume"]) else None,
+            }
+            for _, row in g.iterrows()
+        ]
+    return out
+
+
+def _export_stock_technicals(technical_df: pd.DataFrame, tickers) -> dict:
+    """Per-ticker raw signal flags/values (not just the rolled-up Technical_Score)
+    for the tickers the Stock Detail page can open -- lets the 'Why is this stock
+    interesting?' / AI Market Intelligence panels state real facts (e.g. 'RSI 62,
+    bullish band' or 'Volume running 1.8x average') instead of generic copy."""
+    cols = ["RSI_14", "Volume_Ratio", "Breakout_20D", "Breakout_50D",
+            "EMA_Pullback", "Higher_High", "RSI_Bullish", "Volume_Spike"]
+    ticker_set = set(tickers)
+    subset = technical_df[technical_df["Ticker"].isin(ticker_set)].set_index("Ticker")
+    out = {}
+    for ticker, row in subset.iterrows():
+        rec = {}
+        for c in cols:
+            if c not in subset.columns:
+                continue
+            v = row[c]
+            if isinstance(v, (bool,)) or str(subset[c].dtype) == "bool":
+                rec[c] = bool(v)
+            elif pd.isna(v):
+                rec[c] = None
+            else:
+                rec[c] = round(float(v), 2)
+        out[ticker] = rec
+    return out
+
+
+def _build_market_indices(data_dir: Path, max_rows: int = INDEX_SERIES_MAX_ROWS):
+    """NIFTY 50 / NIFTY BANK latest level + Chg_1D_Pct + a trailing Close series
+    (for the hero metric cards' sparklines and the Market Momentum chart), read
+    from data/index_levels.csv (fetch_index_levels.py). Returns None if that file
+    doesn't exist yet (e.g. before the first run after this export was added, or
+    if the fetch has never once succeeded) -- callers must treat that as 'not
+    available this run', not an error."""
+    path = data_dir / "index_levels.csv"
+    if not path.exists():
+        return None
+    df = pd.read_csv(path, parse_dates=["Date"])
+    if df.empty:
+        return None
+
+    out = {}
+    for index_key, g in df.groupby("Index"):
+        g = g.sort_values("Date").tail(max_rows)
+        latest = g.iloc[-1]
+        out[index_key] = {
+            "Close": round(float(latest["Close"]), 2) if pd.notna(latest["Close"]) else None,
+            "Chg_1D_Pct": round(float(latest["Chg_Pct"]), 2) if pd.notna(latest["Chg_Pct"]) else None,
+            "Date": latest["Date"].strftime("%Y-%m-%d"),
+            "Series": [
+                {"Date": row["Date"].strftime("%Y-%m-%d"), "Close": round(float(row["Close"]), 2)}
+                for _, row in g.iterrows() if pd.notna(row["Close"])
+            ],
+        }
+    return out or None
+
+
 def main():
     report = {"generated_at_utc": datetime.now(timezone.utc).isoformat(), "warnings": []}
 
@@ -96,6 +212,23 @@ def main():
             report["technical_signals_computed_for"] = len(technical)
         except Exception as exc:
             report["warnings"].append(f"Technical signals step failed: {exc!r}")
+
+    # NIFTY 50 / NIFTY BANK index levels (GraphAlpha hero cards + Market Momentum
+    # chart) -- independent of Neo4j, same as breadth/RS/technical above. Its own
+    # try/except since fetch_index_levels.py/index_levels.csv is new as of this
+    # export and untested against a real multi-day history yet.
+    try:
+        market_indices = _build_market_indices(DATA_DIR)
+        if market_indices:
+            report["market_indices"] = market_indices
+        else:
+            report["warnings"].append(
+                "data/index_levels.csv missing or empty -- market_indices not computed "
+                "(GraphAlpha hero index cards will fall back to demo data until "
+                "fetch_index_levels.py has run at least once)."
+            )
+    except Exception as exc:
+        report["warnings"].append(f"Market indices export failed: {exc!r}")
 
     bulk = _read_csv("bulk_deals.csv")
     if bulk is not None:
@@ -198,7 +331,36 @@ def main():
                     swing_df = compute_swing_score(
                         technical, rs, sector_map, rotation_latest, centrality_df, breadth["Regime"]
                     )
-                    report["swing_score_top20"] = swing_df.head(20).to_dict("records")
+                    top_swing = swing_df.head(20).copy()
+
+                    # Merge real Price/Chg_1D/Chg_5D + Volume_Ratio onto the top-20
+                    # rows -- compute_swing_score() only outputs pillar *scores*,
+                    # not raw price, and the GraphAlpha Opportunity Table/Top
+                    # Opportunities list needs both. eod is guaranteed non-None
+                    # here (technical/rs both require it upstream).
+                    if eod is not None:
+                        snapshot = _price_snapshot(eod, top_swing["Ticker"].tolist())
+                        top_swing = top_swing.merge(snapshot, on="Ticker", how="left")
+                        vol_ratio = technical.set_index("Ticker")["Volume_Ratio"] if "Volume_Ratio" in technical.columns else None
+                        if vol_ratio is not None:
+                            top_swing["Volume_Ratio"] = top_swing["Ticker"].map(vol_ratio).round(2)
+
+                    report["swing_score_top20"] = top_swing.to_dict("records")
+
+                    # Compact OHLC history + raw technical signal flags, scoped to
+                    # exactly these top-20 tickers -- the only ones the dashboard's
+                    # Stock Detail page can actually be opened for. See
+                    # _export_stock_ohlc()/_export_stock_technicals() docstrings.
+                    if eod is not None:
+                        try:
+                            report["stock_ohlc"] = _export_stock_ohlc(eod, top_swing["Ticker"].tolist())
+                        except Exception as exc:
+                            report["warnings"].append(f"stock_ohlc export failed: {exc!r}")
+                    if technical is not None:
+                        try:
+                            report["stock_technicals"] = _export_stock_technicals(technical, top_swing["Ticker"].tolist())
+                        except Exception as exc:
+                            report["warnings"].append(f"stock_technicals export failed: {exc!r}")
 
                     # Leader-laggard: operationalizes find_contagion_candidates(),
                     # which existed since the first graph_centrality.py delivery

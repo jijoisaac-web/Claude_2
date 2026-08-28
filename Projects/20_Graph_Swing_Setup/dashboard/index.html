@@ -220,6 +220,9 @@
     padding:3px 8px 3px 7px;border-radius:20px;
   }
   .demo-badge svg{width:11px;height:11px;}
+  .demo-badge.is-live{
+    color:var(--good-strong);background:var(--good-soft);border-color:rgba(31,174,107,.3);
+  }
 
   /* ---------- generic card ---------- */
   .card{
@@ -328,6 +331,12 @@
     background:rgba(20,23,28,.72);backdrop-filter:blur(6px);border:1px solid var(--border);
     border-radius:10px;padding:8px 12px;z-index:3;
   }
+  .graph-empty-state{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;text-align:center;color:var(--text-tertiary);font-size:12.5px;padding:0 40px;
+  }
+  .graph-empty-state svg{width:26px;height:26px;color:var(--text-tertiary);margin-bottom:6px;}
+  .graph-empty-state .ges-title{color:var(--text-secondary);font-weight:650;font-size:13.5px;}
   .gnode{cursor:pointer;}
   .gnode circle,.gnode path.marker-shape{transition:opacity .25s var(--ease),filter .2s var(--ease);}
   .gnode text{fill:var(--text-secondary);font-size:11px;font-weight:600;font-family:var(--font-ui);pointer-events:none;transition:opacity .25s var(--ease),fill .2s var(--ease);}
@@ -360,6 +369,10 @@
 
   /* ---------- leader-laggard flow ---------- */
   .flow-wrap{display:flex;align-items:stretch;gap:0;margin-top:18px;overflow-x:auto;padding-bottom:4px;}
+  .flow-empty{
+    width:100%;padding:30px 20px;text-align:center;color:var(--text-tertiary);font-size:12.5px;
+  }
+  .flow-empty .fe-title{color:var(--text-secondary);font-weight:650;font-size:13.5px;margin-bottom:4px;}
   .flow-node{
     flex:1;min-width:190px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:14px;
     padding:17px 18px;position:relative;
@@ -613,7 +626,7 @@
       </nav>
 
       <div class="sidebar-foot">
-        <div class="db-status"><span class="dot"></span> Neo4j <b>Connected</b></div>
+        <div class="db-status"><span class="dot" id="db-status-dot"></span> Neo4j <b id="db-status-text">Connected</b></div>
         <div class="sidebar-updated">Last updated: <b id="sidebar-updated-time">Today, 3:45 PM</b></div>
       </div>
     </aside>
@@ -652,7 +665,7 @@
         <section class="view active" id="view-overview" data-view-root="overview">
           <div class="page-hero" id="top">
             <div class="greet" id="greet-line">Good evening</div>
-            <h1>Market Intelligence Overview<span class="demo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>Demo data</span></h1>
+            <h1>Market Intelligence Overview<span class="demo-badge" id="demo-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg><span id="demo-badge-text">Demo data</span></span></h1>
           </div>
 
           <!-- metric cards -->
@@ -668,13 +681,14 @@
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-10"/><path d="M15 5h5v5"/></svg>
                       Market Momentum
                     </div>
-                    <div class="card-desc">NIFTY 500 composite, indexed</div>
+                    <div class="card-desc" id="momentum-card-desc">NIFTY 50, indexed</div>
                   </div>
                   <div class="segmented" id="momentum-range" data-target="momentum"></div>
                 </div>
                 <div class="chart-area-wrap">
                   <svg id="momentum-chart" viewBox="0 0 760 260" preserveAspectRatio="none"></svg>
                   <div class="chart-tooltip" id="momentum-tooltip"></div>
+                  <div class="graph-empty-state" id="momentum-empty-state" style="display:none;"></div>
                 </div>
               </div>
             </div>
@@ -719,8 +733,9 @@
                   <div class="glegend-item"><span class="glegend-marker"><svg width="11" height="11" viewBox="0 0 11 11"><rect x="1.5" y="1.5" width="8" height="8" fill="none" stroke="#9AA1AC" stroke-width="1.6" transform="rotate(45 5.5 5.5)"/></svg></span>Theme</div>
                   <div class="glegend-item"><span class="glegend-marker"><svg width="12" height="12" viewBox="0 0 12 12"><polygon points="6,0.8 11,3.5 11,8.5 6,11.2 1,8.5 1,3.5" fill="none" stroke="#9AA1AC" stroke-width="1.4"/></svg></span>Event</div>
                 </div>
-                <div class="graph-hint">Hover to inspect · Click to trace paths</div>
+                <div class="graph-hint" id="graph-hint">Hover to inspect · Click to trace paths</div>
                 <div class="graph-node-card" id="graph-node-card"></div>
+                <div class="graph-empty-state" id="graph-empty-state" style="display:none;"></div>
               </div>
             </div>
           </div>
@@ -977,7 +992,21 @@ function ema(values, period){
 var RANGE_DAYS = {"1D": 32, "5D": 5, "1M": 22, "3M": 66, "6M": 132, "1Y": 252};
 var FULL_DAYS = 260;
 
-var STOCK_UNIVERSE = [
+/* Deterministic synthetic dates for the mock series below (today-relative,
+   consecutive calendar days) -- kept as real ISO date strings, same as the
+   live-data path, so every date-label callsite (formatDateStr) works
+   identically whether the page ended up on mock or real data. */
+function buildMockDates(n){
+  var out = [], today = new Date();
+  for (var i = 0; i < n; i++){
+    var d = new Date(today); d.setDate(d.getDate() - (n - 1 - i));
+    out.push(d.toISOString().slice(0, 10));
+  }
+  return out;
+}
+var MOCK_DATES_FULL = buildMockDates(FULL_DAYS);
+
+var MOCK_STOCK_UNIVERSE = [
   {sym:"HAL", name:"Hindustan Aeronautics", sector:"Aerospace & Defence", price:4832.50, chg1d:2.42, chg5d:6.8, volRatio:1.8, rs:96, graph:0.82, swing:87, status:"HIGH CONVICTION", seed:11},
   {sym:"BEL", name:"Bharat Electronics", sector:"Aerospace & Defence", price:312.40, chg1d:1.85, chg5d:4.1, volRatio:1.4, rs:91, graph:0.74, swing:82, status:"STRONG", seed:22},
   {sym:"BDL", name:"Bharat Dynamics", sector:"Aerospace & Defence", price:1584.20, chg1d:1.22, chg5d:3.4, volRatio:1.2, rs:88, graph:0.61, swing:79, status:"STRONG", seed:33},
@@ -986,16 +1015,17 @@ var STOCK_UNIVERSE = [
   {sym:"AZAD", name:"Azad Engineering", sector:"Capital Goods", price:1462.10, chg1d:-0.34, chg5d:0.6, volRatio:0.7, rs:64, graph:0.44, swing:54, status:"EARLY", seed:66}
 ];
 
-var STOCK_DATA = {};
-STOCK_UNIVERSE.forEach(function(s){
-  STOCK_DATA[s.sym] = Object.assign({}, s, {
-    ohlc: genOHLC(FULL_DAYS, s.seed, s.price * 0.82, 0.0014, 0.021)
-  });
+var MOCK_STOCK_DATA = {};
+MOCK_STOCK_UNIVERSE.forEach(function(s){
+  var ohlc = genOHLC(FULL_DAYS, s.seed, s.price * 0.82, 0.0014, 0.021);
+  ohlc.forEach(function(pt, i){ pt.d = MOCK_DATES_FULL[i]; });
+  MOCK_STOCK_DATA[s.sym] = Object.assign({}, s, { ohlc: ohlc });
 });
 
-var NIFTY_SERIES_FULL = genSeries(FULL_DAYS, 7, 22400, 0.0009, 0.011);
+var MOCK_NIFTY_SERIES_FULL = genSeries(FULL_DAYS, 7, 22400, 0.0009, 0.011);
+var MOCK_NIFTY_DATES_FULL = MOCK_DATES_FULL;
 
-var GRAPH_NODES = [
+var MOCK_GRAPH_NODES = [
   {id:"HAL", label:"HAL", type:"leader", role:"center", score:87, x:400, y:210},
   {id:"BEL", label:"BEL", type:"candidate", role:"stock", score:82, x:236, y:120, strength:0.92},
   {id:"BDL", label:"BDL", type:"candidate", role:"stock", score:79, x:224, y:308, strength:0.78},
@@ -1004,13 +1034,40 @@ var GRAPH_NODES = [
   {id:"SUPPLIER", label:"Supplier Network", type:"candidate", role:"stock", score:61, x:520, y:352, strength:0.55},
   {id:"INFRA", label:"Infrastructure Theme", type:"theme", role:"theme", score:null, x:330, y:378, strength:0.48}
 ];
-var GRAPH_EDGES = [
+var MOCK_GRAPH_EDGES = [
   ["HAL","BEL"],["HAL","BDL"],["HAL","DEFENCE"],["HAL","GOVORDERS"],["HAL","SUPPLIER"],["BDL","INFRA"]
 ];
+
+/* ============================================================
+   Active module state -- points at the mock data above by default.
+   applyLiveData() (near Init, below) reassigns these in place when a real
+   dashboard_data.json loads successfully, so every render*() function below
+   keeps reading the SAME variables regardless of which source won out.
+   ============================================================ */
+var STOCK_UNIVERSE = MOCK_STOCK_UNIVERSE;
+var STOCK_DATA = MOCK_STOCK_DATA;
+var NIFTY_SERIES_FULL = MOCK_NIFTY_SERIES_FULL;
+var NIFTY_DATES_FULL = MOCK_NIFTY_DATES_FULL;
+var GRAPH_NODES = MOCK_GRAPH_NODES;
+var GRAPH_EDGES = MOCK_GRAPH_EDGES;
+var METRIC_CARDS = null;          // null -> renderMetricCards() falls back to buildMetricCardsMock()
+var FLOW_DATA_LIVE = null;        // non-null only once applyLiveData() finds real leader-laggard data
+var GRAPH_LIVE_AVAILABLE = false; // true only in live mode when real graph relationship data exists
+var MOMENTUM_LIVE_AVAILABLE = false; // true only in live mode when market_indices.NIFTY50 has a real series
+var IS_LIVE = false;
+var LIVE_WARNINGS = [];
 
 var TIME_FMT = new Intl.DateTimeFormat("en-IN", {month:"short", day:"numeric"});
 function dateLabel(i, total){
   var d = new Date(); d.setDate(d.getDate() - (total - 1 - i));
+  return TIME_FMT.format(d);
+}
+function formatDateStr(iso){
+  if (!iso) return "";
+  // Avoid new Date("YYYY-MM-DD") local-timezone-shift surprises by parsing manually.
+  var parts = iso.split("-");
+  if (parts.length !== 3) return iso;
+  var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
   return TIME_FMT.format(d);
 }
 function fmtINR(v, digits){
@@ -1074,7 +1131,7 @@ function showView(name){
 }
 
 function openStock(sym){
-  var s = STOCK_DATA[sym] || STOCK_DATA.HAL;
+  var s = STOCK_DATA[sym] || STOCK_DATA[STOCK_UNIVERSE[0].sym];
   showView("stock");
   document.getElementById("crumb-current").textContent = s.sym + " · Research";
   document.getElementById("stock-logo").textContent = s.sym.slice(0,2);
@@ -1088,6 +1145,12 @@ function openStock(sym){
   var tier = s.swing >= 80 ? ["A+ SETUP","tone-good"] : s.swing >= 70 ? ["A SETUP","tone-good"] : s.swing >= 60 ? ["WATCHLIST","tone-warn"] : ["EARLY SETUP","tone-neutral"];
   document.getElementById("stock-score-badge").innerHTML = '<span class="badge ' + tier[1] + '">' + tier[0] + '</span>';
 
+  if (IS_LIVE && s.ohlc && s.ohlc.length){
+    var closesForEma = s.ohlc.map(function(c){ return c.c; });
+    s._ema20Last = ema(closesForEma, 20).slice(-1)[0];
+    s._ema50Last = ema(closesForEma, 50).slice(-1)[0];
+  }
+
   renderInsightCards(s);
   renderPathChain(s);
   renderAIPanel(s);
@@ -1097,26 +1160,48 @@ function openStock(sym){
 }
 
 function renderInsightCards(s){
-  var cards = [
-    {icon:ICON_UP, title:"Sector Momentum", body: s.sector + " is outperforming the broader market this month, with breadth confirming the move rather than a handful of names."},
-    {icon:ICON_GRAPH, title:"Graph Connection", body:"Structurally connected to " + (GRAPH_EDGES.filter(function(e){return e[0]===s.sym||e[1]===s.sym;}).length || 3) + " momentum leaders through shared theme and correlation edges."},
-    {icon:ICON_CHECK, title:"Catalyst", body:"Recent positive industry event strengthens the near-term setup — demo placeholder until live news ingestion is wired in."}
-  ];
+  var cards;
+  if (IS_LIVE){
+    var graphLinks = s.graphLinks || 0;
+    cards = [
+      {icon:ICON_UP, title:"Sector Momentum", body: s.sector + " sector relative-strength score: " + Math.round(s.sectorScore || 0) + "/100" + (s.rs != null ? " · stock RS Rating " + s.rs : "") + "."},
+      {icon:ICON_GRAPH, title:"Graph Connection", body: graphLinks > 0
+        ? ("Structurally connected to " + graphLinks + " stock" + (graphLinks === 1 ? "" : "s") + " via today's leader-laggard graph traversal (Graph Strength " + Math.round(s.graphStrengthScore || 0) + "/100).")
+        : ("No active leader-laggard link today. Graph Strength score is " + Math.round(s.graphStrengthScore || 0) + "/100, based on structural hub/community position.")},
+      {icon:ICON_CHECK, title:"Catalyst", body:"Catalyst/news signal isn't wired into the pipeline yet (queued: NSE corporate announcements) — Swing Score currently runs on the other six pillars, rescaled to 100%."}
+    ];
+  } else {
+    cards = [
+      {icon:ICON_UP, title:"Sector Momentum", body: s.sector + " is outperforming the broader market this month, with breadth confirming the move rather than a handful of names."},
+      {icon:ICON_GRAPH, title:"Graph Connection", body:"Structurally connected to " + (GRAPH_EDGES.filter(function(e){return e[0]===s.sym||e[1]===s.sym;}).length || 3) + " momentum leaders through shared theme and correlation edges."},
+      {icon:ICON_CHECK, title:"Catalyst", body:"Recent positive industry event strengthens the near-term setup — demo placeholder until live news ingestion is wired in."}
+    ];
+  }
   document.getElementById("insight-grid").innerHTML = cards.map(function(c, i){
     return '<div class="insight-card"><div class="insight-num">0' + (i+1) + '</div>' +
       '<div class="insight-icon">' + c.icon + '</div>' +
       '<div class="insight-title">' + c.title + '</div>' +
-      '<div class="insight-body">' + c.body + '</div></div>';
+      '<div class="insight-body">' + esc(c.body) + '</div></div>';
   }).join("");
 }
 
 function renderPathChain(s){
-  var chain = [
-    {label:s.sym, root:true},
-    {label:s.sector, root:false},
-    {label:"Government / Institutional Spending", root:false},
-    {label:"Related Companies", root:false}
-  ];
+  var chain;
+  if (IS_LIVE){
+    chain = [
+      {label:s.sym, root:true},
+      {label:s.sector, root:false},
+      {label:"Tier: " + (s.tier || "—"), root:false},
+      {label:"Graph Strength " + Math.round(s.graphStrengthScore || 0) + "/100", root:false}
+    ];
+  } else {
+    chain = [
+      {label:s.sym, root:true},
+      {label:s.sector, root:false},
+      {label:"Government / Institutional Spending", root:false},
+      {label:"Related Companies", root:false}
+    ];
+  }
   var html = chain.map(function(p, i){
     var pill = '<div class="path-pill' + (p.root ? " root" : "") + '"><span class="pp-dot" style="background:' + (p.root ? "var(--accent-strong)" : "var(--text-tertiary)") + '"></span>' + esc(p.label) + '</div>';
     if (i === 0) return pill;
@@ -1126,9 +1211,34 @@ function renderPathChain(s){
 }
 
 function renderAIPanel(s){
-  var facts = ["Trading above EMA 20 and EMA 50", "Volume running " + s.volRatio.toFixed(1) + "x the 20-day average", s.sector + " ranks in the top sectors by relative strength"];
-  var graph = ["Connected to " + (2 + Math.round(s.graph*3)) + " momentum leaders in the structure graph", "Strong theme exposure to Defence / Government Capex", "High relationship convergence (Graph Score " + Math.round(s.graph*100) + ")"];
-  var risks = ["Price is approaching a prior resistance zone", "Implied volatility is elevated versus its 3-month average", "Swing setups are momentum-based — confirm with your own risk plan before entry"];
+  var facts, graph, risks;
+  if (IS_LIVE){
+    var t = s.technicals || {};
+    var emaBits = [];
+    if (s._ema20Last != null) emaBits.push((s.price >= s._ema20Last ? "above" : "below") + " EMA 20");
+    if (s._ema50Last != null) emaBits.push((s.price >= s._ema50Last ? "above" : "below") + " EMA 50");
+    facts = [emaBits.length ? ("Trading " + emaBits.join(", ")) : "EMA comparison unavailable for this stock."];
+    facts.push("Volume running " + (s.volRatio != null ? s.volRatio.toFixed(1) : "—") + "x the 20-day average");
+    facts.push(s.sector + " sector relative-strength score: " + Math.round(s.sectorScore || 0) + "/100");
+    if (t.RSI_14 != null) facts.push("RSI(14): " + t.RSI_14 + (t.RSI_Bullish ? " — bullish momentum band" : ""));
+
+    var graphLinks = s.graphLinks || 0;
+    graph = [
+      graphLinks > 0 ? ("Connected to " + graphLinks + " stock" + (graphLinks === 1 ? "" : "s") + " in today's leader-laggard graph") : "No active structural breakout link today",
+      "Graph Strength score: " + Math.round(s.graphStrengthScore || 0) + "/100"
+    ];
+    if (s.hubScore != null) graph.push("Hub score " + s.hubScore.toFixed(2) + (s.communitySize != null ? (", community of " + s.communitySize + " stocks") : ""));
+
+    risks = [];
+    if (t.RSI_14 != null && t.RSI_14 >= 70) risks.push("RSI is in overbought territory (elevated pullback risk).");
+    if (!t.Breakout_20D && !t.Breakout_50D && !t.EMA_Pullback) risks.push("No fresh technical trigger today — the score reflects broader RS/sector/graph strength rather than an active breakout.");
+    if (s.tier === "Watchlist" || s.tier === "Early setup") risks.push("Tier is " + s.tier + " — lower conviction than an A/A+ setup.");
+    risks.push("Swing setups are momentum-based — confirm with your own risk plan before entry.");
+  } else {
+    facts = ["Trading above EMA 20 and EMA 50", "Volume running " + s.volRatio.toFixed(1) + "x the 20-day average", s.sector + " ranks in the top sectors by relative strength"];
+    graph = ["Connected to " + (2 + Math.round(s.graph*3)) + " momentum leaders in the structure graph", "Strong theme exposure to Defence / Government Capex", "High relationship convergence (Graph Score " + Math.round(s.graph*100) + ")"];
+    risks = ["Price is approaching a prior resistance zone", "Implied volatility is elevated versus its 3-month average", "Swing setups are momentum-based — confirm with your own risk plan before entry"];
+  }
   document.getElementById("ai-facts").innerHTML = facts.map(function(t){ return '<div class="ai-item fact">' + ICON_DOT + '<span>' + esc(t) + '</span></div>'; }).join("");
   document.getElementById("ai-graph").innerHTML = graph.map(function(t){ return '<div class="ai-item graph">' + ICON_GRAPH + '<span>' + esc(t) + '</span></div>'; }).join("");
   document.getElementById("ai-risks").innerHTML = risks.map(function(t){ return '<div class="ai-item risk">' + ICON_WARN + '<span>' + esc(t) + '</span></div>'; }).join("");
@@ -1171,14 +1281,17 @@ document.getElementById("stock-back").addEventListener("click", function(){
 /* ============================================================
    Metric cards
    ============================================================ */
-function renderMetricCards(){
+function buildMetricCardsMock(){
   var breadthSeries = genSeries(24, 3, 55, 0.0, 0.05);
-  var cards = [
+  return [
     {label:"NIFTY 50", value:"24,318", chg:0.62, spark: genSeries(24, 1, 24100, 0.0007, 0.008), icon: ICON_UP, iconBg:"var(--good-soft)", iconColor:"var(--good-strong)"},
     {label:"BANK NIFTY", value:"51,204", chg:-0.18, spark: genSeries(24, 2, 51500, -0.0002, 0.009), icon: ICON_DOWN, iconBg:"var(--critical-soft)", iconColor:"var(--critical-strong)"},
     {label:"Market Breadth", value:"62%", sub:"Positive", chg:4.1, spark: breadthSeries, icon: ICON_CHECK, iconBg:"var(--accent-soft)", iconColor:"var(--accent-strong)"},
     {label:"Market Regime", value:"Bullish", sub:"78% Confidence", chg:null, spark: genSeries(24, 4, 70, 0.0015, 0.02), icon: ICON_GRAPH, iconBg:"var(--good-soft)", iconColor:"var(--good-strong)"}
   ];
+}
+function renderMetricCards(){
+  var cards = METRIC_CARDS || buildMetricCardsMock();
   document.getElementById("metric-grid").innerHTML = cards.map(function(c){
     var trend = c.chg === null ? "" : '<span class="trend-chip ' + (c.chg >= 0 ? "up" : "down") + '">' + (c.chg >= 0 ? ICON_UP : ICON_DOWN) + (c.chg >= 0 ? "+" : "") + c.chg.toFixed(2) + (c.sub ? "" : "%") + '</span>';
     return '<div class="metric-card">' +
@@ -1273,28 +1386,47 @@ document.querySelectorAll('#opp-table th[data-key]').forEach(function(th){
    Flow (leader -> laggard) card
    ============================================================ */
 function renderFlow(){
-  var leader = STOCK_DATA.HAL, candidate = STOCK_DATA.AZAD;
+  var wrap = document.getElementById("flow-wrap");
+  if (IS_LIVE && !FLOW_DATA_LIVE){
+    wrap.innerHTML = '<div class="flow-empty"><div class="fe-title">No active propagation signal today</div>' +
+      'No confirmed breakout produced a structurally connected laggard candidate in today\'s run. This section repopulates automatically the next time a Breakout_20D/50D signal fires with a graph-connected peer.</div>';
+    return;
+  }
+
+  var leader, candidate, peerLabel, peerItemsHtml;
+  if (IS_LIVE){
+    var f = FLOW_DATA_LIVE;
+    leader = {sym: f.leader.sym, sub: f.leader.sector, chg: f.leader.chg};
+    candidate = {sym: f.candidate.sym, sub: f.candidate.sector, chg: f.candidate.chg1d, score: f.candidate.convergenceScore};
+    peerLabel = f.peerCount + (f.peerCount === 1 ? " Link" : " Strong");
+    peerItemsHtml = f.peerItems.map(function(p){ return '<div class="flow-conn-item">' + ICON_GRAPH + esc(p) + '</div>'; }).join("");
+  } else {
+    var leaderS = STOCK_DATA.HAL, candidateS = STOCK_DATA.AZAD;
+    leader = {sym:leaderS.sym, sub: leaderS.name, chg: leaderS.chg5d};
+    candidate = {sym:candidateS.sym, sub: candidateS.name, chg: candidateS.chg1d, score: 87};
+    peerLabel = "3 Strong";
+    peerItemsHtml = ["BEL · Defence theme", "BDL · Correlation 0.81", "MTARTECH · Sector peer"].map(function(t){
+      return '<div class="flow-conn-item">' + ICON_GRAPH + t + '</div>';
+    }).join("");
+  }
+
   var nodes = [
     '<div class="flow-node is-leader"><div class="flow-kicker leader-tone">Leader</div>' +
-      '<div class="flow-sym">' + leader.sym + '</div><div class="flow-sub">' + esc(leader.name) + '</div>' +
-      '<div class="flow-metric pos">' + fmtPct(leader.chg5d) + '</div></div>',
+      '<div class="flow-sym">' + esc(leader.sym) + '</div><div class="flow-sub">' + esc(leader.sub) + '</div>' +
+      '<div class="flow-metric pos">' + fmtPct(leader.chg) + '</div></div>',
     '<div class="flow-arrow"><span class="flow-arrow-label">Propagates</span>' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h18M14 6l6 6-6 6"/></svg></div>',
     '<div class="flow-node"><div class="flow-kicker">Peer Network</div>' +
-      '<div class="flow-sym">3 Strong</div><div class="flow-sub">Structural connections</div>' +
-      '<div class="flow-conn-list">' +
-        '<div class="flow-conn-item">' + ICON_GRAPH + 'BEL · Defence theme</div>' +
-        '<div class="flow-conn-item">' + ICON_GRAPH + 'BDL · Correlation 0.81</div>' +
-        '<div class="flow-conn-item">' + ICON_GRAPH + 'MTARTECH · Sector peer</div>' +
-      '</div></div>',
+      '<div class="flow-sym">' + esc(peerLabel) + '</div><div class="flow-sub">Structural connections</div>' +
+      '<div class="flow-conn-list">' + peerItemsHtml + '</div></div>',
     '<div class="flow-arrow"><span class="flow-arrow-label">Early signal</span>' +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h18M14 6l6 6-6 6"/></svg></div>',
     '<div class="flow-node is-candidate"><div class="flow-kicker candidate-tone">Early Candidate</div>' +
-      '<div class="flow-sym">' + candidate.sym + '</div><div class="flow-sub">' + esc(candidate.name) + '</div>' +
-      '<div class="flow-metric" style="color:var(--text-primary);">' + fmtPct(candidate.chg1d) + '</div>' +
-      '<div class="flow-score-ring" style="display:flex;align-items:center;gap:9px;">' + scoreRing(87, 40) + '<div><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;">Graph Convergence</div><div style="font-family:var(--font-mono);font-weight:700;">87 / 100</div></div></div></div>'
+      '<div class="flow-sym">' + esc(candidate.sym) + '</div><div class="flow-sub">' + esc(candidate.sub) + '</div>' +
+      '<div class="flow-metric" style="color:var(--text-primary);">' + fmtPct(candidate.chg) + '</div>' +
+      '<div class="flow-score-ring" style="display:flex;align-items:center;gap:9px;">' + scoreRing(candidate.score, 40) + '<div><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.04em;">Graph Convergence</div><div style="font-family:var(--font-mono);font-weight:700;">' + Math.round(candidate.score) + ' / 100</div></div></div></div>'
   ];
-  document.getElementById("flow-wrap").innerHTML = nodes.join("");
+  wrap.innerHTML = nodes.join("");
 }
 
 /* ============================================================
@@ -1331,9 +1463,22 @@ function currentDetailSym(){
 }
 
 function renderMomentumChart(range){
+  var svg = document.getElementById("momentum-chart");
+  var emptyState = document.getElementById("momentum-empty-state");
+  var tooltipEl = document.getElementById("momentum-tooltip");
+  if (IS_LIVE && !MOMENTUM_LIVE_AVAILABLE){
+    svg.style.display = "none";
+    tooltipEl.classList.remove("show");
+    emptyState.style.display = "flex";
+    emptyState.innerHTML = ICON_UP + '<div class="ges-title">Index-level history not available yet</div>' +
+      '<div>NIFTY 50 levels populate after fetch_index_levels.py has run at least once. Real Swing Score / Opportunity data above is unaffected.</div>';
+    return;
+  }
+  svg.style.display = ""; emptyState.style.display = "none";
+
   var n = RANGE_DAYS[range];
   var series = NIFTY_SERIES_FULL.slice(-n);
-  var svg = document.getElementById("momentum-chart");
+  var seriesDates = NIFTY_DATES_FULL.slice(-n);
   svg.innerHTML = "";
   var W = 760, H = 260, padL = 6, padR = 6, padT = 14, padB = 26;
   var min = Math.min.apply(null, series), max = Math.max.apply(null, series);
@@ -1376,7 +1521,7 @@ function renderMomentumChart(range){
     var x = X(idx), y = Y(series[idx]);
     hoverLine.setAttribute("x1", x); hoverLine.setAttribute("x2", x); hoverLine.setAttribute("opacity", 1);
     hoverDot.setAttribute("cx", x); hoverDot.setAttribute("cy", y); hoverDot.setAttribute("opacity", 1);
-    tooltip.innerHTML = '<div class="tt-date">' + dateLabel(idx, series.length) + '</div><div class="tt-val">' + series[idx].toLocaleString("en-IN",{maximumFractionDigits:0}) + '</div>';
+    tooltip.innerHTML = '<div class="tt-date">' + formatDateStr(seriesDates[idx]) + '</div><div class="tt-val">' + series[idx].toLocaleString("en-IN",{maximumFractionDigits:0}) + '</div>';
     tooltip.style.left = Math.min(W - 110, Math.max(0, x / W * rect.width - 40)) + "px";
     tooltip.style.top = (y / H * rect.height - 54) + "px";
     tooltip.classList.add("show");
@@ -1441,7 +1586,7 @@ function renderStockChart(s, range){
     var c = slice[idx];
     var x = X(idx);
     hoverLine.setAttribute("x1", x); hoverLine.setAttribute("x2", x); hoverLine.setAttribute("opacity", 1);
-    tooltip.innerHTML = '<div class="tt-date">' + dateLabel(idx + (s.ohlc.length - slice.length), s.ohlc.length) + '</div>' +
+    tooltip.innerHTML = '<div class="tt-date">' + formatDateStr(c.d) + '</div>' +
       '<div class="tt-val">O ' + c.o.toFixed(1) + ' · H ' + c.h.toFixed(1) + ' · L ' + c.l.toFixed(1) + ' · C ' + c.c.toFixed(1) + '</div>';
     tooltip.style.left = Math.min(W - 190, Math.max(0, x / W * rect.width - 60)) + "px";
     tooltip.style.top = "6px";
@@ -1455,6 +1600,21 @@ function renderStockChart(s, range){
    ============================================================ */
 function renderGraph(){
   var svg = document.getElementById("graph-svg");
+  var emptyState = document.getElementById("graph-empty-state");
+  var legend = document.querySelector(".graph-legend");
+  var hint = document.getElementById("graph-hint");
+  if (IS_LIVE && !GRAPH_LIVE_AVAILABLE){
+    svg.style.display = "none";
+    if (legend) legend.style.display = "none";
+    if (hint) hint.style.display = "none";
+    emptyState.style.display = "flex";
+    emptyState.innerHTML = ICON_GRAPH + '<div class="ges-title">No structural graph data this run</div>' +
+      '<div>Neo4j has no Stock nodes loaded, or today\'s graph-centrality step didn\'t complete. ' +
+      'This card repopulates automatically once the graph is populated/reachable again.</div>';
+    return;
+  }
+  svg.style.display = ""; if (legend) legend.style.display = ""; if (hint) hint.style.display = "";
+  emptyState.style.display = "none";
   svg.innerHTML = "";
   var edgesG = svgEl("g", {});
   var nodesG = svgEl("g", {});
@@ -1563,6 +1723,291 @@ function showNodeCard(n){
 function hideNodeCard(){ document.getElementById("graph-node-card").classList.remove("show"); }
 
 /* ============================================================
+   Live data adapter -- fetches dashboard_data.json and, when the anchor
+   dataset (swing_score_top20) is present and non-empty, reassigns the
+   module state above in place so every render*() function above keeps
+   working completely unmodified. Falls back to (and stays on) the mock
+   data already assigned above when the fetch fails, 404s, or the anchor
+   dataset is missing/empty -- the .demo-badge in the UI reflects whichever
+   happened. Sub-sections with their own gaps (no index-level history yet,
+   no breakout->laggard signal today, empty structure graph) degrade to an
+   explicit empty state rather than silently mixing in mock numbers under
+   a "Live" label.
+   ============================================================ */
+
+var TIER_STATUS_MAP = {
+  "A+ setup": "HIGH CONVICTION",
+  "A setup": "STRONG",
+  "Watchlist": "WATCHLIST",
+  "Early setup": "EARLY"
+};
+
+function fetchDashboardData(){
+  return fetch("dashboard_data.json?cb=" + Date.now(), {cache: "no-store"})
+    .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .catch(function(err){
+      console.warn("[GraphAlpha] dashboard_data.json fetch failed, staying on demo data:", err);
+      return null;
+    });
+}
+
+function buildLiveUniverse(data){
+  var rows = (data.swing_score_top20 || []).filter(function(r){ return r.Tier !== "Ignore"; });
+  if (!rows.length) return null;
+
+  var ohlcMap = data.stock_ohlc || {};
+  var techMap = data.stock_technicals || {};
+  var hubByTicker = {};
+  (data.graph_hub_leaders_top20 || []).forEach(function(r){ hubByTicker[r.Ticker] = r; });
+
+  var linkCount = {};
+  (data.leader_laggard_top20 || []).forEach(function(r){
+    linkCount[r.Breakout_Ticker] = (linkCount[r.Breakout_Ticker] || 0) + 1;
+    linkCount[r.Laggard_Candidate] = (linkCount[r.Laggard_Candidate] || 0) + 1;
+  });
+
+  var universe = rows.map(function(r){
+    var hub = hubByTicker[r.Ticker];
+    return {
+      sym: r.Ticker, name: r.Ticker, sector: r.Sector || "—",
+      price: r.Price != null ? r.Price : 0,
+      chg1d: r.Chg_1D_Pct != null ? r.Chg_1D_Pct : 0,
+      chg5d: r.Chg_5D_Pct != null ? r.Chg_5D_Pct : 0,
+      volRatio: r.Volume_Ratio != null ? r.Volume_Ratio : 0,
+      rs: r.RS_Score != null ? Math.round(r.RS_Score) : null,
+      graph: (r.GraphStrength_Score != null ? r.GraphStrength_Score : 0) / 100,
+      swing: r.Swing_Score, status: TIER_STATUS_MAP[r.Tier] || "EARLY", tier: r.Tier,
+      sectorScore: r.Sector_Score, graphStrengthScore: r.GraphStrength_Score,
+      technicals: techMap[r.Ticker] || {},
+      graphLinks: linkCount[r.Ticker] || 0,
+      hubScore: hub ? hub.Hub_Score : null,
+      communitySize: hub ? hub.Community_Size : null
+    };
+  });
+
+  var stockData = {};
+  universe.forEach(function(s){
+    var ohlcRaw = ohlcMap[s.sym] || [];
+    var ohlc = ohlcRaw.map(function(pt){
+      return {o: pt.Open, h: pt.High, l: pt.Low, c: pt.Close, v: pt.Volume, d: pt.Date};
+    }).filter(function(pt){ return pt.o != null && pt.h != null && pt.l != null && pt.c != null; });
+    stockData[s.sym] = Object.assign({}, s, {ohlc: ohlc});
+  });
+
+  return {universe: universe, stockData: stockData};
+}
+
+function buildLiveMetricCards(data){
+  var breadth = data.breadth || {};
+  var mi = data.market_indices || {};
+  var cards = [];
+
+  ["NIFTY50", "BANKNIFTY"].forEach(function(key){
+    var label = key === "NIFTY50" ? "NIFTY 50" : "BANK NIFTY";
+    var idx = mi[key];
+    if (idx && idx.Series && idx.Series.length && idx.Close != null){
+      var chg = idx.Chg_1D_Pct != null ? idx.Chg_1D_Pct : 0;
+      cards.push({
+        label: label, value: idx.Close.toLocaleString("en-IN", {maximumFractionDigits: 0}),
+        chg: chg, spark: idx.Series.map(function(p){ return p.Close; }),
+        icon: chg >= 0 ? ICON_UP : ICON_DOWN,
+        iconBg: chg >= 0 ? "var(--good-soft)" : "var(--critical-soft)",
+        iconColor: chg >= 0 ? "var(--good-strong)" : "var(--critical-strong)"
+      });
+    } else {
+      cards.push({
+        label: label, value: "—", sub: "Awaiting first fetch", chg: null, spark: [0, 0],
+        icon: ICON_WARN, iconBg: "var(--warning-soft)", iconColor: "var(--warning-strong)"
+      });
+    }
+  });
+
+  var advPositive = (breadth.Advancers || 0) >= (breadth.Decliners || 0);
+  var breadthPct = breadth.Pct_Above_50DMA;
+  cards.push({
+    label: "Market Breadth", value: (breadthPct != null ? breadthPct.toFixed(1) : "—") + "%",
+    sub: advPositive ? "Positive" : "Negative", chg: null, spark: [breadthPct || 0, breadthPct || 0],
+    icon: advPositive ? ICON_CHECK : ICON_WARN,
+    iconBg: advPositive ? "var(--accent-soft)" : "var(--warning-soft)",
+    iconColor: advPositive ? "var(--accent-strong)" : "var(--warning-strong)"
+  });
+
+  var regimeLabel = {RISK_ON: "Bullish", NEUTRAL: "Neutral", RISK_OFF: "Bearish"}[breadth.Regime] || "Neutral";
+  cards.push({
+    label: "Market Regime", value: regimeLabel,
+    sub: "AD Ratio " + (breadth.AD_Ratio != null ? breadth.AD_Ratio.toFixed(2) : "—"),
+    chg: null, spark: [1, 1], icon: ICON_GRAPH,
+    iconBg: regimeLabel === "Bullish" ? "var(--good-soft)" : regimeLabel === "Bearish" ? "var(--critical-soft)" : "var(--accent-soft)",
+    iconColor: regimeLabel === "Bullish" ? "var(--good-strong)" : regimeLabel === "Bearish" ? "var(--critical-strong)" : "var(--accent-strong)"
+  });
+
+  return cards;
+}
+
+function edgeWeightLabel(w){
+  if (w == null) return "Structural link";
+  if (w <= 0.75) return "Sector peer";
+  if (w <= 2.0) return "Correlation edge";
+  return "Structural link";
+}
+
+function buildLiveGraphAndFlow(data){
+  var rows = data.leader_laggard_top20 || [];
+  var sectorByTicker = {}, rowByTicker = {};
+  (data.swing_score_top20 || []).forEach(function(r){ sectorByTicker[r.Ticker] = r.Sector; rowByTicker[r.Ticker] = r; });
+
+  var result = {graphNodes: null, graphEdges: null, graphAvailable: false, flow: null};
+
+  if (rows.length){
+    var byLeader = {};
+    rows.forEach(function(r){ (byLeader[r.Breakout_Ticker] = byLeader[r.Breakout_Ticker] || []).push(r); });
+    var topRow = rows.slice().sort(function(a, b){ return b.Contagion_Score - a.Contagion_Score; })[0];
+    var leaderTicker = topRow.Breakout_Ticker;
+    var laggards = byLeader[leaderTicker].slice().sort(function(a, b){ return b.Contagion_Score - a.Contagion_Score; });
+    var topLaggard = laggards[0];
+
+    var cx = 400, cy = 215, radius = 165;
+    var nodes = [{id: leaderTicker, label: leaderTicker, type: "leader", role: "center",
+      score: Math.round((rowByTicker[leaderTicker] || {}).Swing_Score || 0), x: cx, y: cy}];
+    var edges = [];
+    var leaderSector = sectorByTicker[leaderTicker];
+    if (leaderSector){
+      nodes.push({id: "SECTOR::" + leaderSector, label: leaderSector, type: "theme", role: "theme",
+        score: null, x: cx + 235, y: cy - 90, strength: 0.7});
+      edges.push([leaderTicker, "SECTOR::" + leaderSector]);
+    }
+    var nLag = laggards.length;
+    laggards.slice(0, 6).forEach(function(row, i){
+      var angle = (Math.PI * 2 * i / Math.max(nLag, 1)) - Math.PI / 2 + 0.6;
+      var x = cx + radius * Math.cos(angle), y = cy + radius * Math.sin(angle) * 0.78;
+      nodes.push({
+        id: row.Laggard_Candidate, label: row.Laggard_Candidate, type: "candidate", role: "stock",
+        score: Math.round((row.Hub_Score || 0) * 100), x: Math.round(x), y: Math.round(y),
+        strength: Math.max(0.3, Math.min(0.95, (row.Contagion_Score || 1) / (topLaggard.Contagion_Score || 1)))
+      });
+      edges.push([leaderTicker, row.Laggard_Candidate]);
+    });
+    result.graphNodes = nodes; result.graphEdges = edges; result.graphAvailable = true;
+
+    var peerItems = laggards.slice(0, 3).map(function(row){
+      return row.Laggard_Candidate + " · " + edgeWeightLabel(row.Edge_Weight) +
+        (row.Edge_Weight != null ? " " + row.Edge_Weight.toFixed(1) : "");
+    });
+    var leaderRow = rowByTicker[leaderTicker] || {};
+    var candidateRow = rowByTicker[topLaggard.Laggard_Candidate] || {};
+    result.flow = {
+      leader: {sym: leaderTicker, sector: leaderSector || "—",
+        chg: leaderRow.Chg_5D_Pct != null ? leaderRow.Chg_5D_Pct : (leaderRow.Chg_1D_Pct || 0)},
+      peerCount: laggards.length, peerItems: peerItems,
+      candidate: {
+        sym: topLaggard.Laggard_Candidate, sector: sectorByTicker[topLaggard.Laggard_Candidate] || "—",
+        chg1d: candidateRow.Chg_1D_Pct != null ? candidateRow.Chg_1D_Pct : 0,
+        convergenceScore: Math.round((topLaggard.Hub_Score || 0) * 100)
+      }
+    };
+  } else if ((data.graph_hub_leaders_top20 || []).length){
+    // No breakout->laggard signal today, but the structure graph is populated --
+    // show the largest Louvain community among the top hub leaders instead, as
+    // a generic "these stocks cluster together structurally" view.
+    var byCommunity = {};
+    data.graph_hub_leaders_top20.forEach(function(h){ (byCommunity[h.Community_ID] = byCommunity[h.Community_ID] || []).push(h); });
+    var communities = Object.keys(byCommunity).map(function(k){ return byCommunity[k]; });
+    communities.sort(function(a, b){ return b.length - a.length; });
+    var cluster = communities[0];
+    if (cluster && cluster.length > 1){
+      var centerHub = cluster.slice().sort(function(a, b){ return b.Hub_Score - a.Hub_Score; })[0];
+      var cx2 = 400, cy2 = 215, r2 = 165;
+      var members = cluster.filter(function(h){ return h.Ticker !== centerHub.Ticker; }).slice(0, 6);
+      var nodes2 = [{id: centerHub.Ticker, label: centerHub.Ticker, type: "leader", role: "center",
+        score: Math.round(centerHub.Hub_Score * 100), x: cx2, y: cy2}];
+      var edges2 = [];
+      members.forEach(function(h, i){
+        var angle = (Math.PI * 2 * i / Math.max(members.length, 1)) - Math.PI / 2;
+        var x = cx2 + r2 * Math.cos(angle), y = cy2 + r2 * Math.sin(angle) * 0.78;
+        nodes2.push({id: h.Ticker, label: h.Ticker, type: "candidate", role: "stock",
+          score: Math.round(h.Hub_Score * 100), x: Math.round(x), y: Math.round(y), strength: Math.max(0.3, h.Hub_Score)});
+        edges2.push([centerHub.Ticker, h.Ticker]);
+      });
+      result.graphNodes = nodes2; result.graphEdges = edges2; result.graphAvailable = true;
+    }
+  }
+
+  return result;
+}
+
+function applyLiveData(data){
+  if (!data) return false;
+  var live = buildLiveUniverse(data);
+  if (!live) return false;
+
+  STOCK_UNIVERSE = live.universe;
+  STOCK_DATA = live.stockData;
+  METRIC_CARDS = buildLiveMetricCards(data);
+
+  var mi = data.market_indices;
+  if (mi && mi.NIFTY50 && mi.NIFTY50.Series && mi.NIFTY50.Series.length){
+    NIFTY_SERIES_FULL = mi.NIFTY50.Series.map(function(p){ return p.Close; });
+    NIFTY_DATES_FULL = mi.NIFTY50.Series.map(function(p){ return p.Date; });
+    MOMENTUM_LIVE_AVAILABLE = true;
+  } else {
+    MOMENTUM_LIVE_AVAILABLE = false; // renderMomentumChart() shows an explicit empty state, not mock numbers
+  }
+
+  var gf = buildLiveGraphAndFlow(data);
+  if (gf.graphAvailable){ GRAPH_NODES = gf.graphNodes; GRAPH_EDGES = gf.graphEdges; }
+  GRAPH_LIVE_AVAILABLE = gf.graphAvailable;
+  FLOW_DATA_LIVE = gf.flow;
+
+  LIVE_WARNINGS = data.warnings || [];
+  IS_LIVE = true;
+  return true;
+}
+
+function applyLiveChrome(data){
+  var badge = document.getElementById("demo-badge");
+  var badgeText = document.getElementById("demo-badge-text");
+  var updatedEl = document.getElementById("sidebar-updated-time");
+  var dbDot = document.getElementById("db-status-dot");
+  var dbText = document.getElementById("db-status-text");
+
+  if (IS_LIVE){
+    badge.classList.add("is-live");
+    badgeText.textContent = "Live";
+  } else {
+    badge.classList.remove("is-live");
+    badgeText.textContent = "Demo data";
+  }
+
+  if (data && data.generated_at_utc){
+    try {
+      var gen = new Date(data.generated_at_utc);
+      updatedEl.textContent = gen.toLocaleString("en-IN", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+    } catch (e) { /* leave the default text */ }
+  }
+
+  var warnings = LIVE_WARNINGS || [];
+  var neo4jDown = warnings.some(function(w){
+    return /NEO4J_URI not set|Graph centrality step failed|no Stock nodes found/.test(w);
+  });
+  if (IS_LIVE && neo4jDown){
+    if (dbDot) dbDot.classList.add("warn");
+    if (dbText) dbText.textContent = "Degraded";
+  } else if (IS_LIVE){
+    if (dbDot) dbDot.classList.remove("warn");
+    if (dbText) dbText.textContent = "Connected";
+  }
+  // In mock mode (IS_LIVE false), leave the sidebar's default "Connected" —
+  // it describes the pipeline's own last known state, not this page load.
+}
+
+function updateDefaultStockNav(){
+  var ranked = STOCK_UNIVERSE.slice().sort(function(a, b){ return b.swing - a.swing; });
+  var top = ranked[0] && ranked[0].sym;
+  if (!top) return;
+  document.querySelectorAll('[data-stock]').forEach(function(el){ el.setAttribute("data-stock", top); });
+}
+
+/* ============================================================
    Init
    ============================================================ */
 function updateGreeting(){
@@ -1570,8 +2015,9 @@ function updateGreeting(){
   document.getElementById("greet-line").textContent = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
 }
 
-function init(){
+function renderAll(){
   updateGreeting();
+  updateDefaultStockNav();
   renderMetricCards();
   renderOpportunities();
   renderOppTable();
@@ -1581,6 +2027,10 @@ function init(){
   syncSegmented(document.getElementById("momentum-range"), currentMomentumRange);
   renderMomentumChart(currentMomentumRange);
   buildSegmented(document.getElementById("stock-range"), "stock");
+}
+
+function init(){
+  renderAll();
 
   var stageEl = document.getElementById("graph-stage");
   stageEl.addEventListener("click", function(evt){
@@ -1590,6 +2040,15 @@ function init(){
   window.addEventListener("resize", function(){
     renderMomentumChart(currentMomentumRange);
     if (document.body.getAttribute("data-view") === "stock"){ renderStockChart(STOCK_DATA[currentDetailSym()], currentStockRange); }
+  });
+
+  // Render immediately on the deterministic mock data (no flash of empty
+  // UI while the network round-trip is in flight), then swap to real data
+  // in place and re-render if/when a usable dashboard_data.json arrives.
+  fetchDashboardData().then(function(data){
+    var wasLive = applyLiveData(data);
+    applyLiveChrome(data);
+    if (wasLive){ renderAll(); }
   });
 }
 init();
