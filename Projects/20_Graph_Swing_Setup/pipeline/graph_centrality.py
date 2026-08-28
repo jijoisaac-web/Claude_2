@@ -14,6 +14,24 @@ queries can filter/sort on them directly.
 Writes are batched (UNWIND + MERGE) to stay efficient against Aura Free's
 memory headroom and the 400k relationship / 200k node ceiling.
 
+BUG FIX (2026-08-28): fetch_graph() originally only pulled Stock-to-Stock
+relationships (MATCH (a:Stock)-[r:...]->(b:Stock)). Until supply-chain /
+ownership edges are curated, BELONGS_TO -- (:Stock)-[:BELONGS_TO]->(:Sector)
+-- is the ONLY relationship type actually populated, and its target is a
+:Sector node, never a :Stock node. That query therefore matched zero rows,
+so every Stock node landed in the graph fully isolated (0 edges). The
+observable symptom on the very first real run: Hub_Score = exactly 0.5 for
+every single stock (PageRank/PageRank_max = 1 for all when PageRank is
+uniform across an edgeless graph; betweenness and out-degree both collapse
+to the "or 1e-9" fallback and contribute 0), and Louvain assigned every
+stock its own singleton community (0, 1, 2, ... in node-insertion order,
+since there was no structure to cluster on). Fix: fetch_graph() now also
+pulls BELONGS_TO edges and includes Sector nodes in the graph purely as
+structure -- something for PageRank to flow through and for Louvain to
+cluster around -- while compute_centrality()/compute_communities() filter
+Sector nodes back out before returning, since scores are only ever reported
+and written for Stock nodes.
+
 Requires: neo4j, networkx, pandas, python-dotenv
 Environment variables expected: NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 """
@@ -34,7 +52,8 @@ BATCH_SIZE = 500  # keep write transactions small
 
 # Which relationship types feed the centrality graph, and their traversal weight.
 # Supply-chain / ownership edges carry more contagion weight than a shared-sector edge,
-# which is too coarse (hundreds of stocks) to treat as a strong structural link.
+# which is too coarse (hundreds of stocks) to treat as a strong structural link -- it's
+# included at low weight so the graph isn't fully disconnected before those edges exist.
 EDGE_WEIGHTS = {
     "SUPPLIES_TO": 3.0,
     "PARENT_OF": 3.0,
@@ -43,22 +62,42 @@ EDGE_WEIGHTS = {
     "BELONGS_TO": 0.5,   # sector
 }
 
+# Prefix used to namespace Sector nodes in the networkx graph so a sector name can
+# never collide with a ticker symbol (both are added as plain string node IDs).
+SECTOR_PREFIX = "SECTOR::"
+
 
 def fetch_graph(driver) -> nx.DiGraph:
-    """Pull all Stock nodes and weighted relationships into a networkx DiGraph."""
+    """
+    Pull all Stock nodes plus every structural relationship that connects
+    them: direct Stock-to-Stock edges (SUPPLIES_TO / PARENT_OF /
+    SUBSIDIARY_OF / PART_OF) when present, and Stock-to-Sector BELONGS_TO
+    edges, which today are the only edges actually populated. Sector nodes
+    are added to the networkx graph (namespaced with SECTOR_PREFIX) purely
+    as structure -- callers that report per-stock results filter them back
+    out.
+    """
     g = nx.DiGraph()
     with driver.session() as session:
         for record in session.run("MATCH (s:Stock) RETURN s.ticker AS ticker"):
-            g.add_node(record["ticker"])
+            g.add_node(record["ticker"], node_type="Stock")
 
-        rel_types = "|".join(EDGE_WEIGHTS.keys())
-        query = f"""
-            MATCH (a:Stock)-[r:{rel_types}]->(b:Stock)
-            RETURN a.ticker AS src, b.ticker AS dst, type(r) AS rel_type
-        """
-        for record in session.run(query):
-            weight = EDGE_WEIGHTS.get(record["rel_type"], 0.5)
-            g.add_edge(record["src"], record["dst"], weight=weight, rel_type=record["rel_type"])
+        stock_rel_types = [t for t in EDGE_WEIGHTS if t != "BELONGS_TO"]
+        if stock_rel_types:
+            query = f"""
+                MATCH (a:Stock)-[r:{'|'.join(stock_rel_types)}]->(b:Stock)
+                RETURN a.ticker AS src, b.ticker AS dst, type(r) AS rel_type
+            """
+            for record in session.run(query):
+                weight = EDGE_WEIGHTS.get(record["rel_type"], 0.5)
+                g.add_edge(record["src"], record["dst"], weight=weight, rel_type=record["rel_type"])
+
+        for record in session.run(
+            "MATCH (s:Stock)-[:BELONGS_TO]->(sec:Sector) RETURN s.ticker AS src, sec.name AS dst"
+        ):
+            sector_node = f"{SECTOR_PREFIX}{record['dst']}"
+            g.add_node(sector_node, node_type="Sector")
+            g.add_edge(record["src"], sector_node, weight=EDGE_WEIGHTS["BELONGS_TO"], rel_type="BELONGS_TO")
     return g
 
 
@@ -75,13 +114,19 @@ def compute_centrality(g: nx.DiGraph) -> pd.DataFrame:
     actually want a contagion hub to mean. Out-degree centrality reinforces the same
     intuition directly; betweenness stays on the original (forward) direction since
     it measures a node's role as a pass-through link in real supply-chain paths.
+
+    Sector nodes participate in these computations (they're real graph structure --
+    e.g. a stock in a small sector gets a bigger reversed-PageRank share per edge
+    than one in a large sector) but are excluded from the returned DataFrame, which
+    reports Stock nodes only.
     """
     reversed_g = g.reverse(copy=True)
     pagerank = nx.pagerank(reversed_g, weight="weight")
     betweenness = nx.betweenness_centrality(g, weight="weight", normalized=True)
     out_degree = nx.out_degree_centrality(g)
 
-    df = pd.DataFrame({"Ticker": list(g.nodes())})
+    stock_nodes = [n for n, data in g.nodes(data=True) if data.get("node_type") == "Stock"]
+    df = pd.DataFrame({"Ticker": stock_nodes})
     df["PageRank"] = df["Ticker"].map(pagerank)
     df["Betweenness"] = df["Ticker"].map(betweenness)
     df["Out_Degree_Centrality"] = df["Ticker"].map(out_degree)
@@ -102,13 +147,20 @@ def compute_centrality(g: nx.DiGraph) -> pd.DataFrame:
 
 
 def compute_communities(g: nx.DiGraph) -> pd.DataFrame:
-    """Louvain community detection on the undirected projection of the graph."""
+    """
+    Louvain community detection on the undirected projection of the graph.
+    Sector nodes are included in the clustering (today they're the only thing
+    giving Louvain any structure to cluster on -- without them every stock is
+    isolated and lands in its own singleton community) but are stripped out
+    of the returned rows, and Community_Size counts Stock members only.
+    """
     undirected = g.to_undirected()
     communities = nx.algorithms.community.louvain_communities(undirected, weight="weight", seed=42)
     rows = []
     for community_id, members in enumerate(communities):
-        for ticker in members:
-            rows.append({"Ticker": ticker, "Community_ID": community_id, "Community_Size": len(members)})
+        stock_members = [m for m in members if g.nodes[m].get("node_type") == "Stock"]
+        for ticker in stock_members:
+            rows.append({"Ticker": ticker, "Community_ID": community_id, "Community_Size": len(stock_members)})
     return pd.DataFrame(rows)
 
 
@@ -137,12 +189,16 @@ def find_contagion_candidates(g: nx.DiGraph, centrality_df: pd.DataFrame,
     Given tickers that just triggered a technical breakout, return their direct
     graph neighbors (laggard candidates) ranked by how strongly they're
     structurally coupled to the breakout node -- this is the core laggard screen.
+
+    Sector nodes are excluded from "neighbors": a stock's own sector isn't a
+    laggard candidate, it's the grouping structure the graph runs through.
     """
     candidates = []
     for ticker in breakout_tickers:
         if ticker not in g:
             continue
-        neighbors = set(g.predecessors(ticker)) | set(g.successors(ticker))
+        raw_neighbors = set(g.predecessors(ticker)) | set(g.successors(ticker))
+        neighbors = {n for n in raw_neighbors if g.nodes[n].get("node_type") == "Stock"}
         for neighbor in neighbors:
             edge_data = g.get_edge_data(ticker, neighbor) or g.get_edge_data(neighbor, ticker)
             weight = edge_data["weight"] if edge_data else 0.5
