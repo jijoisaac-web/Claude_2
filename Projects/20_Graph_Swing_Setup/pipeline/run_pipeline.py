@@ -30,6 +30,8 @@ import pandas as pd
 from rs_ranking import compute_rs_ranking, compute_market_breadth
 from institutional_footprint import compute_bulk_deal_signals, compute_flow_regime
 from derivatives_analysis import classify_oi_buildup, screen_high_conviction_longs
+from technical_signals import compute_technical_signals
+from swing_score import compute_swing_score
 
 BASE = Path(__file__).resolve().parent
 DATA_DIR = BASE.parent / "data"
@@ -79,6 +81,22 @@ def main():
     else:
         report["warnings"].append("daily_eod.csv missing -- breadth + RS ranking not computed.")
 
+    # Technical signals (breakout/pullback/RSI/volume) only need daily_eod.csv,
+    # same as breadth/RS above -- computed here, independent of whether Neo4j
+    # is reachable, so swing_score's Technical/Volume pillars and the
+    # leader-laggard breakout list both still work even if the graph step
+    # below fails or is skipped. New code path on real 750-ticker data for
+    # the first time, unlike breadth/RS which are already proven live, so
+    # this one gets its own try/except rather than being allowed to abort
+    # the whole run.
+    technical = None
+    if eod is not None:
+        try:
+            technical = compute_technical_signals(eod)
+            report["technical_signals_computed_for"] = len(technical)
+        except Exception as exc:
+            report["warnings"].append(f"Technical signals step failed: {exc!r}")
+
     bulk = _read_csv("bulk_deals.csv")
     if bulk is not None:
         signals = compute_bulk_deal_signals(bulk)
@@ -107,7 +125,10 @@ def main():
 
     if os.environ.get("NEO4J_URI"):
         from neo4j import GraphDatabase
-        from graph_centrality import fetch_graph, compute_centrality, compute_communities, write_scores_back
+        from graph_centrality import (
+            fetch_graph, compute_centrality, compute_communities, write_scores_back,
+            find_contagion_candidates,
+        )
         from correlation_edges import compute_return_matrix, compute_top_correlated_pairs, refresh_correlation_edges
         from sector_rotation import fetch_sector_map, compute_sector_rotation, update_rotation_history
 
@@ -134,6 +155,10 @@ def main():
                         "60+ trading days) -- skipped this run, will retry as history accumulates."
                     )
 
+            # Default empty so swing_score's GraphStrength pillar and the
+            # leader-laggard screener below can both run (as all-zero /
+            # skipped, not crashed) even when the graph itself is empty.
+            centrality_df = pd.DataFrame(columns=["Ticker", "Hub_Score"])
             graph = fetch_graph(driver)
             if graph.number_of_nodes() == 0:
                 report["warnings"].append(
@@ -147,6 +172,7 @@ def main():
                 merged = centrality.merge(communities, on="Ticker", how="left")
                 write_scores_back(driver, merged)
                 report["graph_hub_leaders_top20"] = merged.head(20).to_dict("records")
+                centrality_df = merged
 
             # Sector rotation: aggregates RS Ranking (already computed above) up to
             # sector level using Neo4j's BELONGS_TO membership -- independent of
@@ -161,6 +187,33 @@ def main():
                 rotation_path = DATA_DIR / "sector_rotation_history.csv"
                 rotation_latest = update_rotation_history(rotation_today, breadth["Date"], rotation_path)
                 report["sector_rotation"] = rotation_latest.to_dict("records")
+
+                # Swing Score: the composite opportunity-ranking engine, blending
+                # Technical/RS/Volume/Sector/GraphStrength/Regime -- everything
+                # above is already in scope here, so this is pure combination,
+                # no new data source. Runs even if centrality_df ended up empty
+                # (graph step above hit the empty-graph branch) -- GraphStrength
+                # just contributes 0 for every ticker in that case.
+                if technical is not None:
+                    swing_df = compute_swing_score(
+                        technical, rs, sector_map, rotation_latest, centrality_df, breadth["Regime"]
+                    )
+                    report["swing_score_top20"] = swing_df.head(20).to_dict("records")
+
+                    # Leader-laggard: operationalizes find_contagion_candidates(),
+                    # which existed since the first graph_centrality.py delivery
+                    # but was never called (example_breakouts = [] was hardcoded).
+                    # Feed it today's real Breakout_20D/50D tickers. Needs the
+                    # actual graph object, which only carries real edges when the
+                    # graph wasn't empty.
+                    if graph.number_of_nodes() > 0:
+                        breakout_tickers = technical.loc[
+                            technical["Breakout_20D"] | technical["Breakout_50D"], "Ticker"
+                        ].tolist()
+                        if breakout_tickers:
+                            contagion = find_contagion_candidates(graph, centrality_df, breakout_tickers)
+                            if not contagion.empty:
+                                report["leader_laggard_top20"] = contagion.head(20).to_dict("records")
         except Exception as exc:
             # A graph-centrality failure (bad creds, transient Aura hiccup,
             # missing scipy, anything) should not discard the breadth/RS/

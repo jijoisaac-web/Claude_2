@@ -170,7 +170,12 @@ def compute_communities(g: nx.DiGraph) -> pd.DataFrame:
         stock_members = [m for m in members if g.nodes[m].get("node_type") == "Stock"]
         for ticker in stock_members:
             rows.append({"Ticker": ticker, "Community_ID": community_id, "Community_Size": len(stock_members)})
-    return pd.DataFrame(rows)
+    # Explicit columns matter here: pd.DataFrame([]) with no rows produces a
+    # DataFrame with ZERO columns, not these three -- and callers merge this
+    # onto centrality's output with `on="Ticker"`, which raises KeyError if
+    # every community happened to contain only Sector nodes (caught via a
+    # smoke test exercising a graph with no Stock-typed nodes at all).
+    return pd.DataFrame(rows, columns=["Ticker", "Community_ID", "Community_Size"])
 
 
 def write_scores_back(driver, scores_df: pd.DataFrame):
