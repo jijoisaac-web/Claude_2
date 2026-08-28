@@ -6405,3 +6405,36 @@ function nrifiRetake(){
 }
 // ── END NRI-FI SCORE ─────────────────────────────────────────────────────
 
+
+// ── ALL TOOLS GROUP SCROLL ───────────────────────────────────────────────
+function scrollToAllToolsGroup(group) {
+  var section = document.querySelector('.all-tools-section');
+  if (!section) return;
+  // scroll to section
+  var top = section.getBoundingClientRect().top + window.scrollY - 72;
+  window.scrollTo({top: top, behavior: 'smooth'});
+  // find and highlight the right group label
+  setTimeout(function() {
+    var labels = document.querySelectorAll('.all-tools-group-lbl');
+    labels.forEach(function(lbl) {
+      lbl.classList.remove('at-group-highlight');
+    });
+    var map = {
+      'manage': '📊 Manage Finances',
+      'move':   '💸 Move Money',
+      'plan':   '🗓 Plan Your Future',
+      'travel': '✈ Travel & Guides'
+    };
+    var target = map[group];
+    labels.forEach(function(lbl) {
+      if (lbl.textContent.trim() === target) {
+        lbl.classList.add('at-group-highlight');
+        // scroll to the specific group within the section
+        var grpTop = lbl.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({top: grpTop, behavior: 'smooth'});
+        setTimeout(function(){ lbl.classList.remove('at-group-highlight'); }, 2000);
+      }
+    });
+  }, 500);
+}
+// ────────────────────────────────────────────────────────────────────────

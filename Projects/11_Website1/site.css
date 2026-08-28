@@ -1511,9 +1511,9 @@ nav.site-nav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;display
 .hero-widgets-row{flex:1;min-width:0;margin-top:0!important;flex-wrap:nowrap;justify-content:flex-start!important;animation:none;}
 .hero-widgets-row .hero-rates-panel{flex:1 1 0;min-width:0;}
 .hero-corpus-panel{flex:0 0 268px;min-width:230px;}
-/* monitor ≥1441px: generous padding + fixed bg parallax */
+/* monitor ≥1441px: generous padding + centered content + fixed bg parallax */
 @media(min-width:1441px){
-  .hero-section{padding:90px 44px 36px!important;background-attachment:fixed,scroll!important;}
+  .hero-section{padding:90px 44px 36px!important;justify-content:center!important;min-height:100vh!important;background-attachment:fixed,scroll!important;background-position:center 55%,center!important;}
 }
 /* laptop 14" ≤1300px */
 @media(max-width:1300px) and (min-width:801px){
@@ -2917,3 +2917,31 @@ details[open].fl-win-fare-details>.fl-win-fare-summary::before{transform:rotate(
   }
 }
 /* ══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ 14" FINAL v2 — fixed bg like monitor, tight padding ═══════════════════ */
+@media (max-width:1440px) and (min-width:801px) {
+  .hero-section {
+    padding: 72px 32px 28px !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    min-height: 100vh !important;
+    background-attachment: fixed, scroll !important;
+    background-position: center center, center !important;
+  }
+}
+@media (max-width:1300px) and (min-width:801px) {
+  .hero-section { padding: 68px 24px 24px !important; }
+}
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+/* All Tools group highlight on pathway click */
+.at-group-highlight{
+  color:var(--amber)!important;
+  animation:atGroupPulse 2s ease;
+}
+@keyframes atGroupPulse{
+  0%{letter-spacing:.8px;opacity:1;}
+  20%{letter-spacing:2px;opacity:1;color:#f59e0b;}
+  60%{letter-spacing:1.5px;opacity:.9;}
+  100%{letter-spacing:.8px;opacity:1;}
+}
