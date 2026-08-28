@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-28T05:16:07.239875+00:00",
+  "generated_at_utc": "2026-08-28T05:31:15.923725+00:00",
   "warnings": [
     "daily_eod.csv missing -- breadth + RS ranking not computed.",
     "bulk_deals.csv missing -- institutional signals not computed.",
@@ -8,184 +8,184 @@
   ],
   "graph_hub_leaders_top20": [
     {
-      "Ticker": "360ONE",
-      "PageRank": 0.0013297872340425419,
+      "Ticker": "JKPAPER",
+      "PageRank": 0.0023331877689402457,
       "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.7,
+      "Community_ID": 20,
       "Community_Size": 1
+    },
+    {
+      "Ticker": "DCMSHRIRAM",
+      "PageRank": 0.0016187486437986309,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5468963504240125,
+      "Community_ID": 1,
+      "Community_Size": 3
+    },
+    {
+      "Ticker": "GODREJIND",
+      "PageRank": 0.0016187486437986309,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5468963504240125,
+      "Community_ID": 1,
+      "Community_Size": 3
     },
     {
       "Ticker": "3MINDIA",
-      "PageRank": 0.0013297872340425419,
+      "PageRank": 0.0016187486437986309,
       "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5468963504240125,
       "Community_ID": 1,
-      "Community_Size": 1
+      "Community_Size": 3
     },
     {
-      "Ticker": "ABB",
-      "PageRank": 0.0013297872340425419,
+      "Ticker": "REFEX",
+      "PageRank": 0.0015294437531559292,
       "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 2,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ACC",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 3,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ACMESOLAR",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 4,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AIAENG",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 5,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "APLAPOLLO",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 6,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ASKAUTOLTD",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 7,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AUBANK",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 8,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AWL",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 9,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AXISCADES",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 10,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AADHARHFC",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 11,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AARTIDRUGS",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 12,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AARTIIND",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 13,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AARTIPHARM",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 14,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "AAVAS",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 15,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ABBOTINDIA",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 16,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ACE",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 17,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ACUTAAS",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
-      "Community_ID": 18,
-      "Community_Size": 1
-    },
-    {
-      "Ticker": "ADANIENSOL",
-      "PageRank": 0.0013297872340425419,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.0,
-      "Hub_Score": 0.5,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5277583942270141,
       "Community_ID": 19,
-      "Community_Size": 1
+      "Community_Size": 4
+    },
+    {
+      "Ticker": "IONEXCHANG",
+      "PageRank": 0.0015294437531559292,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5277583942270141,
+      "Community_ID": 19,
+      "Community_Size": 4
+    },
+    {
+      "Ticker": "WABAG",
+      "PageRank": 0.0015294437531559292,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5277583942270141,
+      "Community_ID": 19,
+      "Community_Size": 4
+    },
+    {
+      "Ticker": "EIEL",
+      "PageRank": 0.0015294437531559292,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.5277583942270141,
+      "Community_ID": 19,
+      "Community_Size": 4
+    },
+    {
+      "Ticker": "NAZARA",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "PFOCUS",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "SUNTV",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "SAREGAMA",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "NETWORK18",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "PVRINOX",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "ZEEL",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "TIPSMUSIC",
+      "PageRank": 0.0013954864171918766,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4990514599315165,
+      "Community_ID": 21,
+      "Community_Size": 8
+    },
+    {
+      "Ticker": "PGIL",
+      "PageRank": 0.0013508339718705255,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4894824818330173,
+      "Community_ID": 16,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "KITEX",
+      "PageRank": 0.0013508339718705255,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4894824818330173,
+      "Community_ID": 16,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "GOKEX",
+      "PageRank": 0.0013508339718705255,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4894824818330173,
+      "Community_ID": 16,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "PAGEIND",
+      "PageRank": 0.0013508339718705255,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.00129366106080207,
+      "Hub_Score": 0.4894824818330173,
+      "Community_ID": 16,
+      "Community_Size": 12
     }
   ]
 }
