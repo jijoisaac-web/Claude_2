@@ -112,11 +112,24 @@ def main():
         )
         try:
             graph = fetch_graph(driver)
-            centrality = compute_centrality(graph)
-            communities = compute_communities(graph)
-            merged = centrality.merge(communities, on="Ticker", how="left")
-            write_scores_back(driver, merged)
-            report["graph_hub_leaders_top20"] = merged.head(20).to_dict("records")
+            if graph.number_of_nodes() == 0:
+                report["warnings"].append(
+                    "Neo4j connected but no Stock nodes found -- graph is empty. "
+                    "Load the Nifty 750 schema (schema_extensions.cypher + your "
+                    "Stock/Sector ingestion) before centrality scores will populate."
+                )
+            else:
+                centrality = compute_centrality(graph)
+                communities = compute_communities(graph)
+                merged = centrality.merge(communities, on="Ticker", how="left")
+                write_scores_back(driver, merged)
+                report["graph_hub_leaders_top20"] = merged.head(20).to_dict("records")
+        except Exception as exc:
+            # A graph-centrality failure (bad creds, transient Aura hiccup,
+            # missing scipy, anything) should not discard the breadth/RS/
+            # institutional/derivatives sections already computed above --
+            # log it into the report and let the rest of the run finish.
+            report["warnings"].append(f"Graph centrality step failed: {exc!r}")
         finally:
             driver.close()
     else:
