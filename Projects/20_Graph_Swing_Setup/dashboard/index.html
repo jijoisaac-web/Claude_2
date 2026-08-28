@@ -1308,8 +1308,12 @@ function renderMetricCards(){
 function sparklineSVG(series, positive){
   var w = 76, h = 30, min = Math.min.apply(null, series), max = Math.max.apply(null, series);
   var range = (max - min) || 1;
+  var n = series.length;
   var pts = series.map(function(v, i){
-    var x = (i / (series.length - 1)) * w;
+    // n===1 (e.g. live index history on its very first day) would divide by
+    // (n-1)=0 -> NaN coordinates and an invalid <polyline>/<circle> the browser
+    // silently drops. Center the lone point instead so it renders as a dot.
+    var x = n > 1 ? (i / (n - 1)) * w : w / 2;
     var y = h - ((v - min) / range) * (h - 4) - 2;
     return x.toFixed(1) + "," + y.toFixed(1);
   }).join(" ");
@@ -1474,11 +1478,25 @@ function renderMomentumChart(range){
       '<div>NIFTY 50 levels populate after fetch_index_levels.py has run at least once. Real Swing Score / Opportunity data above is unaffected.</div>';
     return;
   }
-  svg.style.display = ""; emptyState.style.display = "none";
-
   var n = RANGE_DAYS[range];
   var series = NIFTY_SERIES_FULL.slice(-n);
   var seriesDates = NIFTY_DATES_FULL.slice(-n);
+
+  // Defense in depth: even with the >=2-point gate above, a degenerate slice here
+  // (e.g. a future range bucket smaller than the available history) must never
+  // reach the X()/Y() math below -- dividing by (series.length-1) at length 1
+  // produces NaN coordinates and a silently blank chart. Fall back to the same
+  // honest empty state rather than drawing nothing unexplained.
+  if (series.length < 2){
+    svg.style.display = "none";
+    tooltipEl.classList.remove("show");
+    emptyState.style.display = "flex";
+    emptyState.innerHTML = ICON_UP + '<div class="ges-title">Not enough history for this range yet</div>' +
+      '<div>This range needs at least 2 trading days of index-level history. Real Swing Score / Opportunity data above is unaffected.</div>';
+    return;
+  }
+
+  svg.style.display = ""; emptyState.style.display = "none";
   svg.innerHTML = "";
   var W = 760, H = 260, padL = 6, padR = 6, padT = 14, padB = 26;
   var min = Math.min.apply(null, series), max = Math.max.apply(null, series);
@@ -1945,7 +1963,12 @@ function applyLiveData(data){
   METRIC_CARDS = buildLiveMetricCards(data);
 
   var mi = data.market_indices;
-  if (mi && mi.NIFTY50 && mi.NIFTY50.Series && mi.NIFTY50.Series.length){
+  // Require >=2 points: a single-day Series (day one after fetch_index_levels.py's
+  // first-ever run) can't draw a line -- X(i) divides by (series.length-1), which is
+  // 0/0 = NaN for a lone point, silently rendering a blank chart with no line and no
+  // explanation. Treat that as "not enough history yet" and show the honest empty
+  // state below instead, same as the no-history-at-all case.
+  if (mi && mi.NIFTY50 && mi.NIFTY50.Series && mi.NIFTY50.Series.length >= 2){
     NIFTY_SERIES_FULL = mi.NIFTY50.Series.map(function(p){ return p.Close; });
     NIFTY_DATES_FULL = mi.NIFTY50.Series.map(function(p){ return p.Date; });
     MOMENTUM_LIVE_AVAILABLE = true;
