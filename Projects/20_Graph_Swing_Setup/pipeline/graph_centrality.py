@@ -54,10 +54,19 @@ BATCH_SIZE = 500  # keep write transactions small
 # Supply-chain / ownership edges carry more contagion weight than a shared-sector edge,
 # which is too coarse (hundreds of stocks) to treat as a strong structural link -- it's
 # included at low weight so the graph isn't fully disconnected before those edges exist.
+# CORRELATED_WITH (see correlation_edges.py, added 2026-08-28) sits in between: real,
+# data-driven structure derived from actual price co-movement -- not a guess -- but
+# still statistical association, not confirmed corporate/supply-chain causation, so it's
+# weighted below the ownership tier. As of 2026-08-28, SUPPLIES_TO/PARENT_OF/
+# SUBSIDIARY_OF have zero populated edges (no curated source yet); CORRELATED_WITH is
+# the first edge type besides BELONGS_TO that actually exists in the graph, which is
+# why Hub_Score/community detection should start differentiating beyond pure sector
+# grouping once correlation_edges.py has run against enough backfilled history.
 EDGE_WEIGHTS = {
     "SUPPLIES_TO": 3.0,
     "PARENT_OF": 3.0,
     "SUBSIDIARY_OF": 3.0,
+    "CORRELATED_WITH": 1.5,  # data-driven price co-movement, see correlation_edges.py
     "PART_OF": 1.0,      # industry
     "BELONGS_TO": 0.5,   # sector
 }

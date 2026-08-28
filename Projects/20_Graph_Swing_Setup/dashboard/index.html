@@ -487,6 +487,9 @@
         <a href="#regime" class="active">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-10"/></svg>
           Regime</a>
+        <a href="#rotation">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.5-7.1M21 3v6h-6"/></svg>
+          Sector Rotation</a>
         <a href="#rs">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
           RS Ranking</a>
@@ -551,6 +554,27 @@
           </div>
         </section>
 
+        <section class="card" id="rotation">
+          <div class="card-head">
+            <h2>
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.5-7.1M21 3v6h-6"/></svg>
+              Sector Rotation</h2>
+            <span class="card-desc">Avg RS Rating by sector, day-over-day</span>
+          </div>
+          <div class="table-scroll">
+            <table id="rotation-table">
+              <thead><tr>
+                <th data-key="Sector">Sector</th>
+                <th class="num" data-key="Avg_RS_Rating">Avg RS Rating</th>
+                <th class="num" data-key="Member_Count">Members</th>
+                <th class="num" data-key="Change_1D">1D Change</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="rotation-empty" class="empty-state" style="display:none;">No sector rotation data in this run.</div>
+        </section>
+
         <section class="card" id="rs">
           <div class="card-head">
             <h2>
@@ -576,7 +600,7 @@
             <h2>
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 17l7.5-9.7M8.3 16.5l8 .8"/></svg>
               Graph Hub Leaders</h2>
-            <span class="card-desc">PageRank + betweenness + degree, Louvain community</span>
+            <span class="card-desc">PageRank + betweenness + degree over sector &amp; price-correlation structure</span>
           </div>
           <div class="table-scroll">
             <table id="hub-table">
@@ -739,6 +763,16 @@
     return '<span class="badge ' + meta.cls + '">' + meta.icon + esc((type || "—").replace(/_/g, " ")) + "</span>";
   }
 
+  function changeBadge(value) {
+    var v = Number(value);
+    if (value === null || value === undefined || Number.isNaN(v)) {
+      return '<span class="badge neutral">' + DASH + '—</span>';
+    }
+    if (v > 0) return '<span class="badge good">' + TREND_UP + '+' + fmtNum(v, 1) + '</span>';
+    if (v < 0) return '<span class="badge critical">' + TREND_DOWN + fmtNum(v, 1) + '</span>';
+    return '<span class="badge neutral">' + DASH + '0.0' + '</span>';
+  }
+
   function rolloverBadge(flag) {
     var isCaution = /LOW|CAUTION/i.test(String(flag || ""));
     var cls = isCaution ? "warning" : "good";
@@ -879,6 +913,10 @@
         flowBadge.innerHTML = DASH + "Unavailable";
         flowBadge.className = "badge neutral";
       }
+
+      fillTable("rotation-table", "rotation-empty", data.sector_rotation, ["Sector", "Avg_RS_Rating", "Member_Count", "Change_1D"], function (r) {
+        return "<td class='ticker'>" + esc(r.Sector) + "</td><td class='num'>" + magnitudeBar(r.Avg_RS_Rating, 99, 1) + "</td><td class='num'>" + fmtNum(r.Member_Count, 0) + "</td><td class='num'>" + changeBadge(r.Change_1D) + "</td>";
+      });
 
       fillTable("rs-table", "rs-empty", data.rs_ranking_top20, ["RS_Rank", "Ticker", "RS_Rating"], function (r) {
         return "<td class='num'>" + fmtNum(r.RS_Rank, 0) + "</td><td class='ticker'>" + esc(r.Ticker) + "</td><td class='num'>" + magnitudeBar(r.RS_Rating, 99, 0) + "</td>";

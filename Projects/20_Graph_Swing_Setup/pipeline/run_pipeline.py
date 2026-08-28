@@ -68,6 +68,7 @@ def main():
     report = {"generated_at_utc": datetime.now(timezone.utc).isoformat(), "warnings": []}
 
     eod = _read_csv("daily_eod.csv", parse_dates=["Date"])
+    rs = None
     if eod is not None:
         breadth = compute_market_breadth(eod)
         breadth["Date"] = str(breadth["Date"])
@@ -107,12 +108,32 @@ def main():
     if os.environ.get("NEO4J_URI"):
         from neo4j import GraphDatabase
         from graph_centrality import fetch_graph, compute_centrality, compute_communities, write_scores_back
+        from correlation_edges import compute_return_matrix, compute_top_correlated_pairs, refresh_correlation_edges
+        from sector_rotation import fetch_sector_map, compute_sector_rotation, update_rotation_history
 
         driver = GraphDatabase.driver(
             os.environ["NEO4J_URI"],
             auth=(os.environ["NEO4J_USER"], os.environ["NEO4J_PASSWORD"]),
         )
         try:
+            # Refresh data-driven CORRELATED_WITH edges BEFORE pulling the graph for
+            # centrality, so this same run's Hub_Score/community output already
+            # reflects today's structure rather than lagging a run behind. Kept
+            # inside the same try/except as the rest of the graph step below --
+            # a correlation-edge failure shouldn't abort centrality any more than
+            # a centrality failure should abort it.
+            if eod is not None:
+                returns = compute_return_matrix(eod)
+                if returns is not None:
+                    pairs = compute_top_correlated_pairs(returns)
+                    n_written = refresh_correlation_edges(driver, pairs)
+                    print(f"Refreshed CORRELATED_WITH edges: {len(pairs)} pairs, {n_written} directed edges.")
+                else:
+                    report["warnings"].append(
+                        "Insufficient price history for correlation edges (need "
+                        "60+ trading days) -- skipped this run, will retry as history accumulates."
+                    )
+
             graph = fetch_graph(driver)
             if graph.number_of_nodes() == 0:
                 report["warnings"].append(
@@ -126,6 +147,20 @@ def main():
                 merged = centrality.merge(communities, on="Ticker", how="left")
                 write_scores_back(driver, merged)
                 report["graph_hub_leaders_top20"] = merged.head(20).to_dict("records")
+
+            # Sector rotation: aggregates RS Ranking (already computed above) up to
+            # sector level using Neo4j's BELONGS_TO membership -- independent of
+            # whether Louvain communities/correlation edges are populated, so it's
+            # kept outside the `graph.number_of_nodes() == 0` branch above (an
+            # empty structure graph doesn't mean BELONGS_TO is empty too, and even
+            # if it is, fetch_sector_map() just returns {} and compute_sector_rotation
+            # produces an empty-but-valid table rather than crashing).
+            if rs is not None:
+                sector_map = fetch_sector_map(driver)
+                rotation_today = compute_sector_rotation(rs, sector_map)
+                rotation_path = DATA_DIR / "sector_rotation_history.csv"
+                rotation_latest = update_rotation_history(rotation_today, breadth["Date"], rotation_path)
+                report["sector_rotation"] = rotation_latest.to_dict("records")
         except Exception as exc:
             # A graph-centrality failure (bad creds, transient Aura hiccup,
             # missing scipy, anything) should not discard the breadth/RS/
