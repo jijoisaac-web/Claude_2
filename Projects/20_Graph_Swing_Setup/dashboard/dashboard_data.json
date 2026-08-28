@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-28T13:05:11.222806+00:00",
+  "generated_at_utc": "2026-08-28T21:13:58.813242+00:00",
   "warnings": [
     "fii_dii_flow.csv missing -- flow regime not computed."
   ],
@@ -341,7 +341,24 @@
       "Signal": "NEUTRAL"
     }
   ],
-  "derivatives_high_conviction": [],
+  "derivatives_high_conviction": [
+    {
+      "Ticker": "KEI",
+      "Date": "2026-08-28",
+      "Close": 5507.9,
+      "Prev_Close": 5505.0,
+      "Fut_OI": 1734950,
+      "Prev_Fut_OI": 1677550,
+      "Put_OI": 840175,
+      "Call_OI": 438375,
+      "Days_To_Expiry": 32,
+      "Rollover_Pct": 0.8,
+      "Buildup_Type": "LONG_BUILDUP",
+      "PCR": 1.92,
+      "PCR_Signal": "BULLISH_CONTRARIAN",
+      "Rollover_Flag": "NORMAL"
+    }
+  ],
   "graph_hub_leaders_top20": [
     {
       "Ticker": "RTNPOWER",
@@ -760,22 +777,6 @@
       "Volume_Ratio": 4.33
     },
     {
-      "Ticker": "NSLNISP",
-      "Sector": "Metals & Mining",
-      "Technical_Score": 65,
-      "RS_Score": 73.0,
-      "Volume_Score": 100.0,
-      "Sector_Score": 52.2,
-      "GraphStrength_Score": 5.275935888652761,
-      "Regime_Score": 50.0,
-      "Swing_Score": 62.6,
-      "Tier": "Watchlist",
-      "Price": 49.02,
-      "Chg_1D_Pct": 8.96,
-      "Chg_5D_Pct": 23.2,
-      "Volume_Ratio": 4.68
-    },
-    {
       "Ticker": "CRAFTSMAN",
       "Sector": "Automobile and Auto Components",
       "Technical_Score": 75,
@@ -790,6 +791,22 @@
       "Chg_1D_Pct": 2.02,
       "Chg_5D_Pct": 4.45,
       "Volume_Ratio": 2.07
+    },
+    {
+      "Ticker": "NSLNISP",
+      "Sector": "Metals & Mining",
+      "Technical_Score": 65,
+      "RS_Score": 73.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 52.2,
+      "GraphStrength_Score": 5.275935888652761,
+      "Regime_Score": 50.0,
+      "Swing_Score": 62.6,
+      "Tier": "Watchlist",
+      "Price": 49.02,
+      "Chg_1D_Pct": 8.96,
+      "Chg_5D_Pct": 23.2,
+      "Volume_Ratio": 4.68
     },
     {
       "Ticker": "AETHER",
@@ -808,22 +825,6 @@
       "Volume_Ratio": 2.01
     },
     {
-      "Ticker": "OFSS",
-      "Sector": "Information Technology",
-      "Technical_Score": 75,
-      "RS_Score": 92.0,
-      "Volume_Score": 57.6,
-      "Sector_Score": 43.8,
-      "GraphStrength_Score": 5.241108250505267,
-      "Regime_Score": 50.0,
-      "Swing_Score": 60.6,
-      "Tier": "Watchlist",
-      "Price": 12190.0,
-      "Chg_1D_Pct": 2.83,
-      "Chg_5D_Pct": 3.97,
-      "Volume_Ratio": 2.15
-    },
-    {
       "Ticker": "PRECWIRE",
       "Sector": null,
       "Technical_Score": 75,
@@ -838,6 +839,22 @@
       "Chg_1D_Pct": 20.0,
       "Chg_5D_Pct": 15.7,
       "Volume_Ratio": 6.54
+    },
+    {
+      "Ticker": "OFSS",
+      "Sector": "Information Technology",
+      "Technical_Score": 75,
+      "RS_Score": 92.0,
+      "Volume_Score": 57.6,
+      "Sector_Score": 43.8,
+      "GraphStrength_Score": 5.241108250505267,
+      "Regime_Score": 50.0,
+      "Swing_Score": 60.6,
+      "Tier": "Watchlist",
+      "Price": 12190.0,
+      "Chg_1D_Pct": 2.83,
+      "Chg_5D_Pct": 3.97,
+      "Volume_Ratio": 2.15
     },
     {
       "Ticker": "DYCL",
@@ -904,22 +921,6 @@
       "Volume_Ratio": 1.95
     },
     {
-      "Ticker": "SIMPLEXINF",
-      "Sector": null,
-      "Technical_Score": 75,
-      "RS_Score": 76.0,
-      "Volume_Score": 100.0,
-      "Sector_Score": 0.0,
-      "GraphStrength_Score": 0.0,
-      "Regime_Score": 50.0,
-      "Swing_Score": 57.1,
-      "Tier": "Early setup",
-      "Price": 277.59,
-      "Chg_1D_Pct": 7.31,
-      "Chg_5D_Pct": 8.56,
-      "Volume_Ratio": 3.75
-    },
-    {
       "Ticker": "OMAXE",
       "Sector": null,
       "Technical_Score": 65,
@@ -934,6 +935,22 @@
       "Chg_1D_Pct": 16.19,
       "Chg_5D_Pct": 28.46,
       "Volume_Ratio": 4.32
+    },
+    {
+      "Ticker": "SIMPLEXINF",
+      "Sector": null,
+      "Technical_Score": 75,
+      "RS_Score": 76.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 57.1,
+      "Tier": "Early setup",
+      "Price": 277.59,
+      "Chg_1D_Pct": 7.31,
+      "Chg_5D_Pct": 8.56,
+      "Volume_Ratio": 3.75
     },
     {
       "Ticker": "OAL",
@@ -984,22 +1001,6 @@
       "Volume_Ratio": 7.2
     },
     {
-      "Ticker": "SONAMLTD",
-      "Sector": null,
-      "Technical_Score": 65,
-      "RS_Score": 93.0,
-      "Volume_Score": 100.0,
-      "Sector_Score": 0.0,
-      "GraphStrength_Score": 0.0,
-      "Regime_Score": 50.0,
-      "Swing_Score": 56.6,
-      "Tier": "Early setup",
-      "Price": 73.17,
-      "Chg_1D_Pct": 15.7,
-      "Chg_5D_Pct": 12.29,
-      "Volume_Ratio": 6.02
-    },
-    {
       "Ticker": "GENUSPOWER",
       "Sector": null,
       "Technical_Score": 75,
@@ -1014,6 +1015,22 @@
       "Chg_1D_Pct": 5.27,
       "Chg_5D_Pct": 3.48,
       "Volume_Ratio": 2.91
+    },
+    {
+      "Ticker": "SONAMLTD",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 93.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.6,
+      "Tier": "Early setup",
+      "Price": 73.17,
+      "Chg_1D_Pct": 15.7,
+      "Chg_5D_Pct": 12.29,
+      "Volume_Ratio": 6.02
     }
   ],
   "stock_ohlc": {
@@ -25059,16 +25076,6 @@
     ]
   },
   "stock_technicals": {
-    "GENUSPOWER": {
-      "RSI_14": 67.8,
-      "Volume_Ratio": 2.91,
-      "Breakout_20D": true,
-      "Breakout_50D": true,
-      "EMA_Pullback": false,
-      "Higher_High": true,
-      "RSI_Bullish": true,
-      "Volume_Spike": true
-    },
     "AETHER": {
       "RSI_14": 68.8,
       "Volume_Ratio": 2.01,
@@ -25079,9 +25086,9 @@
       "RSI_Bullish": true,
       "Volume_Spike": true
     },
-    "CRAFTSMAN": {
-      "RSI_14": 68.6,
-      "Volume_Ratio": 2.07,
+    "DYCL": {
+      "RSI_14": 66.3,
+      "Volume_Ratio": 3.92,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
@@ -25089,9 +25096,9 @@
       "RSI_Bullish": true,
       "Volume_Spike": true
     },
-    "OFSS": {
-      "RSI_14": 64.8,
-      "Volume_Ratio": 2.15,
+    "GENUSPOWER": {
+      "RSI_14": 67.8,
+      "Volume_Ratio": 2.91,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
@@ -25119,9 +25126,9 @@
       "RSI_Bullish": true,
       "Volume_Spike": true
     },
-    "DYCL": {
-      "RSI_14": 66.3,
-      "Volume_Ratio": 3.92,
+    "CRAFTSMAN": {
+      "RSI_14": 68.6,
+      "Volume_Ratio": 2.07,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
@@ -25129,54 +25136,14 @@
       "RSI_Bullish": true,
       "Volume_Spike": true
     },
-    "ATHERENERG": {
-      "RSI_14": 74.1,
-      "Volume_Ratio": 4.01,
+    "OFSS": {
+      "RSI_14": 64.8,
+      "Volume_Ratio": 2.15,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
       "Higher_High": true,
-      "RSI_Bullish": false,
-      "Volume_Spike": true
-    },
-    "PTCIL": {
-      "RSI_14": 70.5,
-      "Volume_Ratio": 1.95,
-      "Breakout_20D": true,
-      "Breakout_50D": true,
-      "EMA_Pullback": false,
-      "Higher_High": true,
-      "RSI_Bullish": false,
-      "Volume_Spike": false
-    },
-    "OMAXE": {
-      "RSI_14": 83.9,
-      "Volume_Ratio": 4.32,
-      "Breakout_20D": true,
-      "Breakout_50D": true,
-      "EMA_Pullback": false,
-      "Higher_High": true,
-      "RSI_Bullish": false,
-      "Volume_Spike": true
-    },
-    "NSLNISP": {
-      "RSI_14": 73.1,
-      "Volume_Ratio": 4.68,
-      "Breakout_20D": true,
-      "Breakout_50D": true,
-      "EMA_Pullback": false,
-      "Higher_High": true,
-      "RSI_Bullish": false,
-      "Volume_Spike": true
-    },
-    "OAL": {
-      "RSI_14": 82.6,
-      "Volume_Ratio": 6.94,
-      "Breakout_20D": true,
-      "Breakout_50D": true,
-      "EMA_Pullback": false,
-      "Higher_High": true,
-      "RSI_Bullish": false,
+      "RSI_Bullish": true,
       "Volume_Spike": true
     },
     "SONAMLTD": {
@@ -25209,9 +25176,29 @@
       "RSI_Bullish": false,
       "Volume_Spike": true
     },
-    "COFORGE": {
-      "RSI_14": 78.9,
-      "Volume_Ratio": 2.58,
+    "OAL": {
+      "RSI_14": 82.6,
+      "Volume_Ratio": 6.94,
+      "Breakout_20D": true,
+      "Breakout_50D": true,
+      "EMA_Pullback": false,
+      "Higher_High": true,
+      "RSI_Bullish": false,
+      "Volume_Spike": true
+    },
+    "NAZARA": {
+      "RSI_14": 73.9,
+      "Volume_Ratio": 4.15,
+      "Breakout_20D": true,
+      "Breakout_50D": true,
+      "EMA_Pullback": false,
+      "Higher_High": true,
+      "RSI_Bullish": false,
+      "Volume_Spike": true
+    },
+    "OMAXE": {
+      "RSI_14": 83.9,
+      "Volume_Ratio": 4.32,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
@@ -25229,9 +25216,19 @@
       "RSI_Bullish": false,
       "Volume_Spike": true
     },
-    "RUBYMILLS": {
-      "RSI_14": 82.1,
-      "Volume_Ratio": 7.2,
+    "ATHERENERG": {
+      "RSI_14": 74.1,
+      "Volume_Ratio": 4.01,
+      "Breakout_20D": true,
+      "Breakout_50D": true,
+      "EMA_Pullback": false,
+      "Higher_High": true,
+      "RSI_Bullish": false,
+      "Volume_Spike": true
+    },
+    "COFORGE": {
+      "RSI_14": 78.9,
+      "Volume_Ratio": 2.58,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
@@ -25249,9 +25246,29 @@
       "RSI_Bullish": false,
       "Volume_Spike": true
     },
-    "NAZARA": {
-      "RSI_14": 73.9,
-      "Volume_Ratio": 4.15,
+    "PTCIL": {
+      "RSI_14": 70.5,
+      "Volume_Ratio": 1.95,
+      "Breakout_20D": true,
+      "Breakout_50D": true,
+      "EMA_Pullback": false,
+      "Higher_High": true,
+      "RSI_Bullish": false,
+      "Volume_Spike": false
+    },
+    "RUBYMILLS": {
+      "RSI_14": 82.1,
+      "Volume_Ratio": 7.2,
+      "Breakout_20D": true,
+      "Breakout_50D": true,
+      "EMA_Pullback": false,
+      "Higher_High": true,
+      "RSI_Bullish": false,
+      "Volume_Spike": true
+    },
+    "NSLNISP": {
+      "RSI_14": 73.1,
+      "Volume_Ratio": 4.68,
       "Breakout_20D": true,
       "Breakout_50D": true,
       "EMA_Pullback": false,
