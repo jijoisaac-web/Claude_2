@@ -1,10 +1,191 @@
 {
-  "generated_at_utc": "2026-08-28T04:53:48.044778+00:00",
+  "generated_at_utc": "2026-08-28T05:16:07.239875+00:00",
   "warnings": [
     "daily_eod.csv missing -- breadth + RS ranking not computed.",
     "bulk_deals.csv missing -- institutional signals not computed.",
     "fii_dii_flow.csv missing -- flow regime not computed.",
-    "derivatives_data.csv missing -- OI confluence not computed.",
-    "Neo4j connected but no Stock nodes found -- graph is empty. Load the Nifty 750 schema (schema_extensions.cypher + your Stock/Sector ingestion) before centrality scores will populate."
+    "derivatives_data.csv missing -- OI confluence not computed."
+  ],
+  "graph_hub_leaders_top20": [
+    {
+      "Ticker": "360ONE",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 0,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "3MINDIA",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 1,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ABB",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 2,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ACC",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 3,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ACMESOLAR",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 4,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AIAENG",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 5,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "APLAPOLLO",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 6,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ASKAUTOLTD",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 7,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AUBANK",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 8,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AWL",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 9,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AXISCADES",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 10,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AADHARHFC",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 11,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AARTIDRUGS",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 12,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AARTIIND",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 13,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AARTIPHARM",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 14,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "AAVAS",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 15,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ABBOTINDIA",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 16,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ACE",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 17,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ACUTAAS",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 18,
+      "Community_Size": 1
+    },
+    {
+      "Ticker": "ADANIENSOL",
+      "PageRank": 0.0013297872340425419,
+      "Betweenness": 0.0,
+      "Out_Degree_Centrality": 0.0,
+      "Hub_Score": 0.5,
+      "Community_ID": 19,
+      "Community_Size": 1
+    }
   ]
 }
