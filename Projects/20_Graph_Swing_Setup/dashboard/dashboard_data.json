@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-28T10:44:48.389539+00:00",
+  "generated_at_utc": "2026-08-28T11:08:22.298169+00:00",
   "warnings": [
     "fii_dii_flow.csv missing -- flow regime not computed."
   ],
@@ -134,6 +134,7 @@
       "RS_Rank": 20
     }
   ],
+  "technical_signals_computed_for": 2680,
   "institutional_signals": [
     {
       "Ticker": "ASIANTILES",
@@ -667,6 +668,299 @@
       "Median_RS_Rating": 25.5,
       "Member_Count": 16,
       "Change_1D": null
+    }
+  ],
+  "swing_score_top20": [
+    {
+      "Ticker": "MEDANTA",
+      "Sector": "Healthcare",
+      "Technical_Score": 75,
+      "RS_Score": 86.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 65.2,
+      "GraphStrength_Score": 4.7447139697835965,
+      "Regime_Score": 50.0,
+      "Swing_Score": 70.2,
+      "Tier": "A setup"
+    },
+    {
+      "Ticker": "INOXINDIA",
+      "Sector": "Capital Goods",
+      "Technical_Score": 65,
+      "RS_Score": 95.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 61.3,
+      "GraphStrength_Score": 4.733028610184428,
+      "Regime_Score": 50.0,
+      "Swing_Score": 67.7,
+      "Tier": "Watchlist"
+    },
+    {
+      "Ticker": "ENTERO",
+      "Sector": "Consumer Services",
+      "Technical_Score": 65,
+      "RS_Score": 94.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 46.5,
+      "GraphStrength_Score": 4.760509989478915,
+      "Regime_Score": 50.0,
+      "Swing_Score": 65.1,
+      "Tier": "Watchlist"
+    },
+    {
+      "Ticker": "CRISIL",
+      "Sector": "Financial Services",
+      "Technical_Score": 75,
+      "RS_Score": 67.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 50.6,
+      "GraphStrength_Score": 4.731953135690891,
+      "Regime_Score": 50.0,
+      "Swing_Score": 64.6,
+      "Tier": "Watchlist"
+    },
+    {
+      "Ticker": "JINDALSAW",
+      "Sector": "Capital Goods",
+      "Technical_Score": 65,
+      "RS_Score": 94.0,
+      "Volume_Score": 68.9,
+      "Sector_Score": 61.3,
+      "GraphStrength_Score": 4.733028610184428,
+      "Regime_Score": 50.0,
+      "Swing_Score": 62.3,
+      "Tier": "Watchlist"
+    },
+    {
+      "Ticker": "LAURUSLABS",
+      "Sector": "Healthcare",
+      "Technical_Score": 65,
+      "RS_Score": 96.0,
+      "Volume_Score": 61.2,
+      "Sector_Score": 65.2,
+      "GraphStrength_Score": 4.7447139697835965,
+      "Regime_Score": 50.0,
+      "Swing_Score": 62.0,
+      "Tier": "Watchlist"
+    },
+    {
+      "Ticker": "WHIRLPOOL",
+      "Sector": "Consumer Durables",
+      "Technical_Score": 75,
+      "RS_Score": 35.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 51.3,
+      "GraphStrength_Score": 4.766128492419322,
+      "Regime_Score": 50.0,
+      "Swing_Score": 59.4,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "ADANIPOWER",
+      "Sector": "Power",
+      "Technical_Score": 45,
+      "RS_Score": 82.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 37.6,
+      "GraphStrength_Score": 29.684603441031165,
+      "Regime_Score": 50.0,
+      "Swing_Score": 57.7,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "RUBYMILLS",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 95.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.9,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "RAMRAT",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 94.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.8,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "BBTC",
+      "Sector": "Fast Moving Consumer Goods",
+      "Technical_Score": 65,
+      "RS_Score": 42.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 46.7,
+      "GraphStrength_Score": 4.761533805570278,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.4,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "ALMONDZ",
+      "Sector": null,
+      "Technical_Score": 75,
+      "RS_Score": 71.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.3,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "PRITIKAUTO",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 91.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.3,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "OAL",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 91.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 56.3,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "APLAPOLLO",
+      "Sector": "Capital Goods",
+      "Technical_Score": 65,
+      "RS_Score": 76.0,
+      "Volume_Score": 48.2,
+      "Sector_Score": 61.3,
+      "GraphStrength_Score": 4.733028610184428,
+      "Regime_Score": 50.0,
+      "Swing_Score": 55.9,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "GOLDTECH",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 87.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 55.6,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "IMAGICAA",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 86.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 55.4,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "NATCAPSUQ",
+      "Sector": null,
+      "Technical_Score": 65,
+      "RS_Score": 85.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 0.0,
+      "GraphStrength_Score": 0.0,
+      "Regime_Score": 50.0,
+      "Swing_Score": 55.3,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "YATHARTH",
+      "Sector": "Healthcare",
+      "Technical_Score": 65,
+      "RS_Score": 87.0,
+      "Volume_Score": 26.2,
+      "Sector_Score": 65.2,
+      "GraphStrength_Score": 4.7447139697835965,
+      "Regime_Score": 50.0,
+      "Swing_Score": 54.7,
+      "Tier": "Early setup"
+    },
+    {
+      "Ticker": "HCC",
+      "Sector": "Construction",
+      "Technical_Score": 45,
+      "RS_Score": 76.0,
+      "Volume_Score": 100.0,
+      "Sector_Score": 35.0,
+      "GraphStrength_Score": 14.746593398007878,
+      "Regime_Score": 50.0,
+      "Swing_Score": 54.6,
+      "Tier": "Early setup"
+    }
+  ],
+  "leader_laggard_top20": [
+    {
+      "Breakout_Ticker": "ADANIPOWER",
+      "Laggard_Candidate": "ADANIENT",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.3100141016160194,
+      "Contagion_Score": 1.965021152424029
+    },
+    {
+      "Breakout_Ticker": "ADANIENT",
+      "Laggard_Candidate": "ADANIGREEN",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.29684603441031165,
+      "Contagion_Score": 1.9452690516154676
+    },
+    {
+      "Breakout_Ticker": "ADANIENT",
+      "Laggard_Candidate": "ADANIPOWER",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.29684603441031165,
+      "Contagion_Score": 1.9452690516154676
+    },
+    {
+      "Breakout_Ticker": "ADANIPOWER",
+      "Laggard_Candidate": "ADANIGREEN",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.29684603441031165,
+      "Contagion_Score": 1.9452690516154676
+    },
+    {
+      "Breakout_Ticker": "HCC",
+      "Laggard_Candidate": "TITAGARH",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.2553788025577739,
+      "Contagion_Score": 1.8830682038366608
+    },
+    {
+      "Breakout_Ticker": "ADANIPOWER",
+      "Laggard_Candidate": "ADANIENSOL",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.20975415418928367,
+      "Contagion_Score": 1.8146312312839257
+    },
+    {
+      "Breakout_Ticker": "ADANIENT",
+      "Laggard_Candidate": "ADANIPORTS",
+      "Edge_Weight": 1.5,
+      "Hub_Score": 0.13283163230050016,
+      "Contagion_Score": 1.69924744845075
     }
   ]
 }
