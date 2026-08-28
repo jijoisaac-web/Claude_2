@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nifty 750 Graph Swing Desk</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --status-good:      #0ca30c;
+    --status-warning:   #fab219;
+    --status-serious:   #ec835a;
+    --status-critical:  #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-1:       #3987e5;
+      --status-good:      #0ca30c;
+      --status-warning:   #fab219;
+      --status-serious:   #ec835a;
+      --status-critical:  #d03b3b;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-1:       #3987e5;
+    --status-good:      #0ca30c;
+    --status-warning:   #fab219;
+    --status-serious:   #ec835a;
+    --status-critical:  #d03b3b;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body.viz-root {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  header.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--gridline);
+    padding-bottom: 16px;
+  }
+  header.page-head h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+  header.page-head .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+  #generated-at {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin: 0 0 14px;
+  }
+
+  .regime-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .stat-tile {
+    flex: 1 1 200px;
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .stat-tile .label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+  .stat-tile .value {
+    font-size: 1.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .badge.good     { color: var(--status-good); }
+  .badge.warning  { color: var(--status-warning); }
+  .badge.critical { color: var(--status-critical); }
+  .badge.neutral  { color: var(--text-muted); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  thead th {
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--baseline);
+    padding: 8px 10px;
+  }
+  tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gridline);
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.ticker { font-variant-numeric: normal; font-weight: 600; }
+
+  .table-scroll { overflow-x: auto; }
+
+  .empty-state {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 8px 0;
+  }
+  .warnings {
+    font-size: 0.8rem;
+    color: var(--status-serious);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body class="viz-root">
+  <div class="wrap">
+    <header class="page-head">
+      <div>
+        <h1>Nifty 750 Graph Swing Desk</h1>
+        <div class="subtitle">Price action &middot; sectoral rotation &middot; graph-theoretic contagion</div>
+      </div>
+      <div id="generated-at">Loading&hellip;</div>
+    </header>
+
+    <div id="load-error" class="card" style="display:none;">
+      <h2>Could not load report</h2>
+      <p class="empty-state">
+        dashboard_data.json was not found or failed to parse. This dashboard is static --
+        it only reflects the last successful run of the GitHub Actions pipeline.
+        Check the Actions tab in the repo for the latest run status.
+      </p>
+    </div>
+
+    <div id="content" style="display:none;">
+      <section class="card">
+        <h2>Systemic Regime</h2>
+        <div class="regime-row">
+          <div class="stat-tile">
+            <div class="label">Market Breadth</div>
+            <div class="value"><span id="breadth-badge" class="badge neutral">&mdash;</span></div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">% Above 50DMA</div>
+            <div class="value" id="pct-50dma">&mdash;</div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">% Above 200DMA</div>
+            <div class="value" id="pct-200dma">&mdash;</div>
+          </div>
+          <div class="stat-tile">
+            <div class="label">FII+DII 5D Flow Regime</div>
+            <div class="value"><span id="flow-badge" class="badge neutral">&mdash;</span></div>
+          </div>
+        </div>
+        <div id="regime-warning" class="warnings" style="display:none;"></div>
+      </section>
+
+      <section class="card">
+        <h2>RS Ranking &mdash; Top 20 (vs NIFTY 500)</h2>
+        <div class="table-scroll">
+          <table id="rs-table">
+            <thead><tr><th>Rank</th><th>Ticker</th><th>RS Rating</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="rs-empty" class="empty-state" style="display:none;">No RS ranking data in this run.</div>
+      </section>
+
+      <section class="card">
+        <h2>Graph Hub Leaders</h2>
+        <div class="table-scroll">
+          <table id="hub-table">
+            <thead><tr><th>Ticker</th><th>Hub Score</th><th>Community</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="hub-empty" class="empty-state" style="display:none;">No graph centrality data in this run (Neo4j credentials not configured, or step skipped).</div>
+      </section>
+
+      <section class="card">
+        <h2>Institutional Footprint &mdash; Bulk/Block Deals</h2>
+        <div class="table-scroll">
+          <table id="inst-table">
+            <thead><tr><th>Ticker</th><th>Net Buy Qty</th><th>Buy/Sell Ratio</th><th>Signal</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="inst-empty" class="empty-state" style="display:none;">No bulk deal data in this run.</div>
+      </section>
+
+      <section class="card">
+        <h2>Derivatives &mdash; High-Conviction Confluence</h2>
+        <div class="table-scroll">
+          <table id="deriv-table">
+            <thead><tr><th>Ticker</th><th>Buildup</th><th>PCR</th><th>Rollover</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div id="deriv-empty" class="empty-state" style="display:none;">No high-conviction derivatives confluence in this run.</div>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function () {
+  function regimeClass(regime) {
+    if (regime === "RISK_ON") return "good";
+    if (regime === "RISK_OFF" || regime === "NEUTRAL_LOW") return "critical";
+    if (regime === "NEUTRAL") return "warning";
+    return "neutral";
+  }
+
+  function fmtNum(n, digits) {
+    if (n === null || n === undefined || Number.isNaN(n)) return "—";
+    return Number(n).toLocaleString(undefined, { maximumFractionDigits: digits ?? 2 });
+  }
+
+  function fillTable(bodyId, emptyId, rows, rowFn) {
+    var tbody = document.querySelector("#" + bodyId + " tbody");
+    var empty = document.getElementById(emptyId);
+    if (!rows || rows.length === 0) {
+      empty.style.display = "block";
+      return;
+    }
+    empty.style.display = "none";
+    rows.forEach(function (row) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = rowFn(row);
+      tbody.appendChild(tr);
+    });
+  }
+
+  fetch("./dashboard_data.json", { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (data) {
+      document.getElementById("content").style.display = "block";
+      document.getElementById("generated-at").textContent =
+        "Last run: " + (data.generated_at_utc ? new Date(data.generated_at_utc).toLocaleString() : "unknown");
+
+      if (data.warnings && data.warnings.length) {
+        var w = document.getElementById("regime-warning");
+        w.style.display = "block";
+        w.textContent = data.warnings.join(" • ");
+      }
+
+      var breadth = data.breadth;
+      var badge = document.getElementById("breadth-badge");
+      if (breadth) {
+        badge.textContent = breadth.Regime;
+        badge.className = "badge " + regimeClass(breadth.Regime);
+        document.getElementById("pct-50dma").textContent = fmtNum(breadth.Pct_Above_50DMA, 1) + "%";
+        document.getElementById("pct-200dma").textContent = fmtNum(breadth.Pct_Above_200DMA, 1) + "%";
+      }
+
+      var flow = data.flow_regime;
+      var flowBadge = document.getElementById("flow-badge");
+      if (flow) {
+        flowBadge.textContent = flow.Flow_Regime;
+        flowBadge.className = "badge " + regimeClass(flow.Flow_Regime);
+      }
+
+      fillTable("rs-table", "rs-empty", data.rs_ranking_top20, function (r) {
+        return "<td>" + r.RS_Rank + "</td><td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.RS_Rating, 0) + "</td>";
+      });
+
+      fillTable("hub-table", "hub-empty", data.graph_hub_leaders_top20, function (r) {
+        return "<td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.Hub_Score, 3) + "</td><td>" + fmtNum(r.Community_ID, 0) + "</td>";
+      });
+
+      fillTable("inst-table", "inst-empty", data.institutional_signals, function (r) {
+        return "<td class='ticker'>" + r.Ticker + "</td><td>" + fmtNum(r.Net_Buy_Qty, 0) + "</td><td>" + fmtNum(r.Buy_Sell_Ratio, 2) + "</td><td>" + r.Signal + "</td>";
+      });
+
+      fillTable("deriv-table", "deriv-empty", data.derivatives_high_conviction, function (r) {
+        return "<td class='ticker'>" + r.Ticker + "</td><td>" + r.Buildup_Type + "</td><td>" + fmtNum(r.PCR, 2) + "</td><td>" + r.Rollover_Flag + "</td>";
+      });
+    })
+    .catch(function (err) {
+      document.getElementById("load-error").style.display = "block";
+      document.getElementById("generated-at").textContent = "";
+      console.error(err);
+    });
+})();
+</script>
+</body>
+</html>

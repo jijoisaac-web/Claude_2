@@ -1,0 +1,6 @@
+{
+  "generated_at_utc": null,
+  "warnings": [
+    "Placeholder file -- no pipeline run has executed yet. Trigger the 'Daily Swing Pipeline' workflow (Actions tab -> Run workflow) to populate this with real data."
+  ]
+}

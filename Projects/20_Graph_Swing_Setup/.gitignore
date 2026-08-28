@@ -1,0 +1,10 @@
+# Raw daily market data -- fetched fresh by the pipeline, not committed.
+data/*.csv
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Environment secrets -- never commit real credentials
+.env

@@ -1,0 +1,55 @@
+name: Daily Swing Pipeline
+
+on:
+  schedule:
+    # 10:35 UTC = 16:05 IST -- ~35 min after NSE close (15:30 IST), so EOD
+    # data has time to post. Adjust if your data source publishes later.
+    - cron: "35 10 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r pipeline/requirements.txt
+
+      # KNOWN GAP: this pipeline does not yet fetch live market data itself.
+      # Wire your EOD / bulk-deal / FII-DII / derivatives source here so that
+      # data/daily_eod.csv etc. exist before the pipeline step runs -- e.g. a
+      # broker API pull, an NSE bhavcopy download, or a step that copies from
+      # object storage. Until this step is real, the workflow will run but the
+      # dashboard will report each missing section rather than fail silently.
+      - name: Fetch market data (placeholder -- replace before relying on this)
+        run: echo "No live data source wired in yet. See README 'Known gaps'."
+
+      - name: Run pipeline
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        run: python pipeline/run_pipeline.py
+
+      - name: Deploy dashboard to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: nifty-graph-swing
+          directory: dashboard
+
+      - name: Commit dashboard_data.json back to the repo
+        run: |
+          git config user.name "swing-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add dashboard/dashboard_data.json
+          git diff --staged --quiet || git commit -m "Daily pipeline run: $(date -u +'%Y-%m-%d')"
+          git push
