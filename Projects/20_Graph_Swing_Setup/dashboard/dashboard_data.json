@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-08-28T07:48:59.760022+00:00",
+  "generated_at_utc": "2026-08-28T10:44:48.389539+00:00",
   "warnings": [
     "fii_dii_flow.csv missing -- flow regime not computed."
   ],
@@ -319,184 +319,354 @@
   "derivatives_high_conviction": [],
   "graph_hub_leaders_top20": [
     {
-      "Ticker": "JKPAPER",
-      "PageRank": 0.0023331877689402457,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.7,
-      "Community_ID": 20,
-      "Community_Size": 1
+      "Ticker": "RTNPOWER",
+      "PageRank": 0.01037157962804362,
+      "Betweenness": 0.0017494587402556488,
+      "Out_Degree_Centrality": 0.00905562742561449,
+      "Hub_Score": 0.9059583108525243,
+      "Community_ID": 2,
+      "Community_Size": 41
     },
     {
-      "Ticker": "GODREJIND",
-      "PageRank": 0.0016187486437986309,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5468963504240125,
-      "Community_ID": 1,
-      "Community_Size": 3
+      "Ticker": "IRCON",
+      "PageRank": 0.011513672492084574,
+      "Betweenness": 0.00026671984306260297,
+      "Out_Degree_Centrality": 0.01034928848641656,
+      "Hub_Score": 0.7235153256704981,
+      "Community_ID": 5,
+      "Community_Size": 40
     },
     {
-      "Ticker": "DCMSHRIRAM",
-      "PageRank": 0.0016187486437986309,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5468963504240125,
-      "Community_ID": 1,
-      "Community_Size": 3
-    },
-    {
-      "Ticker": "3MINDIA",
-      "PageRank": 0.0016187486437986309,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5468963504240125,
-      "Community_ID": 1,
-      "Community_Size": 3
-    },
-    {
-      "Ticker": "EIEL",
-      "PageRank": 0.0015294437531559292,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5277583942270141,
-      "Community_ID": 19,
-      "Community_Size": 4
-    },
-    {
-      "Ticker": "REFEX",
-      "PageRank": 0.0015294437531559292,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5277583942270141,
-      "Community_ID": 19,
-      "Community_Size": 4
-    },
-    {
-      "Ticker": "WABAG",
-      "PageRank": 0.0015294437531559292,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5277583942270141,
-      "Community_ID": 19,
-      "Community_Size": 4
-    },
-    {
-      "Ticker": "IONEXCHANG",
-      "PageRank": 0.0015294437531559292,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.5277583942270141,
-      "Community_ID": 19,
-      "Community_Size": 4
-    },
-    {
-      "Ticker": "TIPSMUSIC",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "NAZARA",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "NETWORK18",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "SUNTV",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "SAREGAMA",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "PVRINOX",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "PFOCUS",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "ZEEL",
-      "PageRank": 0.0013954864171918766,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4990514599315165,
-      "Community_ID": 21,
-      "Community_Size": 8
-    },
-    {
-      "Ticker": "ARVIND",
-      "PageRank": 0.0013508339718705255,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4894824818330173,
-      "Community_ID": 16,
+      "Ticker": "CHOLAFIN",
+      "PageRank": 0.00721809426944564,
+      "Betweenness": 0.0012609843889294786,
+      "Out_Degree_Centrality": 0.00905562742561449,
+      "Hub_Score": 0.6852486998585524,
+      "Community_ID": 9,
       "Community_Size": 12
     },
     {
-      "Ticker": "PAGEIND",
-      "PageRank": 0.0013508339718705255,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4894824818330173,
-      "Community_ID": 16,
+      "Ticker": "SHRIRAMFIN",
+      "PageRank": 0.009538918594288574,
+      "Betweenness": 0.0004002194084907956,
+      "Out_Degree_Centrality": 0.01164294954721863,
+      "Hub_Score": 0.6828733605247448,
+      "Community_ID": 9,
       "Community_Size": 12
     },
     {
-      "Ticker": "RAYMONDLSL",
-      "PageRank": 0.0013508339718705255,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4894824818330173,
-      "Community_ID": 16,
+      "Ticker": "JPPOWER",
+      "PageRank": 0.006352534159769102,
+      "Betweenness": 0.0016363471837736027,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.6675837125236612,
+      "Community_ID": 0,
       "Community_Size": 12
     },
     {
-      "Ticker": "ALOKINDS",
-      "PageRank": 0.0013508339718705255,
-      "Betweenness": 0.0,
-      "Out_Degree_Centrality": 0.00129366106080207,
-      "Hub_Score": 0.4894824818330173,
-      "Community_ID": 16,
+      "Ticker": "JKTYRE",
+      "PageRank": 0.005982305407411464,
+      "Betweenness": 0.0017268364289592397,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.6670231667063945,
+      "Community_ID": 0,
       "Community_Size": 12
+    },
+    {
+      "Ticker": "RAILTEL",
+      "PageRank": 0.007888889533651487,
+      "Betweenness": 0.0007146974642902627,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.5762564725154384,
+      "Community_ID": 2,
+      "Community_Size": 41
+    },
+    {
+      "Ticker": "FINPIPE",
+      "PageRank": 0.0045778336893253025,
+      "Betweenness": 0.0015399928949185262,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.5517692403735057,
+      "Community_ID": 0,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "PNBHOUSING",
+      "PageRank": 0.004506561014310933,
+      "Betweenness": 0.0014034211637587223,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.5252545680272881,
+      "Community_ID": 0,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "LTF",
+      "PageRank": 0.006638947512050397,
+      "Betweenness": 0.0004133459347985886,
+      "Out_Degree_Centrality": 0.00776196636481242,
+      "Hub_Score": 0.49252167931827856,
+      "Community_ID": 9,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "LEMONTREE",
+      "PageRank": 0.003132070842058763,
+      "Betweenness": 0.0014436386060634498,
+      "Out_Degree_Centrality": 0.00388098318240621,
+      "Hub_Score": 0.4502394208137116,
+      "Community_ID": 0,
+      "Community_Size": 12
+    },
+    {
+      "Ticker": "PNB",
+      "PageRank": 0.007374934638726222,
+      "Betweenness": 2.3460174677757744e-05,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.435402660486396,
+      "Community_ID": 10,
+      "Community_Size": 100
+    },
+    {
+      "Ticker": "IRFC",
+      "PageRank": 0.006387001046737701,
+      "Betweenness": 0.0001270759461711878,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.4102682327491045,
+      "Community_ID": 5,
+      "Community_Size": 40
+    },
+    {
+      "Ticker": "TATASTEEL",
+      "PageRank": 0.007058833043592678,
+      "Betweenness": 1.6757267626969816e-05,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.3983037858322701,
+      "Community_ID": 4,
+      "Community_Size": 25
+    },
+    {
+      "Ticker": "GODREJPROP",
+      "PageRank": 0.005937729579871812,
+      "Betweenness": 2.2901599090192083e-05,
+      "Out_Degree_Centrality": 0.00776196636481242,
+      "Hub_Score": 0.3951161243506993,
+      "Community_ID": 18,
+      "Community_Size": 16
+    },
+    {
+      "Ticker": "TATAELXSI",
+      "PageRank": 0.006739666753685957,
+      "Betweenness": 2.3460174677757744e-05,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.38559289460783824,
+      "Community_ID": 6,
+      "Community_Size": 35
+    },
+    {
+      "Ticker": "BSOFT",
+      "PageRank": 0.006739666753685957,
+      "Betweenness": 2.3460174677757744e-05,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.38559289460783824,
+      "Community_ID": 6,
+      "Community_Size": 35
+    },
+    {
+      "Ticker": "UCOBANK",
+      "PageRank": 0.006512416966631332,
+      "Betweenness": 3.519026201663662e-05,
+      "Out_Degree_Centrality": 0.00517464424320828,
+      "Hub_Score": 0.37773569634705667,
+      "Community_ID": 3,
+      "Community_Size": 6
+    },
+    {
+      "Ticker": "RPOWER",
+      "PageRank": 0.003747888857589209,
+      "Betweenness": 0.0007859158517048844,
+      "Out_Degree_Centrality": 0.00388098318240621,
+      "Hub_Score": 0.36419496585344113,
+      "Community_ID": 2,
+      "Community_Size": 41
+    },
+    {
+      "Ticker": "BAJAJFINSV",
+      "PageRank": 0.005202699826243448,
+      "Betweenness": 0.00014634680394220304,
+      "Out_Degree_Centrality": 0.00646830530401035,
+      "Hub_Score": 0.36214261905122214,
+      "Community_ID": 9,
+      "Community_Size": 12
+    }
+  ],
+  "sector_rotation": [
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Healthcare",
+      "Avg_RS_Rating": 65.2,
+      "Median_RS_Rating": 70.0,
+      "Member_Count": 67,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Utilities",
+      "Avg_RS_Rating": 63.8,
+      "Median_RS_Rating": 54.5,
+      "Member_Count": 4,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Media Entertainment & Publication",
+      "Avg_RS_Rating": 63.1,
+      "Median_RS_Rating": 78.5,
+      "Member_Count": 8,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Capital Goods",
+      "Avg_RS_Rating": 61.3,
+      "Median_RS_Rating": 66.0,
+      "Member_Count": 105,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Automobile and Auto Components",
+      "Avg_RS_Rating": 60.6,
+      "Median_RS_Rating": 62.0,
+      "Member_Count": 47,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Textiles",
+      "Avg_RS_Rating": 56.8,
+      "Median_RS_Rating": 72.0,
+      "Member_Count": 12,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Chemicals",
+      "Avg_RS_Rating": 54.3,
+      "Median_RS_Rating": 58.0,
+      "Member_Count": 44,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Services",
+      "Avg_RS_Rating": 51.8,
+      "Median_RS_Rating": 50.5,
+      "Member_Count": 26,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Metals & Mining",
+      "Avg_RS_Rating": 51.3,
+      "Median_RS_Rating": 55.5,
+      "Member_Count": 24,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Consumer Durables",
+      "Avg_RS_Rating": 51.3,
+      "Median_RS_Rating": 46.0,
+      "Member_Count": 39,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Financial Services",
+      "Avg_RS_Rating": 50.6,
+      "Median_RS_Rating": 50.5,
+      "Member_Count": 116,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Diversified",
+      "Avg_RS_Rating": 50.3,
+      "Median_RS_Rating": 54.0,
+      "Member_Count": 3,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Realty",
+      "Avg_RS_Rating": 49.1,
+      "Median_RS_Rating": 56.0,
+      "Member_Count": 16,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Oil Gas & Consumable Fuels",
+      "Avg_RS_Rating": 47.0,
+      "Median_RS_Rating": 43.0,
+      "Member_Count": 17,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Fast Moving Consumer Goods",
+      "Avg_RS_Rating": 46.7,
+      "Median_RS_Rating": 36.0,
+      "Member_Count": 45,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Consumer Services",
+      "Avg_RS_Rating": 46.5,
+      "Median_RS_Rating": 35.0,
+      "Member_Count": 43,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Telecommunication",
+      "Avg_RS_Rating": 46.1,
+      "Median_RS_Rating": 37.0,
+      "Member_Count": 12,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Information Technology",
+      "Avg_RS_Rating": 40.6,
+      "Median_RS_Rating": 39.0,
+      "Member_Count": 34,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Power",
+      "Avg_RS_Rating": 37.6,
+      "Median_RS_Rating": 31.0,
+      "Member_Count": 21,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Construction",
+      "Avg_RS_Rating": 35.0,
+      "Median_RS_Rating": 25.0,
+      "Member_Count": 23,
+      "Change_1D": null
+    },
+    {
+      "Date": "2026-08-27 00:00:00",
+      "Sector": "Construction Materials",
+      "Avg_RS_Rating": 29.3,
+      "Median_RS_Rating": 25.5,
+      "Member_Count": 16,
+      "Change_1D": null
     }
   ]
 }
