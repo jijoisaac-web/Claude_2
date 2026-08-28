@@ -1,6 +1,10 @@
 {
-  "generated_at_utc": null,
+  "generated_at_utc": "2026-08-28T04:53:48.044778+00:00",
   "warnings": [
-    "Placeholder file -- no pipeline run has executed yet. Trigger the 'Daily Swing Pipeline' workflow (Actions tab -> Run workflow) to populate this with real data."
+    "daily_eod.csv missing -- breadth + RS ranking not computed.",
+    "bulk_deals.csv missing -- institutional signals not computed.",
+    "fii_dii_flow.csv missing -- flow regime not computed.",
+    "derivatives_data.csv missing -- OI confluence not computed.",
+    "Neo4j connected but no Stock nodes found -- graph is empty. Load the Nifty 750 schema (schema_extensions.cypher + your Stock/Sector ingestion) before centrality scores will populate."
   ]
 }
