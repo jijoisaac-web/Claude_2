@@ -1,5 +1,7 @@
-# Raw daily market data -- fetched fresh by the pipeline, not committed.
-data/*.csv
+# NSE downloads are large scratch files -- never committed. The accumulated
+# CSVs the pipeline builds FROM those downloads ARE committed by the daily
+# workflow's commit-back step -- they're accumulating history, not scratch.
+data/*.zip
 
 # Python
 __pycache__/

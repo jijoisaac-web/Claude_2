@@ -22,14 +22,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r Projects/20_Graph_Swing_Setup/pipeline/requirements.txt
 
-      # KNOWN GAP: this pipeline does not yet fetch live market data itself.
-      # Wire your EOD / bulk-deal / FII-DII / derivatives source here so that
-      # data/daily_eod.csv etc. exist before the pipeline step runs -- e.g. a
-      # broker API pull, an NSE bhavcopy download, or a step that copies from
-      # object storage. Until this step is real, the workflow will run but the
-      # dashboard will report each missing section rather than fail silently.
-      - name: Fetch market data (placeholder -- replace before relying on this)
-        run: echo "No live data source wired in yet. See README 'Known gaps'."
+      - name: Fetch live market data (EOD, bulk deals, FII/DII, F&O OI)
+        run: python Projects/20_Graph_Swing_Setup/pipeline/fetch_all_market_data.py
 
       - name: Run pipeline
         env:
@@ -46,10 +40,10 @@ jobs:
           projectName: nifty-graph-swing
           directory: Projects/20_Graph_Swing_Setup/dashboard
 
-      - name: Commit dashboard_data.json back to the repo
+      - name: Commit updated market data + dashboard back to the repo
         run: |
           git config user.name "swing-pipeline-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add Projects/20_Graph_Swing_Setup/dashboard/dashboard_data.json
+          git add Projects/20_Graph_Swing_Setup/dashboard/dashboard_data.json Projects/20_Graph_Swing_Setup/data/*.csv
           git diff --staged --quiet || git commit -m "Daily pipeline run: $(date -u +'%Y-%m-%d')"
           git push

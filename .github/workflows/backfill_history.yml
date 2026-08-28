@@ -1,0 +1,33 @@
+name: Backfill EOD History
+
+# Manual, on-demand only -- NOT scheduled. Run this ONCE to seed ~400 days of
+# trading history so RS Ranking and MA200 breadth have enough data to compute
+# from day one, instead of waiting months for daily runs to accumulate it.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r Projects/20_Graph_Swing_Setup/pipeline/requirements.txt
+
+      - name: Backfill ~400 days of EOD history
+        run: python Projects/20_Graph_Swing_Setup/pipeline/backfill_eod_history.py
+
+      - name: Commit seeded history back to the repo
+        run: |
+          git config user.name "swing-pipeline-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add Projects/20_Graph_Swing_Setup/data/daily_eod.csv
+          git diff --staged --quiet || git commit -m "Backfill EOD history: $(date -u +'%Y-%m-%d')"
+          git push
