@@ -1,22 +1,43 @@
 Date,Sector,Avg_RS_Rating,Median_RS_Rating,Member_Count
 2026-08-27,Automobile and Auto Components,60.6,62.0,47
+2026-08-28,Automobile and Auto Components,61.0,63.0,47
 2026-08-27,Capital Goods,61.3,66.0,105
+2026-08-28,Capital Goods,61.3,69.0,105
 2026-08-27,Chemicals,54.3,58.0,44
+2026-08-28,Chemicals,53.3,58.0,44
 2026-08-27,Construction,35.0,25.0,23
+2026-08-28,Construction,34.8,25.0,23
 2026-08-27,Construction Materials,29.3,25.5,16
+2026-08-28,Construction Materials,28.3,28.0,16
 2026-08-27,Consumer Durables,51.3,46.0,39
+2026-08-28,Consumer Durables,50.4,51.0,39
 2026-08-27,Consumer Services,46.5,35.0,43
+2026-08-28,Consumer Services,45.5,34.0,43
 2026-08-27,Diversified,50.3,54.0,3
+2026-08-28,Diversified,50.7,55.0,3
 2026-08-27,Fast Moving Consumer Goods,46.7,36.0,45
+2026-08-28,Fast Moving Consumer Goods,45.6,34.0,45
 2026-08-27,Financial Services,50.6,50.5,116
+2026-08-28,Financial Services,49.6,52.0,116
 2026-08-27,Healthcare,65.2,70.0,67
+2026-08-28,Healthcare,65.5,72.0,67
 2026-08-27,Information Technology,40.6,39.0,34
+2026-08-28,Information Technology,43.8,47.5,34
 2026-08-27,Media Entertainment & Publication,63.1,78.5,8
+2026-08-28,Media Entertainment & Publication,61.9,76.0,8
 2026-08-27,Metals & Mining,51.3,55.5,24
+2026-08-28,Metals & Mining,52.2,58.0,24
 2026-08-27,Oil Gas & Consumable Fuels,47.0,43.0,17
+2026-08-28,Oil Gas & Consumable Fuels,46.1,42.0,17
 2026-08-27,Power,37.6,31.0,21
+2026-08-28,Power,37.0,31.0,21
 2026-08-27,Realty,49.1,56.0,16
+2026-08-28,Realty,47.8,54.5,16
 2026-08-27,Services,51.8,50.5,26
+2026-08-28,Services,52.2,53.0,26
 2026-08-27,Telecommunication,46.1,37.0,12
+2026-08-28,Telecommunication,47.9,37.5,12
 2026-08-27,Textiles,56.8,72.0,12
+2026-08-28,Textiles,56.4,71.5,12
 2026-08-27,Utilities,63.8,54.5,4
+2026-08-28,Utilities,61.5,53.0,4
