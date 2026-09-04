@@ -5,123 +5,144 @@ Date,Sector,Avg_RS_Rating,Median_RS_Rating,Member_Count
 2026-09-01,Automobile and Auto Components,60.8,62.0,47
 2026-09-02,Automobile and Auto Components,59.4,63.0,47
 2026-09-03,Automobile and Auto Components,57.7,58.0,47
+2026-09-04,Automobile and Auto Components,56.4,59.0,47
 2026-08-27,Capital Goods,61.3,66.0,105
 2026-08-28,Capital Goods,61.3,69.0,105
 2026-08-31,Capital Goods,60.8,67.0,105
 2026-09-01,Capital Goods,60.9,68.5,106
 2026-09-02,Capital Goods,59.8,67.5,106
 2026-09-03,Capital Goods,60.1,67.0,106
+2026-09-04,Capital Goods,59.6,65.5,106
 2026-08-27,Chemicals,54.3,58.0,44
 2026-08-28,Chemicals,53.3,58.0,44
 2026-08-31,Chemicals,52.8,58.5,44
 2026-09-01,Chemicals,53.9,59.5,44
 2026-09-02,Chemicals,54.1,62.0,44
 2026-09-03,Chemicals,53.7,59.0,44
+2026-09-04,Chemicals,52.8,55.5,44
 2026-08-27,Construction,35.0,25.0,23
 2026-08-28,Construction,34.8,25.0,23
 2026-08-31,Construction,33.9,25.0,23
 2026-09-01,Construction,33.8,23.0,23
 2026-09-02,Construction,33.1,21.0,23
 2026-09-03,Construction,33.0,22.0,23
+2026-09-04,Construction,32.5,20.0,23
 2026-08-27,Construction Materials,29.3,25.5,16
 2026-08-28,Construction Materials,28.3,28.0,16
 2026-08-31,Construction Materials,27.2,23.5,16
 2026-09-01,Construction Materials,27.4,26.0,16
 2026-09-02,Construction Materials,28.6,25.5,16
 2026-09-03,Construction Materials,28.8,27.0,16
+2026-09-04,Construction Materials,29.8,28.5,16
 2026-08-27,Consumer Durables,51.3,46.0,39
 2026-08-28,Consumer Durables,50.4,51.0,39
 2026-08-31,Consumer Durables,50.9,52.0,39
 2026-09-01,Consumer Durables,50.1,48.0,39
 2026-09-02,Consumer Durables,49.3,47.0,39
 2026-09-03,Consumer Durables,48.8,48.0,39
+2026-09-04,Consumer Durables,49.3,47.0,39
 2026-08-27,Consumer Services,46.5,35.0,43
 2026-08-28,Consumer Services,45.5,34.0,43
 2026-08-31,Consumer Services,46.0,34.0,43
 2026-09-01,Consumer Services,46.8,43.5,44
 2026-09-02,Consumer Services,46.9,46.5,44
 2026-09-03,Consumer Services,46.0,43.5,44
+2026-09-04,Consumer Services,46.3,45.5,44
 2026-08-27,Diversified,50.3,54.0,3
 2026-08-28,Diversified,50.7,55.0,3
 2026-08-31,Diversified,46.0,45.0,3
 2026-09-01,Diversified,49.3,47.0,3
 2026-09-02,Diversified,48.0,46.0,3
 2026-09-03,Diversified,47.0,42.0,3
+2026-09-04,Diversified,47.7,42.0,3
 2026-08-27,Fast Moving Consumer Goods,46.7,36.0,45
 2026-08-28,Fast Moving Consumer Goods,45.6,34.0,45
 2026-08-31,Fast Moving Consumer Goods,45.8,34.0,45
 2026-09-01,Fast Moving Consumer Goods,46.2,35.0,45
 2026-09-02,Fast Moving Consumer Goods,46.2,36.0,45
 2026-09-03,Fast Moving Consumer Goods,45.8,35.0,45
+2026-09-04,Fast Moving Consumer Goods,45.2,36.0,45
 2026-08-27,Financial Services,50.6,50.5,116
 2026-08-28,Financial Services,49.6,52.0,116
 2026-08-31,Financial Services,50.0,52.0,116
 2026-09-01,Financial Services,49.2,53.0,116
 2026-09-02,Financial Services,49.9,52.5,116
 2026-09-03,Financial Services,50.0,53.0,117
+2026-09-04,Financial Services,50.3,55.0,117
 2026-08-27,Healthcare,65.2,70.0,67
 2026-08-28,Healthcare,65.5,72.0,67
 2026-08-31,Healthcare,66.1,73.0,67
 2026-09-01,Healthcare,66.6,71.0,67
 2026-09-02,Healthcare,67.0,72.0,67
 2026-09-03,Healthcare,66.8,73.0,67
+2026-09-04,Healthcare,65.6,70.0,67
 2026-08-27,Information Technology,40.6,39.0,34
 2026-08-28,Information Technology,43.8,47.5,34
 2026-08-31,Information Technology,42.8,39.0,34
 2026-09-01,Information Technology,43.6,44.0,34
 2026-09-02,Information Technology,42.6,40.5,34
 2026-09-03,Information Technology,41.3,38.5,34
+2026-09-04,Information Technology,40.9,36.5,34
 2026-08-27,Media Entertainment & Publication,63.1,78.5,8
 2026-08-28,Media Entertainment & Publication,61.9,76.0,8
 2026-08-31,Media Entertainment & Publication,58.6,74.0,8
 2026-09-01,Media Entertainment & Publication,59.8,78.0,8
 2026-09-02,Media Entertainment & Publication,57.8,76.0,8
 2026-09-03,Media Entertainment & Publication,58.6,78.0,8
+2026-09-04,Media Entertainment & Publication,58.6,78.0,8
 2026-08-27,Metals & Mining,51.3,55.5,24
 2026-08-28,Metals & Mining,52.2,58.0,24
 2026-08-31,Metals & Mining,49.6,59.5,24
 2026-09-01,Metals & Mining,49.0,56.0,24
 2026-09-02,Metals & Mining,48.6,55.5,24
 2026-09-03,Metals & Mining,48.1,51.5,24
+2026-09-04,Metals & Mining,48.8,51.5,24
 2026-08-27,Oil Gas & Consumable Fuels,47.0,43.0,17
 2026-08-28,Oil Gas & Consumable Fuels,46.1,42.0,17
 2026-08-31,Oil Gas & Consumable Fuels,47.7,43.0,17
 2026-09-01,Oil Gas & Consumable Fuels,48.8,45.0,17
 2026-09-02,Oil Gas & Consumable Fuels,50.9,47.0,17
 2026-09-03,Oil Gas & Consumable Fuels,50.2,45.0,17
+2026-09-04,Oil Gas & Consumable Fuels,50.1,44.0,17
 2026-08-27,Power,37.6,31.0,21
 2026-08-28,Power,37.0,31.0,21
 2026-08-31,Power,35.0,30.0,21
 2026-09-01,Power,36.1,30.0,21
 2026-09-02,Power,38.9,32.0,21
 2026-09-03,Power,38.8,34.0,21
+2026-09-04,Power,38.7,35.0,21
 2026-08-27,Realty,49.1,56.0,16
 2026-08-28,Realty,47.8,54.5,16
 2026-08-31,Realty,48.9,53.0,16
 2026-09-01,Realty,48.9,53.5,16
 2026-09-02,Realty,50.1,55.0,16
 2026-09-03,Realty,53.2,62.0,16
+2026-09-04,Realty,54.2,61.0,16
 2026-08-27,Services,51.8,50.5,26
 2026-08-28,Services,52.2,53.0,26
 2026-08-31,Services,50.8,51.0,26
 2026-09-01,Services,51.3,50.5,26
 2026-09-02,Services,51.2,50.0,26
 2026-09-03,Services,51.4,47.0,26
+2026-09-04,Services,51.3,47.5,26
 2026-08-27,Telecommunication,46.1,37.0,12
 2026-08-28,Telecommunication,47.9,37.5,12
 2026-08-31,Telecommunication,47.8,35.5,12
 2026-09-01,Telecommunication,48.8,39.0,12
 2026-09-02,Telecommunication,48.1,37.0,12
 2026-09-03,Telecommunication,46.6,36.0,12
+2026-09-04,Telecommunication,47.0,33.0,12
 2026-08-27,Textiles,56.8,72.0,12
 2026-08-28,Textiles,56.4,71.5,12
 2026-08-31,Textiles,56.5,69.5,12
 2026-09-01,Textiles,54.9,70.5,12
 2026-09-02,Textiles,55.3,67.5,12
 2026-09-03,Textiles,54.0,65.0,12
+2026-09-04,Textiles,55.3,69.5,12
 2026-08-27,Utilities,63.8,54.5,4
 2026-08-28,Utilities,61.5,53.0,4
 2026-08-31,Utilities,58.8,52.5,4
 2026-09-01,Utilities,58.2,48.0,4
 2026-09-02,Utilities,59.8,52.5,4
 2026-09-03,Utilities,59.8,53.0,4
+2026-09-04,Utilities,61.8,57.0,4
