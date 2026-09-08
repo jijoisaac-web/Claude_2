@@ -263,6 +263,7 @@
   .grid-12{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
   .col-8{grid-column:span 8;}
   .col-4{grid-column:span 4;}
+  .col-6{grid-column:span 6;}
   .col-12{grid-column:span 12;}
   .section-block{margin-top:20px;}
 
@@ -299,6 +300,8 @@
   }
   .opp-row:last-child{border-bottom:none;}
   .opp-row:hover{background:var(--bg-hover);}
+  .opp-row.no-link{cursor:default;}
+  .opp-row.no-link:hover{background:none;}
   .opp-rank{width:20px;flex:none;font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);font-weight:600;}
   .opp-id{min-width:0;flex:1;}
   .opp-sym{font-weight:650;font-size:13px;letter-spacing:-.005em;}
@@ -525,7 +528,7 @@
      Responsive
      ========================================================================== */
   @media (max-width: 1180px){
-    .col-8,.col-4{grid-column:span 12;}
+    .col-8,.col-4,.col-6{grid-column:span 12;}
     .metric-grid{grid-template-columns:repeat(2,1fr);}
     .insight-grid{grid-template-columns:1fr;}
   }
@@ -753,6 +756,40 @@
                 </div>
               </div>
               <div class="flow-wrap" id="flow-wrap"></div>
+            </div>
+          </div>
+
+          <!-- bridge stocks + community drift -->
+          <div class="section-block">
+            <div class="grid-12">
+              <div class="col-6">
+                <div class="card card-pad">
+                  <div class="card-head">
+                    <div>
+                      <div class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M4.5 12h4.9M14.6 12h4.9M12 4.5v4.9M12 14.6v4.9"/></svg>
+                        Bridge Stocks
+                      </div>
+                      <div class="card-desc">Structurally spans multiple clusters — often leads cross-sector rotation</div>
+                    </div>
+                  </div>
+                  <div class="opp-list" id="bridge-list"></div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="card card-pad">
+                  <div class="card-head">
+                    <div>
+                      <div class="card-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5"/></svg>
+                        Community Shift
+                      </div>
+                      <div class="card-desc">Stocks whose structural peer group changed since yesterday</div>
+                    </div>
+                  </div>
+                  <div class="opp-list" id="drift-list"></div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1038,6 +1075,20 @@ var MOCK_GRAPH_EDGES = [
   ["HAL","BEL"],["HAL","BDL"],["HAL","DEFENCE"],["HAL","GOVORDERS"],["HAL","SUPPLIER"],["BDL","INFRA"]
 ];
 
+// Illustrative mock data for the two graph-analytics cards added 2026-08-28
+// (bridge-stock detection, community-drift alerts) -- small, hand-authored,
+// same spirit as the rest of the mock universe: plausible numbers on the
+// existing 6-stock defence/capital-goods roster, not meant to be realistic
+// market data, just a working demo of the feature's shape.
+var MOCK_BRIDGE_STOCKS = [
+  {ticker:"HAL", sector:"Aerospace & Defence", betweennessScore:71, communitiesBridged:2},
+  {ticker:"MTARTECH", sector:"Capital Goods", betweennessScore:58, communitiesBridged:2}
+];
+var MOCK_COMMUNITY_DRIFT = [
+  {ticker:"AZAD", sector:"Capital Goods", overlapPct:38,
+    priorPeers:["MTARTECH","COCHINSHIP","BDL"], currentPeers:["VOLTAS","THERMAX","KIRLOSENG"]}
+];
+
 /* ============================================================
    Active module state -- points at the mock data above by default.
    applyLiveData() (near Init, below) reassigns these in place when a real
@@ -1054,6 +1105,9 @@ var METRIC_CARDS = null;          // null -> renderMetricCards() falls back to b
 var FLOW_DATA_LIVE = null;        // non-null only once applyLiveData() finds real leader-laggard data
 var GRAPH_LIVE_AVAILABLE = false; // true only in live mode when real graph relationship data exists
 var MOMENTUM_LIVE_AVAILABLE = false; // true only in live mode when market_indices.NIFTY50 has a real series
+var BRIDGE_STOCKS = MOCK_BRIDGE_STOCKS;   // gated on GRAPH_LIVE_AVAILABLE in live mode -- same underlying graph
+var COMMUNITY_DRIFT = MOCK_COMMUNITY_DRIFT;
+var DRIFT_BASELINE_AVAILABLE = true; // false only in live mode on the very first run (no prior snapshot yet)
 var IS_LIVE = false;
 var LIVE_WARNINGS = [];
 
@@ -1389,6 +1443,78 @@ document.querySelectorAll('#opp-table th[data-key]').forEach(function(th){
 /* ============================================================
    Flow (leader -> laggard) card
    ============================================================ */
+/* ============================================================
+   Bridge stocks + community drift (2026-08-28)
+   ============================================================ */
+function stockLinkParts(sym){
+  // Bridge-stock / community-drift tickers aren't guaranteed to be in the
+  // top-20 swing-score universe STOCK_DATA is built from (they come from the
+  // broader structure graph) -- only wire up an open-stock click, and only
+  // look clickable, when the ticker actually has a detail page to open.
+  return STOCK_DATA[sym]
+    ? {cls: "", attr: ' data-open-stock="' + sym + '"'}
+    : {cls: " no-link", attr: ""};
+}
+function wireStockLinks(containerId){
+  document.querySelectorAll("#" + containerId + " [data-open-stock]").forEach(function(el){
+    el.addEventListener("click", function(){
+      openStock(el.getAttribute("data-open-stock"));
+      setActiveNav(document.querySelector('.nav-item[data-stock]'));
+    });
+  });
+}
+
+function renderBridgeStocks(){
+  var el = document.getElementById("bridge-list");
+  if (IS_LIVE && !GRAPH_LIVE_AVAILABLE){
+    el.innerHTML = '<div class="flow-empty"><div class="fe-title">No structural graph data this run</div>' +
+      '<div>Bridge-stock detection runs on the same structure graph as Graph Intelligence above -- it repopulates once that\'s available again.</div></div>';
+    return;
+  }
+  if (!BRIDGE_STOCKS.length){
+    el.innerHTML = '<div class="flow-empty"><div class="fe-title">No bridge stocks detected this run</div>' +
+      '<div>Every stock in today\'s structure graph sits inside a single cluster -- no name spans multiple communities right now.</div></div>';
+    return;
+  }
+  el.innerHTML = BRIDGE_STOCKS.map(function(s, i){
+    var lp = stockLinkParts(s.ticker);
+    return '<div class="opp-row' + lp.cls + '"' + lp.attr + '>' +
+      '<span class="opp-rank">' + String(i+1).padStart(2,"0") + '</span>' +
+      '<div class="opp-id"><div class="opp-sym">' + esc(s.ticker) + '</div><div class="opp-name">' + esc(s.sector) + '</div></div>' +
+      '<div class="opp-price"><div class="p">' + s.communitiesBridged + ' cluster' + (s.communitiesBridged === 1 ? '' : 's') + '</div>' +
+        '<div class="c" style="color:var(--text-tertiary);font-weight:600;">bridged</div></div>' +
+      scoreRing(s.betweennessScore) +
+    '</div>';
+  }).join("");
+  wireStockLinks("bridge-list");
+}
+
+function renderCommunityDrift(){
+  var el = document.getElementById("drift-list");
+  if (IS_LIVE && !DRIFT_BASELINE_AVAILABLE){
+    el.innerHTML = '<div class="flow-empty"><div class="fe-title">Building baseline</div>' +
+      '<div>Community-shift detection compares today\'s structure against yesterday\'s snapshot. Today\'s run has saved its baseline -- check back after tomorrow\'s run.</div></div>';
+    return;
+  }
+  if (!COMMUNITY_DRIFT.length){
+    el.innerHTML = '<div class="flow-empty"><div class="fe-title">No significant peer-group changes</div>' +
+      '<div>Every tracked stock\'s structural peer group is materially the same as yesterday -- a stable, uneventful signal.</div></div>';
+    return;
+  }
+  el.innerHTML = COMMUNITY_DRIFT.map(function(s, i){
+    var lp = stockLinkParts(s.ticker);
+    var wasWith = s.priorPeers.length ? s.priorPeers.slice(0, 2).join(", ") : "—";
+    return '<div class="opp-row' + lp.cls + '"' + lp.attr + '>' +
+      '<span class="opp-rank">' + String(i+1).padStart(2,"0") + '</span>' +
+      '<div class="opp-id"><div class="opp-sym">' + esc(s.ticker) + '</div>' +
+        '<div class="opp-name">' + esc(s.sector) + ' · was with ' + esc(wasWith) + '</div></div>' +
+      '<div class="opp-price"><div class="p ' + (s.overlapPct < 25 ? "chg-text neg" : "") + '">' + s.overlapPct.toFixed(0) + '%</div>' +
+        '<div class="c" style="color:var(--text-tertiary);font-weight:600;">overlap</div></div>' +
+    '</div>';
+  }).join("");
+  wireStockLinks("drift-list");
+}
+
 function renderFlow(){
   var wrap = document.getElementById("flow-wrap");
   if (IS_LIVE && !FLOW_DATA_LIVE){
@@ -1644,10 +1770,16 @@ function renderGraph(){
   GRAPH_EDGES.forEach(function(e){
     var a = nodeById[e[0]], b = nodeById[e[1]];
     var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2 - 18;
-    var path = svgEl("path", {
+    var attrs = {
       d: "M" + a.x + "," + a.y + " Q " + mx + "," + my + " " + b.x + "," + b.y,
       class:"gedge", "data-a":a.id, "data-b":b.id, "stroke-width": 1 + (b.strength || 0.5) * 1.6
-    });
+    };
+    // e[2] carries Hops when this edge came from the 2-hop leader-laggard
+    // traversal (see buildLiveGraphAndFlow) -- dash it so a "laggard's
+    // laggard" reads visually as a weaker, indirect connection, not
+    // identical to a direct 1-hop structural link.
+    if (e[2] === 2) attrs["stroke-dasharray"] = "4,3";
+    var path = svgEl("path", attrs);
     edgesG.appendChild(path);
   });
 
@@ -1862,11 +1994,18 @@ function buildLiveMetricCards(data){
   return cards;
 }
 
-function edgeWeightLabel(w){
-  if (w == null) return "Structural link";
-  if (w <= 0.75) return "Sector peer";
-  if (w <= 2.0) return "Correlation edge";
-  return "Structural link";
+function edgeWeightLabel(w, hops){
+  var base;
+  if (w == null) base = "Structural link";
+  else if (w <= 0.75) base = "Sector peer";
+  else if (w <= 2.0) base = "Correlation edge";
+  else if (w <= 2.6) base = "Group affiliate";  // GROUP_AFFILIATE_OF, weight 2.2 -- see corporate_group_edges.py
+  else base = "Structural link";                // confirmed PARENT_OF/SUBSIDIARY_OF/SUPPLIES_TO, weight 3.0
+  // hops===2 means this candidate was reached via find_contagion_candidates()'s
+  // 2-hop traversal (the "laggard's laggard") -- lower conviction, earlier-stage
+  // than a direct 1-hop link, so label it distinctly rather than let it read
+  // identically to a direct connection.
+  return hops === 2 ? "2-hop " + base.toLowerCase() : base;
 }
 
 function buildLiveGraphAndFlow(data){
@@ -1901,14 +2040,15 @@ function buildLiveGraphAndFlow(data){
       nodes.push({
         id: row.Laggard_Candidate, label: row.Laggard_Candidate, type: "candidate", role: "stock",
         score: Math.round((row.Hub_Score || 0) * 100), x: Math.round(x), y: Math.round(y),
-        strength: Math.max(0.3, Math.min(0.95, (row.Contagion_Score || 1) / (topLaggard.Contagion_Score || 1)))
+        strength: Math.max(0.3, Math.min(0.95, (row.Contagion_Score || 1) / (topLaggard.Contagion_Score || 1))),
+        hops: row.Hops || 1
       });
-      edges.push([leaderTicker, row.Laggard_Candidate]);
+      edges.push([leaderTicker, row.Laggard_Candidate, row.Hops || 1]);
     });
     result.graphNodes = nodes; result.graphEdges = edges; result.graphAvailable = true;
 
     var peerItems = laggards.slice(0, 3).map(function(row){
-      return row.Laggard_Candidate + " · " + edgeWeightLabel(row.Edge_Weight) +
+      return row.Laggard_Candidate + " · " + edgeWeightLabel(row.Edge_Weight, row.Hops) +
         (row.Edge_Weight != null ? " " + row.Edge_Weight.toFixed(1) : "");
     });
     var leaderRow = rowByTicker[leaderTicker] || {};
@@ -1953,6 +2093,20 @@ function buildLiveGraphAndFlow(data){
   return result;
 }
 
+function buildLiveBridgeStocks(data){
+  return (data.graph_bridge_stocks_top10 || []).map(function(r){
+    return {ticker: r.Ticker, sector: r.Sector || "—",
+      betweennessScore: r.Betweenness_Score || 0, communitiesBridged: r.Communities_Bridged || 0};
+  });
+}
+
+function buildLiveCommunityDrift(data){
+  return (data.community_drift_alerts || []).map(function(r){
+    return {ticker: r.Ticker, sector: r.Sector || "—", overlapPct: r.Overlap_Pct,
+      priorPeers: r.Sample_Prior_Peers || [], currentPeers: r.Sample_Current_Peers || []};
+  });
+}
+
 function applyLiveData(data){
   if (!data) return false;
   var live = buildLiveUniverse(data);
@@ -1980,6 +2134,18 @@ function applyLiveData(data){
   if (gf.graphAvailable){ GRAPH_NODES = gf.graphNodes; GRAPH_EDGES = gf.graphEdges; }
   GRAPH_LIVE_AVAILABLE = gf.graphAvailable;
   FLOW_DATA_LIVE = gf.flow;
+
+  // Bridge stocks share the same underlying graph as GRAPH_LIVE_AVAILABLE above
+  // (an empty BRIDGE_STOCKS list when the graph itself IS available is a real,
+  // honest finding -- "no cross-community spanning today" -- not a fetch gap).
+  BRIDGE_STOCKS = buildLiveBridgeStocks(data);
+
+  // Community drift needs its own availability flag, independent of the graph
+  // above: the very first run after this feature ships has no prior snapshot
+  // to diff against yet, which is a different state from "graph unavailable"
+  // (see community_drift_baseline_available's docstring in run_pipeline.py).
+  DRIFT_BASELINE_AVAILABLE = !!data.community_drift_baseline_available;
+  COMMUNITY_DRIFT = buildLiveCommunityDrift(data);
 
   LIVE_WARNINGS = data.warnings || [];
   IS_LIVE = true;
@@ -2046,6 +2212,8 @@ function renderAll(){
   renderOppTable();
   renderFlow();
   renderGraph();
+  renderBridgeStocks();
+  renderCommunityDrift();
   buildSegmented(document.getElementById("momentum-range"), "momentum");
   syncSegmented(document.getElementById("momentum-range"), currentMomentumRange);
   renderMomentumChart(currentMomentumRange);

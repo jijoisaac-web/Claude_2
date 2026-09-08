@@ -57,15 +57,21 @@ BATCH_SIZE = 500  # keep write transactions small
 # CORRELATED_WITH (see correlation_edges.py, added 2026-08-28) sits in between: real,
 # data-driven structure derived from actual price co-movement -- not a guess -- but
 # still statistical association, not confirmed corporate/supply-chain causation, so it's
-# weighted below the ownership tier. As of 2026-08-28, SUPPLIES_TO/PARENT_OF/
-# SUBSIDIARY_OF have zero populated edges (no curated source yet); CORRELATED_WITH is
-# the first edge type besides BELONGS_TO that actually exists in the graph, which is
-# why Hub_Score/community detection should start differentiating beyond pure sector
-# grouping once correlation_edges.py has run against enough backfilled history.
+# weighted below the ownership tier. GROUP_AFFILIATE_OF (see corporate_group_edges.py,
+# added 2026-08-28) sits between CORRELATED_WITH and confirmed ownership: "same
+# promoter family/conglomerate" is real, non-statistical structure (not a guess, and
+# stronger propagation evidence than mere price co-movement) but weaker than a
+# confirmed listed-to-listed majority-ownership or supply-chain link, since sibling
+# group companies can and do move independently on their own company-specific news.
+# SUPPLIES_TO/PARENT_OF/SUBSIDIARY_OF/GROUP_AFFILIATE_OF are now populated by
+# corporate_group_edges.py's curated starter set (a handful of major conglomerate
+# groups); CORRELATED_WITH remains the broader, fully data-driven source of structure
+# across the rest of the universe.
 EDGE_WEIGHTS = {
     "SUPPLIES_TO": 3.0,
     "PARENT_OF": 3.0,
     "SUBSIDIARY_OF": 3.0,
+    "GROUP_AFFILIATE_OF": 2.2,  # curated "same conglomerate family," see corporate_group_edges.py
     "CORRELATED_WITH": 1.5,  # data-driven price co-movement, see correlation_edges.py
     "PART_OF": 1.0,      # industry
     "BELONGS_TO": 0.5,   # sector
@@ -198,37 +204,168 @@ def write_scores_back(driver, scores_df: pd.DataFrame):
 
 
 def find_contagion_candidates(g: nx.DiGraph, centrality_df: pd.DataFrame,
-                               breakout_tickers: list) -> pd.DataFrame:
+                               breakout_tickers: list, max_hops: int = 1,
+                               hop_decay: float = 0.5) -> pd.DataFrame:
     """
-    Given tickers that just triggered a technical breakout, return their direct
+    Given tickers that just triggered a technical breakout, return their
     graph neighbors (laggard candidates) ranked by how strongly they're
     structurally coupled to the breakout node -- this is the core laggard screen.
 
-    Sector nodes are excluded from "neighbors": a stock's own sector isn't a
-    laggard candidate, it's the grouping structure the graph runs through.
+    max_hops=1 (default, matches the original single-hop-only screener):
+    direct graph neighbors only.
+
+    max_hops=2 additionally surfaces "the laggard's laggard" -- a stock
+    reachable only via an intermediate neighbor, not directly connected to
+    the breakout ticker itself. These are lower-conviction, earlier-stage
+    propagation candidates -- catching them before they're obvious is the
+    whole point of a graph-based swing-trading edge, so their Contagion_Score
+    is multiplied by hop_decay per additional hop (hop 1: x1.0, hop 2:
+    x{hop_decay}) rather than treated as equally strong evidence as a direct
+    structural link. A BFS explores each breakout ticker's neighborhood one
+    hop at a time and marks nodes visited as soon as they're first reached,
+    so a candidate discoverable at multiple hop-distances (e.g. both a direct
+    neighbor AND a 2-hop path via a different intermediate) is kept only at
+    its shortest, strongest, highest-scored distance -- never double-counted.
+
+    Sector nodes are excluded from "neighbors" at every hop: a stock's own
+    sector isn't a laggard candidate, it's the grouping structure the graph
+    runs through (though a path CAN legitimately pass through a Sector node
+    to reach a 2-hop Stock candidate on the other side of it).
     """
+    if max_hops < 1:
+        raise ValueError("max_hops must be >= 1")
     candidates = []
     for ticker in breakout_tickers:
         if ticker not in g:
             continue
-        raw_neighbors = set(g.predecessors(ticker)) | set(g.successors(ticker))
-        neighbors = {n for n in raw_neighbors if g.nodes[n].get("node_type") == "Stock"}
-        for neighbor in neighbors:
-            edge_data = g.get_edge_data(ticker, neighbor) or g.get_edge_data(neighbor, ticker)
-            weight = edge_data["weight"] if edge_data else 0.5
-            hub_row = centrality_df.loc[centrality_df["Ticker"] == neighbor]
-            hub_score = float(hub_row["Hub_Score"].iloc[0]) if not hub_row.empty else 0.0
-            candidates.append({
-                "Breakout_Ticker": ticker,
-                "Laggard_Candidate": neighbor,
-                "Edge_Weight": weight,
-                "Hub_Score": hub_score,
-                "Contagion_Score": weight * (1 + hub_score),
-            })
+        visited = {ticker}
+        frontier = [ticker]
+        for hop in range(1, max_hops + 1):
+            next_frontier = []
+            for node in frontier:
+                raw_neighbors = set(g.predecessors(node)) | set(g.successors(node))
+                for neighbor in raw_neighbors:
+                    if neighbor in visited:
+                        continue
+                    visited.add(neighbor)
+                    if g.nodes[neighbor].get("node_type") != "Stock":
+                        # A Sector (or other non-Stock) node still extends the
+                        # frontier for further hops -- traversal passes through
+                        # it -- it's just never itself reported as a candidate.
+                        next_frontier.append(neighbor)
+                        continue
+                    next_frontier.append(neighbor)
+                    edge_data = g.get_edge_data(node, neighbor) or g.get_edge_data(neighbor, node)
+                    weight = edge_data["weight"] if edge_data else 0.5
+                    hub_row = centrality_df.loc[centrality_df["Ticker"] == neighbor]
+                    hub_score = float(hub_row["Hub_Score"].iloc[0]) if not hub_row.empty else 0.0
+                    decay = hop_decay ** (hop - 1)
+                    candidates.append({
+                        "Breakout_Ticker": ticker,
+                        "Laggard_Candidate": neighbor,
+                        "Edge_Weight": weight,
+                        "Hub_Score": hub_score,
+                        "Hops": hop,
+                        "Contagion_Score": weight * (1 + hub_score) * decay,
+                    })
+            frontier = next_frontier
+            if not frontier:
+                break
     result = pd.DataFrame(candidates)
     if result.empty:
         return result
     return result.sort_values("Contagion_Score", ascending=False).reset_index(drop=True)
+
+
+def identify_bridge_stocks(g: nx.DiGraph, centrality_df: pd.DataFrame,
+                            communities_df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    """
+    Surface "bridge stocks": nodes with high betweenness centrality (already
+    30% of the Hub_Score composite, but blended in rather than reported on
+    its own) whose direct neighbors reach into at least one OTHER Louvain
+    community besides their own. A stock that structurally sits between two
+    different clusters -- often a diversified conglomerate or a company mid
+    business-model transition -- tends to be where cross-sector rotation
+    shows up first, before it's visible in any single sector's own price
+    action. Blended into Hub_Score, this signal is invisible; surfaced on
+    its own, it's a distinct, actionable "watch this name for rotation"
+    screen.
+
+    THRESHOLD NOTE: this is deliberately ">=1 other community," not ">=2."
+    Louvain always resolves a node straddling exactly two clusters INTO one
+    of them (it has to be assigned somewhere) -- so the most common real
+    bridge case (a stock genuinely connecting cluster A and cluster B) shows
+    up as "my own community is A, and I touch B" -- exactly one OTHER
+    community, never two, no matter how strong the bridge. Requiring >=2
+    would only ever fire for a node straddling three-plus clusters
+    simultaneously, which is rare almost to the point of never happening,
+    and would silently exclude the entire common case this feature exists
+    to catch (caught by a smoke test constructing exactly this two-cluster
+    scenario and asserting the bridge node IS flagged).
+
+    Ranked by Betweenness (not the composite Hub_Score, and not the
+    Communities_Bridged count) since a stock can be a strong bridge without
+    being an overall hub (e.g. modest PageRank/out-degree but a uniquely
+    cross-cutting position) -- betweenness is the metric that actually
+    measures "how much do shortest paths between OTHER nodes pass through
+    me," which is what "bridge" is meant to capture. Communities_Bridged is
+    reported alongside as corroborating context, not the primary sort key.
+
+    Sector nodes participate in the neighbor traversal (a stock's neighbors
+    legitimately include its own BELONGS_TO Sector node, which itself
+    belongs to no Louvain community as a Stock-only concept) but are
+    excluded from the "distinct communities touched" count, same as
+    everywhere else Sector nodes are structure-only.
+    """
+    if communities_df.empty or "Community_ID" not in communities_df.columns:
+        return pd.DataFrame(columns=[
+            "Ticker", "Sector", "Betweenness_Score", "Own_Community_ID",
+            "Communities_Bridged", "Bridged_Community_IDs",
+        ])
+
+    community_by_ticker = communities_df.set_index("Ticker")["Community_ID"].to_dict()
+    betweenness_by_ticker = centrality_df.set_index("Ticker")["Betweenness"].to_dict() \
+        if "Betweenness" in centrality_df.columns else {}
+    sector_by_ticker = {}
+
+    rows = []
+    for ticker, own_community in community_by_ticker.items():
+        if ticker not in g:
+            continue
+        raw_neighbors = set(g.predecessors(ticker)) | set(g.successors(ticker))
+        neighbor_communities = set()
+        sector = None
+        for neighbor in raw_neighbors:
+            if g.nodes[neighbor].get("node_type") == "Sector":
+                sector = neighbor.split("::", 1)[-1]
+                continue
+            neighbor_community = community_by_ticker.get(neighbor)
+            if neighbor_community is not None and neighbor_community != own_community:
+                neighbor_communities.add(neighbor_community)
+        if sector:
+            sector_by_ticker[ticker] = sector
+        if len(neighbor_communities) < 1:
+            continue  # not a bridge -- every neighbor is in its own community
+        rows.append({
+            "Ticker": ticker,
+            "Sector": sector_by_ticker.get(ticker),
+            "Betweenness_Score": round(betweenness_by_ticker.get(ticker, 0.0) * 100, 2),
+            "Own_Community_ID": own_community,
+            "Communities_Bridged": len(neighbor_communities),
+            "Bridged_Community_IDs": sorted(neighbor_communities),
+        })
+
+    result = pd.DataFrame(rows, columns=[
+        "Ticker", "Sector", "Betweenness_Score", "Own_Community_ID",
+        "Communities_Bridged", "Bridged_Community_IDs",
+    ])
+    if result.empty:
+        return result
+    return (
+        result.sort_values(["Betweenness_Score", "Communities_Bridged"], ascending=[False, False])
+        .head(top_n)
+        .reset_index(drop=True)
+    )
 
 
 if __name__ == "__main__":

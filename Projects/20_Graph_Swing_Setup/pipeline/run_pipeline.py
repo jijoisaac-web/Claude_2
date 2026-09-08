@@ -260,10 +260,14 @@ def main():
         from neo4j import GraphDatabase
         from graph_centrality import (
             fetch_graph, compute_centrality, compute_communities, write_scores_back,
-            find_contagion_candidates,
+            find_contagion_candidates, identify_bridge_stocks,
         )
         from correlation_edges import compute_return_matrix, compute_top_correlated_pairs, refresh_correlation_edges
+        from corporate_group_edges import refresh_structural_edges
         from sector_rotation import fetch_sector_map, compute_sector_rotation, update_rotation_history
+        from community_drift import (
+            compute_peer_sets, load_prev_snapshot, save_snapshot, compute_community_drift,
+        )
 
         driver = GraphDatabase.driver(
             os.environ["NEO4J_URI"],
@@ -288,10 +292,27 @@ def main():
                         "60+ trading days) -- skipped this run, will retry as history accumulates."
                     )
 
+            # Curated structural edges (SUPPLIES_TO/PARENT_OF/SUBSIDIARY_OF/
+            # GROUP_AFFILIATE_OF for major conglomerate groups) -- refreshed
+            # BEFORE pulling the graph for centrality, same reasoning as
+            # correlation edges above: this run's Hub_Score/community output
+            # should reflect today's full structure, not lag a run behind.
+            # Own try/except: a curation-loader bug shouldn't take down
+            # correlation edges or centrality, which already worked before
+            # this feature existed.
+            try:
+                structural_stats = refresh_structural_edges(driver)
+                print(f"Refreshed curated structural edges: "
+                      f"{structural_stats['written']}/{structural_stats['requested']} "
+                      f"matched real Stock nodes and were written.")
+            except Exception as exc:
+                report["warnings"].append(f"Structural edge refresh failed: {exc!r}")
+
             # Default empty so swing_score's GraphStrength pillar and the
             # leader-laggard screener below can both run (as all-zero /
             # skipped, not crashed) even when the graph itself is empty.
             centrality_df = pd.DataFrame(columns=["Ticker", "Hub_Score"])
+            communities_df = pd.DataFrame(columns=["Ticker", "Community_ID", "Community_Size"])
             graph = fetch_graph(driver)
             if graph.number_of_nodes() == 0:
                 report["warnings"].append(
@@ -306,6 +327,52 @@ def main():
                 write_scores_back(driver, merged)
                 report["graph_hub_leaders_top20"] = merged.head(20).to_dict("records")
                 centrality_df = merged
+                communities_df = communities
+
+                # Bridge stocks: betweenness-ranked nodes whose neighbors span
+                # multiple distinct Louvain communities -- see
+                # identify_bridge_stocks()'s docstring. Own try/except since
+                # this is new logic touching the just-computed graph/community
+                # output for the first time.
+                try:
+                    bridge_stocks = identify_bridge_stocks(graph, centrality_df, communities_df, top_n=10)
+                    if not bridge_stocks.empty:
+                        report["graph_bridge_stocks_top10"] = bridge_stocks.to_dict("records")
+                except Exception as exc:
+                    report["warnings"].append(f"Bridge-stock detection failed: {exc!r}")
+
+                # Community drift: compare today's Louvain peer sets against
+                # yesterday's snapshot (see community_drift.py's docstring for
+                # why this diffs peer SETS, not raw unstable Community_ID
+                # values). The snapshot is always overwritten with today's
+                # peer sets at the end, regardless of whether a prior
+                # snapshot existed, so tomorrow's run has something to
+                # compare against.
+                try:
+                    snapshot_path = DATA_DIR / "community_snapshot.csv"
+                    current_peer_sets = compute_peer_sets(communities_df)
+                    prev_peer_sets = load_prev_snapshot(snapshot_path)
+                    # Always emit both fields (even an empty alerts list) so the
+                    # dashboard can distinguish three real states: no prior
+                    # snapshot to compare against (first run), a prior snapshot
+                    # with zero flagged drift (a genuine, boring "stable today"
+                    # finding), and a prior snapshot with real alerts -- vs.
+                    # collapsing the first two into "key absent," which reads
+                    # identically to a broken feature.
+                    report["community_drift_baseline_available"] = bool(prev_peer_sets)
+                    if not prev_peer_sets:
+                        report["warnings"].append(
+                            "No prior community_snapshot.csv -- community drift not computable "
+                            "this run (expected on the first run after this feature shipped; "
+                            "today's snapshot has been saved for tomorrow's comparison)."
+                        )
+                        report["community_drift_alerts"] = []
+                    else:
+                        drift = compute_community_drift(current_peer_sets, prev_peer_sets)
+                        report["community_drift_alerts"] = drift.to_dict("records")
+                    save_snapshot(current_peer_sets, snapshot_path)
+                except Exception as exc:
+                    report["warnings"].append(f"Community drift detection failed: {exc!r}")
 
             # Sector rotation: aggregates RS Ranking (already computed above) up to
             # sector level using Neo4j's BELONGS_TO membership -- independent of
@@ -373,7 +440,14 @@ def main():
                             technical["Breakout_20D"] | technical["Breakout_50D"], "Ticker"
                         ].tolist()
                         if breakout_tickers:
-                            contagion = find_contagion_candidates(graph, centrality_df, breakout_tickers)
+                            # max_hops=2: also surface "the laggard's laggard" at a
+                            # decayed score, not just direct neighbors -- see
+                            # find_contagion_candidates()'s docstring. Each row's
+                            # Hops field (1 or 2) lets the dashboard label 2-hop
+                            # candidates as lower-conviction, earlier-stage signals.
+                            contagion = find_contagion_candidates(
+                                graph, centrality_df, breakout_tickers, max_hops=2
+                            )
                             if not contagion.empty:
                                 report["leader_laggard_top20"] = contagion.head(20).to_dict("records")
         except Exception as exc:
