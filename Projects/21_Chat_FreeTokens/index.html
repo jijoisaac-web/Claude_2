@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="version" content="2.1.0" />
-  <title>FreeTokens Studio v2.1.0 — Pro YouTube & Reels Creator Suite</title>
+  <meta name="version" content="2.2.0" />
+  <title>FreeTokens Studio v2.2.0 — Prompt-to-Shorts & Creator AI Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -291,13 +291,13 @@
     }
     .output-header {
       padding: 13px 20px; border-bottom: 1px solid var(--border); background: rgba(14, 20, 30, 0.6);
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
     }
     .output-title {
       font-size: 12px; font-weight: 600; color: #FFF;
       display: flex; align-items: center; gap: 7px; font-family: var(--mono);
     }
-    .output-tools { display: flex; gap: 8px; }
+    .output-tools { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-sm {
       background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: var(--radius-sm);
       color: var(--text-dim); font-size: 11.5px; font-weight: 500; padding: 6px 11px;
@@ -419,7 +419,7 @@
       <div class="logo-row">
         <div class="logo-badge">⚡</div>
         <span class="logo-title">FreeTokens Studio</span>
-        <span class="ver-badge">v2.1.0</span>
+        <span class="ver-badge">v2.2.0</span>
       </div>
       <div class="logo-sub">YouTube & Reels AI Suite · $0 Free</div>
     </div>
@@ -428,10 +428,15 @@
       <!-- Dedicated Studio Tools -->
       <div class="section-title">Creator Tools</div>
       <div class="tool-nav">
-        <button class="tool-btn active" data-tool="script">
+        <button class="tool-btn active" data-tool="creator">
+          <span class="t-icon">⚡</span>
+          <span class="t-name">Prompt-to-Shorts</span>
+          <span class="t-pill">AI Director</span>
+        </button>
+        <button class="tool-btn" data-tool="script">
           <span class="t-icon">🎬</span>
           <span class="t-name">Script Generator</span>
-          <span class="t-pill">Hooks + B-Roll</span>
+          <span class="t-pill">Full Script</span>
         </button>
         <button class="tool-btn" data-tool="shorts">
           <span class="t-icon">✂️</span>
@@ -503,7 +508,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <span>FreeTokens Studio v2.1.0</span>
+      <span>FreeTokens Studio v2.2.0</span>
       <span id="active-provider-tag" style="color:var(--accent)">OpenRouter</span>
     </div>
   </aside>
@@ -515,21 +520,94 @@
     <div id="topbar">
       <div class="topbar-left">
         <button id="menu-toggle">☰</button>
-        <span class="topbar-title" id="topbar-title">🎬 Script Generator</span>
+        <span class="topbar-title" id="topbar-title">⚡ Prompt-to-Shorts Creator</span>
         <span class="pill-badge" id="topbar-provider-badge">OpenRouter</span>
       </div>
       <div class="topbar-right">
         <span class="pill-badge" id="topbar-model-badge">Free Model</span>
-        <span class="ver-badge">v2.1.0</span>
+        <span class="ver-badge">v2.2.0</span>
       </div>
     </div>
 
     <div id="panels-container">
 
-      <!-- ── Tool 1: Script Generator ── -->
-      <section class="studio-panel active" id="panel-script">
+      <!-- ── Tool 0: Prompt-to-Shorts Creator (NEW FLAGSHIP) ── -->
+      <section class="studio-panel active" id="panel-creator">
         <div class="studio-header">
-          <h1>🎬 YouTube & Reels Script Generator</h1>
+          <h1>⚡ Prompt-to-Shorts Creator</h1>
+          <p>Turn a single prompt or idea into a viral 9:16 Short/Reel. Generates scene-by-scene AI video prompts (Midjourney/Runway/Kling), spoken voiceover (ElevenLabs), on-screen text overlays, sound effects, and infinite loop engineering.</p>
+        </div>
+
+        <div class="form-card">
+          <div class="form-field">
+            <label>Short Topic / Idea Prompt</label>
+            <input type="text" id="creator-prompt" placeholder="e.g. The dark psychological trick casinos use by removing all clocks and windows" />
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-field">
+              <label>Channel Niche / Genre</label>
+              <select id="creator-niche">
+                <option value="Psychology, Mind & Behavior">Psychology, Mind & Behavior</option>
+                <option value="Tech, AI & Future Secrets">Tech, AI & Future Secrets</option>
+                <option value="Money, Wealth & Dark Finance">Money, Wealth & Dark Finance</option>
+                <option value="History, Mysteries & Conspiracies">History, Mysteries & Conspiracies</option>
+                <option value="Science & Crazy Facts">Science & Crazy Facts</option>
+                <option value="Stoicism & Alpha Motivation">Stoicism & Motivation</option>
+                <option value="Health, Body & Biohacking">Health, Body & Biohacking</option>
+                <option value="Business & Marketing Secrets">Business & Marketing Secrets</option>
+                <option value="Custom General Niche">Custom General Niche</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>AI Video Art Style (Visual Prompts)</label>
+              <select id="creator-style">
+                <option value="Cinematic Hyper-Realistic 8K (Photorealistic)">Cinematic 8K (Photorealistic)</option>
+                <option value="Dark Moody Neo-Noir (High Contrast)">Dark Moody Neo-Noir</option>
+                <option value="Cyberpunk & Neon Sci-Fi">Cyberpunk & Neon Sci-Fi</option>
+                <option value="3D Pixar / Unreal Engine 5 Render">3D Pixar / Unreal Engine 5</option>
+                <option value="Vintage 35mm Analog Film Grain">Vintage 35mm Analog Film</option>
+                <option value="Anime & Dark Manga Aesthetic">Anime & Dark Manga</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>Target Duration & Pacing</label>
+              <select id="creator-duration">
+                <option value="Fast Viral (20–30s · ~65 words)">Fast Viral (20–30s · ~65 words)</option>
+                <option value="Standard Reel (30–45s · ~95 words)" selected>Standard Reel (30–45s · ~95 words)</option>
+                <option value="Deep Story (45–60s · ~130 words)">Deep Story (45–60s · ~130 words)</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-action" id="creator-generate-btn">⚡ Direct & Generate Complete Short (Free Tokens)</button>
+        </div>
+
+        <div class="output-card" id="creator-output-card">
+          <div class="output-header">
+            <div class="output-title">🎬 Viral Short Production Package</div>
+            <div class="output-tools">
+              <button class="btn-sm" onclick="copyVoiceoverOnly('creator-output')">🎙️ Copy Voiceover Only</button>
+              <button class="btn-sm" onclick="copyVisualPromptsOnly('creator-output')">🖼️ Copy AI Video Prompts</button>
+              <button class="btn-sm" onclick="copyOutput('creator-output')">📋 Copy All</button>
+              <button class="btn-sm" onclick="downloadMd('creator-output', 'viral-short-production')">💾 Export .md</button>
+            </div>
+          </div>
+          <div class="output-body" id="creator-output">
+            <div class="output-placeholder">
+              <div class="icon">⚡</div>
+              <div>Enter a prompt or concept above to generate your complete Short video storyboard.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tool 1: Script Generator ── -->
+      <section class="studio-panel" id="panel-script">
+        <div class="studio-header">
+          <h1>🎬 YouTube Video Script Generator</h1>
           <p>Utilize free AI tokens to write structured, high-retention video scripts complete with scroll-stopping hooks, dual-column visual/voiceover cues, and conversion CTAs.</p>
         </div>
 
@@ -552,7 +630,6 @@
             <div class="form-field">
               <label>Target Length / Format</label>
               <select id="script-length">
-                <option value="YouTube Shorts / Reels (30–60s)">YouTube Shorts / Reels (30–60 seconds)</option>
                 <option value="Mid-Length Video (3–5 minutes)">Mid-Length Video (3–5 minutes)</option>
                 <option value="Deep-Dive Video (8–12 minutes)">Deep-Dive Video (8–12 minutes)</option>
                 <option value="Long Educational Masterclass (15+ min)">Long Educational Masterclass (15+ min)</option>
@@ -852,7 +929,7 @@ const PROVIDERS = {
 };
 
 // ── Global State ──
-let currentTool = localStorage.getItem('active_tool') || 'script';
+let currentTool = localStorage.getItem('active_tool') || 'creator';
 let currentProvider = localStorage.getItem('active_provider') || 'openrouter';
 let isStreaming = false;
 let totalTokens = 0;
@@ -914,7 +991,8 @@ function setTool(toolId) {
 
   // Update Topbar
   const titles = {
-    script: '🎬 Script Generator',
+    creator: '⚡ Prompt-to-Shorts Creator',
+    script: '🎬 YouTube Script Generator',
     shorts: '✂️ Shorts Splitter',
     seo: '🚀 SEO Package Generator',
     ideas: '📅 30-Day Content Calendar',
@@ -1132,18 +1210,18 @@ async function runStreamRequest(promptText, outputElemId, actionBtnId) {
 
   isStreaming = true;
   actionBtn.disabled = true;
-  actionBtn.innerHTML = '<span class="status-dot loading"></span> Generating with Free Tokens…';
-  outElem.innerHTML = '<div style="display:flex;gap:10px;align-items:center;color:var(--accent);padding:12px 0"><span class="status-dot loading"></span> Streaming response with free tokens…</div>';
+  actionBtn.innerHTML = '<span class="status-dot loading"></span> Directing with Free Tokens…';
+  outElem.innerHTML = '<div style="display:flex;gap:10px;align-items:center;color:var(--accent);padding:12px 0"><span class="status-dot loading"></span> Directing and streaming short-form storyboard with free tokens…</div>';
 
   const body = {
     model,
     stream: true,
-    max_tokens: 3000,
+    max_tokens: 3200,
     temperature: 0.7,
     messages: [
       {
         role: 'system',
-        content: 'You are an elite YouTube Creator Strategist, Instagram Reels Producer, and Viral Content Architect. Format all responses cleanly using Markdown, bold headings, bullet points, and tables when requested.'
+        content: 'You are an elite short-form video director, viral hook engineer, and AI visual prompt artist. Format all outputs cleanly using Markdown, bold headings, bullet points, and code blocks for visual prompts.'
       },
       { role: 'user', content: promptText }
     ]
@@ -1197,12 +1275,74 @@ async function runStreamRequest(promptText, outputElemId, actionBtnId) {
   } finally {
     isStreaming = false;
     actionBtn.disabled = false;
+    if (actionBtnId === 'creator-generate-btn') actionBtn.textContent = '⚡ Direct & Generate Complete Short (Free Tokens)';
     if (actionBtnId === 'script-generate-btn') actionBtn.textContent = '⚡ Generate Structured Script (Free Tokens)';
     if (actionBtnId === 'shorts-generate-btn') actionBtn.textContent = '✂️ Split Into 5 Shorts (Free Tokens)';
     if (actionBtnId === 'seo-generate-btn') actionBtn.textContent = '🚀 Generate Complete SEO Package (Free Tokens)';
     if (actionBtnId === 'ideas-generate-btn') actionBtn.textContent = '📅 Generate 30-Day Content Calendar (Free Tokens)';
   }
 }
+
+// ── 0. Prompt-to-Shorts Creator Handler ──
+$('creator-generate-btn').addEventListener('click', () => {
+  const promptText = $('creator-prompt').value.trim();
+  const niche = $('creator-niche').value;
+  const style = $('creator-style').value;
+  const duration = $('creator-duration').value;
+
+  if (!promptText) {
+    showToast('Please enter a Short topic or prompt');
+    $('creator-prompt').focus();
+    return;
+  }
+
+  const prompt = `You are a world-class viral Short/Reel director and AI prompt engineer.
+Create a complete, production-ready 9:16 Short/Reel package based on:
+- Topic / Idea Prompt: "${promptText}"
+- Category: ${niche}
+- AI Video/Image Art Style: ${style}
+- Target Duration: ${duration}
+- Aspect Ratio: 9:16 Vertical Video
+
+Format the output strictly as:
+
+# ⚡ [Viral Video Title]
+> **Viral Potential**: 9.9/10 · **Hook Type**: High Dopamine Curiosity · **Target Length**: ${duration}
+
+## 🎣 The 3-Second Scroll-Stopper
+- **👁️ Visual Scene (0-3s)**: [Exact framing, motion, subject action]
+- **🗣️ Spoken Hook Line**: "[First words spoken in spoken English to hook the viewer]"
+- **🔤 On-Screen Bold Text**: [3-5 punchy words to flash on screen]
+- **💥 Sound FX Cue**: [e.g. Low sub bass impact + whoosh]
+
+## 🎬 Scene-by-Scene Production Storyboard (5 Distinct Scenes)
+For each scene (1 to 5), provide:
+### 🎞️ Scene [Number] ([Timestamp e.g. 0:03 - 0:12])
+- **🎙️ Spoken Voiceover**: "[Spoken voiceover text, highly conversational]"
+- **🖼️ AI Video/Image Prompt (Midjourney / Kling / Runway Gen-3 / Sora)**:
+\`${style}, [detailed scene action and cinematic lighting], photorealistic, 8k, dynamic camera angle, hyper-detailed, masterpiece, --ar 9:16\`
+- **🔤 On-Screen Captions**: [Highlighted text for CapCut / Premiere]
+- **🔊 Sound Design / SFX**: [Specific SFX cue e.g. camera shutter, riser, riser cut]
+
+## 🔄 Infinite Loop Secret
+(Explain the exact sentence structure used to make the final line seamlessly transition into the opening 3-second hook for continuous looping).
+
+## 🎙️ Clean Voiceover Script (Ready for ElevenLabs / TTS)
+\`\`\`
+[Provide the complete, unbroken voiceover script here with no bracketed notes so the creator can copy and paste directly into ElevenLabs]
+\`\`\`
+
+## 🖼️ All AI Visual Generation Prompts (Ready for Midjourney / Kling / Runway)
+\`\`\`
+Scene 1: ${style}, [prompt description] --ar 9:16
+Scene 2: ${style}, [prompt description] --ar 9:16
+Scene 3: ${style}, [prompt description] --ar 9:16
+Scene 4: ${style}, [prompt description] --ar 9:16
+Scene 5: ${style}, [prompt description] --ar 9:16
+\`\`\``;
+
+  runStreamRequest(prompt, 'creator-output', 'creator-generate-btn');
+});
 
 // ── 1. Script Generator Handler ──
 $('script-generate-btn').addEventListener('click', () => {
@@ -1500,6 +1640,35 @@ function copyOutput(elementId) {
   showToast('✓ Copied to clipboard!');
 }
 window.copyOutput = copyOutput;
+
+function copyVoiceoverOnly(elementId) {
+  const elem = $(elementId);
+  if (!elem) return;
+  const fullText = elem.innerText;
+  const match = fullText.match(/Clean Voiceover Script[\s\S]*?```([\s\S]*?)```/i);
+  if (match && match[1].trim()) {
+    navigator.clipboard.writeText(match[1].trim());
+    showToast('✓ Voiceover script copied (ElevenLabs ready)!');
+  } else {
+    // Fallback copy
+    copyOutput(elementId);
+  }
+}
+window.copyVoiceoverOnly = copyVoiceoverOnly;
+
+function copyVisualPromptsOnly(elementId) {
+  const elem = $(elementId);
+  if (!elem) return;
+  const fullText = elem.innerText;
+  const match = fullText.match(/All AI Visual Generation Prompts[\s\S]*?```([\s\S]*?)```/i);
+  if (match && match[1].trim()) {
+    navigator.clipboard.writeText(match[1].trim());
+    showToast('✓ AI Visual Prompts copied (Midjourney/Kling ready)!');
+  } else {
+    copyOutput(elementId);
+  }
+}
+window.copyVisualPromptsOnly = copyVisualPromptsOnly;
 
 function downloadMd(elementId, filenamePrefix) {
   const elem = $(elementId);
