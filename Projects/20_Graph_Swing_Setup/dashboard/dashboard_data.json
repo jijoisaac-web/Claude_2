@@ -1,145 +1,145 @@
 {
-  "generated_at_utc": "2026-09-07T16:00:08.677605+00:00",
+  "generated_at_utc": "2026-09-08T14:43:30.906518+00:00",
   "warnings": [
     "Graph centrality step failed: ServiceUnavailable('Failed to DNS resolve address 86ebd6d2.databases.neo4j.io:7687: [Errno -2] Name or service not known')"
   ],
   "breadth": {
-    "Date": "2026-09-07 00:00:00",
-    "Advancers": 959,
-    "Decliners": 1636,
-    "AD_Ratio": 0.59,
-    "Pct_Above_50DMA": 42.4,
-    "Pct_Above_200DMA": 53.3,
+    "Date": "2026-09-08 00:00:00",
+    "Advancers": 1178,
+    "Decliners": 1437,
+    "AD_Ratio": 0.82,
+    "Pct_Above_50DMA": 42.3,
+    "Pct_Above_200DMA": 52.9,
     "Regime": "NEUTRAL"
   },
   "rs_ranking_top20": [
     {
       "Ticker": "MODISONLTD",
-      "RS_Raw": 3.3515551921967957,
+      "RS_Raw": 3.515771510471485,
       "RS_Rating": 99,
       "RS_Rank": 1
     },
     {
-      "Ticker": "BODALCHEM",
-      "RS_Raw": 3.0494930651681353,
+      "Ticker": "TBZ",
+      "RS_Raw": 3.167211139358002,
       "RS_Rating": 99,
       "RS_Rank": 2
     },
     {
-      "Ticker": "TBZ",
-      "RS_Raw": 3.028462830480734,
+      "Ticker": "BODALCHEM",
+      "RS_Raw": 3.1417051003914005,
       "RS_Rating": 99,
       "RS_Rank": 3
     },
     {
       "Ticker": "MTARTECH",
-      "RS_Raw": 2.9463290313922386,
+      "RS_Raw": 2.953289068498246,
       "RS_Rating": 99,
       "RS_Rank": 4
     },
     {
       "Ticker": "UFBL",
-      "RS_Raw": 2.9155355068316826,
+      "RS_Raw": 2.9249280712119905,
       "RS_Rating": 99,
       "RS_Rank": 5
     },
     {
       "Ticker": "KABRAEXTRU",
-      "RS_Raw": 2.77714042844472,
+      "RS_Raw": 2.872038242448797,
       "RS_Rating": 99,
       "RS_Rank": 6
     },
     {
-      "Ticker": "MOREPENLAB",
-      "RS_Raw": 2.6751632960178515,
+      "Ticker": "INDSWFTLAB",
+      "RS_Raw": 2.783249311338129,
       "RS_Rating": 99,
       "RS_Rank": 7
     },
     {
-      "Ticker": "BLISSGVS",
-      "RS_Raw": 2.6694709245061916,
+      "Ticker": "DEEDEV",
+      "RS_Raw": 2.6831402312163783,
       "RS_Rating": 99,
       "RS_Rank": 8
     },
     {
-      "Ticker": "INDSWFTLAB",
-      "RS_Raw": 2.6505865678549627,
+      "Ticker": "BLISSGVS",
+      "RS_Raw": 2.6748994691026917,
       "RS_Rating": 99,
       "RS_Rank": 9
     },
     {
-      "Ticker": "DEEDEV",
-      "RS_Raw": 2.6406768128726226,
+      "Ticker": "MOREPENLAB",
+      "RS_Raw": 2.6106805241436155,
       "RS_Rating": 99,
       "RS_Rank": 10
     },
     {
-      "Ticker": "INDOTECH",
-      "RS_Raw": 2.6056975783517635,
+      "Ticker": "WELCORP",
+      "RS_Raw": 2.512618829113344,
       "RS_Rating": 99,
       "RS_Rank": 11
     },
     {
-      "Ticker": "WELCORP",
-      "RS_Raw": 2.5269242075221103,
+      "Ticker": "INDOTECH",
+      "RS_Raw": 2.4701091645899576,
       "RS_Rating": 98,
       "RS_Rank": 12
     },
     {
-      "Ticker": "HFCL",
-      "RS_Raw": 2.348910861890809,
+      "Ticker": "CYIENTDLM",
+      "RS_Raw": 2.4303706385115973,
       "RS_Rating": 98,
       "RS_Rank": 13
     },
     {
-      "Ticker": "SHILPAMED",
-      "RS_Raw": 2.252865564325905,
+      "Ticker": "HFCL",
+      "RS_Raw": 2.3560971350318525,
       "RS_Rating": 98,
       "RS_Rank": 14
     },
     {
-      "Ticker": "YASHO",
-      "RS_Raw": 2.1908880961174644,
+      "Ticker": "SHILPAMED",
+      "RS_Raw": 2.3036423359827882,
       "RS_Rating": 98,
       "RS_Rank": 15
     },
     {
-      "Ticker": "IOLCP",
-      "RS_Raw": 2.1865123224135976,
+      "Ticker": "YASHO",
+      "RS_Raw": 2.2836176947909754,
       "RS_Rating": 98,
       "RS_Rank": 16
     },
     {
-      "Ticker": "CYIENTDLM",
-      "RS_Raw": 2.148975990293329,
+      "Ticker": "CORDSCABLE",
+      "RS_Raw": 2.261472831368944,
       "RS_Rating": 98,
       "RS_Rank": 17
     },
     {
-      "Ticker": "RUBYMILLS",
-      "RS_Raw": 2.108644933127698,
+      "Ticker": "AEROFLEX",
+      "RS_Raw": 2.1549783527865642,
       "RS_Rating": 98,
       "RS_Rank": 18
     },
     {
-      "Ticker": "AEROFLEX",
-      "RS_Raw": 2.0909595845114253,
+      "Ticker": "IOLCP",
+      "RS_Raw": 2.1496349202553464,
       "RS_Rating": 98,
       "RS_Rank": 19
     },
     {
       "Ticker": "SAKAR",
-      "RS_Raw": 2.0473459779762413,
+      "RS_Raw": 2.1267546391332814,
       "RS_Rating": 98,
       "RS_Rank": 20
     }
   ],
-  "technical_signals_computed_for": 2681,
+  "technical_signals_computed_for": 2682,
   "market_indices": {
     "BANKNIFTY": {
-      "Close": 57088.3,
-      "Chg_1D_Pct": -0.49,
-      "Date": "2026-09-07",
+      "Close": 56777.55,
+      "Chg_1D_Pct": -0.54,
+      "Date": "2026-09-08",
       "Series": [
         {
           "Date": "2026-08-28",
@@ -168,13 +168,17 @@
         {
           "Date": "2026-09-07",
           "Close": 57088.3
+        },
+        {
+          "Date": "2026-09-08",
+          "Close": 56777.55
         }
       ]
     },
     "NIFTY50": {
-      "Close": 23779.15,
-      "Chg_1D_Pct": -0.5,
-      "Date": "2026-09-07",
+      "Close": 23635.1,
+      "Chg_1D_Pct": -0.61,
+      "Date": "2026-09-08",
       "Series": [
         {
           "Date": "2026-08-28",
@@ -203,20 +207,15 @@
         {
           "Date": "2026-09-07",
           "Close": 23779.15
+        },
+        {
+          "Date": "2026-09-08",
+          "Close": 23635.1
         }
       ]
     }
   },
   "institutional_signals": [
-    {
-      "Ticker": "PCJEWELLER",
-      "Buy_Qty": 790576363.0,
-      "Sell_Qty": 725234237.0,
-      "Deal_Count": 10,
-      "Net_Buy_Qty": 65342126.0,
-      "Buy_Sell_Ratio": 1.09,
-      "Signal": "NEUTRAL"
-    },
     {
       "Ticker": "SWIGGY",
       "Buy_Qty": 37704137.0,
@@ -227,21 +226,21 @@
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
+      "Ticker": "PCJEWELLER",
+      "Buy_Qty": 1004600421.0,
+      "Sell_Qty": 975660061.0,
+      "Deal_Count": 14,
+      "Net_Buy_Qty": 28940360.0,
+      "Buy_Sell_Ratio": 1.03,
+      "Signal": "NEUTRAL"
+    },
+    {
       "Ticker": "IFCI",
       "Buy_Qty": 157996685.0,
       "Sell_Qty": 150372659.0,
       "Deal_Count": 18,
       "Net_Buy_Qty": 7624026.0,
       "Buy_Sell_Ratio": 1.05,
-      "Signal": "NEUTRAL"
-    },
-    {
-      "Ticker": "KSHITIJ-RE",
-      "Buy_Qty": 14025455.0,
-      "Sell_Qty": 8216696.0,
-      "Deal_Count": 23,
-      "Net_Buy_Qty": 5808759.0,
-      "Buy_Sell_Ratio": 1.71,
       "Signal": "NEUTRAL"
     },
     {
@@ -263,6 +262,15 @@
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
+      "Ticker": "KSHITIJ-RE",
+      "Buy_Qty": 13028229.0,
+      "Sell_Qty": 8216696.0,
+      "Deal_Count": 22,
+      "Net_Buy_Qty": 4811533.0,
+      "Buy_Sell_Ratio": 1.59,
+      "Signal": "NEUTRAL"
+    },
+    {
       "Ticker": "ASIANTILES",
       "Buy_Qty": 9331209.0,
       "Sell_Qty": 5618568.0,
@@ -270,15 +278,6 @@
       "Net_Buy_Qty": 3712641.0,
       "Buy_Sell_Ratio": 1.66,
       "Signal": "NEUTRAL"
-    },
-    {
-      "Ticker": "RELIGARE",
-      "Buy_Qty": 3498790.0,
-      "Sell_Qty": 0.0,
-      "Deal_Count": 2,
-      "Net_Buy_Qty": 3498790.0,
-      "Buy_Sell_Ratio": 999.0,
-      "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
       "Ticker": "JINDWORLD",
@@ -290,22 +289,31 @@
       "Signal": "NEUTRAL"
     },
     {
-      "Ticker": "ATALREAL",
-      "Buy_Qty": 78663933.0,
-      "Sell_Qty": 75891707.0,
-      "Deal_Count": 108,
-      "Net_Buy_Qty": 2772226.0,
-      "Buy_Sell_Ratio": 1.04,
-      "Signal": "NEUTRAL"
+      "Ticker": "KSHITIJPOL",
+      "Buy_Qty": 5039928.0,
+      "Sell_Qty": 1967335.0,
+      "Deal_Count": 9,
+      "Net_Buy_Qty": 3072593.0,
+      "Buy_Sell_Ratio": 2.56,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
       "Ticker": "ATHERENERG",
-      "Buy_Qty": 14479574.0,
-      "Sell_Qty": 11880000.0,
-      "Deal_Count": 3,
+      "Buy_Qty": 2599574.0,
+      "Sell_Qty": 0.0,
+      "Deal_Count": 1,
       "Net_Buy_Qty": 2599574.0,
-      "Buy_Sell_Ratio": 1.22,
-      "Signal": "NEUTRAL"
+      "Buy_Sell_Ratio": 999.0,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
+    },
+    {
+      "Ticker": "WEL",
+      "Buy_Qty": 4178499.0,
+      "Sell_Qty": 1585646.0,
+      "Deal_Count": 6,
+      "Net_Buy_Qty": 2592853.0,
+      "Buy_Sell_Ratio": 2.64,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
       "Ticker": "SKYWAYS",
@@ -317,15 +325,6 @@
       "Signal": "NEUTRAL"
     },
     {
-      "Ticker": "KSHITIJPOL",
-      "Buy_Qty": 3205859.0,
-      "Sell_Qty": 1000000.0,
-      "Deal_Count": 5,
-      "Net_Buy_Qty": 2205859.0,
-      "Buy_Sell_Ratio": 3.21,
-      "Signal": "INSTITUTIONAL_ACCUMULATION"
-    },
-    {
       "Ticker": "DUCON-RE1",
       "Buy_Qty": 2005000.0,
       "Sell_Qty": 0.0,
@@ -335,21 +334,30 @@
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
-      "Ticker": "WEL",
-      "Buy_Qty": 4294099.0,
-      "Sell_Qty": 2588989.0,
-      "Deal_Count": 8,
-      "Net_Buy_Qty": 1705110.0,
-      "Buy_Sell_Ratio": 1.66,
-      "Signal": "NEUTRAL"
+      "Ticker": "SUBEXLTD",
+      "Buy_Qty": 2925408.0,
+      "Sell_Qty": 987052.0,
+      "Deal_Count": 2,
+      "Net_Buy_Qty": 1938356.0,
+      "Buy_Sell_Ratio": 2.96,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
-      "Ticker": "RATNAVEER",
-      "Buy_Qty": 10663470.0,
-      "Sell_Qty": 9025832.0,
-      "Deal_Count": 30,
-      "Net_Buy_Qty": 1637638.0,
-      "Buy_Sell_Ratio": 1.18,
+      "Ticker": "RELIGARE",
+      "Buy_Qty": 1698790.0,
+      "Sell_Qty": 0.0,
+      "Deal_Count": 1,
+      "Net_Buy_Qty": 1698790.0,
+      "Buy_Sell_Ratio": 999.0,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
+    },
+    {
+      "Ticker": "ATALREAL",
+      "Buy_Qty": 77237405.0,
+      "Sell_Qty": 75550303.0,
+      "Deal_Count": 105,
+      "Net_Buy_Qty": 1687102.0,
+      "Buy_Sell_Ratio": 1.02,
       "Signal": "NEUTRAL"
     },
     {
@@ -371,6 +379,15 @@
       "Signal": "NEUTRAL"
     },
     {
+      "Ticker": "RATNAVEER",
+      "Buy_Qty": 7965400.0,
+      "Sell_Qty": 6859543.0,
+      "Deal_Count": 23,
+      "Net_Buy_Qty": 1105857.0,
+      "Buy_Sell_Ratio": 1.16,
+      "Signal": "NEUTRAL"
+    },
+    {
       "Ticker": "BALKRISIND",
       "Buy_Qty": 1020085.0,
       "Sell_Qty": 0.0,
@@ -378,21 +395,12 @@
       "Net_Buy_Qty": 1020085.0,
       "Buy_Sell_Ratio": 999.0,
       "Signal": "INSTITUTIONAL_ACCUMULATION"
-    },
-    {
-      "Ticker": "UDS",
-      "Buy_Qty": 1012731.0,
-      "Sell_Qty": 0.0,
-      "Deal_Count": 1,
-      "Net_Buy_Qty": 1012731.0,
-      "Buy_Sell_Ratio": 999.0,
-      "Signal": "INSTITUTIONAL_ACCUMULATION"
     }
   ],
   "flow_regime": {
-    "Date": "2026-09-03 00:00:00",
-    "FII_Net_Cr": -2345.87,
-    "DII_Net_Cr": 4977.46,
+    "Date": "2026-09-08 00:00:00",
+    "FII_Net_Cr": -123.19,
+    "DII_Net_Cr": 1349.64,
     "FII_5D_Net": null,
     "DII_5D_Net": null,
     "Combined_5D_Net": null,
