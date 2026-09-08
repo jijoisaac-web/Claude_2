@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="version" content="2.2.0" />
-  <title>FreeTokens Studio v2.2.0 — Prompt-to-Shorts & Creator AI Suite</title>
+  <meta name="version" content="2.2.1" />
+  <title>FreeTokens Studio v2.2.1 — Prompt-to-Shorts & Creator AI Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -408,6 +408,187 @@
       #panels-container { padding: 16px; }
       #topbar { padding: 10px 16px; }
     }
+
+    /* ── Video Production Tracker ── */
+    .tracker-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 6px;
+    }
+    .tracker-stats {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+    .t-stat {
+      background: var(--surface-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 80px;
+    }
+    .t-stat-val { font-size: 20px; font-weight: 700; font-family: var(--mono); color: var(--accent); }
+    .t-stat-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    .btn-add-video {
+      background: var(--accent-grad); color: #FFF; border: none;
+      border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(0,110,255,.3); transition: all .15s;
+    }
+    .btn-add-video:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    /* Tool Links Row */
+    .tool-links-row {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px;
+    }
+    .tool-link {
+      background: var(--surface-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 12px;
+      display: flex; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--text-dim); font-size: 12px; font-weight: 500;
+      transition: all .15s; cursor: pointer;
+    }
+    .tool-link:hover { border-color: var(--accent); color: var(--text); background: rgba(0,200,255,.06); }
+    .tool-link .tl-icon { font-size: 18px; }
+    .tool-link .tl-info { display: flex; flex-direction: column; gap: 1px; }
+    .tool-link .tl-name { color: var(--text); font-weight: 600; font-size: 12px; }
+    .tool-link .tl-sub  { font-size: 10px; color: var(--muted); }
+
+    /* Video Cards */
+    .video-cards { display: flex; flex-direction: column; gap: 14px; }
+
+    .video-card {
+      background: var(--surface-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+      transition: border-color .15s;
+    }
+    .video-card:hover { border-color: var(--border-hover); }
+    .video-card.done-card { border-color: rgba(16,185,129,.25); }
+
+    .vc-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      background: rgba(14,20,30,.5);
+    }
+    .vc-num {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--accent-grad); color: #FFF;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .vc-title { flex: 1; font-size: 14px; font-weight: 600; color: #FFF; min-width: 0; }
+    .vc-title input {
+      background: transparent; border: none; outline: none; color: #FFF;
+      font-size: 14px; font-weight: 600; width: 100%; font-family: var(--sans);
+    }
+    .vc-title input::placeholder { color: var(--muted); }
+    .vc-badge {
+      font-size: 10px; font-family: var(--mono); padding: 3px 9px;
+      border-radius: 12px; font-weight: 600; flex-shrink: 0;
+    }
+    .vc-badge.in-progress { background: rgba(251,191,36,.1); color: #FBB724; border: 1px solid rgba(251,191,36,.25); }
+    .vc-badge.completed   { background: rgba(16,185,129,.1); color: var(--success); border: 1px solid rgba(16,185,129,.25); }
+    .vc-delete {
+      background: transparent; border: none; color: var(--muted);
+      cursor: pointer; font-size: 15px; padding: 4px; transition: color .15s; flex-shrink: 0;
+    }
+    .vc-delete:hover { color: var(--danger); }
+
+    /* Pipeline stages */
+    .vc-pipeline { padding: 14px 18px; }
+    .pipeline-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; }
+    .pipeline-stages { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+
+    .stage-step {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; position: relative; flex: 1; min-width: 70px;
+    }
+    .stage-step::after {
+      content: ''; position: absolute; top: 15px; left: 50%; width: 100%;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+    .stage-step:last-child::after { display: none; }
+
+    .stage-dot {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--surface-elev); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; transition: all .2s; z-index: 1; position: relative;
+    }
+    .stage-step:hover .stage-dot { border-color: var(--accent); }
+    .stage-step.done .stage-dot {
+      background: rgba(16,185,129,.15); border-color: var(--success);
+      box-shadow: 0 0 10px rgba(16,185,129,.25);
+    }
+    .stage-step.done::after { background: rgba(16,185,129,.4); }
+    .stage-name {
+      font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3;
+      transition: color .2s;
+    }
+    .stage-step.done .stage-name { color: var(--success); }
+    .stage-step:hover .stage-name { color: var(--text); }
+
+    /* Progress bar */
+    .vc-progress { padding: 0 18px 14px; }
+    .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .progress-pct { font-size: 11px; font-family: var(--mono); color: var(--accent); }
+    .progress-bar-bg { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--accent-grad); border-radius: 4px; transition: width .4s ease; }
+    .progress-bar-fill.full { background: linear-gradient(90deg, #10B981, #00C8FF); }
+
+    /* Notes */
+    .vc-notes { padding: 0 18px 14px; }
+    .vc-notes textarea {
+      width: 100%; background: rgba(7,10,15,.7); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-dim); font-family: var(--sans);
+      font-size: 12px; padding: 8px 10px; outline: none; resize: none; line-height: 1.5;
+      transition: border-color .15s;
+    }
+    .vc-notes textarea:focus { border-color: var(--border-focus); color: var(--text); }
+    .vc-notes textarea::placeholder { color: var(--muted); }
+
+    /* Empty tracker */
+    .tracker-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 20px; gap: 14px; text-align: center; color: var(--muted);
+    }
+    .tracker-empty .te-icon { font-size: 48px; opacity: .3; }
+    .tracker-empty h3 { font-size: 18px; font-weight: 600; color: var(--text-dim); }
+    .tracker-empty p { max-width: 360px; line-height: 1.6; font-size: 13px; }
+
+    /* Add video modal */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(6px);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: #0E1520; border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 26px; width: 480px; max-width: 95vw;
+      box-shadow: 0 24px 64px rgba(0,0,0,.7);
+      animation: fadeIn .18s ease;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .modal-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .modal-field label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; }
+    .modal-field input, .modal-field select {
+      background: rgba(7,10,15,.9); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-family: var(--sans);
+      font-size: 13px; padding: 10px 12px; outline: none; transition: border-color .15s;
+    }
+    .modal-field input:focus, .modal-field select:focus { border-color: var(--border-focus); }
+    .modal-field select option { background: #0E1520; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 6px; }
+    .modal-btn-cancel {
+      flex: 1; padding: 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500;
+      cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+      transition: all .15s;
+    }
+    .modal-btn-cancel:hover { border-color: var(--border-hover); color: var(--text); }
+    .modal-btn-add {
+      flex: 2; padding: 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      cursor: pointer; background: var(--accent-grad); border: none; color: #FFF;
+      box-shadow: 0 4px 14px rgba(0,110,255,.3); transition: filter .15s;
+    }
+    .modal-btn-add:hover { filter: brightness(1.1); }
   </style>
 </head>
 <body>
@@ -419,7 +600,7 @@
       <div class="logo-row">
         <div class="logo-badge">⚡</div>
         <span class="logo-title">FreeTokens Studio</span>
-        <span class="ver-badge">v2.2.0</span>
+        <span class="ver-badge">v2.2.1</span>
       </div>
       <div class="logo-sub">YouTube & Reels AI Suite · $0 Free</div>
     </div>
@@ -457,6 +638,11 @@
           <span class="t-icon">💬</span>
           <span class="t-name">Free Chat</span>
           <span class="t-pill">Assistant</span>
+        </button>
+        <button class="tool-btn" data-tool="tracker">
+          <span class="t-icon">🎬</span>
+          <span class="t-name">Video Tracker</span>
+          <span class="t-pill">Pipeline</span>
         </button>
       </div>
 
@@ -508,7 +694,7 @@
     </div>
 
     <div class="sidebar-footer">
-      <span>FreeTokens Studio v2.2.0</span>
+      <span>FreeTokens Studio v2.2.1</span>
       <span id="active-provider-tag" style="color:var(--accent)">OpenRouter</span>
     </div>
   </aside>
@@ -525,7 +711,7 @@
       </div>
       <div class="topbar-right">
         <span class="pill-badge" id="topbar-model-badge">Free Model</span>
-        <span class="ver-badge">v2.2.0</span>
+        <span class="ver-badge">v2.2.1</span>
       </div>
     </div>
 
@@ -828,6 +1014,72 @@
         </div>
       </section>
 
+      <!-- ── Tool 6: Video Production Tracker ── -->
+      <section class="studio-panel" id="panel-tracker">
+        <div class="studio-header">
+          <h1>🎬 Video Production Tracker</h1>
+          <p>Track every video from script to upload. Click each stage to mark it done. Direct links to every free tool you need — ElevenLabs, Kling, Pexels, CapCut and more.</p>
+        </div>
+
+        <!-- Stats + Add Button -->
+        <div class="tracker-topbar">
+          <div class="tracker-stats">
+            <div class="t-stat"><span class="t-stat-val" id="trk-total">0</span><span class="t-stat-lbl">Videos</span></div>
+            <div class="t-stat"><span class="t-stat-val" id="trk-done" style="color:var(--success)">0</span><span class="t-stat-lbl">Uploaded</span></div>
+            <div class="t-stat"><span class="t-stat-val" id="trk-progress" style="color:#FBB724">0</span><span class="t-stat-lbl">In Progress</span></div>
+          </div>
+          <button class="btn-add-video" id="trk-add-btn">＋ Add New Video</button>
+        </div>
+
+        <!-- Free Tools Quick Links -->
+        <div class="form-card" style="padding:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">🔗 Free Production Tools</div>
+          <div class="tool-links-row">
+            <a class="tool-link" href="https://elevenlabs.io" target="_blank">
+              <span class="tl-icon">🎙️</span>
+              <div class="tl-info"><span class="tl-name">ElevenLabs</span><span class="tl-sub">AI Voiceover</span></div>
+            </a>
+            <a class="tool-link" href="https://klingai.com" target="_blank">
+              <span class="tl-icon">🎞️</span>
+              <div class="tl-info"><span class="tl-name">Kling AI</span><span class="tl-sub">AI Video Clips</span></div>
+            </a>
+            <a class="tool-link" href="https://runwayml.com" target="_blank">
+              <span class="tl-icon">🚀</span>
+              <div class="tl-info"><span class="tl-name">Runway Gen-3</span><span class="tl-sub">AI Video</span></div>
+            </a>
+            <a class="tool-link" href="https://pika.art" target="_blank">
+              <span class="tl-icon">✨</span>
+              <div class="tl-info"><span class="tl-name">Pika Labs</span><span class="tl-sub">Text-to-Video</span></div>
+            </a>
+            <a class="tool-link" href="https://www.pexels.com/videos/" target="_blank">
+              <span class="tl-icon">🎥</span>
+              <div class="tl-info"><span class="tl-name">Pexels</span><span class="tl-sub">Free Stock Video</span></div>
+            </a>
+            <a class="tool-link" href="https://www.capcut.com" target="_blank">
+              <span class="tl-icon">✂️</span>
+              <div class="tl-info"><span class="tl-name">CapCut</span><span class="tl-sub">Edit + Captions</span></div>
+            </a>
+            <a class="tool-link" href="https://www.canva.com/youtube-thumbnails/" target="_blank">
+              <span class="tl-icon">🖼️</span>
+              <div class="tl-info"><span class="tl-name">Canva</span><span class="tl-sub">Thumbnails</span></div>
+            </a>
+            <a class="tool-link" href="https://studio.youtube.com" target="_blank">
+              <span class="tl-icon">▶️</span>
+              <div class="tl-info"><span class="tl-name">YT Studio</span><span class="tl-sub">Upload</span></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Video Cards -->
+        <div id="trk-cards" class="video-cards">
+          <div class="tracker-empty" id="trk-empty">
+            <div class="te-icon">🎬</div>
+            <h3>No videos yet</h3>
+            <p>Click "Add New Video" to start tracking your first video through the full production pipeline — from script to YouTube upload.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ── Tool 5: Free Chat Assistant ── -->
       <section id="panel-chat">
         <div id="chat-messages">
@@ -848,6 +1100,46 @@
 
     </div>
   </main>
+</div>
+
+<!-- Add Video Modal -->
+<div class="modal-bg" id="add-video-modal">
+  <div class="modal-box">
+    <div class="modal-title">🎬 Add New Video</div>
+    <div class="modal-field">
+      <label>Video Title / Working Title</label>
+      <input type="text" id="modal-title" placeholder="e.g. How I use AI to make YouTube videos for free" autocomplete="off" />
+    </div>
+    <div class="modal-field">
+      <label>Category / Niche</label>
+      <select id="modal-niche">
+        <option value="Tech & AI">Tech & AI</option>
+        <option value="Finance & Crypto">Finance & Crypto</option>
+        <option value="Self-Improvement">Self-Improvement</option>
+        <option value="Health & Fitness">Health & Fitness</option>
+        <option value="Coding & Dev">Coding & Dev</option>
+        <option value="Business & Marketing">Business & Marketing</option>
+        <option value="Education">Education</option>
+        <option value="Gaming">Gaming</option>
+        <option value="Shorts / Reels">Shorts / Reels</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Format</label>
+      <select id="modal-format">
+        <option value="YouTube Long-form">YouTube Long-form</option>
+        <option value="YouTube Short">YouTube Short</option>
+        <option value="Instagram Reel">Instagram Reel</option>
+        <option value="TikTok">TikTok</option>
+        <option value="Multi-platform">Multi-platform</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" id="modal-cancel">Cancel</button>
+      <button class="modal-btn-add" id="modal-confirm">🎬 Add Video</button>
+    </div>
+  </div>
 </div>
 
 <!-- Floating Toast Notification -->
@@ -996,7 +1288,8 @@ function setTool(toolId) {
     shorts: '✂️ Shorts Splitter',
     seo: '🚀 SEO Package Generator',
     ideas: '📅 30-Day Content Calendar',
-    chat: '💬 Free Chat Assistant'
+    chat:    '💬 Free Chat Assistant',
+    tracker: '🎬 Video Production Tracker'
   };
   $('topbar-title').textContent = titles[toolId] || 'FreeTokens Studio';
 }
@@ -1004,6 +1297,7 @@ function setTool(toolId) {
 document.querySelectorAll('.tool-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     setTool(btn.dataset.tool);
+    if (btn.dataset.tool === 'tracker') renderTracker();
     if (window.innerWidth <= 800) {
       $('sidebar').classList.remove('open');
       $('overlay').classList.remove('visible');
@@ -1694,6 +1988,192 @@ $('overlay').addEventListener('click', () => {
   $('overlay').classList.remove('visible');
 });
 
+// ── Video Production Tracker ──
+const PIPELINE_STAGES = [
+  { id: 'idea',      icon: '💡', name: 'Idea' },
+  { id: 'script',    icon: '📝', name: 'Script' },
+  { id: 'voiceover', icon: '🎙️', name: 'Voiceover' },
+  { id: 'visuals',   icon: '🎞️', name: 'Visuals' },
+  { id: 'edit',      icon: '✂️',  name: 'Edit' },
+  { id: 'thumbnail', icon: '🖼️', name: 'Thumbnail' },
+  { id: 'seo',       icon: '🚀', name: 'SEO' },
+  { id: 'upload',    icon: '▶️',  name: 'Upload' },
+];
+
+function loadVideos() {
+  try { return JSON.parse(localStorage.getItem('trk_videos') || '[]'); } catch { return []; }
+}
+function saveVideos(videos) {
+  localStorage.setItem('trk_videos', JSON.stringify(videos));
+}
+
+function renderTracker() {
+  const videos = loadVideos();
+  const container = $('trk-cards');
+  const empty     = $('trk-empty');
+
+  // Stats
+  const done = videos.filter(v => v.stages.every(s => s));
+  const inProg = videos.filter(v => v.stages.some(s => s) && !v.stages.every(s => s));
+  $('trk-total').textContent    = videos.length;
+  $('trk-done').textContent     = done.length;
+  $('trk-progress').textContent = inProg.length;
+
+  // Clear existing cards (keep empty placeholder)
+  [...container.querySelectorAll('.video-card')].forEach(c => c.remove());
+
+  if (videos.length === 0) {
+    if (empty) empty.style.display = 'flex';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  videos.forEach((video, vIdx) => {
+    const completedCount = video.stages.filter(Boolean).length;
+    const pct = Math.round((completedCount / PIPELINE_STAGES.length) * 100);
+    const isComplete = completedCount === PIPELINE_STAGES.length;
+
+    const card = document.createElement('div');
+    card.className = `video-card${isComplete ? ' done-card' : ''}`;
+    card.dataset.idx = vIdx;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'vc-header';
+    header.innerHTML = `
+      <div class="vc-num">${vIdx + 1}</div>
+      <div class="vc-title">
+        <input type="text" value="${escHtml(video.title)}" placeholder="Video title…" data-vidx="${vIdx}" class="trk-title-input" />
+      </div>
+      <span class="vc-badge ${isComplete ? 'completed' : 'in-progress'}">${isComplete ? '✓ Uploaded' : pct + '% done'}</span>
+      <button class="vc-delete" data-vidx="${vIdx}" title="Delete video">🗑</button>
+    `;
+
+    // Pipeline
+    const pipeline = document.createElement('div');
+    pipeline.className = 'vc-pipeline';
+    const stagesHtml = PIPELINE_STAGES.map((stage, sIdx) => `
+      <div class="stage-step ${video.stages[sIdx] ? 'done' : ''}" data-vidx="${vIdx}" data-sidx="${sIdx}" title="Click to toggle: ${stage.name}">
+        <div class="stage-dot">${video.stages[sIdx] ? '✓' : stage.icon}</div>
+        <div class="stage-name">${stage.name}</div>
+      </div>
+    `).join('');
+    pipeline.innerHTML = `
+      <div class="pipeline-label">Production Pipeline — click to mark done</div>
+      <div class="pipeline-stages">${stagesHtml}</div>
+    `;
+
+    // Progress bar
+    const progressDiv = document.createElement('div');
+    progressDiv.className = 'vc-progress';
+    progressDiv.innerHTML = `
+      <div class="progress-row">
+        <span style="font-size:11px;color:var(--muted)">${completedCount} of ${PIPELINE_STAGES.length} stages complete</span>
+        <span class="progress-pct">${pct}%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill${isComplete ? ' full' : ''}" style="width:${pct}%"></div>
+      </div>
+    `;
+
+    // Notes
+    const notesDiv = document.createElement('div');
+    notesDiv.className = 'vc-notes';
+    notesDiv.innerHTML = `
+      <textarea rows="2" placeholder="Notes, links, ideas for this video…" data-vidx="${vIdx}" class="trk-notes-input">${escHtml(video.notes || '')}</textarea>
+    `;
+
+    card.appendChild(header);
+    card.appendChild(pipeline);
+    card.appendChild(progressDiv);
+    card.appendChild(notesDiv);
+    container.appendChild(card);
+  });
+
+  // Bind events
+  container.querySelectorAll('.stage-step').forEach(step => {
+    step.addEventListener('click', () => {
+      const vi = parseInt(step.dataset.vidx);
+      const si = parseInt(step.dataset.sidx);
+      const videos = loadVideos();
+      videos[vi].stages[si] = !videos[vi].stages[si];
+      saveVideos(videos);
+      renderTracker();
+      const stageName = PIPELINE_STAGES[si].name;
+      const isDone = videos[vi].stages[si];
+      showToast(`${isDone ? '✓' : '○'} ${stageName} marked ${isDone ? 'done' : 'pending'}`);
+    });
+  });
+
+  container.querySelectorAll('.vc-delete').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const vi = parseInt(btn.dataset.vidx);
+      const videos = loadVideos();
+      const title = videos[vi]?.title || 'this video';
+      if (!confirm(`Delete "${title}"?`)) return;
+      videos.splice(vi, 1);
+      saveVideos(videos);
+      renderTracker();
+      showToast('Video removed from tracker');
+    });
+  });
+
+  container.querySelectorAll('.trk-title-input').forEach(input => {
+    input.addEventListener('change', () => {
+      const vi = parseInt(input.dataset.vidx);
+      const videos = loadVideos();
+      videos[vi].title = input.value.trim() || 'Untitled';
+      saveVideos(videos);
+    });
+  });
+
+  container.querySelectorAll('.trk-notes-input').forEach(ta => {
+    ta.addEventListener('change', () => {
+      const vi = parseInt(ta.dataset.vidx);
+      const videos = loadVideos();
+      videos[vi].notes = ta.value;
+      saveVideos(videos);
+    });
+  });
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Add video modal
+$('trk-add-btn').addEventListener('click', () => {
+  $('modal-title').value = '';
+  $('add-video-modal').classList.add('open');
+  setTimeout(() => $('modal-title').focus(), 80);
+});
+$('modal-cancel').addEventListener('click', () => $('add-video-modal').classList.remove('open'));
+$('add-video-modal').addEventListener('click', e => { if (e.target === $('add-video-modal')) $('add-video-modal').classList.remove('open'); });
+
+$('modal-title').addEventListener('keydown', e => { if (e.key === 'Enter') $('modal-confirm').click(); });
+
+$('modal-confirm').addEventListener('click', () => {
+  const title  = $('modal-title').value.trim();
+  const niche  = $('modal-niche').value;
+  const format = $('modal-format').value;
+  if (!title) { showToast('Please enter a video title'); $('modal-title').focus(); return; }
+  const videos = loadVideos();
+  videos.unshift({
+    id: Date.now(),
+    title,
+    niche,
+    format,
+    stages: new Array(PIPELINE_STAGES.length).fill(false),
+    notes: '',
+    createdAt: new Date().toLocaleDateString()
+  });
+  saveVideos(videos);
+  $('add-video-modal').classList.remove('open');
+  setTool('tracker');
+  renderTracker();
+  showToast(`🎬 "${title}" added to tracker!`);
+});
+
 // ── App Kickoff ──
 function init() {
   if (!PROVIDERS[currentProvider]) currentProvider = 'openrouter';
@@ -1710,6 +2190,7 @@ function init() {
 
   // Set active tool
   setTool(currentTool);
+  if (currentTool === 'tracker') renderTracker();
 }
 
 init();
