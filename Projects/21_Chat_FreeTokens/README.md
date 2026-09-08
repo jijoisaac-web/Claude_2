@@ -1,59 +1,67 @@
-# ⚡ FreeTokens AI — Multi-Provider Free AI Chat (v2.0.0)
+# ⚡ FreeTokens Studio — YouTube & Reels AI Creator Suite (v2.1.0)
 
-A clean, fast, zero-backend chat interface for **free-tier models** across **OpenRouter**, **Groq Cloud**, and **Google Gemini (AI Studio)**. Runs 100% in the client's browser with no server needed.
+A dedicated, zero-backend **YouTube Video Studio and Instagram Reels Creator Suite** powered by **100% free AI tokens** across **OpenRouter**, **Groq Cloud**, and **Google Gemini (AI Studio)**.
 
 Hosted live at: [https://freetokensai.pages.dev/](https://freetokensai.pages.dev/)
 
 ---
 
+## 🎬 Dedicated Creator Tools
+
+FreeTokens Studio turns free token quotas into high-leverage content creation tools:
+
+| Tool | Input | Output & Superpower |
+| :--- | :--- | :--- |
+| **🎬 Script Generator** | Niche + Topic + Tone + Target Duration | Complete video script with 3 scroll-stopping hook angles (curiosity, bold, high-stakes), retention anchor, two-column scene breakdown (`[Visual Cue]` & `[Voiceover]`), and conversion CTA. |
+| **✂️ Shorts Splitter** | Long script, transcript, or article | Automatically cuts long-form content into **5 standalone viral 30–60s Shorts/Reels** with 3s visual hooks, voiceover scripts, on-screen text cues, and infinite loop endings. |
+| **🚀 SEO Package** | Video topic / summary + keyword | Generates 5 High-CTR title variations (Search, Curiosity gap, Contrarian, Step-by-Step, Short hook), SEO-rich description with chapter placeholders, 15–20 YouTube Studio tags, and viral hashtags in 1 click. |
+| **📅 Batch 30-Day Ideas** | Niche + Audience avatar + Goal | Instant 30-day content calendar structured into 4 weekly content pillars (Discovery, Authority, Debates, Conversion) with daily titles and 3-second opening hook angles. |
+| **💬 Free Chat Assistant** | Free-form prompt | Conversational AI companion for brainstorming, script refinement, and general research. |
+
+---
+
 ## 🚀 Free Providers & Getting Your Free Keys
 
-FreeTokens AI supports three leading AI providers with 100% free tiers:
+FreeTokens Studio connects directly to three leading providers with 100% free developer tiers:
 
 ### 1. OpenRouter (20+ Community Models & Auto-Router)
 - **Free Quota**: All `:free` models + auto router (`openrouter/free`) are completely $0.
 - **Get Free Key**: [https://openrouter.ai/keys](https://openrouter.ai/keys)
-- **Top Models**: `openrouter/free` (Auto-load balanced), DeepSeek R1, Llama 3.3 70B, Qwen 2.5 72B, Google Gemma 4.
+- **Notable Models**: `openrouter/free` (Auto-load balanced), DeepSeek R1, Llama 3.3 70B, Google Gemma 4.
 
 ### 2. Groq Cloud (Ultra-Fast Inference)
 - **Free Quota**: Free rate-limited tier on Groq's custom LPU hardware (>500-750 tokens/sec).
 - **Get Free Key**: [https://console.groq.com/keys](https://console.groq.com/keys)
-- **Top Models**: `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`, `llama-3.1-8b-instant`, `mixtral-8x7b-32768`.
+- **Notable Models**: `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b`, `llama-3.1-8b-instant`.
 
 ### 3. Google Gemini (1M – 2M Context Window)
 - **Free Quota**: 15 requests/min, 1,000,000 tokens/min, 1,500 requests/day completely free on Google AI Studio.
 - **Get Free Key**: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
-- **Top Models**: `gemini-2.0-flash`, `gemini-2.0-flash-lite`, `gemini-1.5-pro`, `gemini-2.0-flash-thinking-exp`.
+- **Notable Models**: `gemini-2.0-flash`, `gemini-1.5-pro` (Ideal for splitting massive transcripts in Shorts Splitter).
 
 ---
 
 ## 🆓 Free Models Matrix
 
-| Provider | Model | Context | Key Strength |
+| Provider | Model | Context Window | Best Use Case in Studio |
 | :--- | :--- | :--- | :--- |
-| **OpenRouter** | `openrouter/free` | 200k | Auto-routes to available free model with zero downtime |
-| **OpenRouter** | DeepSeek R1 | 164k | SOTA reasoning, math, and code synthesis |
-| **OpenRouter** | DeepSeek V3 Chat | 164k | Fast general purpose coding and assistant chat |
-| **OpenRouter** | Llama 3.3 70B Instruct | 131k | High capability open model |
-| **OpenRouter** | Google Gemma 4 31B | 262k | Latest open weights Google release |
-| **Groq** | Llama 3.3 70B Versatile | 128k | Near-instant generation (>300 tok/s) |
-| **Groq** | DeepSeek R1 Distill 70B | 128k | Ultra-fast distilled reasoning |
-| **Groq** | Llama 3.1 8B Instant | 128k | Extreme speeds (>750 tok/s) |
-| **Google** | Gemini 2.0 Flash | 1,000k | Massive 1M context, next-gen multimodal speed |
-| **Google** | Gemini 1.5 Pro | 2,000k | Giant 2M context, complex reasoning |
+| **Groq** | `llama-3.3-70b-versatile` | 128k | Blazing-fast full script & hook generation |
+| **Groq** | `deepseek-r1-distill-llama-70b` | 128k | High-reasoning content calendar & SEO logic |
+| **Google** | `gemini-2.0-flash` | 1,000k | Massive transcripts & multi-hour podcast splitting |
+| **Google** | `gemini-1.5-pro` | 2,000k | Giant 2M context deep-dive masterclass scripts |
+| **OpenRouter** | `openrouter/free` | 200k | Auto-routes to active free models with zero downtime |
+| **OpenRouter** | `deepseek/deepseek-r1:free` | 164k | SOTA reasoning with collapsible `<think>` accordions |
 
 ---
 
-## ✨ Features in v2.0.0
+## ✨ Studio Features in v2.1.0
 
-- **Visible Version Badge (`v2.0.0`)** — Displayed in the sidebar logo, topbar, and footer.
-- **Multi-Provider Selector** — Effortlessly switch between OpenRouter, Groq, and Google Gemini with independent key persistence in `localStorage`.
-- **Auto Model Discovery** — OpenRouter models load dynamically on initial page load without requiring an API key.
-- **Collapsible Thinking Process (`<think>`)** — Reasoning chains from DeepSeek R1 and Gemini Thinking models render neatly inside expandable drawers.
-- **Streaming Responses** — Real-time Server-Sent Events (SSE) token streaming across all providers.
-- **Rate Limit Alerts** — Clear feedback if free-tier rate limits (HTTP 429) are encountered, with advice to switch models or wait.
-- **Markdown & Sanitization** — Full Markdown, tables, and code snippets rendered securely via Marked.js and DOMPurify.
-- **Session Stats & Markdown Export** — Track message counts, estimated tokens, and export conversations.
+- **Dedicated Tool Views** — Fast tab navigation between Script Generator, Shorts Splitter, SEO Package, 30-Day Calendar, and Free Chat.
+- **Live SSE Token Streaming** — Responses stream live with collapsible `<think>` accordions for reasoning models.
+- **One-Click Export** — Instant "Copy" and "Download .md" buttons on all generated scripts and packages.
+- **Independent API Key Storage** — Keys for OpenRouter, Groq, and Gemini are saved in browser `localStorage` and never sent to any intermediary server.
+- **Client-Side Security** — Strict Content Security Policy (CSP) set via `_headers` for Cloudflare Pages.
+- **Zero Cost, Zero Backend** — Pure static HTML/CSS/JS deployed automatically via GitHub to Cloudflare Pages.
 
 ---
 
@@ -61,20 +69,19 @@ FreeTokens AI supports three leading AI providers with 100% free tiers:
 
 ```
 21_Chat_FreeTokens/
-├── index.html      ← Full app (HTML + CSS + JS, single file)
-├── _headers        ← Cloudflare Pages security headers
+├── index.html      ← FreeTokens Studio (HTML + CSS + JS, single file)
+├── _headers        ← Cloudflare Pages security headers (CSP for OpenRouter, Groq, Gemini)
 ├── _redirects      ← SPA routing fallback
 ├── .gitignore      ← Git ignore
-└── README.md       ← This file
+└── README.md       ← Studio documentation
 ```
 
 ---
 
 ## 🔐 Security Notes
 
-- Your API key is stored in **browser localStorage** only — never sent to any third-party server, only directly to the AI provider you select (OpenRouter, Groq, or Google)
-- The `_headers` file sets strict CSP, X-Frame-Options, and other security headers via Cloudflare
-- For a team setup, consider using Cloudflare Workers to proxy API calls and keep the key server-side
+- Your API keys are stored in **browser localStorage** only — never sent to any third-party server, only directly to the AI provider you select (OpenRouter, Groq, or Google).
+- The `_headers` file sets strict CSP, X-Frame-Options, and other security headers via Cloudflare.
 
 ---
 
@@ -94,4 +101,4 @@ npx serve .
 
 ## 📄 License
 
-MIT — do whatever you want with it.
+MIT — Free and open source.

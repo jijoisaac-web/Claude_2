@@ -3,336 +3,313 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="version" content="2.0.0" />
-  <title>FreeTokens AI v2.0.0 — Free Multi-Provider AI Chat</title>
+  <meta name="version" content="2.1.0" />
+  <title>FreeTokens Studio v2.1.0 — YouTube & Reels AI Creator Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0D1117;
-      --surface:   #161B22;
-      --border:    #21262D;
-      --accent:    #00C8FF;
-      --accent-dim:#004F63;
-      --text:      #E6EDF3;
-      --muted:     #7D8590;
-      --user-bg:   #1C2D3A;
-      --ai-bg:     #161B22;
-      --danger:    #F85149;
-      --success:   #3FB950;
-      --radius:    10px;
-      --mono:      'JetBrains Mono', monospace;
-      --sans:      'Inter', system-ui, sans-serif;
+      --bg:         #0A0E14;
+      --surface:    #121820;
+      --surface-alt:#18202A;
+      --border:     #222D3D;
+      --accent:     #00C8FF;
+      --accent-dim: #004D61;
+      --accent-rgb: 0, 200, 255;
+      --text:       #E6EDF3;
+      --muted:      #7D8B9B;
+      --danger:     #F85149;
+      --success:    #3FB950;
+      --warning:    #D29922;
+      --radius:     10px;
+      --mono:       'JetBrains Mono', monospace;
+      --sans:       'Inter', system-ui, -apple-system, sans-serif;
     }
 
     html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; }
 
-    /* ── Layout ── */
     #app { display: flex; height: 100vh; }
 
     /* ── Sidebar ── */
     #sidebar {
-      width: 280px; min-width: 280px; background: var(--surface);
+      width: 310px; min-width: 310px; background: var(--surface);
       border-right: 1px solid var(--border);
       display: flex; flex-direction: column; overflow: hidden;
       transition: transform .25s ease;
+      z-index: 50;
     }
 
     .sidebar-header {
-      padding: 20px 16px 14px;
+      padding: 16px 14px;
       border-bottom: 1px solid var(--border);
     }
 
-    .logo { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
-    .logo-dot {
+    .logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+    .logo-badge {
       width: 28px; height: 28px; border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), #0077AA);
+      background: linear-gradient(135deg, var(--accent), #006699);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+      font-size: 14px; box-shadow: 0 0 12px rgba(var(--accent-rgb), .3);
     }
-    .logo-name { font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
-    .version-badge {
-      font-size: 10px;
-      font-family: var(--mono);
-      background: rgba(0, 200, 255, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(0, 200, 255, 0.3);
-      padding: 1px 6px;
-      border-radius: 10px;
-      font-weight: 600;
-      letter-spacing: 0.2px;
+    .logo-title { font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+    .ver-badge {
+      font-size: 10px; font-family: var(--mono); background: rgba(var(--accent-rgb), .12);
+      color: var(--accent); border: 1px solid rgba(var(--accent-rgb), .3);
+      padding: 1px 6px; border-radius: 12px; font-weight: 600;
     }
-    .logo-sub  { font-size: 11px; color: var(--muted); margin-left: 36px; font-family: var(--mono); }
+    .logo-sub { font-size: 11px; color: var(--muted); margin-left: 36px; font-family: var(--mono); }
 
-    .sidebar-body { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-body { flex: 1; overflow-y: auto; padding: 12px 10px; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Form & Key */
+    /* Section headers */
+    .section-title {
+      font-size: 10px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .8px; padding: 0 6px; margin-bottom: 6px;
+    }
+
+    /* Tool Nav Items */
+    .tool-nav { display: flex; flex-direction: column; gap: 4px; }
+    .tool-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      background: transparent; border: 1px solid transparent;
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .15s; text-align: left; width: 100%;
+    }
+    .tool-btn:hover { background: var(--surface-alt); color: var(--text); }
+    .tool-btn.active {
+      background: rgba(var(--accent-rgb), .1);
+      border-color: rgba(var(--accent-rgb), .35);
+      color: var(--accent); font-weight: 600;
+    }
+    .tool-btn .t-icon { font-size: 16px; width: 20px; text-align: center; }
+    .tool-btn .t-name { flex: 1; }
+    .tool-btn .t-pill {
+      font-size: 9px; font-family: var(--mono); background: rgba(255,255,255,.07);
+      padding: 2px 6px; border-radius: 6px; color: var(--muted);
+    }
+    .tool-btn.active .t-pill { background: rgba(var(--accent-rgb), .2); color: var(--accent); }
+
+    /* Settings Box */
+    .settings-box {
+      background: var(--surface-alt); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; display: flex; flex-direction: column; gap: 12px;
+    }
     .field-group label {
       display: block; font-size: 11px; font-weight: 500; color: var(--muted);
-      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 5px;
     }
-    .field-label-row {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-    }
+    .field-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .field-label-row label { margin-bottom: 0; }
-    .key-link {
+    .link-accent {
       font-size: 11px; color: var(--accent); text-decoration: none; font-family: var(--sans);
-      opacity: 0.85; transition: opacity .15s;
     }
-    .key-link:hover { opacity: 1; text-decoration: underline; }
+    .link-accent:hover { text-decoration: underline; }
 
     .field-group input, .field-group select, .field-group textarea {
       width: 100%; background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--radius); color: var(--text); font-family: var(--mono);
-      font-size: 12px; padding: 8px 10px; outline: none;
-      transition: border-color .15s;
+      font-size: 12px; padding: 8px 10px; outline: none; transition: border-color .15s;
     }
-    .field-group input:focus, .field-group select:focus, .field-group textarea:focus {
-      border-color: var(--accent);
-    }
+    .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: var(--accent); }
     .field-group input[type="password"] { letter-spacing: 2px; }
     .field-group select { cursor: pointer; }
     .field-group select option { background: var(--surface); color: var(--text); }
-    .field-group textarea { resize: vertical; min-height: 80px; font-family: var(--sans); font-size: 13px; line-height: 1.5; letter-spacing: 0; }
 
-    .key-row { display: flex; gap: 6px; }
+    .key-row { display: flex; gap: 5px; }
     .key-row input { flex: 1; }
     .icon-btn {
       background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
-      color: var(--muted); cursor: pointer; padding: 0 10px; font-size: 13px;
+      color: var(--muted); cursor: pointer; padding: 0 10px; font-size: 12px;
       transition: color .15s, border-color .15s;
     }
     .icon-btn:hover { color: var(--text); border-color: var(--muted); }
 
-    .status-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11px; color: var(--muted); }
+    .status-row { display: flex; align-items: center; gap: 6px; margin-top: 5px; font-size: 11px; color: var(--muted); }
     .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
     .status-dot.ok  { background: var(--success); }
     .status-dot.err { background: var(--danger); }
     .status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
-    }
-
-    /* Model selector */
-    .model-meta { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--mono); line-height: 1.4; }
+    .model-meta { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: var(--mono); line-height: 1.4; }
     .model-meta span { color: var(--success); font-weight: 500; }
 
-    /* Params */
-    .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .param-grid .field-group { margin: 0; }
-
-    /* Stats */
+    /* Token Quota / Stats */
     .stat-bar { display: flex; flex-direction: column; gap: 4px; }
     .stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
     .stat-label { color: var(--muted); }
     .stat-val { font-family: var(--mono); color: var(--accent); }
 
-    /* Sidebar footer */
+    /* Sidebar Footer */
     .sidebar-footer {
       padding: 10px 12px; border-top: 1px solid var(--border);
-      display: flex; gap: 8px;
-    }
-    .sidebar-version-footer {
-      padding: 6px 12px 10px; font-size: 11px; color: var(--muted);
       display: flex; justify-content: space-between; align-items: center;
-      font-family: var(--mono);
+      font-size: 11px; color: var(--muted); font-family: var(--mono);
     }
-    .btn {
-      flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 500;
-      cursor: pointer; border: 1px solid var(--border); transition: all .15s;
-    }
-    .btn-ghost { background: transparent; color: var(--muted); }
-    .btn-ghost:hover { background: var(--border); color: var(--text); }
-    .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
-    .btn-danger:hover { background: rgba(248,81,73,.1); }
+    .sidebar-footer a { color: var(--muted); text-decoration: none; }
+    .sidebar-footer a:hover { color: var(--text); }
 
-    /* ── Chat area ── */
-    #chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    /* ── Main Work Area ── */
+    #main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
 
     /* Topbar */
     #topbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 12px 20px; border-bottom: 1px solid var(--border);
-      background: var(--surface); min-height: 54px;
+      background: var(--surface); min-height: 52px;
     }
     .topbar-left { display: flex; align-items: center; gap: 10px; }
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
-    #topbar .model-label { font-size: 13px; font-weight: 500; color: var(--text); }
-    .provider-badge {
+    .topbar-title { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+    .pill-badge {
       font-size: 10px; font-family: var(--mono); background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border); padding: 2px 7px; border-radius: 12px; color: var(--text);
+      border: 1px solid var(--border); padding: 2px 8px; border-radius: 12px; color: var(--text);
     }
-    #topbar .ctx-badge {
-      font-family: var(--mono); font-size: 11px; color: var(--muted);
-      background: var(--bg); border: 1px solid var(--border);
-      padding: 3px 8px; border-radius: 20px;
-    }
-    .version-tag {
-      font-family: var(--mono); font-size: 10px; color: var(--accent);
-      background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.25);
-      padding: 3px 7px; border-radius: 12px;
-    }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
     #menu-toggle {
       display: none; background: none; border: none; color: var(--muted);
       cursor: pointer; font-size: 18px; padding: 4px;
     }
 
-    /* Messages */
-    #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 2px; }
+    /* Tool Panels Container */
+    #panels-container { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
 
-    .msg-wrap { display: flex; gap: 10px; padding: 10px 12px; border-radius: var(--radius); }
-    .msg-wrap.user { background: var(--user-bg); flex-direction: row-reverse; }
-    .msg-wrap.assistant { background: var(--ai-bg); }
-    .msg-wrap:hover .msg-actions { opacity: 1; }
+    /* Studio Card Layout */
+    .studio-panel { display: none; flex-direction: column; gap: 20px; max-width: 960px; margin: 0 auto; width: 100%; }
+    .studio-panel.active { display: flex; }
 
-    .avatar {
-      width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600;
+    .studio-header { margin-bottom: 4px; }
+    .studio-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .studio-header p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .form-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
     }
-    .avatar.user { background: var(--accent-dim); color: var(--accent); }
-    .avatar.ai   { background: #1E2D1A; color: var(--success); }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-    .msg-content { flex: 1; min-width: 0; }
-    .msg-role { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
-    .msg-text { line-height: 1.65; font-size: 14px; word-break: break-word; }
-    .msg-text p { margin-bottom: .6em; }
-    .msg-text p:last-child { margin-bottom: 0; }
-    .msg-text pre { background: #0D1117; border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; margin: 8px 0; }
-    .msg-text code { font-family: var(--mono); font-size: 12.5px; }
-    .msg-text p > code { background: rgba(255,255,255,.07); padding: 2px 5px; border-radius: 4px; }
-    .msg-text ul, .msg-text ol { padding-left: 20px; margin: .4em 0; }
-    .msg-text li { margin: .2em 0; }
-    .msg-text h1,.msg-text h2,.msg-text h3 { margin: .8em 0 .3em; font-weight: 600; }
-    .msg-text blockquote { border-left: 3px solid var(--accent); padding-left: 12px; color: var(--muted); margin: 6px 0; }
-    .msg-text table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-    .msg-text th, .msg-text td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
-    .msg-text th { background: var(--bg); font-weight: 600; }
+    .form-field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px;
+    }
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: var(--sans);
+      font-size: 13px; padding: 9px 12px; outline: none; transition: border-color .15s;
+    }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); }
+    .form-field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .form-field select { cursor: pointer; }
+    .form-field select option { background: var(--surface); color: var(--text); }
+    .form-field .field-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-    /* Thinking box */
+    .btn-action {
+      background: var(--accent); color: #000; border: none;
+      border-radius: 8px; padding: 11px 20px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: filter .15s, transform .1s;
+    }
+    .btn-action:hover { filter: brightness(1.12); }
+    .btn-action:active { transform: scale(.98); }
+    .btn-action:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* Output Card */
+    .output-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column;
+    }
+    .output-header {
+      padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--surface-alt);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .output-title { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; font-family: var(--mono); }
+    .output-tools { display: flex; gap: 8px; }
+    .btn-sm {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--muted); font-size: 11px; font-weight: 500; padding: 5px 10px;
+      cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 5px;
+    }
+    .btn-sm:hover { color: var(--text); border-color: var(--muted); }
+
+    .output-body { padding: 22px; line-height: 1.65; font-size: 14px; word-break: break-word; min-height: 140px; }
+    .output-body pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; overflow-x: auto; margin: 10px 0; }
+    .output-body code { font-family: var(--mono); font-size: 12.5px; }
+    .output-body p > code { background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 4px; }
+    .output-body table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+    .output-body th, .output-body td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    .output-body th { background: var(--surface-alt); font-weight: 600; }
+    .output-body blockquote { border-left: 3px solid var(--accent); padding-left: 12px; color: var(--muted); margin: 8px 0; }
+    .output-body h1, .output-body h2, .output-body h3 { margin: 1em 0 .4em; font-weight: 600; color: var(--text); }
+
+    .output-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px; color: var(--muted); text-align: center; gap: 8px;
+    }
+    .output-placeholder .icon { font-size: 28px; opacity: .5; }
+
+    /* Thinking Drawer */
     .think-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      margin: 8px 0 12px 0;
-      padding: 8px 12px;
-      font-size: 13px;
+      background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+      border-radius: 8px; margin: 10px 0 16px; padding: 8px 12px; font-size: 12.5px;
     }
-    .think-box summary {
-      cursor: pointer;
-      color: var(--muted);
-      font-weight: 500;
-      font-size: 12px;
-      user-select: none;
-      outline: none;
-    }
+    .think-box summary { cursor: pointer; color: var(--muted); font-weight: 500; font-size: 12px; outline: none; }
     .think-box summary:hover { color: var(--accent); }
     .think-content {
-      margin-top: 8px;
-      color: #94a3b8;
-      font-size: 12.5px;
-      border-left: 2px solid var(--accent-dim);
-      padding-left: 10px;
-      line-height: 1.55;
+      margin-top: 8px; color: #8C99A8; font-size: 12px;
+      border-left: 2px solid var(--accent-dim); padding-left: 10px; line-height: 1.55;
     }
 
-    .msg-actions { opacity: 0; transition: opacity .15s; margin-top: 6px; display: flex; gap: 6px; }
-    .msg-action-btn {
-      font-size: 11px; color: var(--muted); background: var(--bg);
-      border: 1px solid var(--border); border-radius: 6px;
-      padding: 3px 8px; cursor: pointer; transition: color .15s;
+    /* ── Chat Panel Layout ── */
+    #panel-chat {
+      height: 100%; display: none; flex-direction: column; max-width: 1000px;
+      margin: 0 auto; width: 100%; overflow: hidden;
     }
-    .msg-action-btn:hover { color: var(--text); }
+    #panel-chat.active { display: flex; }
+    #chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
 
-    /* Thinking indicator */
-    .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
-    .typing span {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-      animation: bounce .9s infinite;
+    .msg-wrap { display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--radius); }
+    .msg-wrap.user { background: #152230; flex-direction: row-reverse; }
+    .msg-wrap.assistant { background: var(--surface); }
+    .avatar {
+      width: 30px; height: 30px; min-width: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;
     }
-    .typing span:nth-child(2) { animation-delay: .15s; }
-    .typing span:nth-child(3) { animation-delay: .3s; }
-    @keyframes bounce {
-      0%,60%,100% { transform: translateY(0); opacity: .4; }
-      30% { transform: translateY(-5px); opacity: 1; }
-    }
+    .avatar.user { background: var(--accent-dim); color: var(--accent); }
+    .avatar.ai   { background: #1C3322; color: var(--success); }
+    .msg-content { flex: 1; min-width: 0; }
+    .msg-role { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+    .msg-text { line-height: 1.6; font-size: 14px; word-break: break-word; }
 
-    /* Empty state */
-    #empty-state {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 14px; padding: 40px; text-align: center;
-    }
-    #empty-state .empty-icon { font-size: 44px; }
-    .empty-badge {
-      font-size: 11px; font-family: var(--mono); background: rgba(0, 200, 255, 0.1);
-      color: var(--accent); border: 1px solid rgba(0, 200, 255, 0.25);
-      padding: 3px 10px; border-radius: 20px; font-weight: 500;
-    }
-    #empty-state h2 { font-size: 22px; font-weight: 600; letter-spacing: -.4px; }
-    #empty-state p { color: var(--muted); max-width: 440px; line-height: 1.6; }
-    .quick-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; max-width: 580px; }
-    .quick-btn {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 20px; padding: 7px 14px; font-size: 13px;
-      cursor: pointer; color: var(--text); transition: border-color .15s, background .15s;
-    }
-    .quick-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
-
-    /* Input area */
-    #input-area {
-      padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface);
-    }
-    #input-form { display: flex; gap: 10px; align-items: flex-end; }
-    #user-input {
+    #chat-input-area { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+    #chat-form { display: flex; gap: 10px; align-items: flex-end; }
+    #chat-user-input {
       flex: 1; background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--radius); color: var(--text); font-family: var(--sans);
       font-size: 14px; padding: 10px 14px; outline: none; resize: none;
-      max-height: 180px; line-height: 1.5; transition: border-color .15s;
+      max-height: 160px; line-height: 1.5;
     }
-    #user-input:focus { border-color: var(--accent); }
-    #user-input::placeholder { color: var(--muted); }
-
-    #send-btn {
+    #chat-user-input:focus { border-color: var(--accent); }
+    #chat-send-btn {
       width: 40px; height: 40px; background: var(--accent); border: none;
-      border-radius: 10px; cursor: pointer; color: #000;
+      border-radius: 10px; cursor: pointer; color: #000; font-size: 16px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; transition: filter .15s, transform .1s;
     }
-    #send-btn:hover { filter: brightness(1.1); }
-    #send-btn:active { transform: scale(.94); }
-    #send-btn:disabled { opacity: .4; cursor: not-allowed; }
-
-    .input-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
-    .input-meta-left { font-size: 11px; color: var(--muted); }
-    .input-meta-right { font-size: 11px; color: var(--muted); font-family: var(--mono); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
     /* Mobile */
-    @media (max-width: 700px) {
-      #sidebar {
-        position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
-        transform: translateX(-100%);
-      }
-      #sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.5); }
+    @media (max-width: 800px) {
+      #sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.6); }
       #menu-toggle { display: block; }
-      #overlay {
-        display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
-        z-index: 99;
-      }
+      #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 40; }
       #overlay.visible { display: block; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+      #panels-container { padding: 16px; }
     }
   </style>
 </head>
@@ -342,148 +319,365 @@
   <!-- ── Sidebar ── -->
   <aside id="sidebar">
     <div class="sidebar-header">
-      <div class="logo">
-        <div class="logo-dot">⚡</div>
-        <span class="logo-name">FreeTokens AI</span>
-        <span class="version-badge">v2.0.0</span>
+      <div class="logo-row">
+        <div class="logo-badge">⚡</div>
+        <span class="logo-title">FreeTokens Studio</span>
+        <span class="ver-badge">v2.1.0</span>
       </div>
-      <div class="logo-sub">Multi-Provider Free AI Chat</div>
+      <div class="logo-sub">YouTube & Reels AI Suite · $0 Free</div>
     </div>
 
     <div class="sidebar-body">
-
-      <!-- Provider Selector -->
-      <div class="field-group">
-        <label>AI Provider</label>
-        <select id="provider-select">
-          <option value="openrouter" selected>⚡ OpenRouter (20+ Free Models)</option>
-          <option value="groq">🚀 Groq Cloud (Ultra-Fast Free Tier)</option>
-          <option value="gemini">✨ Google Gemini (1M Ctx Free Tier)</option>
-        </select>
+      <!-- Dedicated Studio Tools -->
+      <div class="section-title">Creator Tools</div>
+      <div class="tool-nav">
+        <button class="tool-btn active" data-tool="script">
+          <span class="t-icon">🎬</span>
+          <span class="t-name">Script Generator</span>
+          <span class="t-pill">Hooks + B-Roll</span>
+        </button>
+        <button class="tool-btn" data-tool="shorts">
+          <span class="t-icon">✂️</span>
+          <span class="t-name">Shorts Splitter</span>
+          <span class="t-pill">5 Viral Parts</span>
+        </button>
+        <button class="tool-btn" data-tool="seo">
+          <span class="t-icon">🚀</span>
+          <span class="t-name">SEO Package</span>
+          <span class="t-pill">Tags + Titles</span>
+        </button>
+        <button class="tool-btn" data-tool="ideas">
+          <span class="t-icon">📅</span>
+          <span class="t-name">Batch 30-Day Ideas</span>
+          <span class="t-pill">Full Calendar</span>
+        </button>
+        <button class="tool-btn" data-tool="chat">
+          <span class="t-icon">💬</span>
+          <span class="t-name">Free Chat</span>
+          <span class="t-pill">Assistant</span>
+        </button>
       </div>
 
-      <!-- API Key -->
-      <div class="field-group">
-        <div class="field-label-row">
-          <label id="key-label">OpenRouter API Key</label>
-          <a id="key-help-link" href="https://openrouter.ai/keys" target="_blank" class="key-link">Get free key ↗</a>
+      <!-- Free AI Engine Settings -->
+      <div class="section-title" style="margin-top:8px">Free AI Engine</div>
+      <div class="settings-box">
+        <!-- Provider -->
+        <div class="field-group">
+          <label>AI Provider</label>
+          <select id="provider-select">
+            <option value="openrouter" selected>⚡ OpenRouter (20+ Free Models)</option>
+            <option value="groq">🚀 Groq Cloud (Ultra-Fast Free Tier)</option>
+            <option value="gemini">✨ Google Gemini (1M Ctx Free Tier)</option>
+          </select>
         </div>
-        <div class="key-row">
-          <input type="password" id="api-key" placeholder="sk-or-v1-…" autocomplete="off" />
-          <button class="icon-btn" id="key-toggle" title="Show/hide key">👁</button>
-          <button class="icon-btn" id="key-save" title="Save key">✓</button>
-        </div>
-        <div class="status-row">
-          <div class="status-dot" id="key-dot"></div>
-          <span id="key-status">Explore free models or save key</span>
-        </div>
-      </div>
 
-      <!-- Model -->
-      <div class="field-group">
-        <label>Model</label>
-        <select id="model-select">
-          <option value="">— loading free models… —</option>
-        </select>
-        <div class="model-meta" id="model-meta">Select a model above</div>
-      </div>
-
-      <!-- System Prompt -->
-      <div class="field-group">
-        <label>System Prompt</label>
-        <textarea id="system-prompt" placeholder="You are a helpful assistant…">You are a helpful, concise, and knowledgeable assistant. Respond clearly and thoughtfully.</textarea>
-      </div>
-
-      <!-- Params -->
-      <div>
-        <div class="field-group" style="margin-bottom:8px">
-          <label>Parameters</label>
-        </div>
-        <div class="param-grid">
-          <div class="field-group">
-            <label>Temperature</label>
-            <input type="number" id="temperature" value="0.7" min="0" max="2" step="0.1" />
+        <!-- API Key -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label id="key-label">OpenRouter Key</label>
+            <a id="key-help-link" href="https://openrouter.ai/keys" target="_blank" class="link-accent">Get free key ↗</a>
           </div>
-          <div class="field-group">
-            <label>Max Tokens</label>
-            <input type="number" id="max-tokens" value="2048" min="256" max="8192" step="256" />
+          <div class="key-row">
+            <input type="password" id="api-key" placeholder="sk-or-v1-…" autocomplete="off" />
+            <button class="icon-btn" id="key-toggle" title="Show/hide key">👁</button>
+            <button class="icon-btn" id="key-save" title="Save key">✓</button>
+          </div>
+          <div class="status-row">
+            <div class="status-dot" id="key-dot"></div>
+            <span id="key-status">Key ready or explore models</span>
           </div>
         </div>
-      </div>
 
-      <!-- Stats -->
-      <div>
-        <div class="field-group" style="margin-bottom:8px">
-          <label>Session Stats</label>
+        <!-- Model -->
+        <div class="field-group">
+          <label>Active Model</label>
+          <select id="model-select">
+            <option value="">— loading models… —</option>
+          </select>
+          <div class="model-meta" id="model-meta">Loading…</div>
         </div>
+
+        <!-- Session Free Tokens -->
         <div class="stat-bar">
-          <div class="stat-item"><span class="stat-label">Messages</span><span class="stat-val" id="stat-msgs">0</span></div>
-          <div class="stat-item"><span class="stat-label">Est. tokens</span><span class="stat-val" id="stat-tokens">0</span></div>
-          <div class="stat-item"><span class="stat-label">Cost</span><span class="stat-val" id="stat-cost">$0.0000</span></div>
+          <div class="stat-item"><span class="stat-label">Est. tokens used</span><span class="stat-val" id="stat-tokens">0</span></div>
+          <div class="stat-item"><span class="stat-label">Creator cost</span><span class="stat-val" id="stat-cost">$0.0000 Free</span></div>
         </div>
       </div>
-
     </div>
 
     <div class="sidebar-footer">
-      <button class="btn btn-danger" id="clear-btn">Clear chat</button>
-      <button class="btn btn-ghost" id="export-btn">Export</button>
-    </div>
-
-    <div class="sidebar-version-footer">
-      <span>FreeTokens AI v2.0.0</span>
-      <span style="color:var(--border)">|</span>
-      <span id="sidebar-provider-label" style="color:var(--accent)">OpenRouter</span>
+      <span>FreeTokens Studio v2.1.0</span>
+      <span id="active-provider-tag" style="color:var(--accent)">OpenRouter</span>
     </div>
   </aside>
 
   <div id="overlay"></div>
 
-  <!-- ── Chat ── -->
-  <main id="chat-area">
+  <!-- ── Main Workspace ── -->
+  <main id="main-area">
     <div id="topbar">
-      <button id="menu-toggle">☰</button>
       <div class="topbar-left">
-        <span class="model-label" id="topbar-model">Loading models…</span>
-        <span class="provider-badge" id="topbar-provider">OpenRouter</span>
+        <button id="menu-toggle">☰</button>
+        <span class="topbar-title" id="topbar-title">🎬 Script Generator</span>
+        <span class="pill-badge" id="topbar-provider-badge">OpenRouter</span>
       </div>
       <div class="topbar-right">
-        <span class="ctx-badge" id="topbar-ctx">0 msgs</span>
-        <span class="version-tag">v2.0.0</span>
+        <span class="pill-badge" id="topbar-model-badge">Free Model</span>
+        <span class="ver-badge">v2.1.0</span>
       </div>
     </div>
 
-    <div id="messages">
-      <div id="empty-state">
-        <div class="empty-icon">⚡</div>
-        <div class="empty-badge">Release v2.0.0 · Multi-Provider Free AI</div>
-        <h2>FreeTokens AI</h2>
-        <p>Access high-power AI models 100% free across OpenRouter, Groq, and Google Gemini. Zero backend, private & runs in your browser.</p>
-        <div class="quick-prompts">
-          <button class="quick-btn" onclick="setPrompt('Explain quantum computing in simple terms')">Explain quantum computing</button>
-          <button class="quick-btn" onclick="setPrompt('Write a Python web scraper for any website')">Write a web scraper</button>
-          <button class="quick-btn" onclick="setPrompt('Compare DeepSeek R1 and Llama 3.3 70B for coding')">Compare R1 vs Llama 3.3</button>
-          <button class="quick-btn" onclick="setPrompt('What are the best free AI models available right now?')">Best free AI models</button>
+    <div id="panels-container">
+
+      <!-- ── Tool 1: Script Generator ── -->
+      <section class="studio-panel active" id="panel-script">
+        <div class="studio-header">
+          <h1>🎬 YouTube & Reels Script Generator</h1>
+          <p>Utilize free AI tokens to write structured, high-retention video scripts complete with scroll-stopping hooks, dual-column visual/voiceover cues, and conversion CTAs.</p>
         </div>
-      </div>
-    </div>
 
-    <div id="input-area">
-      <div id="input-form">
-        <textarea id="user-input" rows="1" placeholder="Message… (Enter to send, Shift+Enter for new line)"></textarea>
-        <button id="send-btn" title="Send message">▶</button>
-      </div>
-      <div class="input-meta">
-        <span class="input-meta-left" id="powered-by-text">Powered by <a href="https://openrouter.ai" target="_blank" style="color:var(--accent);text-decoration:none">OpenRouter</a> · Free Models</span>
-        <span class="input-meta-right" id="char-count">0 chars</span>
-      </div>
+        <div class="form-card">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Channel Niche / Category</label>
+              <select id="script-niche">
+                <option value="Tech & Artificial Intelligence">Tech & Artificial Intelligence</option>
+                <option value="Finance, Crypto & Wealth">Finance, Crypto & Wealth</option>
+                <option value="Self-Improvement & Productivity">Self-Improvement & Productivity</option>
+                <option value="Health, Gym & Fitness">Health, Gym & Fitness</option>
+                <option value="Coding, Software & WebDev">Coding, Software & WebDev</option>
+                <option value="Business, Startups & Marketing">Business, Startups & Marketing</option>
+                <option value="Education, Science & History">Education, Science & History</option>
+                <option value="Gaming & Pop Culture">Gaming & Pop Culture</option>
+                <option value="Custom Niche">Custom Niche</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Target Length / Format</label>
+              <select id="script-length">
+                <option value="YouTube Shorts / Reels (30–60s)">YouTube Shorts / Reels (30–60 seconds)</option>
+                <option value="Mid-Length Video (3–5 minutes)">Mid-Length Video (3–5 minutes)</option>
+                <option value="Deep-Dive Video (8–12 minutes)">Deep-Dive Video (8–12 minutes)</option>
+                <option value="Long Educational Masterclass (15+ min)">Long Educational Masterclass (15+ min)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Video Topic or Core Question</label>
+              <input type="text" id="script-topic" placeholder="e.g. How to use Free AI models to automate coding tasks in 2026" />
+            </div>
+            <div class="form-field">
+              <label>Tone & Energy</label>
+              <select id="script-tone">
+                <option value="Fast-Paced, High-Energy & Punchy">Fast-Paced, High-Energy & Punchy</option>
+                <option value="Educational, Authoritative & Clear">Educational, Authoritative & Clear</option>
+                <option value="Dramatic, Mystery & Storytelling">Dramatic, Mystery & Storytelling</option>
+                <option value="Conversational, Casual & Relatable">Conversational, Casual & Relatable</option>
+                <option value="Contrarian, Opinionated & Provocative">Contrarian, Opinionated & Provocative</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Specific Key Points / B-Roll Preferences (Optional)</label>
+            <textarea id="script-notes" placeholder="e.g. Mention OpenRouter free tier, show code split-screen, hook must appeal to beginner developers"></textarea>
+          </div>
+
+          <button class="btn-action" id="script-generate-btn">⚡ Generate Structured Script (Free Tokens)</button>
+        </div>
+
+        <div class="output-card" id="script-output-card">
+          <div class="output-header">
+            <div class="output-title">📄 Generated Script Result</div>
+            <div class="output-tools">
+              <button class="btn-sm" onclick="copyOutput('script-output')">📋 Copy Script</button>
+              <button class="btn-sm" onclick="downloadMd('script-output', 'youtube-script')">💾 Export .md</button>
+            </div>
+          </div>
+          <div class="output-body" id="script-output">
+            <div class="output-placeholder">
+              <div class="icon">🎬</div>
+              <div>Fill in your topic above and hit Generate to produce your script.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tool 2: Shorts Splitter ── -->
+      <section class="studio-panel" id="panel-shorts">
+        <div class="studio-header">
+          <h1>✂️ Long-to-Shorts Video Splitter</h1>
+          <p>Paste any long video script, podcast transcript, or article. AI will automatically extract and construct **5 viral 30–60 second Shorts / Reels** with custom hooks and visual cues.</p>
+        </div>
+
+        <div class="form-card">
+          <div class="form-field">
+            <label>Paste Long Script, Article, or Transcript</label>
+            <textarea id="shorts-content" style="min-height:140px" placeholder="Paste your full transcript or script here..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Target Platform</label>
+              <select id="shorts-platform">
+                <option value="YouTube Shorts">YouTube Shorts</option>
+                <option value="Instagram Reels">Instagram Reels</option>
+                <option value="TikTok & Cross-Platform">TikTok & Cross-Platform</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Splitting Strategy</label>
+              <select id="shorts-strategy">
+                <option value="5 Standalone Value Nuggets">5 Standalone Value Nuggets (Best retention)</option>
+                <option value="5 Chronological Story Parts">5 Chronological Story Parts (Part 1 to 5)</option>
+                <option value="5 Controversial / Myth-Busting Takes">5 Controversial / Myth-Busting Takes</option>
+                <option value="5 Actionable How-To Hacks">5 Actionable How-To Hacks</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-action" id="shorts-generate-btn">✂️ Split Into 5 Shorts (Free Tokens)</button>
+        </div>
+
+        <div class="output-card" id="shorts-output-card">
+          <div class="output-header">
+            <div class="output-title">✂️ 5 Short-Form Video Scripts</div>
+            <div class="output-tools">
+              <button class="btn-sm" onclick="copyOutput('shorts-output')">📋 Copy All Shorts</button>
+              <button class="btn-sm" onclick="downloadMd('shorts-output', '5-shorts-pack')">💾 Export .md</button>
+            </div>
+          </div>
+          <div class="output-body" id="shorts-output">
+            <div class="output-placeholder">
+              <div class="icon">✂️</div>
+              <div>Paste your long content above to split into 5 viral shorts.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tool 3: SEO Package ── -->
+      <section class="studio-panel" id="panel-seo">
+        <div class="studio-header">
+          <h1>🚀 SEO & Metadata Package Generator</h1>
+          <p>Generate 5 high-CTR click-worthy titles, an algorithm-friendly video description with chapters, 15–20 YouTube Studio tags, and viral hashtags in one click.</p>
+        </div>
+
+        <div class="form-card">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Video Topic or Summary</label>
+              <input type="text" id="seo-topic" placeholder="e.g. Free open source alternative to ChatGPT with unlimited tokens" />
+            </div>
+            <div class="form-field">
+              <label>Primary Focus Keyword</label>
+              <input type="text" id="seo-keyword" placeholder="e.g. free ai tokens, openrouter api, best ai chat" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Platform Target</label>
+            <select id="seo-platform">
+              <option value="YouTube Long-form & Studio">YouTube Long-form (Titles, Description, Studio Tags)</option>
+              <option value="YouTube Shorts & Instagram Reels">YouTube Shorts & Instagram Reels (Short Titles, Captions, Hashtags)</option>
+              <option value="Cross-Platform Omnichannel">Cross-Platform Omnichannel (YouTube + Reels + TikTok)</option>
+            </select>
+          </div>
+
+          <button class="btn-action" id="seo-generate-btn">🚀 Generate Complete SEO Package (Free Tokens)</button>
+        </div>
+
+        <div class="output-card" id="seo-output-card">
+          <div class="output-header">
+            <div class="output-title">📦 Complete SEO & Metadata Pack</div>
+            <div class="output-tools">
+              <button class="btn-sm" onclick="copyOutput('seo-output')">📋 Copy Package</button>
+              <button class="btn-sm" onclick="downloadMd('seo-output', 'seo-metadata')">💾 Export .md</button>
+            </div>
+          </div>
+          <div class="output-body" id="seo-output">
+            <div class="output-placeholder">
+              <div class="icon">🚀</div>
+              <div>Enter your topic to generate high-ranking titles, tags, and descriptions.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tool 4: Batch Idea Generator ── -->
+      <section class="studio-panel" id="panel-ideas">
+        <div class="studio-header">
+          <h1>📅 30-Day Batch Idea & Content Calendar</h1>
+          <p>Plan an entire month of viral YouTube videos and Reels with a single prompt. Organizes 30 days into 4 weekly content pillars with irresistible scroll-stopping hooks.</p>
+        </div>
+
+        <div class="form-card">
+          <div class="form-grid-3">
+            <div class="form-field">
+              <label>Creator Niche / Industry</label>
+              <input type="text" id="ideas-niche" placeholder="e.g. AI tools, Personal Finance, Python Coding" />
+            </div>
+            <div class="form-field">
+              <label>Target Audience Persona</label>
+              <input type="text" id="ideas-audience" placeholder="e.g. Busy professionals, beginner coders, creators" />
+            </div>
+            <div class="form-field">
+              <label>Monthly Strategic Goal</label>
+              <select id="ideas-goal">
+                <option value="Maximum Subscriber Growth & Viral Reach">Maximum Subscriber Growth & Viral Reach</option>
+                <option value="Deep Authority & Community Trust">Deep Authority & Community Trust</option>
+                <option value="Monetization, Leads & Product Sales">Monetization, Leads & Product Sales</option>
+                <option value="Balanced Omnichannel Consistency">Balanced Omnichannel Consistency</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-action" id="ideas-generate-btn">📅 Generate 30-Day Content Calendar (Free Tokens)</button>
+        </div>
+
+        <div class="output-card" id="ideas-output-card">
+          <div class="output-header">
+            <div class="output-title">🗓️ 30-Day Content Roadmap</div>
+            <div class="output-tools">
+              <button class="btn-sm" onclick="copyOutput('ideas-output')">📋 Copy Calendar</button>
+              <button class="btn-sm" onclick="downloadMd('ideas-output', '30-day-calendar')">💾 Export .md</button>
+            </div>
+          </div>
+          <div class="output-body" id="ideas-output">
+            <div class="output-placeholder">
+              <div class="icon">📅</div>
+              <div>Configure your niche above to generate a 30-day viral content calendar.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Tool 5: Free Chat Assistant ── -->
+      <section id="panel-chat">
+        <div id="chat-messages">
+          <div class="output-placeholder" id="chat-empty">
+            <div class="icon">💬</div>
+            <div style="font-weight:600;font-size:16px;color:var(--text)">Free AI Creator Assistant</div>
+            <div style="max-width:400px;font-size:13px">Ask any question, brainstorm video hooks, or refine your scripts with 100% free tokens.</div>
+          </div>
+        </div>
+
+        <div id="chat-input-area">
+          <div id="chat-form">
+            <textarea id="chat-user-input" rows="1" placeholder="Ask AI anything or brainstorm video ideas…"></textarea>
+            <button id="chat-send-btn" title="Send message">▶</button>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
 
-
 <script>
-// ── Provider Specifications ──
+// ── Multi-Provider Configurations ──
 const PROVIDERS = {
   openrouter: {
     id: 'openrouter',
@@ -491,32 +685,26 @@ const PROVIDERS = {
     keyStorage: 'or_api_key',
     keyPlaceholder: 'sk-or-v1-…',
     keyHelpUrl: 'https://openrouter.ai/keys',
-    keyLabel: 'OpenRouter API Key',
+    keyLabel: 'OpenRouter Key',
     defaultEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
     headers: (key) => ({
       'Authorization': `Bearer ${key}`,
       'Content-Type': 'application/json',
       'HTTP-Referer': location.origin,
-      'X-Title': 'FreeTokens AI'
+      'X-Title': 'FreeTokens Studio'
     }),
     fetchedModels: null,
     defaultModels: [
       { id: 'openrouter/free',                             name: '⚡ Free Models Router (Auto-selects best)', ctx: 200000, bestFor: 'Auto-Balanced' },
-      { id: 'meta-llama/llama-3.3-70b-instruct:free',      name: 'Llama 3.3 70B Instruct',                 ctx: 131072, bestFor: 'General Purpose' },
-      { id: 'deepseek/deepseek-r1:free',                   name: 'DeepSeek R1 (Reasoning)',                 ctx: 163840, bestFor: 'Math & Reasoning' },
-      { id: 'deepseek/deepseek-chat-v3-0324:free',         name: 'DeepSeek V3 Chat',                       ctx: 163840, bestFor: 'Coding & Conversation' },
-      { id: 'qwen/qwq-32b:free',                           name: 'QwQ 32B (Reasoning)',                     ctx: 131072, bestFor: 'Deep Reasoning' },
-      { id: 'qwen/qwen-2.5-72b-instruct:free',             name: 'Qwen 2.5 72B Instruct',                  ctx: 131072, bestFor: 'Multilingual & Code' },
-      { id: 'google/gemma-4-31b-it:free',                  name: 'Google Gemma 4 31B (free)',              ctx: 262144, bestFor: 'Latest Google Model' },
-      { id: 'google/gemma-4-26b-a4b-it:free',              name: 'Google Gemma 4 26B A4B (free)',          ctx: 262144, bestFor: 'Fast Instruction' },
-      { id: 'google/gemma-3-27b-it:free',                  name: 'Gemma 3 27B IT',                         ctx: 131072, bestFor: 'Instruction Following' },
-      { id: 'mistralai/devstral-small:free',               name: 'Devstral Small (Code)',                   ctx: 131072, bestFor: 'Software Engineering' },
-      { id: 'mistralai/mistral-7b-instruct:free',          name: 'Mistral 7B Instruct',                    ctx: 32768,  bestFor: 'Fast & Lightweight' },
-      { id: 'nvidia/nemotron-3.5-lightning:free',          name: 'Nemotron 3.5 Lightning (free)',          ctx: 1000000, bestFor: '1M Context Window' },
-      { id: 'thinkingmachines/inkling:free',               name: 'Thinking Machines Inkling (free)',       ctx: 1048576, bestFor: '1M Context & Analysis' },
-      { id: 'poolside/laguna-s-2.1:free',                  name: 'Poolside Laguna S 2.1 (free)',           ctx: 262144, bestFor: 'Code Synthesis' },
-      { id: 'microsoft/phi-4-reasoning:free',              name: 'Phi-4 Reasoning',                        ctx: 32768,  bestFor: 'Structured Logic' },
-      { id: 'nousresearch/hermes-3-llama-3.1-405b:free',  name: 'Hermes 3 Llama 405B',                   ctx: 131072, bestFor: 'Massive Parameters' }
+      { id: 'meta-llama/llama-3.3-70b-instruct:free',      name: 'Llama 3.3 70B Instruct',                 ctx: 131072, bestFor: 'Scriptwriting' },
+      { id: 'deepseek/deepseek-r1:free',                   name: 'DeepSeek R1 (Reasoning)',                 ctx: 163840, bestFor: 'Deep Thinking' },
+      { id: 'deepseek/deepseek-chat-v3-0324:free',         name: 'DeepSeek V3 Chat',                       ctx: 163840, bestFor: 'Writing & SEO' },
+      { id: 'qwen/qwq-32b:free',                           name: 'QwQ 32B (Reasoning)',                     ctx: 131072, bestFor: 'Logical Hooks' },
+      { id: 'qwen/qwen-2.5-72b-instruct:free',             name: 'Qwen 2.5 72B Instruct',                  ctx: 131072, bestFor: 'Multilingual' },
+      { id: 'google/gemma-4-31b-it:free',                  name: 'Google Gemma 4 31B (free)',              ctx: 262144, bestFor: 'Latest Model' },
+      { id: 'google/gemma-3-27b-it:free',                  name: 'Gemma 3 27B IT',                         ctx: 131072, bestFor: 'Creative Flow' },
+      { id: 'nvidia/nemotron-3.5-lightning:free',          name: 'Nemotron 3.5 Lightning (free)',          ctx: 1000000, bestFor: '1M Context' },
+      { id: 'thinkingmachines/inkling:free',               name: 'Thinking Machines Inkling (free)',       ctx: 1048576, bestFor: '1M Analysis' }
     ]
   },
   groq: {
@@ -525,7 +713,7 @@ const PROVIDERS = {
     keyStorage: 'groq_api_key',
     keyPlaceholder: 'gsk_…',
     keyHelpUrl: 'https://console.groq.com/keys',
-    keyLabel: 'Groq API Key (Free)',
+    keyLabel: 'Groq Key (Free)',
     defaultEndpoint: 'https://api.groq.com/openai/v1/chat/completions',
     headers: (key) => ({
       'Authorization': `Bearer ${key}`,
@@ -533,11 +721,11 @@ const PROVIDERS = {
     }),
     fetchedModels: null,
     defaultModels: [
-      { id: 'llama-3.3-70b-versatile',          name: 'Llama 3.3 70B Versatile (Groq)',       ctx: 128000, bestFor: 'Flagship Speed & Quality' },
-      { id: 'deepseek-r1-distill-llama-70b',    name: 'DeepSeek R1 Distill 70B (Groq)',       ctx: 128000, bestFor: 'Ultra-fast Reasoning' },
-      { id: 'llama-3.1-8b-instant',             name: 'Llama 3.1 8B Instant (Groq)',          ctx: 128000, bestFor: 'Extreme Speed (>750 tok/s)' },
-      { id: 'mixtral-8x7b-32768',               name: 'Mixtral 8x7B 32k (Groq)',              ctx: 32768,  bestFor: 'Fast Mixture of Experts' },
-      { id: 'gemma2-9b-it',                     name: 'Gemma 2 9B IT (Groq)',                 ctx: 8192,   bestFor: 'Google Gemma on Groq' }
+      { id: 'llama-3.3-70b-versatile',          name: 'Llama 3.3 70B Versatile (Groq)',       ctx: 128000, bestFor: 'Ultra-Fast Scripts' },
+      { id: 'deepseek-r1-distill-llama-70b',    name: 'DeepSeek R1 Distill 70B (Groq)',       ctx: 128000, bestFor: 'Instant Reasoning' },
+      { id: 'llama-3.1-8b-instant',             name: 'Llama 3.1 8B Instant (Groq)',          ctx: 128000, bestFor: 'Speed (>750 tok/s)' },
+      { id: 'mixtral-8x7b-32768',               name: 'Mixtral 8x7B 32k (Groq)',              ctx: 32768,  bestFor: 'Creative Ideas' },
+      { id: 'gemma2-9b-it',                     name: 'Gemma 2 9B IT (Groq)',                 ctx: 8192,   bestFor: 'Google Gemma' }
     ]
   },
   gemini: {
@@ -546,7 +734,7 @@ const PROVIDERS = {
     keyStorage: 'gemini_api_key',
     keyPlaceholder: 'AIzaSy…',
     keyHelpUrl: 'https://aistudio.google.com/app/apikey',
-    keyLabel: 'Gemini API Key (Free Studio)',
+    keyLabel: 'Gemini Key (Free)',
     defaultEndpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
     headers: (key) => ({
       'Authorization': `Bearer ${key}`,
@@ -554,29 +742,29 @@ const PROVIDERS = {
     }),
     fetchedModels: null,
     defaultModels: [
-      { id: 'gemini-2.0-flash',                 name: 'Gemini 2.0 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · Next-Gen Speed' },
+      { id: 'gemini-2.0-flash',                 name: 'Gemini 2.0 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · High Speed' },
       { id: 'gemini-2.0-flash-lite',            name: 'Gemini 2.0 Flash Lite (Google)',       ctx: 1048576, bestFor: '1M Ctx · Fast & Efficient' },
-      { id: 'gemini-1.5-flash',                 name: 'Gemini 1.5 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · Reliable Workhorse' },
-      { id: 'gemini-1.5-pro',                   name: 'Gemini 1.5 Pro (Google)',              ctx: 2097152, bestFor: '2M Ctx · Deep Reasoning' },
-      { id: 'gemini-2.0-flash-thinking-exp-01-21', name: 'Gemini 2.0 Flash Thinking Exp',    ctx: 1048576, bestFor: 'Chain-of-Thought Reasoning' }
+      { id: 'gemini-1.5-flash',                 name: 'Gemini 1.5 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · Long Transcripts' },
+      { id: 'gemini-1.5-pro',                   name: 'Gemini 1.5 Pro (Google)',              ctx: 2097152, bestFor: '2M Ctx · Masterclass Scripts' },
+      { id: 'gemini-2.0-flash-thinking-exp-01-21', name: 'Gemini 2.0 Flash Thinking Exp',    ctx: 1048576, bestFor: 'Chain of Thought' }
     ]
   }
 };
 
-// ── State ──
+// ── Global State ──
+let currentTool = localStorage.getItem('active_tool') || 'script';
 let currentProvider = localStorage.getItem('active_provider') || 'openrouter';
-let messages = [];
 let isStreaming = false;
 let totalTokens = 0;
+let chatMessages = [];
 
 const $ = id => document.getElementById(id);
 
-// ── Markdown & Thinking Formatter ──
-function renderContent(raw) {
+// ── Markdown Formatter with <think> drawer support ──
+function renderMarkdown(raw) {
   if (!raw) return '';
-
-  // Parse <think> blocks for reasoning models (DeepSeek R1, Gemini Thinking)
   let text = raw;
+
   if (text.includes('<think>')) {
     const parts = text.split(/<\/?think>/);
     if (text.startsWith('<think>')) {
@@ -587,58 +775,70 @@ function renderContent(raw) {
       return thinkHtml + (answerPart ? DOMPurify.sanitize(marked.parse(answerPart)) : '');
     }
   }
-
   return DOMPurify.sanitize(marked.parse(text));
 }
 
-// ── Initialize Application ──
-function init() {
-  if (!PROVIDERS[currentProvider]) currentProvider = 'openrouter';
-  $('provider-select').value = currentProvider;
+// ── Tool Switcher ──
+function setTool(toolId) {
+  currentTool = toolId;
+  localStorage.setItem('active_tool', toolId);
 
-  // Set up provider UI
-  setupProviderUI(currentProvider);
+  // Update nav buttons
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tool === toolId);
+  });
 
-  // Auto-fetch OpenRouter free models in background without requiring an API key
-  fetchOpenRouterPublicModels();
-
-  // Load saved key for current provider
-  const prov = PROVIDERS[currentProvider];
-  const savedKey = localStorage.getItem(prov.keyStorage) || '';
-  $('api-key').value = savedKey;
-  if (savedKey) {
-    validateKey(savedKey, currentProvider);
+  // Update panels
+  document.querySelectorAll('.studio-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+  const chatPanel = $('panel-chat');
+  if (toolId === 'chat') {
+    chatPanel.classList.add('active');
   } else {
-    setKeyStatus('', 'Explore models or enter your key');
+    chatPanel.classList.remove('active');
+    const targetPanel = $('panel-' + toolId);
+    if (targetPanel) targetPanel.classList.add('active');
   }
+
+  // Update Topbar
+  const titles = {
+    script: '🎬 Script Generator',
+    shorts: '✂️ Shorts Splitter',
+    seo: '🚀 SEO Package Generator',
+    ideas: '📅 30-Day Content Calendar',
+    chat: '💬 Free Chat Assistant'
+  };
+  $('topbar-title').textContent = titles[toolId] || 'FreeTokens Studio';
 }
 
-// ── Provider UI Switcher ──
+document.querySelectorAll('.tool-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setTool(btn.dataset.tool);
+    if (window.innerWidth <= 800) {
+      $('sidebar').classList.remove('open');
+      $('overlay').classList.remove('visible');
+    }
+  });
+});
+
+// ── Provider & API Key Setup ──
 function setupProviderUI(providerKey) {
   const prov = PROVIDERS[providerKey];
   $('key-label').textContent = prov.keyLabel;
   $('key-help-link').href = prov.keyHelpUrl;
   $('api-key').placeholder = prov.keyPlaceholder;
-  $('topbar-provider').textContent = prov.name;
-  $('sidebar-provider-label').textContent = prov.name;
-
-  if (providerKey === 'openrouter') {
-    $('powered-by-text').innerHTML = `Powered by <a href="https://openrouter.ai" target="_blank" style="color:var(--accent);text-decoration:none">OpenRouter</a> · Free Models`;
-  } else if (providerKey === 'groq') {
-    $('powered-by-text').innerHTML = `Powered by <a href="https://groq.com" target="_blank" style="color:var(--accent);text-decoration:none">Groq LPU</a> · Free Tier`;
-  } else if (providerKey === 'gemini') {
-    $('powered-by-text').innerHTML = `Powered by <a href="https://aistudio.google.com" target="_blank" style="color:var(--accent);text-decoration:none">Google AI Studio</a> · Free Tier`;
-  }
+  $('topbar-provider-badge').textContent = prov.name;
+  $('active-provider-tag').textContent = prov.name;
 
   populateModelsForProvider(providerKey);
 }
 
-// ── Model Populator ──
 function populateModelsForProvider(providerKey) {
   const prov = PROVIDERS[providerKey];
   const sel = $('model-select');
   const models = prov.fetchedModels || prov.defaultModels;
-  
+
   sel.innerHTML = '';
   models.forEach(m => {
     const opt = document.createElement('option');
@@ -664,81 +864,29 @@ function updateModelMeta() {
   } else if (id) {
     meta.innerHTML = `<span>FREE</span> · ${id}`;
   } else {
-    meta.textContent = 'Select a model above';
+    meta.textContent = 'Select a model';
   }
 
-  const selectedText = $('model-select').options[$('model-select').selectedIndex]?.text || 'No model selected';
-  $('topbar-model').textContent = selectedText;
+  const selectedText = $('model-select').options[$('model-select').selectedIndex]?.text || 'Free Model';
+  $('topbar-model-badge').textContent = selectedText.split('(')[0].trim();
 }
 
 $('model-select').addEventListener('change', updateModelMeta);
 
-// ── Provider Change Handler ──
 $('provider-select').addEventListener('change', e => {
   currentProvider = e.target.value;
   localStorage.setItem('active_provider', currentProvider);
-
-  const prov = PROVIDERS[currentProvider];
   setupProviderUI(currentProvider);
 
-  // Restore stored key for this provider
-  const key = localStorage.getItem(prov.keyStorage) || '';
+  const key = localStorage.getItem(PROVIDERS[currentProvider].keyStorage) || '';
   $('api-key').value = key;
   if (key) {
     validateKey(key, currentProvider);
   } else {
-    setKeyStatus('', 'Enter your key or use free models');
+    setKeyStatus('', 'Enter key or use free models');
   }
 });
 
-// ── Background Public OpenRouter Fetch ──
-async function fetchOpenRouterPublicModels() {
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/models');
-    if (!res.ok) return;
-    const data = await res.json();
-    if (!data || !Array.isArray(data.data)) return;
-
-    // Filter models ending with :free or having zero pricing
-    const freeList = data.data.filter(m => 
-      m.id.endsWith(':free') || 
-      (m.pricing && Number(m.pricing.prompt) === 0 && Number(m.pricing.completion) === 0)
-    ).map(m => ({
-      id: m.id,
-      name: m.name || m.id,
-      ctx: m.context_length || 131072,
-      bestFor: m.id === 'openrouter/free' ? 'Auto-Router' : (m.id.split('/')[0] || 'Free')
-    })).sort((a, b) => a.name.localeCompare(b.name));
-
-    // Ensure openrouter/free router is positioned first
-    const routerIdx = freeList.findIndex(m => m.id === 'openrouter/free');
-    if (routerIdx > -1) {
-      const [routerModel] = freeList.splice(routerIdx, 1);
-      routerModel.name = '⚡ Free Models Router (Auto-selects best)';
-      freeList.unshift(routerModel);
-    } else {
-      freeList.unshift({
-        id: 'openrouter/free',
-        name: '⚡ Free Models Router (Auto-selects best)',
-        ctx: 200000,
-        bestFor: 'Auto-Router'
-      });
-    }
-
-    PROVIDERS.openrouter.fetchedModels = freeList;
-    if (currentProvider === 'openrouter') {
-      populateModelsForProvider('openrouter');
-      const savedKey = localStorage.getItem('or_api_key');
-      if (savedKey) {
-        setKeyStatus('ok', `Key ready · ${freeList.length} free models loaded`);
-      }
-    }
-  } catch {
-    // Graceful fallback to default list
-  }
-}
-
-// ── Key Management ──
 $('key-toggle').addEventListener('click', () => {
   const inp = $('api-key');
   inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -766,7 +914,6 @@ function setKeyStatus(state, text) {
   status.textContent = text;
 }
 
-// ── Validate API Key ──
 async function validateKey(key, provider) {
   setKeyStatus('loading', 'Verifying key…');
   try {
@@ -775,14 +922,12 @@ async function validateKey(key, provider) {
         headers: { Authorization: `Bearer ${key}` }
       });
       if (!res.ok) {
-        // Fallback test with /models
         const mRes = await fetch('https://openrouter.ai/api/v1/models', {
           headers: { Authorization: `Bearer ${key}` }
         });
         if (!mRes.ok) throw new Error('Invalid key');
       }
-      const count = (PROVIDERS.openrouter.fetchedModels || PROVIDERS.openrouter.defaultModels).length;
-      setKeyStatus('ok', `Key valid · ${count} free models available`);
+      setKeyStatus('ok', 'OpenRouter key valid · Free tokens active');
 
     } else if (provider === 'groq') {
       const res = await fetch('https://api.groq.com/openai/v1/models', {
@@ -791,20 +936,15 @@ async function validateKey(key, provider) {
       if (!res.ok) throw new Error('Invalid Groq key');
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
-        // Enrich Groq models if API returned them
         const groqFree = data.data.filter(m => !m.id.includes('whisper')).map(m => ({
-          id: m.id,
-          name: `${m.id} (Groq)`,
-          ctx: m.context_window || 128000,
-          bestFor: 'Groq LPU'
+          id: m.id, name: `${m.id} (Groq)`, ctx: m.context_window || 128000, bestFor: 'Groq LPU'
         }));
         if (groqFree.length) PROVIDERS.groq.fetchedModels = groqFree;
         populateModelsForProvider('groq');
       }
-      setKeyStatus('ok', 'Groq key valid · Ultra-fast inference ready');
+      setKeyStatus('ok', 'Groq key valid · Ultra-fast active');
 
     } else if (provider === 'gemini') {
-      // Gemini keys validate against models endpoint
       const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/models', {
         headers: { Authorization: `Bearer ${key}` }
       });
@@ -812,39 +952,57 @@ async function validateKey(key, provider) {
       setKeyStatus('ok', 'Gemini key valid · 1M-2M context ready');
     }
   } catch (err) {
-    setKeyStatus('err', `${PROVIDERS[provider].name} key check failed — please verify`);
+    setKeyStatus('err', 'Key validation failed — please check');
   }
 }
 
-// ── Auto-resize Textarea ──
-const userInput = $('user-input');
-userInput.addEventListener('input', () => {
-  userInput.style.height = 'auto';
-  userInput.style.height = Math.min(userInput.scrollHeight, 180) + 'px';
-  $('char-count').textContent = userInput.value.length + ' chars';
-});
+// ── Background Public OpenRouter Fetch ──
+async function fetchOpenRouterPublicModels() {
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/models');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.data)) return;
 
-userInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-});
+    const freeList = data.data.filter(m =>
+      m.id.endsWith(':free') ||
+      (m.pricing && Number(m.pricing.prompt) === 0 && Number(m.pricing.completion) === 0)
+    ).map(m => ({
+      id: m.id,
+      name: m.name || m.id,
+      ctx: m.context_length || 131072,
+      bestFor: m.id === 'openrouter/free' ? 'Auto-Router' : (m.id.split('/')[0] || 'Free')
+    })).sort((a, b) => a.name.localeCompare(b.name));
 
-$('send-btn').addEventListener('click', send);
+    const routerIdx = freeList.findIndex(m => m.id === 'openrouter/free');
+    if (routerIdx > -1) {
+      const [routerModel] = freeList.splice(routerIdx, 1);
+      routerModel.name = '⚡ Free Models Router (Auto-selects best)';
+      freeList.unshift(routerModel);
+    } else {
+      freeList.unshift({
+        id: 'openrouter/free',
+        name: '⚡ Free Models Router (Auto-selects best)',
+        ctx: 200000,
+        bestFor: 'Auto-Router'
+      });
+    }
 
-// ── Quick Prompts ──
-function setPrompt(text) {
-  userInput.value = text;
-  userInput.dispatchEvent(new Event('input'));
-  userInput.focus();
+    PROVIDERS.openrouter.fetchedModels = freeList;
+    if (currentProvider === 'openrouter') {
+      populateModelsForProvider('openrouter');
+      const savedKey = localStorage.getItem('or_api_key');
+      if (savedKey) setKeyStatus('ok', `Key ready · ${freeList.length} free models loaded`);
+    }
+  } catch {}
 }
-window.setPrompt = setPrompt;
 
-// ── Send Message ──
-async function send() {
+// ── Core AI Streaming Engine ──
+async function runStreamRequest(promptText, outputElemId, actionBtnId) {
   if (isStreaming) return;
   const prov = PROVIDERS[currentProvider];
   const key = localStorage.getItem(prov.keyStorage) || '';
   const model = $('model-select').value;
-  const text = userInput.value.trim();
 
   if (!key) {
     alert(`Please enter and save your free ${prov.name} API key in the sidebar.`);
@@ -855,37 +1013,26 @@ async function send() {
     alert('Please select a model from the dropdown.');
     return;
   }
-  if (!text) return;
 
-  hideEmpty();
+  const outElem = $(outputElemId);
+  const actionBtn = $(actionBtnId);
+
   isStreaming = true;
-  $('send-btn').disabled = true;
-
-  // Add user message
-  messages.push({ role: 'user', content: text });
-  appendMessage('user', text);
-  userInput.value = '';
-  userInput.style.height = 'auto';
-  $('char-count').textContent = '0 chars';
-  updateStats();
-
-  // Add assistant placeholder bubble
-  const aiWrap = appendMessage('assistant', '');
-  const aiText = aiWrap.querySelector('.msg-text');
-  aiText.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-
-  const sysPrompt = $('system-prompt').value.trim();
-  const temperature = parseFloat($('temperature').value) || 0.7;
-  const max_tokens = parseInt($('max-tokens').value) || 2048;
+  actionBtn.disabled = true;
+  actionBtn.textContent = 'Generating with Free Tokens…';
+  outElem.innerHTML = '<div style="display:flex;gap:8px;align-items:center;color:var(--accent)"><span class="status-dot loading"></span> Streaming response with free tokens…</div>';
 
   const body = {
     model,
-    max_tokens,
-    temperature,
     stream: true,
+    max_tokens: 3000,
+    temperature: 0.7,
     messages: [
-      ...(sysPrompt ? [{ role: 'system', content: sysPrompt }] : []),
-      ...messages
+      {
+        role: 'system',
+        content: 'You are an elite YouTube Creator Strategist, Instagram Reels Producer, and Viral Content Architect. Format all responses cleanly using Markdown, bold headings, bullet points, and tables when requested.'
+      },
+      { role: 'user', content: promptText }
     ]
   };
 
@@ -908,6 +1055,264 @@ async function send() {
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
+    outElem.innerHTML = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const lines = decoder.decode(value, { stream: true }).split('\n');
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const json = line.slice(6).trim();
+        if (json === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(json);
+          const delta = parsed.choices?.[0]?.delta?.content || '';
+          fullReply += delta;
+          outElem.innerHTML = renderMarkdown(fullReply);
+          if (parsed.usage?.total_tokens) totalTokens += parsed.usage.total_tokens;
+        } catch {}
+      }
+    }
+
+    totalTokens += Math.ceil((promptText.length + fullReply.length) / 4);
+    $('stat-tokens').textContent = totalTokens.toLocaleString();
+
+  } catch (err) {
+    outElem.innerHTML = `<span style="color:var(--danger)">⚠️ Error: ${err.message}</span>`;
+  } finally {
+    isStreaming = false;
+    actionBtn.disabled = false;
+    // Restore button text
+    if (actionBtnId === 'script-generate-btn') actionBtn.textContent = '⚡ Generate Structured Script (Free Tokens)';
+    if (actionBtnId === 'shorts-generate-btn') actionBtn.textContent = '✂️ Split Into 5 Shorts (Free Tokens)';
+    if (actionBtnId === 'seo-generate-btn') actionBtn.textContent = '🚀 Generate Complete SEO Package (Free Tokens)';
+    if (actionBtnId === 'ideas-generate-btn') actionBtn.textContent = '📅 Generate 30-Day Content Calendar (Free Tokens)';
+  }
+}
+
+// ── 1. Script Generator Handler ──
+$('script-generate-btn').addEventListener('click', () => {
+  const niche = $('script-niche').value;
+  const length = $('script-length').value;
+  const topic = $('script-topic').value.trim();
+  const tone = $('script-tone').value;
+  const notes = $('script-notes').value.trim();
+
+  if (!topic) {
+    alert('Please enter a video topic or title.');
+    $('script-topic').focus();
+    return;
+  }
+
+  const prompt = `Write a complete, structured, viral-ready video script with the following parameters:
+- Niche: ${niche}
+- Topic: "${topic}"
+- Target Length / Format: ${length}
+- Tone & Energy: ${tone}
+${notes ? `- Key Talking Points / B-Roll Ideas: ${notes}` : ''}
+
+Structure the output with:
+# 🎬 ${topic}
+## 🎯 3 Scroll-Stopping Hook Variations (First 3-5 Seconds)
+1. **[Curiosity Gap]**: ...
+2. **[Bold / Contrarian Statement]**: ...
+3. **[High-Stakes Question]**: ...
+
+## ⏱️ Retention Anchor (5-15 Seconds)
+Why the viewer must watch until the very end.
+
+## 📜 Full Structured Script
+Format as a two-part breakdown for every section:
+- **[Scene & Visual Cue / B-Roll / On-Screen Text]**
+- **[Voiceover / Host Script]** (Written in spoken, punchy conversational English)
+
+Include:
+- Section 1: The Core Problem / Premise
+- Section 2: The Breakthrough / Method (Step by Step)
+- Section 3: The Common Mistake to Avoid
+- Section 4: The Climax / Master Tip
+
+## 📣 Seamless Call-to-Action (CTA) & Subscribe Hook
+Natural, high-converting outro.`;
+
+  runStreamRequest(prompt, 'script-output', 'script-generate-btn');
+});
+
+// ── 2. Shorts Splitter Handler ──
+$('shorts-generate-btn').addEventListener('click', () => {
+  const content = $('shorts-content').value.trim();
+  const platform = $('shorts-platform').value;
+  const strategy = $('shorts-strategy').value;
+
+  if (!content || content.length < 50) {
+    alert('Please paste a script or transcript with at least 50 characters.');
+    $('shorts-content').focus();
+    return;
+  }
+
+  const prompt = `You are a viral short-form video editor. Transform the following source content into exactly 5 standalone, viral 30–60 second ${platform} scripts using the strategy: "${strategy}".
+
+Source Content:
+"""
+${content}
+"""
+
+For each of the 5 Shorts, provide:
+### ✂️ Short #[Number]: [Punchy Short Title]
+- **Target Duration**: 35–50s
+- **🎣 Visual Hook (0-3s)**: [What the camera sees] + [The exact first words spoken]
+- **📜 Script & Spoken Words**:
+  - [0:03 - 0:15]: ...
+  - [0:15 - 0:35]: ...
+  - [0:35 - 0:50]: ...
+- **🔤 On-Screen Captions**: [3-4 punchy key phrases to flash on screen]
+- **🔄 Infinite Loop Ending**: [A clever closing sentence that flows right back into the opening hook]
+
+---
+Ensure all 5 Shorts are 100% distinct and each stands on its own without needing context from the others.`;
+
+  runStreamRequest(prompt, 'shorts-output', 'shorts-generate-btn');
+});
+
+// ── 3. SEO Package Handler ──
+$('seo-generate-btn').addEventListener('click', () => {
+  const topic = $('seo-topic').value.trim();
+  const keyword = $('seo-keyword').value.trim();
+  const platform = $('seo-platform').value;
+
+  if (!topic) {
+    alert('Please enter a video topic or draft summary.');
+    $('seo-topic').focus();
+    return;
+  }
+
+  const prompt = `Generate an exhaustive, high-ranking SEO & Metadata package for:
+- Video Topic: "${topic}"
+- Focus Keyword: "${keyword || 'Auto-detect best primary keyword'}"
+- Platform: ${platform}
+
+Format the response cleanly as:
+## 🏆 5 High-CTR Title Variations
+1. **[High Search Volume]**: ...
+2. **[Curiosity Gap / Psychological]**: ...
+3. **[Contrarian / Hot Take]**: ...
+4. **[Step-by-Step / How-To]**: ...
+5. **[Short & Punchy Hook]**: ...
+
+## 📝 High-Retention Video Description
+(Write an SEO-optimized description with an engaging 2-sentence hook containing the primary keyword, a concise bulleted summary of key learnings, timestamp chapter placeholders, and links placeholder).
+
+## 🏷️ YouTube Studio Tags (15-20 Tags)
+(Provide a single comma-separated block ready to copy and paste directly into YouTube Studio tag box):
+\`\`\`
+tag1, tag2, tag3, tag4...
+\`\`\`
+
+## 📱 Viral Hashtags
+Provide 10 top relevant viral hashtags (e.g. #shorts #reels etc.).`;
+
+  runStreamRequest(prompt, 'seo-output', 'seo-generate-btn');
+});
+
+// ── 4. Batch Idea Generator Handler ──
+$('ideas-generate-btn').addEventListener('click', () => {
+  const niche = $('ideas-niche').value.trim();
+  const audience = $('ideas-audience').value.trim();
+  const goal = $('ideas-goal').value;
+
+  if (!niche) {
+    alert('Please enter your creator niche or industry.');
+    $('ideas-niche').focus();
+    return;
+  }
+
+  const prompt = `Create a comprehensive 30-Day Content Calendar for a creator in the niche: "${niche}".
+- Target Audience: "${audience || 'General interested audience'}"
+- Strategic Goal: ${goal}
+
+Divide the plan into 4 weekly content pillars:
+- **Week 1 (Days 1–7)**: Viral Discovery & High-Appeal Hooks
+- **Week 2 (Days 8–14)**: Deep Trust, Authority & Step-by-Step Value
+- **Week 3 (Days 15–21)**: Contrarian Takes, Common Myths & Debates
+- **Week 4 (Days 22–30)**: Conversion, Community Engagement & Action Plans
+
+Present the calendar in a clean Markdown Table:
+| Day | Format (Short/Long) | Catchy Video Title | 3-Second Opening Hook | Strategic Reason |
+| :--- | :--- | :--- | :--- | :--- |
+| Day 1 | ... | ... | ... | ... |
+(Provide all 30 days up to Day 30).
+
+Follow with:
+### 💡 3 Key Rules for Executing This Calendar to Maximize View Retention.`;
+
+  runStreamRequest(prompt, 'ideas-output', 'ideas-generate-btn');
+});
+
+// ── 5. Free Chat Handler ──
+$('chat-send-btn').addEventListener('click', sendChat);
+$('chat-user-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+async function sendChat() {
+  if (isStreaming) return;
+  const prov = PROVIDERS[currentProvider];
+  const key = localStorage.getItem(prov.keyStorage) || '';
+  const model = $('model-select').value;
+  const input = $('chat-user-input');
+  const text = input.value.trim();
+
+  if (!key) {
+    alert(`Please enter and save your free ${prov.name} API key in the sidebar.`);
+    $('api-key').focus();
+    return;
+  }
+  if (!text) return;
+
+  const empty = $('chat-empty');
+  if (empty) empty.style.display = 'none';
+
+  isStreaming = true;
+  $('chat-send-btn').disabled = true;
+
+  // Add User Message
+  chatMessages.push({ role: 'user', content: text });
+  appendChatMessage('user', text);
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Add Assistant Placeholder
+  const aiWrap = appendChatMessage('assistant', '');
+  const aiText = aiWrap.querySelector('.msg-text');
+  aiText.innerHTML = '<span class="status-dot loading"></span> Thinking…';
+
+  const body = {
+    model,
+    stream: true,
+    max_tokens: 2048,
+    temperature: 0.7,
+    messages: [
+      { role: 'system', content: 'You are an expert AI video production assistant. Help the creator brainstorm, write, critique, and polish their YouTube and Reels content.' },
+      ...chatMessages
+    ]
+  };
+
+  let fullReply = '';
+  try {
+    const res = await fetch(prov.defaultEndpoint, {
+      method: 'POST',
+      headers: prov.headers(key),
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
     aiText.innerHTML = '';
 
     while (true) {
@@ -922,32 +1327,27 @@ async function send() {
           const parsed = JSON.parse(json);
           const delta = parsed.choices?.[0]?.delta?.content || '';
           fullReply += delta;
-          aiText.innerHTML = renderContent(fullReply);
-          const msgs = $('messages');
-          msgs.scrollTop = msgs.scrollHeight;
-          if (parsed.usage?.total_tokens) totalTokens += parsed.usage.total_tokens;
-        } catch { /* skip non-json chunks */ }
+          aiText.innerHTML = renderMarkdown(fullReply);
+          const container = $('chat-messages');
+          container.scrollTop = container.scrollHeight;
+        } catch {}
       }
     }
 
-    messages.push({ role: 'assistant', content: fullReply });
+    chatMessages.push({ role: 'assistant', content: fullReply });
     totalTokens += Math.ceil((text.length + fullReply.length) / 4);
-    updateStats();
+    $('stat-tokens').textContent = totalTokens.toLocaleString();
 
   } catch (err) {
     aiText.innerHTML = `<span style="color:var(--danger)">⚠️ Error: ${err.message}</span>`;
   } finally {
     isStreaming = false;
-    $('send-btn').disabled = false;
-    userInput.focus();
+    $('chat-send-btn').disabled = false;
+    input.focus();
   }
 }
 
-// ── Render Message Bubble ──
-function appendMessage(role, content) {
-  const empty = $('empty-state');
-  if (empty) empty.remove();
-
+function appendChatMessage(role, content) {
   const wrap = document.createElement('div');
   wrap.className = `msg-wrap ${role}`;
 
@@ -960,102 +1360,48 @@ function appendMessage(role, content) {
 
   const roleLabel = document.createElement('div');
   roleLabel.className = 'msg-role';
-  const modelName = $('model-select').options[$('model-select').selectedIndex]?.text || 'Assistant';
-  roleLabel.textContent = role === 'user' ? 'You' : `${modelName} (${PROVIDERS[currentProvider].name})`;
+  roleLabel.textContent = role === 'user' ? 'You' : `${PROVIDERS[currentProvider].name} Assistant`;
 
   const text = document.createElement('div');
   text.className = 'msg-text';
-  if (content) text.innerHTML = renderContent(content);
-
-  const actions = document.createElement('div');
-  actions.className = 'msg-actions';
-
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'msg-action-btn';
-  copyBtn.textContent = 'Copy';
-  copyBtn.onclick = () => {
-    navigator.clipboard.writeText(content || text.innerText);
-    copyBtn.textContent = 'Copied!';
-    setTimeout(() => copyBtn.textContent = 'Copy', 1500);
-  };
-
-  if (role === 'assistant') {
-    const regen = document.createElement('button');
-    regen.className = 'msg-action-btn';
-    regen.textContent = 'Regenerate';
-    regen.onclick = () => regenerate(wrap);
-    actions.appendChild(regen);
-  }
-  actions.appendChild(copyBtn);
+  if (content) text.innerHTML = renderMarkdown(content);
 
   body.appendChild(roleLabel);
   body.appendChild(text);
-  body.appendChild(actions);
   wrap.appendChild(av);
   wrap.appendChild(body);
 
-  $('messages').appendChild(wrap);
-  $('messages').scrollTop = $('messages').scrollHeight;
-  $('topbar-ctx').textContent = `${messages.length} msgs`;
+  const container = $('chat-messages');
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
   return wrap;
 }
 
-// ── Regenerate ──
-async function regenerate(wrap) {
-  if (isStreaming) return;
-  if (messages[messages.length - 1]?.role === 'assistant') messages.pop();
-  wrap.remove();
-  userInput.value = messages[messages.length - 1]?.content || '';
-  if (messages[messages.length - 1]?.role === 'user') messages.pop();
-  await send();
+// ── Export & Copy Utilities ──
+function copyOutput(elementId) {
+  const elem = $(elementId);
+  if (!elem) return;
+  const text = elem.innerText.trim();
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert('Copied to clipboard!');
 }
+window.copyOutput = copyOutput;
 
-// ── Stats ──
-function updateStats() {
-  $('stat-msgs').textContent = messages.length;
-  $('stat-tokens').textContent = totalTokens.toLocaleString();
-  $('stat-cost').textContent = '$0.0000';
-  $('topbar-ctx').textContent = `${messages.length} msgs`;
-}
-
-// ── Clear Chat ──
-$('clear-btn').addEventListener('click', () => {
-  if (!confirm('Clear all messages in the conversation?')) return;
-  messages = [];
-  totalTokens = 0;
-  const msgs = $('messages');
-  msgs.innerHTML = '';
-  const empty = document.createElement('div');
-  empty.id = 'empty-state';
-  empty.innerHTML = `
-    <div class="empty-icon">⚡</div>
-    <div class="empty-badge">Release v2.0.0 · Multi-Provider Free AI</div>
-    <h2>FreeTokens AI</h2>
-    <p>Access high-power AI models 100% free across OpenRouter, Groq, and Google Gemini. Zero backend, private & runs in your browser.</p>
-    <div class="quick-prompts">
-      <button class="quick-btn" onclick="setPrompt('Explain quantum computing in simple terms')">Explain quantum computing</button>
-      <button class="quick-btn" onclick="setPrompt('Write a Python web scraper for any website')">Write a web scraper</button>
-      <button class="quick-btn" onclick="setPrompt('Compare DeepSeek R1 and Llama 3.3 70B for coding')">Compare R1 vs Llama 3.3</button>
-      <button class="quick-btn" onclick="setPrompt('What are the best free AI models available right now?')">Best free AI models</button>
-    </div>`;
-  msgs.appendChild(empty);
-  updateStats();
-});
-
-// ── Export Markdown ──
-$('export-btn').addEventListener('click', () => {
-  const prov = PROVIDERS[currentProvider];
-  const model = $('model-select').value;
-  let md = `# Chat Export — FreeTokens AI (v2.0.0)\n\n- Provider: ${prov.name}\n- Model: ${model}\n- Date: ${new Date().toLocaleString()}\n\n---\n\n`;
-  md += messages.map(m => `### ${m.role === 'user' ? '👤 USER' : '🤖 ' + model}\n\n${m.content}`).join('\n\n---\n\n');
-  const blob = new Blob([md], { type: 'text/markdown' });
+function downloadMd(elementId, filenamePrefix) {
+  const elem = $(elementId);
+  if (!elem) return;
+  const text = elem.innerText.trim();
+  if (!text) return;
+  const blob = new Blob([text], { type: 'text/markdown' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `freetokens-chat-${Date.now()}.md`;
+  a.download = `${filenamePrefix}-${Date.now()}.md`;
   a.click();
-});
+}
+window.downloadMd = downloadMd;
 
-// ── Mobile Sidebar ──
+// ── Mobile Sidebar Drawer ──
 $('menu-toggle').addEventListener('click', () => {
   $('sidebar').classList.toggle('open');
   $('overlay').classList.toggle('visible');
@@ -1065,12 +1411,24 @@ $('overlay').addEventListener('click', () => {
   $('overlay').classList.remove('visible');
 });
 
-function hideEmpty() {
-  const e = $('empty-state');
-  if (e) e.style.display = 'none';
+// ── App Kickoff ──
+function init() {
+  if (!PROVIDERS[currentProvider]) currentProvider = 'openrouter';
+  $('provider-select').value = currentProvider;
+  setupProviderUI(currentProvider);
+
+  // Restore saved key
+  const key = localStorage.getItem(PROVIDERS[currentProvider].keyStorage) || '';
+  $('api-key').value = key;
+  if (key) validateKey(key, currentProvider);
+
+  // Background fetch OpenRouter public free models
+  fetchOpenRouterPublicModels();
+
+  // Set active tool
+  setTool(currentTool);
 }
 
-// Kick off
 init();
 </script>
 </body>
