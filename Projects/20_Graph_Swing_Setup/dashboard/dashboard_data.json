@@ -1,145 +1,145 @@
 {
-  "generated_at_utc": "2026-09-09T14:46:01.166844+00:00",
+  "generated_at_utc": "2026-09-10T14:35:33.554410+00:00",
   "warnings": [
     "Graph centrality step failed: ServiceUnavailable('Failed to DNS resolve address 86ebd6d2.databases.neo4j.io:7687: [Errno -2] Name or service not known')"
   ],
   "breadth": {
-    "Date": "2026-09-09 00:00:00",
-    "Advancers": 937,
-    "Decliners": 1670,
+    "Date": "2026-09-10 00:00:00",
+    "Advancers": 932,
+    "Decliners": 1665,
     "AD_Ratio": 0.56,
-    "Pct_Above_50DMA": 41.4,
-    "Pct_Above_200DMA": 51.8,
+    "Pct_Above_50DMA": 40.2,
+    "Pct_Above_200DMA": 51.0,
     "Regime": "NEUTRAL"
   },
   "rs_ranking_top20": [
     {
       "Ticker": "MODISONLTD",
-      "RS_Raw": 3.5159450604690425,
+      "RS_Raw": 3.6981735149971984,
       "RS_Rating": 99,
       "RS_Rank": 1
     },
     {
-      "Ticker": "TBZ",
-      "RS_Raw": 3.0592246139881936,
+      "Ticker": "KABRAEXTRU",
+      "RS_Raw": 3.065910103401002,
       "RS_Rating": 99,
       "RS_Rank": 2
     },
     {
-      "Ticker": "BODALCHEM",
-      "RS_Raw": 2.994638007896726,
+      "Ticker": "MTARTECH",
+      "RS_Raw": 2.976423644730529,
       "RS_Rating": 99,
       "RS_Rank": 3
     },
     {
-      "Ticker": "MTARTECH",
-      "RS_Raw": 2.9701788704390886,
+      "Ticker": "UFBL",
+      "RS_Raw": 2.9394647030487815,
       "RS_Rating": 99,
       "RS_Rank": 4
     },
     {
-      "Ticker": "UFBL",
-      "RS_Raw": 2.9380250860892994,
+      "Ticker": "TBZ",
+      "RS_Raw": 2.927083463709946,
       "RS_Rating": 99,
       "RS_Rank": 5
     },
     {
-      "Ticker": "KABRAEXTRU",
-      "RS_Raw": 2.884562409733001,
+      "Ticker": "BODALCHEM",
+      "RS_Raw": 2.8357233305772866,
       "RS_Rating": 99,
       "RS_Rank": 6
     },
     {
       "Ticker": "INDSWFTLAB",
-      "RS_Raw": 2.818115095522375,
+      "RS_Raw": 2.729865756435183,
       "RS_Rating": 99,
       "RS_Rank": 7
     },
     {
       "Ticker": "BLISSGVS",
-      "RS_Raw": 2.6872824581469317,
+      "RS_Raw": 2.696307260431301,
       "RS_Rating": 99,
       "RS_Rank": 8
     },
     {
-      "Ticker": "DEEDEV",
-      "RS_Raw": 2.6041751573864422,
+      "Ticker": "WELCORP",
+      "RS_Raw": 2.684635943951748,
       "RS_Rating": 99,
       "RS_Rank": 9
     },
     {
-      "Ticker": "MOREPENLAB",
-      "RS_Raw": 2.6022648462824245,
+      "Ticker": "DEEDEV",
+      "RS_Raw": 2.5746358977185873,
       "RS_Rating": 99,
       "RS_Rank": 10
     },
     {
-      "Ticker": "INDOTECH",
-      "RS_Raw": 2.5001373888001943,
+      "Ticker": "MOREPENLAB",
+      "RS_Raw": 2.5684673379083764,
       "RS_Rating": 99,
       "RS_Rank": 11
     },
     {
-      "Ticker": "WELCORP",
-      "RS_Raw": 2.497677811348326,
+      "Ticker": "INDOTECH",
+      "RS_Raw": 2.491952210276241,
       "RS_Rating": 98,
       "RS_Rank": 12
     },
     {
       "Ticker": "HFCL",
-      "RS_Raw": 2.367428945112131,
+      "RS_Raw": 2.367595879036366,
       "RS_Rating": 98,
       "RS_Rank": 13
     },
     {
       "Ticker": "SHILPAMED",
-      "RS_Raw": 2.346192638650661,
+      "RS_Raw": 2.269176129648328,
       "RS_Rating": 98,
       "RS_Rank": 14
     },
     {
       "Ticker": "CYIENTDLM",
-      "RS_Raw": 2.3236617858075914,
+      "RS_Raw": 2.2570884442293364,
       "RS_Rating": 98,
       "RS_Rank": 15
     },
     {
-      "Ticker": "YASHO",
-      "RS_Raw": 2.2177650749367355,
+      "Ticker": "CORDSCABLE",
+      "RS_Raw": 2.22380528398037,
       "RS_Rating": 98,
       "RS_Rank": 16
     },
     {
-      "Ticker": "WHEELS",
-      "RS_Raw": 2.20930171200633,
+      "Ticker": "YASHO",
+      "RS_Raw": 2.198986354626165,
       "RS_Rating": 98,
       "RS_Rank": 17
     },
     {
-      "Ticker": "CORDSCABLE",
-      "RS_Raw": 2.205316235858409,
+      "Ticker": "IOLCP",
+      "RS_Raw": 2.1509610507791086,
       "RS_Rating": 98,
       "RS_Rank": 18
     },
     {
-      "Ticker": "RUBYMILLS",
-      "RS_Raw": 2.1776427019580646,
+      "Ticker": "AEROFLEX",
+      "RS_Raw": 2.1258412255709045,
       "RS_Rating": 98,
       "RS_Rank": 19
     },
     {
-      "Ticker": "IOLCP",
-      "RS_Raw": 2.128687734599602,
+      "Ticker": "WHEELS",
+      "RS_Raw": 2.124261118871535,
       "RS_Rating": 98,
       "RS_Rank": 20
     }
   ],
-  "technical_signals_computed_for": 2685,
+  "technical_signals_computed_for": 2687,
   "market_indices": {
     "BANKNIFTY": {
-      "Close": 56295.55,
-      "Chg_1D_Pct": -0.85,
-      "Date": "2026-09-09",
+      "Close": 56471.95,
+      "Chg_1D_Pct": 0.31,
+      "Date": "2026-09-10",
       "Series": [
         {
           "Date": "2026-08-28",
@@ -176,13 +176,17 @@
         {
           "Date": "2026-09-09",
           "Close": 56295.55
+        },
+        {
+          "Date": "2026-09-10",
+          "Close": 56471.95
         }
       ]
     },
     "NIFTY50": {
-      "Close": 23431.5,
-      "Chg_1D_Pct": -0.86,
-      "Date": "2026-09-09",
+      "Close": 23477.8,
+      "Chg_1D_Pct": 0.2,
+      "Date": "2026-09-10",
       "Series": [
         {
           "Date": "2026-08-28",
@@ -219,6 +223,10 @@
         {
           "Date": "2026-09-09",
           "Close": 23431.5
+        },
+        {
+          "Date": "2026-09-10",
+          "Close": 23477.8
         }
       ]
     }
@@ -241,15 +249,6 @@
       "Net_Buy_Qty": 23753000.0,
       "Buy_Sell_Ratio": 2.65,
       "Signal": "INSTITUTIONAL_ACCUMULATION"
-    },
-    {
-      "Ticker": "PCJEWELLER",
-      "Buy_Qty": 1167608744.0,
-      "Sell_Qty": 1158505346.0,
-      "Deal_Count": 18,
-      "Net_Buy_Qty": 9103398.0,
-      "Buy_Sell_Ratio": 1.01,
-      "Signal": "NEUTRAL"
     },
     {
       "Ticker": "IFCI",
@@ -279,6 +278,15 @@
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
+      "Ticker": "KSHITIJPOL",
+      "Buy_Qty": 6874393.0,
+      "Sell_Qty": 1967335.0,
+      "Deal_Count": 10,
+      "Net_Buy_Qty": 4907058.0,
+      "Buy_Sell_Ratio": 3.49,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
+    },
+    {
       "Ticker": "KSHITIJ-RE",
       "Buy_Qty": 13028229.0,
       "Sell_Qty": 8216696.0,
@@ -304,15 +312,6 @@
       "Net_Buy_Qty": 3272827.0,
       "Buy_Sell_Ratio": 1.04,
       "Signal": "NEUTRAL"
-    },
-    {
-      "Ticker": "KSHITIJPOL",
-      "Buy_Qty": 5039928.0,
-      "Sell_Qty": 1967335.0,
-      "Deal_Count": 9,
-      "Net_Buy_Qty": 3072593.0,
-      "Buy_Sell_Ratio": 2.56,
-      "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
       "Ticker": "ATHERENERG",
@@ -369,12 +368,30 @@
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
+      "Ticker": "RATNAVEER",
+      "Buy_Qty": 9941467.0,
+      "Sell_Qty": 8684219.0,
+      "Deal_Count": 29,
+      "Net_Buy_Qty": 1257248.0,
+      "Buy_Sell_Ratio": 1.14,
+      "Signal": "NEUTRAL"
+    },
+    {
       "Ticker": "ANNU",
       "Buy_Qty": 1892000.0,
       "Sell_Qty": 668650.0,
       "Deal_Count": 4,
       "Net_Buy_Qty": 1223350.0,
       "Buy_Sell_Ratio": 2.83,
+      "Signal": "INSTITUTIONAL_ACCUMULATION"
+    },
+    {
+      "Ticker": "SUMAX",
+      "Buy_Qty": 1288800.0,
+      "Sell_Qty": 126000.0,
+      "Deal_Count": 10,
+      "Net_Buy_Qty": 1162800.0,
+      "Buy_Sell_Ratio": 10.23,
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     },
     {
@@ -387,28 +404,19 @@
       "Signal": "NEUTRAL"
     },
     {
-      "Ticker": "RATNAVEER",
-      "Buy_Qty": 8419983.0,
-      "Sell_Qty": 7324403.0,
-      "Deal_Count": 25,
-      "Net_Buy_Qty": 1095580.0,
-      "Buy_Sell_Ratio": 1.15,
-      "Signal": "NEUTRAL"
-    },
-    {
-      "Ticker": "SUMAX",
-      "Buy_Qty": 1093200.0,
-      "Sell_Qty": 0.0,
-      "Deal_Count": 7,
-      "Net_Buy_Qty": 1093200.0,
-      "Buy_Sell_Ratio": 999.0,
+      "Ticker": "MOMSBELIEF",
+      "Buy_Qty": 1217973.0,
+      "Sell_Qty": 143401.0,
+      "Deal_Count": 6,
+      "Net_Buy_Qty": 1074572.0,
+      "Buy_Sell_Ratio": 8.49,
       "Signal": "INSTITUTIONAL_ACCUMULATION"
     }
   ],
   "flow_regime": {
-    "Date": "2026-09-08 00:00:00",
-    "FII_Net_Cr": -123.19,
-    "DII_Net_Cr": 1349.64,
+    "Date": "2026-09-10 00:00:00",
+    "FII_Net_Cr": -438.24,
+    "DII_Net_Cr": 1025.85,
     "FII_5D_Net": null,
     "DII_5D_Net": null,
     "Combined_5D_Net": null,
