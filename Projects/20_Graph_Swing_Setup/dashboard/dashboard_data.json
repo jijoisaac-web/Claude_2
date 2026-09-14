@@ -1,14 +1,14 @@
 {
-  "generated_at_utc": "2026-09-11T14:34:53.374221+00:00",
+  "generated_at_utc": "2026-09-14T16:29:00.485213+00:00",
   "warnings": [
     "Graph centrality step failed: ServiceUnavailable('Failed to DNS resolve address 86ebd6d2.databases.neo4j.io:7687: [Errno -2] Name or service not known')"
   ],
   "breadth": {
-    "Date": "2026-09-11 00:00:00",
-    "Advancers": 952,
-    "Decliners": 1640,
-    "AD_Ratio": 0.58,
-    "Pct_Above_50DMA": 37.6,
+    "Date": "2026-09-14 00:00:00",
+    "Advancers": 0,
+    "Decliners": 0,
+    "AD_Ratio": null,
+    "Pct_Above_50DMA": 37.5,
     "Pct_Above_200DMA": 50.1,
     "Regime": "NEUTRAL"
   },
@@ -20,26 +20,26 @@
       "RS_Rank": 1
     },
     {
-      "Ticker": "KABRAEXTRU",
-      "RS_Raw": 3.150486475821782,
+      "Ticker": "TBZ",
+      "RS_Raw": 3.0937411265410915,
       "RS_Rating": 99,
       "RS_Rank": 2
     },
     {
-      "Ticker": "TBZ",
-      "RS_Raw": 3.097020783602039,
+      "Ticker": "KABRAEXTRU",
+      "RS_Raw": 3.0632905284930696,
       "RS_Rating": 99,
       "RS_Rank": 3
     },
     {
-      "Ticker": "BODALCHEM",
-      "RS_Raw": 3.017729299029918,
+      "Ticker": "MTARTECH",
+      "RS_Raw": 2.996756017910002,
       "RS_Rating": 99,
       "RS_Rank": 4
     },
     {
-      "Ticker": "MTARTECH",
-      "RS_Raw": 2.996756017910002,
+      "Ticker": "BODALCHEM",
+      "RS_Raw": 2.9787778955707456,
       "RS_Rating": 99,
       "RS_Rank": 5
     },
@@ -51,7 +51,7 @@
     },
     {
       "Ticker": "INDSWFTLAB",
-      "RS_Raw": 2.8004491115220618,
+      "RS_Raw": 2.806890745444018,
       "RS_Rating": 99,
       "RS_Rank": 7
     },
@@ -63,31 +63,31 @@
     },
     {
       "Ticker": "MOREPENLAB",
-      "RS_Raw": 2.580148761321898,
+      "RS_Raw": 2.5779971646205198,
       "RS_Rating": 99,
       "RS_Rank": 9
     },
     {
-      "Ticker": "WELCORP",
-      "RS_Raw": 2.577175701339437,
+      "Ticker": "DEEDEV",
+      "RS_Raw": 2.5379574766840287,
       "RS_Rating": 99,
       "RS_Rank": 10
     },
     {
-      "Ticker": "DEEDEV",
-      "RS_Raw": 2.537912735616733,
+      "Ticker": "WELCORP",
+      "RS_Raw": 2.5296952715236376,
       "RS_Rating": 99,
       "RS_Rank": 11
     },
     {
       "Ticker": "INDOTECH",
-      "RS_Raw": 2.4834106573097685,
+      "RS_Raw": 2.496700597300773,
       "RS_Rating": 98,
       "RS_Rank": 12
     },
     {
       "Ticker": "CORDSCABLE",
-      "RS_Raw": 2.385245672272833,
+      "RS_Raw": 2.404050245334548,
       "RS_Rating": 98,
       "RS_Rank": 13
     },
@@ -98,43 +98,43 @@
       "RS_Rank": 14
     },
     {
-      "Ticker": "YASHO",
-      "RS_Raw": 2.3591484862384897,
+      "Ticker": "SHILPAMED",
+      "RS_Raw": 2.3535515553413164,
       "RS_Rating": 98,
       "RS_Rank": 15
     },
     {
-      "Ticker": "SHILPAMED",
-      "RS_Raw": 2.3426399716966078,
+      "Ticker": "YASHO",
+      "RS_Raw": 2.3238937358035665,
       "RS_Rating": 98,
       "RS_Rank": 16
     },
     {
       "Ticker": "CYIENTDLM",
-      "RS_Raw": 2.2301637972781987,
+      "RS_Raw": 2.2326864398439894,
       "RS_Rating": 98,
       "RS_Rank": 17
     },
     {
       "Ticker": "SAKAR",
-      "RS_Raw": 2.1609284870506045,
+      "RS_Raw": 2.154116982823644,
       "RS_Rating": 98,
       "RS_Rank": 18
     },
     {
-      "Ticker": "RUBYMILLS",
-      "RS_Raw": 2.1474694271946713,
+      "Ticker": "AEROFLEX",
+      "RS_Raw": 2.138973506460215,
       "RS_Rating": 98,
       "RS_Rank": 19
     },
     {
-      "Ticker": "AEROFLEX",
-      "RS_Raw": 2.130445772074924,
+      "Ticker": "RUBYMILLS",
+      "RS_Raw": 2.1268611220494544,
       "RS_Rating": 98,
       "RS_Rank": 20
     }
   ],
-  "technical_signals_computed_for": 2687,
+  "technical_signals_computed_for": 2695,
   "market_indices": {
     "BANKNIFTY": {
       "Close": 56606.55,
