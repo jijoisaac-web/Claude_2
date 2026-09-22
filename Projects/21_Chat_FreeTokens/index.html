@@ -1163,17 +1163,18 @@ const PROVIDERS = {
       'X-Title': 'FreeTokens Studio'
     }),
     fetchedModels: null,
+    // NOTE: this is only a fallback used if the live fetch (fetchOpenRouterPublicModels)
+    // fails. It was last verified against https://openrouter.ai/api/v1/models on 2026-09-22.
+    // Free-tier model availability changes often — the live fetch should be preferred.
     defaultModels: [
-      { id: 'openrouter/free',                             name: '⚡ Free Models Router (Auto-selects best)', ctx: 200000, bestFor: 'Auto-Balanced' },
-      { id: 'meta-llama/llama-3.3-70b-instruct:free',      name: 'Llama 3.3 70B Instruct',                 ctx: 131072, bestFor: 'Scriptwriting' },
-      { id: 'deepseek/deepseek-r1:free',                   name: 'DeepSeek R1 (Reasoning)',                 ctx: 163840, bestFor: 'Deep Thinking' },
-      { id: 'deepseek/deepseek-chat-v3-0324:free',         name: 'DeepSeek V3 Chat',                       ctx: 163840, bestFor: 'Writing & SEO' },
-      { id: 'qwen/qwq-32b:free',                           name: 'QwQ 32B (Reasoning)',                     ctx: 131072, bestFor: 'Logical Hooks' },
-      { id: 'qwen/qwen-2.5-72b-instruct:free',             name: 'Qwen 2.5 72B Instruct',                  ctx: 131072, bestFor: 'Multilingual' },
-      { id: 'google/gemma-4-31b-it:free',                  name: 'Google Gemma 4 31B (free)',              ctx: 262144, bestFor: 'Latest Model' },
-      { id: 'google/gemma-3-27b-it:free',                  name: 'Gemma 3 27B IT',                         ctx: 131072, bestFor: 'Creative Flow' },
-      { id: 'nvidia/nemotron-3.5-lightning:free',          name: 'Nemotron 3.5 Lightning (free)',          ctx: 1000000, bestFor: '1M Context' },
-      { id: 'thinkingmachines/inkling:free',               name: 'Thinking Machines Inkling (free)',       ctx: 1048576, bestFor: '1M Analysis' }
+      { id: 'inclusionai/ling-3.0-flash-vl:free',          name: 'inclusionAI: Ling 3.0 Flash VL (free)',  ctx: 262144,  bestFor: 'Multimodal' },
+      { id: 'nex-agi/nex-n2.5-mini:free',                  name: 'Nex AGI: Nex-N2.5-Mini (free)',          ctx: 262144,  bestFor: 'Agentic Coding' },
+      { id: 'nex-agi/nex-n2.5-pro:free',                   name: 'Nex AGI: Nex-N2.5-Pro (free)',           ctx: 262144,  bestFor: 'Agentic Coding (Pro)' },
+      { id: 'qwen/qwen3.8-27b:free',                       name: 'Qwen: Qwen3.8 27B (free)',               ctx: 262144,  bestFor: 'Multilingual' },
+      { id: 'nvidia/nemotron-3.5-lightning:free',          name: 'NVIDIA: Nemotron 3.5 Lightning (free)',  ctx: 1000000, bestFor: '1M Context' },
+      { id: 'thinkingmachines/inkling-small:free',         name: 'Thinking Machines: Inkling Small (free)', ctx: 1048576, bestFor: '1M Analysis' },
+      { id: 'dots-studio/dots-3-note-preview:free',        name: 'Dots Studio: Dots3-Note Preview (free)', ctx: 512000,  bestFor: 'Long-form Notes' },
+      { id: 'inclusionai/ling-3.0-flash-fin:free',         name: 'inclusionAI: Ling 3.0 Flash Fin (free)', ctx: 262144,  bestFor: 'Finance-tuned' }
     ]
   },
   groq: {
@@ -1189,12 +1190,14 @@ const PROVIDERS = {
       'Content-Type': 'application/json'
     }),
     fetchedModels: null,
+    // NOTE: fallback only — llama-3.3-70b-versatile, llama-3.1-8b-instant, mixtral-8x7b-32768,
+    // and gemma2-9b-it were all deprecated/removed by Groq as of 2026-08-16. Replaced below with
+    // Groq's official recommended migration targets, per console.groq.com/docs/deprecations.
+    // Prefer the live fetch (validateKey → fetchedModels) over this list.
     defaultModels: [
-      { id: 'llama-3.3-70b-versatile',          name: 'Llama 3.3 70B Versatile (Groq)',       ctx: 128000, bestFor: 'Ultra-Fast Scripts' },
-      { id: 'deepseek-r1-distill-llama-70b',    name: 'DeepSeek R1 Distill 70B (Groq)',       ctx: 128000, bestFor: 'Instant Reasoning' },
-      { id: 'llama-3.1-8b-instant',             name: 'Llama 3.1 8B Instant (Groq)',          ctx: 128000, bestFor: 'Speed (>750 tok/s)' },
-      { id: 'mixtral-8x7b-32768',               name: 'Mixtral 8x7B 32k (Groq)',              ctx: 32768,  bestFor: 'Creative Ideas' },
-      { id: 'gemma2-9b-it',                     name: 'Gemma 2 9B IT (Groq)',                 ctx: 8192,   bestFor: 'Google Gemma' }
+      { id: 'openai/gpt-oss-120b',              name: 'GPT-OSS 120B (Groq)',                   ctx: 128000, bestFor: 'Best Overall Quality' },
+      { id: 'openai/gpt-oss-20b',                name: 'GPT-OSS 20B (Groq)',                    ctx: 128000, bestFor: 'Speed' },
+      { id: 'qwen/qwen3.6-27b',                 name: 'Qwen3.6 27B (Groq)',                    ctx: 128000, bestFor: 'Reasoning' }
     ]
   },
   gemini: {
@@ -1210,12 +1213,14 @@ const PROVIDERS = {
       'Content-Type': 'application/json'
     }),
     fetchedModels: null,
+    // NOTE: fallback only -- gemini-1.5-pro/flash were retired Sept 2025, and gemini-2.0-*
+    // has been superseded by the 2.5/3.x lines. Google deprecates fast (see
+    // ai.google.dev/gemini-api/docs/deprecations) -- prefer wiring up a live fetch here too,
+    // the same way fetchOpenRouterPublicModels() and validateKey('groq') already do.
     defaultModels: [
-      { id: 'gemini-2.0-flash',                 name: 'Gemini 2.0 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · High Speed' },
-      { id: 'gemini-2.0-flash-lite',            name: 'Gemini 2.0 Flash Lite (Google)',       ctx: 1048576, bestFor: '1M Ctx · Fast & Efficient' },
-      { id: 'gemini-1.5-flash',                 name: 'Gemini 1.5 Flash (Google)',            ctx: 1048576, bestFor: '1M Ctx · Long Transcripts' },
-      { id: 'gemini-1.5-pro',                   name: 'Gemini 1.5 Pro (Google)',              ctx: 2097152, bestFor: '2M Ctx · Masterclass Scripts' },
-      { id: 'gemini-2.0-flash-thinking-exp-01-21', name: 'Gemini 2.0 Flash Thinking Exp',    ctx: 1048576, bestFor: 'Chain of Thought' }
+      { id: 'gemini-2.5-flash',                 name: 'Gemini 2.5 Flash (Google)',            ctx: 1048576, bestFor: 'High Speed' },
+      { id: 'gemini-2.5-flash-lite',            name: 'Gemini 2.5 Flash Lite (Google)',       ctx: 1048576, bestFor: 'Fast & Efficient' },
+      { id: 'gemini-2.5-pro',                   name: 'Gemini 2.5 Pro (Google)',              ctx: 2097152, bestFor: 'Highest Quality' }
     ]
   }
 };
@@ -1456,22 +1461,13 @@ async function fetchOpenRouterPublicModels() {
       id: m.id,
       name: m.name || m.id,
       ctx: m.context_length || 131072,
-      bestFor: m.id === 'openrouter/free' ? 'Auto-Router' : (m.id.split('/')[0] || 'Free')
+      bestFor: m.id.split('/')[0] || 'Free'
     })).sort((a, b) => a.name.localeCompare(b.name));
 
-    const routerIdx = freeList.findIndex(m => m.id === 'openrouter/free');
-    if (routerIdx > -1) {
-      const [routerModel] = freeList.splice(routerIdx, 1);
-      routerModel.name = '⚡ Free Models Router (Auto-selects best)';
-      freeList.unshift(routerModel);
-    } else {
-      freeList.unshift({
-        id: 'openrouter/free',
-        name: '⚡ Free Models Router (Auto-selects best)',
-        ctx: 200000,
-        bestFor: 'Auto-Router'
-      });
-    }
+    // NOTE: previously this block force-injected a fake 'openrouter/free' entry
+    // whenever the live API didn't return one -- that model ID doesn't actually
+    // exist/route reliably, so it was silently offering a broken option in the
+    // dropdown. Only real, API-confirmed free models are listed now.
 
     PROVIDERS.openrouter.fetchedModels = freeList;
     if (currentProvider === 'openrouter') {
