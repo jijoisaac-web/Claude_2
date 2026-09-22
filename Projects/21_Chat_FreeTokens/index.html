@@ -1435,10 +1435,41 @@ async function validateKey(key, provider) {
       setKeyStatus('ok', 'Groq key valid · Ultra-fast active');
 
     } else if (provider === 'gemini') {
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/models', {
-        headers: { Authorization: `Bearer ${key}` }
-      });
+      // NOTE: the OpenAI-compat layer (/v1beta/openai/models) does not support GET listing --
+      // it 404s even with a valid key (confirmed on Google's own dev forums, discuss.ai.google.dev).
+      // Chat completions work fine there; only listing is broken. So we validate + fetch the
+      // live model list via Gemini's *native* endpoint instead, which authenticates with the
+      // key as a query param rather than a Bearer header.
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
       if (!res.ok) throw new Error('Invalid Gemini key');
+      const data = await res.json();
+      if (data && Array.isArray(data.models)) {
+        // IMPORTANT: the native /v1beta/models list includes many dated, preview, experimental,
+        // and tuned variants that exist for the *native* generateContent API but are NOT exposed
+        // through the OpenAI-compatibility layer (/v1beta/openai/chat/completions) -- calling
+        // those via chat/completions 404s even though they show up here. So on top of filtering
+        // for generateContent support, we only keep canonical stable names matching Google's
+        // published OpenAI-compat examples (gemini-2.5-flash, gemini-2.5-pro, -flash-lite, etc.)
+        // and drop anything with a date stamp, "-exp", "-preview", "-thinking", or "tuned" in it.
+        const CANONICAL_RE = /^gemini-\d+(\.\d+)?-(flash|pro)(-lite)?(-latest)?$/;
+        const chatModels = data.models
+          .filter(m => {
+            const id = m.name.replace(/^models\//, '');
+            return Array.isArray(m.supportedGenerationMethods) &&
+                   m.supportedGenerationMethods.includes('generateContent') &&
+                   CANONICAL_RE.test(id);
+          })
+          .map(m => ({
+            id: m.name.replace(/^models\//, ''),
+            name: (m.displayName || m.name.replace(/^models\//, '')) + ' (Google)',
+            ctx: m.inputTokenLimit || 1048576,
+            bestFor: m.description ? m.description.slice(0, 40) : 'Gemini'
+          }));
+        if (chatModels.length) {
+          PROVIDERS.gemini.fetchedModels = chatModels;
+          if (currentProvider === 'gemini') populateModelsForProvider('gemini');
+        }
+      }
       setKeyStatus('ok', 'Gemini key valid · 1M-2M context ready');
     }
   } catch (err) {
