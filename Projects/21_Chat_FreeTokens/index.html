@@ -2667,6 +2667,15 @@ const FFMPEG_CDN_SOURCES = [
   }
 ];
 
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s`)), ms)
+    )
+  ]);
+}
+
 async function ensureFFmpegLoaded(onStatus) {
   if (ffmpegInstance && ffmpegInstance.isLoaded && ffmpegInstance.isLoaded()) {
     return ffmpegInstance;
@@ -2682,14 +2691,21 @@ async function ensureFFmpegLoaded(onStatus) {
               ? 'Loading video engine (first time only, ~25MB)…'
               : `Retrying from a backup source (attempt ${i + 1})…`
           );
-          await loadScriptOnce(src.script);
+          // 30s cap on fetching the script tag itself — a stalled/blocked
+          // request otherwise hangs here with no error, forever.
+          await withTimeout(loadScriptOnce(src.script), 30000, 'Video engine script load');
           if (!window.FFmpeg) {
             throw new Error('Video engine script loaded but did not initialize');
           }
           const { createFFmpeg, fetchFile } = window.FFmpeg;
           const inst = createFFmpeg({ log: false, corePath: src.core });
           onStatus && onStatus('Initializing video engine…');
-          await inst.load();
+          // 60s cap on the core .wasm load/handshake — this is the step that
+          // was observed hanging for 400+ seconds with no progress and no
+          // error, which left the user stuck with no way to recover except
+          // reloading the page. This makes it fail fast and fall through to
+          // the backup CDN instead.
+          await withTimeout(inst.load(), 60000, 'Video engine initialization');
           if (!inst.isLoaded()) {
             throw new Error('Video engine failed to fully initialize');
           }
@@ -2706,7 +2722,7 @@ async function ensureFFmpegLoaded(onStatus) {
       }
       throw new Error(
         (lastErr && lastErr.message ? lastErr.message : 'Failed to fetch') +
-        ' — both primary and backup video-engine sources failed. This usually means a network/DNS issue reaching cdn.jsdelivr.net or unpkg.com from your connection right now; try again in a minute or from a different network.'
+        ' — both primary and backup video-engine sources failed after retrying. This usually means a network/DNS issue reaching cdn.jsdelivr.net and unpkg.com from your connection right now; try again in a minute or from a different network.'
       );
     })();
 
