@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="version" content="2.5.0" />
-  <title>FreeTokens Studio v2.5.0 — Prompt-to-Shorts & Creator AI Suite</title>
+  <meta name="version" content="2.5.1" />
+  <title>FreeTokens Studio v2.5.1 — Creator AI Suite</title>
   <link rel="preconnect" href="https://googleapis.com" />
   <link href="https://googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
   <script src="https://jsdelivr.net"></script>
@@ -102,16 +102,16 @@
       border-radius: var(--radius-sm); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 8px 10px; outline: none;
     }
 
-    /* ── Main Panel System ── */
+    /* ── Main View Container ── */
     #main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: transparent; }
     .app-panel { display: none; flex-direction: column; height: 100%; width: 100%; padding: 24px; overflow-y: auto; }
     .app-panel.active { display: flex; }
 
-    /* Forms */
+    /* Forms Configuration */
     .form-panel { max-width: 800px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 20px; }
     .studio-card { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
     .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .input-grid { display: grid; grid-template-columns: 1xl; gap: 16px; }
+    .input-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media(min-width: 600px) { .input-grid { grid-template-columns: 1fr 1fr; } }
     
     .form-field { display: flex; flex-direction: column; gap: 6px; }
@@ -121,16 +121,14 @@
       color: var(--text); padding: 10px 12px; font-size: 13px; outline: none; font-family: var(--sans);
     }
     .form-field textarea { resize: vertical; min-height: 80px; }
-    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); }
-
     .primary-btn {
       background: var(--accent-grad); color: #fff; border: none; padding: 12px 20px;
       border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .primary-btn:hover { opacity: 0.9; box-shadow: 0 0 15px var(--accent-glow); }
+    .primary-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
 
-    /* ── Chat Assistant UI ── */
+    /* ── Chat Canvas Framework ── */
     .chat-container { display: flex; flex-direction: column; height: 100%; width: 100%; max-width: 900px; margin: 0 auto; }
     .chat-history { flex: 1; overflow-y: auto; padding-right: 8px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
     .message-row { display: flex; width: 100%; gap: 12px; }
@@ -140,7 +138,7 @@
     .message-row.assistant .message-bubble { background: var(--surface-card); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
     .ai-generated-img { max-width: 100%; border-radius: var(--radius-md); margin-top: 10px; border: 1px solid var(--border); }
 
-    /* Chat Entry Box Component Layout */
+    /* Input Frame Dock */
     .chat-input-wrapper { background: var(--surface-card); border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 12px; position: relative; }
     .chat-input-wrapper.dragover { border-color: var(--accent); background: rgba(0, 200, 255, 0.05); }
     .file-preview-area { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -160,9 +158,15 @@
 <body>
 
   <div id="app">
-    <!-- Sidebar Module Layout -->
     <aside id="sidebar">
       <div class="sidebar-header">
         <div class="logo-row">
           <div class="logo-badge">⚡</div>
           <h1 class="logo-title">FreeTokens Studio</h1>
+          <span class="ver-badge">v2.5.1</span>
+        </div>
+        <p class="logo-sub">Creator AI Suite · $0 Free</p>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="tool-nav">
