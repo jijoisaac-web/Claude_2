@@ -2344,13 +2344,37 @@ $('clip-convert-btn').addEventListener('click', async () => {
   progress.style.display = 'block';
   convertBtn.disabled = true;
 
+  // ── Timing / ETA helpers ──
+  // There's no reliable way to predict ffmpeg.wasm's engine-load time up
+  // front (it depends entirely on the user's connection), so for that phase
+  // we just show a live "Xs elapsed" ticker — that's honest and at least
+  // confirms it isn't frozen. Once actual conversion starts, ffmpeg reports
+  // real progress ratios, so from that point we extrapolate a genuine ETA:
+  // elapsed / ratio = estimated total time, minus elapsed = time remaining.
+  let phaseLabel = '';
+  let phaseStart = Date.now();
+  let conversionStart = null;
+  const tick = setInterval(() => {
+    const elapsed = Math.round((Date.now() - phaseStart) / 1000);
+    if (phaseLabel) progress.textContent = `${phaseLabel} (${elapsed}s elapsed)`;
+  }, 1000);
+  const setPhase = (label) => { phaseLabel = label; phaseStart = Date.now(); progress.textContent = label; };
+
   try {
-    const ffmpeg = await ensureFFmpegLoaded(msg => { progress.textContent = msg; });
+    const ffmpeg = await ensureFFmpegLoaded(msg => setPhase(msg));
+
     ffmpeg.setProgress(({ ratio }) => {
-      if (ratio >= 0 && ratio <= 1) progress.textContent = `Converting… ${Math.round(ratio * 100)}%`;
+      if (ratio > 0 && ratio <= 1) {
+        if (!conversionStart) conversionStart = Date.now();
+        const elapsedS = (Date.now() - conversionStart) / 1000;
+        const totalEstS = elapsedS / ratio;
+        const remainingS = Math.max(0, Math.round(totalEstS - elapsedS));
+        phaseLabel = ''; // stop the generic elapsed ticker, we have a real ETA now
+        progress.textContent = `Converting… ${Math.round(ratio * 100)}% — about ${remainingS}s remaining`;
+      }
     });
 
-    progress.textContent = 'Reading video file…';
+    setPhase('Reading video file…');
     ffmpeg.FS('writeFile', 'input.mp4', await ffmpegFetchFile(clipSelectedFile));
 
     // Build the crop+scale filter. For cropped aspect ratios we take a
@@ -2369,7 +2393,7 @@ $('clip-convert-btn').addEventListener('click', async () => {
       vf = `crop=${cropW}:ih:${x}:0,scale=${resW}:-2`;
     }
 
-    progress.textContent = 'Converting — this can take a minute for longer clips…';
+    setPhase('Converting…');
     await ffmpeg.run(
       '-i', 'input.mp4',
       '-ss', String(start),
@@ -2388,14 +2412,18 @@ $('clip-convert-btn').addEventListener('click', async () => {
       <video controls style="max-width:300px;border-radius:8px;background:#000;display:block;margin-bottom:12px" src="${url}"></video>
       <a class="btn-sm" href="${url}" download="short-${aspect.replace(':', 'x')}-${resW}w.mp4">💾 Download .mp4</a>
     `;
-    progress.textContent = '✓ Done! Preview and download below.';
+    const totalS = Math.round((Date.now() - (conversionStart || Date.now())) / 1000);
+    phaseLabel = '';
+    progress.textContent = `✓ Done in ~${totalS}s! Preview and download below.`;
 
     // Free the ffmpeg virtual filesystem for the next run
     try { ffmpeg.FS('unlink', 'input.mp4'); ffmpeg.FS('unlink', 'output.mp4'); } catch {}
   } catch (err) {
+    phaseLabel = '';
     progress.textContent = '❌ Error: ' + (err.message || 'conversion failed');
     showToast('Video conversion failed — see the log below the Convert button');
   } finally {
+    clearInterval(tick);
     convertBtn.disabled = false;
   }
 });
