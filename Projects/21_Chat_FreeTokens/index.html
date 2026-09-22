@@ -410,6 +410,25 @@
       border-radius: 12px; padding: 2px 8px; margin: 0 4px 6px 0;
     }
 
+    /* AI Video Generator — scene cards */
+    .vg-scene-card {
+      display: flex; gap: 12px; padding: 12px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--surface-card); align-items: flex-start;
+    }
+    .vg-scene-card.narrating { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+    .vg-scene-thumb {
+      width: 90px; height: 90px; min-width: 90px; border-radius: 6px; background: rgba(255,255,255,.04);
+      display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 22px;
+    }
+    .vg-scene-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .vg-scene-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .vg-scene-body textarea {
+      width: 100%; background: rgba(7,10,15,.6); border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: var(--sans); font-size: 12.5px; padding: 6px 8px; resize: vertical;
+    }
+    .vg-scene-label { font-size: 10px; color: var(--text-dim); font-family: var(--mono); text-transform: uppercase; }
+    .vg-scene-actions { display: flex; gap: 6px; }
+
     /* Floating Toast */
     #toast {
       position: fixed; bottom: 24px; right: 24px;
@@ -661,6 +680,11 @@
           <span class="t-icon">📅</span>
           <span class="t-name">Batch 30-Day Ideas</span>
           <span class="t-pill">Full Calendar</span>
+        </button>
+        <button class="tool-btn" data-tool="videogen">
+          <span class="t-icon">🎥</span>
+          <span class="t-name">AI Video Generator</span>
+          <span class="t-pill">Script → Video</span>
         </button>
         <button class="tool-btn" data-tool="chat">
           <span class="t-icon">💬</span>
@@ -1047,6 +1071,73 @@
         </div>
       </section>
 
+      <!-- ── Tool 8: AI Video Generator (Script → Video) ── -->
+      <section class="studio-panel" id="panel-videogen">
+        <div class="studio-header">
+          <h1>🎥 AI Video Generator</h1>
+          <p>Turn a script or topic into an actual video: AI breaks it into scenes, generates an image per scene (free, no signup), and assembles them into a captioned video with Ken Burns motion — 100% free, runs in your browser.</p>
+          <p style="font-size:12px;color:var(--text-dim)">Note: the exported video is silent with burned-in captions. Browsers can't capture AI voiceover audio into a downloadable file — but you can preview the script narrated aloud live using the button below.</p>
+        </div>
+
+        <div class="form-card">
+          <div class="form-field">
+            <label>Script or Topic</label>
+            <textarea id="vg-script" style="min-height:120px" placeholder="Paste a script, or just describe a topic and let AI write + scene it out..."></textarea>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label>Aspect Ratio</label>
+              <select id="vg-aspect">
+                <option value="9:16">9:16 — Shorts / Reels / TikTok</option>
+                <option value="1:1">1:1 — Square</option>
+                <option value="4:5">4:5 — Portrait Feed</option>
+                <option value="16:9">16:9 — Landscape</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Seconds per Scene</label>
+              <input type="number" id="vg-scene-duration" min="2" max="10" step="0.5" value="4">
+            </div>
+          </div>
+
+          <div class="form-field" style="display:flex;align-items:center;gap:8px;flex-direction:row">
+            <input type="checkbox" id="vg-captions" checked style="width:16px;height:16px">
+            <label style="margin:0">Burn in captions</label>
+          </div>
+
+          <button class="btn-action" id="vg-scenes-btn">✨ Break Into Scenes (Free Tokens)</button>
+        </div>
+
+        <div id="vg-scenes-wrap" style="display:none">
+          <div class="output-card" style="margin-top:16px">
+            <div class="output-header">
+              <div class="output-title">🎬 Scenes</div>
+              <div class="output-tools">
+                <button class="btn-sm" id="vg-narrate-btn">🔊 Preview Narration</button>
+                <button class="btn-sm" id="vg-images-btn">🖼️ Generate All Images</button>
+              </div>
+            </div>
+            <div class="output-body" id="vg-scenes-list" style="display:flex;flex-direction:column;gap:12px"></div>
+          </div>
+
+          <button class="btn-action" id="vg-generate-btn" style="margin-top:14px">🎥 Assemble Video (Runs in Browser)</button>
+          <div id="vg-progress" style="display:none;margin-top:10px;font-size:12px;color:var(--text-dim);font-family:var(--mono)"></div>
+        </div>
+
+        <div class="output-card" id="vg-output-card" style="margin-top:16px">
+          <div class="output-header">
+            <div class="output-title">🎥 Generated Video</div>
+          </div>
+          <div class="output-body" id="vg-output">
+            <div class="output-placeholder">
+              <div class="icon">🎥</div>
+              <div>Break your script into scenes, generate images, then assemble the video.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ── Tool 6: Video Production Tracker ── -->
       <section class="studio-panel" id="panel-tracker">
         <div class="studio-header">
@@ -1402,6 +1493,7 @@ function setTool(toolId) {
     shorts: '✂️ Shorts Splitter',
     seo: '🚀 SEO Package Generator',
     ideas: '📅 30-Day Content Calendar',
+    videogen: '🎥 AI Video Generator',
     chat:    '💬 Free Chat Assistant',
     clipper: '🎞️ Shorts & Reels Clipper',
     tracker: '🎬 Video Production Tracker'
@@ -1931,6 +2023,334 @@ Follow with:
 ### 💡 3 Key Rules for Executing This Calendar to Maximize View Retention.`;
 
   runStreamRequest(prompt, 'ideas-output', 'ideas-generate-btn');
+});
+
+// ── 8. AI Video Generator (Script → Scenes → Images → Assembled Video) ──
+let vgScenes = []; // { id, caption, imagePrompt, imageBlob, imageObjUrl }
+let vgNarrating = false;
+
+// Non-streaming AI call — we need the full response back at once to parse
+// it as JSON (the scene breakdown), unlike the other tools which stream
+// markdown straight into the page.
+async function callAIJson(promptText, systemPrompt) {
+  const prov = PROVIDERS[currentProvider];
+  const key = localStorage.getItem(prov.keyStorage) || '';
+  const model = $('model-select').value;
+  if (!key) throw new Error(`Please enter your free ${prov.name} API key`);
+  if (!model) throw new Error('Please select a model from the dropdown');
+
+  const res = await fetch(prov.defaultEndpoint, {
+    method: 'POST',
+    headers: prov.headers(key),
+    body: JSON.stringify({
+      model,
+      stream: false,
+      max_tokens: 2048,
+      temperature: 0.6,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: promptText }
+      ]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '';
+}
+
+function parseScenesJson(raw) {
+  // Models often wrap JSON in ```json fences or add stray prose — strip that defensively.
+  let cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
+  const firstBracket = cleaned.indexOf('[');
+  const lastBracket = cleaned.lastIndexOf(']');
+  if (firstBracket > -1 && lastBracket > firstBracket) {
+    cleaned = cleaned.slice(firstBracket, lastBracket + 1);
+  }
+  const parsed = JSON.parse(cleaned);
+  if (!Array.isArray(parsed)) throw new Error('AI did not return a scene list');
+  return parsed;
+}
+
+$('vg-scenes-btn').addEventListener('click', async () => {
+  const script = $('vg-script').value.trim();
+  if (!script) { showToast('Paste a script or topic first'); return; }
+
+  const btn = $('vg-scenes-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="status-dot loading"></span> Breaking into scenes…';
+
+  try {
+    const raw = await callAIJson(
+      `Break the following into 5-8 short video scenes for a vertical Short/Reel:\n\n"""${script}"""\n\nReturn ONLY a JSON array, no prose, no markdown fences. Each element: {"caption": "one short spoken/on-screen line, under 15 words", "imagePrompt": "a vivid, specific visual description for an AI image generator to illustrate this scene"}`,
+      'You are a short-form video scene planner. You output strictly valid JSON arrays and nothing else — no explanations, no markdown formatting.'
+    );
+    const scenes = parseScenesJson(raw);
+    vgScenes = scenes.map((s, i) => ({
+      id: 'scn_' + i,
+      caption: (s.caption || '').toString(),
+      imagePrompt: (s.imagePrompt || s.caption || '').toString(),
+      imageBlob: null,
+      imageObjUrl: null
+    }));
+    renderVgScenes();
+    $('vg-scenes-wrap').style.display = 'block';
+    showToast(`✓ ${vgScenes.length} scenes ready — generate images next`);
+  } catch (err) {
+    showToast('Scene breakdown failed: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Break Into Scenes (Free Tokens)';
+  }
+});
+
+function renderVgScenes() {
+  const list = $('vg-scenes-list');
+  list.innerHTML = '';
+  vgScenes.forEach((scene, idx) => {
+    const card = document.createElement('div');
+    card.className = 'vg-scene-card';
+    card.id = 'vg-card-' + scene.id;
+    card.innerHTML = `
+      <div class="vg-scene-thumb" id="vg-thumb-${scene.id}">🖼️</div>
+      <div class="vg-scene-body">
+        <div class="vg-scene-label">Scene ${idx + 1} · Caption</div>
+        <textarea rows="2" data-field="caption" data-id="${scene.id}">${scene.caption}</textarea>
+        <div class="vg-scene-label">Image Prompt</div>
+        <textarea rows="2" data-field="imagePrompt" data-id="${scene.id}">${scene.imagePrompt}</textarea>
+        <div class="vg-scene-actions">
+          <button class="btn-sm" data-gen-img="${scene.id}">🖼️ Generate Image</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('textarea[data-field]').forEach(ta => {
+    ta.addEventListener('input', (e) => {
+      const scene = vgScenes.find(s => s.id === e.target.dataset.id);
+      if (scene) scene[e.target.dataset.field] = e.target.value;
+    });
+  });
+  list.querySelectorAll('[data-gen-img]').forEach(btn => {
+    btn.addEventListener('click', () => generateVgImage(btn.dataset.genImg));
+  });
+}
+
+function vgTargetDims() {
+  const aspect = $('vg-aspect').value;
+  const [w, h] = aspect.split(':').map(Number);
+  // Keep generation requests a reasonable size — scaled up during assembly if needed.
+  const base = 720;
+  if (w >= h) return { w: base, h: Math.round(base * h / w) };
+  return { w: Math.round(base * w / h), h: base };
+}
+
+async function generateVgImage(sceneId) {
+  const scene = vgScenes.find(s => s.id === sceneId);
+  if (!scene) return;
+  const thumb = $('vg-thumb-' + sceneId);
+  thumb.innerHTML = '<span class="status-dot loading"></span>';
+
+  try {
+    const { w, h } = vgTargetDims();
+    // Pollinations.ai — free, no signup, no API key, CORS-enabled image generation.
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(scene.imagePrompt)}?width=${w}&height=${h}&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    if (scene.imageObjUrl) URL.revokeObjectURL(scene.imageObjUrl);
+    scene.imageBlob = blob;
+    scene.imageObjUrl = URL.createObjectURL(blob);
+    thumb.innerHTML = `<img src="${scene.imageObjUrl}" alt="">`;
+  } catch (err) {
+    thumb.innerHTML = '❌';
+    showToast(`Image failed for a scene: ${err.message}`);
+  }
+}
+
+$('vg-images-btn').addEventListener('click', async () => {
+  if (!vgScenes.length) return;
+  const btn = $('vg-images-btn');
+  btn.disabled = true;
+  for (const scene of vgScenes) {
+    btn.textContent = `🖼️ Generating… (${vgScenes.indexOf(scene) + 1}/${vgScenes.length})`;
+    await generateVgImage(scene.id);
+  }
+  btn.disabled = false;
+  btn.textContent = '🖼️ Generate All Images';
+});
+
+// ── Live narration preview (Web Speech API — free, browser-native, NOT
+// embedded in the exported video; browsers don't expose speechSynthesis as
+// a capturable audio stream, so this is preview-only). ──
+$('vg-narrate-btn').addEventListener('click', () => {
+  if (vgNarrating) {
+    speechSynthesis.cancel();
+    vgNarrating = false;
+    $('vg-narrate-btn').textContent = '🔊 Preview Narration';
+    document.querySelectorAll('.vg-scene-card.narrating').forEach(el => el.classList.remove('narrating'));
+    return;
+  }
+  if (!vgScenes.length) { showToast('Break your script into scenes first'); return; }
+  if (!('speechSynthesis' in window)) { showToast('Speech preview is not supported in this browser'); return; }
+
+  vgNarrating = true;
+  $('vg-narrate-btn').textContent = '⏹️ Stop Preview';
+
+  let i = 0;
+  const speakNext = () => {
+    document.querySelectorAll('.vg-scene-card.narrating').forEach(el => el.classList.remove('narrating'));
+    if (!vgNarrating || i >= vgScenes.length) {
+      vgNarrating = false;
+      $('vg-narrate-btn').textContent = '🔊 Preview Narration';
+      return;
+    }
+    const scene = vgScenes[i];
+    $('vg-card-' + scene.id)?.classList.add('narrating');
+    const utter = new SpeechSynthesisUtterance(scene.caption);
+    utter.onend = () => { i++; speakNext(); };
+    utter.onerror = () => { i++; speakNext(); };
+    speechSynthesis.speak(utter);
+  };
+  speakNext();
+});
+
+// ── Assemble the final video: canvas-compose each scene (image + burned-in
+// caption) into a flattened JPEG, then hand off to ffmpeg.wasm (the same
+// engine used by the Shorts Clipper) for Ken Burns motion + concatenation.
+async function composeSceneCanvas(scene, targetW, targetH, showCaption) {
+  const canvas = document.createElement('canvas');
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, targetW, targetH);
+
+  if (scene.imageBlob) {
+    const bitmap = await createImageBitmap(scene.imageBlob);
+    // Cover-fit the image into the target frame
+    const scale = Math.max(targetW / bitmap.width, targetH / bitmap.height);
+    const dw = bitmap.width * scale, dh = bitmap.height * scale;
+    ctx.drawImage(bitmap, (targetW - dw) / 2, (targetH - dh) / 2, dw, dh);
+  }
+
+  if (showCaption && scene.caption) {
+    const fontSize = Math.round(targetW / 16);
+    ctx.font = `700 ${fontSize}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const maxWidth = targetW * 0.85;
+    const words = scene.caption.split(' ');
+    const lines = [];
+    let line = '';
+    words.forEach(word => {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+
+    const lineHeight = fontSize * 1.25;
+    const blockH = lines.length * lineHeight;
+    const startY = targetH - blockH - targetH * 0.08;
+
+    lines.forEach((l, idx) => {
+      const y = startY + idx * lineHeight;
+      ctx.lineWidth = fontSize * 0.18;
+      ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+      ctx.strokeText(l, targetW / 2, y);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(l, targetW / 2, y);
+    });
+  }
+
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+}
+
+$('vg-generate-btn').addEventListener('click', async () => {
+  const scenesWithImages = vgScenes.filter(s => s.imageBlob);
+  if (!scenesWithImages.length) { showToast('Generate at least one scene image first'); return; }
+
+  const aspect = $('vg-aspect').value;
+  const [arW, arH] = aspect.split(':').map(Number);
+  const targetH = 1024;
+  const targetW = Math.round(targetH * arW / arH / 2) * 2; // keep even for libx264
+  const sceneDur = parseFloat($('vg-scene-duration').value) || 4;
+  const showCaption = $('vg-captions').checked;
+
+  const progress = $('vg-progress');
+  const genBtn = $('vg-generate-btn');
+  progress.style.display = 'block';
+  genBtn.disabled = true;
+
+  const tick = setInterval(() => {}, 1000); // placeholder kept minimal; reuse clipper's ffmpeg engine below
+
+  try {
+    progress.textContent = 'Preparing scene images…';
+    const ffmpeg = await ensureFFmpegLoaded(msg => { progress.textContent = msg; });
+
+    const inputArgs = [];
+    for (let i = 0; i < scenesWithImages.length; i++) {
+      progress.textContent = `Composing scene ${i + 1}/${scenesWithImages.length}…`;
+      const blob = await composeSceneCanvas(scenesWithImages[i], targetW, targetH, showCaption);
+      const buf = new Uint8Array(await blob.arrayBuffer());
+      const fname = `scene${i}.jpg`;
+      ffmpeg.FS('writeFile', fname, buf);
+      inputArgs.push('-loop', '1', '-t', String(sceneDur), '-i', fname);
+    }
+
+    // Ken Burns (slow zoom-in) per scene, then concat all scenes together.
+    const n = scenesWithImages.length;
+    const fps = 25;
+    const framesPerScene = Math.round(sceneDur * fps);
+    let filterParts = [];
+    for (let i = 0; i < n; i++) {
+      filterParts.push(
+        `[${i}:v]scale=${targetW}:${targetH},zoompan=z='min(zoom+0.0012,1.15)':d=${framesPerScene}:s=${targetW}x${targetH}:fps=${fps},setsar=1[v${i}]`
+      );
+    }
+    const concatInputs = Array.from({ length: n }, (_, i) => `[v${i}]`).join('');
+    filterParts.push(`${concatInputs}concat=n=${n}:v=1:a=0[outv]`);
+    const filterComplex = filterParts.join(';');
+
+    progress.textContent = 'Rendering final video — this can take a minute…';
+    ffmpeg.setProgress(({ ratio }) => {
+      if (ratio > 0 && ratio <= 1) progress.textContent = `Rendering… ${Math.round(ratio * 100)}%`;
+    });
+
+    await ffmpeg.run(
+      ...inputArgs,
+      '-filter_complex', filterComplex,
+      '-map', '[outv]',
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p',
+      'vgoutput.mp4'
+    );
+
+    const data = ffmpeg.FS('readFile', 'vgoutput.mp4');
+    const outBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    const url = URL.createObjectURL(outBlob);
+
+    $('vg-output').innerHTML = `
+      <video controls style="max-width:300px;border-radius:8px;background:#000;display:block;margin-bottom:12px" src="${url}"></video>
+      <a class="btn-sm" href="${url}" download="ai-video-${aspect.replace(':', 'x')}.mp4">💾 Download .mp4</a>
+    `;
+    progress.textContent = '✓ Done! Preview and download below.';
+
+    // Clean up ffmpeg's virtual filesystem for next run
+    try {
+      for (let i = 0; i < n; i++) ffmpeg.FS('unlink', `scene${i}.jpg`);
+      ffmpeg.FS('unlink', 'vgoutput.mp4');
+    } catch {}
+  } catch (err) {
+    progress.textContent = '❌ Error: ' + (err.message || 'video assembly failed');
+    showToast('Video assembly failed — see the log below the Assemble button');
+  } finally {
+    clearInterval(tick);
+    genBtn.disabled = false;
+  }
 });
 
 // ── 5. Free Chat Handler ──
