@@ -2205,6 +2205,7 @@ function appendChatMessage(role, content, attachments) {
 // ── 7. Shorts & Reels Clipper (client-side, via ffmpeg.wasm) ──
 let ffmpegInstance = null;
 let ffmpegFetchFile = null;
+let ffmpegLoadPromise = null; // shared in-flight promise so concurrent/retry calls never race
 let clipSelectedFile = null;
 
 function loadScriptOnce(src) {
@@ -2213,25 +2214,54 @@ function loadScriptOnce(src) {
     const s = document.createElement('script');
     s.src = src;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error('Failed to load ' + src));
+    s.onerror = () => reject(new Error('Failed to load video engine script — check your connection or an ad-blocker/extension blocking cdn.jsdelivr.net'));
     document.head.appendChild(s);
   });
 }
 
 // Loaded lazily (only when the user actually converts something) since it's
 // a ~25MB WebAssembly engine — no point loading it on every page visit.
+//
+// IMPORTANT: this uses a single shared `ffmpegLoadPromise` rather than just
+// checking `if (ffmpegInstance) return ffmpegInstance`. The earlier version
+// assigned `ffmpegInstance` synchronously from createFFmpeg() *before*
+// `.load()` resolved, so a second call in flight (or a retry after a failed
+// load) could get back an instance that wasn't actually ready yet, causing
+// ffmpeg.wasm's own internal error: "ffmpeg.wasm is not ready, make sure you
+// have completed load()." This version guarantees every caller either gets
+// a fully-loaded instance or a real error, and a failed load resets cleanly
+// so the next attempt actually retries instead of reusing a broken instance.
 async function ensureFFmpegLoaded(onStatus) {
-  if (ffmpegInstance) return ffmpegInstance;
-  onStatus && onStatus('Loading video engine (first time only, ~25MB)…');
-  await loadScriptOnce('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
-  const { createFFmpeg, fetchFile } = window.FFmpeg;
-  ffmpegInstance = createFFmpeg({
-    log: false,
-    corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
-  });
-  ffmpegFetchFile = fetchFile;
-  await ffmpegInstance.load();
-  return ffmpegInstance;
+  if (ffmpegInstance && ffmpegInstance.isLoaded && ffmpegInstance.isLoaded()) {
+    return ffmpegInstance;
+  }
+  if (!ffmpegLoadPromise) {
+    ffmpegLoadPromise = (async () => {
+      onStatus && onStatus('Loading video engine (first time only, ~25MB)…');
+      await loadScriptOnce('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');
+      if (!window.FFmpeg) {
+        throw new Error('Video engine script loaded but did not initialize — try refreshing the page');
+      }
+      const { createFFmpeg, fetchFile } = window.FFmpeg;
+      const inst = createFFmpeg({
+        log: false,
+        corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+      });
+      onStatus && onStatus('Initializing video engine…');
+      await inst.load();
+      if (!inst.isLoaded()) {
+        throw new Error('Video engine failed to fully initialize');
+      }
+      ffmpegFetchFile = fetchFile;
+      ffmpegInstance = inst;
+      return inst;
+    })();
+
+    // If loading fails, clear the cached promise so the *next* click starts
+    // a fresh attempt instead of permanently re-throwing the same failure.
+    ffmpegLoadPromise.catch(() => { ffmpegLoadPromise = null; ffmpegInstance = null; });
+  }
+  return ffmpegLoadPromise;
 }
 
 $('clip-file-input').addEventListener('change', (e) => {
