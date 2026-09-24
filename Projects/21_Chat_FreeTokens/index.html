@@ -2298,7 +2298,7 @@ $('vg-generate-btn').addEventListener('click', async () => {
       const blob = await composeSceneCanvas(scenesWithImages[i], targetW, targetH, showCaption);
       const buf = new Uint8Array(await blob.arrayBuffer());
       const fname = `scene${i}.jpg`;
-      ffmpeg.FS('writeFile', fname, buf);
+      await ffmpeg.writeFile(fname, buf);
       inputArgs.push('-loop', '1', '-t', String(sceneDur), '-i', fname);
     }
 
@@ -2317,19 +2317,19 @@ $('vg-generate-btn').addEventListener('click', async () => {
     const filterComplex = filterParts.join(';');
 
     progress.textContent = 'Rendering final video — this can take a minute…';
-    ffmpeg.setProgress(({ ratio }) => {
+    ffmpeg.on('progress', ({ progress: ratio }) => {
       if (ratio > 0 && ratio <= 1) progress.textContent = `Rendering… ${Math.round(ratio * 100)}%`;
     });
 
-    await ffmpeg.run(
+    await ffmpeg.exec([
       ...inputArgs,
       '-filter_complex', filterComplex,
       '-map', '[outv]',
       '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p',
       'vgoutput.mp4'
-    );
+    ]);
 
-    const data = ffmpeg.FS('readFile', 'vgoutput.mp4');
+    const data = await ffmpeg.readFile('vgoutput.mp4');
     const outBlob = new Blob([data.buffer], { type: 'video/mp4' });
     const url = URL.createObjectURL(outBlob);
 
@@ -2341,8 +2341,8 @@ $('vg-generate-btn').addEventListener('click', async () => {
 
     // Clean up ffmpeg's virtual filesystem for next run
     try {
-      for (let i = 0; i < n; i++) ffmpeg.FS('unlink', `scene${i}.jpg`);
-      ffmpeg.FS('unlink', 'vgoutput.mp4');
+      for (let i = 0; i < n; i++) await ffmpeg.deleteFile(`scene${i}.jpg`);
+      await ffmpeg.deleteFile('vgoutput.mp4');
     } catch {}
   } catch (err) {
     progress.textContent = '❌ Error: ' + (err.message || 'video assembly failed');
@@ -2628,54 +2628,6 @@ let ffmpegFetchFile = null;
 let ffmpegLoadPromise = null; // shared in-flight promise so concurrent/retry calls never race
 let clipSelectedFile = null;
 
-function loadScriptOnce(src) {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error('Failed to load video engine script — check your connection or an ad-blocker/extension blocking cdn.jsdelivr.net'));
-    document.head.appendChild(s);
-  });
-}
-
-// Loaded lazily (only when the user actually converts something) since it's
-// a ~25MB WebAssembly engine — no point loading it on every page visit.
-//
-// IMPORTANT: this uses a single shared `ffmpegLoadPromise` rather than just
-// checking `if (ffmpegInstance) return ffmpegInstance`. The earlier version
-// assigned `ffmpegInstance` synchronously from createFFmpeg() *before*
-// `.load()` resolved, so a second call in flight (or a retry after a failed
-// load) could get back an instance that wasn't actually ready yet, causing
-// ffmpeg.wasm's own internal error: "ffmpeg.wasm is not ready, make sure you
-// have completed load()." This version guarantees every caller either gets
-// a fully-loaded instance or a real error, and a failed load resets cleanly
-// so the next attempt actually retries instead of reusing a broken instance.
-// Two known-good CDN sources for ffmpeg.wasm — jsDelivr has a fairly commonly
-// reported issue where its worker-context fetch for the core files fails with
-// a bare "Failed to fetch" (unrelated to ad-blockers/CORS misconfig on our
-// end). If the primary source fails, we retry once against unpkg before
-// giving up, since the two rarely fail at the same time.
-//
-// IMPORTANT: use @ffmpeg/core-st (single-threaded), NOT @ffmpeg/core. The
-// latter is the multi-threaded build, which requires SharedArrayBuffer —
-// which in turn requires the page to send Cross-Origin-Opener-Policy:
-// same-origin and Cross-Origin-Embedder-Policy: require-corp response
-// headers (full "cross-origin isolation"). This site doesn't send those, so
-// core (not core-st) throws "SharedArrayBuffer is not defined" and/or hangs
-// indefinitely trying to negotiate threading it can't use. core-st needs
-// none of that and works with the CSP we already have configured.
-const FFMPEG_CDN_SOURCES = [
-  {
-    script: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
-    core:   'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'
-  },
-  {
-    script: 'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
-    core:   'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'
-  }
-];
-
 function withTimeout(promise, ms, label) {
   return Promise.race([
     promise,
@@ -2685,8 +2637,47 @@ function withTimeout(promise, ms, label) {
   ]);
 }
 
+// ── ffmpeg.wasm engine loader (0.12.x API) ──
+//
+// HISTORY / WHY THIS LOOKS THE WAY IT DOES: earlier versions of this loader
+// used the older 0.11.x line (@ffmpeg/ffmpeg@0.11.6 + @ffmpeg/core-st@0.11.1)
+// with a UMD <script>-tag + window-global pattern. That combination went
+// through several rounds of hard-to-diagnose failures: CSP blocking its
+// internal blob: script/fetch calls, a version mismatch between the wrapper
+// and core producing "Cannot call unknown function proxy_main", and general
+// fragility from mixing package versions not meant to pair together.
+//
+// This now imports the current 0.12.x packages directly as real ES modules
+// from jsDelivr's/unpkg's ESM endpoints (import ... from '.../+esm' and
+// '...?module' respectively) — the same named exports (FFmpeg, fetchFile,
+// toBlobURL) used in every official bundler-based example, just fetched by
+// URL instead of via npm. This avoids ever having to guess a UMD build's
+// global variable name. Using @ffmpeg/core (NOT core-mt) keeps it
+// single-threaded — no SharedArrayBuffer / cross-origin-isolation headers
+// required, matching the CSP already configured for this site.
+//
+// API differences from the old 0.11.x code elsewhere in this file:
+//   ffmpeg.FS('writeFile', name, data)  →  ffmpeg.writeFile(name, data)
+//   ffmpeg.FS('readFile', name)         →  await ffmpeg.readFile(name)
+//   ffmpeg.FS('unlink', name)           →  await ffmpeg.deleteFile(name)
+//   ffmpeg.run(...args)                 →  await ffmpeg.exec([...args])
+//   ffmpeg.setProgress(({ratio}) => {}) →  ffmpeg.on('progress', ({progress}) => {})
+//   ffmpeg.isLoaded()                   →  ffmpeg.loaded (property, not method)
+const FFMPEG_CDN_SOURCES = [
+  {
+    ffmpegModule: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/+esm',
+    utilModule:   'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm',
+    coreBase:     'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd'
+  },
+  {
+    ffmpegModule: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15?module',
+    utilModule:   'https://unpkg.com/@ffmpeg/util@0.12.1?module',
+    coreBase:     'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd'
+  }
+];
+
 async function ensureFFmpegLoaded(onStatus) {
-  if (ffmpegInstance && ffmpegInstance.isLoaded && ffmpegInstance.isLoaded()) {
+  if (ffmpegInstance && ffmpegInstance.loaded) {
     return ffmpegInstance;
   }
   if (!ffmpegLoadPromise) {
@@ -2700,37 +2691,33 @@ async function ensureFFmpegLoaded(onStatus) {
               ? 'Loading video engine (first time only, ~25MB)…'
               : `Retrying from a backup source (attempt ${i + 1})…`
           );
-          // 30s cap on fetching the script tag itself — a stalled/blocked
-          // request otherwise hangs here with no error, forever.
-          await withTimeout(loadScriptOnce(src.script), 30000, 'Video engine script load');
-          if (!window.FFmpeg) {
-            throw new Error('Video engine script loaded but did not initialize');
-          }
-          const { createFFmpeg, fetchFile } = window.FFmpeg;
-          const inst = createFFmpeg({ log: false, corePath: src.core });
+          const [{ FFmpeg }, { fetchFile, toBlobURL }] = await withTimeout(
+            Promise.all([import(src.ffmpegModule), import(src.utilModule)]),
+            30000, 'Video engine module load'
+          );
+
+          const inst = new FFmpeg();
+
           onStatus && onStatus('Initializing video engine…');
-          // 60s cap on the core .wasm load/handshake — this is the step that
-          // was observed hanging for 400+ seconds with no progress and no
-          // error, which left the user stuck with no way to recover except
-          // reloading the page. This makes it fail fast and fall through to
-          // the backup CDN instead.
-          await withTimeout(inst.load(), 60000, 'Video engine initialization');
-          if (!inst.isLoaded()) {
-            throw new Error('Video engine failed to fully initialize');
-          }
-          ffmpegFetchFile = fetchFile;
+          const [coreURL, wasmURL] = await withTimeout(
+            Promise.all([
+              toBlobURL(`${src.coreBase}/ffmpeg-core.js`, 'text/javascript'),
+              toBlobURL(`${src.coreBase}/ffmpeg-core.wasm`, 'application/wasm')
+            ]),
+            60000, 'Video engine core fetch'
+          );
+          await withTimeout(inst.load({ coreURL, wasmURL }), 60000, 'Video engine initialization');
+          if (!inst.loaded) throw new Error('Video engine failed to fully initialize');
+
           ffmpegInstance = inst;
+          ffmpegFetchFile = fetchFile;
           return inst;
         } catch (err) {
           lastErr = err;
-          // Remove the failed script tag so a retry with a different CDN
-          // actually re-fetches instead of no-op'ing on loadScriptOnce's
-          // "already present" check.
-          document.querySelectorAll(`script[src="${src.script}"]`).forEach(el => el.remove());
         }
       }
       throw new Error(
-        (lastErr && lastErr.message ? lastErr.message : 'Failed to fetch') +
+        (lastErr && lastErr.message ? lastErr.message : 'Failed to load') +
         ' — both primary and backup video-engine sources failed after retrying. This usually means a network/DNS issue reaching cdn.jsdelivr.net and unpkg.com from your connection right now; try again in a minute or from a different network.'
       );
     })();
@@ -2808,7 +2795,7 @@ $('clip-convert-btn').addEventListener('click', async () => {
   try {
     const ffmpeg = await ensureFFmpegLoaded(msg => setPhase(msg));
 
-    ffmpeg.setProgress(({ ratio }) => {
+    ffmpeg.on('progress', ({ progress: ratio }) => {
       if (ratio > 0 && ratio <= 1) {
         if (!conversionStart) conversionStart = Date.now();
         const elapsedS = (Date.now() - conversionStart) / 1000;
@@ -2820,7 +2807,7 @@ $('clip-convert-btn').addEventListener('click', async () => {
     });
 
     setPhase('Reading video file…');
-    ffmpeg.FS('writeFile', 'input.mp4', await ffmpegFetchFile(clipSelectedFile));
+    await ffmpeg.writeFile('input.mp4', await ffmpegFetchFile(clipSelectedFile));
 
     // Build the crop+scale filter. For cropped aspect ratios we take a
     // vertical/square slice out of the source frame (anchored by the chosen
@@ -2839,7 +2826,7 @@ $('clip-convert-btn').addEventListener('click', async () => {
     }
 
     setPhase('Converting…');
-    await ffmpeg.run(
+    await ffmpeg.exec([
       '-i', 'input.mp4',
       '-ss', String(start),
       '-t', String(duration),
@@ -2847,9 +2834,9 @@ $('clip-convert-btn').addEventListener('click', async () => {
       '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
       '-c:a', 'aac', '-b:a', '128k',
       'output.mp4'
-    );
+    ]);
 
-    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const data = await ffmpeg.readFile('output.mp4');
     const blob = new Blob([data.buffer], { type: 'video/mp4' });
     const url = URL.createObjectURL(blob);
 
@@ -2862,7 +2849,7 @@ $('clip-convert-btn').addEventListener('click', async () => {
     progress.textContent = `✓ Done in ~${totalS}s! Preview and download below.`;
 
     // Free the ffmpeg virtual filesystem for the next run
-    try { ffmpeg.FS('unlink', 'input.mp4'); ffmpeg.FS('unlink', 'output.mp4'); } catch {}
+    try { await ffmpeg.deleteFile('input.mp4'); await ffmpeg.deleteFile('output.mp4'); } catch {}
   } catch (err) {
     phaseLabel = '';
     progress.textContent = '❌ Error: ' + (err.message || 'conversion failed');
