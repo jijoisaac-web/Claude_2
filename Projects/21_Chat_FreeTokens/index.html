@@ -2656,14 +2656,23 @@ function loadScriptOnce(src) {
 // a bare "Failed to fetch" (unrelated to ad-blockers/CORS misconfig on our
 // end). If the primary source fails, we retry once against unpkg before
 // giving up, since the two rarely fail at the same time.
+//
+// IMPORTANT: use @ffmpeg/core-st (single-threaded), NOT @ffmpeg/core. The
+// latter is the multi-threaded build, which requires SharedArrayBuffer —
+// which in turn requires the page to send Cross-Origin-Opener-Policy:
+// same-origin and Cross-Origin-Embedder-Policy: require-corp response
+// headers (full "cross-origin isolation"). This site doesn't send those, so
+// core (not core-st) throws "SharedArrayBuffer is not defined" and/or hangs
+// indefinitely trying to negotiate threading it can't use. core-st needs
+// none of that and works with the CSP we already have configured.
 const FFMPEG_CDN_SOURCES = [
   {
     script: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
-    core:   'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+    core:   'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.0/dist/ffmpeg-core.js'
   },
   {
     script: 'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js',
-    core:   'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+    core:   'https://unpkg.com/@ffmpeg/core-st@0.11.0/dist/ffmpeg-core.js'
   }
 ];
 
