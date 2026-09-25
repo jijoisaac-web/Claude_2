@@ -1,10 +1,1009 @@
 {
-  "generatedAt": null,
+  "generatedAt": "2026-09-25T17:11:00.000Z",
   "version": "1.0",
-  "groupId": "",
-  "groupName": "",
-  "myId": "",
-  "lastExpenseDate": null,
-  "expenseCount": 0,
-  "expenses": []
+  "source": "pdf",
+  "groupName": "Badminton Expense",
+  "myName": "",
+  "lastExpenseDate": "2026-09-30",
+  "expenseCount": 26,
+  "members": [
+    {
+      "name": "Jagath M.",
+      "balance": -223.78
+    },
+    {
+      "name": "Jijo",
+      "balance": -540.42
+    },
+    {
+      "name": "deepak s.",
+      "balance": -7.46
+    },
+    {
+      "name": "Vysakh",
+      "balance": -148.98
+    },
+    {
+      "name": "Handel Thomas",
+      "balance": -49.66
+    },
+    {
+      "name": "Ritheesh",
+      "balance": -27.09
+    },
+    {
+      "name": "Shami",
+      "balance": 38.89
+    },
+    {
+      "name": "Nishad",
+      "balance": 97.97
+    },
+    {
+      "name": "Avjot",
+      "balance": 152.4
+    },
+    {
+      "name": "Arjun S.",
+      "balance": 19.0
+    },
+    {
+      "name": "Shan",
+      "balance": 28.45
+    },
+    {
+      "name": "Sreejith Malaysia",
+      "balance": 53.2
+    },
+    {
+      "name": "Mohamed Safwan",
+      "balance": 42.06
+    },
+    {
+      "name": "Rajeev Nair",
+      "balance": 79.07
+    },
+    {
+      "name": "Rohit",
+      "balance": 124.22
+    },
+    {
+      "name": "Narendra Yadav",
+      "balance": 209.48
+    },
+    {
+      "name": "Kkarthick.ak",
+      "balance": 65.51
+    },
+    {
+      "name": "Mohan Gs",
+      "balance": 22.18
+    },
+    {
+      "name": "Deepak Kaipanchery",
+      "balance": 10.18
+    },
+    {
+      "name": "Arun S.",
+      "balance": 0
+    },
+    {
+      "name": "kk.sajin",
+      "balance": 0
+    },
+    {
+      "name": "Shibin",
+      "balance": 0
+    },
+    {
+      "name": "sujesh shivan",
+      "balance": 0
+    },
+    {
+      "name": "Bimal Mohan",
+      "balance": 0
+    },
+    {
+      "name": "Sriram Ranganathan",
+      "balance": 0
+    },
+    {
+      "name": "Retheesh Kumar",
+      "balance": 0
+    },
+    {
+      "name": "siva",
+      "balance": 0
+    },
+    {
+      "name": "Bhargav",
+      "balance": 0
+    },
+    {
+      "name": "Shehzad Badminton",
+      "balance": 0
+    },
+    {
+      "name": "Durai",
+      "balance": 0
+    },
+    {
+      "name": "Manoj Mohan",
+      "balance": 0
+    },
+    {
+      "name": "Sathish PT",
+      "balance": 0
+    },
+    {
+      "name": "Rajesh Abraham",
+      "balance": 0
+    },
+    {
+      "name": "Mohammed Safeer",
+      "balance": 0
+    },
+    {
+      "name": "Prajith",
+      "balance": 0
+    },
+    {
+      "name": "HARISH",
+      "balance": 0
+    },
+    {
+      "name": "Kodiswarann Arumugam",
+      "balance": 0
+    }
+  ],
+  "expenses": [
+    {
+      "date": "2026-09-30",
+      "desc": "Court fees 30 Sep",
+      "cost": 119.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 14.87
+        },
+        {
+          "name": "deepak s.",
+          "owed": 14.88
+        },
+        {
+          "name": "Vysakh",
+          "owed": 14.87
+        },
+        {
+          "name": "Avjot",
+          "owed": 14.87
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 14.88
+        },
+        {
+          "name": "Kkarthick.ak",
+          "owed": 14.88
+        }
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "desc": "Ritheesh paid Jijo",
+      "cost": 50.56,
+      "currency": "MYR",
+      "isPayment": true,
+      "payer": "Ritheesh",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 50.56
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "desc": "Shuttle 21 Sep /23 Sep",
+      "cost": 141.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 14.1
+        },
+        {
+          "name": "Avjot",
+          "owed": 14.1
+        },
+        {
+          "name": "Shan",
+          "owed": 14.1
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 14.1
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 14.1
+        },
+        {
+          "name": "Rohit",
+          "owed": 14.1
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 14.1
+        },
+        {
+          "name": "Kkarthick.ak",
+          "owed": 14.1
+        },
+        {
+          "name": "Sreejith Malaysia",
+          "owed": 14.1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "desc": "Court fees 23 Sep",
+      "cost": 119.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 13.23
+        },
+        {
+          "name": "Avjot",
+          "owed": 13.23
+        },
+        {
+          "name": "Shan",
+          "owed": 13.22
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 13.22
+        },
+        {
+          "name": "Rohit",
+          "owed": 13.22
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 13.22
+        },
+        {
+          "name": "Kkarthick.ak",
+          "owed": 13.22
+        },
+        {
+          "name": "Sreejith Malaysia",
+          "owed": 13.22
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "desc": "Water",
+      "cost": 9.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 1.13
+        },
+        {
+          "name": "Avjot",
+          "owed": 1.13
+        },
+        {
+          "name": "Shan",
+          "owed": 1.13
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 1.12
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 1.12
+        },
+        {
+          "name": "Kkarthick.ak",
+          "owed": 1.13
+        },
+        {
+          "name": "Sreejith Malaysia",
+          "owed": 1.12
+        }
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "desc": "Court 21sept",
+      "cost": 59.36,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 9.89
+        },
+        {
+          "name": "Rohit",
+          "owed": 9.9
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 9.89
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 9.9
+        },
+        {
+          "name": "Sreejith Malaysia",
+          "owed": 9.89
+        }
+      ]
+    },
+    {
+      "date": "2026-09-20",
+      "desc": "Shuttle,Water 20 Sep",
+      "cost": 141.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 17.63
+        },
+        {
+          "name": "Shami",
+          "owed": 17.63
+        },
+        {
+          "name": "deepak s.",
+          "owed": 17.63
+        },
+        {
+          "name": "Vysakh",
+          "owed": 17.62
+        },
+        {
+          "name": "Avjot",
+          "owed": 17.62
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 17.63
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 17.62
+        }
+      ]
+    },
+    {
+      "date": "2026-09-20",
+      "desc": "Court sentul, water",
+      "cost": 100.3,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 12.54
+        },
+        {
+          "name": "Shami",
+          "owed": 12.54
+        },
+        {
+          "name": "deepak s.",
+          "owed": 12.53
+        },
+        {
+          "name": "Vysakh",
+          "owed": 12.54
+        },
+        {
+          "name": "Avjot",
+          "owed": 12.54
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 12.53
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 12.54
+        }
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "desc": "Court 16th",
+      "cost": 101.75,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Vysakh",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 12.72
+        },
+        {
+          "name": "Jijo",
+          "owed": 12.72
+        },
+        {
+          "name": "Nishad",
+          "owed": 12.72
+        },
+        {
+          "name": "Avjot",
+          "owed": 12.72
+        },
+        {
+          "name": "Rohit",
+          "owed": 12.72
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 12.72
+        }
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "desc": "RSL Shuttle Wednesday",
+      "cost": 132.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "deepak s.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 14.67
+        },
+        {
+          "name": "Jijo",
+          "owed": 14.67
+        },
+        {
+          "name": "Vysakh",
+          "owed": 14.66
+        },
+        {
+          "name": "Nishad",
+          "owed": 14.66
+        },
+        {
+          "name": "Avjot",
+          "owed": 14.67
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 14.67
+        },
+        {
+          "name": "Rohit",
+          "owed": 14.67
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 14.67
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "desc": "Shuttle RSL",
+      "cost": 132.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "deepak s.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 14.67
+        },
+        {
+          "name": "Jijo",
+          "owed": 14.66
+        },
+        {
+          "name": "Vysakh",
+          "owed": 14.67
+        },
+        {
+          "name": "Nishad",
+          "owed": 14.67
+        },
+        {
+          "name": "Avjot",
+          "owed": 14.67
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 14.67
+        },
+        {
+          "name": "Rohit",
+          "owed": 14.66
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 14.67
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "desc": "Court",
+      "cost": 101.75,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Vysakh",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 12.72
+        },
+        {
+          "name": "Jijo",
+          "owed": 12.72
+        },
+        {
+          "name": "Nishad",
+          "owed": 12.71
+        },
+        {
+          "name": "Avjot",
+          "owed": 12.72
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 12.72
+        },
+        {
+          "name": "Rohit",
+          "owed": 12.72
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "desc": "Cash",
+      "cost": 40.0,
+      "currency": "MYR",
+      "isPayment": true,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Narendra Yadav",
+          "owed": 40.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "desc": "Jijo dinner",
+      "cost": 21.6,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 21.6
+        }
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "desc": "Water",
+      "cost": 12.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 1.33
+        },
+        {
+          "name": "deepak s.",
+          "owed": 1.33
+        },
+        {
+          "name": "Vysakh",
+          "owed": 1.33
+        },
+        {
+          "name": "Nishad",
+          "owed": 1.33
+        },
+        {
+          "name": "Avjot",
+          "owed": 1.33
+        },
+        {
+          "name": "Rajeev Nair",
+          "owed": 1.34
+        },
+        {
+          "name": "Rohit",
+          "owed": 1.34
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 1.33
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "desc": "Sep 11 Friday",
+      "cost": 25.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "deepak s.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 25.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "desc": "Water",
+      "cost": 9.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "deepak s.",
+          "owed": 1.28
+        },
+        {
+          "name": "Vysakh",
+          "owed": 1.29
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 1.28
+        },
+        {
+          "name": "Ritheesh",
+          "owed": 1.29
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 1.29
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 1.29
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "desc": "Court 9 sept",
+      "cost": 69.96,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 11.66
+        },
+        {
+          "name": "deepak s.",
+          "owed": 11.66
+        },
+        {
+          "name": "Vysakh",
+          "owed": 11.66
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 11.66
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 11.66
+        }
+      ]
+    },
+    {
+      "date": "2026-09-08",
+      "desc": "Shuttle 7/9/26",
+      "cost": 126.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "deepak s.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 21.0
+        },
+        {
+          "name": "Vysakh",
+          "owed": 21.0
+        },
+        {
+          "name": "Nishad",
+          "owed": 21.0
+        },
+        {
+          "name": "Rohit",
+          "owed": 21.0
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 21.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "desc": "Court 7sept monday",
+      "cost": 59.36,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jagath M.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jijo",
+          "owed": 9.89
+        },
+        {
+          "name": "deepak s.",
+          "owed": 9.9
+        },
+        {
+          "name": "Vysakh",
+          "owed": 9.9
+        },
+        {
+          "name": "Nishad",
+          "owed": 9.89
+        },
+        {
+          "name": "Rohit",
+          "owed": 9.89
+        },
+        {
+          "name": "Narendra Yadav",
+          "owed": 9.89
+        }
+      ]
+    },
+    {
+      "date": "2026-09-06",
+      "desc": "Court ,Water Sep 6",
+      "cost": 48.4,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 12.1
+        },
+        {
+          "name": "deepak s.",
+          "owed": 12.1
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 12.1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "desc": "Cash from safwan",
+      "cost": 50.0,
+      "currency": "MYR",
+      "isPayment": true,
+      "payer": "Mohamed Safwan",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 50.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "desc": "Court fees 2 sep",
+      "cost": 112.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "Jijo",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 10.18
+        },
+        {
+          "name": "deepak s.",
+          "owed": 10.18
+        },
+        {
+          "name": "Vysakh",
+          "owed": 10.19
+        },
+        {
+          "name": "Nishad",
+          "owed": 10.19
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 10.18
+        },
+        {
+          "name": "Ritheesh",
+          "owed": 10.18
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 10.18
+        },
+        {
+          "name": "Deepak Kaipanchery",
+          "owed": 10.18
+        },
+        {
+          "name": "Mohan Gs",
+          "owed": 10.18
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "desc": "Cash from handel bhai",
+      "cost": 100.0,
+      "currency": "MYR",
+      "isPayment": true,
+      "payer": "Handel Thomas",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 100.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "desc": "Shuttle",
+      "cost": 132.0,
+      "currency": "MYR",
+      "isPayment": false,
+      "payer": "deepak s.",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 12.0
+        },
+        {
+          "name": "Jijo",
+          "owed": 12.0
+        },
+        {
+          "name": "Vysakh",
+          "owed": 12.0
+        },
+        {
+          "name": "Nishad",
+          "owed": 12.0
+        },
+        {
+          "name": "Handel Thomas",
+          "owed": 12.0
+        },
+        {
+          "name": "Ritheesh",
+          "owed": 12.0
+        },
+        {
+          "name": "Mohamed Safwan",
+          "owed": 12.0
+        },
+        {
+          "name": "Mohan Gs",
+          "owed": 12.0
+        }
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "desc": "Nishad paid Jagath M.",
+      "cost": 37.54,
+      "currency": "MYR",
+      "isPayment": true,
+      "payer": "Nishad",
+      "myNet": 0,
+      "myOwed": 0,
+      "participants": [
+        {
+          "name": "Jagath M.",
+          "owed": 37.54
+        }
+      ]
+    }
+  ]
 }
