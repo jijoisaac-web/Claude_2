@@ -1,130 +1,53 @@
 /**
- * Splitwise Badminton Dashboard — Cloudflare Worker v2.2.0
- * FLAG: Creditors (Has Credit > flagAbove) are flagged — they are owed money by the group
+ * Splitwise Badminton Dashboard — Cloudflare Worker v3.0.0
+ * CSV-mode: reads data entirely from cache.json (no Splitwise API required)
  */
 
-const VERSION    = "2.9.11";
-const BUILD_DATE = "2026-08-01";
-const SW_BASE    = "https://secure.splitwise.com/api/v3.0";
+const VERSION    = "3.0.0";
+const BUILD_DATE = "2026-09-25";
 
-async function swFetch(path, token) {
-  const res = await fetch(`${SW_BASE}/${path}`, { headers: { Authorization: `Bearer ${token}` } });
-  return res.json();
-}
-function cleanName(u) {
-  if (!u) return "Unknown";
-  return (`${u.first_name||""} ${u.last_name||""}`).trim() || u.email || "Unknown";
-}
-async function fetchAllExpenses(token, groupId, daysBack) {
-  const after = new Date(Date.now() - daysBack*86400000).toISOString().slice(0,10)+"T00:00:00Z";
-  const all=[]; let offset=0;
-  while(true){
-    const d = await swFetch(`get_expenses?group_id=${groupId}&limit=100&offset=${offset}&dated_after=${after}`,token);
-    const b = (d.expenses||[]).filter(e=>!e.deleted_at);
-    all.push(...b); offset+=100;
-    if((d.expenses||[]).length<100) break;
-  }
-  return all;
+async function loadCache(env) {
+  const cacheUrl=(env.CACHE_URL||"").trim();
+  if(!cacheUrl) return {error:"CACHE_URL is not set in wrangler.toml."};
+  let resp;
+  try{ resp=await fetch(cacheUrl+"?cb="+Math.floor(Date.now()/300000)); }
+  catch(e){ return {error:"Failed to fetch cache: "+e.message}; }
+  if(!resp.ok) return {error:`Cache fetch failed: HTTP ${resp.status}`};
+  let c;
+  try{ c=await resp.json(); } catch(e){ return {error:"Cache JSON parse error: "+e.message}; }
+  if(!c.expenses||!Array.isArray(c.expenses)) return {error:"Cache is empty or malformed."};
+  return c;
 }
 
-// Phase 1 — fast: only 2 API calls (user + groups)
 async function getSummary(env) {
-  const token=env.SPLITWISE_TOKEN, flagAbove=parseFloat(env.FLAG_ABOVE||"50"),
-        groupName=env.GROUP_NAME||"Badminton Expense";
-  if(!token) return {error:"SPLITWISE_TOKEN not set."};
-  const meR=await swFetch("get_current_user",token);
-  if(!meR.user) return {error:`Auth failed: ${JSON.stringify(meR)}`};
-  const me=meR.user, myId=String(me.id);
-  const gR=await swFetch("get_groups",token);
-  const group=(gR.groups||[]).find(g=>g.name.toLowerCase().includes(groupName.toLowerCase()));
-  if(!group) return {error:`Group '${groupName}' not found.`};
-
-  const members=(group.members||[]).map(m=>{
-    let bal=0;
-    (m.balance||[]).forEach(b=>{ if(b.currency_code==="MYR") bal=parseFloat(b.amount||0); });
-    const isMe=String(m.id)===myId;
-    return { id:String(m.id), name:cleanName(m), balance:bal, isMe,
-             flagged: bal<0 && Math.abs(bal)>=flagAbove };
-  }).sort((a,b)=>a.balance-b.balance);
-
-  const creditors=members.filter(m=>m.balance<0), debtors=members.filter(m=>m.balance>0);
-  return { version:VERSION, buildDate:BUILD_DATE, me:cleanName(me),
-           myId, groupId:String(group.id), groupName:group.name, flagAbove,
-           totalCredit:creditors.reduce((s,m)=>s+Math.abs(m.balance),0),
-           totalDebt:debtors.reduce((s,m)=>s+m.balance,0),
-           members, generatedAt:new Date().toISOString() };
+  const flagAbove=parseFloat(env.FLAG_ABOVE||"50");
+  const c=await loadCache(env);
+  if(c.error) return c;
+  const members=(c.members||[]).map(m=>({
+    ...m,
+    isMe:!!(env.MY_NAME&&m.name.toLowerCase().includes((env.MY_NAME||"").toLowerCase())),
+    flagged:m.balance>0&&m.balance>=flagAbove
+  })).sort((a,b)=>a.balance-b.balance);
+  const owedM=members.filter(m=>m.balance<0);
+  const owesM=members.filter(m=>m.balance>0);
+  const me=members.find(m=>m.isMe);
+  return {
+    version:VERSION, buildDate:BUILD_DATE,
+    me:me?me.name:(env.MY_NAME||""),
+    myId:"", groupId:"",
+    groupName:c.groupName||(env.GROUP_NAME||"Badminton Expense"),
+    flagAbove,
+    totalCredit:owedM.reduce((s,m)=>s+Math.abs(m.balance),0),
+    totalDebt:owesM.reduce((s,m)=>s+m.balance,0),
+    members, generatedAt:c.generatedAt||new Date().toISOString(),
+    source:"csv", cacheDate:c.generatedAt||null
+  };
 }
 
-// Process raw Splitwise expense objects into dashboard format (all expenses, myOwed=0 if not part)
-function processExpenses(exps, myId) {
-  return exps.map(e=>{
-    let myPaid=0,myOwed=0,payer="";
-    const participants=[];
-    (e.users||[]).forEach(u=>{
-      const ui=u.user||{},ps=parseFloat(u.paid_share||0),os=parseFloat(u.owed_share||0);
-      if(ps>0&&!payer) payer=cleanName(ui);
-      if(String(ui.id)===myId){myPaid=ps;myOwed=os;}
-      if(os>0) participants.push({name:cleanName(ui),owed:os});
-    });
-    return { date:(e.date||"").slice(0,10), desc:e.description||"",
-             cost:parseFloat(e.cost||0), currency:e.currency_code||"",
-             isPayment:!!e.payment, payer, myNet:myPaid-myOwed, myOwed, participants };
-  }).filter(e=>e.date).sort((a,b)=>b.date.localeCompare(a.date));
-}
-
-// Phase 2 — cache-first with delta from Splitwise API
-async function getExpenses(env, groupId, myId) {
-  const token=env.SPLITWISE_TOKEN, daysBack=parseInt(env.DAYS_BACK||"1095");
-  const cacheUrl=env.CACHE_URL||"";
-
-  // ── Load cache (GitHub raw JSON) ──
-  let cachedExps=[], cacheInfo={fromCache:false,cacheDate:null,cacheCount:0};
-  if(cacheUrl){
-    try{
-      const cr=await fetch(cacheUrl+'?cb='+Math.floor(Date.now()/300000)); // 5-min CDN bust
-      if(cr.ok){
-        const c=await cr.json();
-        if(c.expenses&&Array.isArray(c.expenses)){
-          cachedExps=c.expenses;
-          cacheInfo={fromCache:true,cacheDate:c.generatedAt||null,cacheCount:c.expenses.length};
-        }
-      }
-    }catch(e){/* cache unavailable, fall through to full fetch */}
-  }
-
-  if(!token){
-    if(cachedExps.length>0) return {expenses:cachedExps,...cacheInfo,deltaCount:0};
-    return {error:"SPLITWISE_TOKEN not set."};
-  }
-
-  // ── Determine delta range (only fetch what's new since cache) ──
-  const lastCached=[...cachedExps].filter(e=>!e.isPayment).sort((a,b)=>b.date.localeCompare(a.date))[0]?.date||null;
-  let daysBackDelta=daysBack;
-  if(cacheInfo.fromCache&&lastCached){
-    const d=new Date(lastCached); d.setDate(d.getDate()-2); // 2-day overlap to catch edits
-    daysBackDelta=Math.min(Math.ceil((Date.now()-d.getTime())/86400000)+1, daysBack);
-  }
-
-  // ── Fetch delta from Splitwise ──
-  const rawExps=await fetchAllExpenses(token,groupId,daysBackDelta);
-  const deltaExps=processExpenses(rawExps,myId);
-
-  // ── Merge: keep older cache + fresh delta ──
-  let merged;
-  if(cacheInfo.fromCache&&lastCached){
-    const cutoff=new Date(lastCached); cutoff.setDate(cutoff.getDate()-2);
-    const cutStr=cutoff.toISOString().slice(0,10);
-    const older=cachedExps.filter(e=>e.date<cutStr);
-    const seen=new Set();
-    merged=[...older,...deltaExps].filter(e=>{
-      const key=e.date+'|'+e.desc+'|'+e.cost.toFixed(2);
-      if(seen.has(key)) return false; seen.add(key); return true;
-    }).sort((a,b)=>b.date.localeCompare(a.date));
-  } else {
-    merged=deltaExps;
-  }
-
-  return {expenses:merged,...cacheInfo,deltaCount:deltaExps.length};
+async function getExpenses(env) {
+  const c=await loadCache(env);
+  if(c.error) return c;
+  return {expenses:c.expenses,fromCache:true,cacheDate:c.generatedAt||null,cacheCount:c.expenses.length,deltaCount:0,source:"csv"};
 }
 
 // ── HTML ──────────────────────────────────────────────────────────────────────
@@ -382,26 +305,26 @@ function mgSection(members,cls,title,opts){
 function renderApp(d){
   D=d;
   const ts=new Date(d.generatedAt).toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});
-  // credit = member IS owed money (balance < 0); owes = member owes money (balance > 0)
-  // Normalize: |balance| < 1 → treated as 0 (rounding noise)
+  // owedM = paid for group, owed money back (balance < 0, green)
+  // highOwe/midOwe/lowOwe = owe money to the group (balance > 0, red/yellow/blue)
   const members=d.members.map(m=>({...m,balance:Math.abs(m.balance)<1?0:m.balance}));
-  const highCr  =members.filter(m=>m.balance<0&&Math.abs(m.balance)>50).sort((a,b)=>a.balance-b.balance);   // RED, highest credit first
-  const midCr   =members.filter(m=>m.balance<0&&Math.abs(m.balance)>=20&&Math.abs(m.balance)<=50).sort((a,b)=>a.balance-b.balance); // YELLOW
-  const lowCr   =members.filter(m=>m.balance<0&&Math.abs(m.balance)<20).sort((a,b)=>a.balance-b.balance);   // BLUE
-  const settledM=members.filter(m=>m.balance===0);                                                           // BLUE
-  const owesM   =members.filter(m=>m.balance>0).sort((a,b)=>b.balance-a.balance);                           // GREEN, highest owes first
+  const owedM   =members.filter(m=>m.balance<0).sort((a,b)=>a.balance-b.balance);
+  const highOwe =members.filter(m=>m.balance>0&&m.balance>50).sort((a,b)=>b.balance-a.balance);
+  const midOwe  =members.filter(m=>m.balance>0&&m.balance>=20&&m.balance<=50).sort((a,b)=>b.balance-a.balance);
+  const lowOwe  =members.filter(m=>m.balance>0&&m.balance<20).sort((a,b)=>b.balance-a.balance);
+  const settledM=members.filter(m=>m.balance===0);
 
-  const alertHtml=highCr.length>0
-    ?'<div class="alert" style="background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border-left-color:#EF5350;color:#B71C1C">🔴 <strong>'+highCr.length+' member'+(highCr.length>1?'s':'')+' are owed more than MYR 50</strong> — please pay them back!</div>'
+  const alertHtml=highOwe.length>0
+    ?'<div class="alert" style="background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border-left-color:#EF5350;color:#B71C1C">🔴 <strong>'+highOwe.length+' member'+(highOwe.length>1?'s':'')+' owe more than MYR 50</strong> — please settle up!</div>'
     :'';
 
   // 4-col: active groups side-by-side; settled alone at bottom
   const grouped=
     '<div class="mg4top">'
-      +mgSection(owesM,'gn','💸 Group Overpaid for Them')
-      +mgSection(highCr,'rd','🔴 Credit > MYR 50')
-      +mgSection(midCr,'yw','🟡 Credit 20–50')
-      +mgSection(lowCr,'bl','🔵 Credit < MYR 20')
+      +mgSection(owedM,'gn','💸 Paid for the Group')
+      +mgSection(highOwe,'rd','🔴 Owes > MYR 50')
+      +mgSection(midOwe,'yw','🟡 Owes MYR 20–50')
+      +mgSection(lowOwe,'bl','🔵 Owes < MYR 20')
     +'</div>'
     +mgSection(settledM,'bl','✅ Settled',{collapsible:true,collapsed:true});
 
@@ -429,9 +352,9 @@ function renderApp(d){
   +'</div></div>'
 
   +'<div class="cw"><div class="cards">'
-    +'<div class="card fl"><div class="lbl">🔴 Owed &gt; MYR 50</div><div class="val">'+highCr.length+'</div><div class="hint">Pay back urgently</div></div>'
-    +'<div class="card db"><div class="lbl">🟡 Owed MYR 20–50</div><div class="val">'+midCr.length+'</div><div class="hint">MYR '+d.totalCredit.toFixed(2)+' total owed</div></div>'
-    +'<div class="card ok"><div class="lbl">✅ Owes Group</div><div class="val">'+owesM.length+'</div><div class="hint">MYR '+d.totalDebt.toFixed(2)+' to collect</div></div>'
+    +'<div class="card fl"><div class="lbl">🔴 Owes &gt; MYR 50</div><div class="val">'+highOwe.length+'</div><div class="hint">Settle urgently</div></div>'
+    +'<div class="card db"><div class="lbl">🟡 Owes MYR 20–50</div><div class="val">'+midOwe.length+'</div><div class="hint">MYR '+d.totalDebt.toFixed(2)+' pending</div></div>'
+    +'<div class="card ok"><div class="lbl">💸 Paid for Group</div><div class="val">'+owedM.length+'</div><div class="hint">MYR '+d.totalCredit.toFixed(2)+' to collect</div></div>'
     +'<div class="card cr"><div class="lbl">Settled</div><div class="val">'+settledM.length+'</div><div class="hint">members</div></div>'
     +'<div class="card"><div class="lbl">Transactions</div><div class="val">'+d.expenses.length+'</div><div class="hint">3 years</div></div>'
   +'</div></div>'
@@ -819,15 +742,15 @@ function buildInsights(){
   }
 
   // ── Top owed members ──
-  const topCr=D.members.filter(m=>m.balance<0).sort((a,b)=>a.balance-b.balance).slice(0,5);
-  const maxCr=Math.abs(topCr[0]?.balance)||1;
+  const topCr=D.members.filter(m=>m.balance>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
+  const maxCr=(topCr[0]?.balance)||1;
   document.getElementById('top-cred').innerHTML=topCr.length===0
-    ?'<div class="empty">No outstanding amounts 🎉</div>'
+    ?'<div class="empty">Everyone has settled up 🎉</div>'
     :topCr.map((m,i)=>'<div class="ri">'
       +'<div class="rn">'+(i+1)+'</div>'
       +'<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+m.name+'</div>'
-      +'<div class="rbw"><div class="rbb" style="width:'+(Math.abs(m.balance)/maxCr*100).toFixed(0)+'%"></div></div></div>'
-      +'<div style="font-weight:700;color:var(--r);font-size:.85rem">MYR '+Math.abs(m.balance).toFixed(2)+'</div>'
+      +'<div class="rbw"><div class="rbb" style="width:'+(m.balance/maxCr*100).toFixed(0)+'%"></div></div></div>'
+      +'<div style="font-weight:700;color:var(--r);font-size:.85rem">MYR '+m.balance.toFixed(2)+'</div>'
       +'</div>').join('');
 
   // ── Summary stats ──
@@ -891,16 +814,16 @@ async function loadData(){
   const expTbody=document.getElementById('exp-tbody');
   if(expTbody) expTbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#aaa">⏳ Loading expense history...</td></tr>';
   try{
-    const r2=await fetch('/api/expenses?groupId='+sum.groupId+'&myId='+sum.myId);
+    const r2=await fetch('/api/expenses');
     const expData=await r2.json();
     if(!expData.error && expData.expenses){
       D.expenses=expData.expenses;
       D.expensesLoaded=true;
       // Show cache badge
       const badge=document.getElementById('cache-badge');
-      if(badge&&expData.fromCache){
+      if(badge&&expData.fromCache&&expData.cacheDate){
         const cd=new Date(expData.cacheDate).toLocaleString('en-MY',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-        badge.textContent='📦 Cache '+cd+(expData.deltaCount>0?' + '+expData.deltaCount+' new':'');
+        badge.textContent='📂 CSV export · '+cd;
         badge.style.display='inline';
       }
       // Rebuild member dropdown with all participants
@@ -937,9 +860,7 @@ export default {
     }
     if(url.pathname==="/api/expenses"){
       try{
-        const groupId=url.searchParams.get("groupId")||"";
-        const myId=url.searchParams.get("myId")||"";
-        const data=await getExpenses(env,groupId,myId);
+        const data=await getExpenses(env);
         return new Response(JSON.stringify(data),{headers:{...cors,"Content-Type":"application/json"}});
       }catch(e){
         return new Response(JSON.stringify({error:e.message}),{status:500,headers:{...cors,"Content-Type":"application/json"}});

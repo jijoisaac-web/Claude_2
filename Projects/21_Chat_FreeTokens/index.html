@@ -363,6 +363,18 @@
     .msg-content { flex: 1; min-width: 0; }
     .msg-role { font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: 600; font-family: var(--mono); }
     .msg-text { line-height: 1.65; font-size: 14px; word-break: break-word; }
+    .msg-actions {
+      display: flex; gap: 4px; margin-top: 6px; opacity: 0; transition: opacity .12s ease;
+    }
+    .msg-wrap:hover .msg-actions,
+    .msg-actions.pinned { opacity: 1; }
+    .msg-action-btn {
+      display: flex; align-items: center; gap: 4px; background: transparent; border: 1px solid transparent;
+      border-radius: 6px; padding: 3px 7px; font-size: 11px; color: var(--text-dim); cursor: pointer;
+      font-family: var(--sans);
+    }
+    .msg-action-btn:hover { background: var(--surface-card); border-color: var(--border); color: var(--text); }
+    .msg-action-btn.active { color: var(--accent); }
 
     #chat-input-area {
       padding: 14px 24px; border-top: 1px solid var(--border);
@@ -2580,6 +2592,8 @@ async function sendChat() {
   }
 }
 
+let chatMsgCounter = 0;
+
 function appendChatMessage(role, content, attachments) {
   const wrap = document.createElement('div');
   wrap.className = `msg-wrap ${role}`;
@@ -2608,11 +2622,42 @@ function appendChatMessage(role, content, attachments) {
     body.appendChild(tagRow);
   }
 
+  const msgId = 'msg_' + (chatMsgCounter++);
   const text = document.createElement('div');
   text.className = 'msg-text';
+  text.id = msgId;
   if (content) text.innerHTML = renderMarkdown(content);
 
   body.appendChild(text);
+
+  // ChatGPT/Cowork-style hover action bar — Copy, Download, and (for
+  // assistant replies) Read Aloud via the same free browser TTS used in
+  // the Video Generator's narration preview.
+  const actions = document.createElement('div');
+  actions.className = 'msg-actions';
+  actions.id = msgId + '_actions';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'msg-action-btn';
+  copyBtn.innerHTML = '📋 Copy';
+  copyBtn.addEventListener('click', () => copyChatMessage(msgId, copyBtn));
+  actions.appendChild(copyBtn);
+
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'msg-action-btn';
+  dlBtn.innerHTML = '💾 Download';
+  dlBtn.addEventListener('click', () => downloadChatMessage(msgId, role));
+  actions.appendChild(dlBtn);
+
+  if (role === 'assistant') {
+    const readBtn = document.createElement('button');
+    readBtn.className = 'msg-action-btn';
+    readBtn.innerHTML = '🔊 Read Aloud';
+    readBtn.addEventListener('click', () => toggleReadAloud(msgId, readBtn));
+    actions.appendChild(readBtn);
+  }
+
+  body.appendChild(actions);
   wrap.appendChild(av);
   wrap.appendChild(body);
 
@@ -2620,6 +2665,66 @@ function appendChatMessage(role, content, attachments) {
   container.appendChild(wrap);
   container.scrollTop = container.scrollHeight;
   return wrap;
+}
+
+function copyChatMessage(msgId, btnEl) {
+  const elem = $(msgId);
+  if (!elem) return;
+  const text = elem.innerText.trim();
+  if (!text) { showToast('Nothing to copy yet'); return; }
+  navigator.clipboard.writeText(text);
+  if (btnEl) {
+    const original = btnEl.innerHTML;
+    btnEl.innerHTML = '✓ Copied';
+    btnEl.classList.add('active');
+    setTimeout(() => { btnEl.innerHTML = original; btnEl.classList.remove('active'); }, 1500);
+  }
+  showToast('✓ Copied to clipboard!');
+}
+
+function downloadChatMessage(msgId, role) {
+  const elem = $(msgId);
+  if (!elem) return;
+  const text = elem.innerText.trim();
+  if (!text) { showToast('Nothing to download yet'); return; }
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chat-${role}-${Date.now()}.md`;
+  a.click();
+  showToast('✓ Message downloaded!');
+}
+
+// Reuses the same free, browser-native Web Speech API narration approach as
+// the AI Video Generator's "Preview Narration" — no API key, no cost.
+let activeReadAloudBtn = null;
+function toggleReadAloud(msgId, btnEl) {
+  if (!('speechSynthesis' in window)) { showToast('Read Aloud is not supported in this browser'); return; }
+
+  const isThisPlaying = activeReadAloudBtn === btnEl && speechSynthesis.speaking;
+  speechSynthesis.cancel();
+  if (activeReadAloudBtn && activeReadAloudBtn !== btnEl) {
+    activeReadAloudBtn.innerHTML = '🔊 Read Aloud';
+    activeReadAloudBtn.classList.remove('active');
+  }
+  if (isThisPlaying) {
+    btnEl.innerHTML = '🔊 Read Aloud';
+    btnEl.classList.remove('active');
+    activeReadAloudBtn = null;
+    return;
+  }
+
+  const elem = $(msgId);
+  const text = elem ? elem.innerText.trim() : '';
+  if (!text) { showToast('Nothing to read yet'); return; }
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.onend = () => { btnEl.innerHTML = '🔊 Read Aloud'; btnEl.classList.remove('active'); activeReadAloudBtn = null; };
+  utter.onerror = utter.onend;
+  btnEl.innerHTML = '⏹️ Stop';
+  btnEl.classList.add('active');
+  activeReadAloudBtn = btnEl;
+  speechSynthesis.speak(utter);
 }
 
 // ── 7. Shorts & Reels Clipper (client-side, via ffmpeg.wasm) ──
@@ -2648,13 +2753,17 @@ function withTimeout(promise, ms, label) {
 // fragility from mixing package versions not meant to pair together.
 //
 // This now imports the current 0.12.x packages directly as real ES modules
-// from jsDelivr's/unpkg's ESM endpoints (import ... from '.../+esm' and
-// '...?module' respectively) — the same named exports (FFmpeg, fetchFile,
-// toBlobURL) used in every official bundler-based example, just fetched by
-// URL instead of via npm. This avoids ever having to guess a UMD build's
-// global variable name. Using @ffmpeg/core (NOT core-mt) keeps it
-// single-threaded — no SharedArrayBuffer / cross-origin-isolation headers
-// required, matching the CSP already configured for this site.
+// from esm.sh — which correctly resolves the package.json "exports"
+// conditional map (many packages, including @ffmpeg/util, list a CJS "main"
+// with ESM only reachable via "exports"; jsDelivr's +esm / unpkg's ?module
+// auto-conversion did NOT resolve that correctly and served CJS code
+// mislabeled as ESM, causing a browser "exports is not defined" error).
+// esm.sh is purpose-built for this exact conversion and is the more
+// reliable choice here. Same named exports (FFmpeg, fetchFile, toBlobURL)
+// used in every official bundler-based example, just fetched by URL.
+// Using @ffmpeg/core (NOT core-mt) keeps it single-threaded — no
+// SharedArrayBuffer / cross-origin-isolation headers required, matching the
+// CSP already configured for this site.
 //
 // API differences from the old 0.11.x code elsewhere in this file:
 //   ffmpeg.FS('writeFile', name, data)  →  ffmpeg.writeFile(name, data)
@@ -2665,13 +2774,13 @@ function withTimeout(promise, ms, label) {
 //   ffmpeg.isLoaded()                   →  ffmpeg.loaded (property, not method)
 const FFMPEG_CDN_SOURCES = [
   {
-    ffmpegModule: 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/+esm',
-    utilModule:   'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/+esm',
+    ffmpegModule: 'https://esm.sh/@ffmpeg/ffmpeg@0.12.15',
+    utilModule:   'https://esm.sh/@ffmpeg/util@0.12.1',
     coreBase:     'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd'
   },
   {
-    ffmpegModule: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.15?module',
-    utilModule:   'https://unpkg.com/@ffmpeg/util@0.12.1?module',
+    ffmpegModule: 'https://esm.sh/@ffmpeg/ffmpeg@0.12.15?no-dts',
+    utilModule:   'https://esm.sh/@ffmpeg/util@0.12.1?no-dts',
     coreBase:     'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd'
   }
 ];
