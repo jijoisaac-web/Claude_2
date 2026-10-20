@@ -904,7 +904,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
-  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v2 (includes myOwed fix)</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v3 (myOwed fix + remembers your name)</div>
 
   <div class="card">
     <div class="drop" id="drop">
@@ -912,7 +912,7 @@ return `<!DOCTYPE html>
       <input type="file" id="fileInput" accept=".csv">
     </div>
     <label>Your name (exactly as the CSV column header shows it)</label>
-    <input type="text" id="myName" placeholder="e.g. Jijo">
+    <input type="text" id="myName" placeholder="e.g. Jijo" value="Jijo">
     <label>Group name (for display only)</label>
     <input type="text" id="groupName" value="Badminton Expense">
     <div id="parseMsg"></div>
@@ -1091,6 +1091,25 @@ function renderPreview(cache){
 
 const drop = document.getElementById('drop');
 const fileInput = document.getElementById('fileInput');
+const myNameInput = document.getElementById('myName');
+const groupNameInput = document.getElementById('groupName');
+
+// Remember "Your name" / group name across visits so a blank field can't
+// silently zero out myNet/myOwed again. Falls back silently if storage
+// is unavailable (e.g. private browsing).
+try {
+  const savedName = localStorage.getItem('sw_myName');
+  const savedGroup = localStorage.getItem('sw_groupName');
+  if (savedName) myNameInput.value = savedName;
+  if (savedGroup) groupNameInput.value = savedGroup;
+} catch(e){}
+
+myNameInput.addEventListener('change', () => {
+  try { localStorage.setItem('sw_myName', myNameInput.value.trim()); } catch(e){}
+});
+groupNameInput.addEventListener('change', () => {
+  try { localStorage.setItem('sw_groupName', groupNameInput.value.trim()); } catch(e){}
+});
 
 function handleFile(file){
   const reader = new FileReader();
