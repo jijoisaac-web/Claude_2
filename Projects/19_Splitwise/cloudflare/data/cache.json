@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-20T00:35:34.810Z",
+  "generatedAt": "2026-10-20T00:45:25.161Z",
   "version": "1.0",
   "source": "csv",
   "groupName": "Badminton Expense",
@@ -8,92 +8,48 @@
   "expenseCount": 2449,
   "members": [
     {
-      "name": "Mohamed Safwan",
-      "balance": -162.42
+      "name": "deepak surendran",
+      "balance": -374.17
     },
     {
-      "name": "Nishad",
-      "balance": -97.95
+      "name": "Jijo",
+      "balance": -296.79
     },
     {
-      "name": "Bimal Mohan",
-      "balance": -91.81
+      "name": "Jagath Malaysia",
+      "balance": -269.02
     },
     {
-      "name": "Rajeev Nair",
-      "balance": -88.79
+      "name": "Rohit",
+      "balance": -86.22
     },
     {
-      "name": "Mohd Rakin",
-      "balance": -86.37
+      "name": "Prince Nishchal N E",
+      "balance": -47.92
     },
     {
-      "name": "Durai",
-      "balance": -79.25
+      "name": "Sreejith Malaysia",
+      "balance": -18.71
     },
     {
-      "name": "Ritheesh",
-      "balance": -65.72
+      "name": "sujesh shivan",
+      "balance": -13.8
     },
     {
-      "name": "Handel Thomas",
-      "balance": -58.92
+      "name": "Vysakh",
+      "balance": -10.89
     },
     {
-      "name": "Kkarthick.ak",
-      "balance": -47.58
+      "name": "Shan",
+      "balance": -0.23
     },
     {
-      "name": "Ramesh Kandavelu",
-      "balance": -35.82
+      "name": "Avjot",
+      "balance": -0.12
     },
     {
-      "name": "Manoj Mohan",
-      "balance": -35.75
-    },
-    {
-      "name": "Mohan Gs",
-      "balance": -32.85
-    },
-    {
-      "name": "Deepak",
-      "balance": -31.04
-    },
-    {
-      "name": "Manjunath",
-      "balance": -31.03
-    },
-    {
-      "name": "Athul Asok",
-      "balance": -29.45
-    },
-    {
-      "name": "Narendra Yadav",
-      "balance": -27.78
-    },
-    {
-      "name": "HARISH",
-      "balance": -24.44
-    },
-    {
-      "name": "Prajith",
-      "balance": -23.94
-    },
-    {
-      "name": "Deepak Kaipanchery",
-      "balance": -21.32
-    },
-    {
-      "name": "Arjun S K",
-      "balance": -19
-    },
-    {
-      "name": "Shami",
-      "balance": -18.15
-    },
-    {
-      "name": "Bhargav",
-      "balance": -8.51
+      "name": "siva",
+      "balance": -0.02
     },
     {
       "name": "Rajesh Abraham",
@@ -192,48 +148,92 @@
       "balance": 0
     },
     {
-      "name": "siva",
-      "balance": 0.02
+      "name": "Bhargav",
+      "balance": 8.51
     },
     {
-      "name": "Avjot",
-      "balance": 0.12
+      "name": "Shami",
+      "balance": 18.15
     },
     {
-      "name": "Shan",
-      "balance": 0.23
+      "name": "Arjun S K",
+      "balance": 19
     },
     {
-      "name": "Vysakh",
-      "balance": 10.89
+      "name": "Deepak Kaipanchery",
+      "balance": 21.32
     },
     {
-      "name": "sujesh shivan",
-      "balance": 13.8
+      "name": "Prajith",
+      "balance": 23.94
     },
     {
-      "name": "Sreejith Malaysia",
-      "balance": 18.71
+      "name": "HARISH",
+      "balance": 24.44
     },
     {
-      "name": "Prince Nishchal N E",
-      "balance": 47.92
+      "name": "Narendra Yadav",
+      "balance": 27.78
     },
     {
-      "name": "Rohit",
-      "balance": 86.22
+      "name": "Athul Asok",
+      "balance": 29.45
     },
     {
-      "name": "Jagath Malaysia",
-      "balance": 269.02
+      "name": "Manjunath",
+      "balance": 31.03
     },
     {
-      "name": "Jijo",
-      "balance": 296.79
+      "name": "Deepak",
+      "balance": 31.04
     },
     {
-      "name": "deepak surendran",
-      "balance": 374.17
+      "name": "Mohan Gs",
+      "balance": 32.85
+    },
+    {
+      "name": "Manoj Mohan",
+      "balance": 35.75
+    },
+    {
+      "name": "Ramesh Kandavelu",
+      "balance": 35.82
+    },
+    {
+      "name": "Kkarthick.ak",
+      "balance": 47.58
+    },
+    {
+      "name": "Handel Thomas",
+      "balance": 58.92
+    },
+    {
+      "name": "Ritheesh",
+      "balance": 65.72
+    },
+    {
+      "name": "Durai",
+      "balance": 79.25
+    },
+    {
+      "name": "Mohd Rakin",
+      "balance": 86.37
+    },
+    {
+      "name": "Rajeev Nair",
+      "balance": 88.79
+    },
+    {
+      "name": "Bimal Mohan",
+      "balance": 91.81
+    },
+    {
+      "name": "Nishad",
+      "balance": 97.95
+    },
+    {
+      "name": "Mohamed Safwan",
+      "balance": 162.42
     }
   ],
   "expenses": [
