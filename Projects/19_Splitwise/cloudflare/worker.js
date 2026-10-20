@@ -904,7 +904,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
-  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v3 (myOwed fix + remembers your name)</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v4 (payment detection by description substring)</div>
 
   <div class="card">
     <div class="drop" id="drop">
@@ -1028,7 +1028,11 @@ function convert(csvText, groupName, myName){
     const perUser = {};
     memberNames.forEach((name, i) => { perUser[name] = parseAmount(row[5+i]); });
 
-    const isPayment = desc.toLowerCase() === 'payment' || category.toLowerCase() === 'payment';
+    // Match "Payment", "Payment Safwan", "Ramesh K. paid siva", etc. —
+    // not just an exact "Payment" description, since real-world entries
+    // often append a name or use "paid" phrasing.
+    const descL = desc.toLowerCase();
+    const isPayment = descL.includes('payment') || category.toLowerCase() === 'payment' || descL.includes(' paid ');
     let payer = '';
     let maxVal = -Infinity;
     for (const [n, v] of Object.entries(perUser)) if (v > maxVal){ maxVal = v; payer = n; }
