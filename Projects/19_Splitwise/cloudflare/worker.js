@@ -1037,11 +1037,21 @@ function convert(csvText, groupName, myName){
       .filter(([,v]) => v < 0)
       .map(([n,v]) => ({ name: n, owed: Math.round(-v*100)/100 }));
 
-    const myNet = myName ? Math.round((perUser[myName]||0)*100)/100 : null;
+    // Always a number (never null) — worker.js calls .toFixed() on this
+    // unconditionally, so a blank "Your name" field must still yield 0,
+    // not null, or the dashboard's Expenses tab throws and gets stuck.
+    const myNet = myName ? Math.round((perUser[myName]||0)*100)/100 : 0;
+
+    // worker.js separately needs myOwed (your SHARE of the cost, not your
+    // net). The CSV only gives net = paid - owed, so we derive owed with the
+    // standard single-payer assumption: positive net means you paid the
+    // FULL cost, so owed = cost - net; otherwise you paid 0, so owed = -net.
+    const myRaw = myName ? (perUser[myName]||0) : 0;
+    const myOwed = Math.round((myRaw > 0 ? (cost - myRaw) : -myRaw) * 100) / 100;
 
     expenses.push({
       date, desc, category, cost: Math.round(cost*100)/100, currency,
-      isPayment, payer, myNet, participants
+      isPayment, payer, myNet, myOwed, participants
     });
   }
   expenses.sort((a,b) => b.date.localeCompare(a.date));
@@ -1088,7 +1098,13 @@ function handleFile(file){
       const groupName = document.getElementById('groupName').value;
       const myName = document.getElementById('myName').value.trim();
       cacheData = convert(reader.result, groupName, myName);
-      document.getElementById('parseMsg').innerHTML = \`<div class="msg ok">✅ Parsed successfully.</div>\`;
+      let warn = '';
+      if (!myName) {
+        warn = \`<div class="msg err">⚠️ "Your name" is blank — Net/My Share will show as 0 for every row. Fill it in and re-drop the CSV if you want correct per-expense values.</div>\`;
+      } else if (!cacheData.members.some(m => m.name === myName)) {
+        warn = \`<div class="msg err">⚠️ "\${myName}" doesn't exactly match any column header in this CSV — check spelling/case. Net values will show as 0 until it matches.</div>\`;
+      }
+      document.getElementById('parseMsg').innerHTML = \`<div class="msg ok">✅ Parsed successfully.</div>\` + warn;
       renderPreview(cacheData);
     } catch(e){
       document.getElementById('parseMsg').innerHTML = \`<div class="msg err">❌ \${e.message}</div>\`;
