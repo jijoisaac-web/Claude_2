@@ -904,7 +904,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
-  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v4 (payment detection by description substring)</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v5 (repo/path/branch default + optional token memory)</div>
 
   <div class="card">
     <div class="drop" id="drop">
@@ -939,8 +939,11 @@ return `<!DOCTYPE html>
     </div>
     <label>GitHub token</label>
     <input type="password" id="ghToken" placeholder="ghp_...">
+    <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;margin-top:4px;">
+      <input type="checkbox" id="rememberToken" style="width:auto;margin:0;"> Remember token on this device (stored only in this browser's local storage, never in the page itself)
+    </label>
     <label>Repo (owner/name)</label>
-    <input type="text" id="ghRepo" placeholder="jijoisaac-web/Claude_2">
+    <input type="text" id="ghRepo" value="jijoisaac-web/Claude_2">
     <label>Path to cache.json in the repo</label>
     <input type="text" id="ghPath" value="Projects/19_Splitwise/cloudflare/data/cache.json">
     <label>Branch</label>
@@ -1114,6 +1117,36 @@ myNameInput.addEventListener('change', () => {
 groupNameInput.addEventListener('change', () => {
   try { localStorage.setItem('sw_groupName', groupNameInput.value.trim()); } catch(e){}
 });
+
+// Repo/Path/Branch are not secret, so remember them unconditionally.
+// The token is only remembered if the person explicitly opts in via the
+// checkbox, since this page is reachable at a public URL.
+const ghRepoInput = document.getElementById('ghRepo');
+const ghPathInput = document.getElementById('ghPath');
+const ghBranchInput = document.getElementById('ghBranch');
+const ghTokenInput = document.getElementById('ghToken');
+const rememberTokenCb = document.getElementById('rememberToken');
+
+try {
+  const r = localStorage.getItem('sw_ghRepo'); if (r) ghRepoInput.value = r;
+  const p = localStorage.getItem('sw_ghPath'); if (p) ghPathInput.value = p;
+  const b = localStorage.getItem('sw_ghBranch'); if (b) ghBranchInput.value = b;
+  const t = localStorage.getItem('sw_ghToken');
+  if (t) { ghTokenInput.value = t; rememberTokenCb.checked = true; }
+} catch(e){}
+
+ghRepoInput.addEventListener('change', () => { try { localStorage.setItem('sw_ghRepo', ghRepoInput.value.trim()); } catch(e){} });
+ghPathInput.addEventListener('change', () => { try { localStorage.setItem('sw_ghPath', ghPathInput.value.trim()); } catch(e){} });
+ghBranchInput.addEventListener('change', () => { try { localStorage.setItem('sw_ghBranch', ghBranchInput.value.trim()); } catch(e){} });
+
+function syncTokenStorage(){
+  try {
+    if (rememberTokenCb.checked) localStorage.setItem('sw_ghToken', ghTokenInput.value.trim());
+    else localStorage.removeItem('sw_ghToken');
+  } catch(e){}
+}
+ghTokenInput.addEventListener('change', syncTokenStorage);
+rememberTokenCb.addEventListener('change', syncTokenStorage);
 
 function handleFile(file){
   const reader = new FileReader();
