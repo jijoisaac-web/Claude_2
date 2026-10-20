@@ -844,6 +844,334 @@ loadData();
 </html>`;
 }
 
+function renderUpdateTool(){
+return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Badminton Expense — CSV → Dashboard Updater</title>
+<style>
+  :root{
+    --g:#1B6C3E; --g2:#2E9E5B; --r:#C62828; --o:#E65100; --bg:#F0F4F8;
+    --card:#ffffff; --text:#222; --muted:#777; --border:#E5E5E5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#15181c; --card:#1f2328; --text:#eee; --muted:#9aa0a6; --border:#333; }
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px 16px;}
+  .wrap{max-width:780px;margin:0 auto;}
+  h1{font-size:1.4rem;margin-bottom:4px;}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:20px;}
+  .card{background:var(--card);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+  .drop{
+    border:2px dashed var(--border);border-radius:12px;padding:36px 20px;text-align:center;
+    cursor:pointer;transition:.15s;color:var(--muted);
+  }
+  .drop.drag{border-color:var(--g);background:rgba(27,108,62,0.06);color:var(--g);}
+  .drop input{display:none;}
+  button{
+    background:var(--g);color:#fff;border:none;border-radius:8px;padding:10px 20px;
+    font-size:.92rem;font-weight:600;cursor:pointer;margin-top:10px;
+  }
+  button:hover{background:var(--g2);}
+  button:disabled{background:#999;cursor:not-allowed;}
+  button.secondary{background:#555;}
+  label{display:block;font-size:.82rem;color:var(--muted);margin:10px 0 4px;}
+  input[type=text], input[type=password]{
+    width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;
+    background:transparent;color:var(--text);font-size:.9rem;
+  }
+  .stats{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0;}
+  .stat{flex:1;min-width:120px;background:rgba(27,108,62,0.07);border-radius:10px;padding:12px 14px;}
+  .stat .lbl{font-size:.72rem;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;}
+  .stat .val{font-size:1.3rem;font-weight:800;margin-top:2px;}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:8px;}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;font-size:.76rem;text-transform:uppercase;}
+  .pos{color:var(--r);font-weight:700;}
+  .neg{color:#1565C0;font-weight:700;}
+  .zero{color:var(--muted);}
+  .msg{padding:10px 14px;border-radius:8px;font-size:.88rem;margin-top:10px;}
+  .msg.ok{background:rgba(27,108,62,0.12);color:var(--g);}
+  .msg.err{background:rgba(198,40,40,0.12);color:var(--r);}
+  .hint{font-size:.78rem;color:var(--muted);margin-top:6px;}
+  code{background:rgba(127,127,127,0.15);padding:1px 5px;border-radius:4px;font-size:.85em;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
+  <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      📄 Drop the Splitwise CSV export here, or click to choose a file
+      <input type="file" id="fileInput" accept=".csv">
+    </div>
+    <label>Your name (exactly as the CSV column header shows it)</label>
+    <input type="text" id="myName" placeholder="e.g. Jijo">
+    <label>Group name (for display only)</label>
+    <input type="text" id="groupName" value="Badminton Expense">
+    <div id="parseMsg"></div>
+  </div>
+
+  <div class="card" id="previewCard" style="display:none">
+    <h3>Preview</h3>
+    <div class="stats" id="stats"></div>
+    <table>
+      <thead><tr><th>Member</th><th style="text-align:right">Balance (MYR)</th></tr></thead>
+      <tbody id="memberRows"></tbody>
+    </table>
+    <button id="downloadBtn">⬇ Download cache.json</button>
+  </div>
+
+  <div class="card" id="githubCard" style="display:none">
+    <h3>Push to GitHub</h3>
+    <div class="hint">
+      Needs a GitHub Personal Access Token with <code>repo</code> scope (classic) or
+      <code>Contents: Read & write</code> (fine-grained), for the repo your
+      <code>wrangler.toml</code> <code>CACHE_URL</code> points to.
+      The token is kept only in this page's memory — it is never saved,
+      logged, or sent anywhere except directly to api.github.com.
+    </div>
+    <label>GitHub token</label>
+    <input type="password" id="ghToken" placeholder="ghp_...">
+    <label>Repo (owner/name)</label>
+    <input type="text" id="ghRepo" placeholder="jijoisaac-web/Claude_2">
+    <label>Path to cache.json in the repo</label>
+    <input type="text" id="ghPath" value="Projects/19_Splitwise/cloudflare/data/cache.json">
+    <label>Branch</label>
+    <input type="text" id="ghBranch" value="main">
+    <button id="pushBtn">🚀 Push cache.json to GitHub</button>
+    <div id="pushMsg"></div>
+  </div>
+</div>
+
+<script>
+let cacheData = null;
+
+function parseAmount(s){
+  if (s === undefined || s === null) return 0;
+  s = String(s).trim().replace(/,/g, '');
+  if (s === '' || s === '-') return 0;
+  const v = parseFloat(s);
+  return isNaN(v) ? 0 : v;
+}
+
+// Minimal CSV parser that handles quoted fields with commas.
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i], n = text[i+1];
+    if (inQuotes){
+      if (c === '"' && n === '"'){ field += '"'; i++; }
+      else if (c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ','){ row.push(field); field = ''; }
+      else if (c === '\\n' || c === '\\r'){
+        if (c === '\\r' && n === '\\n') i++;
+        row.push(field); field = '';
+        if (row.some(x => x.trim() !== '')) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+  }
+  if (field !== '' || row.length){ row.push(field); if (row.some(x=>x.trim()!=='')) rows.push(row); }
+  return rows;
+}
+
+function findHeaderRow(rows){
+  for (let i = 0; i < rows.length; i++){
+    if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'date') return i;
+  }
+  throw new Error("Couldn't find a header row starting with 'Date'. Is this a raw Splitwise group CSV export?");
+}
+
+function convert(csvText, groupName, myName){
+  const rows = parseCSV(csvText);
+  const headerIdx = findHeaderRow(rows);
+  const header = rows[headerIdx];
+  const dataRows = rows.slice(headerIdx + 1);
+  const memberNames = header.slice(5).map(h => h.trim());
+
+  if (dataRows.length === 0) throw new Error('No data rows found in CSV.');
+  const totalRow = dataRows[dataRows.length - 1];
+  const expenseRows = dataRows.slice(0, -1);
+
+  // Sign convention fix: Splitwise's CSV gives (paid - owed), where POSITIVE
+  // means they fronted extra money. worker.js / the dashboard expect the
+  // opposite (matching Splitwise's own balance API): NEGATIVE = paid extra
+  // (good, green), POSITIVE = owes money (flagged, red). Negate to match.
+  const balances = {};
+  memberNames.forEach((name, i) => {
+    const col = 5 + i;
+    balances[name] = Math.round(-parseAmount(totalRow[col]) * 100) / 100;
+  });
+
+  const members = memberNames.map(name => ({ name, balance: balances[name] }))
+    .sort((a,b) => a.balance - b.balance);
+
+  const expenses = [];
+  for (const row of expenseRows){
+    const date = (row[0] || '').trim();
+    if (!date) continue;
+    const desc = (row[1] || '').trim();
+    const category = (row[2] || '').trim();
+    const cost = parseAmount(row[3]);
+    const currency = (row[4] || '').trim();
+    const perUser = {};
+    memberNames.forEach((name, i) => { perUser[name] = parseAmount(row[5+i]); });
+
+    const isPayment = desc.toLowerCase() === 'payment' || category.toLowerCase() === 'payment';
+    let payer = '';
+    let maxVal = -Infinity;
+    for (const [n, v] of Object.entries(perUser)) if (v > maxVal){ maxVal = v; payer = n; }
+    if (maxVal <= 0) payer = '';
+
+    const participants = Object.entries(perUser)
+      .filter(([,v]) => v < 0)
+      .map(([n,v]) => ({ name: n, owed: Math.round(-v*100)/100 }));
+
+    const myNet = myName ? Math.round((perUser[myName]||0)*100)/100 : null;
+
+    expenses.push({
+      date, desc, category, cost: Math.round(cost*100)/100, currency,
+      isPayment, payer, myNet, participants
+    });
+  }
+  expenses.sort((a,b) => b.date.localeCompare(a.date));
+
+  const nonPaymentDates = expenses.filter(e => !e.isPayment).map(e => e.date);
+  const lastExpenseDate = nonPaymentDates[0] || (expenses[0] ? expenses[0].date : null);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    version: '1.0',
+    source: 'csv',
+    groupName: groupName || '',
+    myName: myName || '',
+    lastExpenseDate,
+    expenseCount: expenses.length,
+    members,
+    expenses
+  };
+}
+
+function renderPreview(cache){
+  document.getElementById('previewCard').style.display = 'block';
+  document.getElementById('githubCard').style.display = 'block';
+  const flagged = cache.members.filter(m => m.balance >= 50).length;
+  document.getElementById('stats').innerHTML = \`
+    <div class="stat"><div class="lbl">Members</div><div class="val">\${cache.members.length}</div></div>
+    <div class="stat"><div class="lbl">Expenses</div><div class="val">\${cache.expenseCount}</div></div>
+    <div class="stat"><div class="lbl">Last expense</div><div class="val">\${cache.lastExpenseDate || '—'}</div></div>
+    <div class="stat"><div class="lbl">Flagged (≥50)</div><div class="val">\${flagged}</div></div>
+  \`;
+  document.getElementById('memberRows').innerHTML = cache.members.map(m => {
+    const cls = m.balance > 0 ? 'pos' : (m.balance < 0 ? 'neg' : 'zero');
+    return \`<tr><td>\${m.name}</td><td style="text-align:right" class="\${cls}">\${m.balance.toFixed(2)}</td></tr>\`;
+  }).join('');
+}
+
+const drop = document.getElementById('drop');
+const fileInput = document.getElementById('fileInput');
+
+function handleFile(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const groupName = document.getElementById('groupName').value;
+      const myName = document.getElementById('myName').value.trim();
+      cacheData = convert(reader.result, groupName, myName);
+      document.getElementById('parseMsg').innerHTML = \`<div class="msg ok">✅ Parsed successfully.</div>\`;
+      renderPreview(cacheData);
+    } catch(e){
+      document.getElementById('parseMsg').innerHTML = \`<div class="msg err">❌ \${e.message}</div>\`;
+      document.getElementById('previewCard').style.display = 'none';
+      document.getElementById('githubCard').style.display = 'none';
+    }
+  };
+  reader.readAsText(file);
+}
+
+drop.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if (!cacheData) return;
+  const blob = new Blob([JSON.stringify(cacheData, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'cache.json'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('pushBtn').addEventListener('click', async () => {
+  const msgEl = document.getElementById('pushMsg');
+  if (!cacheData){ msgEl.innerHTML = \`<div class="msg err">Parse a CSV first.</div>\`; return; }
+  const token = document.getElementById('ghToken').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const path = document.getElementById('ghPath').value.trim();
+  const branch = document.getElementById('ghBranch').value.trim() || 'main';
+  if (!token || !repo || !path){
+    msgEl.innerHTML = \`<div class="msg err">Fill in token, repo, and path.</div>\`;
+    return;
+  }
+  const btn = document.getElementById('pushBtn');
+  btn.disabled = true; btn.textContent = 'Pushing…';
+  try{
+    const apiBase = \`https://api.github.com/repos/\${repo}/contents/\${encodeURIComponent(path).replace(/%2F/g,'/')}\`;
+    // Need the current file's sha to update it (if it exists)
+    let sha = undefined;
+    const getResp = await fetch(\`\${apiBase}?ref=\${encodeURIComponent(branch)}\`, {
+      headers: { Authorization: \`Bearer \${token}\`, Accept: 'application/vnd.github+json' }
+    });
+    if (getResp.ok){
+      const getData = await getResp.json();
+      sha = getData.sha;
+    } else if (getResp.status !== 404){
+      const errBody = await getResp.text();
+      throw new Error(\`Couldn't read existing file (HTTP \${getResp.status}): \${errBody.slice(0,200)}\`);
+    }
+
+    const content = JSON.stringify(cacheData, null, 2);
+    const contentB64 = btoa(unescape(encodeURIComponent(content)));
+
+    const putResp = await fetch(apiBase, {
+      method: 'PUT',
+      headers: { Authorization: \`Bearer \${token}\`, Accept: 'application/vnd.github+json' },
+      body: JSON.stringify({
+        message: \`chore: update Splitwise cache \${new Date().toISOString().slice(0,16)}\`,
+        content: contentB64,
+        branch,
+        ...(sha ? { sha } : {})
+      })
+    });
+    if (!putResp.ok){
+      const errBody = await putResp.text();
+      throw new Error(\`GitHub push failed (HTTP \${putResp.status}): \${errBody.slice(0,300)}\`);
+    }
+    msgEl.innerHTML = \`<div class="msg ok">✅ Pushed to \${repo}@\${branch}. The live dashboard will pick it up on next load (cache-busted every 5 min).</div>\`;
+  } catch(e){
+    msgEl.innerHTML = \`<div class="msg err">❌ \${e.message}</div>\`;
+  } finally {
+    btn.disabled = false; btn.textContent = '🚀 Push cache.json to GitHub';
+  }
+});
+</script>
+</body>
+</html>
+`;
+}
+
 // ── Worker entry ──────────────────────────────────────────────────────────────
 export default {
   async fetch(request,env){
@@ -868,6 +1196,8 @@ export default {
     }
     if(url.pathname==="/"||url.pathname==="/dashboard")
       return new Response(renderHTML(),{headers:{"Content-Type":"text/html;charset=UTF-8"}});
+    if(url.pathname==="/update")
+      return new Response(renderUpdateTool(),{headers:{"Content-Type":"text/html;charset=UTF-8"}});
     return new Response("Not found",{status:404});
   }
 };
