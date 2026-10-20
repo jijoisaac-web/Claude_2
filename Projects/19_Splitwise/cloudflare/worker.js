@@ -904,6 +904,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v2 (includes myOwed fix)</div>
 
   <div class="card">
     <div class="drop" id="drop">
