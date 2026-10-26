@@ -10,7 +10,7 @@ async function loadCache(env) {
   const cacheUrl=(env.CACHE_URL||"").trim();
   if(!cacheUrl) return {error:"CACHE_URL is not set in wrangler.toml."};
   let resp;
-  try{ resp=await fetch(cacheUrl+"?cb="+Math.floor(Date.now()/300000)); }
+  try{ resp=await fetch(cacheUrl+"?cb="+Math.floor(Date.now()/30000)); }
   catch(e){ return {error:"Failed to fetch cache: "+e.message}; }
   if(!resp.ok) return {error:`Cache fetch failed: HTTP ${resp.status}`};
   let c;
@@ -19,11 +19,18 @@ async function loadCache(env) {
   return c;
 }
 
+// Splitwise appends "(removed)" to a member's name once they've left the
+// group; we keep their historical expenses/payments (so past math stays
+// correct) but drop them from the roster, balance cards, and member filter.
+function isRemoved(name){
+  return /\(removed\)/i.test(name||"");
+}
+
 async function getSummary(env) {
   const flagAbove=parseFloat(env.FLAG_ABOVE||"50");
   const c=await loadCache(env);
   if(c.error) return c;
-  const members=(c.members||[]).map(m=>({
+  const members=(c.members||[]).filter(m=>!isRemoved(m.name)).map(m=>({
     ...m,
     isMe:!!(env.MY_NAME&&m.name.toLowerCase().includes((env.MY_NAME||"").toLowerCase())),
     flagged:m.balance>0&&m.balance>=flagAbove
@@ -328,11 +335,14 @@ function renderApp(d){
     +'</div>'
     +mgSection(settledM,'bl','✅ Settled',{collapsible:true,collapsed:true});
 
-  // Build member dropdown — all unique names from payers + participants
+  // Build member dropdown — all unique names from payers + participants,
+  // excluding anyone Splitwise marked "(removed)" from the group (their
+  // past transactions stay visible in the history, just not as a filter
+  // option or roster entry).
   const allNames=new Set();
   d.expenses.forEach(e=>{
-    if(e.payer) allNames.add(e.payer);
-    (e.participants||[]).forEach(p=>allNames.add(p.name));
+    if(e.payer&&!isRemoved(e.payer)) allNames.add(e.payer);
+    (e.participants||[]).forEach(p=>{ if(!isRemoved(p.name)) allNames.add(p.name); });
   });
   const payerOpts=[...allNames].sort().map(p=>'<option value="'+p+'">'+p+'</option>').join('');
 
@@ -445,10 +455,17 @@ function renderApp(d){
 // ── EXPENSES ──
 // Treat "advance"/"settled"/"settlement" entries as Payment type on the Expenses tab,
 // even when Splitwise recorded them as a regular expense.
+// Splitwise appends "(removed)" to a member's name once they've left the
+// group; their past expenses/payments stay in the history for correct
+// math, but they're dropped from member filters/dropdowns.
+function isRemovedName(name){
+  return /\(removed\)/i.test(name||"");
+}
 function isPmt(e){
   if(e.isPayment) return true;
   const d=(e.desc||'').toLowerCase();
-  return d.includes('advance')||d.includes('settled')||d.includes('settlement');
+  return d.includes('advance')||d.includes('settled')||d.includes('settlement')
+    ||/\bpaid\b/.test(d)||d.includes('cash to')||d.includes('payment');
 }
 function setF(f){
   expFilter=f;
@@ -512,14 +529,14 @@ function populateMemberOptions(){
   const sel=document.getElementById('mem-select'); if(!sel||!D) return;
   const names=new Set();
   D.expenses.forEach(e=>{
-    if(e.payer) names.add(e.payer);
-    (e.participants||[]).forEach(p=>names.add(p.name));
+    if(e.payer&&!isRemovedName(e.payer)) names.add(e.payer);
+    (e.participants||[]).forEach(p=>{ if(!isRemovedName(p.name)) names.add(p.name); });
   });
   const cur=memberSpendFilter;
   sel.innerHTML='<option value="">— Select a member —</option>'
     +[...names].sort().map(n=>'<option value="'+n+'"'+(n===cur?' selected':'')+'>'+n+'</option>').join('');
 }
-function setMemberFilter(v){ memberSpendFilter=v; renderMemberSpend(); }
+function setMemberFilter(v){ memberSpendFilter=v; buildInsights(); }
 function renderMemberSpend(){
   const empty=document.getElementById('mem-empty'), body=document.getElementById('mem-body');
   if(!empty||!body||!D) return;
@@ -621,7 +638,19 @@ function buildInsights(){
   const lbl=document.getElementById('ins-label');
   if(lbl) lbl.textContent=mo==='all'?'All months':'Month: '+new Date(mo+'-01').toLocaleString('en',{month:'long',year:'numeric'});
 
-  const expenses=D.expenses.filter(e=>!e.isPayment);
+  // When a member is selected in the filter, every chart/total on this tab
+  // scopes down to that member's own share — not just the dedicated
+  // "Member Spend" card further below. scopedAmt() returns their owed
+  // share of an expense (0 if uninvolved); when no member is selected it
+  // falls back to the full expense cost as before.
+  const scopeName=memberSpendFilter;
+  function scopedAmt(e){
+    if(!scopeName) return e.cost;
+    const p=(e.participants||[]).find(p=>p.name===scopeName);
+    return p?p.owed:0;
+  }
+  let expenses=D.expenses.filter(e=>!e.isPayment);
+  if(scopeName) expenses=expenses.filter(e=>e.payer===scopeName||(e.participants||[]).some(p=>p.name===scopeName));
   const filtered=mo==='all'?expenses:expenses.filter(e=>e.date.startsWith(mo));
 
   // ── Category pie chart (Payment/Settlement excluded) ──
@@ -629,7 +658,7 @@ function buildInsights(){
   const catBuckets={};
   filtered.forEach(e=>{
     const c=categorize(e.desc);
-    if(c!=='Payment/Settlement') catBuckets[c]=(catBuckets[c]||0)+e.cost;
+    if(c!=='Payment/Settlement') catBuckets[c]=(catBuckets[c]||0)+scopedAmt(e);
   });
   const catKeys=Object.keys(catBuckets).sort((a,b)=>catBuckets[b]-catBuckets[a]);
   const fallback=['#FB8C00','#8E24AA','#6D4C41','#7B1FA2'];
@@ -657,28 +686,33 @@ function buildInsights(){
   }
 
 
-  // ── Top payers ──
-  const payerTotals={};
-  filtered.forEach(e=>{if(e.payer) payerTotals[e.payer]=(payerTotals[e.payer]||0)+e.cost;});
-  const topPayers=Object.entries(payerTotals).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxPay=topPayers[0]?.[1]||1;
+  // ── Top payers ── (not meaningful scoped to one member — their own
+  // paid/owed/net is already shown in the Member Spend card below)
   const pl=document.getElementById('payers-list');
-  if(pl) pl.innerHTML=topPayers.length===0?'<div class="empty">No expenses</div>'
-    :topPayers.map(([name,amt],i)=>'<div class="ri">'
-      +'<div class="rn">'+(i+1)+'</div>'
-      +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>'
-      +'<div class="rbw"><div class="rbb" style="width:'+(amt/maxPay*100).toFixed(0)+'%;background:linear-gradient(90deg,#1565C0,#42A5F5)"></div></div></div>'
-      +'<div style="font-weight:700;color:var(--b);font-size:.82rem;white-space:nowrap;margin-left:6px">MYR '+amt.toFixed(2)+'</div>'
-      +'</div>').join('');
+  if(scopeName){
+    if(pl) pl.innerHTML='<div class="empty">Payer ranking is group-wide — clear the member filter above to see it, or scroll down for '+scopeName+'\\'s own paid/owed/net.</div>';
+  } else {
+    const payerTotals={};
+    filtered.forEach(e=>{if(e.payer) payerTotals[e.payer]=(payerTotals[e.payer]||0)+e.cost;});
+    const topPayers=Object.entries(payerTotals).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxPay=topPayers[0]?.[1]||1;
+    if(pl) pl.innerHTML=topPayers.length===0?'<div class="empty">No expenses</div>'
+      :topPayers.map(([name,amt],i)=>'<div class="ri">'
+        +'<div class="rn">'+(i+1)+'</div>'
+        +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>'
+        +'<div class="rbw"><div class="rbb" style="width:'+(amt/maxPay*100).toFixed(0)+'%;background:linear-gradient(90deg,#1565C0,#42A5F5)"></div></div></div>'
+        +'<div style="font-weight:700;color:var(--b);font-size:.82rem;white-space:nowrap;margin-left:6px">MYR '+amt.toFixed(2)+'</div>'
+        +'</div>').join('');
+  }
 
   // ── Monthly bar chart ──
   const buckets={};
   const now=new Date();
   if(mo==='all'){
     for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);buckets[d.toISOString().slice(0,7)]=0;}
-    expenses.forEach(e=>{if(buckets[e.date.slice(0,7)]!==undefined) buckets[e.date.slice(0,7)]+=e.cost;});
+    expenses.forEach(e=>{if(buckets[e.date.slice(0,7)]!==undefined) buckets[e.date.slice(0,7)]+=scopedAmt(e);});
   } else {
-    filtered.forEach(e=>{buckets[e.date]=(buckets[e.date]||0)+e.cost;});
+    filtered.forEach(e=>{buckets[e.date]=(buckets[e.date]||0)+scopedAmt(e);});
   }
   const bKeys=Object.keys(buckets).sort();
   const bLabels=bKeys.map(k=>mo==='all'?new Date(k+'-01').toLocaleString('en',{month:'short',year:'2-digit'}):k.slice(5));
@@ -697,7 +731,7 @@ function buildInsights(){
   const palette=['#E53935','#1E88E5','#00ACC1','#43A047'];
   const trendDS=catNames.map((cat,i)=>({
     label:cat,
-    data:last12.map(m=>expenses.filter(e=>categorize(e.desc)===cat&&e.date.startsWith(m)).reduce((s,e)=>s+e.cost,0)),
+    data:last12.map(m=>expenses.filter(e=>categorize(e.desc)===cat&&e.date.startsWith(m)).reduce((s,e)=>s+scopedAmt(e),0)),
     borderColor:palette[i],backgroundColor:palette[i]+'22',
     tension:0.4,fill:false,pointRadius:4,pointHoverRadius:6,borderWidth:2.5
   }));
@@ -712,14 +746,15 @@ function buildInsights(){
   // ── Item split by category ──
   const title=document.getElementById('items-title');
   const tbl=document.getElementById('items-table');
-  if(title) title.textContent=(mo==='all'?'All time':'Month: '+new Date(mo+'-01').toLocaleString('en',{month:'long',year:'numeric'}))+' — Expenses by Category';
+  if(title) title.textContent=(mo==='all'?'All time':'Month: '+new Date(mo+'-01').toLocaleString('en',{month:'long',year:'numeric'}))+(scopeName?' — '+scopeName+'\\'s Share by Category':' — Expenses by Category');
   if(tbl){
     const catGroup={};
     filtered.forEach(e=>{
       const cat=categorize(e.desc);
+      const amt=scopedAmt(e);
       if(!catGroup[cat]) catGroup[cat]={total:0,items:{}};
-      catGroup[cat].total+=e.cost;
-      catGroup[cat].items[e.desc]=(catGroup[cat].items[e.desc]||0)+e.cost;
+      catGroup[cat].total+=amt;
+      catGroup[cat].items[e.desc]=(catGroup[cat].items[e.desc]||0)+amt;
     });
     const cats=Object.entries(catGroup).sort((a,b)=>b[1].total-a[1].total);
     const grandTotal=cats.reduce((s,[,v])=>s+v.total,0);
@@ -741,28 +776,39 @@ function buildInsights(){
       }).join('')+'</tbody></table>';
   }
 
-  // ── Top owed members ──
-  const topCr=D.members.filter(m=>m.balance>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
-  const maxCr=(topCr[0]?.balance)||1;
-  document.getElementById('top-cred').innerHTML=topCr.length===0
-    ?'<div class="empty">Everyone has settled up 🎉</div>'
-    :topCr.map((m,i)=>'<div class="ri">'
-      +'<div class="rn">'+(i+1)+'</div>'
-      +'<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+m.name+'</div>'
-      +'<div class="rbw"><div class="rbb" style="width:'+(m.balance/maxCr*100).toFixed(0)+'%"></div></div></div>'
-      +'<div style="font-weight:700;color:var(--r);font-size:.85rem">MYR '+m.balance.toFixed(2)+'</div>'
-      +'</div>').join('');
+  // ── Top owed members ── (not meaningful scoped to one member — their
+  // own balance is already visible on the Members tab / Member Spend card)
+  const topCredEl=document.getElementById('top-cred');
+  if(scopeName){
+    const meRow=D.members.find(m=>m.name===scopeName);
+    if(topCredEl) topCredEl.innerHTML=meRow
+      ?'<div class="empty">'+scopeName+'\\'s current balance: <strong style="color:'+(meRow.balance>0?'var(--r)':'var(--g)')+'">MYR '+meRow.balance.toFixed(2)+'</strong> ('+(meRow.balance>0?'owes the group':meRow.balance<0?'is owed by the group':'settled')+'). Clear the filter above to see the full ranking.</div>'
+      :'<div class="empty">Clear the member filter above to see the full ranking.</div>';
+  } else {
+    const topCr=D.members.filter(m=>m.balance>0).sort((a,b)=>b.balance-a.balance).slice(0,5);
+    const maxCr=(topCr[0]?.balance)||1;
+    if(topCredEl) topCredEl.innerHTML=topCr.length===0
+      ?'<div class="empty">Everyone has settled up 🎉</div>'
+      :topCr.map((m,i)=>'<div class="ri">'
+        +'<div class="rn">'+(i+1)+'</div>'
+        +'<div style="flex:1"><div style="font-weight:600;font-size:.85rem">'+m.name+'</div>'
+        +'<div class="rbw"><div class="rbb" style="width:'+(m.balance/maxCr*100).toFixed(0)+'%"></div></div></div>'
+        +'<div style="font-weight:700;color:var(--r);font-size:.85rem">MYR '+m.balance.toFixed(2)+'</div>'
+        +'</div>').join('');
+  }
 
-  // ── Summary stats ──
-  const totalSpend=expenses.reduce((s,e)=>s+e.cost,0);
-  const numPay=D.expenses.filter(e=>e.isPayment).length;
-  const largest=[...expenses].sort((a,b)=>b.cost-a.cost)[0];
+  // ── Summary stats ── (scoped to the selected member's share when one is picked)
+  const totalSpend=expenses.reduce((s,e)=>s+scopedAmt(e),0);
+  const numPay=scopeName
+    ?D.expenses.filter(e=>e.isPayment&&(e.payer===scopeName||(e.participants||[]).some(p=>p.name===scopeName))).length
+    :D.expenses.filter(e=>e.isPayment).length;
+  const largest=[...expenses].sort((a,b)=>scopedAmt(b)-scopedAmt(a))[0];
   document.getElementById('stats').innerHTML=
-    '<div class="sr"><span>Total group spend (3yr)</span><span class="sv">MYR '+totalSpend.toFixed(2)+'</span></div>'
+    '<div class="sr"><span>'+(scopeName?scopeName+'\\'s total share (3yr)':'Total group spend (3yr)')+'</span><span class="sv">MYR '+totalSpend.toFixed(2)+'</span></div>'
     +'<div class="sr"><span>Avg monthly (12mo)</span><span class="sv">MYR '+(totalSpend/36).toFixed(2)+'</span></div>'
     +'<div class="sr"><span>Filtered transactions</span><span class="sv">'+filtered.length+'</span></div>'
     +'<div class="sr"><span>Payments made</span><span class="sv">'+numPay+'</span></div>'
-    +'<div class="sr"><span>Biggest single expense</span><span class="sv">MYR '+(largest?.cost||0).toFixed(2)+'</span></div>'
+    +'<div class="sr"><span>'+(scopeName?'Biggest share':'Biggest single expense')+'</span><span class="sv">MYR '+(largest?scopedAmt(largest):0).toFixed(2)+'</span></div>'
     +'<div class="sr"><span>Members settled</span><span class="sv">'+D.members.filter(m=>m.balance===0).length+'/'+D.members.length+'</span></div>';
 
   // ── Busiest months ──
@@ -829,8 +875,8 @@ async function loadData(){
       // Rebuild member dropdown with all participants
       const allN=new Set();
       D.expenses.forEach(e=>{
-        if(e.payer) allN.add(e.payer);
-        (e.participants||[]).forEach(p=>allN.add(p.name));
+        if(e.payer&&!isRemovedName(e.payer)) allN.add(e.payer);
+        (e.participants||[]).forEach(p=>{ if(!isRemovedName(p.name)) allN.add(p.name); });
       });
       const sel=document.getElementById('exp-member');
       if(sel) sel.innerHTML='<option value="">All members</option>'+[...allN].sort().map(p=>'<option value="'+p+'">'+p+'</option>').join('');
@@ -904,7 +950,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
-  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v5 (repo/path/branch default + optional token memory)</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v7 (wider payment detection: paid/cash to)</div>
 
   <div class="card">
     <div class="drop" id="drop">
@@ -1031,11 +1077,15 @@ function convert(csvText, groupName, myName){
     const perUser = {};
     memberNames.forEach((name, i) => { perUser[name] = parseAmount(row[5+i]); });
 
-    // Match "Payment", "Payment Safwan", "Ramesh K. paid siva", etc. —
-    // not just an exact "Payment" description, since real-world entries
-    // often append a name or use "paid" phrasing.
+    // Match "Payment", "Payment Safwan", "Ramesh K. paid siva",
+    // "Paid to Deepak", "Cash to Jagath", etc. — not just an exact
+    // "Payment" description, since real-world entries often append a
+    // name or use "paid"/"cash to" phrasing. \\bpaid\\b is a WORD boundary
+    // match (unlike a plain " paid " substring) so it also catches "paid"
+    // at the very start/end of the description.
     const descL = desc.toLowerCase();
-    const isPayment = descL.includes('payment') || category.toLowerCase() === 'payment' || descL.includes(' paid ');
+    const isPayment = descL.includes('payment') || category.toLowerCase() === 'payment'
+      || /\\bpaid\\b/.test(descL) || descL.includes('cash to');
     let payer = '';
     let maxVal = -Infinity;
     for (const [n, v] of Object.entries(perUser)) if (v > maxVal){ maxVal = v; payer = n; }
@@ -1232,7 +1282,7 @@ document.getElementById('pushBtn').addEventListener('click', async () => {
       const errBody = await putResp.text();
       throw new Error(\`GitHub push failed (HTTP \${putResp.status}): \${errBody.slice(0,300)}\`);
     }
-    msgEl.innerHTML = \`<div class="msg ok">✅ Pushed to \${repo}@\${branch}. The live dashboard will pick it up on next load (cache-busted every 5 min).</div>\`;
+    msgEl.innerHTML = \`<div class="msg ok">✅ Pushed to \${repo}@\${branch}. The live dashboard will pick it up within about 30 seconds.</div>\`;
   } catch(e){
     msgEl.innerHTML = \`<div class="msg err">❌ \${e.message}</div>\`;
   } finally {
