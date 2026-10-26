@@ -3,8 +3,8 @@
  * CSV-mode: reads data entirely from cache.json (no Splitwise API required)
  */
 
-const VERSION    = "3.0.0";
-const BUILD_DATE = "2026-09-25";
+const VERSION    = "3.1.0";
+const BUILD_DATE = "2026-10-26";
 
 async function loadCache(env) {
   const cacheUrl=(env.CACHE_URL||"").trim();
@@ -61,6 +61,9 @@ async function getExpenses(env) {
 function renderHTML(){
 // Pexels background — shuttlecock on green badminton court (ID 7438732)
 const bgUrl = `https://images.pexels.com/photos/7438732/pexels-photo-7438732.jpeg?auto=compress&cs=tinysrgb&w=1920&fit=max`;
+// Flat per-session rate charged to ad-hoc (non-regular) players, for the
+// Advance / Ad-hoc Tracker card in Insights.
+const ADHOC_RATE = 24;
 
 return `<!DOCTYPE html>
 <html lang="en">
@@ -441,6 +444,7 @@ function renderApp(d){
         +'<canvas id="monthly-chart" height="40"></canvas></div>'
       +'<div class="ic full"><div class="it" id="items-title">Expenses by Category</div>'
         +'<div id="items-table"></div></div>'
+      +'<div class="ic full"><div class="it">💰 Advance / Ad-hoc Tracker <span style="font-weight:500;color:#999;font-size:.75rem;text-transform:none;letter-spacing:0">(Regular = has paid an Advance before · Ad-hoc = MYR '+ADHOC_RATE.toFixed(0)+'/session)</span></div><div id="advance-tracker"></div></div>'
       +'<div class="ic"><div class="it">🔴 Owed to Members</div><div id="top-cred"></div></div>'
       +'<div class="ic"><div class="it">📈 Summary Stats</div><div id="stats"></div></div>'
       +'<div class="ic"><div class="it">💳 Top Payers</div><div id="payers-list"></div></div>'
@@ -950,7 +954,7 @@ return `<!DOCTYPE html>
 <div class="wrap">
   <h1>🏸 Badminton Expense — CSV → Dashboard Updater</h1>
   <div class="sub">Drag in the Splitwise CSV export, check the preview, then push straight to GitHub. Runs entirely in your browser — nothing is uploaded anywhere except the GitHub push you trigger yourself.</div>
-  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-20-v7 (wider payment detection: paid/cash to)</div>
+  <div class="sub" style="font-family:monospace;opacity:.6">tool build: 2026-10-26-v8 (fixes stale-SHA 409 push conflicts)</div>
 
   <div class="card">
     <div class="drop" id="drop">
@@ -1250,12 +1254,18 @@ document.getElementById('pushBtn').addEventListener('click', async () => {
   }
   const btn = document.getElementById('pushBtn');
   btn.disabled = true; btn.textContent = 'Pushing…';
-  try{
-    const apiBase = \`https://api.github.com/repos/\${repo}/contents/\${encodeURIComponent(path).replace(/%2F/g,'/')}\`;
-    // Need the current file's sha to update it (if it exists)
+  const apiBase = \`https://api.github.com/repos/\${repo}/contents/\${encodeURIComponent(path).replace(/%2F/g,'/')}\`;
+  const content = JSON.stringify(cacheData, null, 2);
+  const contentB64 = btoa(unescape(encodeURIComponent(content)));
+
+  // One attempt: fetch the current SHA fresh (never cached), then PUT.
+  // A 409 here means the SHA went stale between the GET and the PUT —
+  // rare, but possible if something else touched the file in that instant.
+  async function attemptPush(){
     let sha = undefined;
-    const getResp = await fetch(\`\${apiBase}?ref=\${encodeURIComponent(branch)}\`, {
-      headers: { Authorization: \`Bearer \${token}\`, Accept: 'application/vnd.github+json' }
+    const getResp = await fetch(\`\${apiBase}?ref=\${encodeURIComponent(branch)}&_=\${Date.now()}\`, {
+      headers: { Authorization: \`Bearer \${token}\`, Accept: 'application/vnd.github+json' },
+      cache: 'no-store'
     });
     if (getResp.ok){
       const getData = await getResp.json();
@@ -1264,10 +1274,6 @@ document.getElementById('pushBtn').addEventListener('click', async () => {
       const errBody = await getResp.text();
       throw new Error(\`Couldn't read existing file (HTTP \${getResp.status}): \${errBody.slice(0,200)}\`);
     }
-
-    const content = JSON.stringify(cacheData, null, 2);
-    const contentB64 = btoa(unescape(encodeURIComponent(content)));
-
     const putResp = await fetch(apiBase, {
       method: 'PUT',
       headers: { Authorization: \`Bearer \${token}\`, Accept: 'application/vnd.github+json' },
@@ -1278,6 +1284,16 @@ document.getElementById('pushBtn').addEventListener('click', async () => {
         ...(sha ? { sha } : {})
       })
     });
+    return putResp;
+  }
+
+  try{
+    let putResp = await attemptPush();
+    if (putResp.status === 409){
+      // SHA went stale between GET and PUT — refetch and try exactly once more.
+      await new Promise(r => setTimeout(r, 500));
+      putResp = await attemptPush();
+    }
     if (!putResp.ok){
       const errBody = await putResp.text();
       throw new Error(\`GitHub push failed (HTTP \${putResp.status}): \${errBody.slice(0,300)}\`);
