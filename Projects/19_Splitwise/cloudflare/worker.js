@@ -3,8 +3,8 @@
  * CSV-mode: reads data entirely from cache.json (no Splitwise API required)
  */
 
-const VERSION    = "3.1.0";
-const BUILD_DATE = "2026-10-26";
+const VERSION    = "3.2.3";
+const BUILD_DATE = "2026-10-30";
 
 async function loadCache(env) {
   const cacheUrl=(env.CACHE_URL||"").trim();
@@ -61,9 +61,6 @@ async function getExpenses(env) {
 function renderHTML(){
 // Pexels background — shuttlecock on green badminton court (ID 7438732)
 const bgUrl = `https://images.pexels.com/photos/7438732/pexels-photo-7438732.jpeg?auto=compress&cs=tinysrgb&w=1920&fit=max`;
-// Flat per-session rate charged to ad-hoc (non-regular) players, for the
-// Advance / Ad-hoc Tracker card in Insights.
-const ADHOC_RATE = 24;
 
 return `<!DOCTYPE html>
 <html lang="en">
@@ -157,9 +154,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
 .mgra{font-weight:800;font-size:.83rem;text-align:right;white-space:nowrap;}
 .mgra.rd{color:#C62828}.mgra.yw{color:#F57F17}.mgra.bl{color:#1565C0}.mgra.gn{color:#1B6C3E}
 .me-tag{font-size:.6rem;background:rgba(27,108,62,.15);color:#1B6C3E;padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px;vertical-align:middle;}
-/* 4-col top: active groups side-by-side; settled full-width below */
-.mg4top{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
-.mg4top>.mgg{margin-bottom:0;}
+/* 6-col top: active groups side-by-side; settled full-width below */
+.mg5top{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px;}
+.mg5top>.mgg{margin-bottom:0;}
 
 /* EXPENSE BAR */
 .ebar{padding:12px 20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
@@ -226,7 +223,10 @@ tr:hover td{background:#FAFBFC;}
 .foot{text-align:center;padding:16px;color:#aaa;font-size:.72rem;margin:0 32px 20px;
   background:rgba(255,255,255,.7);border-radius:10px;backdrop-filter:blur(4px);}
 @media(max-width:1100px){
-  .mg4top{grid-template-columns:1fr 1fr;}
+  .mg5top{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:900px){
+  .mg5top{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:700px){
   .hero{padding:20px 18px 60px;}.hero h1{font-size:1.5rem;}
@@ -252,7 +252,7 @@ tr:hover td{background:#FAFBFC;}
   .mem-charts{grid-template-columns:1fr;gap:12px;}
 }
 @media(max-width:420px){
-  .mg4top{grid-template-columns:1fr;}
+  .mg5top{grid-template-columns:1fr;}
   .mggtot{font-size:.60rem;}
   .tab{padding:6px 9px;font-size:.75rem;}
   th,td{padding:5px 6px;font-size:.70rem;}
@@ -264,6 +264,12 @@ tr:hover td{background:#FAFBFC;}
 <div id="app"><div class="loading">⏳ Loading Badminton data...</div></div>
 <script>
 let D=null, chartMonthly=null, chartType=null, chartTrend=null, chartCat=null, chartPayers=null, chartMemberCat=null, expFilter='2y', insMonthFilter='all', memberSpendFilter='';
+// Flat per-session rate charged to ad-hoc (non-regular) players, for the
+// Advance / Ad-hoc Tracker card in Insights. This MUST live here, inside
+// the client-side script, not in the Worker's own server-side scope —
+// renderHTML() returns one giant template literal, so anything referenced
+// in the HTML/JS text below is evaluated by the BROWSER, not the Worker.
+const ADHOC_RATE=24;
 
 const twoYearsAgo=()=>{const d=new Date();d.setFullYear(d.getFullYear()-2);return d.toISOString().slice(0,10);};
 
@@ -319,6 +325,10 @@ function renderApp(d){
   // highOwe/midOwe/lowOwe = owe money to the group (balance > 0, red/yellow/blue)
   const members=d.members.map(m=>({...m,balance:Math.abs(m.balance)<1?0:m.balance}));
   const owedM   =members.filter(m=>m.balance<0).sort((a,b)=>a.balance-b.balance);
+  // "Paid for the Group" split into 2 tiers by magnitude: under MYR 40
+  // (small buffer — nudge them to top up) vs MYR 40+ (healthy balance).
+  const paidHigh=owedM.filter(m=>Math.abs(m.balance)>=40);
+  const paidLow =owedM.filter(m=>Math.abs(m.balance)<40);
   const highOwe =members.filter(m=>m.balance>0&&m.balance>50).sort((a,b)=>b.balance-a.balance);
   const midOwe  =members.filter(m=>m.balance>0&&m.balance>=20&&m.balance<=50).sort((a,b)=>b.balance-a.balance);
   const lowOwe  =members.filter(m=>m.balance>0&&m.balance<20).sort((a,b)=>b.balance-a.balance);
@@ -328,10 +338,11 @@ function renderApp(d){
     ?'<div class="alert" style="background:linear-gradient(135deg,#FFEBEE,#FFCDD2);border-left-color:#EF5350;color:#B71C1C">🔴 <strong>'+highOwe.length+' member'+(highOwe.length>1?'s':'')+' owe more than MYR 50</strong> — please settle up!</div>'
     :'';
 
-  // 4-col: active groups side-by-side; settled alone at bottom
+  // 6-col: active groups side-by-side; settled alone at bottom
   const grouped=
-    '<div class="mg4top">'
-      +mgSection(owedM,'gn','💸 Paid for the Group')
+    '<div class="mg5top">'
+      +mgSection(paidHigh,'gn','💚 Paid for the Group (Advance) (≥ MYR 40)')
+      +mgSection(paidLow,'gn','🟡 Please top up your advance (&lt; MYR 40)')
       +mgSection(highOwe,'rd','🔴 Owes > MYR 50')
       +mgSection(midOwe,'yw','🟡 Owes MYR 20–50')
       +mgSection(lowOwe,'bl','🔵 Owes < MYR 20')

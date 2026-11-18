@@ -1,0 +1,14 @@
+{
+  "_comment": "Copy to trader/config.json and edit. Delete keys you do not want to change.",
+  "capital": 100000,
+  "max_loss_per_trade": 500,
+  "daily_loss_limit": 1500,
+  "max_trades_per_day": 3,
+  "max_position_pct": 50,
+  "intraday_leverage": 1,
+  "product": "MIS",
+  "entry_latest": "11:00",
+  "flat_by": "15:10",
+  "holidays": [],
+  "paper": true
+}
